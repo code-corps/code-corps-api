@@ -1,4 +1,6 @@
-# CodeCorps
+# Code Corps Phoenix API
+
+![Code Corps Phoenix Logo](https://d3pgew4wbk2vb1.cloudfront.net/images/github/code-corps-phoenix.png)
 
 To start your Phoenix app:
 
