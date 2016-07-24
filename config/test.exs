@@ -14,6 +14,10 @@ config :code_corps, CodeCorps.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: "postgres",
   password: "postgres",
-  database: "code_corps_test",
+  database: "code_corps_phoenix_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
+
+# speed up password hashing
+config :comeonin, :bcrypt_log_rounds, 4
+config :comeonin, :pbkdf2_rounds, 1

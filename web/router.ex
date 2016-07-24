@@ -10,13 +10,19 @@ defmodule CodeCorps.Router do
   end
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug :accepts, ["json-api"]
   end
 
   scope "/", CodeCorps do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
+  end
+
+  scope "/", CodeCorps, host: "api." do
+    pipe_through :api
+
+    resources "/users", UserController, except: [:new, :edit]
   end
 
   # Other scopes may use custom stacks.
