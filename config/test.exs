@@ -12,8 +12,8 @@ config :logger, level: :warn
 # Configure your database
 config :code_corps, CodeCorps.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
+  username: System.get_env("DATABASE_POSTGRESQL_USERNAME") || "postgres",
+  password: System.get_env("DATABASE_POSTGRESQL_PASSWORD") || "postgres",
   database: "code_corps_phoenix_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
