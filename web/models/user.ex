@@ -17,6 +17,7 @@ defmodule CodeCorps.User do
     struct
     |> cast(params, [:email, :username])
     |> validate_required([:email, :username])
+    |> validate_length(:username, min: 1, max: 39)
   end
 
   @doc """
