@@ -2,6 +2,8 @@
 
 ![Code Corps Phoenix Logo](https://d3pgew4wbk2vb1.cloudfront.net/images/github/code-corps-phoenix.png)
 
+[![Build Status](https://semaphoreci.com/api/v1/joshsmith/code-corps-phoenix/branches/add-users-endpoint/badge.svg)](https://semaphoreci.com/joshsmith/code-corps-phoenix)
+
 To start your Phoenix app:
 
   * Install dependencies with `mix deps.get`
