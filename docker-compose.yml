@@ -13,16 +13,9 @@ services:
     expose:
       - "9200"
 
-  proxy:
-    image: jwilder/nginx-proxy:latest
-    ports:
-      - 80:80
-    volumes:
-      - "/var/run/docker.sock:/tmp/docker.sock"
-
   web: &api_base
     build: .
-    command: mix phoenix.server
+    command: bash -c "mix do ecto.create, ecto.migrate, phoenix.server"
     depends_on:
       - postgres
       - elasticsearch
@@ -31,12 +24,11 @@ services:
       PORT: 4000
       DATABASE_POSTGRESQL_HOST: postgres
       DATABASE_POSTGRESQL_USERNAME: postgres
-      VIRTUAL_HOST: lvh.me,api.lvh.me
     links:
       - postgres
       - elasticsearch
     ports:
-      - 4001:4000
+      - 49235:4000
     volumes:
       - .:/code-corps-api
 
@@ -48,7 +40,7 @@ services:
       MIX_ENV: test
       PORT: 4001
     ports:
-      - 4002:4001
+      - 49236:4001
 
   apiary:
     image: apiaryio/client
