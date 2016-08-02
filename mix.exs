@@ -42,6 +42,8 @@ defmodule CodeCorps.Mixfile do
       {:ja_serializer, "~> 0.10"}, # JSON API
       {:guardian, "~> 0.12.0"}, # Authentication (JWT)
       {:comeonin, "~> 2.0"},
+      {:mix_test_watch, "~> 0.2", only: :dev}, # Test watcher
+      {:credo, "~> 0.4", only: [:dev, :test]}, # Code style suggestions
     ]
   end
 
