@@ -1,0 +1,1985 @@
+FORMAT: 1A
+HOST: https://api.codecorps.org
+
+# API Reference
+
+The Code Corps API is a [JSON API](https://github.com/code-corps/code-corps-api)-based REST API built on Rails. You can visit the [API project on GitHub](https://github.com/code-corps/code-corps-api).
+
+This document outlines how to interact with the API's resource-oriented URLs. JSON API errors returned by the API are also documented along with their HTTP status codes.
+
+This API is intended for direct consumption by the Code Corps Ember application.
+
+The production API can be found at `https://api.codecorps.org`.
+
+The staging API can be found at `https://api.pbqrpbecf.org`.
+
+The remote development API can be found at `https://api.pbqrpbecf-qri.org`.
+
+# Authentication
+
+When using the API's authenticated endpoints you can authenticate users by exchanging the `username` (email address) and `password` for an OAuth token.
+
+## OAuth Token Exchange [/oauth/token]
+
+Exchange email and password for `access_token`.
+
+### Exchange email and password for token [POST]
+
++ Parameters
+
+    + grant_type: `password` (string, required)
+    + username: `me@testuser.org` (string, required) - The user's email address.
+    + password: `password` (string, required)
+
++ Request
+
+    + Headers
+
+            Content-Type: application/vnd.api+json
+
++ Response 200 (application/json)
+
+    + Attributes (OAuth Valid Response)
+
++ Response 401 (application/json)
+
+    + Attributes (OAuth Invalid Response)
+
+# Group Categories
+
+## Categories [/categories]
+
+### Create a category [POST]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 201 (application/vnd.api+json)
+
+    + Attributes (Category Response)
+
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Unprocessable Entity Response)
+
+### List all categories [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Categories Response)
+
+## Category [/categories/{id}]
+
+### Retrieve a category [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Category Response)
+
++ Response 404 (application/vnd.api+json)
+
+    + Attributes (Record Not Found Response)
+
+### Update a category [PATCH]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
+
++ Response 204 (application/vnd.api+json)
+
+    + Attributes (No Content Response)
+
++ Response 404 (application/vnd.api+json)
+
+    + Attributes (Record Not Found Response)
+
++ Response 409 (application/vnd.api+json)
+
+    + Attributes (Creation Conflict Response)
+
+# Group Comment Images
+
+## Comment Image [/comment_images]
+
+### Create a Comment Image [POST]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 201 (application/vnd.api+json)
+
+    + Attributes (Comment Image Response)
+
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Unprocessable Entity Response)
+
+# Group Comment User Mentions
+
+A comment may contain a number of comment user mentions. For example, let's imagine a user were to comment:
+
+> Looks good to merge, @test!
+
+The comment user mention inside the body of this comment string would return the user's `username` which is `test`, along with `indices`, an array of positions indicating the start and end characters for the user's original username inside the string.
+
+When fetching mentions, you are expected to replace the old `username` in the string with the current `username` using the provided `indices`.
+
+Since a user's username may change over time, we don't want to always update the user's previous comments. Instead, we keep track of the location of the `username` inside the string. This allows us to update the text dynamically, and return a dynamic `username` that reflects the current value.
+
+In the example above, the `indices` returned would be `[21, 26]`, corresponding to their location in the string. If the `username` were to change to `testuser` after the comment was created, the `indices` would remain the same, but the `username` returned would be the new value of `testuser`. Many languages allow some form of `slice` that lets you use these indices to replace the substring dynamically.
+
+## Comment User mentions [/comment_user_mentions]
+
+### List all comment user mentions [GET]
+
++ Parameters
+
+    + comment_id: `1` (string)
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Comment User Mentions Response)
+
+# Group Comments
+
+## Comments [/comments]
+
+### Filter comments by list of ids [GET /comments{?filter[id]}]
+
++ Parameters
+
+    + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
+
+        Technically, the parameter is `filter: { id: '1,2,3' }`, which ends up being serialized into `filter[id]`. However, synthax constraints to not allow us to define it in the documentation this way.
+
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Comments Response)
+
+## List comments for a specified post [GET /posts/{number}/comments]
+
++ Parameters
+
+    + number: 1 (number, required) - Post number, uniquely identifying a post
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Comments Response)
+
+### Create a comment [POST]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
+    + Attributes (Comment Create Request)
+
++ Response 201 (application/vnd.api+json)
+
+    + Attributes (Comment Response)
+
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Unprocessable Entity Response)
+
+## Comment [/comments/{id}]
+
++ Parameters
+
+    + id (number) - Id of a comment.
+
+### Update a comment [PATCH]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
+    + Attributes (Comment Update Request)
+
++ Response 201 (application/vnd.api+json)
+
+    + Attributes (Comment Response)
+
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Unprocessable Entity Response)
+
+# Group Organization Memberships
+
+## Organization Memberships [/organization_memberships]
+
+### Filter organization memberships by id [GET]
+
++ Parameters
+
+    + filter
+        + id: `1,2,...` (string, required) - Comma separated string of `ids` to filter by.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Organization Memberships Response)
+
+### Create an organization membership [POST]
+
++ Request
+
+    + Attributes (Organization Membership Create Request)
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 201 (application/vnd.api+json)
+
+    + Attributes (Organization Membership Response)
+
++ Response 401 (application/json)
+
+    + Attributes (OAuth Invalid Response)
+
++ Response 403 (application/json)
+
+    + Attributes (Forbidden Response)
+
+### List all organization memberships for an organization [GET /organizations/:id/memberships]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Organization Memberships Response)
+
+## Organization Membership [/organization_memberships/:id]
+
+### Retrieve an organization membership [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Organization Membership Response)
+
+### Update an organization membership [PATCH]
+
++ Request
+
+    + Attributes (Organization Membership Update Request)
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 201 (application/vnd.api+json)
+
+    + Attributes (Organization Membership Response)
+
++ Response 401 (application/json)
+
+    + Attributes (OAuth Invalid Response)
+
++ Response 403 (application/json)
+
+    + Attributes (Forbidden Response)
+
+### Destroy an organization membership [DELETE]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 204 (application/vnd.api+json)
+
+    + Attributes (No Content Response)
+
++ Response 401 (application/json)
+
+    + Attributes (OAuth Invalid Response)
+
++ Response 403 (application/json)
+
+    + Attributes (Forbidden Response)
+
++ Response 404 (application/vnd.api+json)
+
+    + Attributes (Record Not Found Response)
+
+# Group Organizations
+
+This endpoint retrieves organzations that are signed up with Code Corp looking for contributors.
+
+Write privileges are for admin users only, read can be accessable by any user.
+
+## Organizations [/organizations{?filter}]
+
+### Filter organizations by id [GET]
+
++ Parameters
+
+    + filter: `1` (enum[number], required) - Array of Ids query to filter organizations
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Organizations Response)
+
++ Response 400 (application/vnd.api+json)
+
+    + Attributes (Filter Missing Response)
+
+### Create an organization [POST]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer <access_token>
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Organization Response)
+
++ Response 401 (application/json)
+
+    + Attributes (OAuth Invalid Response)
+
++ Response 403 (application/json)
+
+    + Attributes (Forbidden Response)
+
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Unprocessable Entity Response)
+
+## Organization [/organizations/{id}]
+
+### Retrieve an organization [GET]
+
++ Parameters
+
+    + id (number) - Id of an organization.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Organization Response)
+
++ Response 404 (application/vnd.api+json)
+
+    + Attributes (Record Not Found Response)
+
+### Update an organization [PATCH]
+
++ Parameters
+
+    + id (number) - Id of an organization.
+
++ Request (application/vnd.api+json)
+
+    + Attributes (Organization Resource)
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Organization Response)
+
++ Response 401 (application/vnd.api+json)
+
+    + Attributes (OAuth Invalid Response)
+
++ Response 403 (application/vnd.api+json)
+
+    + Attributes (Forbidden Response)
+
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Unprocessable Entity Response)
+
+# Group Ping
+
+# Group Post Images
+
+# Group Post User Mentions
+
+# Group Posts
+
+## Posts [/posts]
+
+### Create a post [POST]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 201 (application/vnd.api+json)
+
+    + Attributes (Post Response)
+
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Unprocessable Entity Response)
+
+### List all posts [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Posts Response)
+
+## Post [/posts/{id}]
+
+### Retrieve a post [GET /posts/{id}]
+
++ Parameters
+
+    + id (number) - Id of a post.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Post Response)
+
++ Response 404 (application/vnd.api+json)
+
+    + Attributes (Record Not Found Response)
+
+### Update a post [PATCH /posts/{id}]
+
++ Parameters
+
+    + id (number) - Id of a post.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 201 (application/vnd.api+json)
+
+    + Attributes (Post Response)
+
++ Response 204 (application/vnd.api+json)
+
+    + Attributes (No Content Response)
+
++ Response 404 (application/vnd.api+json)
+
+    + Attributes (Record Not Found Response)
+
++ Response 409 (application/vnd.api+json)
+
+    + Attributes (Creation Conflict Response)
+
+# Group Preview User Mentions
+
+# Group Previews
+
+## Preview [/previews]
+
+### Create a preview [POST]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 201 (application/vnd.api+json)
+
+    + Attributes (Preview Response)
+
++ Response 401 (application/json)
+
+    + Attributes (OAuth Invalid Response)
+
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Unprocessable Entity Response)
+
+# Group Project Categories
+
+## Project Categories [/project_categories]
+
+### Create a project category [POST]
+
++ Request
+
+    + Attributes (Project Category Create Request)
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 201 (application/vnd.api+json)
+
+    + Attributes (Project Category Response)
+
++ Response 401 (application/json)
+
+    + Attributes (OAuth Invalid Response)
+
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Unprocessable Entity Response)
+
+## Project Category [/project_categories/:id]
+
+### Delete a project category [DELETE]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 204 (application/vnd.api+json)
+
+    + Attributes (No Content Response)
+
++ Response 401 (application/json)
+
+    + Attributes (OAuth Invalid Response)
+
++ Response 403 (application/json)
+
+    + Attributes (Forbidden Response)
+
+# Group Project Roles
+
+# Group Projects
+
+## Projects [/projects]
+
+### List all projects [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Projects Response)
+
+### Retrieve a project [GET /projects/:id]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Project Response)
+
+### Retrieve all projects for organization specified by slug [GET /:slug/projects]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Projects Response)
+
+### Retrieve a project by slug [GET /:slug/:project_slug]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Project Response)
+
+### Create a project [POST]
+
++ Request
+
+    + Attributes (Project Create Request)
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Project Response)
+
+## Project [/projects/{id}]
+
+### Update a project [PATCH]
+
++ Request
+
+    + Attributes (Project Update Request)
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Project Response)
+
+# Group Roles
+
+This endpoint is for creating and returning the roles available for users.
+
+A user is able to have multiple roles through their user roles.
+
+## Roles [/roles]
+
+### Create a role [POST]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 200 (application/vnd.api+json)
+
+  + Attributes (Role Response)
+
++ Response 401 (application/json)
+
+  + Attributes (OAuth Invalid Response)
+
++ Response 403 (application/json)
+
+  + Attributes (Forbidden Response)
+
++ Response 422 (application/vnd.api+json)
+
+  + Attributes (Unprocessable Entity Response)
+
+### List all roles [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+  + Attributes (Roles Response)
+
+# Group Role Skills
+
+This resource identifies a relationship between a Role and a Skill. For example, the skill of "JavaScript" may relate to the role of "Backend Developer," and also "Front End Developer" and even "Mobile Developer".
+
+We can use the many skills grouped under a role to suggest popular skills to users who may have self-identifed as a "Backend Developer".
+
+## Role Skill [/role_skills]
+
+### Create a role skill [POST]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Role Skill Response)
+
++ Response 401 (application/json)
+
+    + Attributes (OAuth Invalid Response)
+
++ Response 403 (application/json)
+
+    + Attributes (Forbidden Response)
+
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Unprocessable Entity Response)
+
+# Group Skills
+
+This endpoint retrieves skills that can be applied to both users (through user_skills) and roles (through role_skills)
+
+## Skills [/skills]
+
+Skills can be filtered by the id of the skill. This should be an array of one or multiple ids.
+
+### Filter by id [GET /skills{?filter}]
+
++ Parameters
+
+    + filter: `1` (enum[number], optional) - Id query to filter returned skills
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Skills Response)
+
+### Autocomplete skill with query [GET /skills{?query}]
+
+Skills can be queried by a substring of the name of the skill. This should be a string with one or more letters of the name of the skill requested.
+
+For example, if we wanted to return skills like "Java" and "JavaScript", we may query with the substring "jav". A good use for this API would be a skill typeahed input.
+
++ Parameters
+
+    + query: `jav` (string, optional) - Text query to filter returned skills
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Skills Response)
+
+### Create a skill [POST]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer <access_token>
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Skill Response)
+
++ Response 401 (application/json)
+
+    + Attributes (OAuth Invalid Response)
+
++ Response 403 (application/json)
+
+    + Attributes (Forbidden Response)
+
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Unprocessable Entity Response)
+
+## Skill [/skills/{id}]
+
+### Retrieve a skill [GET]
+
++ Parameters
+
+    + id (number) - Id of a skill.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Skill Response)
+
++ Response 404 (application/vnd.api+json)
+
+    + Attributes (Record Not Found Response)
+
+# Group Slugged Routes
+
+A slugged route is a unique slug that resolves at the root of any request to `codecorps.org`. For the URI `codecorps.org/code-corps`, for example, `code-corps` is the slug that represents the slugged route.
+
+Slugged routes allow us to make API requests for a user or an organization without knowing their `id` in advance. This is particularly useful on the web when the first request may be to a user's profile or an organization's page.
+
+## Slugged Routes [/:slug]
+
+### Find a Slugged Route [GET]
+
+This endpoint will return one of two possible responses, depending on if the slugged route's owner is a user or an organization. If the slugged route is owned by a user, the responses's owner relationship will point to a user and include a user resource. If it's owned by an organization, it will point to and include an organization resource.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Slugged Route User Response)
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Slugged Route Organization Response)
+
+# Group User Categories
+
+This resource identifies a relationship between a User and a Category. For example, the category of "Society" may belong to a given user.
+
+It may be eaasier to think of a User Category as one of a user's interest. They may be interested in "Society", "Technology" and "Government". We use those interests to match users up to relevant organizations and projects. The term "category" therefore is more appropriate for _categorizing_ those organizations and projects.
+
+## User Categories [/user_categories]
+
+### Filter user categories by id [GET]
+
++ Parameters
+
+    + filter: `1,2` (string, required) - Comma separated string of `id`s to filter by.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (User Categories Response)
+
+### Create a user category [POST]
+
+When creating a user category, the authenticated user is assumed by the server so you should not supply the user's `id`. This will be ignored by your request and the server will default to the authenticated user making the request.
+
++ Request
+
+    + Attributes
+
+      + data (object)
+          + relationships (object)
+              + category (object)
+                  + data (object)
+                      + type: `categories` (string, required)
+                      + id: `1` (number, required)
+
+                  + Request
+
+                      + Headers
+
+                              Accept: application/vnd.api+json
+                              Authorization: Bearer {access_token}
+
++ Response 201 (application/vnd.api+json)
+
+    + Attributes (User Category Response)
+
++ Response 401 (application/json)
+
+    + Attributes (OAuth Invalid Response)
+
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Unprocessable Entity Response)
+
+## User Category [/user_categories/{id}]
+
+### Retrieve a user category [GET]
+
++ Parameters
+
+    + id (number) - Id of a user category.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (User Category Response)
+
++ Response 404 (application/vnd.api+json)
+
+    + Attributes (Record Not Found Response)
+
+### Delete a user category [DELETE]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {access_token}
+
++ Response 204 (application/vnd.api+json)
+
+    + Attributes (No Content Response)
+
++ Response 401 (application/json)
+
+    + Attributes (OAuth Invalid Response)
+
++ Response 403 (application/json)
+
+    + Attributes (Forbidden Response)
+
+# Group User Roles
+
+This resource identifies a relationship between a User and a Role. For example, the role of "Backend Developer" may belong to a given user.
+
+## User Roles [/user_roles]
+
+### Create a user role [POST]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer <access_token>
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (User Role Response)
+
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Unprocessable Entity Response)
+
+## User Roles [/user_roles/{id}]
+
+### Delete a user role [DELETE]
+
++ Parameters
+
+    + id (number) - Id of a user role.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer <access_token>
+
++ Response 204 (application/vnd.api+json)
+
+    + Attributes (No Content Response)
+
++ Response 401 (application/json)
+
+    + Attributes (OAuth Invalid Response)
+
++ Response 403 (application/vnd.api+json)
+
+    + Attributes (Forbidden Response)
+
++ Response 404 (application/vnd.api+json)
+
+    + Attributes (Record Not Found Response)
+
+# Group User Skills
+
+This resource identifies a relationship between a User and a Skill. For example, the skill of "Elixir" may belong to a given user.
+
+## User Skills [/user_skills]
+
+### Filter user skills by id [GET /user_skills{?filter}]
+
++ Parameters
+
+    + filter: (Id Filter)
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (User Skills Response)
+
+### Create a User Skill [POST /user_skills]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer <access_token>
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (User Skill Response)
+
++ Response 401 (application/json)
+
+    + Attributes (OAuth Invalid Response)
+
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Unprocessable Entity Response)
+
+## User Skill [/user_skills/{id}]
+
+### Retrieve a user skill [GET]
+
++ Parameters
+
+    + id (number) - Id of a user skill.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (User Skill Response)
+
+
+### Delete a user skill [DELETE]
+
++ Parameters
+
+    + id (number) - Id of a user skill.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer <access_token>
+
++ Response 204 (application/vnd.api+json)
+
+    + Attributes (No Content Response)
+
++ Response 401 (application/json)
+
+    + Attributes (OAuth Invalid Response)
+
++ Response 403 (application/vnd.api+json)
+
+    + Attributes (Forbidden Response)
+
++ Response 404 (application/vnd.api+json)
+
+    + Attributes (Record Not Found Response)
+
+# Group Users
+
+## Users [/users]
+
+### Filter users by id [GET /users?filter[id]={ids}]
+
++ Parameters
+
+    + `filter[id]`: `1,2` (required, string)
+
++ Request (application/vnd.api+json)
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Users Response)
+
++ Response 404 (application/vnd.api+json)
+
+    + Attributes (Record Not Found Response)
+
+### Create a user [POST]
+
++ Request (application/vnd.api+json)
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
+    + Attributes (object)
+
+        + data (object)
+            + type: `users` (string, required)
+            + attributes (object)
+                + base64_photo_data: `data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7` (string, optional)
+                + email: `me@testuser.org` (string, optional)
+                + facebook_id: `1234567890` (string, optional)
+                + facebook_access_token: `CAABwiWr8tH8BAGKCYOIgoMwJ9T0ZAmJ6KJJNcUjzmftdAOCx1RgzxZAjzGB1s37DDCEoy9r2VgrCLffCTvEGe9cZBZPAwBhygi2ZpTubZC2eCzMe16CLP4Wlc9bStWGwUNYoLEl4dXu4uJl2CCLiFXEtP4GKDv0Gk4s35iXty77KZBx5NYBCcEUs98WjdJQcXLsb1X2ZBaMTW2AZDZN` (string, optional)
+                + password: `password` (string, required)
+                + username: `testuser` (string, required)
+
++ Response 201 (application/vnd.api+json)
+
+    + Attributes (User Response)
+
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Unprocessable Entity Response)
+
+### Check email availability [GET /users/email_available?email={email}]
+
++ Parameters
+
+    + email: me@testuser.org (string, required)
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes
+
+        + available: `true` (boolean)
+        + valid: `true` (boolean)
+
+### Check username availability [GET /users/username_available?username={username}]
+
++ Parameters
+
+    + username: testuser (string, required)
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes
+
+        + available: `true` (boolean)
+        + valid: `true` (boolean)
+
+## User [/users/{id}]
+
+### Retrieve a user [GET /users/{id}]
+
++ Parameters
+
+    + id (number) - Id of a user.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (User Response)
+
++ Response 404 (application/vnd.api+json)
+
+    + Attributes (Record Not Found Response)
+
+### Update a user [PATCH /users/{id}]
+
++ Parameters
+
+    + id (number) - Id of a user.
+
++ Request (application/vnd.api+json)
+
+    + Attributes
+        + data
+            + Include (User Resource Identifier)
+            + attributes (object)
+                + first_name: `Test` (string, optional)
+                + last_name: `User` (string, optional)
+                + website: `https://testuser.org` (string, optional)
+                + biography: `Sample bio.` (string, optional)
+                + twitter: `testuser` (string, optional)
+                + base64_photo_data: `data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7` (string, optional)
+                + `state_transition`: `signed_up` (string, optional)
+                + theme: `light` (string, optional)
+
+    + Headers
+
+            Authorization: Bearer {access_token}
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (User Response)
+
++ Response 401 (application/vnd.api+json)
+
+    + Attributes (OAuth Invalid Response)
+
++ Response 403 (application/vnd.api+json)
+
+    + Attributes (Forbidden Response)
+
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Unprocessable Entity Response)
+
+### Update me [PATCH /users/me]
+
++ Request (application/vnd.api+json)
+
+    + Attributes
+        + data
+            + Include (User Resource Identifier)
+            + attributes (object)
+                + first_name: `Test` (string, optional)
+                + last_name: `User` (string, optional)
+                + website: `https://testuser.org` (string, optional)
+                + biography: `Sample bio.` (string, optional)
+                + twitter: `testuser` (string, optional)
+                + base64_photo_data: `data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7` (string, optional)
+                + `state_transition`: `signed_up` (string, optional)
+                + theme: `light` (string, optional)
+
+    + Headers
+
+            Authorization: Bearer {access_token}
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (User Response)
+
++ Response 401 (application/vnd.api+json)
+
+    + Attributes (OAuth Invalid Response)
+
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Unprocessable Entity Response)
+
+## User [/user]
+
+### Show authenticated user [GET]
+
++ Request (application/vnd.api+json)
+
+    + Headers
+
+            Authorization: Bearer {access_token}
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (User Response)
+
++ Response 401 (application/vnd.api+json)
+
+    + Attributes (OAuth Invalid Response)
+
+# Data Structures
+
+## Category (object)
++ name: `Category` (required, string)
++ slug: `cat1` (required, string)
++ description: `This is the category description` (string)
+
+## Categories Relationship (object)
++ data
+  + id: 1 (string)
+  + type: categories (string)
+
+## Categories Relationships (object)
++ categories
+  + data(array[Categories Relationship], required)
+
+## Category Relationships Base (object)
++ include Project Category Resource Identifier
+
+## Category Resource Identifier
++ id: `1` (string)
++ type: `categories`
+
+## Category Response (object)
++ data
+  + id: `1` (string)
+  + type: `categories` (string)
+  + attributes(Category, required)
+  + relationships(Category Relationships Base, required)
+
+## Categories Response (object)
++ categories
+  + data(array[Category], required)
+
+## Comment Image (object)
++ filename: `file name` (string)
+
+## Comment Image Relationships Base (object)
++ comment
+  + data(Comment Resource Identifier)
++ user
+  + data(User Resource Identifier)
+
+## Comment Image Response Base (object)
++ id: `1` (string)
++ type: `comment_images` (string)
++ attributes(Comment Image)
++ relationships(Comment Image Relationships Base)
+
+## Comment Image Response (object)
++ data(Comment Image Response Base)
+
+## Comment Resource (object)
++ include Comment Resource Identifier
++ attributes(Comment Attributes)
++ relationships
+    + posts
+        + data(Post Resource Identifier)
+        + links (object)
+    + users
+        + data(User Resource Identifier)
+        + links (object)
+    + comment_user_mentions
+        + data(array[Comment User Mention Resource Identifier])
+        + links (object)
+
+## Comment Attributes (object)
++ markdown: `Markdown formatted string` (string)
++ body: `Html string rendered from markdown` (string)
++ state: (enum[string])
+    + Members
+        + `published`
+        + `edited`
++ edited_at: `2014-07-07T18:01:26.000Z` (string)
++ created_at: `2014-07-07T18:01:26.000Z` (string)
+
+## Comment Resource Identifier (object)
++ id: `1` (string)
++ type: `comments` (string)
+
+## Comment Create Request (object)
++ type: `comments` (string)
++ attributes
+    + markdown: `Markdown formatted string` (string)
++ relationships
+    + posts
+        + data(Post Resource Identifier)
+
+## Comment Update Request (object)
++ include Comment Resource Identifier
++ attributes
+    + markdown: `Markdown formatted content` (string)
+
+## Comment Response (object)
++ data
+    + include Comment Resource
++ included(array[Comment User Mention Resource])
+
+## Comments Response (object)
++ comments
+    + data(array[Comment Response], required)
++ included(array[Comment User Mention Resource])
+
+## Comment User Mention Resource (object)
++ include Comment User Mention Resource Identifier
++ attributes
+    + include Comment User Mention Attributes
++ relationships
+    + users
+        + data(User Resource Identifier)
+        + links (object)
+    + comments
+        + data(Comment Resource Identifier)
+        + links (object)
+
+## Comment User Mention Attributes (object)
++ indices: 1, 2 (array[number])
+    The start and the end index of where the mention is to be placed within the comment body
++ username: 'Username of related user' (string)
+
+## Comment Relationship (object)
++ id: 1 (string)
++ type: comments (string)
+
+## Comment User Mention Relationships (object)
++ user
+    + data (User Relationship)
++ comment
+    + data (Comment Relationship)
+
+## Comment User Mention Resource Identifier
++ id: `1` (string)
++ type: `comment_user_mentions` (string)
+
+## Comment User Mention Response (object)
++ data (object)
+    + Include (Comment User Mention Resource)
+    + relationships
+        + Include (Comment User Mention Relationships)
+
+## Comment User Mentions Response (object)
++ data(array[Comment User Mention Response])
+
+## Creation Conflict Response (object)
++ title: `Conflict` (string)
+
++ detail: `{Object} with 'id'={id} already created` (string) - Details of what record was already there.
+
++ status: 409 (number) - HTTP status code
+
+## Filter Missing Response (object)
++ errors (array)
+    + Attributes
+        + id: `PARAMETER_MISSING` (string)
+        + title: `Filter is missing` (string)
+        + detail: `You must specify a Filter.` (string) - Details of what record was not found.
+        + status: 400 (number) - HTTP status code
+
+## Forbidden Response (object)
++ errors (array)
+    + Attributes
+        + id: `FORBIDDEN` (string)
+        + title: `Forbidden` (string)
+        + detail: `You are not authorized to perform this action on {subject_name}` (string) - Details of what record was not found.
+        + status: 403 (number) - HTTP status code
+
+## Id Filter (object)
++ filter:
+    + id: `1,2,3,...` (string, required) - A list of ids, in a single string, comma-separated
+
+## Github Repository Resource Identifier
++ id: `1` (string)
++ type: `github_repositories` (string)
+
+## No Content Response (object)
+
+    {}
+
+## OAuth Invalid Response (object)
++ errors (array)
+    + Attributes
+        + id: `INVALID_GRANT` (string, required)
+        + title: `Invalid grant` (string, required)
+        + detail: `The provided authorization grant is invalid, expired, revoked, does not match the redirection URI used in the authorization request, or was issued to another client.` (string, required)
+        + status: 401 (number, required)
+
+## OAuth Valid Response (object)
++ access_token: `5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8` (string, required)
++ token_type: `bearer` (string, required)
++ expires_in: 7200 (number, required)
++ refresh_token: `f160d958cab936626305062dc594c2cadb12712ebc7cbca091a27ec4921b91d8` (string, required)
++ created_at: 1468283904 (number, required)
++ user_id: 1 (number, required)
+
+## Organization Resource Identifier
++ id: `1` (string)
++ type: `organizations` (string)
+
+## Organization Response (object)
++ data(Organization Resource)
+
+## Organizations Response (object)
++ data(array[Organization Resource])
+
+## Organization Resource (object)
++ include Organization Resource Identifier
++ attributes
+    + name: `Code Corps`
+    + slug: `code_corps`
+    + description: `Build a better future.`
+    + icon_thumb_url: `https://random_string.cloundfront.net/organizations/1/thumb.png`
+    + icon_large_url: `https://random_string.cloundfront.net/organizations/1/large.png`
++ relationships
+    + members
+        + data(array[Member Resource Identifier])
+        + links
+    + projects
+        + data(array[Project Resource Identifier])
+        + links
+    + organization_memberships
+        + data(array[Organization Membership Resource Identifier])
+        + links
+
+## Organization Membership Resource (object)
++ include Organization Membership Resource Identifier
++ attributes(Organization Membership Attributes)
++ relationships
+    + members (object)
+        + data(User Resource Identifier)
+        + links (object)
+    + organizations
+        + data(Organization Resource Identifier)
+        + links (object)
+
+## Organization Membership Attributes (object)
++ role: (enum[string])
+    + Members
+        + `pending`
+        + `contributor`
+        + `admin`
+        + `owner`
+
+## Organization Membership Resource Identifier (object)
++ id: `1` (string)
++ type: `organization_memberships` (string)
+
+## Organization Membership Response (object)
++ data(Organization Membership Resource)
+
+## Organization Memberships Response (object)
++ data(array[Organization Membership Resource])
+
+## Organization Membership Create Request (object)
++ type: `organization_memberships` (string)
++ attributes(Organization Membership Attributes)
++ relationships
+    + members
+        + data(User Recource Identifier)
+        + links (object)
+    + organizations
+        + data(Organization Resource Identifier)
+        + links (object)
+
+## Organization Membership Update Request (object)
++ include Organization Membership Resource Identifier
++ attributes(Organization Membership Attributes)
+
+## Post Resource Identifier
++ id: `1` (string)
++ type: `posts` (string)
+
+## Post Response (object)
++ id: 1 (string)
++ status: `open` (string)
++ post_type: `task` (string)
++ title: `This is the title of a post` (string)
++ body: `This is the body of of a post filled with lots of awesome details` (string)
++ user_id: 1 (string)
+
+## Posts Response (object)
++ posts
+    + data(array[Post Response], required)
+
+## Preview (object)
++ body: `<p>A <strong>strong</strong> preview</p>` (string)
++ markdown: `A *strong* preview` (string)
+
+## Preview Response Base (object)
++ id: `1` (string)
++ type: `previews` (string)
++ attributes(Preview, required)
++ relationships(Preview Relationships Base, required)
+
+## Preview Response (object)
++ data(Preview Response Base)
+
+## Previews Relationship (object)
++ id: 1 (string)
++ type: previews (string)
+
+## Preview Relationships Base (object)
++ include User Resource Identifier
++ include Preview User Mentions Relationship
+
+## Preview User Mentions Relationship (object)
++ id: 1 (string)
++ type: preview_user_mentions (string)
+
+## Project Category Resource (object)
++ include Project Category Resource Identifier
++ relationships
+    + projects
+        + data(Project Resource Identifier)
+    + categories
+        + data(Category Resource Identifier)
+
+## Project Category Resource Identifier (object)
++ id: 1 (string)
++ type: project_categories (string)
+
+## Project Category Create Request (object)
++ data(Project Category Resource)
+
+## Project Category Response (object)
++ data(Project Category Resource)
+
+## Project Resource (object)
++ include Project Resource Identifier
++ attributes(Project Attributes)
++ relationships
+    + categories
+        + data(array[Category Resource Identifier])
+    + github_repositories
+        + data(array[Github Repository Resource Identifier])
+    + roles
+        + data(array[Role Resource Identifier])
+    + skills
+        + data(array[Skill Resource Identifier])
+    + organizations
+        + data(Organization Resource Identifier)
+
+## Project Resource Identifier (object)
++ id: `1` (string)
++ type: `projects` (string)
+
+## Project Attributes (object)
++ slug: 'code_corps' (string) - Case insensitive unique string identifier for the project
++ title: 'Code Corps' (string) - A title for the project
++ description: 'Help build and fund public software projects for social good.' (string) - A short plain text description for the project
++ icon_thumb_url: 'example.com/icon_thumb.png' (string) - A url pointing to the project thumbnail
++ icon_large_url: 'example.com/icon_large.png' (string) - A url pointing to a large icon for the project
++ long_description_body: 'Example <b>html</b>' (string) - A html string containing the rendered long_description_markdown
++ long_description_markdown: 'Example **markdown**' (string) - Markdown formatted string containing the project long description
++ open_posts_count: 27 (number) - Number of open posts created for the project
++ closed_posts_count: 4 (number) - Number of closed posts created for the project
+
+## Projects Response
++ data(array[Project Resource])
+
+## Project Response
++ data(Project Resource)
+
+## Project Create Request
++ data
+    + attributes
+        + base64_icon_data (string) - A base64 encoded string containing the project icon
+        + title (string) - A title for the project
+        + description (string) - A short plain text description for the project
+        + slug (string) - Case insensitive unique string identifier for the project
+        + long_description_markdown (string) - Markdown formatted string containing the project long description
+    + relationships
+        + organizations
+            + data(Organization Resource Identifier) - Identifier of organization this project is being created for
+
+## Project Update Request
++ data
+    + attributes
+        + base64_icon_data (string) - A base64 encoded string containing the project icon
+        + title (string) - A title for the project
+        + description (string) - A short plain text description for the project
+        + slug (string) - Case insensitive unique string identifier for the project
+        + long_description_markdown (string) - Markdown formatted string containing the project long description
+
+## Record Not Found Response (object)
++ errors (array)
+    + Attributes
+        + id: `RECORD_NOT_FOUND` (string)
+        + title: `Record not found` (string)
+        + detail: `Couldn't find {object} with 'id'={id}` (string) - Details of what record was not found.
+        + status: 404 (number) - HTTP status code
+
+## Role Resource Identifier
++ id: `1` (string)
++ type: `roles` (string)
+
+## Role Response (object)
++ data(Role Resource)
+
+## Roles Response (object)
++ data(array[Role Resource])
+
+## Role Resource (object)
++ include Role Resource Identifier
++ attributes
+    + name: `Backend Developer` (string)
+    + ability: `Backend Development` (string)
+    + kind: `technology` (enum[string])
+        + Members
+            + `technology`
+            + `creative`
+            + `support`
++ relationships
+    + skills
+        + data(array[Skill Resource Identifier])
+        + links
+
+## Role Skill Response (object)
++ data(Role Skill Resource)
+
+## Role Skill Resource (object)
++ include Role Skill Resource Identifier
++ relationships
+    + roles
+        + data(array[Role Resource Identifier])
+        + data(array[Skill Resource Identifier])
+        + links
+
+## Role Skill Resource Identifier (object)
++ id: `1` (string)
++ type: `role_skills` (string)
+
+## Skill Resource Identifier (object)
++ id: `1` (string)
++ type: `skill` (string)
+
+## Skill Resource (object)
++ include Skill Resource Identifier
++ attributes
+    + title: `Elixir`
+    + description: `Elixir is a functional, concurrent, general-purpose programming language that runs on the Erlang virtual machine (BEAM).`
++ relationships
+    + roles
+        + data(array[Role Resource Identifier])
+        + links
+
+## Skill Response (object)
++ data(Skill Resource)
+
+## Skills Response (object)
++ data(array[Skill Resource])
+
+## Slugged Route User Resource (object)
++ include Slugged Route Resource Identifier
++ attributes
+    + slug: `example-slug`
+    + owner_type: `user`
++ relationships
+    + owner
+        + data(User Resource Identifier)
+
+## Slugged Route Organization Resource (object)
++ include Slugged Route Resource Identifier
++ attributes
+    + slug: `example-slug`
+    + owner_type: `organization`
++ relationships
+    + owner
+        + data(Organization Resource Identifier)
+
+## Slugged Route Resource Identifier (object)
++ id: `1` (string)
++ type: `slugged_routes` (string)
+
+## Slugged Route User Response (object)
++ data(Slugged Route User Resource)
++ included(array[User Resource])
+
+## Slugged Route Organization Response (object)
++ data(Slugged Route Organization Resource)
++ included(array[Organization Resource])
+
+## Unprocessable Entity Response (object)
++ errors (array)
+    + Attributes
+        + title: `Unprocessable Entity` (string)
+        + status: 422 (number) - HTTP status code
+
+## User Attributes (object)
++ created_at: `2016-07-08T03:03:51.967Z` (string)
++ email: `me@testuser.org` (string)
++ first_name: `Test` (string)
++ last_name: `User` (string)
++ name: `Test User` (string)
++ username: `testuser` (string)
++ twitter: `testuser` (string)
++ biography: `Sample bio.` (string)
++ website: `https://testuser.org` (string)
++ facebook_id: `1234567890` (string)
++ facebook_access_token: `CAABwiWr8tH8BAGKCYOIgoMwJ9T0ZAmJ6KJJNcUjzmftdAOCx1RgzxZAjzGB1s37DDCEoy9r2VgrCLffCTvEGe9cZBZPAwBhygi2ZpTubZC2eCzMe16CLP4Wlc9bStWGwUNYoLEl4dXu4uJl2CCLiFXEtP4GKDv0Gk4s35iXty77KZBx5NYBCcEUs98WjdJQcXLsb1X2ZBaMTW2AZDZN` (string)
++ photo_thumb_url: `https://d3pgew4wbk2vb1.cloudfront.net/icons/user_default_thumb.png` (string)
++ photo_large_url: `https://d3pgew4wbk2vb1.cloudfront.net/icons/user_default_large.png` (string)
++ state: `signed_up` (string)
++ theme: `light` (string)
+
+## User Category Resource (object)
++ include User Category Resource Identifier
++ relationships
+    + categories
+        + data(Category Resource Identifier)
+        + links
+    + users
+        + data(User Resource Identifier)
+        + links
+
+## User Category Resource Identifier
++ id: `1` (string)
++ type: `user_categories` (string)
+
+## User Category Response (object)
++ data(User Category Resource)
+
+## User Categories Response (object)
++ data(array[User Category Resource])
+
+## User Relationships (object)
++ categories (object)
+    + data(array[Category Resource Identifier])
++ organization_memberships (object)
+    + data(array[Organization Membership Resource Identifier])
++ organizations (object)
+    + data(array[Organization Resource Identifier])
++ roles (object)
+    + data(array[Role Resource Identifier])
++ skills (object)
+    + data(array[Skill Resource Identifier])
++ user_categories (object)
+    + data(array[User Category Resource Identifier])
++ user_roles (object)
+    + data(array[User Role Resource Identifier])
++ user_skills (object)
+    + data(array[User Skill Resource Identifier])
+
+## User Response (object)
++ data (User Resource)
+
+## Users Response (object)
++ data(array[User Resource])
+
+## User Resource (object)
++ Include User Resource Identifier
++ attributes (User Attributes)
++ relationships(User Relationships)
+
+## User Resource Identifier (object)
++ id: `1` (string)
++ type: `users` (string)
+
+## User Relationship (object)
++ id: 1 (string)
++ type: users (string)
+
+## User Roles Relationship (object)
++ id: 1 (string)
++ type: user_roles (string)
+
+## User Role Resource Identifier
++ id: `1` (string)
++ type: `user_roles` (string)
+
+## User Role Response (object)
++ data(User Role Resource)
+
+## User Roles Response (object)
++ data(array[User Role Resource])
+
+## User Role Resource (object)
++ include User Role Resource Identifier
++ relationships
+    + role
+        + data(Role Resource Identifier)
+        + links
+    + user
+        + data(User Resource Identifier)
+        + links
+
+## User Skill Resource Identifier (object)
++ id: `1` (string)
++ type: `user_skills` (string)
+
+## User Skill Response (object)
++ data(User Skill Resource)
+
+## User Skills Response (object)
++ data(array[User Skill Resource])
+
+## User Skill Resource (object)
++ include User Skill Resource Identifier
++ relationships
+    + skill
+        + data(Skill Resource Identifier)
+        + links
+    + user
+        + data(User Resource Identifier)
+        + links

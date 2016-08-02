@@ -2,6 +2,10 @@ FROM elixir:1.3.2
 
 RUN apt-get update -qq && apt-get install -y build-essential
 
+RUN apt-get install -y -q apt-utils
+
+RUN apt-get install -y -q inotify-tools
+
 # PostgreSQL
 RUN apt-get install -y libpq-dev
 
