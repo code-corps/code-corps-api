@@ -34,15 +34,25 @@ services:
 
   test:
     <<: *api_base
+    environment:
+      <<: *api_environment
+      MIX_ENV: test
+      PORT: 4001
+    ports:
+      - 49236:4001
+
+  watch:
+    <<: *api_base
     command: bash -c "mix do deps.get, compile, test.watch"
     depends_on:
+      - test
       - web
     environment:
       <<: *api_environment
       MIX_ENV: dev
-      PORT: 4001
+      PORT: 4002
     ports:
-      - 49236:4001
+      - 49237:4002
 
   apiary:
     image: apiaryio/client
