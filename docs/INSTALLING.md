@@ -16,8 +16,8 @@ The directory structure will look like the following:
 
 ```shell
 code-corps-api/          # → Root folder for this project
+├── blueprint/
 ├── config/
-├── deps/
 ├── ...                  # → More standard Phoenix files
 ├── docker-compose.yml   # → Compose file for configuring Docker containers
 └── Dockerfile           # → Creates base Ruby Docker container
