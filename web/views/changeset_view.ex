@@ -1,6 +1,8 @@
 defmodule CodeCorps.ChangesetView do
   use CodeCorps.Web, :view
 
+  alias Ecto.Changeset
+
   @doc """
   Traverses and translates changeset errors.
 
@@ -8,7 +10,7 @@ defmodule CodeCorps.ChangesetView do
   `CodeCorps.ErrorHelpers.translate_error/1` for more details.
   """
   def translate_errors(changeset) do
-    Ecto.Changeset.traverse_errors(changeset, &translate_error/1)
+    Changeset.traverse_errors(changeset, &translate_error/1)
   end
 
   def render("error.json-api", %{changeset: changeset}) do

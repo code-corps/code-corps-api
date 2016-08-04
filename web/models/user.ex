@@ -1,5 +1,15 @@
 defmodule CodeCorps.User do
+  @moduledoc """
+  This module defines a user of the Code Corps app.
+  """
+
   use CodeCorps.Web, :model
+
+  alias CodeCorps.SluggedRoute
+  alias Comeonin.Bcrypt
+  alias Ecto.Changeset
+
+  import CodeCorps.Validators.SlugValidator
 
   schema "users" do
     field :biography, :string
@@ -12,6 +22,8 @@ defmodule CodeCorps.User do
     field :username, :string
     field :website, :string
 
+    has_one :slugged_route, SluggedRoute
+
     timestamps()
   end
 
@@ -20,9 +32,9 @@ defmodule CodeCorps.User do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:email, :username])
-    |> validate_required([:email, :username])
-    |> validate_length(:username, min: 1, max: 39)
+    |> cast(params, [:email])
+    |> validate_required([:email])
+    |> validate_format(:email, ~r/@/)
   end
 
   @doc """
@@ -31,10 +43,14 @@ defmodule CodeCorps.User do
   def registration_changeset(struct, params) do
     struct
     |> changeset(params)
-    |> cast(params, [:password])
+    |> cast(params, [:password, :username])
     |> validate_required(:password)
+    |> validate_required(:username)
     |> validate_length(:password, min: 6)
+    |> validate_length(:username, min: 1, max: 39)
+    |> validate_slug(:username)
     |> put_pass_hash()
+    |> put_slugged_route()
   end
 
   def update_changeset(struct, params) do
@@ -60,8 +76,18 @@ defmodule CodeCorps.User do
 
   defp put_pass_hash(changeset) do
     case changeset do
-      %Ecto.Changeset{valid?: true, changes: %{password: pass}} ->
-        put_change(changeset, :encrypted_password, Comeonin.Bcrypt.hashpwsalt(pass))
+      %Changeset{valid?: true, changes: %{password: pass}} ->
+        put_change(changeset, :encrypted_password, Bcrypt.hashpwsalt(pass))
+      _ ->
+        changeset
+    end
+  end
+
+  defp put_slugged_route(changeset) do
+    case changeset do
+      %Changeset{valid?: true, changes: %{username: username}} ->
+        slugged_route_changeset = SluggedRoute.changeset(%SluggedRoute{}, %{slug: username})
+        put_assoc(changeset, :slugged_route, slugged_route_changeset)
       _ ->
         changeset
     end
