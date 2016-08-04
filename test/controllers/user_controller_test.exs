@@ -3,6 +3,7 @@ defmodule CodeCorps.UserControllerTest do
 
   alias CodeCorps.User
   alias CodeCorps.Repo
+  alias CodeCorps.SluggedRoute
 
   @valid_attrs %{
     email: "test@user.com",
@@ -22,7 +23,8 @@ defmodule CodeCorps.UserControllerTest do
   }
 
   setup do
-    conn = %{build_conn | host: "api."}
+    conn =
+      %{build_conn | host: "api."}
       |> put_req_header("accept", "application/vnd.api+json")
       |> put_req_header("content-type", "application/vnd.api+json")
 
@@ -68,7 +70,11 @@ defmodule CodeCorps.UserControllerTest do
 
     id = json_response(conn, 201)["data"]["id"]
     assert id
-    assert Repo.get(User, id)
+    user = Repo.get(User, id)
+    assert user
+    slugged_route = Repo.get_by(SluggedRoute, slug: "testuser")
+    assert slugged_route
+    assert user.id == slugged_route.user_id
   end
 
   test "does not create resource and renders errors when data is invalid", %{conn: conn} do
@@ -101,7 +107,6 @@ defmodule CodeCorps.UserControllerTest do
       id = json_response(conn, 200)["data"]["id"]
       assert id
       user =  Repo.get(User, id)
-      assert user.username == "testuser"
       assert user.email == "test@user.com"
       assert user.first_name == "Test"
       assert user.last_name == "User"
@@ -125,17 +130,9 @@ defmodule CodeCorps.UserControllerTest do
       assert json["errors"] != %{}
       errors = json["errors"]
       assert errors["email"] == ["can't be blank"]
-      assert errors["username"] == ["can't be blank"]
       assert errors["twitter"] == ["has invalid format"]
       assert errors["website"] == ["has invalid format"]
     end
-  end
-
-  test "deletes chosen resource", %{conn: conn} do
-    user = insert_user()
-    conn = delete conn, user_path(conn, :delete, user)
-    assert response(conn, 204)
-    refute Repo.get(User, user.id)
   end
 
   describe "email_available" do

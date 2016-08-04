@@ -44,6 +44,7 @@ defmodule CodeCorps.Mixfile do
       {:comeonin, "~> 2.0"},
       {:mix_test_watch, "~> 0.2", only: :dev}, # Test watcher
       {:credo, "~> 0.4", only: [:dev, :test]}, # Code style suggestions
+      {:inflex, "~> 1.7.0"},
     ]
   end
 

@@ -22,13 +22,12 @@ defmodule CodeCorps.Router do
   scope "/", CodeCorps, host: "api." do
     pipe_through :api
 
+    resources "/organizations", OrganizationController, except: [:new, :edit]
+
     get "/users/email_available", UserController, :email_available
     get "/users/username_available", UserController, :username_available
     resources "/users", UserController, except: [:new, :edit]
-  end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", CodeCorps do
-  #   pipe_through :api
-  # end
+    get "/:slug", SluggedRouteController, :show
+  end
 end
