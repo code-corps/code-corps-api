@@ -34,7 +34,7 @@ defmodule CodeCorps.UserController do
 
   def update(conn, %{"id" => id, "data" => data = %{"type" => "user", "attributes" => _user_params}}) do
     user = Repo.get!(User, id)
-    changeset = User.changeset(user, Params.to_attributes(data))
+    changeset = User.update_changeset(user, Params.to_attributes(data))
 
     case Repo.update(changeset) do
       {:ok, user} ->
