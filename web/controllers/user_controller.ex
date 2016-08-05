@@ -56,4 +56,17 @@ defmodule CodeCorps.UserController do
     send_resp(conn, :no_content, "")
   end
 
+  def email_available(conn, %{"email" => email}) do
+    hash = User.check_email_availability(email)
+
+    conn
+    |> json(hash)
+  end
+
+  def username_available(conn, %{"username" => username}) do
+    hash = User.check_username_availability(username)
+
+    conn
+    |> json(hash)
+  end
 end

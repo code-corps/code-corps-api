@@ -137,4 +137,53 @@ defmodule CodeCorps.UserControllerTest do
     assert response(conn, 204)
     refute Repo.get(User, user.id)
   end
+
+  describe "email_available" do
+    test "returns valid and available when email is valid and available", %{conn: conn} do
+      resp = get conn, user_path(conn, :email_available, %{email: "available@mail.com"})
+      json = json_response(resp, 200)
+      assert json["available"]
+      assert json["valid"]
+
+    end
+
+    test "returns valid but inavailable when email is valid but taken", %{conn: conn} do
+      insert_user(%{email: "used@mail.com"})
+      resp = get conn, user_path(conn, :email_available, %{email: "used@mail.com"})
+      json = json_response(resp, 200)
+      refute json["available"]
+      assert json["valid"]
+    end
+
+    test "returns as available but invalid when email is invalid", %{conn: conn} do
+      resp = get conn, user_path(conn, :email_available, %{email: "not_an_email"})
+      json = json_response(resp, 200)
+      assert json["available"]
+      refute json["valid"]
+    end
+  end
+
+  describe "username_available" do
+    test "returns as valid and available when username is valid and available", %{conn: conn} do
+      resp = get conn, user_path(conn, :username_available, %{username: "available"})
+      json = json_response(resp, 200)
+      assert json["available"]
+      assert json["valid"]
+    end
+
+    test "returns as valid, but inavailable when username is valid but taken", %{conn: conn} do
+      insert_user(%{username: "used"})
+      resp = get conn, user_path(conn, :username_available, %{username: "used"})
+      json = json_response(resp, 200)
+      refute json["available"]
+      assert json["valid"]
+    end
+
+    test "returns available but invalid when username is invalid", %{conn: conn} do
+      resp = get conn, user_path(conn, :username_available, %{username: ""})
+      json = json_response(resp, 200)
+      assert json["available"]
+      refute json["valid"]
+    end
+  end
 end
