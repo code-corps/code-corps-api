@@ -7,10 +7,18 @@ defmodule CodeCorps.UserControllerTest do
   @valid_attrs %{
     email: "test@user.com",
     username: "testuser",
+    first_name: "Test",
+    last_name: "User",
+    website: "http://www.example.com",
+    twitter: "testuser",
+    biography: "Just a test user"
   }
+
   @invalid_attrs %{
     email: "",
     username: "",
+    website: "---_<>-blank.com",
+    twitter: " @ testuser"
   }
 
   setup do
@@ -76,37 +84,51 @@ defmodule CodeCorps.UserControllerTest do
     assert json_response(conn, 422)["errors"] != %{}
   end
 
-  test "updates and renders chosen resource when data is valid", %{conn: conn} do
-    user = insert_user()
-    attrs = Map.put(@valid_attrs, :password, "password")
-    conn = put conn, user_path(conn, :update, user), %{
-      "meta" => %{},
-      "data" => %{
-        "type" => "user",
-        "id" => user.id,
-        "attributes" => attrs,
-        "relationships" => relationships
+  describe "update" do
+    test "updates and renders chosen resource when data is valid", %{conn: conn} do
+      user = insert_user()
+      attrs = Map.put(@valid_attrs, :password, "password")
+      conn = put conn, user_path(conn, :update, user), %{
+        "meta" => %{},
+        "data" => %{
+          "type" => "user",
+          "id" => user.id,
+          "attributes" => attrs,
+          "relationships" => relationships
+        }
       }
-    }
 
-    id = json_response(conn, 200)["data"]["id"]
-    assert id
-    assert Repo.get(User, id)
-  end
+      id = json_response(conn, 200)["data"]["id"]
+      assert id
+      user =  Repo.get(User, id)
+      assert user.username == "testuser"
+      assert user.email == "test@user.com"
+      assert user.first_name == "Test"
+      assert user.last_name == "User"
+      assert user.website == "http://www.example.com"
+      assert user.biography == "Just a test user"
+    end
 
-  test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
-    user = insert_user()
-    conn = put conn, user_path(conn, :update, user), %{
-      "meta" => %{},
-      "data" => %{
-        "type" => "user",
-        "id" => user.id,
-        "attributes" => @invalid_attrs,
-        "relationships" => relationships
+    test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
+      user = insert_user()
+      conn = put conn, user_path(conn, :update, user), %{
+        "meta" => %{},
+        "data" => %{
+          "type" => "user",
+          "id" => user.id,
+          "attributes" => @invalid_attrs,
+          "relationships" => relationships
+        }
       }
-    }
 
-    assert json_response(conn, 422)["errors"] != %{}
+      json =  json_response(conn, 422)
+      assert json["errors"] != %{}
+      errors = json["errors"]
+      assert errors["email"] == ["can't be blank"]
+      assert errors["username"] == ["can't be blank"]
+      assert errors["twitter"] == ["has invalid format"]
+      assert errors["website"] == ["has invalid format"]
+    end
   end
 
   test "deletes chosen resource", %{conn: conn} do
