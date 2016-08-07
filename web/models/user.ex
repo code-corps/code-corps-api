@@ -82,14 +82,25 @@ defmodule CodeCorps.User do
   end
 
   defp check_username_valid(struct, username) do
+    valid =
+      username
+      |> String.length
+      |> in_range?(1, 39)
+
     struct
-    |> Map.put(:valid, String.length(username) >= 1 && String.length(username) <= 39)
+    |> Map.put(:valid, valid)
   end
 
+  defp in_range?(number, min, max), do: number in min..max
+
   defp check_used(struct, column, value) do
-    query = from u in "users", where: field(u, ^column) == ^value, select: field(u, ^column)
+    available =
+      CodeCorps.User
+      |> where([u], field(u, ^column) == ^value)
+      |> CodeCorps.Repo.all
+      |> Enum.empty?
 
     struct
-    |> Map.put(:available, CodeCorps.Repo.all(query) |> Enum.empty?)
+    |> Map.put(:available, available)
   end
 end
