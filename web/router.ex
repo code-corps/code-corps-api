@@ -10,7 +10,9 @@ defmodule CodeCorps.Router do
   end
 
   pipeline :api do
-    plug :accepts, ["json-api"]
+    plug :accepts, ["json-api", "json"]
+    plug Guardian.Plug.VerifyHeader
+    plug Guardian.Plug.LoadResource
   end
 
   scope "/", CodeCorps do
@@ -22,7 +24,11 @@ defmodule CodeCorps.Router do
   scope "/", CodeCorps, host: "api." do
     pipe_through :api
 
+    post "/login", AuthController, :create
+    delete "/logout", AuthController, :delete
+
     resources "/categories", CategoryController, except: [:delete]
+
     resources "/organizations", OrganizationController, except: [:new, :edit]
 
     get "/users/email_available", UserController, :email_available
