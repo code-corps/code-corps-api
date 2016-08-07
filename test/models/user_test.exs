@@ -35,4 +35,60 @@ defmodule CodeCorps.UserTest do
     assert encrypted_password
     assert Comeonin.Bcrypt.checkpw(pass, encrypted_password)
   end
+
+  describe "update_changeset" do
+    test "requires :twitter to be in proper format" do
+      user = %User{}
+      attrs = %{twitter: "bad @ twitter"}
+
+      changeset = User.update_changeset(user, attrs)
+
+      assert changeset.errors[:twitter] == {"has invalid format", []}
+    end
+
+    test "doesn't require :twitter to be part of the changes" do
+      user = %User{}
+      attrs = %{}
+
+      changeset = User.update_changeset(user, attrs)
+
+      refute Keyword.has_key?(changeset.errors, :twitter)
+    end
+
+    test "requires :website to be in proper format" do
+      user = %User{}
+      attrs = %{website: "bad <> website"}
+
+      changeset = User.update_changeset(user, attrs)
+
+      assert changeset.errors[:website] == {"has invalid format", []}
+    end
+
+    test "doesn't require :website to be part of the changes" do
+      user = %User{}
+      attrs = %{}
+
+      changeset = User.update_changeset(user, attrs)
+
+      refute Keyword.has_key?(changeset.errors, :website)
+    end
+
+    test "prefixes website with 'http://' if there is no prefix" do
+      user = %User{website: "https://first.com"}
+      attrs = %{website: "example.com"}
+
+      changeset = User.update_changeset(user, attrs)
+
+      assert changeset.changes.website == "http://example.com"
+    end
+
+    test "doesn't make a change to the url when there is no param for it" do
+      user = %User{website: "https://first.com"}
+      attrs = %{}
+
+      changeset = User.update_changeset(user, attrs)
+
+      refute Map.has_key?(changeset.changes, :website)
+    end
+  end
 end
