@@ -46,6 +46,18 @@ defmodule CodeCorps.User do
     |> validate_format(:twitter, ~r/\A[a-zA-Z0-9_]{1,15}\z/)
   end
 
+  def check_email_availability(email) do
+    %{}
+    |> check_email_valid(email)
+    |> check_used(:email, email)
+  end
+
+  def check_username_availability(username) do
+    %{}
+    |> check_username_valid(username)
+    |> check_used(:username, username)
+  end
+
   defp put_pass_hash(changeset) do
     case changeset do
       %Ecto.Changeset{valid?: true, changes: %{password: pass}} ->
@@ -63,4 +75,32 @@ defmodule CodeCorps.User do
   defp do_prefix_url("http://" <> rest), do: "http://" <> rest
   defp do_prefix_url("https://" <> rest), do: "https://" <> rest
   defp do_prefix_url(value), do: "http://" <> value
+
+  defp check_email_valid(struct, email) do
+    struct
+    |> Map.put(:valid, String.match?(email, ~r/@/))
+  end
+
+  defp check_username_valid(struct, username) do
+    valid =
+      username
+      |> String.length
+      |> in_range?(1, 39)
+
+    struct
+    |> Map.put(:valid, valid)
+  end
+
+  defp in_range?(number, min, max), do: number in min..max
+
+  defp check_used(struct, column, value) do
+    available =
+      CodeCorps.User
+      |> where([u], field(u, ^column) == ^value)
+      |> CodeCorps.Repo.all
+      |> Enum.empty?
+
+    struct
+    |> Map.put(:available, available)
+  end
 end
