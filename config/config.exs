@@ -32,12 +32,10 @@ config :plug, :mimes, %{
 }
 
 config :guardian, Guardian,
-  allowed_algos: ["HS512"], # optional
-  verify_module: Guardian.JWT,  # optional
   issuer: "CodeCorps",
   ttl: { 30, :days },
   verify_issuer: true, # optional
-  secret_key: "DELETE_ME",
+  secret_key: System.get_env("GUARDIAN_SECRET_KEY"),
   serializer: CodeCorps.GuardianSerializer
 
 # Import environment specific config. This must remain at the bottom
