@@ -1,15 +1,16 @@
 defmodule CodeCorps.TestHelpers do
   alias CodeCorps.Repo
+  alias CodeCorps.User
 
   def insert_user(attrs \\ %{}) do
     changes = Map.merge(%{
-      email: "username",
-      username: "user#{Base.encode16(:crypto.rand_bytes(8))}",
+      email: "test@user.com",
+      username: "user#{Base.encode16(:crypto.strong_rand_bytes(8))}",
       password: "password",
     }, attrs)
 
-    %CodeCorps.User{}
-    |> CodeCorps.User.registration_changeset(changes)
+    %User{}
+    |> User.registration_changeset(changes)
     |> Repo.insert!()
   end
 end

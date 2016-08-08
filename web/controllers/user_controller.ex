@@ -7,7 +7,10 @@ defmodule CodeCorps.UserController do
   plug :scrub_params, "data" when action in [:create, :update]
 
   def index(conn, _params) do
-    users = Repo.all(User)
+    users =
+      User
+      |> preload([:slugged_route])
+      |> Repo.all
     render(conn, "index.json-api", data: users)
   end
 
@@ -16,6 +19,8 @@ defmodule CodeCorps.UserController do
 
     case Repo.insert(changeset) do
       {:ok, user} ->
+        user = Repo.preload(user, [:slugged_route])
+
         conn
         |> put_status(:created)
         |> put_resp_header("location", user_path(conn, :show, user))
@@ -28,12 +33,19 @@ defmodule CodeCorps.UserController do
   end
 
   def show(conn, %{"id" => id}) do
-    user = Repo.get!(User, id)
-    render(conn, "show.json-api", data: user)
+    user =
+      User
+      |> preload([:slugged_route])
+      |> Repo.get!(id)
+  render(conn, "show.json-api", data: user)
   end
 
   def update(conn, %{"id" => id, "data" => data = %{"type" => "user", "attributes" => _user_params}}) do
-    user = Repo.get!(User, id)
+    user =
+      User
+      |> preload([:slugged_route])
+      |> Repo.get!(id)
+
     changeset = User.update_changeset(user, Params.to_attributes(data))
 
     case Repo.update(changeset) do
@@ -44,16 +56,6 @@ defmodule CodeCorps.UserController do
         |> put_status(:unprocessable_entity)
         |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
     end
-  end
-
-  def delete(conn, %{"id" => id}) do
-    user = Repo.get!(User, id)
-
-    # Here we use delete! (with a bang) because we expect
-    # it to always work (and if it does not, it will raise).
-    Repo.delete!(user)
-
-    send_resp(conn, :no_content, "")
   end
 
   def email_available(conn, %{"email" => email}) do
