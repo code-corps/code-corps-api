@@ -14,7 +14,7 @@ defmodule CodeCorps.SkillController do
           query = Skill |> where([p], p.id in ^ids)
           Repo.all(query)
         %{"query" => query} ->
-          text_query = from p in Skill, where: ilike(p.title, ^"#{query}%")
+          text_query = Skill |> where([p], ilike(p.title, ^"#{query}%"))
           Repo.all(text_query)
         %{} ->
           Repo.all(Skill)
