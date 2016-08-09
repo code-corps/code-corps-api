@@ -1,6 +1,6 @@
 defmodule CodeCorps.Skill do
   use CodeCorps.Web, :model
-  import Inflex
+  alias Inflex
 
   schema "skills" do
     field :title, :string

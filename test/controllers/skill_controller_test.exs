@@ -4,7 +4,7 @@ defmodule CodeCorps.SkillControllerTest do
   alias CodeCorps.Skill
   alias CodeCorps.Repo
 
-  @valid_attrs %{description: "some content", original_row: 42, slug: "some content", title: "some content"}
+  @valid_attrs %{description: "Knowledge of the Elixir Language", original_row: 1, slug: "elixir-in-phoenix", title: "Elixir in Phoenix"}
   @invalid_attrs %{}
 
   setup do
