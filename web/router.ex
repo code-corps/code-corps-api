@@ -35,6 +35,8 @@ defmodule CodeCorps.Router do
 
     resources "/projects", ProjectController, except: [:delete]
 
+    resources "/roles", RoleController, only: [:create, :index, :show]
+
     resources "/skills", SkillController, only: [:create, :index, :show]
 
     get "/users/email_available", UserController, :email_available
