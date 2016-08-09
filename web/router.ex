@@ -24,6 +24,7 @@ defmodule CodeCorps.Router do
 
     resources "/categories", CategoryController, except: [:delete]
     resources "/organizations", OrganizationController, except: [:new, :edit]
+    resources "/skills", SkillController, only: [:create, :index, :show]
 
     get "/users/email_available", UserController, :email_available
     get "/users/username_available", UserController, :username_available
