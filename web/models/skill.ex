@@ -15,7 +15,7 @@ defmodule CodeCorps.Skill do
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:title, :description, :original_row])
-    |> validate_required(:title)
+    |> validate_required([:title])
     |> unique_constraint(:title)
   end
 end
