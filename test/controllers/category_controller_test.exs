@@ -3,7 +3,7 @@ defmodule CodeCorps.CategoryControllerTest do
 
   alias CodeCorps.Category
 
-  @valid_attrs %{description: "The technology category", name: "Technology", slug: "technology"}
+  @valid_attrs %{description: "You want to improve software tools and infrastructure.", name: "Technology"}
   @invalid_attrs %{name: nil}
 
   setup do
@@ -36,7 +36,7 @@ defmodule CodeCorps.CategoryControllerTest do
   end
 
   test "shows chosen resource", %{conn: conn} do
-    changeset = Category.changeset(%Category{}, @valid_attrs)
+    changeset = Category.create_changeset(%Category{}, @valid_attrs)
     category = Repo.insert!(changeset)
     conn = get conn, category_path(conn, :show, category)
     assert json_response(conn, 200)["data"] == %{
@@ -58,7 +58,10 @@ defmodule CodeCorps.CategoryControllerTest do
 
   test "creates and renders resource when data is valid", %{conn: conn} do
     conn = post conn, category_path(conn, :create), build_payload(@valid_attrs)
-    assert json_response(conn, 201)["data"]["id"]
+    response = json_response(conn, 201)
+
+    assert response["data"]["id"]
+    assert response["data"]["attributes"]["slug"] == "technology"
     assert Repo.get_by(Category, @valid_attrs)
   end
 
@@ -68,7 +71,7 @@ defmodule CodeCorps.CategoryControllerTest do
   end
 
   test "updates and renders chosen resource when data is valid", %{conn: conn} do
-    changeset = Category.changeset(%Category{}, @valid_attrs)
+    changeset = Category.create_changeset(%Category{}, @valid_attrs)
     category = Repo.insert!(changeset)
     updated_attrs = %{@valid_attrs | description: "New Description"}
     conn = put conn, category_path(conn, :update, category), build_payload(category.id, updated_attrs)
@@ -78,7 +81,7 @@ defmodule CodeCorps.CategoryControllerTest do
   end
 
   test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
-    changeset = Category.changeset(%Category{}, @valid_attrs)
+    changeset = Category.create_changeset(%Category{}, @valid_attrs)
     category = Repo.insert!(changeset)
     conn = put conn, category_path(conn, :update, category), build_payload(category.id, @invalid_attrs)
     assert json_response(conn, 422)["errors"] != %{}

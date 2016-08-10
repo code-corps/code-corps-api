@@ -10,7 +10,7 @@ defmodule CodeCorps.CategoryController do
   end
 
   def create(conn, %{"data" => data = %{"type" => "category", "attributes" => _category_params}}) do
-    changeset = Category.changeset(%Category{}, Params.to_attributes(data))
+    changeset = Category.create_changeset(%Category{}, Params.to_attributes(data))
 
     case Repo.insert(changeset) do
       {:ok, category} ->
@@ -33,7 +33,7 @@ defmodule CodeCorps.CategoryController do
   def update(conn, %{"id" => id, "data" => data = %{"type" => "category", "attributes" => _category_params}}) do
     category = Repo.get!(Category, id)
     changeset = Category.changeset(category, Params.to_attributes(data))
-    
+
     case Repo.update(changeset) do
       {:ok, category} ->
         render(conn, "show.json-api", data: category)

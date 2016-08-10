@@ -5,7 +5,7 @@ defmodule CodeCorps.Category do
 
   use CodeCorps.Web, :model
 
-  import CodeCorps.Validators.SlugValidator
+  import CodeCorps.ModelHelpers
 
   schema "categories" do
     field :name, :string
@@ -20,8 +20,17 @@ defmodule CodeCorps.Category do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:name, :slug, :description])
-    |> validate_required([:name, :slug, :description])
-    |> validate_slug(:slug)
+    |> cast(params, [:name, :description, :slug])
+    |> validate_required([:name])
+  end
+
+  @doc """
+  Builds a changeset for creating an organization.
+  """
+  def create_changeset(struct, params) do
+    struct
+    |> changeset(params)
+    |> generate_slug(:name, :slug)
+    |> validate_required([:slug])
   end
 end

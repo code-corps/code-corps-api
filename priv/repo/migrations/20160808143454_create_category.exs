@@ -10,6 +10,6 @@ defmodule CodeCorps.Repo.Migrations.CreateCategory do
       timestamps()
     end
 
-    create index(:categories, [:slug], unique: true, name: :index_categories_on_slug)
+    create index(:categories, ["lower(slug)"], unique: true, name: :index_categories_on_slug)
   end
 end
