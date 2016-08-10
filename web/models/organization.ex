@@ -7,6 +7,7 @@ defmodule CodeCorps.Organization do
 
   alias CodeCorps.SluggedRoute
 
+  import CodeCorps.ModelHelpers
   import CodeCorps.Validators.SlugValidator
 
   schema "organizations" do
@@ -34,19 +35,10 @@ defmodule CodeCorps.Organization do
   def create_changeset(struct, params) do
     struct
     |> changeset(params)
-    |> generate_slug()
+    |> generate_slug(:name, :slug)
     |> validate_required([:slug])
     |> validate_slug(:slug)
     |> put_slugged_route()
-  end
-
-  defp generate_slug(changeset) do
-    case changeset do
-      %Ecto.Changeset{valid?: true, changes: %{name: name}} ->
-        put_change(changeset, :slug, Inflex.parameterize(name))
-      _ ->
-        changeset
-    end
   end
 
   defp put_slugged_route(changeset) do
