@@ -22,6 +22,7 @@ defmodule CodeCorps.Router do
   scope "/", CodeCorps, host: "api." do
     pipe_through :api
 
+    resources "/categories", CategoryController, except: [:delete]
     resources "/organizations", OrganizationController, except: [:new, :edit]
 
     get "/users/email_available", UserController, :email_available
