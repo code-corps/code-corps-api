@@ -4,7 +4,12 @@ defmodule CodeCorps.SkillControllerTest do
   alias CodeCorps.Skill
   alias CodeCorps.Repo
 
-  @valid_attrs %{description: "Knowledge of the Elixir Language", original_row: 1, slug: "elixir-in-phoenix", title: "Elixir in Phoenix"}
+  @valid_attrs %{
+    description: "Elixir is a functional, concurrent, general-purpose programming language that runs on the Erlang virtual machine (BEAM).",
+    original_row: 1,
+    slug: "elixir-in-phoenix",
+    title: "Elixir in Phoenix"
+  }
   @invalid_attrs %{}
 
   setup do
