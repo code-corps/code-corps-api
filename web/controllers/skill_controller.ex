@@ -10,11 +10,11 @@ defmodule CodeCorps.SkillController do
     skills =
       case params do
         %{"filter" => filter} ->
-          ids = String.split(filter, ",") |> Enum.map(fn(n) -> String.to_integer(n) end)
+          ids = coalesce_id_string(filter)
           query = Skill |> where([p], p.id in ^ids)
           Repo.all(query)
         %{"query" => query} ->
-          text_query = Skill |> where([p], ilike(p.title, ^"#{query}%"))
+          text_query = Skill |> where([p], ilike(p.title, ^"%#{query}%"))
           Repo.all(text_query)
         %{} ->
           Repo.all(Skill)
@@ -41,5 +41,9 @@ defmodule CodeCorps.SkillController do
   def show(conn, %{"id" => id}) do
     skill = Repo.get!(Skill, id)
     render(conn, "show.json-api", data: skill)
+  end
+
+  defp coalesce_id_string(string) do
+    String.split(string, ",") |> Enum.map(fn(n) -> String.to_integer(n) end)
   end
 end
