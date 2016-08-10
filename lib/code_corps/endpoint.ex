@@ -38,5 +38,6 @@ defmodule CodeCorps.Endpoint do
     key: "_code_corps_key",
     signing_salt: "RJebPcfU"
 
+  plug Corsica, origins: "http://localhost:4200"
   plug CodeCorps.Router
 end
