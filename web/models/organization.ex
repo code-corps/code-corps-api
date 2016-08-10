@@ -6,6 +6,7 @@ defmodule CodeCorps.Organization do
   use CodeCorps.Web, :model
 
   alias CodeCorps.SluggedRoute
+  alias CodeCorps.Project
 
   import CodeCorps.ModelHelpers
   import CodeCorps.Validators.SlugValidator
@@ -16,6 +17,7 @@ defmodule CodeCorps.Organization do
     field :slug, :string
 
     has_one :slugged_route, SluggedRoute
+    has_many :projects, Project
 
     timestamps()
   end
