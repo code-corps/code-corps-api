@@ -3,9 +3,12 @@ defmodule CodeCorps.SkillTest do
 
   alias CodeCorps.Skill
 
-  @valid_attrs %{description: "test", original_row: 1, slug: nil, title: "Multi Word"}
+  @valid_attrs %{
+    description: "Elixir is a functional, concurrent, general-purpose programming language that runs on the Erlang virtual machine (BEAM).",
+    original_row: 1,
+    title: "Elixir"
+  }
   @invalid_attrs %{description: "test", original_row: 1}
-  @invalid_title %{description: "test", original_row: 1, slug: nil, title: "About"}
 
   test "changeset with valid attributes" do
     changeset = Skill.changeset(%Skill{}, @valid_attrs)
@@ -14,17 +17,6 @@ defmodule CodeCorps.SkillTest do
 
   test "changeset with invalid attributes" do
     changeset = Skill.changeset(%Skill{}, @invalid_attrs)
-    refute changeset.valid?
-  end
-
-  test "title creates correct slug parameterization" do
-    changeset = Skill.changeset(%Skill{}, @valid_attrs)
-    assert changeset.changes.slug == "multi-word"
-  end
-
-  test "title cannot be reserved route" do
-    changeset = Skill.changeset(%Skill{}, @invalid_title)
-    assert changeset.errors == [slug: {"is reserved", []}]
     refute changeset.valid?
   end
 end
