@@ -1,13 +1,10 @@
 defmodule CodeCorps.Skill do
   use CodeCorps.Web, :model
-  import CodeCorps.Validators.SlugValidator
-  import CodeCorps.ModelHelpers
 
   schema "skills" do
     field :title, :string
     field :description, :string
     field :original_row, :integer
-    field :slug, :string
 
     timestamps()
   end
@@ -17,11 +14,8 @@ defmodule CodeCorps.Skill do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:title, :description, :original_row, :slug])
+    |> cast(params, [:title, :description, :original_row])
     |> validate_required(:title)
-    |> generate_slug(:title, :slug)
-    |> validate_required(:slug)
-    |> validate_slug(:slug)
-    |> unique_constraint(:slug)
+    |> unique_constraint(:title)
   end
 end

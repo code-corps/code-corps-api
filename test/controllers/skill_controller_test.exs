@@ -7,8 +7,7 @@ defmodule CodeCorps.SkillControllerTest do
   @valid_attrs %{
     description: "Elixir is a functional, concurrent, general-purpose programming language that runs on the Erlang virtual machine (BEAM).",
     original_row: 1,
-    slug: "elixir-in-phoenix",
-    title: "Elixir in Phoenix"
+    title: "Elixir"
   }
   @invalid_attrs %{}
 
@@ -39,7 +38,6 @@ defmodule CodeCorps.SkillControllerTest do
     assert data["attributes"]["title"] == skill.title
     assert data["attributes"]["description"] == skill.description
     assert data["attributes"]["original_row"] == skill.original_row
-    assert data["attributes"]["slug"] == skill.slug
   end
 
   test "does not show resource and instead throw error when id is nonexistent", %{conn: conn} do
