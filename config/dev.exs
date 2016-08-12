@@ -41,3 +41,6 @@ config :code_corps, CodeCorps.Repo,
   hostname: System.get_env("DATABASE_POSTGRESQL_HOST") || "localhost",
   database: "code_corps_phoenix_dev",
   pool_size: 10
+
+# CORS allowed origins
+config :code_corps, allowed_origins: ["http://localhost:4200"]

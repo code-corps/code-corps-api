@@ -21,3 +21,6 @@ config :code_corps, CodeCorps.Repo,
 # speed up password hashing
 config :comeonin, :bcrypt_log_rounds, 4
 config :comeonin, :pbkdf2_rounds, 1
+
+# CORS allowed origins
+config :code_corps, allowed_origins: ["http://localhost:4200"]
