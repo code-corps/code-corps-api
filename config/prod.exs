@@ -16,6 +16,14 @@ config :code_corps, CodeCorps.Endpoint,
   url: [host: "example.com", port: 80],
   cache_static_manifest: "priv/static/manifest.json"
 
+# CORS allowed origins
+config :code_corps, allowed_origins: [
+  "http://codecorps.org",
+  "http://www.codecorps.org",
+  "https://codecorps.org",
+  "https://www.codecorps.org"
+]
+
 # Do not print debug messages in production
 config :logger, level: :info
 

@@ -38,5 +38,6 @@ defmodule CodeCorps.Endpoint do
     key: "_code_corps_key",
     signing_salt: "RJebPcfU"
 
+  plug Corsica, origins: Application.get_env(:code_corps, :allowed_origins)
   plug CodeCorps.Router
 end
