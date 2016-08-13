@@ -29,6 +29,10 @@ defmodule CodeCorps.Router do
     get "/users/username_available", UserController, :username_available
     resources "/users", UserController, except: [:new, :edit]
 
+    resources "/projects", ProjectController, except: [:delete]
+
     get "/:slug", SluggedRouteController, :show
+    get "/:slug/projects", ProjectController, :index
+    get "/:slug/:project_slug", ProjectController, :show
   end
 end
