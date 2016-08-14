@@ -1,6 +1,13 @@
 defmodule CodeCorps.TestHelpers do
   alias CodeCorps.Repo
+  alias CodeCorps.Skill
   alias CodeCorps.User
+
+  def insert_skill(attrs \\ %{}) do
+    %Skill{}
+    |> Skill.changeset(attrs)
+    |> Repo.insert!()
+  end
 
   def insert_user(attrs \\ %{}) do
     changes = Map.merge(%{

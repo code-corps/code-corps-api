@@ -9,8 +9,8 @@ defmodule CodeCorps.SkillController do
   def index(conn, params) do
     skills =
       case params do
-        %{"filter" => filter} ->
-          ids = coalesce_id_string(filter)
+        %{"filter" => %{"id" => id_list}} ->
+          ids = coalesce_id_string(id_list)
           query = Skill |> where([p], p.id in ^ids)
           Repo.all(query)
         %{"query" => query} ->
