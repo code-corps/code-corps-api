@@ -29,15 +29,38 @@ defmodule CodeCorps.SkillControllerTest do
     assert json_response(conn, 200)["data"] == []
   end
 
+  test "filters resources on index", %{conn: conn} do
+    elixir = insert_skill(%{title: "Elixir"})
+    phoenix = insert_skill(%{title: "Phoenix"})
+    insert_skill(%{title: "Rails"})
+    conn = get conn, "skills/?filter[id]=#{elixir.id},#{phoenix.id}"
+    data = json_response(conn, 200)["data"]
+    [first_result, second_result | _] = data
+    assert length(data) == 2
+    assert first_result["id"] == "#{elixir.id}"
+    assert second_result["id"] == "#{phoenix.id}"
+  end
+
+  test "returns search results on index", %{conn: conn} do
+    ruby = insert_skill(%{title: "Ruby"})
+    rails = insert_skill(%{title: "Rails"})
+    insert_skill(%{title: "Phoenix"})
+    conn = get conn, skill_path(conn, :index, query: "r")
+    data = json_response(conn, 200)["data"]
+    [first_result, second_result | _] = data
+    assert length(data) == 2
+    assert first_result["id"] == "#{ruby.id}"
+    assert second_result["id"] == "#{rails.id}"
+  end
+
   test "shows chosen resource", %{conn: conn} do
-    skill = Repo.insert! %Skill{}
+    skill = insert_skill(@valid_attrs)
     conn = get conn, skill_path(conn, :show, skill)
     data = json_response(conn, 200)["data"]
     assert data["id"] == "#{skill.id}"
     assert data["type"] == "skill"
     assert data["attributes"]["title"] == skill.title
     assert data["attributes"]["description"] == skill.description
-    assert data["attributes"]["original_row"] == skill.original_row
   end
 
   test "does not show resource and instead throw error when id is nonexistent", %{conn: conn} do
