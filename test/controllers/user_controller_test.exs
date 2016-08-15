@@ -40,6 +40,18 @@ defmodule CodeCorps.UserControllerTest do
     assert json_response(conn, 200)["data"] == []
   end
 
+  test "filters resources on index", %{conn: conn} do
+    user_1 = insert_user(%{username: "user_1", email: "user_1@mail.com"})
+    user_2 = insert_user(%{username: "user_2", email: "user_2@mail.com"})
+    insert_user(%{username: "user_3", email: "user_3@mail.com"})
+    conn = get conn, "users/?filter[id]=#{user_1.id},#{user_2.id}"
+    data = json_response(conn, 200)["data"]
+    [first_result, second_result | _] = data
+    assert length(data) == 2
+    assert first_result["id"] == "#{user_1.id}"
+    assert second_result["id"] == "#{user_2.id}"
+  end
+
   test "shows chosen resource", %{conn: conn} do
     user = insert_user()
     conn = get conn, user_path(conn, :show, user)
