@@ -1,6 +1,8 @@
 defmodule CodeCorps.SkillController do
   use CodeCorps.Web, :controller
 
+  import CodeCorps.ControllerHelpers
+
   alias CodeCorps.Skill
   alias JaSerializer.Params
 
@@ -10,14 +12,12 @@ defmodule CodeCorps.SkillController do
     skills =
       case params do
         %{"filter" => %{"id" => id_list}} ->
-          ids = coalesce_id_string(id_list)
-          query = Skill |> where([p], p.id in ^ids)
-          Repo.all(query)
+          ids = id_list |> coalesce_id_string
+          Skill |> where([p], p.id in ^ids) |> Repo.all
         %{"query" => query} ->
-          text_query = Skill |> where([p], ilike(p.title, ^"%#{query}%"))
-          Repo.all(text_query)
+          Skill |> where([p], ilike(p.title, ^"%#{query}%")) |> Repo.all
         %{} ->
-          Repo.all(Skill)
+          Skill |> Repo.all
       end
     render(conn, "index.json-api", data: skills)
   end
@@ -43,7 +43,5 @@ defmodule CodeCorps.SkillController do
     render(conn, "show.json-api", data: skill)
   end
 
-  defp coalesce_id_string(string) do
-    String.split(string, ",") |> Enum.map(fn(n) -> String.to_integer(n) end)
-  end
+
 end

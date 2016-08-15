@@ -1,6 +1,8 @@
 defmodule CodeCorps.OrganizationController do
   use CodeCorps.Web, :controller
 
+  import CodeCorps.ControllerHelpers
+
   alias CodeCorps.Organization
   alias JaSerializer.Params
 
@@ -8,11 +10,21 @@ defmodule CodeCorps.OrganizationController do
 
   plug :scrub_params, "data" when action in [:create, :update]
 
-  def index(conn, _params) do
+  def index(conn, params) do
     organizations =
-      Organization
-      |> preload([:slugged_route])
-      |> Repo.all
+      case params do
+        %{"filter" => %{"id" => id_list}} ->
+          ids = id_list |> coalesce_id_string
+          Organization
+          |> preload([:slugged_route])
+          |> where([p], p.id in ^ids)
+          |> Repo.all
+        %{} ->
+          Organization
+          |> preload([:slugged_route])
+          |> Repo.all
+      end
+
     render(conn, "index.json-api", data: organizations)
   end
 
