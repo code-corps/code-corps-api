@@ -1,16 +1,28 @@
 defmodule CodeCorps.UserController do
   use CodeCorps.Web, :controller
 
+  import CodeCorps.ControllerHelpers
+
   alias CodeCorps.User
   alias JaSerializer.Params
 
   plug :scrub_params, "data" when action in [:create, :update]
 
-  def index(conn, _params) do
+  def index(conn, params) do
     users =
-      User
-      |> preload([:slugged_route])
-      |> Repo.all
+      case params do
+        %{"filter" => %{"id" => id_list}} ->
+          ids = id_list |> coalesce_id_string
+          User
+          |> preload([:slugged_route])
+          |> where([p], p.id in ^ids)
+          |> Repo.all
+        %{} ->
+          User
+          |> preload([:slugged_route])
+          |> Repo.all
+      end
+
     render(conn, "index.json-api", data: users)
   end
 

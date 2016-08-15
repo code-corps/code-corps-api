@@ -42,6 +42,4 @@ defmodule CodeCorps.SkillController do
     skill = Repo.get!(Skill, id)
     render(conn, "show.json-api", data: skill)
   end
-
-
 end
