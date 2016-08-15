@@ -26,6 +26,18 @@ defmodule CodeCorps.OrganizationControllerTest do
     assert json_response(conn, 200)["data"] == []
   end
 
+  test "filters resources on index", %{conn: conn} do
+    first_org = insert_organization(%{name: "Org A"})
+    second_org = insert_organization(%{name: "Org B"})
+    insert_organization(%{name: "Org C"})
+    conn = get conn, "organizations/?filter[id]=#{first_org.id},#{second_org.id}"
+    data = json_response(conn, 200)["data"]
+    [first_result, second_result | _] = data
+    assert length(data) == 2
+    assert first_result["id"] == "#{first_org.id}"
+    assert second_result["id"] == "#{second_org.id}"
+  end
+
   test "shows chosen resource", %{conn: conn} do
     organization = Repo.insert! %Organization{}
     conn = get conn, organization_path(conn, :show, organization)
