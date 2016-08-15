@@ -24,10 +24,10 @@ defmodule CodeCorps.TestHelpers do
   end
 
   def insert_organization(attrs \\ %{}) do
-    changes = Map.merge(attrs, %{
+    changes = Map.merge(%{
       name: "Test organization",
       description: "Test description"
-    })
+    }, attrs)
 
     %Organization{}
     |> Organization.create_changeset(changes)
