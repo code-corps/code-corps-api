@@ -38,6 +38,8 @@ defmodule CodeCorps.Router do
 
     resources "/projects", ProjectController, except: [:delete]
 
+    resources "/previews", PreviewController, only: [:create]
+
     get "/:slug", SluggedRouteController, :show
     get "/:slug/projects", ProjectController, :index
     get "/:slug/:project_slug", ProjectController, :show
