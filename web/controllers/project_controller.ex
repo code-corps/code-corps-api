@@ -23,6 +23,7 @@ defmodule CodeCorps.ProjectController do
     projects =
       Project
       |> Repo.all
+      |> Repo.preload([:organization])
     render(conn, "index.json-api", data: projects)
   end
 
