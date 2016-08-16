@@ -4,6 +4,7 @@ defmodule CodeCorps.TestHelpers do
   alias CodeCorps.User
   alias CodeCorps.Role
   alias CodeCorps.Organization
+  alias CodeCorps.Post
   alias CodeCorps.Project
   alias CodeCorps.UserSkill
   alias CodeCorps.RoleSkill
@@ -20,7 +21,7 @@ defmodule CodeCorps.TestHelpers do
 
   def insert_user(attrs \\ %{}) do
     changes = Map.merge(%{
-      email: "test@user.com",
+      email: "test#{Base.encode16(:crypto.strong_rand_bytes(8))}@user.com",
       username: "user#{Base.encode16(:crypto.strong_rand_bytes(8))}",
       password: "password",
     }, attrs)
@@ -55,8 +56,7 @@ defmodule CodeCorps.TestHelpers do
 
   def insert_project(attrs \\ %{}) do
     changes = Map.merge(%{
-      title: "Default test project",
-      slug: "default_test_project"
+      title: "Default test project #{Base.encode16(:crypto.strong_rand_bytes(8))}",
     }, attrs)
 
     %Project{}
@@ -76,4 +76,15 @@ defmodule CodeCorps.TestHelpers do
     |> Repo.insert!
   end
 
+  def insert_post(attrs \\ %{}) do
+    changes = Map.merge(%{
+      markdown: "some content",
+      post_type: "issue",
+      title: "Default test project",
+    }, attrs)
+
+    %Post{}
+    |> Post.create_changeset(changes)
+    |> Repo.insert!
+  end
 end
