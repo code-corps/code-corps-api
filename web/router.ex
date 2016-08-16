@@ -44,6 +44,7 @@ defmodule CodeCorps.Router do
     resources "/users", UserController, except: [:new, :edit]
 
     resources "/user-skills", UserSkillController, except: [:update]
+    resources "/role-skills", RoleSkillController, except: [:update]
 
     get "/:slug", SluggedRouteController, :show
     get "/:slug/projects", ProjectController, :index

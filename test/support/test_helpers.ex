@@ -2,9 +2,11 @@ defmodule CodeCorps.TestHelpers do
   alias CodeCorps.Repo
   alias CodeCorps.Skill
   alias CodeCorps.User
+  alias CodeCorps.Role
   alias CodeCorps.Organization
   alias CodeCorps.Project
   alias CodeCorps.UserSkill
+  alias CodeCorps.RoleSkill
 
   def insert_skill(attrs \\ %{}) do
     changes = Map.merge(%{
@@ -25,6 +27,18 @@ defmodule CodeCorps.TestHelpers do
 
     %User{}
     |> User.registration_changeset(changes)
+    |> Repo.insert!()
+  end
+
+  def insert_role(attrs \\ %{}) do
+    changes = Map.merge(%{
+      name: "Backend Developer",
+      ability: "Backend Development",
+      kind: "technology"
+    }, attrs)
+
+    %Role{}
+    |> Role.changeset(changes)
     |> Repo.insert!()
   end
 
@@ -55,4 +69,11 @@ defmodule CodeCorps.TestHelpers do
     |> UserSkill.changeset(attrs)
     |> Repo.insert!
   end
+
+  def insert_role_skill(attrs \\ %{}) do
+    %RoleSkill{}
+    |> RoleSkill.changeset(attrs)
+    |> Repo.insert!
+  end
+
 end
