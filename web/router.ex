@@ -31,9 +31,13 @@ defmodule CodeCorps.Router do
 
     resources "/organizations", OrganizationController, except: [:new, :edit]
 
+    resources "/posts", PostController, only: [:create, :index, :show, :update]
+
     resources "/previews", PreviewController, only: [:create]
 
-    resources "/projects", ProjectController, except: [:delete]
+    resources "/projects", ProjectController, except: [:delete] do
+      resources "/posts", PostController, only: [:index, :show]
+    end
 
     resources "/roles", RoleController, only: [:create, :index, :show]
 

@@ -19,7 +19,7 @@ defmodule CodeCorps.Role do
     |> validate_inclusion(:kind, kinds)
   end
 
-  def kinds do
+  defp kinds do
     ~w{ technology creative support }
   end
 end

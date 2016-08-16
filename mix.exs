@@ -47,7 +47,7 @@ defmodule CodeCorps.Mixfile do
       {:credo, "~> 0.4", only: [:dev, :test]}, # Code style suggestions
       {:inflex, "~> 1.7.0"},
       {:corsica, "~> 0.4"}, # CORS
-      {:earmark, "~> 1.0"} # Markdown rendering
+      {:earmark, "~> 1.0"}, # Markdown rendering
     ]
   end
 

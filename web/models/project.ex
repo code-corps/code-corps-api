@@ -5,6 +5,8 @@ defmodule CodeCorps.Project do
 
   use CodeCorps.Web, :model
 
+  alias CodeCorps.MarkdownRenderer
+
   import CodeCorps.ModelHelpers
   import CodeCorps.Validators.SlugValidator
 
@@ -30,7 +32,7 @@ defmodule CodeCorps.Project do
     |> validate_slug(:slug)
     |> unique_constraint(:slug, name: :index_projects_on_slug)
     |> add_project_icons(Map.get(params, :base64_icon_data))
-    |> render_markdown_to_html
+    |> MarkdownRenderer.render_markdown_to_html(:long_description_markdown, :long_description_body)
   end
 
   defp add_project_icons(changeset, nil), do: changeset
@@ -39,24 +41,4 @@ defmodule CodeCorps.Project do
     # TODO: Deal with image file upload
     changeset
   end
-
-  defp render_markdown_to_html(changeset) do
-    case changeset do
-      %Ecto.Changeset{changes: %{long_description_markdown: _}} ->
-        changeset
-        |> do_render_markdown_to_html
-      _ ->
-        changeset
-    end
-  end
-  defp do_render_markdown_to_html(changeset) do
-    html =
-      changeset
-      |> get_change(:long_description_markdown)
-      |> Earmark.to_html
-
-    changeset
-    |> put_change(:long_description_body, html)
-  end
 end
-

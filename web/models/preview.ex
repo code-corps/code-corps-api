@@ -5,6 +5,8 @@ defmodule CodeCorps.Preview do
 
   use CodeCorps.Web, :model
 
+  alias CodeCorps.MarkdownRenderer
+
   schema "preview" do
     field :body, :string
     field :markdown, :string
@@ -22,18 +24,8 @@ defmodule CodeCorps.Preview do
     |> cast(params, [:markdown])
     |> validate_required([:markdown])
     |> assign_user(user)
-    |> render_markdown_to_html
+    |> MarkdownRenderer.render_markdown_to_html(:markdown, :body)
   end
-
-  defp render_markdown_to_html(changeset = %Ecto.Changeset{changes: %{markdown: markdown}}) do
-    html =
-      markdown
-      |> Earmark.to_html
-
-    changeset
-    |> put_change(:body, html)
-  end
-  defp render_markdown_to_html(changeset), do: changeset
 
   defp assign_user(changeset, nil), do: changeset
   defp assign_user(changeset, user) do
