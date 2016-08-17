@@ -17,7 +17,7 @@ services:
 
   web: &api_base
     build: .
-    command: bash -c "mix do deps.get, compile, ecto.setup, phoenix.server"
+    command: bash -c "mix do deps.get, compile, ecto.create, ecto.migrate, phoenix.server"
     depends_on:
       - postgres
       - elasticsearch
@@ -37,25 +37,13 @@ services:
 
   test:
     <<: *api_base
+    command: bash -c "mix do deps.get, compile, ecto.drop, ecto.create, ecto.migrate, phoenix.server"
     environment:
       <<: *api_environment
       MIX_ENV: test
       PORT: 4001
     ports:
       - 49236:4001
-
-  watch:
-    <<: *api_base
-    command: bash -c "mix do deps.get, compile, test.watch"
-    depends_on:
-      - test
-      - web
-    environment:
-      <<: *api_environment
-      MIX_ENV: dev
-      PORT: 4002
-    ports:
-      - 49237:4002
 
   apiary:
     image: apiaryio/client
