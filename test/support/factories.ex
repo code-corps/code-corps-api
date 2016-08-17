@@ -46,4 +46,23 @@ defmodule CodeCorps.Factories do
       category: build(:category)
     }
   end
+
+  def post_factory do
+    %CodeCorps.Post{
+      title: "Test post",
+      post_type: "issue",
+      markdown: "A test post",
+      status: "open",
+      project: build(:project),
+      user: build(:user)
+    }
+  end
+
+  def comment_factory do
+    %CodeCorps.Comment{
+      body: "I love elixir!",
+      markdown: "I love elixir!",
+      post: build(:post)
+    }
+  end
 end

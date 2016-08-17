@@ -29,13 +29,17 @@ defmodule CodeCorps.Router do
 
     resources "/categories", CategoryController, only: [:index, :show, :create, :update]
 
+    resources "/comments", CommentController, only: [:index, :show, :create, :update]
+
     resources "/organizations", OrganizationController, only: [:index, :show, :create, :update] do
       resources "/memberships", OrganizationMembershipController, only: [:index]
     end
 
     resources "/organization-memberships", OrganizationMembershipController, only: [:index, :show, :create, :update, :delete]
 
-    resources "/posts", PostController, only: [:create, :index, :show, :update]
+    resources "/posts", PostController, only: [:create, :index, :show, :update] do
+      resources "/comments", CommentController, only: [:index, :show]
+    end
 
     resources "/previews", PreviewController, only: [:create]
 

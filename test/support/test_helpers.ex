@@ -1,13 +1,14 @@
 defmodule CodeCorps.TestHelpers do
-  alias CodeCorps.Repo
-  alias CodeCorps.Skill
-  alias CodeCorps.User
-  alias CodeCorps.Role
+  alias CodeCorps.Comment
   alias CodeCorps.Organization
   alias CodeCorps.Post
   alias CodeCorps.Project
-  alias CodeCorps.UserSkill
+  alias CodeCorps.Repo
+  alias CodeCorps.Role
   alias CodeCorps.RoleSkill
+  alias CodeCorps.Skill
+  alias CodeCorps.User
+  alias CodeCorps.UserSkill
 
   def insert_skill(attrs \\ %{}) do
     changes = Map.merge(%{
@@ -85,6 +86,16 @@ defmodule CodeCorps.TestHelpers do
 
     %Post{}
     |> Post.create_changeset(changes)
+    |> Repo.insert!
+  end
+
+  def insert_comment(attrs \\ %{}) do
+    changes = Map.merge(%{
+      markdown: "some content",
+    }, attrs)
+
+    %Comment{}
+    |> Comment.create_changeset(changes)
     |> Repo.insert!
   end
 end

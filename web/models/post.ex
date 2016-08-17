@@ -13,6 +13,7 @@ defmodule CodeCorps.Post do
 
     belongs_to :project, CodeCorps.Project
     belongs_to :user, CodeCorps.User
+    has_many :comments, CodeCorps.Comment
 
     timestamps()
   end
