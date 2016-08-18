@@ -2,6 +2,7 @@ alias CodeCorps.Repo
 alias CodeCorps.Category
 alias CodeCorps.Organization
 alias CodeCorps.Project
+alias CodeCorps.Role
 alias CodeCorps.Skill
 alias CodeCorps.User
 
@@ -99,6 +100,106 @@ cond do
   true ->
     Enum.each(skills, fn skill ->
       Skill.changeset(%Skill{}, skill)
+      |> Repo.insert!
+    end)
+end
+
+# Roles
+
+roles = [
+  %{
+    name: "Accountant",
+    ability: "Accounting",
+    kind: "support",
+  },
+  %{
+    name: "Administrator",
+    ability: "Administrative",
+    kind: "support",
+  },
+  %{
+    name: "Donor",
+    ability: "Donations",
+    kind: "support",
+  },
+  %{
+    name: "Backend Developer",
+    ability: "Backend Development",
+    kind: "technology",
+  },
+  %{
+    name: "Data Scientist",
+    ability: "Data Science",
+    kind: "technology",
+  },
+  %{
+    name: "Designer",
+    ability: "Design",
+    kind: "creative",
+  },
+  %{
+    name: "DevOps",
+    ability: "DevOps",
+    kind: "technology",
+  },
+  %{
+    name: "Front End Developer",
+    ability: "Front End Development",
+    kind: "technology",
+  },
+  %{
+    name: "Lawyer",
+    ability: "Legal",
+    kind: "support",
+  },
+  %{
+    name: "Marketer",
+    ability: "Marketing",
+    kind: "creative",
+  },
+  %{
+    name: "Mobile Developer",
+    ability: "Mobile Development",
+    kind: "technology",
+  },
+  %{
+    name: "Product Manager",
+    ability: "Product Management",
+    kind: "technology",
+  },
+  %{
+    name: "Photographer",
+    ability: "Photography",
+    kind: "creative",
+  },
+  %{
+    name: "Researcher",
+    ability: "Research",
+    kind: "support",
+  },
+  %{
+    name: "Tester",
+    ability: "Testing",
+    kind: "technology",
+  },
+  %{
+    name: "Video Producer",
+    ability: "Video Production",
+    kind: "creative",
+  },
+  %{
+    name: "Writer",
+    ability: "Writing",
+    kind: "creative",
+  },
+]
+
+cond do
+  Repo.all(Role) != [] ->
+    IO.puts "Roles detected, aborting role seed."
+  true ->
+    Enum.each(roles, fn role ->
+      Role.changeset(%Role{}, role)
       |> Repo.insert!
     end)
 end
