@@ -29,7 +29,11 @@ defmodule CodeCorps.Router do
 
     resources "/categories", CategoryController, except: [:delete]
 
-    resources "/organizations", OrganizationController, except: [:new, :edit]
+    resources "/organizations", OrganizationController, except: [:new, :edit] do
+      resources "/memberships", OrganizationMembershipController, only: [:index]
+    end
+
+    resources "/organization-memberships", OrganizationMembershipController, only: [:index, :show, :create, :update, :delete]
 
     resources "/posts", PostController, only: [:create, :index, :show, :update]
 
