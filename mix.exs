@@ -20,7 +20,7 @@ defmodule CodeCorps.Mixfile do
     [mod: {CodeCorps, []},
      applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger,
                     :gettext, :phoenix_ecto, :postgrex, :comeonin, :corsica,
-                    :earmark]]
+                    :earmark, :ex_machina]]
   end
 
   # Specifies which paths to compile per environment.
@@ -48,6 +48,7 @@ defmodule CodeCorps.Mixfile do
       {:inflex, "~> 1.7.0"},
       {:corsica, "~> 0.4"}, # CORS
       {:earmark, "~> 1.0"}, # Markdown rendering
+      {:ex_machina, "~> 1.0", only: :test}, # test factories
     ]
   end
 

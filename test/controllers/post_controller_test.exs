@@ -10,6 +10,7 @@ defmodule CodeCorps.PostControllerTest do
     markdown: "A test post",
     status: "open"
   }
+
   @invalid_attrs %{
     post_type: "nonexistent",
     status: "nonexistent"
