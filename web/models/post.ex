@@ -19,10 +19,11 @@ defmodule CodeCorps.Post do
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:title, :markdown, :post_type, :status])
+    |> cast(params, [:title, :markdown, :post_type, :status, :project_id])
     |> validate_required([:title, :markdown, :post_type, :status])
     |> validate_inclusion(:post_type, post_types)
     |> validate_inclusion(:status, statuses)
+    |> assoc_constraint(:project)
     |> MarkdownRenderer.render_markdown_to_html(:markdown, :body)
   end
 

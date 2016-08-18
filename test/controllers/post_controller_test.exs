@@ -98,8 +98,12 @@ defmodule CodeCorps.PostControllerTest do
       }
     }
 
-    assert json_response(conn, 201)["data"]["id"]
+    data = json_response(conn, 201)["data"]
+    id = data["id"]
     assert Repo.get_by(Post, @valid_attrs)
+    assert data["id"] == id
+    assert data["relationships"]["project"]["data"]["id"] == Integer.to_string(project.id)
+    assert data["relationships"]["project"]["data"]["type"] == "project"
   end
 
   test "does not create resource and renders errors when data is invalid", %{conn: conn} do
@@ -129,6 +133,27 @@ defmodule CodeCorps.PostControllerTest do
 
     assert json_response(conn, 200)["data"]["id"]
     assert Repo.get_by(Post, @valid_attrs)
+  end
+
+  test "updates related data and renders chosen resource when data is valid", %{conn: conn} do
+    user = insert_user()
+    project = insert_project()
+    project_two = insert_project()
+    post = insert_post(%{project_id: project.id, user_id: user.id})
+    conn = put conn, post_path(conn, :update, post), %{
+      "meta" => %{},
+      "data" => %{
+        "type" => "post",
+        "id" => post.id,
+        "attributes" => @valid_attrs,
+        "relationships" => relationships(user, project_two)
+      }
+    }
+    data = json_response(conn, 200)["data"]
+    assert data["type"] == "post"
+    assert data["id"] == Integer.to_string(post.id)
+    assert data["relationships"]["project"]["data"]["id"] == Integer.to_string(project_two.id)
+    assert data["relationships"]["project"]["data"]["type"] == "project"
   end
 
   test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
