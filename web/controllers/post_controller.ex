@@ -12,6 +12,7 @@ defmodule CodeCorps.PostController do
       where: c.project_id == ^project_id,
       select: c
     )
+    posts = Repo.preload(posts, [:project])
     render(conn, "index.json-api", data: posts)
   end
   def index(conn, _params) do
@@ -24,6 +25,7 @@ defmodule CodeCorps.PostController do
 
     case Repo.insert(changeset) do
       {:ok, post} ->
+        post = Repo.preload(post, [:project])
         conn
         |> put_status(:created)
         |> put_resp_header("location", post_path(conn, :show, post))
@@ -42,15 +44,22 @@ defmodule CodeCorps.PostController do
       where: c.project_id == ^project_id,
       select: c
     )
+    post = Repo.preload(post, [:project])
     render(conn, "show.json-api", data: post)
   end
   def show(conn, %{"id" => id}) do
-    post = Repo.get!(Post, id)
+    post = 
+      Post
+      |> preload([:project])
+      |> Repo.get!(id)
     render(conn, "show.json-api", data: post)
   end
 
   def update(conn, %{"id" => id, "data" => data = %{"type" => "post", "attributes" => _post_params}}) do
-    post = Repo.get!(Post, id)
+    post = 
+      Post
+      |> preload([:project])
+      |> Repo.get!(id)
     changeset = Post.changeset(post, Params.to_attributes(data))
 
     case Repo.update(changeset) do
