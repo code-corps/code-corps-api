@@ -15,7 +15,7 @@ defmodule CodeCorps.PreviewTest do
     assert changeset.errors[:markdown] == {"can't be blank", []}
   end
 
-  test "assings user_id if present" do
+  test "assigns user_id if present" do
     user = insert_user
     changeset = Preview.changeset(%Preview{}, %{markdown: "A **strong** element"}, user)
     assert changeset.valid?
