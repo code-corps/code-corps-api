@@ -1,5 +1,37 @@
 alias CodeCorps.Repo
 alias CodeCorps.Category
+alias CodeCorps.Skill
+
+skills = [
+  %{
+    title: "Ember.js",
+  },
+  %{
+    title: "HTML",
+  },
+  %{
+    title: "CSS",
+  },
+  %{
+    title: "Ruby",
+  },
+  %{
+    title: "Ruby on Rails",
+  },
+  %{
+    title: "Docker",
+  },
+]
+
+cond do
+  Repo.all(Skill) != [] ->
+    IO.puts "Skills detected, aborting skill seed."
+  true ->
+    Enum.each(skills, fn skill ->
+      Skill.changeset(%Skill{}, skill)
+      |> Repo.insert!
+    end)
+end
 
 categories = [
   %{
