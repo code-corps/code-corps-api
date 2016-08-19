@@ -17,10 +17,25 @@ defmodule CodeCorps.Mixfile do
   #
   # Type `mix help compile.app` for more information.
   def application do
-    [mod: {CodeCorps, []},
-     applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger,
-                    :gettext, :phoenix_ecto, :postgrex, :comeonin, :corsica,
-                    :earmark]]
+    [
+      mod: {CodeCorps, []},
+      applications: [
+        :phoenix,
+        :phoenix_pubsub,
+        :phoenix_html,
+        :cowboy,
+        :logger,
+        :gettext,
+        :phoenix_ecto,
+        :postgrex,
+        :comeonin,
+        :corsica,
+        :earmark,
+        :ex_aws,
+        :httpoison,
+        :arc_ecto
+      ]
+    ]
   end
 
   # Specifies which paths to compile per environment.
@@ -49,6 +64,11 @@ defmodule CodeCorps.Mixfile do
       {:corsica, "~> 0.4"}, # CORS
       {:earmark, "~> 1.0"}, # Markdown rendering
       {:ex_machina, "~> 1.0", only: :test}, # test factories
+      {:arc, git: "https://github.com/stavro/arc.git", ref: "354d4d2e1b86bcd6285db3528118fe3f5db36cf5", override: true}, # Photo uploads
+      {:arc_ecto, "~> 0.4.3"},
+      {:ex_aws, "~> 0.4.10"}, # Amazon AWS
+      {:httpoison, "~> 0.7"},
+      {:poison, "~> 1.2"},
     ]
   end
 
