@@ -17,10 +17,11 @@ services:
 
   web: &api_base
     build: .
-    command: bash -c "mix do deps.get, compile, ecto.create, ecto.migrate, phoenix.server"
+    command: bash -c "mix do deps.get, compile, ecto.setup, phoenix.server"
     depends_on:
       - postgres
       - elasticsearch
+    env_file: .env
     environment: &api_environment
       MIX_ENV: dev
       PORT: 4000

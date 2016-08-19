@@ -3,21 +3,25 @@ defmodule CodeCorps.User do
   This module defines a user of the Code Corps app.
   """
 
+  use Arc.Ecto.Schema
   use CodeCorps.Web, :model
 
   alias CodeCorps.SluggedRoute
   alias Comeonin.Bcrypt
   alias Ecto.Changeset
 
+  import CodeCorps.Base64ImageUploader
   import CodeCorps.Validators.SlugValidator
 
   schema "users" do
+    field :base64_photo_data, :string, virtual: true
     field :biography, :string
     field :encrypted_password, :string
     field :email, :string
     field :first_name, :string
     field :last_name, :string
     field :password, :string, virtual: true
+    field :photo, CodeCorps.UserPhoto.Type
     field :twitter, :string
     field :username, :string
     field :website, :string
@@ -56,10 +60,11 @@ defmodule CodeCorps.User do
   def update_changeset(struct, params) do
     struct
     |> changeset(params)
-    |> cast(params, [:first_name, :last_name, :twitter, :biography, :website])
+    |> cast(params, [:first_name, :last_name, :twitter, :biography, :website, :base64_photo_data])
     |> prefix_url(:website)
     |> validate_format(:website, ~r/\A((http|https):\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,}(([0-9]{1,5})?\/.*)?#=\z/ix)
     |> validate_format(:twitter, ~r/\A[a-zA-Z0-9_]{1,15}\z/)
+    |> upload_image(:base64_photo_data, :photo)
   end
 
   def check_email_availability(email) do
