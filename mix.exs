@@ -20,7 +20,7 @@ defmodule CodeCorps.Mixfile do
     [mod: {CodeCorps, []},
      applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger,
                     :gettext, :phoenix_ecto, :postgrex, :comeonin, :corsica,
-                    :earmark, :ex_machina]]
+                    :earmark]]
   end
 
   # Specifies which paths to compile per environment.
