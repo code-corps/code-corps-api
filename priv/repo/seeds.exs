@@ -17,8 +17,8 @@ users = [
   },
   %{
     username: "testuser",
-    email: "test@example.org",
-    password: "test",
+    email: "test@example.com",
+    password: "test123",
     admin: false
   },
 ]
@@ -28,8 +28,9 @@ cond do
     IO.puts "Users detected, aborting user seed."
   true ->
     Enum.each(users, fn user ->
-      User.registration_changeset(%User{}, user)
-      |> Repo.insert!
+      %User{}
+      |> User.registration_changeset(user)
+      |> Repo.insert!()
     end)
 end
 
