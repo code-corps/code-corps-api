@@ -27,9 +27,9 @@ defmodule CodeCorps.Router do
     post "/login", AuthController, :create
     delete "/logout", AuthController, :delete
 
-    resources "/categories", CategoryController, except: [:delete]
+    resources "/categories", CategoryController, only: [:index, :show, :create, :update]
 
-    resources "/organizations", OrganizationController, except: [:new, :edit] do
+    resources "/organizations", OrganizationController, only: [:index, :show, :create, :update] do
       resources "/memberships", OrganizationMembershipController, only: [:index]
     end
 
@@ -39,7 +39,7 @@ defmodule CodeCorps.Router do
 
     resources "/previews", PreviewController, only: [:create]
 
-    resources "/projects", ProjectController, except: [:delete] do
+    resources "/projects", ProjectController, only: [:index, :show, :create, :update] do
       resources "/posts", PostController, only: [:index, :show]
     end
 
@@ -49,10 +49,10 @@ defmodule CodeCorps.Router do
 
     get "/users/email_available", UserController, :email_available
     get "/users/username_available", UserController, :username_available
-    resources "/users", UserController, except: [:new, :edit]
+    resources "/users", UserController, only: [:index, :show, :create, :update]
 
-    resources "/user-skills", UserSkillController, except: [:update]
-    resources "/role-skills", RoleSkillController, except: [:update]
+    resources "/user-skills", UserSkillController, only: [:index, :show, :create, :delete]
+    resources "/role-skills", RoleSkillController, only: [:index, :show, :create, :delete]
 
     get "/:slug", SluggedRouteController, :show
     get "/:slug/projects", ProjectController, :index
