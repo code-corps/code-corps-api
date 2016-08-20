@@ -2,6 +2,7 @@ alias CodeCorps.Repo
 alias CodeCorps.Category
 alias CodeCorps.Organization
 alias CodeCorps.Project
+alias CodeCorps.Skill
 alias CodeCorps.User
 
 # Users
@@ -56,7 +57,7 @@ projects = [
     title: "Code Corps",
     description: "A basic project for use in development",
     organization_id: 1
-  },
+  }
 ]
 
 cond do
@@ -65,6 +66,39 @@ cond do
   true ->
     Enum.each(projects, fn project ->
       Project.changeset(%Project{}, project)
+      |> Repo.insert!
+    end)
+end
+
+# Skills
+
+skills = [
+  %{
+    title: "CSS",
+    },
+  %{
+    title: "Docker",
+  },
+  %{
+    title: "Ember.js",
+  },
+  %{
+    title: "HTML",
+  },
+  %{
+    title: "Ruby",
+  },
+  %{
+    title: "Ruby on Rails",
+  },
+]
+
+cond do
+  Repo.all(Skill) != [] ->
+    IO.puts "Skills detected, aborting skill seed."
+  true ->
+    Enum.each(skills, fn skill ->
+      Skill.changeset(%Skill{}, skill)
       |> Repo.insert!
     end)
 end
