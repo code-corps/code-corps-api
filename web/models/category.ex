@@ -12,6 +12,9 @@ defmodule CodeCorps.Category do
     field :slug, :string
     field :description, :string
 
+    has_many :project_categories, CodeCorps.ProjectCategory
+    has_many :projects, through: [:project_categories, :project]
+
     timestamps()
   end
 

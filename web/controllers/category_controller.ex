@@ -14,6 +14,10 @@ defmodule CodeCorps.CategoryController do
 
     case Repo.insert(changeset) do
       {:ok, category} ->
+        category =
+          category
+          |> Repo.preload([:projects])
+
         conn
         |> put_status(:created)
         |> put_resp_header("location", category_path(conn, :show, category))
@@ -26,13 +30,20 @@ defmodule CodeCorps.CategoryController do
   end
 
   def show(conn, %{"id" => id}) do
-    category = Repo.get!(Category, id)
+    category =
+      Category
+      |> preload([:projects])
+      |> Repo.get!(id)
+
     render(conn, "show.json-api", data: category)
   end
 
   def update(conn, %{"id" => id, "data" => data = %{"type" => "category", "attributes" => _category_params}}) do
-    category = Repo.get!(Category, id)
-    changeset = Category.changeset(category, Params.to_attributes(data))
+    changeset =
+      Category
+      |> preload([:projects])
+      |> Repo.get!(id)
+      |> Category.changeset(Params.to_attributes(data))
 
     case Repo.update(changeset) do
       {:ok, category} ->

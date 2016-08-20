@@ -1,6 +1,8 @@
 defmodule CodeCorps.CategoryControllerTest do
   use CodeCorps.ConnCase
 
+  import CodeCorps.Factories
+
   alias CodeCorps.Category
 
   @valid_attrs %{description: "You want to improve software tools and infrastructure.", name: "Technology"}
@@ -22,12 +24,7 @@ defmodule CodeCorps.CategoryControllerTest do
   end
 
   defp build_payload(attributes) do
-    %{
-      "data" => %{
-        "type" => "category",
-        "attributes" => attributes
-      }
-    }
+    %{ "data" => %{"type" => "category", "attributes" => attributes}}
   end
 
   test "lists all entries on index", %{conn: conn} do
@@ -36,18 +33,17 @@ defmodule CodeCorps.CategoryControllerTest do
   end
 
   test "shows chosen resource", %{conn: conn} do
-    changeset = Category.create_changeset(%Category{}, @valid_attrs)
-    category = Repo.insert!(changeset)
-    conn = get conn, category_path(conn, :show, category)
-    assert json_response(conn, 200)["data"] == %{
-      "id" => "#{category.id}",
-      "type" => "category",
-      "attributes" => %{
-        "name" => category.name,
-        "slug" => category.slug,
-        "description" => category.description
-      }
-    }
+    category = insert(:category)
+
+    path = conn |> category_path(:show, category)
+    data = conn |> get(path) |> json_response(200) |> Map.get("data")
+
+    assert data["id"] == category.id |> Integer.to_string
+    assert data["type"] == "category"
+
+    assert data["attributes"]["name"] == category.name
+    assert data["attributes"]["slug"] == category.slug
+    assert data["attributes"]["description"] == category.description
   end
 
   test "renders page not found when id is nonexistent", %{conn: conn} do
@@ -71,8 +67,7 @@ defmodule CodeCorps.CategoryControllerTest do
   end
 
   test "updates and renders chosen resource when data is valid", %{conn: conn} do
-    changeset = Category.create_changeset(%Category{}, @valid_attrs)
-    category = Repo.insert!(changeset)
+    category = insert(:category)
     updated_attrs = %{@valid_attrs | description: "New Description"}
     conn = put conn, category_path(conn, :update, category), build_payload(category.id, updated_attrs)
 
@@ -81,8 +76,7 @@ defmodule CodeCorps.CategoryControllerTest do
   end
 
   test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
-    changeset = Category.create_changeset(%Category{}, @valid_attrs)
-    category = Repo.insert!(changeset)
+    category = insert(:category)
     conn = put conn, category_path(conn, :update, category), build_payload(category.id, @invalid_attrs)
     assert json_response(conn, 422)["errors"] != %{}
   end
