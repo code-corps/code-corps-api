@@ -35,7 +35,8 @@ defmodule CodeCorps.Factories do
   def category_factory do
     %CodeCorps.Category{
       name: sequence(:name, &"Category #{&1}"),
-      slug: sequence(:slug, &"category_#{&1}")
+      slug: sequence(:slug, &"category_#{&1}"),
+      description: sequence(:description, &"A description for category #{&1}"),
     }
   end
 
