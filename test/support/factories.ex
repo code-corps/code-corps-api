@@ -24,4 +24,25 @@ defmodule CodeCorps.Factories do
       role: "contributor"
     }
   end
+
+  def project_factory do
+    %CodeCorps.Project{
+      title: sequence(:title, &"Project #{&1}"),
+      slug: sequence(:slug, &"project_#{&1}")
+    }
+  end
+
+  def category_factory do
+    %CodeCorps.Category{
+      name: sequence(:name, &"Category #{&1}"),
+      slug: sequence(:slug, &"category_#{&1}")
+    }
+  end
+
+  def project_category_factory do
+    %CodeCorps.ProjectCategory{
+      project: build(:project),
+      category: build(:category)
+    }
+  end
 end
