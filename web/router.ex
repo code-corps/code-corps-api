@@ -43,6 +43,8 @@ defmodule CodeCorps.Router do
       resources "/posts", PostController, only: [:index, :show]
     end
 
+    resources "/project_categories", ProjectCategoryController, only: [:create, :delete]
+
     resources "/roles", RoleController, only: [:create, :index, :show]
 
     resources "/skills", SkillController, only: [:create, :index, :show]
