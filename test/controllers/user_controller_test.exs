@@ -126,6 +126,27 @@ defmodule CodeCorps.UserControllerTest do
       assert user.biography == "Just a test user"
     end
 
+    test "uploads a photo to S3", %{conn: conn} do
+      user = insert_user()
+      photo_data = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
+      attrs = Map.put(@valid_attrs, :base64_photo_data, photo_data)
+      conn = put conn, user_path(conn, :update, user), %{
+        "meta" => %{},
+        "data" => %{
+          "type" => "user",
+          "id" => user.id,
+          "attributes" => attrs,
+          "relationships" => relationships
+        }
+      }
+
+      data = json_response(conn, 200)["data"]
+      large_url = data["attributes"]["photo-large-url"]
+      assert String.contains? large_url, "/users/#{user.id}/large"
+      thumb_url = data["attributes"]["photo-thumb-url"]
+      assert String.contains? thumb_url, "/users/#{user.id}/thumb"
+    end
+
     test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
       user = insert_user()
       conn = put conn, user_path(conn, :update, user), %{

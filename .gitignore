@@ -26,3 +26,7 @@ erl_crash.dump
 
 # Secret
 .env
+
+/tmp
+
+.DS_Store
