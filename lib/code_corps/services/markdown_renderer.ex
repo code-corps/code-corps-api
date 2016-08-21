@@ -1,6 +1,8 @@
 defmodule CodeCorps.MarkdownRenderer do
   def render_markdown_to_html(changeset, source_field, destination_field) do
     case changeset do
+      %Ecto.Changeset{valid?: false} ->
+        changeset
       %Ecto.Changeset{changes: %{^source_field => _}} ->
         changeset
         |> do_render_markdown_to_html(source_field, destination_field)
