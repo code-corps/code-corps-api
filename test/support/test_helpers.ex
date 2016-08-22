@@ -5,6 +5,7 @@ defmodule CodeCorps.TestHelpers do
   alias CodeCorps.Project
   alias CodeCorps.Repo
   alias CodeCorps.Role
+  alias CodeCorps.UserRole
   alias CodeCorps.RoleSkill
   alias CodeCorps.Skill
   alias CodeCorps.User
@@ -62,6 +63,12 @@ defmodule CodeCorps.TestHelpers do
 
     %Project{}
     |> Project.changeset(changes)
+    |> Repo.insert!
+  end
+
+  def insert_user_role(attrs \\ %{}) do
+    %UserRole{}
+    |> UserRole.changeset(attrs)
     |> Repo.insert!
   end
 

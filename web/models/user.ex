@@ -28,6 +28,9 @@ defmodule CodeCorps.User do
 
     has_one :slugged_route, SluggedRoute
 
+    has_many :user_roles, CodeCorps.UserRole
+    has_many :roles, through: [:user_roles, :role]
+
     timestamps()
   end
 

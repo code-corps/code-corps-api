@@ -98,6 +98,7 @@ defmodule CodeCorps.UserTest do
       refute Map.has_key?(changeset.changes, :website)
     end
 
+    @tag :requires_env
     test "uploads base64photo data to aws" do
       # 1x1 black pixel gif
       photo_data = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
