@@ -62,6 +62,13 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def project_skill_factory do
+    %CodeCorps.ProjectSkill{
+      project: build(:project),
+      skill: build(:skill)
+    }
+  end
+
   def post_factory do
     %CodeCorps.Post{
       title: "Test post",
@@ -70,6 +77,13 @@ defmodule CodeCorps.Factories do
       status: "open",
       project: build(:project),
       user: build(:user)
+    }
+  end
+
+  def skill_factory do
+    %CodeCorps.Skill{
+      title: sequence(:name, &"Skill #{&1}"),
+      description: sequence(:description, &"A description for skill #{&1}"),
     }
   end
 
