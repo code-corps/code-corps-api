@@ -11,6 +11,9 @@ defmodule CodeCorps.Skill do
     has_many :role_skills, CodeCorps.RoleSkill
     has_many :roles, through: [:role_skills, :role]
 
+    has_many :project_skills, CodeCorps.ProjectSkill
+    has_many :projects, through: [:project_skills, :project]
+
     timestamps()
   end
 

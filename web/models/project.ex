@@ -26,6 +26,9 @@ defmodule CodeCorps.Project do
     has_many :project_categories, CodeCorps.ProjectCategory
     has_many :categories, through: [:project_categories, :category]
 
+    has_many :project_skills, CodeCorps.ProjectSkill
+    has_many :skills, through: [:project_skills, :skill]
+
     timestamps()
   end
 

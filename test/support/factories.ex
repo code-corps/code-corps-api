@@ -118,4 +118,11 @@ defmodule CodeCorps.Factories do
       skill: build(:skill)
     }
   end
+
+  def project_skill_factory do
+    %CodeCorps.ProjectSkill{
+      project: build(:project),
+      skill: build(:skill)
+    }
+  end
 end
