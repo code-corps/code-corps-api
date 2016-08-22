@@ -10,13 +10,14 @@ defmodule CodeCorps.UserViewTest do
 
   test "renders all attributes and relationships properly" do
     db_user = insert(:user)
-    user_role = insert(:user_role, user: db_user)
     user_category = insert(:user_category, user: db_user)
+    user_role = insert(:user_role, user: db_user)
+    user_skill = insert(:user_skill, user: db_user)
 
     user =
       CodeCorps.User
-      |> Repo.get(user_role.user_id)
-      |> CodeCorps.Repo.preload([:slugged_route, :roles, :categories])
+      |> Repo.get(db_user.id)
+      |> CodeCorps.Repo.preload([:categories, :roles, :skills, :slugged_route])
 
     rendered_json =  render(CodeCorps.UserView, "show.json-api", data: user)
 
@@ -43,6 +44,11 @@ defmodule CodeCorps.UserViewTest do
               %{id: user_role.role_id |> Integer.to_string, type: "role"}
             ]
           },
+          "skills" => %{
+            data: [
+              %{id: user_skill.skill_id |> Integer.to_string, type: "skill"}
+            ]
+          },
           "slugged-route" => %{
             data: nil
           },
@@ -54,6 +60,11 @@ defmodule CodeCorps.UserViewTest do
           "user-roles" => %{
             data: [
               %{id: user_role.id |> Integer.to_string, type: "user-role"}
+            ]
+          },
+          "user-skills" => %{
+            data: [
+              %{id: user_skill.id |> Integer.to_string, type: "user-skill"}
             ]
           }
         }

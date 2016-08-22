@@ -28,11 +28,14 @@ defmodule CodeCorps.User do
 
     has_one :slugged_route, SluggedRoute
 
+    has_many :user_categories, CodeCorps.UserCategory
+    has_many :categories, through: [:user_categories, :category]
+
     has_many :user_roles, CodeCorps.UserRole
     has_many :roles, through: [:user_roles, :role]
 
-    has_many :user_categories, CodeCorps.UserCategory
-    has_many :categories, through: [:user_categories, :category]
+    has_many :user_skills, CodeCorps.UserSkill
+    has_many :skills, through: [:user_skills, :skill]
 
     timestamps()
   end
