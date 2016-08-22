@@ -28,6 +28,11 @@ defmodule CodeCorps.User do
 
     has_one :slugged_route, SluggedRoute
 
+    has_many :organization_memberships,
+      CodeCorps.OrganizationMembership,
+      foreign_key: :member_id
+    has_many :organizations, through: [:organization_memberships, :organization]
+
     has_many :user_categories, CodeCorps.UserCategory
     has_many :categories, through: [:user_categories, :category]
 
