@@ -9,6 +9,6 @@ defmodule CodeCorps.Repo.Migrations.CreateUserCategory do
       timestamps()
     end
 
-    create index(:user_categories, [:user_id, :category_id], unique: true, name: :index_projects_on_user_id_category_id)
+    create index(:user_categories, [:user_id, :category_id], unique: true
   end
 end

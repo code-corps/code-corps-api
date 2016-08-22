@@ -1,8 +1,8 @@
 defmodule CodeCorps.UserCategoryControllerTest do
   use CodeCorps.ConnCase
 
-  alias CodeCorps.UserCategory
   alias CodeCorps.Repo
+  alias CodeCorps.UserCategory
 
   setup do
     conn =
