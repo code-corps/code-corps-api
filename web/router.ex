@@ -60,6 +60,7 @@ defmodule CodeCorps.Router do
     resources "/user-roles", UserRoleController, only: [:create, :delete]
     resources "/user-skills", UserSkillController, only: [:index, :show, :create, :delete]
     resources "/role-skills", RoleSkillController, only: [:index, :show, :create, :delete]
+    resources "/project-skills", ProjectSkillController, only: [:index, :show, :create, :delete]
 
     get "/:slug", SluggedRouteController, :show
     get "/:slug/projects", ProjectController, :index
