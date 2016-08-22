@@ -9,6 +9,9 @@ defmodule CodeCorps.ProjectView do
 
   has_one :organization, serializer: CodeCorps.OrganizationView
 
+  has_many :project_categories, serializer: CodeCorps.ProjectCategoryView
+  has_many :categories, serializer: CodeCorps.CategoryView
+
   def icon_large_url(project, _conn) do
     CodeCorps.ProjectIcon.url({project.icon, project}, :large)
   end
