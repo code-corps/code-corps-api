@@ -10,6 +10,13 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def user_category_factory do
+    %CodeCorps.UserCategory{
+      user: build(:user),
+      category: build(:category)
+    }
+  end
+
   def user_role_factory do
     %CodeCorps.UserRole{
       user: build(:user),

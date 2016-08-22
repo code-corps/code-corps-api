@@ -14,12 +14,12 @@ defmodule CodeCorps.UserController do
         %{"filter" => %{"id" => id_list}} ->
           ids = id_list |> coalesce_id_string
           User
-          |> preload([:slugged_route, :roles])
+          |> preload([:slugged_route, :categories, :roles])
           |> where([p], p.id in ^ids)
           |> Repo.all
         %{} ->
           User
-          |> preload([:slugged_route, :roles])
+          |> preload([:slugged_route, :categories, :roles])
           |> Repo.all
       end
 
@@ -31,7 +31,7 @@ defmodule CodeCorps.UserController do
 
     case Repo.insert(changeset) do
       {:ok, user} ->
-        user = Repo.preload(user, [:slugged_route, :roles])
+        user = Repo.preload(user, [:slugged_route, :categories, :roles])
 
         conn
         |> put_status(:created)
@@ -47,7 +47,7 @@ defmodule CodeCorps.UserController do
   def show(conn, %{"id" => id}) do
     user =
       User
-      |> preload([:slugged_route, :roles])
+      |> preload([:slugged_route, :categories, :roles])
       |> Repo.get!(id)
   render(conn, "show.json-api", data: user)
   end
@@ -55,7 +55,7 @@ defmodule CodeCorps.UserController do
   def update(conn, %{"id" => id, "data" => data = %{"type" => "user", "attributes" => _user_params}}) do
     user =
       User
-      |> preload([:slugged_route, :roles])
+      |> preload([:slugged_route, :categories, :roles])
       |> Repo.get!(id)
 
     changeset = User.update_changeset(user, Params.to_attributes(data))

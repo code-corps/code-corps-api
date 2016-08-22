@@ -9,6 +9,9 @@ defmodule CodeCorps.UserView do
   has_many :user_roles, serializer: CodeCorps.UserRoleView
   has_many :roles, serializer: CodeCorps.RoleView
 
+  has_many :user_categories, serializer: CodeCorps.UserCategoryView
+  has_many :categories, serializer: CodeCorps.CategoryView
+
   def photo_large_url(user, _conn) do
     CodeCorps.UserPhoto.url({user.photo, user}, :large)
   end

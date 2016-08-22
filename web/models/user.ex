@@ -31,6 +31,9 @@ defmodule CodeCorps.User do
     has_many :user_roles, CodeCorps.UserRole
     has_many :roles, through: [:user_roles, :role]
 
+    has_many :user_categories, CodeCorps.UserCategory
+    has_many :categories, through: [:user_categories, :category]
+
     timestamps()
   end
 
