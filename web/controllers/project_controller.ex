@@ -46,7 +46,7 @@ defmodule CodeCorps.ProjectController do
   end
 
   def create(conn, %{"data" => data = %{"type" => "project", "attributes" => _project_params}}) do
-    changeset = Project.changeset(%Project{}, Params.to_attributes(data))
+    changeset = Project.create_changeset(%Project{}, Params.to_attributes(data))
 
     case Repo.insert(changeset) do
       {:ok, project} ->

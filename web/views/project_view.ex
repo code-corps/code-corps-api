@@ -8,4 +8,12 @@ defmodule CodeCorps.ProjectView do
   	:inserted_at, :updated_at]
 
   has_one :organization, serializer: CodeCorps.OrganizationView
+
+  def icon_large_url(project, _conn) do
+    CodeCorps.ProjectIcon.url({project.icon, project}, :large)
+  end
+
+  def icon_thumb_url(project, _conn) do
+    CodeCorps.ProjectIcon.url({project.icon, project}, :thumb)
+  end
 end

@@ -133,6 +133,28 @@ defmodule CodeCorps.ProjectControllerTest do
       assert project.organization_id == organization.id
     end
 
+    test "uploads a icon to S3", %{conn: conn} do
+      project = insert_project()
+      icon_data = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
+      attrs = Map.put(@valid_attrs, :base64_icon_data, icon_data)
+      conn = put conn, project_path(conn, :update, project), %{
+        "meta" => %{},
+        "data" => %{
+          "type" => "project",
+          "id" => project.id,
+          "attributes" => attrs
+        }
+      }
+
+      data = json_response(conn, 201)["data"]
+      large_url = data["attributes"]["icon-large-url"]
+      assert large_url
+      assert String.contains? large_url, "/projects/#{project.id}/large"
+      thumb_url = data["attributes"]["icon-thumb-url"]
+      assert thumb_url
+      assert String.contains? thumb_url, "/projects/#{project.id}/thumb"
+    end
+
     test "renders errors when attributes are invalid", %{conn: conn} do
       payload = %{
         "meta" => %{},

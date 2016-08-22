@@ -27,4 +27,28 @@ defmodule CodeCorps.ProjectTest do
     changeset = Project.changeset(%Project{}, @valid_attrs)
     assert changeset |> fetch_change(:long_description_body) == :error
   end
+
+  test "create changeset with valid attributes" do
+    changeset = Project.create_changeset(%Project{}, @valid_attrs)
+    assert changeset.valid?
+    assert changeset.changes.slug == "a-title"
+  end
+
+  test "create changeset with invalid attributes" do
+    changeset = Project.create_changeset(%Project{}, @invalid_attrs)
+    refute changeset.valid?
+  end
+
+  test "uploads base64icon data to aws" do
+    # 1x1 black pixel gif
+    icon_data = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
+    project = insert_project
+    attrs = %{base64_icon_data: icon_data, title: "Test"}
+
+    changeset = Project.changeset(project, attrs)
+
+    assert changeset.valid?
+    [_, file_type] = changeset.changes.icon.file_name |> String.split(".")
+    assert file_type == "gif"
+  end
 end
