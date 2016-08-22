@@ -74,6 +74,28 @@ defmodule CodeCorps.OrganizationControllerTest do
     assert organization.id == slugged_route.organization_id
   end
 
+  test "uploads a icon to S3", %{conn: conn} do
+    organization = insert_organization()
+    icon_data = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
+    attrs = Map.put(@valid_attrs, :base64_icon_data, icon_data)
+    conn = put conn, organization_path(conn, :update, organization), %{
+      "meta" => %{},
+      "data" => %{
+        "type" => "organization",
+        "id" => organization.id,
+        "attributes" => attrs
+      }
+    }
+
+    data = json_response(conn, 200)["data"]
+    large_url = data["attributes"]["icon-large-url"]
+    assert large_url
+    assert String.contains? large_url, "/organizations/#{organization.id}/large"
+    thumb_url = data["attributes"]["icon-thumb-url"]
+    assert thumb_url
+    assert String.contains? thumb_url, "/organizations/#{organization.id}/thumb"
+  end
+
   test "does not create resource and renders errors when data is invalid", %{conn: conn} do
     conn = post conn, organization_path(conn, :create), %{
       "meta" => %{},
