@@ -3,17 +3,21 @@ defmodule CodeCorps.Organization do
   Represents an organization on Code Corps, e.g. "Code Corps" itself.
   """
 
+  use Arc.Ecto.Schema
   use CodeCorps.Web, :model
 
   alias CodeCorps.SluggedRoute
   alias CodeCorps.Project
 
+  import CodeCorps.Base64ImageUploader
   import CodeCorps.ModelHelpers
   import CodeCorps.Validators.SlugValidator
 
   schema "organizations" do
-    field :name, :string
+    field :base64_icon_data, :string, virtual: true
     field :description, :string
+    field :icon, CodeCorps.OrganizationIcon.Type
+    field :name, :string
     field :slug, :string
 
     has_one :slugged_route, SluggedRoute
@@ -27,8 +31,9 @@ defmodule CodeCorps.Organization do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:name, :description, :slug])
+    |> cast(params, [:name, :description, :slug, :base64_icon_data])
     |> validate_required([:name])
+    |> upload_image(:base64_icon_data, :icon)
   end
 
   @doc """
