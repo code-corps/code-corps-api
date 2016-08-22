@@ -1,4 +1,5 @@
 defmodule CodeCorps.TestHelpers do
+  alias CodeCorps.Category
   alias CodeCorps.Comment
   alias CodeCorps.Organization
   alias CodeCorps.Post
@@ -9,7 +10,21 @@ defmodule CodeCorps.TestHelpers do
   alias CodeCorps.RoleSkill
   alias CodeCorps.Skill
   alias CodeCorps.User
+  alias CodeCorps.UserCategory
   alias CodeCorps.UserSkill
+
+  def insert_category(attrs \\ %{}) do
+    changes = Map.merge(%{
+      name: "A category"
+    }, attrs)
+
+    changes = changes
+    |> Map.put(:slug, Inflex.parameterize(changes[:name]))
+
+    %Category{}
+    |> Category.changeset(changes)
+    |> Repo.insert!()
+  end
 
   def insert_skill(attrs \\ %{}) do
     changes = Map.merge(%{
@@ -69,6 +84,12 @@ defmodule CodeCorps.TestHelpers do
   def insert_user_role(attrs \\ %{}) do
     %UserRole{}
     |> UserRole.changeset(attrs)
+    |> Repo.insert!
+  end
+
+  def insert_user_category(attrs \\ %{}) do
+    %UserCategory{}
+    |> UserCategory.changeset(attrs)
     |> Repo.insert!
   end
 
