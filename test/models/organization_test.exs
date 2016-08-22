@@ -16,6 +16,7 @@ defmodule CodeCorps.OrganizationTest do
     refute changeset.valid?
   end
 
+  @tag :requires_env
   test "uploads base64icon data to aws" do
     # 1x1 black pixel gif
     icon_data = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="

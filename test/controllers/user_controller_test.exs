@@ -126,6 +126,7 @@ defmodule CodeCorps.UserControllerTest do
       assert user.biography == "Just a test user"
     end
 
+    @tag :requires_env
     test "uploads a photo to S3", %{conn: conn} do
       user = insert_user()
       photo_data = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
