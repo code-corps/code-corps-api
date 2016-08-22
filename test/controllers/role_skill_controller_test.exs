@@ -15,8 +15,7 @@ defmodule CodeCorps.RoleSkillControllerTest do
     {:ok, conn: conn}
   end
 
-  defp attributes do
-    %{}
+  defp attributes do 
   end
 
   defp relationships(role, skill) do

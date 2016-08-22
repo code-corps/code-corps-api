@@ -12,11 +12,12 @@ defmodule CodeCorps.ProjectViewTest do
     organization = insert(:organization)
     project = insert(:project, organization: organization)
     project_category = insert(:project_category, project: project)
+    project_skill = insert(:project_skill, project: project)
 
     project =
       CodeCorps.Project
       |> Repo.get(project.id)
-      |> CodeCorps.Repo.preload([:categories, :organization])
+      |> CodeCorps.Repo.preload([:categories, :organization, :skills])
 
     rendered_json =  render(CodeCorps.ProjectView, "show.json-api", data: project)
 
@@ -54,6 +55,22 @@ defmodule CodeCorps.ProjectViewTest do
               %{
                 id: project_category.id |> Integer.to_string,
                 type: "project-category"
+              }
+            ]
+          },
+          "project-skills" => %{
+            data: [
+              %{
+                id: project_skill.id |> Integer.to_string,
+                type: "project-skill"
+              }
+            ]
+          },
+          "skills" => %{
+            data: [
+              %{
+                id: project_skill.skill_id |> Integer.to_string,
+                type: "skill"
               }
             ]
           },

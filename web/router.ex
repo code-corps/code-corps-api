@@ -25,12 +25,12 @@ defmodule CodeCorps.Router do
   scope "/", CodeCorps, host: "api." do
     pipe_through :api
 
-    post "/login", AuthController, :create
-    delete "/logout", AuthController, :delete
-
     resources "/categories", CategoryController, only: [:index, :show, :create, :update]
 
     resources "/comments", CommentController, only: [:index, :show, :create, :update]
+
+    post "/login", AuthController, :create
+    delete "/logout", AuthController, :delete
 
     resources "/organizations", OrganizationController, only: [:index, :show, :create, :update] do
       resources "/memberships", OrganizationMembershipController, only: [:index]
@@ -49,8 +49,10 @@ defmodule CodeCorps.Router do
     end
 
     resources "/project_categories", ProjectCategoryController, only: [:create, :delete]
+    resources "/project-skills", ProjectSkillController, only: [:index, :show, :create, :delete]
 
     resources "/roles", RoleController, only: [:create, :index, :show]
+    resources "/role-skills", RoleSkillController, only: [:index, :show, :create, :delete]
 
     resources "/skills", SkillController, only: [:create, :index, :show]
 
@@ -61,7 +63,6 @@ defmodule CodeCorps.Router do
     resources "/user-categories", UserCategoryController, only: [:index, :show, :create, :delete]
     resources "/user-roles", UserRoleController, only: [:create, :delete]
     resources "/user-skills", UserSkillController, only: [:index, :show, :create, :delete]
-    resources "/role-skills", RoleSkillController, only: [:index, :show, :create, :delete]
 
     get "/:slug", SluggedRouteController, :show
     get "/:slug/projects", ProjectController, :index
