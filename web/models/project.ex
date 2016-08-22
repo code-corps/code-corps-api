@@ -16,8 +16,6 @@ defmodule CodeCorps.Project do
     field :base64_icon_data, :string, virtual: true
     field :description, :string
     field :icon, CodeCorps.ProjectIcon.Type
-    field :icon_large_url, :string
-    field :icon_thumb_url, :string
     field :long_description_body, :string
     field :long_description_markdown, :string
     field :slug, :string
