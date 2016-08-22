@@ -6,6 +6,10 @@ defmodule CodeCorps.UserView do
 
   has_one :slugged_route, serializer: CodeCorps.SluggedRouteView
 
+  has_many :organization_memberships,
+    serializer: CodeCorps.OrganizationMembershipView
+  has_many :organizations, serializer: CodeCorps.OrganizationView
+
   has_many :user_categories, serializer: CodeCorps.UserCategoryView
   has_many :categories, serializer: CodeCorps.CategoryView
 
@@ -14,7 +18,6 @@ defmodule CodeCorps.UserView do
 
   has_many :user_skills, serializer: CodeCorps.UserSkillView
   has_many :skills, serializer: CodeCorps.SkillView
-
 
   def photo_large_url(user, _conn) do
     CodeCorps.UserPhoto.url({user.photo, user}, :large)
