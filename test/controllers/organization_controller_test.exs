@@ -74,6 +74,7 @@ defmodule CodeCorps.OrganizationControllerTest do
     assert organization.id == slugged_route.organization_id
   end
 
+  @tag :requires_env
   test "uploads a icon to S3", %{conn: conn} do
     organization = insert_organization()
     icon_data = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="

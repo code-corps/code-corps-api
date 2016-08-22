@@ -10,6 +10,21 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def user_role_factory do
+    %CodeCorps.UserRole{
+      user: build(:user),
+      role: build(:role)
+    }
+  end
+
+  def role_factory do
+    %CodeCorps.Role{
+      name: sequence(:name, &"Role #{&1}"),
+      ability: sequence(:ability, &"Ability for role #{&1}"),
+      kind: sequence(:kind, &"Kind for role #{&1}")
+    }
+  end
+
   def organization_factory do
     %CodeCorps.Organization{
       name: sequence(:username, &"Organization #{&1}"),

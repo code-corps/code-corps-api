@@ -133,6 +133,7 @@ defmodule CodeCorps.ProjectControllerTest do
       assert project.organization_id == organization.id
     end
 
+    @tag :requires_env
     test "uploads a icon to S3", %{conn: conn} do
       project = insert_project()
       icon_data = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="

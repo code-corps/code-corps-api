@@ -6,6 +6,9 @@ defmodule CodeCorps.UserView do
 
   has_one :slugged_route, serializer: CodeCorps.SluggedRouteView
 
+  has_many :user_roles, serializer: CodeCorps.UserRoleView
+  has_many :roles, serializer: CodeCorps.RoleView
+
   def photo_large_url(user, _conn) do
     CodeCorps.UserPhoto.url({user.photo, user}, :large)
   end
