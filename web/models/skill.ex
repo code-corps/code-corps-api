@@ -6,6 +6,8 @@ defmodule CodeCorps.Skill do
     field :description, :string
     field :original_row, :integer
 
+    has_many :project_skills, CodeCorps.ProjectSkill
+    has_many :projects, through: [:project_skills, :project]
     timestamps()
   end
 

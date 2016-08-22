@@ -55,13 +55,11 @@ defmodule CodeCorps.ProjectSkillControllerTest do
     [first_result, second_result | _] = data
     assert length(data) == 2
     assert first_result["id"] == "#{project_skill_1.id}"
-    # assert first_result["attributes"] == %{}
     assert first_result["relationships"]["project"]["data"]["id"] == "#{project.id}"
     assert first_result["relationships"]["project"]["data"]["type"] == "project" 
     assert first_result["relationships"]["skill"]["data"]["id"] == "#{elixir.id}"
     assert first_result["relationships"]["skill"]["data"]["type"] == "skill" 
     assert second_result["id"] == "#{project_skill_2.id}"
-    # assert second_result["attributes"] == %{}
     assert second_result["relationships"]["project"]["data"]["id"] == "#{project.id}"
     assert second_result["relationships"]["project"]["data"]["type"] == "project" 
     assert second_result["relationships"]["skill"]["data"]["id"] == "#{phoenix.id}"
@@ -69,13 +67,18 @@ defmodule CodeCorps.ProjectSkillControllerTest do
   end
 
   test "shows chosen resource", %{conn: conn} do
-    project_skill = Repo.insert! %ProjectSkill{}
+    skill = insert_skill()
+    project = insert_project()
+    project_skill = insert_project_skill(%{project_id: project.id, skill_id: skill.id})
     conn = get conn, project_skill_path(conn, :show, project_skill)
     data = json_response(conn, 200)["data"]
     assert data["id"] == "#{project_skill.id}"
     assert data["type"] == "project-skill"
-    assert data["attributes"]["project_id"] == project_skill.project_id
-    assert data["attributes"]["skill_id"] == project_skill.skill_id
+    assert data["attributes"] == %{}
+    assert data["relationships"]["project"]["data"]["id"] == "#{project.id}"
+    assert data["relationships"]["project"]["data"]["type"] == "project"
+    assert data["relationships"]["skill"]["data"]["id"] == "#{skill.id}"
+    assert data["relationships"]["skill"]["data"]["type"] == "skill"
   end
 
   test "does not show resource and instead throw error when id is nonexistent", %{conn: conn} do
@@ -85,8 +88,8 @@ defmodule CodeCorps.ProjectSkillControllerTest do
   end
 
   test "creates and renders resource when data is valid", %{conn: conn} do
-    project = insert_project(%{name: "Frontend Developer"})
-    skill = insert_skill(%{title: "test skill"})
+    project = insert_project()
+    skill = insert_skill()
 
     conn = post conn, project_skill_path(conn, :create), %{
       "meta" => %{},
@@ -103,7 +106,7 @@ defmodule CodeCorps.ProjectSkillControllerTest do
 
     assert json["data"]["id"] == "#{project_skill.id}"
     assert json["data"]["type"] == "project-skill"
-    # assert json["data"]["attributes"] == %{}
+    assert json["data"]["attributes"] == %{}
     assert json["data"]["relationships"]["project"]["data"]["id"] == "#{project.id}"
     assert json["data"]["relationships"]["project"]["data"]["type"] == "project"
     assert json["data"]["relationships"]["skill"]["data"]["id"] == "#{skill.id}"
@@ -111,10 +114,10 @@ defmodule CodeCorps.ProjectSkillControllerTest do
   end
 
   test "does not create resource and renders errors when data is invalid", %{conn: conn} do
-    conn = post conn, role_skill_path(conn, :create), %{
+    conn = post conn, user_skill_path(conn, :create), %{
       "meta" => %{},
       "data" => %{
-        "type" => "role-skill",
+        "type" => "user-skill",
         "attributes" => attributes
       }
     }
