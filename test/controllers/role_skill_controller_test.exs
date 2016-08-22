@@ -16,8 +16,6 @@ defmodule CodeCorps.RoleSkillControllerTest do
   end
   
   defp attributes do 
-    project = Repo.insert!(%CodeCorps.Project{})
-    skill = Repo.insert!(%CodeCorps.Skill{})
   end
 
   defp relationships(role, skill) do 
