@@ -23,6 +23,9 @@ defmodule CodeCorps.Project do
 
     belongs_to :organization, CodeCorps.Organization
 
+    has_many :project_categories, CodeCorps.ProjectCategory
+    has_many :categories, through: [:project_categories, :category]
+
     timestamps()
   end
 

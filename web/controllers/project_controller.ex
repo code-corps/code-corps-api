@@ -14,7 +14,7 @@ defmodule CodeCorps.ProjectController do
       |> Map.get(:organization)
       |> Repo.preload([:projects])
       |> Map.get(:projects)
-      |> Repo.preload([:organization])
+      |> Repo.preload([:categories, :organization])
 
     render(conn, "index.json-api", data: projects)
   end
@@ -23,14 +23,14 @@ defmodule CodeCorps.ProjectController do
     projects =
       Project
       |> Repo.all
-      |> Repo.preload([:organization])
+      |> Repo.preload([:categories, :organization])
     render(conn, "index.json-api", data: projects)
   end
 
   def show(conn, %{"slug" => _slug, "project_slug" => project_slug}) do
     project =
       Project
-      |> preload([:organization])
+      |> preload([:categories, :organization])
       |> Repo.get_by!(slug: project_slug)
 
     render(conn, "show.json-api", data: project)
@@ -39,7 +39,7 @@ defmodule CodeCorps.ProjectController do
   def show(conn, %{"id" => id}) do
     project =
       Project
-      |> preload([:organization])
+      |> preload([:categories, :organization])
       |> Repo.get!(id)
 
     render(conn, "show.json-api", data: project)
@@ -50,7 +50,7 @@ defmodule CodeCorps.ProjectController do
 
     case Repo.insert(changeset) do
       {:ok, project} ->
-        project = Repo.preload(project, [:organization])
+        project = Repo.preload(project, [:categories, :organization])
 
         conn
         |> put_status(:created)
@@ -71,7 +71,7 @@ defmodule CodeCorps.ProjectController do
 
     case Repo.update(changeset) do
       {:ok, project} ->
-        project = Repo.preload(project, [:organization])
+        project = Repo.preload(project, [:categories, :organization])
 
         conn
         |> put_status(:created)
