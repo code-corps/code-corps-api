@@ -16,12 +16,12 @@ defmodule CodeCorps.OrganizationController do
         %{"filter" => %{"id" => id_list}} ->
           ids = id_list |> coalesce_id_string
           Organization
-          |> preload([:slugged_route])
+          |> preload([:members, :projects, :slugged_route])
           |> where([p], p.id in ^ids)
           |> Repo.all
         %{} ->
           Organization
-          |> preload([:slugged_route])
+          |> preload([:members, :projects, :slugged_route])
           |> Repo.all
       end
 
@@ -33,7 +33,7 @@ defmodule CodeCorps.OrganizationController do
 
     case Repo.insert(changeset) do
       {:ok, organization} ->
-        organization = Repo.preload(organization, [:slugged_route])
+        organization = Repo.preload(organization, [:members, :projects, :slugged_route])
 
         conn
         |> put_status(:created)
@@ -49,7 +49,7 @@ defmodule CodeCorps.OrganizationController do
   def show(conn, %{"id" => id}) do
     organization =
       Organization
-      |> preload([:slugged_route])
+      |> preload([:members, :projects, :slugged_route])
       |> Repo.get!(id)
     render(conn, "show.json-api", data: organization)
   end
@@ -57,7 +57,7 @@ defmodule CodeCorps.OrganizationController do
   def update(conn, %{"id" => id, "data" => data = %{"type" => "organization", "attributes" => _organization_params}}) do
     changeset =
       Organization
-      |> preload([:slugged_route])
+      |> preload([:members, :projects, :slugged_route])
       |> Repo.get!(id)
       |> changeset(Params.to_attributes(data))
 
