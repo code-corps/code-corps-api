@@ -21,7 +21,11 @@ defmodule CodeCorps.Organization do
     field :slug, :string
 
     has_one :slugged_route, SluggedRoute
+
     has_many :projects, Project
+
+    has_many :organization_memberships, CodeCorps.OrganizationMembership
+    has_many :members, through: [:organization_memberships, :member]
 
     timestamps()
   end
