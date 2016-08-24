@@ -23,7 +23,7 @@ defmodule CodeCorps.Category do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:name, :description, :slug])
+    |> cast(params, [:name, :description])
     |> validate_required([:name])
   end
 
