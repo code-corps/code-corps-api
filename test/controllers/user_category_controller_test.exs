@@ -1,6 +1,8 @@
 defmodule CodeCorps.UserCategoryControllerTest do
   use CodeCorps.ConnCase
 
+  import CodeCorps.Factories
+
   alias CodeCorps.Repo
   alias CodeCorps.UserCategory
 
@@ -30,9 +32,9 @@ defmodule CodeCorps.UserCategoryControllerTest do
   end
 
   test "filters resources on index", %{conn: conn} do
-    society = insert_category(%{name: "Society"})
-    technology = insert_category(%{name: "Technology"})
-    government = insert_category(%{name: "Government"})
+    society = insert(:category, %{name: "Society"})
+    technology = insert(:category, %{name: "Technology"})
+    government = insert(:category, %{name: "Government"})
 
     user = insert_user()
     user_category_1 = insert_user_category(%{user_id: user.id, category_id: society.id})
@@ -48,7 +50,7 @@ defmodule CodeCorps.UserCategoryControllerTest do
   end
 
   test "shows chosen resource", %{conn: conn} do
-    category = insert_category()
+    category = insert(:category)
     user = insert_user()
     user_category = insert_user_category(%{user_id: user.id, category_id: category.id})
     conn = get conn, user_category_path(conn, :show, user_category)
@@ -67,7 +69,7 @@ defmodule CodeCorps.UserCategoryControllerTest do
 
   test "creates and renders resource when data is valid", %{conn: conn} do
     user = insert_user(%{email: "test-user@mail.com"})
-    category = insert_category(%{name: "test-category"})
+    category = insert(:category, %{name: "test-category"})
 
     conn = post conn, user_category_path(conn, :create), %{
       "meta" => %{},
@@ -102,7 +104,7 @@ defmodule CodeCorps.UserCategoryControllerTest do
   end
 
   test "deletes resource", %{conn: conn} do
-    category = insert_category(%{name: "test-category"})
+    category = insert(:category, %{name: "test-category"})
     user = insert_user(%{email: "test-user@mail.com"})
     user_category = insert_user_category(%{user_id: user.id, category_id: category.id})
     response = delete conn, user_category_path(conn, :delete, user_category)
