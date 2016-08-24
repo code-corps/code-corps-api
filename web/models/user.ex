@@ -67,6 +67,8 @@ defmodule CodeCorps.User do
     |> validate_length(:password, min: 6)
     |> validate_length(:username, min: 1, max: 39)
     |> validate_slug(:username)
+    |> unique_constraint(:username, name: :users_lower_username_index)
+    |> unique_constraint(:email)
     |> put_pass_hash()
     |> put_slugged_route()
   end

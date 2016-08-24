@@ -22,25 +22,47 @@ defmodule CodeCorps.UserTest do
     assert {:email, {"has invalid format", []}} in changeset.errors
   end
 
-  test "registration_changeset does not accept long usernames" do
-    attrs = Map.put(@valid_attrs, :username, String.duplicate("a", 40))
-    changeset = User.registration_changeset(%User{}, attrs)
-    assert {:username, {"should be at most %{count} character(s)", count: 39}} in changeset.errors
-  end
+  describe "registration_changeset" do
+    test "does not accept long usernames" do
+      attrs = Map.put(@valid_attrs, :username, String.duplicate("a", 40))
+      changeset = User.registration_changeset(%User{}, attrs)
+      assert {:username, {"should be at most %{count} character(s)", count: 39}} in changeset.errors
+    end
 
-  test "registration_changeset password must be at least 6 chars long" do
-    attrs = Map.put(@valid_attrs, :password, "12345")
-    changeset = User.registration_changeset(%User{}, attrs)
-    assert {:password, {"should be at least %{count} character(s)", count: 6}} in changeset.errors
-  end
+    test "password must be at least 6 chars long" do
+      attrs = Map.put(@valid_attrs, :password, "12345")
+      changeset = User.registration_changeset(%User{}, attrs)
+      assert {:password, {"should be at least %{count} character(s)", count: 6}} in changeset.errors
+    end
 
-  test "registration_changeset with valid attributes hashes password" do
-    attrs = Map.put(@valid_attrs, :password, "123456")
-    changeset = User.registration_changeset(%User{}, attrs)
-    %{password: pass, encrypted_password: encrypted_password} = changeset.changes
-    assert changeset.valid?
-    assert encrypted_password
-    assert Comeonin.Bcrypt.checkpw(pass, encrypted_password)
+    test "with valid attributes hashes password" do
+      attrs = Map.put(@valid_attrs, :password, "123456")
+      changeset = User.registration_changeset(%User{}, attrs)
+      %{password: pass, encrypted_password: encrypted_password} = changeset.changes
+      assert changeset.valid?
+      assert encrypted_password
+      assert Comeonin.Bcrypt.checkpw(pass, encrypted_password)
+    end
+
+    test "does not allow duplicate emails" do
+      user_1_attrs = %{email: "duplicate@email.com", password: "password", username: "user_1"}
+      user_2_attrs = %{email: "duplicate@email.com", password: "password", username: "user_2"}
+      insert_user(user_1_attrs)
+      changeset = User.registration_changeset(%User{}, user_2_attrs)
+      {:error, changeset} = Repo.insert(changeset)
+      refute changeset.valid?
+      assert changeset.errors[:email] == {"has already been taken", []}
+    end
+
+    test "does not allow duplicate usernames, regardless of case" do
+      user_1_attrs = %{email: "user_1@email.com", password: "password", username: "duplicate"}
+      user_2_attrs = %{email: "user_2@email.com", password: "password", username: "DUPLICATE"}
+      insert_user(user_1_attrs)
+      changeset = User.registration_changeset(%User{}, user_2_attrs)
+      {:error, changeset} = Repo.insert(changeset)
+      refute changeset.valid?
+      assert changeset.errors[:username] == {"has already been taken", []}
+    end
   end
 
   describe "update_changeset" do
