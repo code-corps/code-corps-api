@@ -1,8 +1,6 @@
 defmodule CodeCorps.ProjectCategoryController do
   use CodeCorps.Web, :controller
 
-  import CodeCorps.ControllerHelpers
-
   alias JaSerializer.Params
   alias CodeCorps.ProjectCategory
 
