@@ -1,6 +1,8 @@
 defmodule CodeCorps.CategoryTest do
   use CodeCorps.ModelCase
 
+  import CodeCorps.Factories
+
   alias CodeCorps.Category
 
   @valid_attrs %{description: "You want to improve software tools and infrastructure.", name: "Technology", slug: "technology"}
@@ -33,7 +35,7 @@ defmodule CodeCorps.CategoryTest do
     test "does not allow duplicate slugs, regardless of case" do
       category_1_attrs = %{name: "Technology", slug: "technology", description: "Description"}
       category_2_attrs = %{name: "technology", slug: "TECHNOLOGY", description: "Description"}
-      insert_category(category_1_attrs)
+      insert(:category, category_1_attrs)
       changeset = Category.create_changeset(%Category{}, category_2_attrs)
       {:error, changeset} = Repo.insert(changeset)
       refute changeset.valid?

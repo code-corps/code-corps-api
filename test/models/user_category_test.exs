@@ -1,18 +1,20 @@
 defmodule CodeCorps.UserCategoryTest do
   use CodeCorps.ModelCase
 
+  import CodeCorps.Factories
+
   alias CodeCorps.UserCategory
 
   test "valid_changeset_is_valid" do
-      user_id = insert_user().id
-      category_id = insert_category().id
+      user_id = insert(:user).id
+      category_id = insert(:category).id
 
       changeset = UserCategory.changeset(%UserCategory{}, %{user_id: user_id, category_id: category_id})
       assert changeset.valid?
     end
 
     test "changeset requires user_id" do
-      category_id = insert_category().id
+      category_id = insert(:category).id
 
       changeset = UserCategory.changeset(%UserCategory{}, %{category_id: category_id})
 
@@ -21,7 +23,7 @@ defmodule CodeCorps.UserCategoryTest do
     end
 
     test "changeset requires category_id" do
-      user_id = insert_user().id
+      user_id = insert(:user).id
 
       changeset = UserCategory.changeset(%UserCategory{}, %{user_id: user_id})
 
@@ -31,7 +33,7 @@ defmodule CodeCorps.UserCategoryTest do
 
     test "changeset requires id of actual user" do
       user_id = -1
-      category_id = insert_category().id
+      category_id = insert(:category).id
 
       { result, changeset } =
         UserCategory.changeset(%UserCategory{}, %{user_id: user_id, category_id: category_id})
@@ -43,7 +45,7 @@ defmodule CodeCorps.UserCategoryTest do
     end
 
     test "changeset requires id of actual category" do
-      user_id = insert_user().id
+      user_id = insert(:user).id
       category_id = -1
 
       { result, changeset } =
