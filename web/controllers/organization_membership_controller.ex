@@ -1,30 +1,17 @@
 defmodule CodeCorps.OrganizationMembershipController do
   use CodeCorps.Web, :controller
 
-  import CodeCorps.ControllerHelpers
-
   alias JaSerializer.Params
   alias CodeCorps.OrganizationMembership
 
   plug :scrub_params, "data" when action in [:create, :update]
 
-  def index(conn, %{"filter" => %{"id" => id_list}}) do
-    ids = id_list |> coalesce_id_string
+  def index(conn, params) do
     memberships =
       OrganizationMembership
+      |> OrganizationMembership.index_filters(params)
       |> preload([:organization, :member])
-      |> where([p], p.id in ^ids)
       |> Repo.all
-
-    render(conn, "index.json-api", data: memberships)
-  end
-
-  def index(conn, %{"organization_id" => organization_id}) do
-    memberships =
-      OrganizationMembership
-        |> preload([:organization, :member])
-        |> where([m], m.organization_id == ^organization_id)
-        |> Repo.all
 
     render(conn, "index.json-api", data: memberships)
   end

@@ -4,4 +4,9 @@ defmodule CodeCorps.ControllerHelpers do
     |> String.split(",")
     |> Enum.map(&String.to_integer(&1))
   end
+
+  def coalesce_string(string) do
+    string
+    |> String.split(",")
+  end
 end

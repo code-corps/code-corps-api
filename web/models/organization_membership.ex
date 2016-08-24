@@ -5,6 +5,8 @@ defmodule CodeCorps.OrganizationMembership do
 
   use CodeCorps.Web, :model
 
+  import CodeCorps.ModelHelpers
+
   alias CodeCorps.Organization
   alias CodeCorps.User
 
@@ -45,6 +47,13 @@ defmodule CodeCorps.OrganizationMembership do
   def update_changeset(struct, params \\ %{}) do
     struct
     |> changeset(params)
+  end
+
+  def index_filters(query, params) do
+    query
+    |> organization_filter(params)
+    |> role_filter(params)
+    |> member_filter(params)
   end
 
   defp roles do
