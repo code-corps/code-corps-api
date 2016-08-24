@@ -18,12 +18,23 @@ defmodule CodeCorps.OrganizationMembership do
   end
 
   @doc """
+  Builds a changeset based on the `struct` and `params`.
+  """
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, [:role])
+    |> validate_required([:role])
+    |> validate_inclusion(:role, roles)
+  end
+
+  @doc """
   Builds a changeset based on the `struct` and `params`, for creating a record.
   """
   def create_changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:member_id, :organization_id, :role])
-    |> validate_required([:member_id, :organization_id, :role])
+    |> changeset(params)
+    |> cast(params, [:member_id, :organization_id])
+    |> validate_required([:member_id, :organization_id])
     |> assoc_constraint(:member)
     |> assoc_constraint(:organization)
   end
@@ -33,8 +44,10 @@ defmodule CodeCorps.OrganizationMembership do
   """
   def update_changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:role])
-    |> validate_required([:role])
+    |> changeset(params)
   end
 
+  defp roles do
+    ~w{ pending contributor admin owner }
+  end
 end

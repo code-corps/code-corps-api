@@ -59,4 +59,36 @@ defmodule CodeCorps.OrganizationMembershipTest do
       assert changeset.errors[:member] == {"does not exist", []}
     end
   end
+
+  describe "role validation" do
+    test "includes pending" do
+      attrs = Map.merge(@valid_attrs, %{role: "pending"})
+      changeset = OrganizationMembership.changeset(%OrganizationMembership{}, attrs)
+      assert changeset.valid?
+    end
+
+    test "includes contributor" do
+      attrs = Map.merge(@valid_attrs, %{role: "contributor"})
+      changeset = OrganizationMembership.changeset(%OrganizationMembership{}, attrs)
+      assert changeset.valid?
+    end
+
+    test "includes admin" do
+      attrs = Map.merge(@valid_attrs, %{role: "admin"})
+      changeset = OrganizationMembership.changeset(%OrganizationMembership{}, attrs)
+      assert changeset.valid?
+    end
+
+    test "includes owner" do
+      attrs = Map.merge(@valid_attrs, %{role: "owner"})
+      changeset = OrganizationMembership.changeset(%OrganizationMembership{}, attrs)
+      assert changeset.valid?
+    end
+
+    test "does not include invalid values" do
+      attrs = Map.merge(@valid_attrs, %{role: "invalid"})
+      changeset = OrganizationMembership.changeset(%OrganizationMembership{}, attrs)
+      refute changeset.valid?
+    end
+  end
 end
