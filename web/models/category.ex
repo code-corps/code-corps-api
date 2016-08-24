@@ -35,5 +35,6 @@ defmodule CodeCorps.Category do
     |> changeset(params)
     |> generate_slug(:name, :slug)
     |> validate_required([:slug])
+    |> unique_constraint(:slug, name: :index_categories_on_slug)
   end
 end
