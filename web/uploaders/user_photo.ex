@@ -29,7 +29,7 @@ defmodule CodeCorps.UserPhoto do
   end
 
   # Override the storage directory:
-  def storage_dir(version, {_, scope}) do
+  def storage_dir(_, {_, scope}) do
     "users/#{scope.id}"
   end
 
