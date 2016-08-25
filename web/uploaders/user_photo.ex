@@ -35,7 +35,7 @@ defmodule CodeCorps.UserPhoto do
 
   # Provide a default URL if there hasn't been a file uploaded
   def default_url(version, _) do
-    "/icons/user_default_#{version}.png"
+    "#{Application.get_env(:arc, :asset_host)}/icons/user_default_#{version}.png"
   end
 
   # Specify custom headers for s3 objects
