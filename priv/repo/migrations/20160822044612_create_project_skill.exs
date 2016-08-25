@@ -8,8 +8,9 @@ defmodule CodeCorps.Repo.Migrations.CreateProjectSkill do
 
       timestamps()
     end
+
     create index(:project_skills, [:project_id])
     create index(:project_skills, [:skill_id])
-
+    create index(:project_skills, [:project_id, :skill_id], unique: true)
   end
 end

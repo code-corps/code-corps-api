@@ -15,10 +15,10 @@ defmodule CodeCorps.ProjectSkillControllerTest do
     {:ok, conn: conn}
   end
 
-  defp attributes do 
+  defp attributes do
   end
-  
-  defp relationships(project, skill) do 
+
+  defp relationships(project, skill) do
     %{
       "project" => %{
         "data" => %{
@@ -41,14 +41,14 @@ defmodule CodeCorps.ProjectSkillControllerTest do
   end
 
   test "filters resources on index", %{conn: conn} do
-    elixir = insert_skill(%{title: "Elixir"})
-    phoenix = insert_skill(%{title: "Phoenix"})
-    rails = insert_skill(%{title: "Rails"})
+    elixir = insert(:skill, title: "Elixir")
+    phoenix = insert(:skill, title: "Phoenix")
+    rails = insert(:skill, title: "Rails")
 
-    project = insert_project()
-    project_skill_1 = insert_project_skill(%{project_id: project.id, skill_id: elixir.id})
-    project_skill_2 = insert_project_skill(%{project_id: project.id, skill_id: phoenix.id})
-    insert_project_skill(%{project_id: project.id, skill_id: rails.id})
+    project = insert(:project)
+    project_skill_1 = insert(:project_skill, project: project, skill: elixir)
+    project_skill_2 = insert(:project_skill, project: project, skill: phoenix)
+    insert(:project_skill, project: project, skill: rails)
 
     conn = get conn, "project-skills/?filter[id]=#{project_skill_1.id},#{project_skill_2.id}"
     data = json_response(conn, 200)["data"]
@@ -56,20 +56,20 @@ defmodule CodeCorps.ProjectSkillControllerTest do
     assert length(data) == 2
     assert first_result["id"] == "#{project_skill_1.id}"
     assert first_result["relationships"]["project"]["data"]["id"] == "#{project.id}"
-    assert first_result["relationships"]["project"]["data"]["type"] == "project" 
+    assert first_result["relationships"]["project"]["data"]["type"] == "project"
     assert first_result["relationships"]["skill"]["data"]["id"] == "#{elixir.id}"
-    assert first_result["relationships"]["skill"]["data"]["type"] == "skill" 
+    assert first_result["relationships"]["skill"]["data"]["type"] == "skill"
     assert second_result["id"] == "#{project_skill_2.id}"
     assert second_result["relationships"]["project"]["data"]["id"] == "#{project.id}"
-    assert second_result["relationships"]["project"]["data"]["type"] == "project" 
+    assert second_result["relationships"]["project"]["data"]["type"] == "project"
     assert second_result["relationships"]["skill"]["data"]["id"] == "#{phoenix.id}"
-    assert second_result["relationships"]["skill"]["data"]["type"] == "skill" 
+    assert second_result["relationships"]["skill"]["data"]["type"] == "skill"
   end
 
   test "shows chosen resource", %{conn: conn} do
-    skill = insert_skill()
-    project = insert_project()
-    project_skill = insert_project_skill(%{project_id: project.id, skill_id: skill.id})
+    skill = insert(:skill)
+    project = insert(:project)
+    project_skill = insert(:project_skill, project: project, skill: skill)
     conn = get conn, project_skill_path(conn, :show, project_skill)
     data = json_response(conn, 200)["data"]
     assert data["id"] == "#{project_skill.id}"
@@ -88,8 +88,8 @@ defmodule CodeCorps.ProjectSkillControllerTest do
   end
 
   test "creates and renders resource when data is valid", %{conn: conn} do
-    project = insert_project()
-    skill = insert_skill()
+    project = insert(:project)
+    skill = insert(:skill)
 
     conn = post conn, project_skill_path(conn, :create), %{
       "meta" => %{},
