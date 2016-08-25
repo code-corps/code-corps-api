@@ -19,8 +19,18 @@ defmodule CodeCorps.UserSkillControllerTest do
 
   defp relationships(user, skill) do
     %{
-      user: %{data: %{id: user.id}},
-      skill: %{data: %{id: skill.id}}
+      "user" => %{
+        "data" => %{
+          "type" => "user",
+          "id" => user.id
+        }
+      },
+      "skill" => %{
+        "data" => %{
+          "type" => "skill",
+          "id" => skill.id
+        }
+      },
     }
   end
 
