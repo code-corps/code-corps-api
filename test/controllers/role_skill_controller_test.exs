@@ -14,12 +14,12 @@ defmodule CodeCorps.RoleSkillControllerTest do
 
     {:ok, conn: conn}
   end
-  
-  defp attributes do 
+
+  defp attributes do
     %{}
   end
 
-  defp relationships(role, skill) do 
+  defp relationships(role, skill) do
     %{
       "role" => %{
         "data" => %{
@@ -42,14 +42,14 @@ defmodule CodeCorps.RoleSkillControllerTest do
   end
 
   test "filters resources on index", %{conn: conn} do
-    elixir = insert_skill(%{title: "Elixir"})
-    phoenix = insert_skill(%{title: "Phoenix"})
-    rails = insert_skill(%{title: "Rails"})
+    elixir = insert(:skill, title: "Elixir")
+    phoenix = insert(:skill, title: "Phoenix")
+    rails = insert(:skill, title: "Rails")
 
-    role = insert_role()
-    role_skill_1 = insert_role_skill(%{role_id: role.id, skill_id: elixir.id})
-    role_skill_2 = insert_role_skill(%{role_id: role.id, skill_id: phoenix.id})
-    insert_role_skill(%{role_id: role.id, skill_id: rails.id})
+    role = insert(:role)
+    role_skill_1 = insert(:role_skill, role: role, skill: elixir)
+    role_skill_2 = insert(:role_skill, role: role, skill: phoenix)
+    insert(:role_skill, role: role, skill: rails)
 
     conn = get conn, "role-skills/?filter[id]=#{role_skill_1.id},#{role_skill_2.id}"
     data = json_response(conn, 200)["data"]
@@ -58,21 +58,21 @@ defmodule CodeCorps.RoleSkillControllerTest do
     assert first_result["id"] == "#{role_skill_1.id}"
     assert first_result["attributes"] == %{}
     assert first_result["relationships"]["role"]["data"]["id"] == "#{role.id}"
-    assert first_result["relationships"]["role"]["data"]["type"] == "role" 
+    assert first_result["relationships"]["role"]["data"]["type"] == "role"
     assert first_result["relationships"]["skill"]["data"]["id"] == "#{elixir.id}"
-    assert first_result["relationships"]["skill"]["data"]["type"] == "skill" 
+    assert first_result["relationships"]["skill"]["data"]["type"] == "skill"
     assert second_result["id"] == "#{role_skill_2.id}"
     assert second_result["attributes"] == %{}
     assert second_result["relationships"]["role"]["data"]["id"] == "#{role.id}"
-    assert second_result["relationships"]["role"]["data"]["type"] == "role" 
+    assert second_result["relationships"]["role"]["data"]["type"] == "role"
     assert second_result["relationships"]["skill"]["data"]["id"] == "#{phoenix.id}"
-    assert second_result["relationships"]["skill"]["data"]["type"] == "skill" 
+    assert second_result["relationships"]["skill"]["data"]["type"] == "skill"
   end
 
   test "shows chosen resource", %{conn: conn} do
-    skill = insert_skill()
-    role = insert_role()
-    role_skill = insert_role_skill(%{role_id: role.id, skill_id: skill.id})
+    skill = insert(:skill)
+    role = insert(:role)
+    role_skill = insert(:role_skill, role: role, skill: skill)
     conn = get conn, role_skill_path(conn, :show, role_skill)
     data = json_response(conn, 200)["data"]
     assert data["id"] == "#{role_skill.id}"
@@ -91,8 +91,8 @@ defmodule CodeCorps.RoleSkillControllerTest do
   end
 
   test "creates and renders resource when data is valid", %{conn: conn} do
-    role = insert_role(%{name: "Frontend Developer"})
-    skill = insert_skill(%{title: "test skill"})
+    role = insert(:role, name: "Frontend Developer")
+    skill = insert(:skill, title: "test skill")
 
     conn = post conn, role_skill_path(conn, :create), %{
       "meta" => %{},
@@ -130,9 +130,9 @@ defmodule CodeCorps.RoleSkillControllerTest do
   end
 
   test "deletes resource", %{conn: conn} do
-    skill = insert_skill(%{title: "test-skill"})
-    role = insert_role(%{name: "Frontend Developer"})
-    role_skill = insert_role_skill(%{role_id: role.id, skill_id: skill.id})
+    skill = insert(:skill, title: "test-skill")
+    role = insert(:role, name: "Frontend Developer")
+    role_skill = insert(:role_skill, role: role, skill: skill)
     conn = delete conn, role_skill_path(conn, :delete, role_skill)
 
     assert response(conn, 204)

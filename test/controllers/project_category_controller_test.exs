@@ -1,8 +1,6 @@
 defmodule CodeCorps.ProjectCategoryControllerTest do
   use CodeCorps.ConnCase
 
-  import CodeCorps.Factories
-
   alias CodeCorps.Category
   alias CodeCorps.Project
   alias CodeCorps.ProjectCategory

@@ -1,8 +1,6 @@
 defmodule CodeCorps.CategoryTest do
   use CodeCorps.ModelCase
 
-  import CodeCorps.Factories
-
   alias CodeCorps.Category
 
   @valid_attrs %{description: "You want to improve software tools and infrastructure.", name: "Technology", slug: "technology"}

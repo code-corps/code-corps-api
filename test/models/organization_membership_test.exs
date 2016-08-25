@@ -1,8 +1,6 @@
 defmodule CodeCorps.OrganizationMembershipTest do
   use CodeCorps.ModelCase
 
-  import CodeCorps.Factories
-
   alias CodeCorps.OrganizationMembership
 
   describe "update_changeset" do

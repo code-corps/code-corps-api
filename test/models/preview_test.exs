@@ -16,7 +16,7 @@ defmodule CodeCorps.PreviewTest do
   end
 
   test "assigns user_id if present" do
-    user = insert_user
+    user = insert(:user)
     changeset = Preview.changeset(%Preview{}, %{markdown: "A **strong** element"}, user)
     assert changeset.valid?
     assert Ecto.Changeset.get_change(changeset, :user).data == user

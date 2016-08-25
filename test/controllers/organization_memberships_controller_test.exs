@@ -1,8 +1,6 @@
 defmodule CodeCorps.OrganizationMembershipControllerTest do
   use CodeCorps.ConnCase
 
-  import CodeCorps.Factories
-
   alias CodeCorps.OrganizationMembership
   alias CodeCorps.Organization
   alias CodeCorps.User

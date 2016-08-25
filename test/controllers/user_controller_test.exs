@@ -41,9 +41,9 @@ defmodule CodeCorps.UserControllerTest do
   end
 
   test "filters resources on index", %{conn: conn} do
-    user_1 = insert_user(%{username: "user_1", email: "user_1@mail.com"})
-    user_2 = insert_user(%{username: "user_2", email: "user_2@mail.com"})
-    insert_user(%{username: "user_3", email: "user_3@mail.com"})
+    user_1 = insert(:user, username: "user_1", email: "user_1@mail.com")
+    user_2 = insert(:user, username: "user_2", email: "user_2@mail.com")
+    insert(:user, username: "user_3", email: "user_3@mail.com")
     conn = get conn, "users/?filter[id]=#{user_1.id},#{user_2.id}"
     data = json_response(conn, 200)["data"]
     [first_result, second_result | _] = data
@@ -53,7 +53,7 @@ defmodule CodeCorps.UserControllerTest do
   end
 
   test "shows chosen resource", %{conn: conn} do
-    user = insert_user()
+    user = insert(:user)
     conn = get conn, user_path(conn, :show, user)
     data = json_response(conn, 200)["data"]
     assert data["id"] == "#{user.id}"
@@ -104,7 +104,7 @@ defmodule CodeCorps.UserControllerTest do
 
   describe "update" do
     test "updates and renders chosen resource when data is valid", %{conn: conn} do
-      user = insert_user()
+      user = insert(:user)
       attrs = Map.put(@valid_attrs, :password, "password")
       conn = put conn, user_path(conn, :update, user), %{
         "meta" => %{},
@@ -128,7 +128,7 @@ defmodule CodeCorps.UserControllerTest do
 
     @tag :requires_env
     test "uploads a photo to S3", %{conn: conn} do
-      user = insert_user()
+      user = insert(:user)
       photo_data = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
       attrs = Map.put(@valid_attrs, :base64_photo_data, photo_data)
       conn = put conn, user_path(conn, :update, user), %{
@@ -149,7 +149,7 @@ defmodule CodeCorps.UserControllerTest do
     end
 
     test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
-      user = insert_user()
+      user = insert(:user)
       conn = put conn, user_path(conn, :update, user), %{
         "meta" => %{},
         "data" => %{
@@ -179,7 +179,7 @@ defmodule CodeCorps.UserControllerTest do
     end
 
     test "returns valid but inavailable when email is valid but taken", %{conn: conn} do
-      insert_user(%{email: "used@mail.com"})
+      insert(:user, email: "used@mail.com")
       resp = get conn, user_path(conn, :email_available, %{email: "used@mail.com"})
       json = json_response(resp, 200)
       refute json["available"]
@@ -203,7 +203,7 @@ defmodule CodeCorps.UserControllerTest do
     end
 
     test "returns as valid, but inavailable when username is valid but taken", %{conn: conn} do
-      insert_user(%{username: "used"})
+      insert(:user, username: "used")
       resp = get conn, user_path(conn, :username_available, %{username: "used"})
       json = json_response(resp, 200)
       refute json["available"]

@@ -47,7 +47,7 @@ defmodule CodeCorps.UserTest do
     test "does not allow duplicate emails" do
       user_1_attrs = %{email: "duplicate@email.com", password: "password", username: "user_1"}
       user_2_attrs = %{email: "duplicate@email.com", password: "password", username: "user_2"}
-      insert_user(user_1_attrs)
+      insert(:user, user_1_attrs)
       changeset = User.registration_changeset(%User{}, user_2_attrs)
       {:error, changeset} = Repo.insert(changeset)
       refute changeset.valid?
@@ -57,7 +57,7 @@ defmodule CodeCorps.UserTest do
     test "does not allow duplicate usernames, regardless of case" do
       user_1_attrs = %{email: "user_1@email.com", password: "password", username: "duplicate"}
       user_2_attrs = %{email: "user_2@email.com", password: "password", username: "DUPLICATE"}
-      insert_user(user_1_attrs)
+      insert(:user, user_1_attrs)
       changeset = User.registration_changeset(%User{}, user_2_attrs)
       {:error, changeset} = Repo.insert(changeset)
       refute changeset.valid?
@@ -124,7 +124,7 @@ defmodule CodeCorps.UserTest do
     test "uploads base64photo data to aws" do
       # 1x1 black pixel gif
       photo_data = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
-      user = insert_user
+      user = insert(:user)
       attrs = %{base64_photo_data: photo_data}
 
       changeset = User.update_changeset(user, attrs)

@@ -27,9 +27,9 @@ defmodule CodeCorps.OrganizationControllerTest do
   end
 
   test "filters resources on index", %{conn: conn} do
-    first_org = insert_organization(%{name: "Org A"})
-    second_org = insert_organization(%{name: "Org B"})
-    insert_organization(%{name: "Org C"})
+    first_org = insert(:organization, name: "Org A")
+    second_org = insert(:organization, name: "Org B")
+    insert(:organization, name: "Org C")
     conn = get conn, "organizations/?filter[id]=#{first_org.id},#{second_org.id}"
     data = json_response(conn, 200)["data"]
     [first_result, second_result | _] = data
@@ -76,7 +76,7 @@ defmodule CodeCorps.OrganizationControllerTest do
 
   @tag :requires_env
   test "uploads a icon to S3", %{conn: conn} do
-    organization = insert_organization()
+    organization = insert(:organization)
     icon_data = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
     attrs = Map.put(@valid_attrs, :base64_icon_data, icon_data)
     conn = put conn, organization_path(conn, :update, organization), %{
