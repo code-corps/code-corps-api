@@ -105,7 +105,6 @@ defmodule CodeCorps.Factories do
     }
   end
 
-<<<<<<< HEAD
   def user_role_factory do
     %CodeCorps.UserRole{
       user: build(:user),

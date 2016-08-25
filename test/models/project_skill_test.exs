@@ -7,15 +7,15 @@ defmodule CodeCorps.ProjectSkillTest do
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do
-    project_id = insert_project().id
-    skill_id = insert_skill().id
+    project_id = insert(:project).id
+    skill_id = insert(:skill).id
 
     changeset = ProjectSkill.changeset(%ProjectSkill{}, %{project_id: project_id, skill_id: skill_id})
     assert changeset.valid?
   end
 
   test "changeset requires project_id" do
-    skill_id = insert_skill().id
+    skill_id = insert(:skill).id
 
     changeset = ProjectSkill.changeset(%ProjectSkill{}, %{skill_id: skill_id})
 
@@ -24,7 +24,7 @@ defmodule CodeCorps.ProjectSkillTest do
   end
 
   test "changeset requires skill_id" do
-    project_id = insert_project().id
+    project_id = insert(:project).id
 
     changeset = ProjectSkill.changeset(%ProjectSkill{}, %{project_id: project_id})
 
@@ -34,7 +34,7 @@ defmodule CodeCorps.ProjectSkillTest do
 
   test "changeset requires id of actual project" do
     project_id = -1
-    skill_id = insert_skill().id
+    skill_id = insert(:skill).id
 
     { result, changeset } =
       ProjectSkill.changeset(%ProjectSkill{}, %{project_id: project_id, skill_id: skill_id})
@@ -46,7 +46,7 @@ defmodule CodeCorps.ProjectSkillTest do
   end
 
   test "changeset requires id of actual skill" do
-    project_id = insert_project().id
+    project_id = insert(:project).id
     skill_id = -1
 
     { result, changeset } =
