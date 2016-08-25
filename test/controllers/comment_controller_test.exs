@@ -29,10 +29,10 @@ defmodule CodeCorps.CommentControllerTest do
   end
 
   test "shows chosen resource", %{conn: conn} do
-    user = insert_user()
-    project = insert_project()
-    post = insert_post(%{project_id: project.id, user_id: user.id})
-    comment = insert_comment(%{post_id: post.id, user_id: user.id})
+    user = insert(:user)
+    project = insert(:project)
+    post = insert(:post, project: project, user: user)
+    comment = insert(:comment, post: post, user: user)
     conn = get conn, comment_path(conn, :show, comment)
     data = json_response(conn, 200)["data"]
     assert data["id"] == "#{comment.id}"
@@ -50,9 +50,9 @@ defmodule CodeCorps.CommentControllerTest do
   end
 
   test "creates and renders resource when data is valid", %{conn: conn} do
-    user = insert_user()
-    project = insert_project()
-    post = insert_post(%{project_id: project.id, user_id: user.id})
+    user = insert(:user)
+    project = insert(:project)
+    post = insert(:post, project: project, user: user)
     conn = post conn, comment_path(conn, :create), %{
       "meta" => %{},
       "data" => %{
@@ -79,10 +79,10 @@ defmodule CodeCorps.CommentControllerTest do
   end
 
   test "updates and renders chosen resource when data is valid", %{conn: conn} do
-    user = insert_user()
-    project = insert_project()
-    post = insert_post(%{project_id: project.id, user_id: user.id})
-    comment = insert_comment(%{post_id: post.id, user_id: user.id})
+    user = insert(:user)
+    project = insert(:project)
+    post = insert(:post, project: project, user: user)
+    comment = insert(:comment, post: post, user: user)
     conn = put conn, comment_path(conn, :update, comment), %{
       "meta" => %{},
       "data" => %{
@@ -97,10 +97,10 @@ defmodule CodeCorps.CommentControllerTest do
   end
 
   test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
-    user = insert_user()
-    project = insert_project()
-    post = insert_post(%{project_id: project.id, user_id: user.id})
-    comment = insert_comment(%{post_id: post.id, user_id: user.id})
+    user = insert(:user)
+    project = insert(:project)
+    post = insert(:post, project: project, user: user)
+    comment = insert(:comment, post: post, user: user)
     conn = put conn, comment_path(conn, :update, comment), %{
       "meta" => %{},
       "data" => %{

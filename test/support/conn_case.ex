@@ -26,7 +26,7 @@ defmodule CodeCorps.ConnCase do
       import Ecto.Query
 
       import CodeCorps.Router.Helpers
-      import CodeCorps.TestHelpers
+      import CodeCorps.Factories
 
       # The default endpoint for testing
       @endpoint CodeCorps.Endpoint

@@ -15,8 +15,8 @@ defmodule CodeCorps.PostTest do
   }
 
   test "create changeset with valid attributes is valid" do
-    user = insert_user()
-    project = insert_project()
+    user = insert(:user)
+    project = insert(:project)
     changeset = Post.create_changeset(%Post{}, %{
       markdown: "some content",
       post_type: "issue",
@@ -29,14 +29,14 @@ defmodule CodeCorps.PostTest do
   end
 
   test "number is auto-sequenced scoped to project" do
-    user = insert_user()
-    project_a = insert_project(%{title: "Project A"})
-    project_b = insert_project(%{title: "Project B"})
+    user = insert(:user)
+    project_a = insert(:project, title: "Project A")
+    project_b = insert(:project, title: "Project B")
 
-    insert_post(%{ project_id: project_a.id, user_id: user.id, title: "Project A Post 1" })
-    insert_post(%{ project_id: project_a.id, user_id: user.id, title: "Project A Post 2" })
+    insert(:post, project: project_a, user: user, title: "Project A Post 1")
+    insert(:post, project: project_a, user: user, title: "Project A Post 2")
 
-    insert_post(%{ project_id: project_b.id, user_id: user.id, title: "Project B Post 1" })
+    insert(:post, project: project_b, user: user, title: "Project B Post 1")
 
     changes = Map.merge(@valid_attrs, %{
       project_id: project_a.id,
@@ -75,8 +75,8 @@ defmodule CodeCorps.PostTest do
   end
 
   test "changeset renders body html from markdown" do
-    user = insert_user()
-    project = insert_project()
+    user = insert(:user)
+    project = insert(:project)
     changes = Map.merge(@valid_attrs, %{
       markdown: "A **strong** body",
       project_id: project.id,

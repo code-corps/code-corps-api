@@ -25,8 +25,8 @@ defmodule CodeCorps.UserRoleControllerTest do
   end
 
   test "creates and renders resource when data is valid", %{conn: conn} do
-    user = insert_user(%{email: "test-user@mail.com"})
-    role = insert_role(%{title: "test-role"})
+    user = insert(:user)
+    role = insert(:role)
 
     conn = post conn, user_role_path(conn, :create), %{
       "meta" => %{},
@@ -61,9 +61,9 @@ defmodule CodeCorps.UserRoleControllerTest do
   end
 
   test "deletes resource", %{conn: conn} do
-    role = insert_role(%{title: "test-role"})
-    user = insert_user(%{email: "test-user@mail.com"})
-    user_role = insert_user_role(%{user_id: user.id, role_id: role.id})
+    role = insert(:role)
+    user = insert(:user)
+    user_role = insert(:user_role, user: user, role: role)
     response = delete conn, user_role_path(conn, :delete, user_role)
 
     assert response.status == 204

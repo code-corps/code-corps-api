@@ -30,9 +30,9 @@ defmodule CodeCorps.SkillControllerTest do
   end
 
   test "filters resources on index", %{conn: conn} do
-    elixir = insert_skill(%{title: "Elixir"})
-    phoenix = insert_skill(%{title: "Phoenix"})
-    insert_skill(%{title: "Rails"})
+    elixir = insert(:skill, title: "Elixir")
+    phoenix = insert(:skill, title: "Phoenix")
+    insert(:skill, title: "Rails")
     conn = get conn, "skills/?filter[id]=#{elixir.id},#{phoenix.id}"
     data = json_response(conn, 200)["data"]
     [first_result, second_result | _] = data
@@ -42,9 +42,9 @@ defmodule CodeCorps.SkillControllerTest do
   end
 
   test "returns search results on index", %{conn: conn} do
-    ruby = insert_skill(%{title: "Ruby"})
-    rails = insert_skill(%{title: "Rails"})
-    insert_skill(%{title: "Phoenix"})
+    ruby = insert(:skill, title: "Ruby")
+    rails = insert(:skill, title: "Rails")
+    insert(:skill, title: "Phoenix")
     conn = get conn, skill_path(conn, :index, query: "r")
     data = json_response(conn, 200)["data"]
     [first_result, second_result | _] = data
@@ -54,7 +54,7 @@ defmodule CodeCorps.SkillControllerTest do
   end
 
   test "shows chosen resource", %{conn: conn} do
-    skill = insert_skill(@valid_attrs)
+    skill = insert(:skill)
     conn = get conn, skill_path(conn, :show, skill)
     data = json_response(conn, 200)["data"]
     assert data["id"] == "#{skill.id}"

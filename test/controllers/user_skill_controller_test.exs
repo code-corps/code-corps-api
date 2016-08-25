@@ -30,14 +30,14 @@ defmodule CodeCorps.UserSkillControllerTest do
   end
 
   test "filters resources on index", %{conn: conn} do
-    elixir = insert_skill(%{title: "Elixir"})
-    phoenix = insert_skill(%{title: "Phoenix"})
-    rails = insert_skill(%{title: "Rails"})
+    elixir = insert(:skill, title: "Elixir")
+    phoenix = insert(:skill, title: "Phoenix")
+    rails = insert(:skill, title: "Rails")
 
-    user = insert_user()
-    user_skill_1 = insert_user_skill(%{user_id: user.id, skill_id: elixir.id})
-    user_skill_2 = insert_user_skill(%{user_id: user.id, skill_id: phoenix.id})
-    insert_user_skill(%{user_id: user.id, skill_id: rails.id})
+    user = insert(:user)
+    user_skill_1 = insert(:user_skill, user: user, skill: elixir)
+    user_skill_2 = insert(:user_skill, user: user, skill: phoenix)
+    insert(:user_skill, user: user, skill: rails)
 
     conn = get conn, "user-skills/?filter[id]=#{user_skill_1.id},#{user_skill_2.id}"
     data = json_response(conn, 200)["data"]
@@ -48,9 +48,9 @@ defmodule CodeCorps.UserSkillControllerTest do
   end
 
   test "shows chosen resource", %{conn: conn} do
-    skill = insert_skill()
-    user = insert_user()
-    user_skill = insert_user_skill(%{user_id: user.id, skill_id: skill.id})
+    skill = insert(:skill)
+    user = insert(:user)
+    user_skill = insert(:user_skill, user: user, skill: skill)
     conn = get conn, user_skill_path(conn, :show, user_skill)
     data = json_response(conn, 200)["data"]
     assert data["id"] == "#{user_skill.id}"
@@ -66,8 +66,8 @@ defmodule CodeCorps.UserSkillControllerTest do
   end
 
   test "creates and renders resource when data is valid", %{conn: conn} do
-    user = insert_user(%{email: "test-user@mail.com"})
-    skill = insert_skill(%{title: "test-skill"})
+    user = insert(:user)
+    skill = insert(:skill, title: "test-skill")
 
     conn = post conn, user_skill_path(conn, :create), %{
       "meta" => %{},
@@ -102,9 +102,9 @@ defmodule CodeCorps.UserSkillControllerTest do
   end
 
   test "deletes resource", %{conn: conn} do
-    skill = insert_skill(%{title: "test-skill"})
-    user = insert_user(%{email: "test-user@mail.com"})
-    user_skill = insert_user_skill(%{user_id: user.id, skill_id: skill.id})
+    skill = insert(:skill, title: "test-skill")
+    user = insert(:user)
+    user_skill = insert(:user_skill, user: user, skill: skill)
     response = delete conn, user_skill_path(conn, :delete, user_skill)
 
     assert response.status == 204

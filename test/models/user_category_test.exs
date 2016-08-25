@@ -1,8 +1,6 @@
 defmodule CodeCorps.UserCategoryTest do
   use CodeCorps.ModelCase
 
-  import CodeCorps.Factories
-
   alias CodeCorps.UserCategory
 
   test "valid_changeset_is_valid" do

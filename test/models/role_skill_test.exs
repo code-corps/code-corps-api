@@ -4,15 +4,15 @@ defmodule CodeCorps.RoleSkillTest do
   alias CodeCorps.RoleSkill
 
   test "changeset with valid attributes" do
-    role_id = insert_role().id
-    skill_id = insert_skill().id
+    role_id = insert(:role).id
+    skill_id = insert(:skill).id
 
     changeset = RoleSkill.changeset(%RoleSkill{}, %{role_id: role_id, skill_id: skill_id})
     assert changeset.valid?
   end
 
   test "changeset requires role_id" do
-    skill_id = insert_skill().id
+    skill_id = insert(:skill).id
 
     changeset = RoleSkill.changeset(%RoleSkill{}, %{skill_id: skill_id})
 
@@ -21,7 +21,7 @@ defmodule CodeCorps.RoleSkillTest do
   end
 
   test "changeset requires skill_id" do
-    role_id = insert_role().id
+    role_id = insert(:role).id
 
     changeset = RoleSkill.changeset(%RoleSkill{}, %{role_id: role_id})
 
@@ -31,7 +31,7 @@ defmodule CodeCorps.RoleSkillTest do
 
   test "changeset requires id of actual role" do
     role_id = -1
-    skill_id = insert_skill().id
+    skill_id = insert(:skill).id
 
     { result, changeset } =
       RoleSkill.changeset(%RoleSkill{}, %{role_id: role_id, skill_id: skill_id})
@@ -43,7 +43,7 @@ defmodule CodeCorps.RoleSkillTest do
   end
 
   test "changeset requires id of actual skill" do
-    role_id = insert_role().id
+    role_id = insert(:role).id
     skill_id = -1
 
     { result, changeset } =
