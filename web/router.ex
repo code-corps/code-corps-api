@@ -13,6 +13,7 @@ defmodule CodeCorps.Router do
     plug :accepts, ["json-api", "json"]
     plug Guardian.Plug.VerifyHeader
     plug Guardian.Plug.LoadResource
+    plug JaSerializer.Deserializer
   end
 
   scope "/", CodeCorps do
