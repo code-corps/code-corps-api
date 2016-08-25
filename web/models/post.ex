@@ -3,6 +3,8 @@ defmodule CodeCorps.Post do
 
   alias CodeCorps.MarkdownRenderer
 
+  import CodeCorps.ModelHelpers
+
   schema "posts" do
     field :body, :string
     field :markdown, :string
@@ -42,5 +44,15 @@ defmodule CodeCorps.Post do
 
   defp statuses do
     ~w{ open closed }
+  end
+
+  def index_filters(query, params) do
+    query |> project_filter(params)
+  end
+
+  def show_project_post_filters(query, params) do
+    query
+    |> number_as_id_filter(params)
+    |> project_filter(params)
   end
 end
