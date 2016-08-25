@@ -27,12 +27,17 @@ defmodule CodeCorps.UserViewTest do
         id: user.id |> Integer.to_string,
         type: "user",
         attributes: %{
-          "username" => user.username,
+          "biography" => user.biography,
           "email" => user.email,
+          "first-name" => user.first_name,
+          "last-name" => user.last_name,
+          "inserted-at" => user.inserted_at,
           "photo-large-url" => CodeCorps.UserPhoto.url({user.photo, user}, :large),
           "photo-thumb-url" => CodeCorps.UserPhoto.url({user.photo, user}, :thumb),
-          "inserted-at" => user.inserted_at,
-          "updated-at" => user.updated_at
+          "twitter" => user.twitter,
+          "username" => user.username,
+          "updated-at" => user.updated_at,
+          "website" => user.website,
         },
         relationships: %{
           "categories" => %{
