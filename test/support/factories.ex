@@ -105,6 +105,7 @@ defmodule CodeCorps.Factories do
     }
   end
 
+<<<<<<< HEAD
   def user_role_factory do
     %CodeCorps.UserRole{
       user: build(:user),
@@ -115,6 +116,13 @@ defmodule CodeCorps.Factories do
   def user_skill_factory do
     %CodeCorps.UserSkill{
       user: build(:user),
+      skill: build(:skill)
+    }
+  end
+
+  def project_skill_factory do
+    %CodeCorps.ProjectSkill{
+      project: build(:project),
       skill: build(:skill)
     }
   end
