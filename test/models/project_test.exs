@@ -43,7 +43,7 @@ defmodule CodeCorps.ProjectTest do
   test "uploads base64icon data to aws" do
     # 1x1 black pixel gif
     icon_data = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
-    project = insert_project
+    project = insert(:project)
     attrs = %{base64_icon_data: icon_data, title: "Test"}
 
     changeset = Project.changeset(project, attrs)

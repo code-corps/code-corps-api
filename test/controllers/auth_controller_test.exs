@@ -18,7 +18,7 @@ defmodule CodeCorps.AuthControllerTest do
   end
 
   test "authenticates and returns JWT and user ID when data is valid", %{conn: conn} do
-    user = insert_user()
+    user = build(:user, %{password: "password"}) |> set_password("password") |> insert
     conn = post conn, auth_path(conn, :create), build_payload(user.email, user.password)
 
     response = json_response(conn, 201)
@@ -27,7 +27,7 @@ defmodule CodeCorps.AuthControllerTest do
   end
 
   test "does not authenticate and renders errors when the password is wrong", %{conn: conn} do
-    user = insert_user()
+    user = build(:user, %{password: "password"}) |> set_password("password") |> insert
     conn = post conn, auth_path(conn, :create), build_payload(user.email, "wrong password")
 
     response = json_response(conn, 401)

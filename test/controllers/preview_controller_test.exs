@@ -42,7 +42,7 @@ defmodule CodeCorps.PreviewControllerTest do
   end
 
   test "it assigns current user as owner of preview, if available", %{conn: conn} do
-    user = insert_user()
+    user = insert(:user)
 
     path = preview_path(conn, :create)
     payload = %{

@@ -66,6 +66,18 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def role_skill_factory do
+    %CodeCorps.RoleSkill{
+      role: build(:role),
+      skill: build(:skill)
+    }
+  end
+
+  def set_password(user, password) do
+    hashed_password = Comeonin.Bcrypt.hashpwsalt(password)
+    %{user | encrypted_password: hashed_password}
+  end
+
   def skill_factory do
     %CodeCorps.Skill{
       description: sequence(:description, &"A description for category #{&1}"),
@@ -73,11 +85,16 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def slugged_route_factory do
+    %CodeCorps.SluggedRoute{
+      slug: sequence(:slug, &"slug-#{&1}")
+    }
+  end
+
   def user_factory do
     %CodeCorps.User{
       username: sequence(:username, &"user#{&1}"),
-      email: sequence(:email, &"email-#{&1}@example.com"),
-      password: "password"
+      email: sequence(:email, &"email-#{&1}@example.com")
     }
   end
 

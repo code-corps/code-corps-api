@@ -4,15 +4,15 @@ defmodule CodeCorps.UserRoleTest do
   alias CodeCorps.UserRole
 
   test "valid_changeset_is_valid" do
-    user_id = insert_user().id
-    role_id = insert_role().id
+    user_id = insert(:user).id
+    role_id = insert(:role).id
 
     changeset = UserRole.changeset(%UserRole{}, %{user_id: user_id, role_id: role_id})
     assert changeset.valid?
   end
 
   test "changeset requires user_id" do
-    role_id = insert_role().id
+    role_id = insert(:role).id
 
     changeset = UserRole.changeset(%UserRole{}, %{role_id: role_id})
 
@@ -21,7 +21,7 @@ defmodule CodeCorps.UserRoleTest do
   end
 
   test "changeset requires role_id" do
-    user_id = insert_user().id
+    user_id = insert(:user).id
 
     changeset = UserRole.changeset(%UserRole{}, %{user_id: user_id})
 
@@ -31,7 +31,7 @@ defmodule CodeCorps.UserRoleTest do
 
   test "changeset requires id of actual user" do
     user_id = -1
-    role_id = insert_role().id
+    role_id = insert(:role).id
 
     { result, changeset } =
       UserRole.changeset(%UserRole{}, %{user_id: user_id, role_id: role_id})
@@ -43,7 +43,7 @@ defmodule CodeCorps.UserRoleTest do
   end
 
   test "changeset requires id of actual role" do
-    user_id = insert_user().id
+    user_id = insert(:user).id
     role_id = -1
 
     { result, changeset } =

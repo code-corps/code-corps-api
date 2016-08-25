@@ -29,11 +29,13 @@ defmodule CodeCorps.ProjectControllerTest do
     end
 
     test "lists all entries for organization specified by slug", %{conn: conn} do
-      organization = insert_organization(%{name: "Test Organization"})
-      project_1 = insert_project(%{title: "Test Project 1", organization_id: organization.id})
-      project_2 = insert_project(%{title: "Test Project 2", organization_id: organization.id})
+      organization_slug = "test-organization"
+      organization = insert(:organization, name: "Test Organization", slug: organization_slug)
+      insert(:slugged_route, organization: organization, slug: organization_slug)
+      project_1 = insert(:project, title: "Test Project 1", organization: organization)
+      project_2 = insert(:project, title: "Test Project 2", organization: organization)
 
-      conn = get conn, "/test-organization/projects"
+      conn = get conn, "/#{organization_slug}/projects"
 
       data =
         conn
@@ -59,12 +61,12 @@ defmodule CodeCorps.ProjectControllerTest do
 
   describe "#show" do
     test "shows chosen resource", %{conn: conn} do
-      organization = insert_organization()
-      project = insert_project(%{
+      organization = insert(:organization)
+      project = insert(:project,
         title: "Test project",
         description: "Test project description",
         long_description_markdown: "A markdown **description**",
-        organization_id: organization.id})
+        organization: organization)
 
       conn = get conn, project_path(conn, :show, project)
       data = json_response(conn, 200)["data"]
@@ -77,12 +79,13 @@ defmodule CodeCorps.ProjectControllerTest do
     end
 
     test "shows chosen resource retrieved by slug", %{conn: conn} do
-      organization = insert_organization(%{name: "Test Organization"})
-      project = insert_project(%{
+      organization = insert(:organization, name: "Test Organization", slug: "test-organization")
+      project = insert(:project,
         title: "Test project",
         description: "Test project description",
         long_description_markdown: "A markdown **description**",
-        organization_id: organization.id})
+        slug: "test-project",
+        organization: organization)
 
       conn = get conn, "/test-organization/test-project"
 
@@ -102,7 +105,7 @@ defmodule CodeCorps.ProjectControllerTest do
 
   describe "create" do
     test "creates and renders resource when attributes are valid", %{conn: conn} do
-      organization = insert_organization
+      organization = insert(:organization)
 
       payload = %{
         data: %{
@@ -135,7 +138,7 @@ defmodule CodeCorps.ProjectControllerTest do
 
     @tag :requires_env
     test "uploads a icon to S3", %{conn: conn} do
-      project = insert_project()
+      project = insert(:project)
       icon_data = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
       attrs = Map.put(@valid_attrs, :base64_icon_data, icon_data)
       conn = put conn, project_path(conn, :update, project), %{
@@ -180,13 +183,13 @@ defmodule CodeCorps.ProjectControllerTest do
 
   describe "update" do
     test "updates and renders resource when attributes are valid", %{conn: conn} do
-      organization = insert_organization
-      project = insert_project(%{
-        organization_id: organization.id,
+      organization = insert(:organization)
+      project = insert(:project,
+        organization: organization,
         title: "Initial title",
         description: "Initial description",
         long_description_markdown: "Initial long description"
-      })
+      )
 
       payload = %{
         data: %{
@@ -214,13 +217,13 @@ defmodule CodeCorps.ProjectControllerTest do
     end
 
     test "renders errors when attributes are invalid", %{conn: conn} do
-      organization = insert_organization
-      project = insert_project(%{
-        organization_id: organization.id,
+      organization = insert(:organization)
+      project = insert(:project,
+        organization: organization,
         title: "Initial title",
         description: "Initial description",
         long_description_markdown: "Initial long description"
-      })
+      )
 
       payload = %{
         data: %{

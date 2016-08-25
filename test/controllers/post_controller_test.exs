@@ -38,12 +38,12 @@ defmodule CodeCorps.PostControllerTest do
   end
 
   test "lists all posts for a project", %{conn: conn} do
-    project_1 = insert_project()
-    project_2 = insert_project()
-    user = insert_user()
-    insert_post(%{project_id: project_1.id, user_id: user.id})
-    insert_post(%{project_id: project_1.id, user_id: user.id})
-    insert_post(%{project_id: project_2.id, user_id: user.id})
+    project_1 = insert(:project)
+    project_2 = insert(:project)
+    user = insert(:user)
+    insert(:post, project: project_1, user: user)
+    insert(:post, project: project_1, user: user)
+    insert(:post, project: project_2, user: user)
 
     json =
       conn
@@ -54,9 +54,9 @@ defmodule CodeCorps.PostControllerTest do
   end
 
   test "shows chosen resource", %{conn: conn} do
-    user = insert_user()
-    project = insert_project()
-    post = insert_post(%{project_id: project.id, user_id: user.id})
+    user = insert(:user)
+    project = insert(:project)
+    post = insert(:post, project: project, user: user)
     conn = get conn, post_path(conn, :show, post)
     post = Repo.get(Post, post.id)
     data = json_response(conn, 200)["data"]
@@ -71,9 +71,9 @@ defmodule CodeCorps.PostControllerTest do
   end
 
   test "shows post by number for project", %{conn: conn} do
-    user = insert_user()
-    project = insert_project()
-    post = insert_post(%{project_id: project.id, user_id: user.id})
+    user = insert(:user)
+    project = insert(:project)
+    post = insert(:post, project: project, user: user)
     post = Repo.get(Post, post.id)
     conn = get conn, project_post_path(conn, :show, project.id, post.number)
     data = json_response(conn, 200)["data"]
@@ -88,8 +88,8 @@ defmodule CodeCorps.PostControllerTest do
   end
 
   test "creates and renders resource when data is valid", %{conn: conn} do
-    user = insert_user()
-    project = insert_project()
+    user = insert(:user)
+    project = insert(:project)
     conn = post conn, post_path(conn, :create), %{
       "meta" => %{},
       "data" => %{
@@ -116,9 +116,9 @@ defmodule CodeCorps.PostControllerTest do
   end
 
   test "updates and renders chosen resource when data is valid", %{conn: conn} do
-    user = insert_user()
-    project = insert_project()
-    post = insert_post(%{project_id: project.id, user_id: user.id})
+    user = insert(:user)
+    project = insert(:project)
+    post = insert(:post, project: project, user: user)
     conn = put conn, post_path(conn, :update, post), %{
       "meta" => %{},
       "data" => %{
@@ -133,9 +133,9 @@ defmodule CodeCorps.PostControllerTest do
   end
 
   test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
-    user = insert_user()
-    project = insert_project()
-    post = insert_post(%{project_id: project.id, user_id: user.id})
+    user = insert(:user)
+    project = insert(:project)
+    post = insert(:post, project: project, user: user)
     conn = put conn, post_path(conn, :update, post), %{
       "meta" => %{},
       "data" => %{
