@@ -5,15 +5,6 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
   alias CodeCorps.Organization
   alias CodeCorps.User
 
-  def filter_params(records) do
-    ids =
-      records
-      |> Enum.map(fn(r) -> r.id end)
-      |> Enum.join(",")
-
-    %{filter: %{id: ids}}
-  end
-
   setup do
     conn =
       %{build_conn | host: "api."}
@@ -23,36 +14,111 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
     {:ok, conn: conn}
   end
 
-  test "filters resources on index", %{conn: conn} do
-    membership_1 = insert(:organization_membership)
-    membership_2 = insert(:organization_membership)
-    insert(:organization_membership)
+  describe "index" do
+    test "lists all resources", %{conn: conn} do
+      membership_1 = insert(:organization_membership)
+      membership_2 = insert(:organization_membership)
 
-    params = filter_params([membership_1, membership_2])
-    path = conn |> organization_membership_path(:index)
+      path = conn |> organization_membership_path(:index)
 
-    data = conn |> get(path, params) |> json_response(200) |> Map.get("data")
-    assert data |> length == 2
+      data = conn |> get(path) |> json_response(200) |> Map.get("data")
+      assert data |> length == 2
 
-    [first_result, second_result] = data
-    assert first_result["id"] == "#{membership_1.id}"
-    assert second_result["id"] == "#{membership_2.id}"
-  end
+      [first_result, second_result] = data
+      assert first_result["id"] == "#{membership_1.id}"
+      assert second_result["id"] == "#{membership_2.id}"
+    end
 
-  test "lists all resources for specified organization", %{conn: conn} do
-    organization = insert(:organization)
-    membership_1 = insert(:organization_membership, organization: organization)
-    membership_2 = insert(:organization_membership, organization: organization)
-    insert(:organization_membership)
+    test "lists all resources for specified organization", %{conn: conn} do
+      organization = insert(:organization)
+      membership_1 = insert(:organization_membership, organization: organization)
+      membership_2 = insert(:organization_membership, organization: organization)
+      insert(:organization_membership)
 
-    path = conn |> organization_organization_membership_path(:index, organization)
+      path = conn |> organization_organization_membership_path(:index, organization)
 
-    data = conn |> get(path) |> json_response(200) |> Map.get("data")
-    assert data |> length == 2
+      data = conn |> get(path) |> json_response(200) |> Map.get("data")
+      assert data |> length == 2
 
-    [first_result, second_result] = data
-    assert first_result["id"] == "#{membership_1.id}"
-    assert second_result["id"] == "#{membership_2.id}"
+      [first_result, second_result] = data
+      assert first_result["id"] == "#{membership_1.id}"
+      assert second_result["id"] == "#{membership_2.id}"
+    end
+
+    test "filters resources by member id", %{conn: conn} do
+      member_1 = insert(:user)
+      member_2 = insert(:user)
+      member_3 = insert(:user)
+      membership_1 = insert(:organization_membership, member: member_1)
+      membership_2 = insert(:organization_membership, member: member_2)
+      insert(:organization_membership, member: member_3)
+
+      params = %{"filter" => %{"id" => "#{member_1.id},#{member_2.id}"}}
+      path = conn |> organization_membership_path(:index, params)
+      data = conn |> get(URI.decode(path)) |> json_response(200) |> Map.get("data")
+      assert data |> length == 2
+
+      [first_result, second_result] = data
+      assert first_result["id"] == "#{membership_1.id}"
+      assert second_result["id"] == "#{membership_2.id}"
+    end
+
+    test "filters resources by role", %{conn: conn} do
+      membership_1 = insert(:organization_membership, role: "admin")
+      membership_2 = insert(:organization_membership, role: "admin")
+      insert(:organization_membership, role: "owner")
+
+      params = %{"role" => "admin"}
+      path = conn |> organization_membership_path(:index, params)
+
+      data = conn |> get(path) |> json_response(200) |> Map.get("data")
+      assert data |> length == 2
+
+      [first_result, second_result] = data
+      assert first_result["id"] == "#{membership_1.id}"
+      assert second_result["id"] == "#{membership_2.id}"
+    end
+
+    test "filters resources by role and id", %{conn: conn} do
+      member_1 = insert(:user)
+      member_2 = insert(:user)
+      membership_1 = insert(:organization_membership, role: "admin", member: member_1)
+      insert(:organization_membership, role: "admin", member: member_2)
+      insert(:organization_membership, role: "owner")
+
+      params = %{"role" => "admin", "filter" => %{"id" => "#{member_1.id}"}}
+      path = conn |> organization_membership_path(:index, params)
+
+      data = conn |> get(path) |> json_response(200) |> Map.get("data")
+
+      assert data |> length == 1
+
+      [only_result] = data
+      assert only_result["id"] == "#{membership_1.id}"
+    end
+
+    test "filters resources by role and id on specific organization", %{conn: conn} do
+      member_1 = insert(:user)
+      organization = insert(:organization)
+      membership_1 =
+        insert(
+          :organization_membership,
+          organization: organization,
+          role: "admin",
+          member: member_1
+        )
+      insert(:organization_membership, organization: organization, role: "admin")
+      insert(:organization_membership, role: "owner")
+
+      params = %{"role" => "admin", "filter" => %{"id" => "#{member_1.id}"}}
+      path = conn |> organization_organization_membership_path(:index, organization)
+
+      data = conn |> get(path, params) |> json_response(200) |> Map.get("data")
+      assert data |> length == 1
+
+      [only_result] = data
+      assert only_result["id"] == "#{membership_1.id}"
+    end
   end
 
   test "shows chosen resource", %{conn: conn} do
