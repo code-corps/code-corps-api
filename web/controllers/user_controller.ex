@@ -1,8 +1,6 @@
 defmodule CodeCorps.UserController do
   use CodeCorps.Web, :controller
 
-  import CodeCorps.ControllerHelpers
-
   alias CodeCorps.User
   alias JaSerializer.Params
 
@@ -10,18 +8,10 @@ defmodule CodeCorps.UserController do
 
   def index(conn, params) do
     users =
-      case params do
-        %{"filter" => %{"id" => id_list}} ->
-          ids = id_list |> coalesce_id_string
-          User
-          |> preload([:slugged_route, :categories, :organizations, :roles, :skills])
-          |> where([p], p.id in ^ids)
-          |> Repo.all
-        %{} ->
-          User
-          |> preload([:slugged_route, :categories, :organizations, :roles, :skills])
-          |> Repo.all
-      end
+      User
+      |> User.index_filters(params)
+      |> preload([:slugged_route, :categories, :organizations, :roles, :skills])
+      |> Repo.all
 
     render(conn, "index.json-api", data: users)
   end

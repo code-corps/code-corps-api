@@ -9,19 +9,11 @@ defmodule CodeCorps.RoleSkillController do
   plug :scrub_params, "data" when action in [:create]
 
   def index(conn, params) do
-    role_skills = 
-      case params do
-        %{"filter" => %{"id" => id_list}} ->
-          ids = id_list |> coalesce_id_string
-          RoleSkill
-          |> preload([:role, :skill])
-          |> where([p], p.id in ^ids)
-          |> Repo.all
-        %{} -> 
-          RoleSkill
-          |> preload([:user, :skill])
-          |> Repo.all
-      end
+    role_skills =
+      RoleSkill
+      |> RoleSkill.index_filters(params)
+      |> preload([:role, :skill])
+      |> Repo.all
     render(conn, "index.json-api", data: role_skills)
   end
 
@@ -42,7 +34,7 @@ defmodule CodeCorps.RoleSkillController do
   end
 
   def show(conn, %{"id" => id}) do
-    role_skill = 
+    role_skill =
       RoleSkill
       |> preload([:role, :skill])
       |> Repo.get!(id)
