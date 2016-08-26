@@ -1,6 +1,8 @@
 defmodule CodeCorps.Skill do
   use CodeCorps.Web, :model
 
+  import CodeCorps.ModelHelpers
+
   schema "skills" do
     field :title, :string
     field :description, :string
@@ -17,5 +19,11 @@ defmodule CodeCorps.Skill do
     |> cast(params, [:title, :description, :original_row])
     |> validate_required([:title])
     |> unique_constraint(:title)
+  end
+
+  def index_filters(query, params) do
+    query
+    |> id_filter(params)
+    |> title_filter(params)
   end
 end

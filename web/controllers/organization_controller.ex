@@ -1,8 +1,6 @@
 defmodule CodeCorps.OrganizationController do
   use CodeCorps.Web, :controller
 
-  import CodeCorps.ControllerHelpers
-
   alias CodeCorps.Organization
   alias JaSerializer.Params
 
@@ -12,18 +10,10 @@ defmodule CodeCorps.OrganizationController do
 
   def index(conn, params) do
     organizations =
-      case params do
-        %{"filter" => %{"id" => id_list}} ->
-          ids = id_list |> coalesce_id_string
-          Organization
-          |> preload([:members, :projects, :slugged_route])
-          |> where([p], p.id in ^ids)
-          |> Repo.all
-        %{} ->
-          Organization
-          |> preload([:members, :projects, :slugged_route])
-          |> Repo.all
-      end
+      Organization
+      |> Organization.index_filters(params)
+      |> preload([:members, :projects, :slugged_route])
+      |> Repo.all
 
     render(conn, "index.json-api", data: organizations)
   end

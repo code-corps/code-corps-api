@@ -1,8 +1,6 @@
 defmodule CodeCorps.UserSkillController do
   use CodeCorps.Web, :controller
 
-  import CodeCorps.ControllerHelpers
-
   alias CodeCorps.UserSkill
   alias JaSerializer.Params
 
@@ -10,18 +8,11 @@ defmodule CodeCorps.UserSkillController do
 
   def index(conn, params) do
     user_skills =
-      case params do
-        %{"filter" => %{"id" => id_list}} ->
-          ids = id_list |> coalesce_id_string
-          UserSkill
-          |> preload([:user, :skill])
-          |> where([p], p.id in ^ids)
-          |> Repo.all
-       %{} ->
-          UserSkill
-          |> preload([:user, :skill])
-          |> Repo.all
-      end
+      UserSkill
+      |> UserSkill.index_filters(params)
+      |> preload([:user, :skill])
+      |> Repo.all
+
     render(conn, "index.json-api", data: user_skills)
   end
 

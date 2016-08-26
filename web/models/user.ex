@@ -12,6 +12,7 @@ defmodule CodeCorps.User do
 
   import CodeCorps.Base64ImageUploader
   import CodeCorps.Validators.SlugValidator
+  import CodeCorps.ModelHelpers
 
   schema "users" do
     field :base64_photo_data, :string, virtual: true
@@ -93,6 +94,10 @@ defmodule CodeCorps.User do
     %{}
     |> check_username_valid(username)
     |> check_used(:username, username)
+  end
+
+  def index_filters(query, params) do
+    query |> id_filter(params)
   end
 
   defp put_pass_hash(changeset) do
