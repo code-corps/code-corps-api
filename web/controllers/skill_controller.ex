@@ -11,6 +11,7 @@ defmodule CodeCorps.SkillController do
       Skill
       |> Skill.index_filters(params)
       |> Repo.all
+      |> Repo.preload([:roles])
 
     render(conn, "index.json-api", data: skills)
   end
@@ -20,6 +21,8 @@ defmodule CodeCorps.SkillController do
 
     case Repo.insert(changeset) do
       {:ok, skill} ->
+        skill = Repo.preload(skill, [:roles])
+
         conn
         |> put_status(:created)
         |> put_resp_header("location", skill_path(conn, :show, skill))
@@ -32,7 +35,10 @@ defmodule CodeCorps.SkillController do
   end
 
   def show(conn, %{"id" => id}) do
-    skill = Repo.get!(Skill, id)
+    skill =
+      Skill
+      |> Repo.get!(id)
+      |> Repo.preload([:roles])
     render(conn, "show.json-api", data: skill)
   end
 end

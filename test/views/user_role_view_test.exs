@@ -1,8 +1,6 @@
 defmodule CodeCorps.UserRoleViewTest do
   use CodeCorps.ConnCase, async: true
 
-  import CodeCorps.Factories
-
   alias CodeCorps.Repo
 
   # Bring render/3 and render_to_string/3 for testing custom views
