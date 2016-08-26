@@ -1,8 +1,6 @@
 defmodule CodeCorps.SkillController do
   use CodeCorps.Web, :controller
 
-  import CodeCorps.ControllerHelpers
-
   alias CodeCorps.Skill
   alias JaSerializer.Params
 
@@ -12,7 +10,6 @@ defmodule CodeCorps.SkillController do
     skills =
       Skill
       |> Skill.index_filters(params)
-      |> Repo.preload([:roles])
       |> Repo.all
 
     render(conn, "index.json-api", data: skills)
