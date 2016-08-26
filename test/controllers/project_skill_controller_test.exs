@@ -12,7 +12,7 @@ defmodule CodeCorps.ProjectSkillControllerTest do
     {:ok, conn: conn}
   end
 
-  defp relationships(project, skill) do 
+  defp relationships(project, skill) do
     %{
       "project" => %{
         "data" => %{
