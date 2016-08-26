@@ -34,8 +34,8 @@ defmodule CodeCorps.SkillControllerTest do
     phoenix = insert(:skill, title: "Phoenix")
     insert(:skill, title: "Rails")
     params = %{"filter" => %{"id" => "#{elixir.id},#{phoenix.id}"}}
-    path = conn |> skill_path(:index, params)
-    data = conn |> get(URI.decode(path)) |> json_response(200) |> Map.get("data")
+    conn = get conn, skill_path(conn, :index, params)
+    data = json_response(conn, 200)["data"]
     assert data |> length == 2
 
     [first_result, second_result | _] = data
