@@ -52,6 +52,10 @@ defmodule CodeCorps.Organization do
     |> put_slugged_route()
   end
 
+  def index_filters(query, params) do
+    query |> id_filter(params)
+  end
+
   defp put_slugged_route(changeset) do
     case changeset do
       %Ecto.Changeset{valid?: true, changes: %{slug: slug}} ->

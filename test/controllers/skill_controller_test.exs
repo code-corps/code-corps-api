@@ -33,10 +33,12 @@ defmodule CodeCorps.SkillControllerTest do
     elixir = insert(:skill, title: "Elixir")
     phoenix = insert(:skill, title: "Phoenix")
     insert(:skill, title: "Rails")
-    conn = get conn, "skills/?filter[id]=#{elixir.id},#{phoenix.id}"
-    data = json_response(conn, 200)["data"]
+    params = %{"filter" => %{"id" => "#{elixir.id},#{phoenix.id}"}}
+    path = conn |> skill_path(:index, params)
+    data = conn |> get(URI.decode(path)) |> json_response(200) |> Map.get("data")
+    assert data |> length == 2
+
     [first_result, second_result | _] = data
-    assert length(data) == 2
     assert first_result["id"] == "#{elixir.id}"
     assert second_result["id"] == "#{phoenix.id}"
   end
@@ -45,7 +47,8 @@ defmodule CodeCorps.SkillControllerTest do
     ruby = insert(:skill, title: "Ruby")
     rails = insert(:skill, title: "Rails")
     insert(:skill, title: "Phoenix")
-    conn = get conn, skill_path(conn, :index, query: "r")
+    params = %{"query" => "r"}
+    conn = get conn, skill_path(conn, :index, params)
     data = json_response(conn, 200)["data"]
     [first_result, second_result | _] = data
     assert length(data) == 2

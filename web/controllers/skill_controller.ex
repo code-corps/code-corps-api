@@ -1,8 +1,6 @@
 defmodule CodeCorps.SkillController do
   use CodeCorps.Web, :controller
 
-  import CodeCorps.ControllerHelpers
-
   alias CodeCorps.Skill
   alias JaSerializer.Params
 
@@ -10,15 +8,10 @@ defmodule CodeCorps.SkillController do
 
   def index(conn, params) do
     skills =
-      case params do
-        %{"filter" => %{"id" => id_list}} ->
-          ids = id_list |> coalesce_id_string
-          Skill |> where([p], p.id in ^ids) |> Repo.all
-        %{"query" => query} ->
-          Skill |> where([p], ilike(p.title, ^"%#{query}%")) |> Repo.all
-        %{} ->
-          Skill |> Repo.all
-      end
+      Skill
+      |> Skill.index_filters(params)
+      |> Repo.all
+
     render(conn, "index.json-api", data: skills)
   end
 
