@@ -7,7 +7,10 @@ defmodule CodeCorps.RoleController do
   plug :scrub_params, "data" when action in [:create]
 
   def index(conn, _params) do
-    roles = Repo.all(Role)
+    roles =
+      Role
+      |> Repo.all
+      |> Repo.preload([:skills])
     render(conn, "index.json-api", data: roles)
   end
 
@@ -16,6 +19,8 @@ defmodule CodeCorps.RoleController do
 
     case Repo.insert(changeset) do
       {:ok, role} ->
+        role = Repo.preload(role, [:skills])
+
         conn
         |> put_status(:created)
         |> put_resp_header("location", role_path(conn, :show, role))

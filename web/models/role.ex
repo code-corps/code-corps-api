@@ -6,6 +6,9 @@ defmodule CodeCorps.Role do
     field :ability, :string
     field :kind, :string
 
+    has_many :role_skills, CodeCorps.RoleSkill
+    has_many :skills, through: [:role_skills, :skill]
+
     timestamps()
   end
 
