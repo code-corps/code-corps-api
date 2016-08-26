@@ -54,8 +54,8 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
       insert(:organization_membership, member: member_3)
 
       params = %{"filter" => %{"id" => "#{member_1.id},#{member_2.id}"}}
-      path = conn |> organization_membership_path(:index, params)
-      data = conn |> get(URI.decode(path)) |> json_response(200) |> Map.get("data")
+      conn = get conn, organization_membership_path(conn, :index, params)
+      data = json_response(conn, 200)["data"]
       assert data |> length == 2
 
       [first_result, second_result] = data
