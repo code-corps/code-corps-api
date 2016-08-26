@@ -4,6 +4,7 @@ defmodule CodeCorps.UserSkillController do
   alias CodeCorps.UserSkill
   alias JaSerializer.Params
 
+  plug :load_and_authorize_resource, model: UserSkill, only: [:create, :delete]
   plug :scrub_params, "data" when action in [:create]
 
   def index(conn, params) do

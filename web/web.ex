@@ -36,6 +36,8 @@ defmodule CodeCorps.Web do
 
       import CodeCorps.Router.Helpers
       import CodeCorps.Gettext
+
+      import Canary.Plugs
     end
   end
 

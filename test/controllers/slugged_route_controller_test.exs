@@ -1,20 +1,11 @@
 defmodule CodeCorps.SluggedRouteControllerTest do
-  use CodeCorps.ConnCase
+  use CodeCorps.ApiCase
 
   alias CodeCorps.SluggedRoute
   alias CodeCorps.Repo
 
   @valid_attrs %{organization_id: 42, slug: "some content", user_id: 42}
   @invalid_attrs %{}
-
-  setup do
-    conn =
-      %{build_conn | host: "api."}
-      |> put_req_header("accept", "application/vnd.api+json")
-      |> put_req_header("content-type", "application/vnd.api+json")
-
-    {:ok, conn: conn}
-  end
 
   test "shows chosen resource", %{conn: conn} do
     slug = "test-slug"

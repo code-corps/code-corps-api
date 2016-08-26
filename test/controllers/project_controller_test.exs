@@ -1,5 +1,5 @@
 defmodule CodeCorps.ProjectControllerTest do
-  use CodeCorps.ConnCase
+  use CodeCorps.ApiCase
 
   alias CodeCorps.Project
 
@@ -13,19 +13,26 @@ defmodule CodeCorps.ProjectControllerTest do
     title: ""
   }
 
-  setup do
-    conn =
-      %{build_conn | host: "api."}
-      |> put_req_header("accept", "application/vnd.api+json")
-      |> put_req_header("content-type", "application/vnd.api+json")
+  defp build_payload, do: %{ "data" => %{"type" => "project"}}
+  defp put_id(payload, id), do: payload |> put_in(["data", "id"], id)
+  defp put_attributes(payload, attributes), do: payload |> put_in(["data", "attributes"], attributes)
+  defp put_relationships(payload, organization) do
+    relationships = build_relationships(organization)
+    payload |> put_in(["data", "relationships"], relationships)
+  end
 
-    {:ok, conn: conn}
+  defp build_relationships(organization) do
+    %{
+      organization: %{data: %{id: organization.id}}
+    }
   end
 
   describe "#index" do
     test "lists all entries on index", %{conn: conn} do
-      conn = get conn, project_path(conn, :index)
-      assert json_response(conn, 200)["data"] == []
+      path = conn |> project_path(:index)
+      json = conn |> get(path) |> json_response(200)
+
+      assert json["data"] == []
     end
 
     test "lists all entries for organization specified by slug", %{conn: conn} do
@@ -35,12 +42,9 @@ defmodule CodeCorps.ProjectControllerTest do
       project_1 = insert(:project, title: "Test Project 1", organization: organization)
       project_2 = insert(:project, title: "Test Project 2", organization: organization)
 
-      conn = get conn, "/#{organization_slug}/projects"
+      conn = conn |> get("/#{organization_slug}/projects")
 
-      data =
-        conn
-        |> json_response(200)
-        |> Map.get("data")
+      data = conn |> json_response(200) |> Map.get("data")
 
       assert Enum.count(data) == 2
 
@@ -61,12 +65,10 @@ defmodule CodeCorps.ProjectControllerTest do
 
   describe "#show" do
     test "shows chosen resource", %{conn: conn} do
-      organization = insert(:organization)
       project = insert(:project,
         title: "Test project",
         description: "Test project description",
-        long_description_markdown: "A markdown **description**",
-        organization: organization)
+        long_description_markdown: "A markdown **description**")
 
       conn = get conn, project_path(conn, :show, project)
       data = json_response(conn, 200)["data"]
@@ -75,20 +77,18 @@ defmodule CodeCorps.ProjectControllerTest do
       assert data["attributes"]["title"] == "Test project"
       assert data["attributes"]["description"] == "Test project description"
       assert data["attributes"]["long-description-markdown"] == "A markdown **description**"
-      assert data["relationships"]["organization"]["data"]["id"] == Integer.to_string(organization.id)
+      assert data["relationships"]["organization"]["data"]["id"] == Integer.to_string(project.organization_id)
       assert data["relationships"]["project-categories"]["data"] == []
       assert data["relationships"]["project-skills"]["data"] == []
       assert data["relationships"]["skills"]["data"] == []
     end
 
     test "shows chosen resource retrieved by slug", %{conn: conn} do
-      organization = insert(:organization, name: "Test Organization", slug: "test-organization")
       project = insert(:project,
         title: "Test project",
         description: "Test project description",
         long_description_markdown: "A markdown **description**",
-        slug: "test-project",
-        organization: organization)
+        slug: "test-project")
 
       conn = get conn, "/test-organization/test-project"
 
@@ -102,34 +102,27 @@ defmodule CodeCorps.ProjectControllerTest do
       assert data["attributes"]["title"] == "Test project"
       assert data["attributes"]["description"] == "Test project description"
       assert data["attributes"]["long-description-markdown"] == "A markdown **description**"
-      assert data["relationships"]["organization"]["data"]["id"] == Integer.to_string(organization.id)
+      assert data["relationships"]["organization"]["data"]["id"] == Integer.to_string(project.organization_id)
     end
   end
 
   describe "create" do
+    @tag authenticated: :admin
     test "creates and renders resource when attributes are valid", %{conn: conn} do
       organization = insert(:organization)
 
-      payload = %{
-        data: %{
-          type: "project",
-          attributes: @valid_attrs,
-          relationships: %{
-            organization: %{
-              data: %{ id: organization.id, type: "organization" }
-            }
-          }
-        }
-      }
+      payload =
+        build_payload
+        |> put_attributes(@valid_attrs)
+        |> put_relationships(organization)
 
-      conn = post conn, project_path(conn, :create), payload
+      path = conn |> project_path(:create)
 
-      id = json_response(conn, 201)["data"]["id"]
+      json = conn |> post(path, payload) |> json_response(201)
+
+      id = json["data"]["id"]
       assert id
-      project =
-        Project
-        |> preload([:organization])
-        |> Repo.get(id)
+      project = Project |> Repo.get(id)
 
       assert project
       assert project.title == "Valid project"
@@ -139,21 +132,78 @@ defmodule CodeCorps.ProjectControllerTest do
       assert project.organization_id == organization.id
     end
 
+    @tag authenticated: :admin
+    test "does not create resource and renders errors when attributes are invalid", %{conn: conn} do
+      payload = build_payload |> put_attributes(@invalid_attrs)
+      path = conn |> project_path(:create)
+      errors = conn |> post(path, payload) |> json_response(422) |> Map.get("errors")
+
+      assert errors != %{}
+      assert errors["title"] == ["can't be blank"]
+    end
+
+    test "does not create resource and renders 401 when unauthenticated", %{conn: conn} do
+      path = conn |> project_path(:create)
+      assert conn |> post(path) |> json_response(401)
+    end
+
+    @tag :authenticated
+    test "does not create resource and renders 401 when not authorized", %{conn: conn} do
+      path = conn |> project_path(:create)
+      assert conn |> post(path) |> json_response(401)
+    end
+  end
+
+  describe "update" do
+    @tag authenticated: :admin
+    test "updates and renders resource when attributes are valid", %{conn: conn} do
+      project = insert(:project)
+
+      payload = build_payload |> put_id(project.id) |> put_attributes(@valid_attrs)
+      path = conn |> project_path(:update, project)
+
+      json = conn |> put(path, payload) |> json_response(201)
+
+      id = json["data"]["id"]
+      assert id
+
+      project = Project |> Repo.get(id)
+
+      assert project
+      assert project.title == "Valid project"
+      assert project.description == "Valid project description"
+      assert project.long_description_markdown == "Valid **markdown**"
+      assert project.long_description_body == "<p>Valid <strong>markdown</strong></p>\n"
+      assert project.organization_id
+    end
+
+    @tag authenticated: :admin
+    test "renders errors when attributes are invalid", %{conn: conn} do
+      project = insert(:project)
+
+      payload = build_payload |> put_id(project.id) |> put_attributes(@invalid_attrs)
+      path = conn |> project_path(:update, project)
+
+      errors = conn |> put(path, payload) |> json_response(422) |> Map.get("errors")
+
+      assert errors != %{}
+      assert errors["title"] == ["can't be blank"]
+    end
+
     @tag :requires_env
+    @tag authenticated: :admin
     test "uploads a icon to S3", %{conn: conn} do
       project = insert(:project)
+
       icon_data = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
       attrs = Map.put(@valid_attrs, :base64_icon_data, icon_data)
-      conn = put conn, project_path(conn, :update, project), %{
-        "meta" => %{},
-        "data" => %{
-          "type" => "project",
-          "id" => project.id,
-          "attributes" => attrs
-        }
-      }
 
-      data = json_response(conn, 201)["data"]
+      payload = build_payload |> put_id(project.id) |> put_attributes(attrs)
+      path = conn |> project_path(:update, project)
+
+      json = conn |> put(path, payload) |> json_response(201)
+
+      data = json["data"]
       large_url = data["attributes"]["icon-large-url"]
       assert large_url
       assert String.contains? large_url, "/projects/#{project.id}/large"
@@ -162,91 +212,22 @@ defmodule CodeCorps.ProjectControllerTest do
       assert String.contains? thumb_url, "/projects/#{project.id}/thumb"
     end
 
-    test "renders errors when attributes are invalid", %{conn: conn} do
-      payload = %{
-        "meta" => %{},
-        "data" => %{
-          "type" => "project",
-          "attributes" => @invalid_attrs
-        }
-      }
-
-      conn = post(conn, project_path(conn, :create), payload)
-      errors =
-        conn
-        |> json_response(422)
-        |> Map.get("errors")
-
-      assert errors != %{}
-      assert errors["title"] == ["can't be blank"]
-
-      assert json_response(conn, 422)["errors"] != %{}
-    end
-  end
-
-  describe "update" do
-    test "updates and renders resource when attributes are valid", %{conn: conn} do
-      organization = insert(:organization)
-      project = insert(:project,
-        organization: organization,
-        title: "Initial title",
-        description: "Initial description",
-        long_description_markdown: "Initial long description"
-      )
-
-      payload = %{
-        data: %{
-          id: project.id,
-          type: "project",
-          attributes: @valid_attrs
-        }
-      }
-
-      conn = patch conn, project_path(conn, :update, project), payload
-
-      id = json_response(conn, 201)["data"]["id"]
-      assert id
-      project =
-        Project
-        |> preload([:organization])
-        |> Repo.get(id)
-
-      assert project
-      assert project.title == "Valid project"
-      assert project.description == "Valid project description"
-      assert project.long_description_markdown == "Valid **markdown**"
-      assert project.long_description_body == "<p>Valid <strong>markdown</strong></p>\n"
-      assert project.organization_id == organization.id
+    test "does not create resource and renders 401 when unauthenticated", %{conn: conn} do
+      path = conn |> project_path(:update, "id not important")
+      assert conn |> put(path) |> json_response(401)
     end
 
-    test "renders errors when attributes are invalid", %{conn: conn} do
-      organization = insert(:organization)
-      project = insert(:project,
-        organization: organization,
-        title: "Initial title",
-        description: "Initial description",
-        long_description_markdown: "Initial long description"
-      )
+    @tag :authenticated
+    test "does not create resource and renders 401 when not authorized", %{conn: conn} do
+      project = insert(:project)
+      path = conn |> project_path(:update, project)
+      assert conn |> put(path) |> json_response(401)
+    end
 
-      payload = %{
-        data: %{
-          id: project.id,
-          type: "project",
-          attributes: @invalid_attrs
-        }
-      }
-
-      conn = patch(conn, project_path(conn, :update, project), payload)
-
-      errors =
-        conn
-        |> json_response(422)
-        |> Map.get("errors")
-
-      assert errors != %{}
-      assert errors["title"] == ["can't be blank"]
-
-      assert json_response(conn, 422)["errors"] != %{}
+    @tag :authenticated
+    test "does not update resource and renders 404 when not found", %{conn: conn} do
+      path = conn |> project_path(:update, -1)
+      assert conn |> put(path) |> json_response(404)
     end
   end
 end

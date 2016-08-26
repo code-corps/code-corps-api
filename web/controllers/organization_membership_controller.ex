@@ -4,6 +4,7 @@ defmodule CodeCorps.OrganizationMembershipController do
   alias JaSerializer.Params
   alias CodeCorps.OrganizationMembership
 
+  plug :load_and_authorize_resource, model: OrganizationMembership, only: [:create, :update, :delete]
   plug :scrub_params, "data" when action in [:create, :update]
 
   def index(conn, params) do

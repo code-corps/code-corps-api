@@ -1,5 +1,5 @@
 defmodule CodeCorps.RoleControllerTest do
-  use CodeCorps.ConnCase
+  use CodeCorps.ApiCase
 
   alias CodeCorps.Repo
   alias CodeCorps.Role
@@ -7,48 +7,49 @@ defmodule CodeCorps.RoleControllerTest do
   @valid_attrs %{ability: "Backend Development", kind: "technology", name: "Backend Developer"}
   @invalid_attrs %{ability: "Juggling", kind: "circus", name: "Juggler"}
 
-  setup do
-    conn =
-      %{build_conn | host: "api."}
-      |> put_req_header("accept", "application/vnd.api+json")
-      |> put_req_header("content-type", "application/vnd.api+json")
+  defp build_payload, do: %{ "data" => %{"type" => "role"}}
+  defp put_attributes(payload, attributes), do: payload |> put_in(["data", "attributes"], attributes)
 
-    {:ok, conn: conn}
+  describe "index" do
+    test "lists all entries on index", %{conn: conn} do
+      path = conn |> role_path(:index)
+      json = conn |> get(path) |> json_response(200)
+
+      assert json["data"] == []
+    end
   end
 
-  defp relationships do
-    %{}
-  end
+  describe "create" do
+    @tag authenticated: :admin
+    test "creates and renders resource when data is valid", %{conn: conn} do
+      path = conn |> role_path(:create)
+      payload = build_payload |> put_attributes(@valid_attrs)
+      json = conn |> post(path, payload) |> json_response(201)
 
-  test "lists all entries on index", %{conn: conn} do
-    conn = get conn, role_path(conn, :index)
-    assert json_response(conn, 200)["data"] == []
-  end
+      assert json["data"]["id"]
+      assert Repo.get_by(Role, @valid_attrs)
+    end
 
-  test "creates and renders resource when data is valid", %{conn: conn} do
-    conn = post conn, role_path(conn, :create), %{
-      "meta" => %{},
-      "data" => %{
-        "type" => "role",
-        "attributes" => @valid_attrs,
-        "relationships" => relationships
-      }
-    }
+    @tag authenticated: :admin
+    test "does not create resource and renders errors when data is invalid", %{conn: conn} do
+      path = conn |> role_path(:create)
+      payload = build_payload |> put_attributes(@invalid_attrs)
+      json = conn |> post(path, payload) |> json_response(422)
 
-    assert json_response(conn, 201)["data"]["id"]
-    assert Repo.get_by(Role, @valid_attrs)
-  end
+      assert json["errors"] != %{}
+    end
 
-  test "does not create resource and renders errors when data is invalid", %{conn: conn} do
-    conn = post conn, role_path(conn, :create), %{
-      "meta" => %{},
-      "data" => %{
-        "type" => "role",
-        "attributes" => @invalid_attrs,
-        "relationships" => relationships
-      }
-    }
+    test "does not create resource and renders 401 when unauthenticated", %{conn: conn} do
+      path = conn |> role_path(:create)
+      payload = build_payload |> put_attributes(@valid_attrs)
+      assert conn |> post(path, payload) |> json_response(401)
+    end
 
-    assert json_response(conn, 422)["errors"] != %{}
+    @tag :authenticated
+    test "does not create resource and renders 401 when not authorized", %{conn: conn} do
+      path = conn |> role_path(:create)
+      payload = build_payload |> put_attributes(@valid_attrs)
+      assert conn |> post(path, payload) |> json_response(401)
+    end
   end
 end

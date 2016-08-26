@@ -6,6 +6,7 @@ defmodule CodeCorps.OrganizationController do
 
   import Organization, only: [changeset: 2]
 
+  plug :load_and_authorize_resource, model: Organization, only: [:create, :update]
   plug :scrub_params, "data" when action in [:create, :update]
 
   def index(conn, params) do

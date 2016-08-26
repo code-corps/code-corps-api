@@ -4,6 +4,7 @@ defmodule CodeCorps.PostController do
   alias CodeCorps.Post
   alias JaSerializer.Params
 
+  plug :load_and_authorize_resource, model: Post, only: [:create, :update]
   plug :scrub_params, "data" when action in [:create, :update]
 
   def index(conn, params) do
