@@ -5,7 +5,7 @@ defmodule CodeCorps.Factories do
   def category_factory do
     %CodeCorps.Category{
       name: sequence(:name, &"Category #{&1}"),
-      slug: sequence(:slug, &"category_#{&1}"),
+      slug: sequence(:slug, &"category-#{&1}"),
       description: sequence(:description, &"A description for category #{&1}"),
     }
   end
@@ -47,7 +47,7 @@ defmodule CodeCorps.Factories do
   def project_factory do
     %CodeCorps.Project{
       title: sequence(:title, &"Project #{&1}"),
-      slug: sequence(:slug, &"project_#{&1}")
+      slug: sequence(:slug, &"project-#{&1}")
     }
   end
 
