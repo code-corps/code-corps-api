@@ -38,6 +38,10 @@ config :guardian, Guardian,
   secret_key: System.get_env("GUARDIAN_SECRET_KEY"),
   serializer: CodeCorps.GuardianSerializer
 
+config :canary, repo: CodeCorps.Repo
+config :canary, unauthorized_handler: {CodeCorps.AuthenticationHelpers, :handle_unauthorized}
+config :canary, not_found_handler: {CodeCorps.AuthenticationHelpers, :handle_not_found}
+
 # Configures ex_aws with credentials
 config :ex_aws,
   access_key_id: [System.get_env("AWS_ACCESS_KEY_ID"), :instance_role],

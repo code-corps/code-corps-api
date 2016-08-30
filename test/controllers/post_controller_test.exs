@@ -1,5 +1,5 @@
 defmodule CodeCorps.PostControllerTest do
-  use CodeCorps.ConnCase
+  use CodeCorps.ApiCase
 
   alias CodeCorps.Post
   alias CodeCorps.Repo
@@ -16,135 +16,164 @@ defmodule CodeCorps.PostControllerTest do
     status: "nonexistent"
   }
 
-  setup do
-    conn =
-      %{build_conn | host: "api."}
-      |> put_req_header("accept", "application/vnd.api+json")
-      |> put_req_header("content-type", "application/vnd.api+json")
-
-    {:ok, conn: conn}
+  defp build_payload, do: %{ "data" => %{"type" => "post"}}
+  defp put_id(payload, id), do: payload |> put_in(["data", "id"], id)
+  defp put_attributes(payload, attributes), do: payload |> put_in(["data", "attributes"], attributes)
+  defp put_relationships(payload, user, project) do
+    relationships = build_relationships(user, project)
+    payload |> put_in(["data", "relationships"], relationships)
   end
 
-  defp relationships(user, project) do
+  defp build_relationships(user, project) do
     %{
       user: %{data: %{id: user.id}},
       project: %{data: %{id: project.id}}
     }
   end
 
-  test "lists all entries on index", %{conn: conn} do
-    conn = get conn, post_path(conn, :index)
-    assert json_response(conn, 200)["data"] == []
-  end
+  describe "index" do
+    test "lists all entries on index", %{conn: conn} do
+      path = conn |> post_path(:index)
+      json = conn |> get(path) |> json_response(200)
+      assert json["data"] == []
+    end
 
-  test "lists all posts for a project", %{conn: conn} do
-    project_1 = insert(:project)
-    project_2 = insert(:project)
-    user = insert(:user)
-    insert(:post, project: project_1, user: user)
-    insert(:post, project: project_1, user: user)
-    insert(:post, project: project_2, user: user)
+    test "lists all posts for a project", %{conn: conn} do
+      project_1 = insert(:project)
+      project_2 = insert(:project)
+      user = insert(:user)
+      insert(:post, project: project_1, user: user)
+      insert(:post, project: project_1, user: user)
+      insert(:post, project: project_2, user: user)
 
-    json =
-      conn
-      |> get("projects/#{project_1.id}/posts")
-      |> json_response(200)
+      json =
+        conn
+        |> get("projects/#{project_1.id}/posts")
+        |> json_response(200)
 
-    assert json["data"] |> Enum.count == 2
-  end
-
-  test "shows chosen resource", %{conn: conn} do
-    user = insert(:user)
-    project = insert(:project)
-    post = insert(:post, project: project, user: user)
-    conn = get conn, post_path(conn, :show, post)
-    post = Repo.get(Post, post.id)
-    data = json_response(conn, 200)["data"]
-    assert data["id"] == "#{post.id}"
-    assert data["type"] == "post"
-    assert data["attributes"]["body"] == post.body
-    assert data["attributes"]["markdown"] == post.markdown
-    assert data["attributes"]["number"] == post.number
-    assert data["attributes"]["post-type"] == post.post_type
-    assert data["attributes"]["status"] == post.status
-    assert data["attributes"]["title"] == post.title
-  end
-
-  test "shows post by number for project", %{conn: conn} do
-    user = insert(:user)
-    project = insert(:project)
-    post = insert(:post, project: project, user: user)
-    post = Repo.get(Post, post.id)
-    conn = get conn, project_post_path(conn, :show, project.id, post.number)
-    data = json_response(conn, 200)["data"]
-    assert data["id"] == "#{post.id}"
-    assert data["type"] == "post"
-  end
-
-  test "does not show resource and instead throw error when id is nonexistent", %{conn: conn} do
-    assert_error_sent 404, fn ->
-      get conn, post_path(conn, :show, -1)
+      assert json["data"] |> Enum.count == 2
     end
   end
 
-  test "creates and renders resource when data is valid", %{conn: conn} do
-    user = insert(:user)
-    project = insert(:project)
-    conn = post conn, post_path(conn, :create), %{
-      "meta" => %{},
-      "data" => %{
-        "type" => "post",
-        "attributes" => @valid_attrs,
-        "relationships" => relationships(user, project)
-      }
-    }
+  describe "show" do
+    test "shows chosen resource", %{conn: conn} do
+      post = insert(:post)
+      path = conn |> post_path(:show, post)
 
-    assert json_response(conn, 201)["data"]["id"]
-    assert Repo.get_by(Post, @valid_attrs)
+      data = conn |> get(path) |> json_response(200) |> Map.get("data")
+      post = Post |> Repo.get(post.id)
+
+      assert data["id"] == "#{post.id}"
+      assert data["type"] == "post"
+      assert data["attributes"]["body"] == post.body
+      assert data["attributes"]["markdown"] == post.markdown
+      assert data["attributes"]["number"] == post.number
+      assert data["attributes"]["post-type"] == post.post_type
+      assert data["attributes"]["status"] == post.status
+      assert data["attributes"]["title"] == post.title
+    end
+
+    test "shows post by number for project", %{conn: conn} do
+      post = insert(:post)
+      post = Post |> Repo.get(post.id)
+
+      path = conn |> project_post_path(:show, post.project_id, post.number)
+      data = conn |> get(path) |> json_response(200) |> Map.get("data")
+
+      assert data["id"] == "#{post.id}"
+      assert data["type"] == "post"
+    end
+
+    test "does not show resource and instead throw error when id is nonexistent", %{conn: conn} do
+      assert_error_sent 404, fn ->
+        get conn, post_path(conn, :show, -1)
+      end
+    end
   end
 
-  test "does not create resource and renders errors when data is invalid", %{conn: conn} do
-    conn = post conn, post_path(conn, :create), %{
-      "meta" => %{},
-      "data" => %{
-        "type" => "post",
-        "attributes" => @invalid_attrs,
-      }
-    }
+  describe "create" do
+    @tag :authenticated
+    test "creates and renders resource when data is valid", %{conn: conn} do
+      user = insert(:user)
+      project = insert(:project)
 
-    assert json_response(conn, 422)["errors"] != %{}
+      payload =
+        build_payload
+        |> put_attributes(@valid_attrs)
+        |> put_relationships(user, project)
+
+      path = conn |> post_path(:create)
+      json = conn |> post(path, payload) |> json_response(201)
+
+      assert json["data"]["id"]
+      assert Repo.get_by(Post, @valid_attrs)
+    end
+
+    @tag :authenticated
+    test "does not create resource and renders 422 when data is invalid", %{conn: conn} do
+      payload = build_payload |> put_attributes(@invalid_attrs)
+
+      path = conn |> post_path(:create)
+      json = conn |> post(path, payload) |> json_response(422)
+
+      assert json["errors"] != %{}
+    end
+
+    test "does not create resource and renders 401 when unauthenticated", %{conn: conn} do
+      payload = build_payload |> put_attributes(@invalid_attrs)
+
+      path = conn |> post_path(:create)
+      assert conn |> post(path, payload) |> json_response(401)
+    end
   end
 
-  test "updates and renders chosen resource when data is valid", %{conn: conn} do
-    user = insert(:user)
-    project = insert(:project)
-    post = insert(:post, project: project, user: user)
-    conn = put conn, post_path(conn, :update, post), %{
-      "meta" => %{},
-      "data" => %{
-        "type" => "post",
-        "id" => post.id,
-        "attributes" => @valid_attrs,
-      }
-    }
+  describe "update" do
+    @tag :authenticated
+    test "updates and renders chosen resource when data is valid", %{conn: conn, current_user: current_user} do
+      post = insert(:post, user: current_user)
 
-    assert json_response(conn, 200)["data"]["id"]
-    assert Repo.get_by(Post, @valid_attrs)
-  end
+      payload =
+        build_payload
+        |> put_id(post.id)
+        |> put_attributes(@valid_attrs)
 
-  test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
-    user = insert(:user)
-    project = insert(:project)
-    post = insert(:post, project: project, user: user)
-    conn = put conn, post_path(conn, :update, post), %{
-      "meta" => %{},
-      "data" => %{
-        "type" => "post",
-        "id" => post.id,
-        "attributes" => @invalid_attrs,
-      }
-    }
+      path = conn |> post_path(:update, post)
+      json = conn |> put(path, payload) |> json_response(200)
 
-    assert json_response(conn, 422)["errors"] != %{}
+      assert json["data"]["id"]
+      assert Repo.get_by(Post, @valid_attrs)
+    end
+
+    @tag :authenticated
+    test "does not update chosen resource and renders errors when data is invalid", %{conn: conn, current_user: current_user} do
+      post = insert(:post, user: current_user)
+
+      payload =
+        build_payload
+        |> put_id(post.id)
+        |> put_attributes(@invalid_attrs)
+
+      path = conn |> post_path(:update, post)
+      json = conn |> put(path, payload) |> json_response(422)
+
+      assert json["errors"] != %{}
+    end
+
+    test "does not update resource and renders 401 when unauthenticated", %{conn: conn} do
+      post = insert(:post)
+      payload = build_payload |> put_id(post.id) |> put_attributes(@invalid_attrs)
+
+      path = conn |> post_path(:update, post)
+      assert conn |> put(path, payload) |> json_response(401)
+    end
+
+    @tag :authenticated
+    test "does not update resource and renders 401 when not authorized", %{conn: conn} do
+      post = insert(:post)
+      payload = build_payload |> put_id(post.id) |> put_attributes(@invalid_attrs)
+
+      path = conn |> post_path(:update, post)
+      assert conn |> put(path, payload) |> json_response(401)
+    end
   end
 end

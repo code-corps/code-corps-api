@@ -6,6 +6,7 @@ defmodule CodeCorps.RoleSkillController do
   alias CodeCorps.RoleSkill
   alias JaSerializer.Params
 
+  plug :load_and_authorize_resource, model: RoleSkill, only: [:create, :delete]
   plug :scrub_params, "data" when action in [:create]
 
   def index(conn, params) do

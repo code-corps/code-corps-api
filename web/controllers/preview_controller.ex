@@ -4,6 +4,8 @@ defmodule CodeCorps.PreviewController do
   alias CodeCorps.Preview
   alias JaSerializer.Params
 
+  plug :load_and_authorize_resource, model: Preview, only: [:create]
+
   def create(conn, %{"data" => data = %{"type" => "preview", "attributes" => _project_params}}) do
     user =
       conn

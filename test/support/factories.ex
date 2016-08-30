@@ -14,7 +14,8 @@ defmodule CodeCorps.Factories do
     %CodeCorps.Comment{
       body: "I love elixir!",
       markdown: "I love elixir!",
-      post: build(:post)
+      post: build(:post),
+      user: build(:user)
     }
   end
 
@@ -47,7 +48,8 @@ defmodule CodeCorps.Factories do
   def project_factory do
     %CodeCorps.Project{
       title: sequence(:title, &"Project #{&1}"),
-      slug: sequence(:slug, &"project-#{&1}")
+      slug: sequence(:slug, &"project-#{&1}"),
+      organization: build(:organization)
     }
   end
 

@@ -4,6 +4,7 @@ defmodule CodeCorps.ProjectController do
   alias CodeCorps.Project
   alias JaSerializer.Params
 
+  plug :load_and_authorize_resource, model: Project, only: [:create, :update]
   plug :scrub_params, "data" when action in [:create, :update]
 
   def index(conn, %{"slug" => slug}) do

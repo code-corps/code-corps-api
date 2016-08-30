@@ -1,71 +1,87 @@
 defmodule CodeCorps.UserRoleControllerTest do
-  use CodeCorps.ConnCase
+  use CodeCorps.ApiCase
 
   alias CodeCorps.UserRole
   alias CodeCorps.Repo
 
-  setup do
-    conn =
-      %{build_conn | host: "api."}
-      |> put_req_header("accept", "application/vnd.api+json")
-      |> put_req_header("content-type", "application/vnd.api+json")
-
-    {:ok, conn: conn}
+  defp build_payload, do: %{ "data" => %{"type" => "user-role", "attributes" => %{}}}
+  defp put_relationships(payload, user, role) do
+    relationships = build_relationships(user, role)
+    payload |> put_in(["data", "relationships"], relationships)
   end
 
-  defp attributes do
-    %{}
-  end
-
-  defp relationships(user, role) do
+  defp build_relationships(user, role) do
     %{
       user: %{data: %{id: user.id}},
       role: %{data: %{id: role.id}}
     }
   end
 
-  test "creates and renders resource when data is valid", %{conn: conn} do
-    user = insert(:user)
-    role = insert(:role)
+  describe "create" do
+    @tag authenticated: :admin
+    test "creates and renders resource when data is valid", %{conn: conn} do
+      user = insert(:user)
+      role = insert(:role)
 
-    conn = post conn, user_role_path(conn, :create), %{
-      "meta" => %{},
-      "data" => %{
-        "type" => "user-role",
-        "attributes" => attributes,
-        "relationships" => relationships(user, role)
-      }
-    }
+      payload = build_payload |> put_relationships(user, role)
+      path = conn |> user_role_path(:create)
+      json = conn |> post(path, payload) |> json_response(201)
 
-    json = json_response(conn, 201)
+      id = json["data"]["id"] |> String.to_integer
+      user_role = UserRole |> Repo.get!(id)
 
-    id = json["data"]["id"] |> String.to_integer
-    user_role = UserRole |> Repo.get!(id)
+      assert json["data"]["id"] == "#{user_role.id}"
+      assert json["data"]["type"] == "user-role"
+      assert json["data"]["relationships"]["user"]["data"]["id"] == "#{user_role.user_id}"
+      assert json["data"]["relationships"]["role"]["data"]["id"] == "#{user_role.role_id}"
+    end
 
-    assert json["data"]["id"] == "#{user_role.id}"
-    assert json["data"]["type"] == "user-role"
-    assert json["data"]["relationships"]["user"]["data"]["id"] == "#{user.id}"
-    assert json["data"]["relationships"]["role"]["data"]["id"] == "#{role.id}"
+    @tag authenticated: :admin
+    test "does not create resource and renders errors when data is invalid", %{conn: conn} do
+      payload = build_payload
+      path = conn |> user_role_path(:create)
+      json = conn |> post(path, payload) |> json_response(422)
+
+      assert json["errors"] != %{}
+    end
+
+    test "does not create resource and renders 401 when unauthenticated", %{conn: conn} do
+      path = conn |> user_role_path(:create)
+      assert conn |> post(path) |> json_response(401)
+    end
+
+    @tag :authenticated
+    test "does not create resource and renders 401 when not authorized", %{conn: conn} do
+      path = conn |> user_role_path(:create)
+      assert conn |> post(path) |> json_response(401)
+    end
   end
 
-  test "does not create resource and renders errors when data is invalid", %{conn: conn} do
-    conn = post conn, user_role_path(conn, :create), %{
-      "meta" => %{},
-      "data" => %{
-        "type" => "user-role",
-        "attributes" => attributes,
-      }
-    }
+  describe "delete" do
+    @tag authenticated: :admin
+    test "deletes resource", %{conn: conn} do
+      user_role = insert(:user_role)
 
-    assert json_response(conn, 422)["errors"] != %{}
-  end
+      path = conn |> user_role_path(:delete, user_role)
+      assert conn |> delete(path) |> response(204)
+    end
 
-  test "deletes resource", %{conn: conn} do
-    role = insert(:role)
-    user = insert(:user)
-    user_role = insert(:user_role, user: user, role: role)
-    response = delete conn, user_role_path(conn, :delete, user_role)
+    test "does not delete resource and renders 401 when unauthenticated", %{conn: conn} do
+      path = conn |> user_role_path(:delete, "id not important")
+      assert conn |> delete(path) |> json_response(401)
+    end
 
-    assert response.status == 204
+    @tag :authenticated
+    test "does not create resource and renders 401 when not authorized", %{conn: conn} do
+      user_role = insert(:user_role)
+      path = conn |> user_role_path(:delete, user_role)
+      assert conn |> delete(path) |> json_response(401)
+    end
+
+    @tag :authenticated
+    test "renders page not found when id is nonexistent on delete", %{conn: conn} do
+      path = conn |> user_role_path(:delete, -1)
+      assert conn |> delete(path) |> json_response(404)
+    end
   end
 end

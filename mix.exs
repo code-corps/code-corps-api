@@ -69,6 +69,7 @@ defmodule CodeCorps.Mixfile do
       {:ex_aws, "~> 0.4.10"}, # Amazon AWS
       {:httpoison, "~> 0.7"},
       {:poison, "~> 1.2"},
+      {:canary, "~> 0.14.2"}, # Authorization
     ]
   end
 
