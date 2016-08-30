@@ -6,16 +6,12 @@ defmodule CodeCorps.PostController do
 
   plug :scrub_params, "data" when action in [:create, :update]
 
-  def index(conn, %{"project_id" => project_id}) do
-    posts = Repo.all(
-      from c in Post,
-      where: c.project_id == ^project_id,
-      select: c
-    )
-    render(conn, "index.json-api", data: posts)
-  end
-  def index(conn, _params) do
-    posts = Repo.all(Post)
+  def index(conn, params) do
+    posts =
+      Post
+      |> preload([:comments, :project, :user])
+      |> Post.index_filters(params)
+      |> Repo.all
     render(conn, "index.json-api", data: posts)
   end
 
@@ -24,6 +20,8 @@ defmodule CodeCorps.PostController do
 
     case Repo.insert(changeset) do
       {:ok, post} ->
+        post = Repo.preload(post, [:comments, :project, :user])
+
         conn
         |> put_status(:created)
         |> put_resp_header("location", post_path(conn, :show, post))
@@ -35,23 +33,28 @@ defmodule CodeCorps.PostController do
     end
   end
 
-  def show(conn, %{"id" => number, "project_id" => project_id}) do
-    post = Repo.one(
-      from c in Post,
-      where: c.number == ^number,
-      where: c.project_id == ^project_id,
-      select: c
-    )
+  def show(conn, params = %{"project_id" => _project_id, "id" => _number}) do
+    post =
+      Post
+      |> preload([:comments, :project, :user])
+      |> Post.show_project_post_filters(params)
+      |> Repo.one!
     render(conn, "show.json-api", data: post)
   end
   def show(conn, %{"id" => id}) do
-    post = Repo.get!(Post, id)
+    post =
+      Post
+      |> preload([:comments, :project, :user])
+      |> Repo.get!(id)
     render(conn, "show.json-api", data: post)
   end
 
   def update(conn, %{"id" => id, "data" => data = %{"type" => "post", "attributes" => _post_params}}) do
-    post = Repo.get!(Post, id)
-    changeset = Post.changeset(post, Params.to_attributes(data))
+    changeset =
+      Post
+      |> preload([:comments, :project, :user])
+      |> Repo.get!(id)
+      |> Post.changeset(Params.to_attributes(data))
 
     case Repo.update(changeset) do
       {:ok, post} ->

@@ -25,10 +25,20 @@ defmodule CodeCorps.ModelHelpers do
   end
   def member_filter(query, _), do: query
 
+  def number_as_id_filter(query, %{"id" => number}) do
+    query |> where([object], object.number == ^number)
+  end
+  def number_as_id_filter(query, _), do: query
+
   def organization_filter(query, %{"organization_id" => organization_id}) do
     query |> where([object], object.organization_id == ^organization_id)
   end
   def organization_filter(query, _), do: query
+
+  def project_filter(query, %{"project_id" => project_id}) do
+    query |> where([object], object.project_id == ^project_id)
+  end
+  def project_filter(query, _), do: query
 
   def role_filter(query, %{"role" => roles}) do
     roles = roles |> coalesce_string
