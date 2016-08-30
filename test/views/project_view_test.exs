@@ -9,13 +9,14 @@ defmodule CodeCorps.ProjectViewTest do
   test "renders all attributes and relationships properly" do
     organization = insert(:organization)
     project = insert(:project, organization: organization)
+    post = insert(:post, project: project)
     project_category = insert(:project_category, project: project)
     project_skill = insert(:project_skill, project: project)
 
     project =
       CodeCorps.Project
       |> Repo.get(project.id)
-      |> CodeCorps.Repo.preload([:categories, :organization, :skills])
+      |> CodeCorps.Repo.preload([:categories, :organization, :posts, :skills])
 
     rendered_json =  render(CodeCorps.ProjectView, "show.json-api", data: project)
 
@@ -47,6 +48,14 @@ defmodule CodeCorps.ProjectViewTest do
               id: organization.id |> Integer.to_string,
               type: "organization"
             }
+          },
+          "posts" => %{
+            data: [
+              %{
+                id: post.id |> Integer.to_string,
+                type: "post"
+              }
+            ]
           },
           "project-categories" => %{
             data: [

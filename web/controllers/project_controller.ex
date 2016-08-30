@@ -7,14 +7,14 @@ defmodule CodeCorps.ProjectController do
   plug :scrub_params, "data" when action in [:create, :update]
 
   def index(conn, %{"slug" => slug}) do
-    projects =
+    slugged_route =
       CodeCorps.SluggedRoute
-      |> Repo.get_by(slug: slug)
-      |> Repo.preload([:organization])
-      |> Map.get(:organization)
-      |> Repo.preload([:projects])
-      |> Map.get(:projects)
-      |> Repo.preload([:categories, :organization, :skills])
+      |> Repo.get_by!(slug: slug)
+
+    projects =
+      Project
+      |> Repo.all(organization_id: slugged_route.organization_id)
+      |> Repo.preload([:categories, :organization, :posts, :skills])
 
     render(conn, "index.json-api", data: projects)
   end
@@ -23,15 +23,16 @@ defmodule CodeCorps.ProjectController do
     projects =
       Project
       |> Repo.all
-      |> Repo.preload([:categories, :organization, :skills])
+      |> Repo.preload([:categories, :organization, :posts, :skills])
+
     render(conn, "index.json-api", data: projects)
   end
 
   def show(conn, %{"slug" => _slug, "project_slug" => project_slug}) do
     project =
       Project
-      |> preload([:categories, :organization, :skills])
       |> Repo.get_by!(slug: project_slug)
+      |> Repo.preload([:categories, :organization, :posts, :skills])
 
     render(conn, "show.json-api", data: project)
   end
@@ -39,8 +40,8 @@ defmodule CodeCorps.ProjectController do
   def show(conn, %{"id" => id}) do
     project =
       Project
-      |> preload([:categories, :organization, :skills])
       |> Repo.get!(id)
+      |> Repo.preload([:categories, :organization, :posts, :skills])
 
     render(conn, "show.json-api", data: project)
   end
@@ -50,7 +51,9 @@ defmodule CodeCorps.ProjectController do
 
     case Repo.insert(changeset) do
       {:ok, project} ->
-        project = Repo.preload(project, [:categories, :organization, :skills])
+        project =
+          project
+          |> Repo.preload([:categories, :organization, :posts, :skills])
 
         conn
         |> put_status(:created)
@@ -71,7 +74,9 @@ defmodule CodeCorps.ProjectController do
 
     case Repo.update(changeset) do
       {:ok, project} ->
-        project = Repo.preload(project, [:categories, :organization, :skills])
+        project =
+          project
+          |> Repo.preload([:categories, :organization, :posts, :skills])
 
         conn
         |> put_status(:created)
