@@ -67,7 +67,7 @@ defmodule CodeCorps.ProjectController do
     changeset =
       Project
       |> Repo.get!(id)
-      |> Project.changeset(Params.to_attributes(data))
+      |> Project.update_changeset(Params.to_attributes(data))
 
     case Repo.update(changeset) do
       {:ok, project} ->

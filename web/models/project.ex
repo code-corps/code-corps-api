@@ -34,7 +34,7 @@ defmodule CodeCorps.Project do
 
   def changeset(struct, params) do
     struct
-  	|> cast(params, [:title, :description, :long_description_markdown, :organization_id, :base64_icon_data])
+    |> cast(params, [:title, :description, :long_description_markdown, :base64_icon_data])
     |> validate_required(:title)
     |> generate_slug(:title, :slug)
     |> validate_slug(:slug)
@@ -48,9 +48,16 @@ defmodule CodeCorps.Project do
   """
   def create_changeset(struct, params) do
     struct
+    |> cast(params, [:organization_id])
     |> changeset(params)
-    |> generate_slug(:title, :slug)
-    |> validate_required([:slug])
-    |> validate_slug(:slug)
+
+  end
+
+  @doc """
+  Builds a changeset for updating a project.
+  """
+  def update_changeset(struct, params) do
+    struct
+    |> changeset(params)
   end
 end
