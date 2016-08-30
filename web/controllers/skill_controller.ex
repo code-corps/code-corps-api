@@ -4,6 +4,7 @@ defmodule CodeCorps.SkillController do
   alias CodeCorps.Skill
   alias JaSerializer.Params
 
+  plug :load_and_authorize_resource, model: Skill, only: [:create]
   plug :scrub_params, "data" when action in [:create]
 
   def index(conn, params) do

@@ -6,10 +6,11 @@ defmodule CodeCorps.ProjectSkillController do
   alias CodeCorps.ProjectSkill
   alias JaSerializer.Params
 
+  plug :load_and_authorize_resource, model: ProjectSkill, only: [:create, :delete]
   plug :scrub_params, "data" when action in [:create, :update]
 
   def index(conn, params) do
-    project_skills = 
+    project_skills =
       case params do
         %{"filter" => %{"id" => id_list}} ->
           ids = id_list |> coalesce_id_string
@@ -17,7 +18,7 @@ defmodule CodeCorps.ProjectSkillController do
           |> preload([:project, :skill])
           |> where([p], p.id in ^ids)
           |> Repo.all
-        %{} -> 
+        %{} ->
           ProjectSkill
           |> preload([:user, :skill])
           |> Repo.all
@@ -42,7 +43,7 @@ defmodule CodeCorps.ProjectSkillController do
   end
 
   def show(conn, %{"id" => id}) do
-    project_skill = 
+    project_skill =
       ProjectSkill
       |> preload([:project, :skill])
       |> Repo.get!(id)

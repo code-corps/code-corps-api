@@ -1,72 +1,53 @@
 defmodule CodeCorps.PreviewControllerTest do
-  use CodeCorps.ConnCase
+  use CodeCorps.ApiCase
 
   alias CodeCorps.Preview
 
-  setup do
-    conn =
-      %{build_conn | host: "api."}
-      |> put_req_header("accept", "application/vnd.api+json")
-      |> put_req_header("content-type", "application/vnd.api+json")
-
-    {:ok, conn: conn}
+  defp build_payload do
+    %{"data" => %{"type" => "preview","attributes" => %{markdown: "A **strong** element"}}}
   end
 
-  test "creates and renders resource, with body containing markdown rendered to html", %{conn: conn} do
-    conn = post conn, preview_path(conn, :create), %{
-      "meta" => %{},
-      "data" => %{"type" => "preview","attributes" => %{markdown: "A **strong** element"}}
-    }
+  describe "create" do
+    @tag :authenticated
+    test "creates and renders resource, with body containing markdown rendered to html", %{conn: conn} do
+      payload = build_payload
+      path = conn |> preview_path(:create)
+      json = conn |> post(path, payload) |> json_response(201)
 
-    json =
-      conn
-      |> json_response(201)
+      id = json["data"]["id"] |> String.to_integer
 
-    id =
-      json["data"]["id"]
-      |> String.to_integer
+      assert id
 
-    assert id
+      attributes = json["data"]["attributes"]
 
-    attributes = json["data"]["attributes"]
+      assert attributes["body"] == "<p>A <strong>strong</strong> element</p>\n"
+      assert attributes["markdown"] == "A **strong** element"
 
-    assert attributes["body"] == "<p>A <strong>strong</strong> element</p>\n"
-    assert attributes["markdown"] == "A **strong** element"
+      preview = Preview |> Repo.get!(id)
 
-    preview =
-      Preview
-      |> Repo.get!(id)
+      assert preview.body == "<p>A <strong>strong</strong> element</p>\n"
+      assert preview.markdown == "A **strong** element"
+    end
 
-    assert preview.body == "<p>A <strong>strong</strong> element</p>\n"
-    assert preview.markdown == "A **strong** element"
+    @tag :authenticated
+    test "it assigns current user as owner of preview, if available", %{conn: conn, current_user: current_user} do
+      payload = build_payload
+      path = conn |> preview_path(:create)
+      json = conn |> post(path, payload) |> json_response(201)
+
+
+      id = json["data"]["id"] |> String.to_integer
+
+      preview = Preview |> Repo.get!(id)
+
+      assert preview.user_id == current_user.id
+    end
+
+    test "does not create resource, and responds with 401 when unauthenticated", %{conn: conn} do
+      payload = build_payload
+      path = conn |> preview_path(:create)
+      assert conn |> post(path, payload) |> json_response(401)
+    end
   end
 
-  test "it assigns current user as owner of preview, if available", %{conn: conn} do
-    user = insert(:user)
-
-    path = preview_path(conn, :create)
-    payload = %{
-      "meta" => %{},
-      "data" => %{"type" => "preview", "attributes" => %{markdown: "A **strong** element"}}
-    }
-
-    conn =
-      conn
-      |> Guardian.Plug.api_sign_in(user)
-      |> post(path, payload)
-
-    json =
-      conn
-      |> json_response(201)
-
-    id =
-      json["data"]["id"]
-      |> String.to_integer
-
-    preview =
-      Preview
-      |> Repo.get!(id)
-
-    assert preview.user_id == user.id
-  end
 end

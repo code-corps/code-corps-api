@@ -4,6 +4,8 @@ defmodule CodeCorps.CategoryController do
   alias CodeCorps.Category
   alias JaSerializer.Params
 
+  plug :load_and_authorize_resource, model: Category, only: [:create, :update]
+
   def index(conn, _params) do
     categories = Repo.all(Category)
     render(conn, "index.json-api", data: categories)

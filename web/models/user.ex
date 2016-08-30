@@ -15,6 +15,7 @@ defmodule CodeCorps.User do
   import CodeCorps.ModelHelpers
 
   schema "users" do
+    field :admin, :boolean
     field :base64_photo_data, :string, virtual: true
     field :biography, :string
     field :encrypted_password, :string

@@ -4,6 +4,8 @@ defmodule CodeCorps.UserRoleController do
   alias CodeCorps.UserRole
   alias JaSerializer.Params
 
+  plug :load_and_authorize_resource, model: UserRole, only: [:create, :delete]
+
   def create(conn, %{"data" => data = %{"type" => "user-role"}}) do
     changeset = UserRole.changeset(%UserRole{}, Params.to_attributes(data))
 

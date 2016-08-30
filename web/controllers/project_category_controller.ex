@@ -4,6 +4,7 @@ defmodule CodeCorps.ProjectCategoryController do
   alias JaSerializer.Params
   alias CodeCorps.ProjectCategory
 
+  plug :load_and_authorize_resource, model: ProjectCategory, only: [:create, :delete]
   plug :scrub_params, "data" when action in [:create]
 
   def create(conn, %{"data" => data = %{"type" => "project-category"}}) do

@@ -1,6 +1,18 @@
 defmodule CodeCorps.ErrorView do
   use CodeCorps.Web, :view
 
+  def render("404.json", _assings) do
+    %{
+      errors: [
+        %{
+          id: "NOT_FOUND",
+          title: "404 Resource not found",
+          status: 404,
+        }
+      ]
+    }
+  end
+
   def render("404.html", _assigns) do
     "Page not found"
   end

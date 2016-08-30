@@ -4,6 +4,7 @@ defmodule CodeCorps.UserController do
   alias CodeCorps.User
   alias JaSerializer.Params
 
+  plug :load_and_authorize_resource, model: User, only: [:update]
   plug :scrub_params, "data" when action in [:create, :update]
 
   def index(conn, params) do

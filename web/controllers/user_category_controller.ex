@@ -4,6 +4,7 @@ defmodule CodeCorps.UserCategoryController do
   alias CodeCorps.UserCategory
   alias JaSerializer.Params
 
+  plug :load_and_authorize_resource, model: UserCategory, only: [:create, :delete]
   plug :scrub_params, "data" when action in [:create]
 
   def index(conn, params) do
