@@ -20,20 +20,22 @@ defmodule CodeCorps.UserCategoryController do
   def create(conn, %{"data" => data = %{"type" => "user-category"}}) do
     changeset = UserCategory.changeset(%UserCategory{}, Params.to_attributes(data))
 
-    conn
-    |> assign(:changeset, changeset)
-    |> Canary.Plugs.authorize_resource(model: changeset)
+    conn = conn |> authorize(changeset)
 
-    case Repo.insert(changeset) do
-      {:ok, user_category} ->
-        conn
-        |> put_status(:created)
-        |> put_resp_header("location", user_category_path(conn, :show, user_category))
-        |> render("show.json-api", data: user_category |> Repo.preload([:user, :category]))
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
+    if conn |> authorized? do
+      case Repo.insert(changeset) do
+        {:ok, user_category} ->
+          conn
+          |> put_status(:created)
+          |> put_resp_header("location", user_category_path(conn, :show, user_category))
+          |> render("show.json-api", data: user_category |> Repo.preload([:user, :category]))
+        {:error, changeset} ->
+          conn
+          |> put_status(:unprocessable_entity)
+          |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
+      end
+    else
+      conn
     end
   end
 
@@ -49,4 +51,11 @@ defmodule CodeCorps.UserCategoryController do
     UserCategory |> Repo.get!(id) |> Repo.delete!
     conn |> send_resp(:no_content, "")
   end
+
+  defp authorize(conn, changeset) do
+    conn
+    |> assign(:changeset, changeset)
+    |> Canary.Plugs.authorize_resource(model: changeset)
+  end
+  defp authorized?(conn), do: conn |> Map.get(:assigns) |> Map.get(:authorized)
 end
