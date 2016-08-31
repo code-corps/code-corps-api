@@ -188,7 +188,7 @@ defmodule CodeCorps.PostControllerTest do
       path = conn |> post_path(:index)
       json =
         conn
-        |> get(path, page_size: 2)
+        |> get(path, page: %{page_size: 2})
         |> json_response(200)
 
       assert json["data"] |> Enum.count == 2
@@ -205,7 +205,7 @@ defmodule CodeCorps.PostControllerTest do
       path = conn |> post_path(:index)
       json =
         conn
-        |> get(path, page: 2, page_size: 2)
+        |> get(path, page: %{ page: 2, page_size: 2 })
         |> json_response(200)
       
       [ %{"id" => id} | _ ] = json["data"]
@@ -232,7 +232,7 @@ defmodule CodeCorps.PostControllerTest do
       path = conn |> post_path(:index)
       json =
         conn
-        |> get(path, page_size: 2)
+        |> get(path, page: %{ page_size: 2 })
         |> json_response(200)
         
       assert json["meta"] == meta
