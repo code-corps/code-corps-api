@@ -30,7 +30,7 @@ cond do
     Enum.each(users, fn user ->
       %User{}
       |> User.registration_changeset(user)
-      |> Repo.insert!()
+      |> Repo.insert!
     end)
 end
 
