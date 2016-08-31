@@ -12,8 +12,16 @@ defmodule CodeCorps.PostController do
       Post
       |> preload([:comments, :project, :user])
       |> Post.index_filters(params)
-      |> Repo.all
-    render(conn, "index.json-api", data: posts)
+      |> Repo.paginate(params)
+
+    meta = %{
+      current_page: posts.page_number,
+      page_size: posts.page_size,
+      total_pages: posts.total_pages,
+      total_records: posts.total_entries
+    }
+
+    render(conn, "index.json-api", data: posts, opts: [meta: meta])
   end
 
   def create(conn, %{"data" => data = %{"type" => "post", "attributes" => _post_params}}) do
