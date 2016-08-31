@@ -13,6 +13,7 @@ defmodule CodeCorps.PostController do
       |> preload([:comments, :project, :user])
       |> Post.index_filters(params)
       |> Post.post_type_filters(params)
+      |> Post.post_status_filters(params)
       |> Repo.paginate(params["page"])
 
     meta = %{

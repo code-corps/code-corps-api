@@ -41,6 +41,11 @@ defmodule CodeCorps.ModelHelpers do
   end
   def post_type_filter(query, _), do: query
 
+  def post_status_filter(query, %{"status" => status}) do
+    query |> where([object], object.status == ^status)
+  end
+  def post_status_filter(query, _), do: query
+
   def post_filter(query, %{"post_id" => post_id}) do
     query |> where([object], object.post_id == ^post_id)
   end

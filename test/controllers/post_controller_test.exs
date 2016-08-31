@@ -77,6 +77,30 @@ defmodule CodeCorps.PostControllerTest do
       assert post_types |> Enum.member?("idea")
       refute post_types |> Enum.member?("task")
     end
+
+    test "lists all posts filtered by status", %{conn: conn} do
+      project = insert(:project)
+      post_1 = insert(:post, status: "open", project: project)
+      post_2 = insert(:post, status: "closed", project: project)
+
+      json =
+        conn
+        |> get("projects/#{project.id}/posts?status=open")
+        |> json_response(200)
+
+      assert json["data"] |> Enum.count == 1
+      [post] = json["data"]
+      assert post["id"] == post_1.id |> Integer.to_string
+
+      json =
+        conn
+        |> get("projects/#{project.id}/posts?status=closed")
+        |> json_response(200)
+
+      assert json["data"] |> Enum.count == 1
+      [post] = json["data"]
+      assert post["id"] == post_2.id |> Integer.to_string
+    end
   end
 
   describe "show" do
