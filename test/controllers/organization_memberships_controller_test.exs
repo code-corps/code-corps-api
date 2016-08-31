@@ -5,7 +5,7 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
   alias CodeCorps.Organization
   alias CodeCorps.User
 
-  @valid_attrs %{role: "admin"}
+  @valid_attrs %{role: "contributor"}
   @invalid_attrs %{role: "invalid_role"}
 
   defp build_payload, do: %{ "data" => %{"type" => "organization-membership"}}
@@ -160,35 +160,26 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
       organization = insert(:organization)
       member = insert(:user)
 
-      payload =
-        build_payload
-        |> put_attributes(@valid_attrs)
-        |> put_relationships(organization, member)
+      payload = build_payload |> put_relationships(organization, member)
 
       path = conn |> organization_membership_path(:create)
       data = conn |> post(path, payload) |> json_response(201) |> Map.get("data")
 
       id = data["id"]
-      assert data["attributes"]["role"] == "admin"
+      assert data["attributes"]["role"] == "pending"
       assert data["relationships"]["organization"]["data"]["id"] |> String.to_integer == organization.id
       assert data["relationships"]["member"]["data"]["id"] |> String.to_integer == member.id
 
       membership = OrganizationMembership |> Repo.get(id)
       assert membership
-      assert membership.role == "admin"
+      assert membership.role == "pending"
       assert membership.organization_id == organization.id
       assert membership.member_id == member.id
     end
 
     @tag :authenticated
     test "does not create resource and renders 422 when data is invalid", %{conn: conn} do
-      organization = insert(:organization)
-      member = insert(:user)
-
-      payload =
-        build_payload
-        |> put_attributes(@invalid_attrs)
-        |> put_relationships(organization, member)
+      payload = build_payload
 
       path = conn |> organization_membership_path(:create)
       data = conn |> post(path, payload) |> json_response(422)
@@ -204,22 +195,19 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
       membership = insert(:organization_membership, organization: organization)
       insert(:organization_membership, organization: organization, member: current_user, role: "owner")
 
-      payload =
-        build_payload
-        |> put_id(membership.id)
-        |> put_attributes(@valid_attrs)
+      payload = build_payload |> put_id(membership.id) |> put_attributes(@valid_attrs)
 
       path = conn |> organization_membership_path(:update, membership)
       data = conn |> put(path, payload) |> json_response(200) |> Map.get("data")
 
       id = data["id"]
-      assert data["attributes"]["role"] == "admin"
+      assert data["attributes"]["role"] == "contributor"
       assert data["relationships"]["organization"]["data"]["id"] |> String.to_integer == membership.organization_id
       assert data["relationships"]["member"]["data"]["id"] |> String.to_integer == membership.member_id
 
       membership = OrganizationMembership |> Repo.get(id)
       assert membership
-      assert membership.role == "admin"
+      assert membership.role == "contributor"
       assert membership.organization_id == membership.organization_id
       assert membership.member_id == membership.member_id
     end
