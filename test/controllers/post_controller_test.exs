@@ -176,4 +176,66 @@ defmodule CodeCorps.PostControllerTest do
       assert conn |> put(path, payload) |> json_response(401)
     end
   end
+  
+  describe "pagination" do
+    test "specifying a page size works", %{conn: conn} do
+      project_1 = insert(:project)
+      user = insert(:user)
+      insert(:post, project: project_1, user: user)
+      insert(:post, project: project_1, user: user)
+      insert(:post, project: project_1, user: user)
+
+      path = conn |> post_path(:index)
+      json =
+        conn
+        |> get(path, page: %{page_size: 2})
+        |> json_response(200)
+
+      assert json["data"] |> Enum.count == 2
+    end
+    
+    test "specifying a page number works", %{conn: conn} do
+      project_1 = insert(:project)
+      user = insert(:user)
+      insert(:post, project: project_1, user: user)
+      insert(:post, project: project_1, user: user)
+      post_to_test = insert(:post, project: project_1, user: user)
+      insert(:post, project: project_1, user: user)
+      
+      path = conn |> post_path(:index)
+      json =
+        conn
+        |> get(path, page: %{ page: 2, page_size: 2 })
+        |> json_response(200)
+      
+      [ %{"id" => id} | _ ] = json["data"]
+        
+      assert String.to_integer(id) == post_to_test.id
+    end
+    
+    test "paginated results include a valid meta key", %{conn: conn} do
+      project_1 = insert(:project)
+      user = insert(:user)
+      insert(:post, project: project_1, user: user)
+      insert(:post, project: project_1, user: user)
+      insert(:post, project: project_1, user: user)
+      insert(:post, project: project_1, user: user)
+      insert(:post, project: project_1, user: user)
+      insert(:post, project: project_1, user: user)
+      
+      meta = %{
+        "total_records" => 6,
+        "total_pages" => 3,
+        "page_size" => 2,
+        "current_page" => 1,
+      }
+      path = conn |> post_path(:index)
+      json =
+        conn
+        |> get(path, page: %{ page_size: 2 })
+        |> json_response(200)
+        
+      assert json["meta"] == meta
+    end
+  end
 end
