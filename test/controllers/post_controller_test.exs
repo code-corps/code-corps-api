@@ -70,8 +70,8 @@ defmodule CodeCorps.PostControllerTest do
 
       post_types =
         json["data"]
-        |> Enum.map(fn(r) -> r["attributes"] end)
-        |> Enum.map(fn(atts) -> atts["post-type"] end)
+        |> Enum.map(fn(post_json) -> post_json["attributes"] end)
+        |> Enum.map(fn(post_attributes) -> post_attributes["post-type"] end)
 
       assert post_types |> Enum.member?("issue")
       assert post_types |> Enum.member?("idea")
