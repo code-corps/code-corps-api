@@ -26,7 +26,7 @@ defmodule CodeCorps.OrganizationMembershipController do
     render(conn, "show.json-api", data: membership)
   end
 
-  def create(conn, %{"data" => data = %{"type" => "organization-membership", "attributes" => _params}}) do
+  def create(conn, %{"data" => data = %{"type" => "organization-membership"}}) do
     changeset = %OrganizationMembership{} |> OrganizationMembership.create_changeset(Params.to_attributes(data))
 
     case Repo.insert(changeset) do

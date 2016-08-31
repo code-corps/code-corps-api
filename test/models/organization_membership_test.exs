@@ -3,25 +3,40 @@ defmodule CodeCorps.OrganizationMembershipTest do
 
   alias CodeCorps.OrganizationMembership
 
-  describe "update_changeset" do
-    @valid_attrs %{role: "admin"}
-    @invalid_attrs %{}
-
-    test "changeset with valid attributes" do
-      changeset = OrganizationMembership.update_changeset(%OrganizationMembership{}, @valid_attrs)
+  describe "update_changeset role validation" do
+    test "includes pending" do
+      attrs = %{role: "pending"}
+      changeset = OrganizationMembership.update_changeset(%OrganizationMembership{}, attrs)
       assert changeset.valid?
     end
 
-    test "changeset with invalid attributes" do
-      changeset = OrganizationMembership.update_changeset(%OrganizationMembership{}, @invalid_attrs)
+    test "includes contributor" do
+      attrs = %{role: "contributor"}
+      changeset = OrganizationMembership.update_changeset(%OrganizationMembership{}, attrs)
+      assert changeset.valid?
+    end
 
+    test "includes admin" do
+      attrs = %{role: "admin"}
+      changeset = OrganizationMembership.update_changeset(%OrganizationMembership{}, attrs)
+      assert changeset.valid?
+    end
+
+    test "includes owner" do
+      attrs = %{role: "owner"}
+      changeset = OrganizationMembership.update_changeset(%OrganizationMembership{}, attrs)
+      assert changeset.valid?
+    end
+
+    test "does not include invalid values" do
+      attrs = %{role: "invalid"}
+      changeset = OrganizationMembership.update_changeset(%OrganizationMembership{}, attrs)
       refute changeset.valid?
-      assert changeset.errors[:role] == {"can't be blank", []}
     end
   end
 
   describe "create_changeset" do
-    @valid_attrs %{role: "admin", member_id: 1, organization_id: 2}
+    @valid_attrs %{member_id: 1, organization_id: 2}
     @invalid_attrs %{}
 
     test "changeset with valid attributes" do
@@ -33,7 +48,6 @@ defmodule CodeCorps.OrganizationMembershipTest do
       changeset = OrganizationMembership.create_changeset(%OrganizationMembership{}, @invalid_attrs)
       refute changeset.valid?
 
-      assert changeset.errors[:role] == {"can't be blank", []}
       assert changeset.errors[:member_id] == {"can't be blank", []}
       assert changeset.errors[:organization_id] == {"can't be blank", []}
     end
@@ -55,38 +69,6 @@ defmodule CodeCorps.OrganizationMembershipTest do
 
       assert result == :error
       assert changeset.errors[:member] == {"does not exist", []}
-    end
-  end
-
-  describe "role validation" do
-    test "includes pending" do
-      attrs = Map.merge(@valid_attrs, %{role: "pending"})
-      changeset = OrganizationMembership.changeset(%OrganizationMembership{}, attrs)
-      assert changeset.valid?
-    end
-
-    test "includes contributor" do
-      attrs = Map.merge(@valid_attrs, %{role: "contributor"})
-      changeset = OrganizationMembership.changeset(%OrganizationMembership{}, attrs)
-      assert changeset.valid?
-    end
-
-    test "includes admin" do
-      attrs = Map.merge(@valid_attrs, %{role: "admin"})
-      changeset = OrganizationMembership.changeset(%OrganizationMembership{}, attrs)
-      assert changeset.valid?
-    end
-
-    test "includes owner" do
-      attrs = Map.merge(@valid_attrs, %{role: "owner"})
-      changeset = OrganizationMembership.changeset(%OrganizationMembership{}, attrs)
-      assert changeset.valid?
-    end
-
-    test "does not include invalid values" do
-      attrs = Map.merge(@valid_attrs, %{role: "invalid"})
-      changeset = OrganizationMembership.changeset(%OrganizationMembership{}, attrs)
-      refute changeset.valid?
     end
   end
 end
