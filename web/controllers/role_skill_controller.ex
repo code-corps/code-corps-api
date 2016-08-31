@@ -1,8 +1,6 @@
 defmodule CodeCorps.RoleSkillController do
   use CodeCorps.Web, :controller
 
-  import CodeCorps.ControllerHelpers
-
   alias CodeCorps.RoleSkill
   alias JaSerializer.Params
 
