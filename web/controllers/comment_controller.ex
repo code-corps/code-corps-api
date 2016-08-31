@@ -8,8 +8,13 @@ defmodule CodeCorps.CommentController do
 
   plug :scrub_params, "data" when action in [:create, :update]
 
-  def index(conn, _params) do
-    comments = Repo.all(Comment, preload: [:post])
+  def index(conn, params = %{"post_id" => _}) do
+    comments =
+      Comment
+      |> Comment.index_filters(params)
+      |> Repo.all
+      |> Repo.preload(:post)
+
     render(conn, "index.json-api", data: comments)
   end
 
