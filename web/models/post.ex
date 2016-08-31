@@ -10,7 +10,7 @@ defmodule CodeCorps.Post do
     field :markdown, :string
     field :number, :integer
     field :post_type, :string
-    field :state, :string, default: "published"
+    field :state, :string
     field :status, :string, default: "open"
     field :title, :string
 
@@ -34,10 +34,10 @@ defmodule CodeCorps.Post do
     struct
     |> changeset(params)
     |> cast(params, [:project_id, :user_id])
-    |> put_change(:state, "published")
     |> validate_required([:project_id, :user_id])
     |> assoc_constraint(:project)
     |> assoc_constraint(:user)
+    |> put_change(:state, "published")
   end
 
   def update_changeset(struct, params) do
