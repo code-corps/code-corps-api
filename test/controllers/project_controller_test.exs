@@ -139,7 +139,6 @@ defmodule CodeCorps.ProjectControllerTest do
       errors = conn |> post(path, payload) |> json_response(422) |> Map.get("errors")
 
       assert errors != %{}
-      assert errors["title"] == ["can't be blank"]
     end
 
     test "does not create resource and renders 401 when unauthenticated", %{conn: conn} do
@@ -187,7 +186,6 @@ defmodule CodeCorps.ProjectControllerTest do
       errors = conn |> put(path, payload) |> json_response(422) |> Map.get("errors")
 
       assert errors != %{}
-      assert errors["title"] == ["can't be blank"]
     end
 
     @tag :requires_env
