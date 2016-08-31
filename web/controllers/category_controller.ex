@@ -7,7 +7,7 @@ defmodule CodeCorps.CategoryController do
   plug :load_and_authorize_resource, model: Category, only: [:create, :update]
 
   def index(conn, _params) do
-    categories = Repo.all(Category)
+    categories = Category |> Repo.all |> Repo.preload([:project_categories, :projects])
     render(conn, "index.json-api", data: categories)
   end
 
