@@ -27,7 +27,14 @@ code-corps-phoenix/          # → Root folder for this project
 
 > Note: We bind to ports 49235 for `web`, 49236 for `test`, and 8081 for `apiary`. Make sure you're not running anything on those ports. We do not expose port 5432 for `postgres` or 9200 for `elasticsearch`.
 
-Go to the `code-corps-phoenix` directory and type:
+Go to the `code-corps-phoenix` directory and copy the `.env.example` file:
+
+```
+cd code-corps-phoenix
+cp .env.example
+```
+
+Now, you can initialize docker, type:
 
 ```shell
 docker-compose build
@@ -42,7 +49,7 @@ Docker will set up your base Elixir container, as well as containers for:
 - `elasticsearch`
 - `web` runs `mix do ecto.create, ecto.migrate, phoenix.server`
 - `test` runs `mix test`
-- `apiary` runs an [Apiary client](API.md#apiary-cli) server on port `8081`
+- `apiary` runs an [Apiary client](https://github.com/apiaryio/apiary-client) server on port `8081`
 
 You can view more detailed information about these services in the `docker-compose.yml` file, but you shouldn't need to edit it unless you're intentionally contributing changes to our Docker workflow.
 
