@@ -50,6 +50,10 @@ defmodule CodeCorps.Post do
     query |> project_filter(params)
   end
 
+  def post_type_filters(query, params) do
+    query |> post_type_filter(params)
+  end
+
   def show_project_post_filters(query, params) do
     query
     |> number_as_id_filter(params)

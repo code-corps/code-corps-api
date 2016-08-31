@@ -35,6 +35,11 @@ defmodule CodeCorps.ModelHelpers do
   end
   def organization_filter(query, _), do: query
 
+  def post_type_filter(query, %{"post_type" => post_type}) do
+    query |> where([object], object.post_type == ^post_type)
+  end
+  def post_type_filter(query, _), do: query
+
   def project_filter(query, %{"project_id" => project_id}) do
     query |> where([object], object.project_id == ^project_id)
   end

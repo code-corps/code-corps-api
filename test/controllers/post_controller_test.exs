@@ -53,6 +53,22 @@ defmodule CodeCorps.PostControllerTest do
 
       assert json["data"] |> Enum.count == 2
     end
+
+    test "lists all posts filtered by post_type", %{conn: conn} do
+      project_1 = insert(:project)
+      user = insert(:user)
+      post = insert(:post, post_type: "abc", project: project_1, user: user)
+      insert(:post, post_type: "def", project: project_1, user: user)
+      insert(:post, post_type: "abcd", project: project_1, user: user)
+
+      json =
+        conn
+        |> get("projects/#{project_1.id}/posts?post_type=abc")
+        |> json_response(200)
+
+      assert json["data"] |> Enum.count == 1
+      assert Enum.at(json["data"], 0)["attributes"]["post-type"] == post.post_type
+    end
   end
 
   describe "show" do
