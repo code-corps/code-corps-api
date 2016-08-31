@@ -4,7 +4,7 @@ defmodule CodeCorps.UserSkillController do
   alias CodeCorps.UserSkill
   alias JaSerializer.Params
 
-  plug :load_and_authorize_resource, model: UserSkill, only: [:create, :delete]
+  plug :load_and_authorize_resource, model: UserSkill, only: [:delete]
   plug :scrub_params, "data" when action in [:create]
 
   def index(conn, params) do
@@ -20,16 +20,22 @@ defmodule CodeCorps.UserSkillController do
   def create(conn, %{"data" => data = %{"type" => "user-skill"}}) do
     changeset = UserSkill.changeset(%UserSkill{}, Params.to_attributes(data))
 
-    case Repo.insert(changeset) do
-      {:ok, user_skill} ->
-        conn
-        |> put_status(:created)
-        |> put_resp_header("location", user_skill_path(conn, :show, user_skill))
-        |> render("show.json-api", data: user_skill |> Repo.preload([:user, :skill]))
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
+    conn = conn |> authorize(changeset)
+
+    if conn |> authorized? do
+      case Repo.insert(changeset) do
+        {:ok, user_skill} ->
+          conn
+          |> put_status(:created)
+          |> put_resp_header("location", user_skill_path(conn, :show, user_skill))
+          |> render("show.json-api", data: user_skill |> Repo.preload([:user, :skill]))
+        {:error, changeset} ->
+          conn
+          |> put_status(:unprocessable_entity)
+          |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
+      end
+    else
+      conn
     end
   end
 
@@ -45,4 +51,11 @@ defmodule CodeCorps.UserSkillController do
     UserSkill |> Repo.get!(id) |> Repo.delete!
     conn |> send_resp(:no_content, "")
   end
+
+  defp authorize(conn, changeset) do
+    conn
+    |> assign(:changeset, changeset)
+    |> Canary.Plugs.authorize_resource(model: changeset)
+  end
+  defp authorized?(conn), do: conn |> Map.get(:assigns) |> Map.get(:authorized)
 end
