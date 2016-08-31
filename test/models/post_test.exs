@@ -20,12 +20,6 @@ defmodule CodeCorps.PostTest do
       refute changeset.valid?
     end
 
-    test "only allows specific values for status" do
-      changes = Map.put(@valid_attrs, :status, "nonexistent")
-      changeset = Post.changeset(%Post{}, changes)
-      refute changeset.valid?
-    end
-
     test "only allows specific values for post_type" do
       changes = Map.put(@valid_attrs, :post_type, "nonexistent")
       changeset = Post.changeset(%Post{}, changes)
@@ -91,14 +85,26 @@ defmodule CodeCorps.PostTest do
     end
 
     test "sets state to 'published'" do
-      changeset = Post.create_changeset(%Post{}, %{project_id: 1, user_id: 2})
+      changeset = Post.create_changeset(%Post{}, %{})
       assert changeset |> get_change(:state) == "published"
+    end
+
+    test "sets status to 'open'" do
+      changeset = Post.create_changeset(%Post{}, %{})
+      # open is default, so we `get_field` instead of `get_change`
+      assert changeset |> get_field(:status) == "open"
     end
   end
   describe "&update_changeset/2" do
     test "sets state to 'edited'" do
       changeset = Post.update_changeset(%Post{}, %{})
       assert changeset |> get_change(:state) == "edited"
+    end
+
+    test "only allows specific values for status" do
+      changes = Map.put(@valid_attrs, :status, "nonexistent")
+      changeset = Post.update_changeset(%Post{}, changes)
+      refute changeset.valid?
     end
   end
 
