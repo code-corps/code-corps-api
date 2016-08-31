@@ -21,12 +21,6 @@ defmodule CodeCorps.ModelHelpers do
   end
   def id_filter(query, _), do: query
 
-  def member_filter(query, %{"filter" => %{"id" => id_list}}) do
-    ids = id_list |> coalesce_id_string
-    query |> where([object], object.member_id in ^ids)
-  end
-  def member_filter(query, _), do: query
-
   def number_as_id_filter(query, %{"id" => number}) do
     query |> where([object], object.number == ^number)
   end

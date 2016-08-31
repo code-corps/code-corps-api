@@ -54,15 +54,12 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
       assert second_result["id"] == "#{membership_2.id}"
     end
 
-    test "filters resources by member id", %{conn: conn} do
-      member_1 = insert(:user)
-      member_2 = insert(:user)
-      member_3 = insert(:user)
-      membership_1 = insert(:organization_membership, member: member_1)
-      membership_2 = insert(:organization_membership, member: member_2)
-      insert(:organization_membership, member: member_3)
+    test "filters resources by membership id", %{conn: conn} do
+      membership_1 = insert(:organization_membership)
+      membership_2 = insert(:organization_membership)
+      insert(:organization_membership)
 
-      params = %{"filter" => %{"id" => "#{member_1.id},#{member_2.id}"}}
+      params = %{"filter" => %{"id" => "#{membership_1.id},#{membership_2.id}"}}
       conn = get conn, organization_membership_path(conn, :index, params)
       data = json_response(conn, 200)["data"]
       assert data |> length == 2
@@ -89,13 +86,11 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
     end
 
     test "filters resources by role and id", %{conn: conn} do
-      member_1 = insert(:user)
-      member_2 = insert(:user)
-      membership_1 = insert(:organization_membership, role: "admin", member: member_1)
-      insert(:organization_membership, role: "admin", member: member_2)
+      membership_1 = insert(:organization_membership, role: "admin")
+      insert(:organization_membership, role: "admin")
       insert(:organization_membership, role: "owner")
 
-      params = %{"role" => "admin", "filter" => %{"id" => "#{member_1.id}"}}
+      params = %{"role" => "admin", "filter" => %{"id" => "#{membership_1.id}"}}
       path = conn |> organization_membership_path(:index, params)
 
       data = conn |> get(path) |> json_response(200) |> Map.get("data")
@@ -107,19 +102,12 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
     end
 
     test "filters resources by role and id on specific organization", %{conn: conn} do
-      member_1 = insert(:user)
       organization = insert(:organization)
-      membership_1 =
-        insert(
-          :organization_membership,
-          organization: organization,
-          role: "admin",
-          member: member_1
-        )
+      membership_1 = insert(:organization_membership, organization: organization, role: "admin")
       insert(:organization_membership, organization: organization, role: "admin")
       insert(:organization_membership, role: "owner")
 
-      params = %{"role" => "admin", "filter" => %{"id" => "#{member_1.id}"}}
+      params = %{"role" => "admin", "filter" => %{"id" => "#{membership_1.id}"}}
       path = conn |> organization_organization_membership_path(:index, organization)
 
       data = conn |> get(path, params) |> json_response(200) |> Map.get("data")
