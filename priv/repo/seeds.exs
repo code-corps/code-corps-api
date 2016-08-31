@@ -5,6 +5,7 @@ alias CodeCorps.Project
 alias CodeCorps.Role
 alias CodeCorps.Skill
 alias CodeCorps.User
+alias CodeCorps.Post
 
 # Users
 
@@ -274,4 +275,25 @@ cond do
       Category.create_changeset(%Category{}, category)
       |> Repo.insert!
     end)
+end
+
+# Posts
+
+cond do
+  Repo.all(Post) != [] ->
+    IO.puts "Posts detected, aborting post seed."
+  true ->
+    for i <- 1..50 do
+      %Post{}
+      |> Post.create_changeset(%{
+        title: "test post #{i}",
+        markdown: "test *body* #{i}",
+        post_type: Enum.random(~w{idea issue task}),
+        status: "open",
+        number: i,
+        project_id: 1,
+        user_id: 1
+      })
+      |> Repo.insert!
+    end
 end
