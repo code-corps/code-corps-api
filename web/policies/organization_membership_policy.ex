@@ -52,7 +52,7 @@ defmodule CodeCorps.OrganizationMembershipPolicy do
     Organization
     |> Repo.get(membership.organization_id)
   end
-  defp fetch_membership(user, nil), do: nil
+  defp fetch_membership(_user, nil), do: nil
   defp fetch_membership(user, organization) do
     OrganizationMembership
     |> where([m], m.member_id == ^user.id and m.organization_id == ^organization.id)
