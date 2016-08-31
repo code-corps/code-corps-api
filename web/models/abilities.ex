@@ -79,8 +79,8 @@ defmodule Canary.Abilities do
 
     def can?(%User{} = user, :create, Skill), do: SkillPolicy.create?(user)
 
-    def can?(%User{} = user, :create, UserCategory), do: UserCategoryPolicy.create?(user)
-    def can?(%User{} = user, :delete, %UserCategory{}), do: UserCategoryPolicy.delete?(user)
+    def can?(%User{} = user, :create, %Ecto.Changeset{} = changeset), do: UserCategoryPolicy.create?(user, changeset)
+    def can?(%User{} = user, :delete, %UserCategory{} = user_category), do: UserCategoryPolicy.delete?(user, user_category)
 
     def can?(%User{} = user, :create, UserRole), do: UserRolePolicy.create?(user)
     def can?(%User{} = user, :delete, %UserRole{}), do: UserRolePolicy.delete?(user)
