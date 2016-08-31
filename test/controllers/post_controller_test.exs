@@ -53,6 +53,30 @@ defmodule CodeCorps.PostControllerTest do
 
       assert json["data"] |> Enum.count == 2
     end
+
+    test "lists all posts filtered by post_type", %{conn: conn} do
+      project_1 = insert(:project)
+      user = insert(:user)
+      insert(:post, post_type: "idea", project: project_1, user: user)
+      insert(:post, post_type: "issue", project: project_1, user: user)
+      insert(:post, post_type: "task", project: project_1, user: user)
+
+      json =
+        conn
+        |> get("projects/#{project_1.id}/posts?post_type=idea,issue")
+        |> json_response(200)
+
+      assert json["data"] |> Enum.count == 2
+
+      post_types =
+        json["data"]
+        |> Enum.map(fn(post_json) -> post_json["attributes"] end)
+        |> Enum.map(fn(post_attributes) -> post_attributes["post-type"] end)
+
+      assert post_types |> Enum.member?("issue")
+      assert post_types |> Enum.member?("idea")
+      refute post_types |> Enum.member?("task")
+    end
   end
 
   describe "show" do
@@ -176,7 +200,7 @@ defmodule CodeCorps.PostControllerTest do
       assert conn |> put(path, payload) |> json_response(401)
     end
   end
-  
+
   describe "pagination" do
     test "specifying a page size works", %{conn: conn} do
       project_1 = insert(:project)
@@ -193,7 +217,7 @@ defmodule CodeCorps.PostControllerTest do
 
       assert json["data"] |> Enum.count == 2
     end
-    
+
     test "specifying a page number works", %{conn: conn} do
       project_1 = insert(:project)
       user = insert(:user)
@@ -201,18 +225,18 @@ defmodule CodeCorps.PostControllerTest do
       insert(:post, project: project_1, user: user)
       post_to_test = insert(:post, project: project_1, user: user)
       insert(:post, project: project_1, user: user)
-      
+
       path = conn |> post_path(:index)
       json =
         conn
         |> get(path, page: %{ page: 2, page_size: 2 })
         |> json_response(200)
-      
+
       [ %{"id" => id} | _ ] = json["data"]
-        
+
       assert String.to_integer(id) == post_to_test.id
     end
-    
+
     test "paginated results include a valid meta key", %{conn: conn} do
       project_1 = insert(:project)
       user = insert(:user)
@@ -222,7 +246,7 @@ defmodule CodeCorps.PostControllerTest do
       insert(:post, project: project_1, user: user)
       insert(:post, project: project_1, user: user)
       insert(:post, project: project_1, user: user)
-      
+
       meta = %{
         "total_records" => 6,
         "total_pages" => 3,
@@ -234,7 +258,7 @@ defmodule CodeCorps.PostControllerTest do
         conn
         |> get(path, page: %{ page_size: 2 })
         |> json_response(200)
-        
+
       assert json["meta"] == meta
     end
   end
