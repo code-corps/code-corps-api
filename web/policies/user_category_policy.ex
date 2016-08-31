@@ -1,11 +1,6 @@
 defmodule CodeCorps.UserCategoryPolicy do
-  alias CodeCorps.OrganizationMembership
   alias CodeCorps.UserCategory
   alias CodeCorps.User
-
-  alias CodeCorps.Repo
-
-  import Ecto.Query
 
   def create?(%User{admin: true}), do: true
   def create?(%User{}), do: false
