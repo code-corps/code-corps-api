@@ -25,6 +25,7 @@ defmodule CodeCorps.PostViewTest do
           "number" => post.number,
           "post-type" => post.post_type,
           "status" => post.status,
+          "state" => post.state,
           "title" => post.title,
           "updated-at" => post.updated_at,
         },
