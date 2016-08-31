@@ -22,10 +22,13 @@ defmodule CodeCorps.CommentControllerTest do
     }
   end
 
-  test "lists all entries on index", %{conn: conn} do
-    path = conn |> comment_path(:index)
-    conn = conn |> get(path)
-    assert json_response(conn, 200)["data"] == []
+  describe "index" do
+    test "lists all entries for specified post on index", %{conn: conn} do
+      post = insert(:post)
+      path = conn |> post_comment_path(:index, post)
+      conn = conn |> get(path)
+      assert json_response(conn, 200)["data"] == []
+    end
   end
 
   describe "show" do
