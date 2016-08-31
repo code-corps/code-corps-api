@@ -202,10 +202,6 @@ defmodule CodeCorps.UserControllerTest do
 
       json =  json_response(conn, 422)
       assert json["errors"] != %{}
-      errors = json["errors"]
-      assert errors["email"] == ["can't be blank"]
-      assert errors["twitter"] == ["has invalid format"]
-      assert errors["website"] == ["has invalid format"]
     end
 
     test "transitions from one state to the next", %{conn: conn} do
@@ -221,20 +217,6 @@ defmodule CodeCorps.UserControllerTest do
       %{"data" => %{"id" => id}} = json_response(conn, 200)
       user = Repo.get(User, id)
       assert user.state == "edited_profile"
-    end
-
-    test "prevents an invalid transition", %{conn: conn} do
-      user = insert(:user)
-      conn = put authenticate(conn, user), user_path(conn, :update, user), %{
-        "data" => %{
-          "type" => "user",
-          "id" => user.id,
-          "attributes" => %{"password" => "password", "state_transition" => "yehaww"}
-        }
-      }
-
-      %{"errors" => errors} = json_response(conn, 422)
-      assert errors["state_transition"] == ["invalid transition yehaww from signed_up"]
     end
   end
 

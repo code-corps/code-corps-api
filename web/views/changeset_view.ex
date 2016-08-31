@@ -10,7 +10,35 @@ defmodule CodeCorps.ChangesetView do
   `CodeCorps.ErrorHelpers.translate_error/1` for more details.
   """
   def translate_errors(changeset) do
-    Changeset.traverse_errors(changeset, &translate_error/1)
+    errors =
+      changeset
+      |> Changeset.traverse_errors(&translate_error/1)
+      |> format_errors
+    errors
+  end
+
+  defp format_errors(errors) do
+    errors
+    |> Map.keys
+    |> Enum.map(fn(attribute) -> format_attribute_errors(errors, attribute) end)
+    |> Enum.flat_map(fn(error) -> error end)
+  end
+
+  defp format_attribute_errors(errors, attribute) do
+    errors
+    |> Map.get(attribute)
+    |> Enum.map(fn(message) -> create_error(attribute, message) end)
+  end
+
+  def create_error(attribute, message) do
+    %{
+      id: "VALIDATION_ERROR",
+      source: %{
+        pointer: "data/attributes/#{attribute}"
+      },
+      detail: message,
+      status: 422
+    }
   end
 
   def render("error.json-api", %{changeset: changeset}) do

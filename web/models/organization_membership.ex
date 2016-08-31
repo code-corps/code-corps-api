@@ -43,9 +43,9 @@ defmodule CodeCorps.OrganizationMembership do
 
   def index_filters(query, params) do
     query
+    |> id_filter(params)
     |> organization_filter(params)
     |> role_filter(params)
-    |> member_filter(params)
   end
 
   defp roles do

@@ -33,7 +33,7 @@ defmodule CodeCorps.Router do
     post "/login", AuthController, :create
 
     resources "/categories", CategoryController, only: [:index, :show]
-    resources "/comments", CommentController, only: [:index, :show]
+    resources "/comments", CommentController, only: [:show]
 
     resources "/organizations", OrganizationController, only: [:index, :show] do
       resources "/memberships", OrganizationMembershipController, only: [:index]

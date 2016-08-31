@@ -103,7 +103,7 @@ defmodule CodeCorps.UserSkillControllerTest do
     @tag :authenticated
     test "does not create resource and renders 401 when not authorized", %{conn: conn} do
       path = conn |> user_skill_path(:create)
-      assert conn |> post(path) |> json_response(401)
+      assert conn |> post(path, build_payload) |> json_response(401)
     end
   end
 
