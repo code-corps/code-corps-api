@@ -28,7 +28,7 @@ defmodule CodeCorps.User do
     field :username, :string
     field :website, :string
 
-    field :state, :string
+    field :state, :string, default: "signed_up"
     field :state_transition, :string, virtual: true
 
     has_one :slugged_route, SluggedRoute
