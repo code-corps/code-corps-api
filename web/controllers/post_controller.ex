@@ -64,7 +64,7 @@ defmodule CodeCorps.PostController do
       Post
       |> preload([:comments, :project, :user])
       |> Repo.get!(id)
-      |> Post.changeset(Params.to_attributes(data))
+      |> Post.update_changeset(Params.to_attributes(data))
 
     case Repo.update(changeset) do
       {:ok, post} ->
