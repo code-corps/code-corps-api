@@ -7,11 +7,9 @@ defmodule CodeCorps.PostTest do
     title: "Test post",
     post_type: "issue",
     markdown: "A test post",
-    status: "open"
   }
   @invalid_attrs %{
-    post_type: "nonexistent",
-    status: "nonexistent"
+    post_type: "nonexistent"
   }
 
   describe "&create/2" do
@@ -50,7 +48,6 @@ defmodule CodeCorps.PostTest do
         title: "some content",
         project_id: project.id,
         user_id: user.id,
-        status: "open"
       })
       assert changeset.valid?
     end
