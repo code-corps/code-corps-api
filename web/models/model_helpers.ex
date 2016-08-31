@@ -6,8 +6,10 @@ defmodule CodeCorps.ModelHelpers do
   def generate_slug(changeset, value_key, slug_key) do
     case changeset do
       %Ecto.Changeset{valid?: true, changes: changes} ->
-        {:ok, value} = Map.fetch(changes, value_key)
-        put_change(changeset, slug_key, Inflex.parameterize(value))
+        case Map.fetch(changes, value_key) do
+          {:ok, value} -> put_change(changeset, slug_key, Inflex.parameterize(value))
+          _ -> changeset
+        end
       _ ->
         changeset
     end
