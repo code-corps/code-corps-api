@@ -28,6 +28,9 @@ defmodule CodeCorps.User do
     field :username, :string
     field :website, :string
 
+    field :state, :string
+    field :state_transition, :string, virtual: true
+
     has_one :slugged_route, SluggedRoute
 
     has_many :organization_memberships,
@@ -78,11 +81,22 @@ defmodule CodeCorps.User do
   def update_changeset(struct, params) do
     struct
     |> changeset(params)
-    |> cast(params, [:first_name, :last_name, :twitter, :biography, :website, :base64_photo_data])
+    |> cast(params, [:first_name, :last_name, :twitter, :biography, :website, :base64_photo_data, :state_transition])
     |> prefix_url(:website)
     |> validate_format(:website, ~r/\A((http|https):\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,}(([0-9]{1,5})?\/.*)?#=\z/ix)
     |> validate_format(:twitter, ~r/\A[a-zA-Z0-9_]{1,15}\z/)
     |> upload_image(:base64_photo_data, :photo)
+    |> apply_state_transition(struct)
+  end
+
+  def apply_state_transition(changeset, %{state: current_state}) do
+    state_transition = get_field(changeset, :state_transition)
+    next_state = CodeCorps.Transition.UserState.next(current_state, state_transition)
+    case next_state do
+      nil -> changeset
+      {:ok, next_state} -> cast(changeset, %{state: next_state}, [:state])
+      {:error, reason} -> add_error(changeset, :state_transition, reason)
+    end
   end
 
   def check_email_availability(email) do
