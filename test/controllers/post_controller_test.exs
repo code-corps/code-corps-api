@@ -131,6 +131,10 @@ defmodule CodeCorps.PostControllerTest do
 
       assert json["data"]["id"]
       assert Repo.get_by(Post, @valid_attrs)
+
+      # ensure record is reloaded from database before serialized, since number is added
+      # on database level upon insert
+      assert json["data"]["attributes"]["number"] == 1
     end
 
     @tag :authenticated
