@@ -40,6 +40,7 @@ defmodule CodeCorps.Factories do
       post_type: "issue",
       markdown: "A test post",
       status: "open",
+      state: "published",
       project: build(:project),
       user: build(:user)
     }

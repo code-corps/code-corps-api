@@ -10,6 +10,7 @@ defmodule CodeCorps.Post do
     field :markdown, :string
     field :number, :integer
     field :post_type, :string
+    field :state, :string
     field :status, :string, default: "open"
     field :title, :string
 
@@ -22,10 +23,9 @@ defmodule CodeCorps.Post do
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:title, :markdown, :post_type, :status])
-    |> validate_required([:title, :markdown, :post_type, :status])
+    |> cast(params, [:title, :markdown, :post_type])
+    |> validate_required([:title, :markdown, :post_type])
     |> validate_inclusion(:post_type, post_types)
-    |> validate_inclusion(:status, statuses)
     |> MarkdownRenderer.render_markdown_to_html(:markdown, :body)
   end
 
@@ -36,6 +36,17 @@ defmodule CodeCorps.Post do
     |> validate_required([:project_id, :user_id])
     |> assoc_constraint(:project)
     |> assoc_constraint(:user)
+    |> put_change(:state, "published")
+    |> put_change(:status, "open")
+  end
+
+  def update_changeset(struct, params) do
+    struct
+    |> changeset(params)
+    |> cast(params, [:status])
+    |> validate_inclusion(:status, statuses)
+    |> put_change(:state, "edited")
+
   end
 
   defp post_types do
