@@ -15,7 +15,6 @@ defmodule CodeCorps.ProjectPolicy do
   def create?(%User{} = user, %Project{} = project), do: user |> fetch_membership(project) |> is_admin_or_higher
 
   def update?(%User{admin: true}, %Project{}), do: true
-  def update?(%User{}, %Project{}), do: false
   def update?(%User{} = user, %Project{} = project), do: user |> fetch_membership(project) |> is_admin_or_higher
 
   defp fetch_membership(%User{} = user, %Project{} = project) do
