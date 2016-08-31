@@ -12,7 +12,7 @@ defmodule CodeCorps.PostTest do
     post_type: "nonexistent"
   }
 
-  describe "&create/2" do
+  describe "create/2" do
     test "is invalid with invalid attributes" do
       changeset = Post.changeset(%Post{}, @invalid_attrs)
       refute changeset.valid?
@@ -38,7 +38,7 @@ defmodule CodeCorps.PostTest do
     end
   end
 
-  describe "&create_changeset/2" do
+  describe "create_changeset/2" do
     test "is valid with valid attributes" do
       user = insert(:user)
       project = insert(:project)
@@ -92,7 +92,7 @@ defmodule CodeCorps.PostTest do
       assert changeset |> get_field(:status) == "open"
     end
   end
-  describe "&update_changeset/2" do
+  describe "update_changeset/2" do
     test "sets state to 'edited'" do
       changeset = Post.update_changeset(%Post{}, %{})
       assert changeset |> get_change(:state) == "edited"
