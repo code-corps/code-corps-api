@@ -1,6 +1,8 @@
 defmodule CodeCorps.UserCategoryController do
   use CodeCorps.Web, :controller
 
+  import CodeCorps.AuthenticationHelpers, only: [authorize: 2, authorized?: 1]
+
   alias CodeCorps.UserCategory
   alias JaSerializer.Params
 
@@ -51,11 +53,4 @@ defmodule CodeCorps.UserCategoryController do
     UserCategory |> Repo.get!(id) |> Repo.delete!
     conn |> send_resp(:no_content, "")
   end
-
-  defp authorize(conn, changeset) do
-    conn
-    |> assign(:changeset, changeset)
-    |> Canary.Plugs.authorize_resource(model: changeset)
-  end
-  defp authorized?(conn), do: conn |> Map.get(:assigns) |> Map.get(:authorized)
 end
