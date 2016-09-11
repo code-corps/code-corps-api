@@ -13,6 +13,7 @@ defmodule CodeCorps.PostController do
       |> preload([:comments, :project, :user])
       |> Post.index_filters(params)
       |> Post.post_type_filters(params)
+      |> Post.post_status_filters(params)
       |> Repo.paginate(params["page"])
 
     meta = %{
@@ -30,7 +31,10 @@ defmodule CodeCorps.PostController do
 
     case Repo.insert(changeset) do
       {:ok, post} ->
-        post = Repo.preload(post, [:comments, :project, :user])
+        post =
+          Post
+          |> Repo.get(post.id) # need to reload, due to number being added on database level
+          |> Repo.preload([:comments, :project, :user])
 
         conn
         |> put_status(:created)

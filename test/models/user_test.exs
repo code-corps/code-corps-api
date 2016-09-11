@@ -133,5 +133,17 @@ defmodule CodeCorps.UserTest do
       [_, file_type] = changeset.changes.photo.file_name |> String.split(".")
       assert file_type == "gif"
     end
+
+    test "prevents an invalid transition" do
+      user = insert(:user, state: "signed_up")
+
+      changeset = user |> User.update_changeset(%{state_transition: "yehaww"})
+
+      refute changeset.valid?
+      [error | _] = changeset.errors
+      {attribute, {message, _}} = error
+      assert attribute == :state_transition
+      assert message == "invalid transition yehaww from signed_up"
+    end
   end
 end

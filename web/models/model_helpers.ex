@@ -6,8 +6,10 @@ defmodule CodeCorps.ModelHelpers do
   def generate_slug(changeset, value_key, slug_key) do
     case changeset do
       %Ecto.Changeset{valid?: true, changes: changes} ->
-        {:ok, value} = Map.fetch(changes, value_key)
-        put_change(changeset, slug_key, Inflex.parameterize(value))
+        case Map.fetch(changes, value_key) do
+          {:ok, value} -> put_change(changeset, slug_key, Inflex.parameterize(value))
+          _ -> changeset
+        end
       _ ->
         changeset
     end
@@ -18,12 +20,6 @@ defmodule CodeCorps.ModelHelpers do
     query |> where([object], object.id in ^ids)
   end
   def id_filter(query, _), do: query
-
-  def member_filter(query, %{"filter" => %{"id" => id_list}}) do
-    ids = id_list |> coalesce_id_string
-    query |> where([object], object.member_id in ^ids)
-  end
-  def member_filter(query, _), do: query
 
   def number_as_id_filter(query, %{"id" => number}) do
     query |> where([object], object.number == ^number)
@@ -40,6 +36,16 @@ defmodule CodeCorps.ModelHelpers do
     query |> where([object], object.post_type in ^post_types)
   end
   def post_type_filter(query, _), do: query
+
+  def post_status_filter(query, %{"status" => status}) do
+    query |> where([object], object.status == ^status)
+  end
+  def post_status_filter(query, _), do: query
+
+  def post_filter(query, %{"post_id" => post_id}) do
+    query |> where([object], object.post_id == ^post_id)
+  end
+  def post_filter(query, _), do: query
 
   def project_filter(query, %{"project_id" => project_id}) do
     query |> where([object], object.project_id == ^project_id)

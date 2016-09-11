@@ -2,13 +2,11 @@ defmodule CodeCorps.UserRolePolicy do
   alias CodeCorps.UserRole
   alias CodeCorps.User
 
-  def create?(%User{admin: true}), do: true
-  def create?(%User{}), do: false
-  # TODO: Need to figure out how to pass in params for create
-  # A non-admin user can modify their own category. This method is right now unreachable
-  def create?(%User{} = user, %UserRole{} = user_role), do: user.id == user_role.user_id
+  def create?(%User{admin: true}, %Ecto.Changeset{}), do: true
+  def create?(%User{} = user, %Ecto.Changeset{} = changeset) do
+    user.id == changeset |> Ecto.Changeset.get_change(:user_id)
+  end
 
-  def delete?(%User{admin: true}), do: true
-  def delete?(%User{}), do: false
+  def delete?(%User{admin: true}, %UserRole{}), do: true
   def delete?(%User{} = user, %UserRole{} = user_role), do: user.id == user_role.user_id
 end
