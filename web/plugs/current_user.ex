@@ -1,6 +1,4 @@
 defmodule CodeCorps.Plug.CurrentUser do
-  import Plug.Conn
-
   alias CodeCorps.GuardianSerializer
 
   def init(opts), do: opts

@@ -37,7 +37,7 @@ services:
 
   test:
     <<: *api_base
-    command: bash -c "mix do deps.get, compile, ecto.drop, ecto.create, ecto.migrate"
+    command: bash -c "mix do deps.get, compile"
     depends_on:
       - web
     environment:
