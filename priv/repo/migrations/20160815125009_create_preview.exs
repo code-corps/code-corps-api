@@ -2,7 +2,7 @@ defmodule CodeCorps.Repo.Migrations.CreatePreview do
   use Ecto.Migration
 
   def change do
-    create table(:preview) do
+    create table(:previews) do
       add :markdown, :text, null: false
       add :body, :text, null: false
 
