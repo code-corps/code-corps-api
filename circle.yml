@@ -1,0 +1,25 @@
+machine:
+  environment:
+    PATH: "$HOME/.asdf/bin:$HOME/.asdf/shims:$PATH"
+
+dependencies:
+  cache_directories:
+    - ~/.asdf
+    - deps
+    - _build
+  pre:
+    - ./circle_pre_build.sh
+    - mix deps.compile
+    - mix compile
+test:
+  override:
+    - mix test
+
+deployment:
+  staging:
+    branch: develop
+    commands:
+      - git push git@heroku.com:code-corps-phoenix-staging.git $CIRCLE_SHA1:master
+      - heroku run "POOL_SIZE=2 mix ecto.migrate" --app code-corps-phoenix-staging
+      - gem install apiaryio
+      - apiary publish --api-name="codecorpsapidevelop" --path ./blueprint/api.apib
