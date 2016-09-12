@@ -7,7 +7,7 @@ defmodule CodeCorps.Preview do
 
   alias CodeCorps.MarkdownRenderer
 
-  schema "preview" do
+  schema "previews" do
     field :body, :string
     field :markdown, :string
 
