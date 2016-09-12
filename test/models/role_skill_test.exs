@@ -54,4 +54,25 @@ defmodule CodeCorps.RoleSkillTest do
     refute changeset.valid?
     assert changeset.errors[:skill] == {"does not exist", []}
   end
+
+  describe "import_changeset" do
+    test "valid cat value included in cats is accepted" do
+      role_id = insert(:role).id
+      skill_id = insert(:skill).id
+      cat_value = 1
+
+      changeset = RoleSkill.import_changeset(%RoleSkill{}, %{role_id: role_id, skill_id: skill_id, cat: cat_value})
+      assert changeset.valid?
+    end
+
+    test "invalid cat value not included in cats is rejected" do
+      role_id = insert(:role).id
+      skill_id = insert(:skill).id
+      cat_value = 9
+
+      changeset = RoleSkill.import_changeset(%RoleSkill{}, %{role_id: role_id, skill_id: skill_id, cat: cat_value})
+      refute changeset.valid?
+      assert changeset.errors[:cat] == {"is invalid", []}
+    end
+  end
 end
