@@ -13,7 +13,7 @@ use Mix.Config
 # which you typically run after static files are built.
 config :code_corps, CodeCorps.Endpoint,
   http: [port: {:system, "PORT"}],
-  url: [scheme: "https", host: "codecorps.org", port: 443],
+  url: [scheme: "https", host: "code-corps-phoenix-staging.herokuapp.com", port: 443],
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
   cache_static_manifest: "priv/static/manifest.json"
   secret_key_base: System.get_env("SECRET_KEY_BASE")
@@ -27,10 +27,10 @@ config :code_corps, CodeCorps.Repo,
 
 # CORS allowed origins
 config :code_corps, allowed_origins: [
-  "http://codecorps.org",
-  "http://www.codecorps.org",
-  "https://codecorps.org",
-  "https://www.codecorps.org"
+  "http://pbqrpbecf.org",
+  "http://www.pbqrpbecf.org",
+  "https://pbqrpbecf.org",
+  "https://www.pbqrpbecf.org"
 ]
 
 # Do not print debug messages in production
