@@ -15,7 +15,6 @@ config :code_corps, CodeCorps.Endpoint,
   http: [port: {:system, "PORT"}],
   url: [scheme: "https", host: "api.pbqrpbecf.org", port: 443],
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
-  cache_static_manifest: "priv/static/manifest.json",
   secret_key_base: System.get_env("SECRET_KEY_BASE")
 
 # Configure your database
@@ -34,7 +33,7 @@ config :code_corps, allowed_origins: [
 ]
 
 config :guardian, Guardian,
-  secret_key: System.get_env("GUARDIAN_SECRET_KEY"),
+  secret_key: System.get_env("GUARDIAN_SECRET_KEY")
 
 # Do not print debug messages in production
 config :logger, level: :info
