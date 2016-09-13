@@ -33,7 +33,7 @@ config :code_corps, allowed_origins: [
 ]
 
 config :guardian, Guardian,
-  secret_key: System.get_env("GUARDIAN_SECRET_KEY"),
+  secret_key: System.get_env("GUARDIAN_SECRET_KEY")
 
 # Do not print debug messages in production
 config :logger, level: :info
