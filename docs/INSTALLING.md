@@ -31,7 +31,7 @@ Go to the `code-corps-phoenix` directory and copy the `.env.example` file:
 
 ```
 cd code-corps-phoenix
-cp .env.example
+cp .env.example .env
 ```
 
 Now, you can initialize docker, type:
