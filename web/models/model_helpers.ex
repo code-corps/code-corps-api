@@ -25,6 +25,11 @@ defmodule CodeCorps.ModelHelpers do
 
   def newest_first_filter(query), do: query |> order_by([desc: :inserted_at])
 
+  def limit_filter(query, %{"limit" => count}) do
+    query |> limit(^count)
+  end
+  def limit_filter(query, _), do: query
+
   def number_as_id_filter(query, %{"id" => number}) do
     query |> where([object], object.number == ^number)
   end

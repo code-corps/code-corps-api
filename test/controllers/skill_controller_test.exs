@@ -56,6 +56,17 @@ defmodule CodeCorps.SkillControllerTest do
       assert first_result["id"] == "#{ruby.id}"
       assert second_result["id"] == "#{rails.id}"
     end
+
+    test "limit filter limits results on index", %{conn: conn} do
+      insert_list(6, :skill)
+
+      params = %{"limit" => 5}
+      path = conn |> skill_path(:index, params)
+      json = conn |> get(path) |> json_response(200)
+
+      returned_skills_length = json["data"] |> length
+      assert returned_skills_length == 5
+    end
   end
 
   describe "show" do
