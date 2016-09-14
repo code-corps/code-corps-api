@@ -1,4 +1,6 @@
 defmodule CodeCorps.UserController do
+  @analytics Application.get_env(:code_corps, :analytics)
+
   use CodeCorps.Web, :controller
 
   alias CodeCorps.User
@@ -32,6 +34,8 @@ defmodule CodeCorps.UserController do
         user = Repo.preload(user, [:slugged_route, :categories, :organizations, :roles, :skills])
 
         conn
+        |> Plug.Conn.assign(:current_user, user)
+        |> @analytics.track(:signed_up)
         |> put_status(:created)
         |> put_resp_header("location", user_path(conn, :show, user))
         |> render("show.json-api", data: user)
@@ -61,7 +65,9 @@ defmodule CodeCorps.UserController do
 
     case Repo.update(changeset) do
       {:ok, user} ->
-        render(conn, "show.json-api", data: user)
+        conn
+        |> @analytics.track(:updated_profile)
+        |> render("show.json-api", data: user)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)

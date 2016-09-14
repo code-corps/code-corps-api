@@ -1,4 +1,6 @@
 defmodule CodeCorps.AuthController do
+  @analytics Application.get_env(:code_corps, :analytics)
+
   use CodeCorps.Web, :controller
   import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
   alias CodeCorps.Repo
@@ -10,6 +12,8 @@ defmodule CodeCorps.AuthController do
         {:ok, token, claims} = user |> Guardian.encode_and_sign(:token)
 
         conn
+        |> Plug.Conn.assign(:current_user, user)
+        |> @analytics.track(:signed_in)
         |> put_status(:created)
         |> render("show.json", token: token, user_id: user.id)
 
@@ -26,6 +30,7 @@ defmodule CodeCorps.AuthController do
     conn
     |> Guardian.Plug.current_token
     |> Guardian.revoke!(claims)
+    |> @analytics.track(:signed_out)
 
     conn
     |> render("delete.json")

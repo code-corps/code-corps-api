@@ -4,17 +4,16 @@ defmodule CodeCorps.Plug.CurrentUser do
   def init(opts), do: opts
 
   def call(conn, _opts) do
-    current_token = Guardian.Plug.current_token(conn)
-    case Guardian.decode_and_verify(current_token) do
-      {:ok, claims} ->
-        case GuardianSerializer.from_token(claims["sub"]) do
-          {:ok, user} ->
-            Plug.Conn.assign(conn, :current_user, user)
-          {:error, _reason} ->
-            conn
-        end
-      {:error, _reason} ->
+    case Guardian.Plug.current_token(conn) do
+      nil ->
         conn
+      current_token ->
+        with {:ok, claims} <- Guardian.decode_and_verify(current_token),
+             {:ok, user} <- GuardianSerializer.from_token(claims["sub"]) do
+                Plug.Conn.assign(conn, :current_user, user)
+        else
+          {:error, _reason} -> conn
+        end
     end
   end
 end

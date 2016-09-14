@@ -1,4 +1,6 @@
 defmodule CodeCorps.UserSkillController do
+  @analytics Application.get_env(:code_corps, :analytics)
+
   use CodeCorps.Web, :controller
 
   import CodeCorps.AuthenticationHelpers, only: [authorize: 2, authorized?: 1]
@@ -27,10 +29,12 @@ defmodule CodeCorps.UserSkillController do
     if conn |> authorized? do
       case Repo.insert(changeset) do
         {:ok, user_skill} ->
+          user_skill = user_skill |> Repo.preload([:user, :skill])
           conn
+          |> @analytics.track(:added, user_skill)
           |> put_status(:created)
           |> put_resp_header("location", user_skill_path(conn, :show, user_skill))
-          |> render("show.json-api", data: user_skill |> Repo.preload([:user, :skill]))
+          |> render("show.json-api", data: user_skill)
         {:error, changeset} ->
           conn
           |> put_status(:unprocessable_entity)
@@ -50,7 +54,14 @@ defmodule CodeCorps.UserSkillController do
   end
 
   def delete(conn, %{"id" => id}) do
-    UserSkill |> Repo.get!(id) |> Repo.delete!
-    conn |> send_resp(:no_content, "")
+    user_skill =
+      UserSkill
+      |> preload([:user, :skill])
+      |> Repo.get!(id)
+      |> Repo.delete!
+
+    conn
+    |> @analytics.track(:removed, user_skill)
+    |> send_resp(:no_content, "")
   end
 end
