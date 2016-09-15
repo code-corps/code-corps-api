@@ -32,10 +32,29 @@ defmodule CodeCorps.PostControllerTest do
   end
 
   describe "index" do
-    test "lists all entries on index", %{conn: conn} do
+    test "lists all entries", %{conn: conn} do
       path = conn |> post_path(:index)
       json = conn |> get(path) |> json_response(200)
       assert json["data"] == []
+    end
+
+    test "lists all entries newest first", %{conn: conn} do
+      # Has to be done manually. Inserting as a list is too quick.
+      # Field lacks the resolution to differentiate.
+      post_1 = insert(:post, inserted_at: Ecto.DateTime.cast!("2000-01-15T00:00:10"))
+      post_2 = insert(:post, inserted_at: Ecto.DateTime.cast!("2000-01-15T00:00:20"))
+      post_3 = insert(:post, inserted_at: Ecto.DateTime.cast!("2000-01-15T00:00:30"))
+
+      path = conn |> post_path(:index)
+      json = conn |> get(path) |> json_response(200)
+
+      ids =
+        json["data"]
+        |> Enum.map(&Map.get(&1, "id"))
+        |> Enum.map(&Integer.parse/1)
+        |> Enum.map(fn({id, _rem}) -> id end)
+
+      assert ids == [post_3.id, post_2.id, post_1.id]
     end
 
     test "lists all posts for a project", %{conn: conn} do
