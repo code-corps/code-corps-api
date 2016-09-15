@@ -55,7 +55,7 @@ defmodule CodeCorps.UserControllerTest do
       assert data["id"] == "#{user.id}"
       assert data["type"] == "user"
       assert data["attributes"]["username"] == user.username
-      assert data["attributes"]["email"] == user.email
+      assert data["attributes"]["email"] == ""
       assert data["attributes"]["password"] == nil
     end
 

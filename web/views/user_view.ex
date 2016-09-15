@@ -31,4 +31,19 @@ defmodule CodeCorps.UserView do
   def photo_thumb_url(user, _conn) do
     CodeCorps.UserPhoto.url({user.photo, user}, :thumb)
   end
+
+  @doc """
+  Returns the user email or an empty string, depending on the user
+  being rendered is the authenticated user, or some other user.
+
+  Users can only see their own emails. Everyone else's are private.
+  """
+  def email(user, %Plug.Conn{assigns: %{current_user: current_user}}) do
+    cond do
+      user.id == current_user.id -> user.email
+      user.id != current_user.id -> ""
+    end
+  end
+
+  def email(_user, _conn), do: ""
 end

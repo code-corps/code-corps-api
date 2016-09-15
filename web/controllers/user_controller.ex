@@ -40,7 +40,8 @@ defmodule CodeCorps.UserController do
       User
       |> preload([:slugged_route, :categories, :organizations, :roles, :skills])
       |> Repo.get!(id)
-  render(conn, "show.json-api", data: user)
+
+    render(conn, "show.json-api", data: user)
   end
 
   def update(conn, %{"id" => id, "data" => data = %{"type" => "user", "attributes" => _user_params}}) do
