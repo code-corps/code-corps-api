@@ -18,7 +18,7 @@ defmodule CodeCorps.UserViewTest do
       |> Repo.get(db_user.id)
       |> CodeCorps.Repo.preload([:categories, :organizations, :roles, :skills, :slugged_route])
 
-    rendered_json =  render(CodeCorps.UserView, "show.json-api", data: user)
+    rendered_json = render(CodeCorps.UserView, "show.json-api", data: user)
 
     expected_json = %{
       data: %{
@@ -26,7 +26,7 @@ defmodule CodeCorps.UserViewTest do
         type: "user",
         attributes: %{
           "biography" => user.biography,
-          "email" => user.email,
+          "email" => "",
           "first-name" => user.first_name,
           "last-name" => user.last_name,
           "inserted-at" => user.inserted_at,
@@ -91,4 +91,37 @@ defmodule CodeCorps.UserViewTest do
 
     assert rendered_json == expected_json
   end
+
+  test "renders email when user is the authenticated user" do
+    db_user = insert(:user)
+    user =
+      CodeCorps.User
+      |> Repo.get(db_user.id)
+      |> CodeCorps.Repo.preload([:categories, :organizations, :roles, :skills, :slugged_route])
+
+    conn = Phoenix.ConnTest.build_conn |> assign(:current_user, user)
+    rendered_json = render(CodeCorps.UserView, "show.json-api", data: user, conn: conn)
+    assert rendered_json[:data][:attributes]["email"] == user.email
+  end
+
+  test "renders email for only the authenticated user when rendering list" do
+      auth_user = insert(:user)
+      insert_list(3, :user)
+
+      users =
+        CodeCorps.User
+        |> Repo.all
+        |> CodeCorps.Repo.preload([:categories, :organizations, :roles, :skills, :slugged_route])
+
+      conn = Phoenix.ConnTest.build_conn |> assign(:current_user, auth_user)
+      rendered_json = render(CodeCorps.UserView, "show.json-api", data: users, conn: conn)
+
+      emails =
+        rendered_json[:data]
+        |> Enum.map(&Map.get(&1, :attributes))
+        |> Enum.map(&Map.get(&1, "email"))
+        |> Enum.filter(fn(email) -> email != "" end)
+
+      assert emails == [auth_user.email]
+    end
 end
