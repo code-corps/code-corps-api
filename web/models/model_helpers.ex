@@ -17,6 +17,11 @@ defmodule CodeCorps.ModelHelpers do
 
   # filters
 
+  def current_user_filter(query, %{current_user_id: user_id}) do
+    query |> where([object], object.user_id == ^user_id)
+  end
+  def current_user_filter(query, _), do: query
+
   def id_filter(query, %{"filter" => %{"id" => id_list}}) do
     ids = id_list |> coalesce_id_string
     query |> where([object], object.id in ^ids)
