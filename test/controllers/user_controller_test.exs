@@ -59,6 +59,14 @@ defmodule CodeCorps.UserControllerTest do
       assert data["attributes"]["password"] == nil
     end
 
+    test "renders email when authenticated", %{conn: conn} do
+      user = insert(:user)
+      path = conn |> user_path(:show, user)
+      json = conn |> authenticate(user) |> get(path) |> json_response(200)
+
+      assert json["data"]["attributes"]["email"] == user.email
+    end
+
     test "does not show resource and instead throw error when id is nonexistent", %{conn: conn} do
       assert_error_sent 404, fn ->
         get conn, user_path(conn, :show, -1)

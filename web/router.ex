@@ -66,6 +66,7 @@ defmodule CodeCorps.Router do
     get "/users/username_available", UserController, :username_available
     resources "/users", UserController, only: [:index, :show, :create]
     resources "/user-categories", UserCategoryController, only: [:index, :show]
+    resources "/user-roles", UserRoleController, only: [:index, :show]
     resources "/user-skills", UserSkillController, only: [:index, :show]
     resources "/role-skills", RoleSkillController, only: [:index, :show]
     get "/:slug", SluggedRouteController, :show

@@ -19,10 +19,7 @@ defmodule CodeCorps.UserView do
   has_many :categories, serializer: CodeCorps.CategoryView
 
   has_many :user_roles, serializer: CodeCorps.UserRoleView
-  has_many :roles, serializer: CodeCorps.RoleView
-
   has_many :user_skills, serializer: CodeCorps.UserSkillView
-  has_many :skills, serializer: CodeCorps.SkillView
 
   def photo_large_url(user, _conn) do
     CodeCorps.UserPhoto.url({user.photo, user}, :large)
@@ -38,12 +35,11 @@ defmodule CodeCorps.UserView do
 
   Users can only see their own emails. Everyone else's are private.
   """
-  def email(user, %Plug.Conn{assigns: %{current_user: current_user}}) do
+  def email(user, conn = %Plug.Conn{assigns: %{current_user: current_user}}) do
     cond do
       user.id == current_user.id -> user.email
       user.id != current_user.id -> ""
     end
   end
-
   def email(_user, _conn), do: ""
 end
