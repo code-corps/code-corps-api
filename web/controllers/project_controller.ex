@@ -10,7 +10,7 @@ defmodule CodeCorps.ProjectController do
   def index(conn, %{"slug" => slug}) do
     slugged_route =
       CodeCorps.SluggedRoute
-      |> Repo.get_by!(slug: slug)
+      |> CodeCorps.ModelHelpers.slug_finder(slug)
 
     projects =
       Project
@@ -32,7 +32,7 @@ defmodule CodeCorps.ProjectController do
   def show(conn, %{"slug" => _slug, "project_slug" => project_slug}) do
     project =
       Project
-      |> Repo.get_by!(slug: project_slug)
+      |> CodeCorps.ModelHelpers.slug_finder(project_slug)
       |> Repo.preload([:categories, :organization, :posts, :skills])
 
     render(conn, "show.json-api", data: project)
