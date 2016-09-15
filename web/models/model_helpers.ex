@@ -21,6 +21,8 @@ defmodule CodeCorps.ModelHelpers do
   end
   def id_filter(query, _), do: query
 
+  def newest_first_filter(query), do: query |> order_by([desc: :inserted_at])
+
   def number_as_id_filter(query, %{"id" => number}) do
     query |> where([object], object.number == ^number)
   end

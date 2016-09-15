@@ -58,7 +58,9 @@ defmodule CodeCorps.Post do
   end
 
   def index_filters(query, params) do
-    query |> project_filter(params)
+    query
+    |> project_filter(params)
+    |> newest_first_filter
   end
 
   def post_type_filters(query, params) do
