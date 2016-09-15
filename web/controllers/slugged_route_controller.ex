@@ -7,7 +7,8 @@ defmodule CodeCorps.SluggedRouteController do
     slugged_route =
       SluggedRoute
       |> preload([:organization, :user])
-      |> Repo.get_by!(slug: slug)
+      |> CodeCorps.ModelHelpers.slug_finder(slug)
+
     render(conn, "show.json-api", data: slugged_route)
   end
 end

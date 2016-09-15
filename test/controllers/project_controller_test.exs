@@ -61,6 +61,13 @@ defmodule CodeCorps.ProjectControllerTest do
 
       assert expected_ids == actual_ids
     end
+
+    test "listing by organization slug is case insensitive", %{conn: conn} do
+      organization = insert(:organization)
+      insert(:slugged_route, slug: "codecorps", organization: organization)
+
+      assert conn |> get("/codeCorps/projects") |> json_response(200)
+    end
   end
 
   describe "#show" do
@@ -103,6 +110,13 @@ defmodule CodeCorps.ProjectControllerTest do
       assert data["attributes"]["description"] == "Test project description"
       assert data["attributes"]["long-description-markdown"] == "A markdown **description**"
       assert data["relationships"]["organization"]["data"]["id"] == Integer.to_string(project.organization_id)
+    end
+
+    test "retrieval by slug is case insensitive", %{conn: conn} do
+      organization = insert(:organization, slug: "codecorps")
+      insert(:project, slug: "codecorpsproject", organization: organization)
+
+      assert conn |> get("codeCorps/codeCorpsProject") |> json_response(200)
     end
   end
 

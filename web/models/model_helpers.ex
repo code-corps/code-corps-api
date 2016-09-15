@@ -15,6 +15,8 @@ defmodule CodeCorps.ModelHelpers do
     end
   end
 
+  # filters
+
   def id_filter(query, %{"filter" => %{"id" => id_list}}) do
     ids = id_list |> coalesce_id_string
     query |> where([object], object.id in ^ids)
@@ -64,4 +66,14 @@ defmodule CodeCorps.ModelHelpers do
     query |> where([object], ilike(object.title, ^"%#{title}%"))
   end
   def title_filter(query, _), do: query
+
+  # end filters
+
+  # finders
+
+  def slug_finder(query, slug) do
+    query |> CodeCorps.Repo.get_by!(slug: slug |> String.downcase)
+  end
+
+  # end finders
 end
