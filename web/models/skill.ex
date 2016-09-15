@@ -31,5 +31,6 @@ defmodule CodeCorps.Skill do
     query
     |> id_filter(params)
     |> title_filter(params)
+    |> limit_filter(params)
   end
 end
