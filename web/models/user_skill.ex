@@ -23,6 +23,8 @@ defmodule CodeCorps.UserSkill do
   end
 
   def index_filters(query, params) do
-    query |> id_filter(params)
+    query
+    |> id_filter(params)
+    |> current_user_filter(params)
   end
 end

@@ -10,6 +10,14 @@ defmodule CodeCorps.UserSkillController do
   plug :scrub_params, "data" when action in [:create]
 
   def index(conn, params) do
+    params =
+      case conn.assigns[:current_user] do
+        nil ->
+          params
+        user ->
+          Map.put(params, :current_user_id, user.id)
+      end
+
     user_skills =
       UserSkill
       |> UserSkill.index_filters(params)
