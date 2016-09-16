@@ -13,8 +13,7 @@ use Mix.Config
 # which you typically run after static files are built.
 config :code_corps, CodeCorps.Endpoint,
   http: [port: {:system, "PORT"}],
-  url: [scheme: "https", host: "api.pbqrpbecf.org", port: 443],
-  force_ssl: [rewrite_on: [:x_forwarded_proto]],
+  url: [scheme: "http", host: "api.pbqrpbecf.org", port: 80],
   secret_key_base: System.get_env("SECRET_KEY_BASE")
 
 # Configure your database
