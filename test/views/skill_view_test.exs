@@ -10,13 +10,12 @@ defmodule CodeCorps.SkillViewTest do
 
   test "renders all attributes and relationships properly" do
     skill = insert(:skill)
-    role = insert(:role)
-    role_skill = insert(:role_skill, role: role, skill: skill)
+    role_skill = insert(:role_skill, skill: skill)
 
     skill =
       CodeCorps.Skill
       |> Repo.get(skill.id)
-      |> Repo.preload([:roles])
+      |> Repo.preload([:role_skills])
 
     rendered_json =  render(CodeCorps.SkillView, "show.json-api", data: skill)
 
@@ -33,11 +32,6 @@ defmodule CodeCorps.SkillViewTest do
           "role-skills" => %{
             data: [
               %{id: role_skill.id |> Integer.to_string, type: "role-skill"}
-            ]
-          },
-          "roles" => %{
-            data: [
-              %{id: role.id |> Integer.to_string, type: "role"}
             ]
           }
         },

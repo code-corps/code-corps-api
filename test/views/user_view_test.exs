@@ -54,16 +54,6 @@ defmodule CodeCorps.UserViewTest do
               %{id: organization_membership.id |> Integer.to_string, type: "organization-membership"}
             ]
           },
-          "roles" => %{
-            data: [
-              %{id: user_role.role_id |> Integer.to_string, type: "role"}
-            ]
-          },
-          "skills" => %{
-            data: [
-              %{id: user_skill.skill_id |> Integer.to_string, type: "skill"}
-            ]
-          },
           "slugged-route" => %{
             data: nil
           },

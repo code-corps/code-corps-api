@@ -10,6 +10,16 @@ defmodule CodeCorps.UserRoleController do
 
   plug :load_and_authorize_resource, model: UserRole, only: [:delete]
 
+  def index(conn, params) do
+    user_roles =
+      UserRole
+      |> UserRole.index_filters(params)
+      |> preload([:user, :role])
+      |> Repo.all
+
+    render(conn, "index.json-api", data: user_roles)
+  end
+
   def create(conn, %{"data" => data = %{"type" => "user-role"}}) do
     changeset = UserRole.changeset(%UserRole{}, Params.to_attributes(data))
 
@@ -31,6 +41,14 @@ defmodule CodeCorps.UserRoleController do
     else
       conn
     end
+  end
+
+  def show(conn, %{"id" => id}) do
+    user_role =
+      UserRole
+      |> preload([:user, :role])
+      |> Repo.get!(id)
+    render(conn, "show.json-api", data: user_role)
   end
 
   def delete(conn, %{"id" => id}) do
