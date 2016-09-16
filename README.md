@@ -2,8 +2,7 @@
 
 ![Code Corps Phoenix Logo](https://d3pgew4wbk2vb1.cloudfront.net/images/github/code-corps-phoenix.png)
 
-[![Build Status](https://semaphoreci.com/api/v1/joshsmith/code-corps-phoenix/branches/add-users-endpoint/badge.svg)](https://semaphoreci.com/joshsmith/code-corps-phoenix)
-
+[![CircleCI](https://circleci.com/gh/code-corps/code-corps-phoenix.svg?style=svg)](https://circleci.com/gh/code-corps/code-corps-phoenix)
 
 ## Installing with Docker
 
