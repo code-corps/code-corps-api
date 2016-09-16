@@ -1,4 +1,6 @@
 defmodule CodeCorps.PostController do
+  @analytics Application.get_env(:code_corps, :analytics)
+
   use CodeCorps.Web, :controller
 
   alias CodeCorps.Post
@@ -37,6 +39,7 @@ defmodule CodeCorps.PostController do
           |> Repo.preload([:comments, :project, :user])
 
         conn
+        |> @analytics.track(:created, post)
         |> put_status(:created)
         |> put_resp_header("location", post_path(conn, :show, post))
         |> render("show.json-api", data: post)
@@ -72,7 +75,9 @@ defmodule CodeCorps.PostController do
 
     case Repo.update(changeset) do
       {:ok, post} ->
-        render(conn, "show.json-api", data: post)
+        conn
+        |> @analytics.track(:edited, post)
+        |> render("show.json-api", data: post)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)

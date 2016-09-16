@@ -1,4 +1,6 @@
 defmodule CodeCorps.UserCategoryController do
+  @analytics Application.get_env(:code_corps, :analytics)
+  
   use CodeCorps.Web, :controller
 
   import CodeCorps.AuthenticationHelpers, only: [authorize: 2, authorized?: 1]
@@ -27,10 +29,12 @@ defmodule CodeCorps.UserCategoryController do
     if conn |> authorized? do
       case Repo.insert(changeset) do
         {:ok, user_category} ->
+          user_category = user_category |> Repo.preload([:user, :category])
           conn
+          |> @analytics.track(:added, user_category)
           |> put_status(:created)
           |> put_resp_header("location", user_category_path(conn, :show, user_category))
-          |> render("show.json-api", data: user_category |> Repo.preload([:user, :category]))
+          |> render("show.json-api", data: user_category)
         {:error, changeset} ->
           conn
           |> put_status(:unprocessable_entity)
@@ -50,7 +54,14 @@ defmodule CodeCorps.UserCategoryController do
   end
 
   def delete(conn, %{"id" => id}) do
-    UserCategory |> Repo.get!(id) |> Repo.delete!
-    conn |> send_resp(:no_content, "")
+    user_category =
+      UserCategory
+      |> preload([:user, :category])
+      |> Repo.get!(id)
+      |> Repo.delete!
+
+    conn
+    |> @analytics.track(:removed, user_category)
+    |> send_resp(:no_content, "")
   end
 end

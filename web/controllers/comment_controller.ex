@@ -1,4 +1,6 @@
 defmodule CodeCorps.CommentController do
+  @analytics Application.get_env(:code_corps, :analytics)
+
   use CodeCorps.Web, :controller
 
   alias CodeCorps.Comment
@@ -23,7 +25,10 @@ defmodule CodeCorps.CommentController do
 
     case Repo.insert(changeset) do
       {:ok, comment} ->
+        comment = comment |> Repo.preload([:post])
+
         conn
+        |> @analytics.track(:created, comment)
         |> put_status(:created)
         |> put_resp_header("location", comment_path(conn, :show, comment))
         |> render("show.json-api", data: comment)
@@ -40,12 +45,17 @@ defmodule CodeCorps.CommentController do
   end
 
   def update(conn, %{"id" => id, "data" => data = %{"type" => "comment", "attributes" => _comment_params}}) do
-    comment = Repo.get!(Comment, id)
-    changeset = Comment.changeset(comment, Params.to_attributes(data))
+    changeset =
+      Comment
+      |> preload([:post])
+      |> Repo.get!(id)
+      |> Comment.changeset(Params.to_attributes(data))
 
     case Repo.update(changeset) do
       {:ok, comment} ->
-        render(conn, "show.json-api", data: comment)
+        conn
+        |> @analytics.track(:edited, comment)
+        |> render("show.json-api", data: comment)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)

@@ -1,4 +1,6 @@
 defmodule CodeCorps.OrganizationMembershipController do
+  @analytics Application.get_env(:code_corps, :analytics)
+
   use CodeCorps.Web, :controller
 
   alias JaSerializer.Params
@@ -34,6 +36,7 @@ defmodule CodeCorps.OrganizationMembershipController do
         membership = membership |> Repo.preload([:member, :organization])
 
         conn
+        |> @analytics.track(:created, membership)
         |> put_status(:created)
         |> put_resp_header("location", organization_membership_path(conn, :show, membership))
         |> render("show.json-api", data: membership)
