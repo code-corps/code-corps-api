@@ -4,6 +4,9 @@ Need to stop the containers? Either `Ctrl+C` or in a separate prompt run `docker
 
 To start the services again you can run `docker-compose up`, or `docker-compose start` to start the containers in a detached state.
 
+### Running tests
+
+To run the tests you can run `docker-compose run test mix test`.
 
 ### Rebuilding Docker containers
 
