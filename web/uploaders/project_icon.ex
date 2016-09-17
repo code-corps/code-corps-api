@@ -8,6 +8,8 @@ defmodule CodeCorps.ProjectIcon do
 
   @acl :public_read
 
+  @icon_color_generator Application.get_env(:code_corps, :icon_color_generator)
+
   # Whitelist file extensions:
   def validate({file, _}) do
     ~w(.jpg .jpeg .gif .png) |> Enum.member?(Path.extname(file.file_name))
@@ -35,7 +37,7 @@ defmodule CodeCorps.ProjectIcon do
 
   # Provide a default URL if there hasn't been a file uploaded
   def default_url(version, _) do
-    "#{Application.get_env(:arc, :asset_host)}/icons/project_default_#{version}.png"
+    "#{Application.get_env(:arc, :asset_host)}/icons/project_default_#{version}_#{@icon_color_generator.generate}.png"
   end
 
   # Specify custom headers for s3 objects

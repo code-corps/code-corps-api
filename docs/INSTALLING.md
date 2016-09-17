@@ -10,12 +10,12 @@ Follow those download instructions. Once you can run the `docker` command, you c
 
 ### Clone this repository
 
-You'll want to [clone this repository](https://help.github.com/articles/cloning-a-repository/) with `git clone https://github.com/code-corps/code-corps-phoenix.git`.
+You'll want to [clone this repository](https://help.github.com/articles/cloning-a-repository/) with `git clone https://github.com/code-corps/code-corps-api.git`.
 
 The directory structure will look like the following:
 
 ```shell
-code-corps-phoenix/          # → Root folder for this project
+code-corps-api/          # → Root folder for this project
 ├── blueprint/
 ├── config/
 ├── ...                  # → More standard Phoenix files
@@ -27,10 +27,10 @@ code-corps-phoenix/          # → Root folder for this project
 
 > Note: We bind to ports 49235 for `web`, 49236 for `test`, and 8081 for `apiary`. Make sure you're not running anything on those ports. We do not expose port 5432 for `postgres` or 9200 for `elasticsearch`.
 
-Go to the `code-corps-phoenix` directory and copy the `.env.example` file:
+Go to the `code-corps-api` directory and copy the `.env.example` file:
 
 ```
-cd code-corps-phoenix
+cd code-corps-api
 cp .env.example .env
 ```
 
