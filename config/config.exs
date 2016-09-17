@@ -58,6 +58,9 @@ config :code_corps, :analytics, CodeCorps.Analytics.Segment
 config :segment,
   write_key: System.get_env("SEGMENT_WRITE_KEY")
 
+# Configures random icon color generator
+config :code_corps, :icon_color_generator, CodeCorps.RandomIconColor.Generator
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"
