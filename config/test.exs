@@ -31,3 +31,6 @@ config :guardian, Guardian,
 config :code_corps, :analytics, CodeCorps.Analytics.InMemory
 
 config :code_corps, :icon_color_generator, CodeCorps.RandomIconColor.TestGenerator
+
+# Set Corsica logging to output no console warning when rejecting a request
+config :code_corps, :corsica_log_level, [rejected: :debug]
