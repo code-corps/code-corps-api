@@ -14,16 +14,9 @@ defmodule CodeCorps.UserController do
       User
       |> User.index_filters(params)
       |> preload([:slugged_route, :categories, :organizations, :roles, :skills])
-      |> Repo.paginate(params["page"])
+      |> Repo.all
 
-    meta = %{
-      current_page: users.page_number,
-      page_size: users.page_size,
-      total_pages: users.total_pages,
-      total_records: users.total_entries
-    }
-
-    render(conn, "index.json-api", data: users, opts: [meta: meta])
+    render(conn, "index.json-api", data: users)
   end
 
   def create(conn, %{"data" => data = %{"type" => "user", "attributes" => _user_params}}) do
