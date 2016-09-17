@@ -21,6 +21,7 @@ defmodule CodeCorps.ModelCase do
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
+      import CodeCorps.Factories
       import CodeCorps.ModelCase
     end
   end

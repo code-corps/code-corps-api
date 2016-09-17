@@ -4,18 +4,19 @@ defmodule CodeCorps.ErrorViewTest do
   # Bring render/3 and render_to_string/3 for testing custom views
   import Phoenix.View
 
-  test "renders 404.html" do
-    assert render_to_string(CodeCorps.ErrorView, "404.html", []) ==
-           "Page not found"
+  test "renders 404.json-api" do
+    assert render(CodeCorps.ErrorView, "404.json-api", []) ==
+           %{errors: [%{status: 404, title: "404 Resource not found", id: "NOT_FOUND"}]}
   end
 
-  test "render 500.html" do
-    assert render_to_string(CodeCorps.ErrorView, "500.html", []) ==
-           "Internal server error"
+  test "renders 500.json-api" do
+    assert render(CodeCorps.ErrorView, "500.json-api", []) ==
+           %{errors: [%{status: 500, title: "500 Internal server error", id: "INTERNAL_SERVER_ERROR"}]}
   end
 
   test "render any other" do
-    assert render_to_string(CodeCorps.ErrorView, "505.html", []) ==
-           "Internal server error"
+    string = render_to_string(CodeCorps.ErrorView, "505.json-api", [])
+
+    assert String.contains? string, "Internal server error"
   end
 end

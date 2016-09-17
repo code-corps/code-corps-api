@@ -1,5 +1,9 @@
 defmodule CodeCorps do
+  @moduledoc false
+
   use Application
+
+  alias CodeCorps.Endpoint
 
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
@@ -14,6 +18,8 @@ defmodule CodeCorps do
       supervisor(CodeCorps.Endpoint, []),
       # Start your own worker by calling: CodeCorps.Worker.start_link(arg1, arg2, arg3)
       # worker(CodeCorps.Worker, [arg1, arg2, arg3]),
+
+      worker(Segment, [Application.get_env(:segment, :write_key)])
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
@@ -25,7 +31,7 @@ defmodule CodeCorps do
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
   def config_change(changed, _new, removed) do
-    CodeCorps.Endpoint.config_change(changed, removed)
+    Endpoint.config_change(changed, removed)
     :ok
   end
 end

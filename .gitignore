@@ -3,6 +3,7 @@
 /db
 /deps
 /*.ez
+/tmp
 
 # Generated on crash by the VM
 erl_crash.dump
@@ -22,3 +23,10 @@ erl_crash.dump
 # secrets file as long as you replace its contents by environment
 # variables.
 /config/prod.secret.exs
+
+# Secret
+.env
+
+/tmp
+
+.DS_Store

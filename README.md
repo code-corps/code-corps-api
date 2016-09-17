@@ -1,15 +1,12 @@
-# CodeCorps
+# Code Corps Phoenix API
 
-To start your Phoenix app:
+![Code Corps Phoenix Logo](https://d3pgew4wbk2vb1.cloudfront.net/images/github/code-corps-phoenix.png)
 
-  * Install dependencies with `mix deps.get`
-  * Create and migrate your database with `mix ecto.create && mix ecto.migrate`
-  * Install Node.js dependencies with `npm install`
-  * Start Phoenix endpoint with `mix phoenix.server`
+[![CircleCI](https://circleci.com/gh/code-corps/code-corps-phoenix.svg?style=svg)](https://circleci.com/gh/code-corps/code-corps-phoenix)
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+## Installing with Docker
 
-Ready to run in production? Please [check our deployment guides](http://www.phoenixframework.org/docs/deployment).
+To make your life easier, you can just clone this repository and use our Docker container. [Follow this guide to get started.](docs/INSTALLING.md)
 
 ## Learn more
 

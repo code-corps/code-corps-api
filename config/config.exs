@@ -22,6 +22,42 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
+# Configures JSON API encoding
+config :phoenix, :format_encoders,
+  "json-api": Poison
+
+# Configures JSON API mime type
+config :plug, :mimes, %{
+  "application/vnd.api+json" => ["json-api"]
+}
+
+config :guardian, Guardian,
+  issuer: "CodeCorps",
+  ttl: { 30, :days },
+  verify_issuer: true, # optional
+  secret_key: System.get_env("GUARDIAN_SECRET_KEY"),
+  serializer: CodeCorps.GuardianSerializer
+
+config :canary, repo: CodeCorps.Repo
+config :canary, unauthorized_handler: {CodeCorps.AuthenticationHelpers, :handle_unauthorized}
+config :canary, not_found_handler: {CodeCorps.AuthenticationHelpers, :handle_not_found}
+
+# Configures ex_aws with credentials
+config :ex_aws,
+  access_key_id: [System.get_env("AWS_ACCESS_KEY_ID"), :instance_role],
+  secret_access_key: [System.get_env("AWS_SECRET_ACCESS_KEY"), :instance_role]
+
+# Configures Arc for image uploads
+config :arc,
+  bucket: System.get_env("S3_BUCKET"),
+  asset_host: System.get_env("CLOUDFRONT_DOMAIN")
+
+# Configures Segment for analytics
+config :code_corps, :analytics, CodeCorps.Analytics.Segment
+
+config :segment,
+  write_key: System.get_env("SEGMENT_WRITE_KEY")
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"
