@@ -1,8 +1,8 @@
 # Code Corps Phoenix API
 
-![Code Corps Phoenix Logo](https://d3pgew4wbk2vb1.cloudfront.net/images/github/code-corps-phoenix.png)
+![Code Corps Phoenix Logo](https://d3pgew4wbk2vb1.cloudfront.net/images/github/code-corps-api.png)
 
-[![CircleCI](https://circleci.com/gh/code-corps/code-corps-phoenix.svg?style=svg)](https://circleci.com/gh/code-corps/code-corps-phoenix)
+[![CircleCI](https://circleci.com/gh/code-corps/code-corps-api.svg?style=svg)](https://circleci.com/gh/code-corps/code-corps-api)
 
 ## Installing with Docker
 
