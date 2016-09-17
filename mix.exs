@@ -4,7 +4,7 @@ defmodule CodeCorps.Mixfile do
   def project do
     [app: :code_corps,
      version: "0.0.1",
-     elixir: "~> 1.2",
+     elixir: "~> 1.3.3",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
@@ -37,6 +37,7 @@ defmodule CodeCorps.Mixfile do
         :httpoison,
         :scrivener_ecto,
         :segment,
+        :sentry,
         :stripity_stripe
       ]
     ]
@@ -71,6 +72,7 @@ defmodule CodeCorps.Mixfile do
       {:ex_doc, "~> 0.13", only: [:dev, :test]},
       {:ex_machina, "~> 1.0", only: :test}, # test factories
       {:guardian, "~> 0.13"}, # Authentication (JWT)
+      {:hackney, ">= 1.4.4", override: true},
       {:inch_ex, "~> 0.5", only: [:dev, :test]}, # Inch CI
       {:inflex, "~> 1.7.0"},
       {:ja_serializer, "~> 0.10.1"}, # JSON API
@@ -78,7 +80,8 @@ defmodule CodeCorps.Mixfile do
       {:poison, "~> 1.2 or ~> 2.0"},
       {:scrivener_ecto, "~> 1.0"}, # DB query pagination
       {:segment, github: "stueccles/analytics-elixir"}, # Segment analytics
-      {:stripity_stripe, "~> 1.4.0"} # Stripe
+      {:sentry, "~> 1.0"}, # Sentry error tracking
+      {:stripity_stripe, "~> 1.3.0"} # Stripe
     ]
   end
 
