@@ -23,3 +23,10 @@ deployment:
       - heroku run "POOL_SIZE=2 mix ecto.migrate" --app code-corps-phoenix-staging
       - gem install apiaryio
       - apiary publish --api-name="codecorpsapidevelop" --path ./blueprint/api.apib
+  production:
+    branch: master
+    commands:
+      - git push git@heroku.com:code-corps-phoenix.git $CIRCLE_SHA1:master
+      - heroku run "POOL_SIZE=2 mix ecto.migrate" --app code-corps-phoenix
+      - gem install apiaryio
+      - apiary publish --api-name="codecorpsapi" --path ./blueprint/api.apib
