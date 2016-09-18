@@ -40,7 +40,8 @@ defmodule CodeCorps.Endpoint do
 
   plug Corsica, [
     origins: Application.get_env(:code_corps, :allowed_origins),
-    allow_headers: ["accept", "authorization", "content-type"]
+    allow_headers: ["accept", "authorization", "content-type"],
+    log: Application.get_env(:code_corps, :corsica_log_level)
   ]
   plug CodeCorps.Router
 end

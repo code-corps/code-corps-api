@@ -3,7 +3,7 @@ defmodule CodeCorps.PageControllerTest do
 
   test "GET /", %{conn: conn} do
     conn = get conn, "/"
-    assert html_response(conn, 200) =~ "Welcome to Phoenix!"
+    assert redirected_to(conn, 302) =~ "http://docs.codecorpsapi.apiary.io/"
   end
 
   test "allows CORS from http://localhost:4200" do
