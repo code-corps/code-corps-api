@@ -16,8 +16,6 @@ defmodule CodeCorps.UserView do
   has_many :organizations, serializer: CodeCorps.OrganizationView
 
   has_many :user_categories, serializer: CodeCorps.UserCategoryView
-  has_many :categories, serializer: CodeCorps.CategoryView
-
   has_many :user_roles, serializer: CodeCorps.UserRoleView
   has_many :user_skills, serializer: CodeCorps.UserSkillView
 

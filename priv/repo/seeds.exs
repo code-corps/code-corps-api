@@ -2,6 +2,8 @@ alias CodeCorps.Repo
 alias CodeCorps.Category
 alias CodeCorps.Organization
 alias CodeCorps.Project
+alias CodeCorps.ProjectCategory
+alias CodeCorps.ProjectSkill
 alias CodeCorps.Role
 alias CodeCorps.Skill
 alias CodeCorps.User
@@ -68,7 +70,7 @@ cond do
     IO.puts "Projects detected, aborting project seed."
   true ->
     Enum.each(projects, fn project ->
-      Project.changeset(%Project{}, project)
+      Project.create_changeset(%Project{}, project)
       |> Repo.insert!
     end)
 end
@@ -198,7 +200,7 @@ roles = [
 
 cond do
   Repo.all(Role) != [] ->
-    IO.puts "Roles detected, aborting role seed."
+    IO.puts "Roles detected, aborting this seed."
   true ->
     Enum.each(roles, fn role ->
       Role.changeset(%Role{}, role)
@@ -281,7 +283,7 @@ end
 
 cond do
   Repo.all(Post) != [] ->
-    IO.puts "Posts detected, aborting post seed."
+    IO.puts "Posts detected, aborting this seed."
   true ->
     for i <- 1..50 do
       %Post{}
@@ -296,4 +298,28 @@ cond do
       })
       |> Repo.insert!
     end
+end
+
+cond do
+  Repo.all(ProjectCategory) != [] ->
+    IO.puts "Project categories detected, aborting this seed."
+  true ->
+    %ProjectCategory{}
+    |> ProjectCategory.create_changeset(%{
+      project_id: 1,
+      category_id: 12
+    })
+    |> Repo.insert!
+end
+
+cond do
+  Repo.all(ProjectSkill) != [] ->
+    IO.puts "Project skills detected, aborting this seed."
+  true ->
+    %ProjectSkill{}
+    |> ProjectSkill.changeset(%{
+      project_id: 1,
+      skill_id: 1
+    })
+    |> Repo.insert!
 end

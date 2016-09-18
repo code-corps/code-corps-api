@@ -53,9 +53,17 @@ Docker will set up your base Elixir container, as well as containers for:
 
 You can view more detailed information about these services in the `docker-compose.yml` file, but you shouldn't need to edit it unless you're intentionally contributing changes to our Docker workflow.
 
+### Seed the database
+
+You'll probably want to seed the database. You can do this with the following command:
+
+```shell
+docker-compose run web mix run priv/repo/seeds.exs
+```
+
 ### Verify it worked
 
-Point your browser (or make a direct request) to `http://api.localhost:49235/users`. You'll get the following response:
+Point your browser (or make a direct request) to `http://api.localhost:49235/users`. You'll get the following response (although you might have data if you seeded the database):
 
 ```json
 {
