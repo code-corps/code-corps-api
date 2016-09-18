@@ -39,11 +39,6 @@ defmodule CodeCorps.UserViewTest do
           "state" => "signed_up"
         },
         relationships: %{
-          "categories" => %{
-            data: [
-              %{id: user_category.category_id |> Integer.to_string, type: "category"}
-            ]
-          },
           "organizations" => %{
             data: [
               %{id: organization_membership.organization_id |> Integer.to_string, type: "organization"}
