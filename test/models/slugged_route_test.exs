@@ -7,18 +7,33 @@ defmodule CodeCorps.SluggedRouteTest do
   @valid_user_attrs %{slug: "user-slug", user_id: 1}
   @invalid_attrs %{}
 
-  test "changeset with valid organization attributes" do
-    changeset = SluggedRoute.changeset(%SluggedRoute{}, @valid_organization_attrs)
-    assert changeset.valid?
+  describe "changeset" do
+    test "changeset with valid organization attributes" do
+      changeset = SluggedRoute.changeset(%SluggedRoute{}, @valid_organization_attrs)
+      assert changeset.valid?
+    end
+
+    test "changeset with valid user attributes" do
+      changeset = SluggedRoute.changeset(%SluggedRoute{}, @valid_user_attrs)
+      assert changeset.valid?
+    end
+
+    test "changeset with invalid attributes" do
+      changeset = SluggedRoute.changeset(%SluggedRoute{}, @invalid_attrs)
+      refute changeset.valid?
+    end
   end
 
-  test "user changeset with valid user attributes" do
-    changeset = SluggedRoute.changeset(%SluggedRoute{}, @valid_user_attrs)
-    assert changeset.valid?
-  end
+  describe "create_changeset" do
+    test "with valid attributes" do
+      changeset = SluggedRoute.create_changeset(%SluggedRoute{}, %{slug: "CODE-CORPS", organization_id: 1})
+      assert changeset.valid?
+      assert changeset.changes.slug == "code-corps"
+    end
 
-  test "changeset with invalid attributes" do
-    changeset = SluggedRoute.changeset(%SluggedRoute{}, @invalid_attrs)
-    refute changeset.valid?
+    test "with invalid attributes" do
+      changeset = SluggedRoute.create_changeset(%SluggedRoute{}, @invalid_attrs)
+      refute changeset.valid?
+    end
   end
 end
