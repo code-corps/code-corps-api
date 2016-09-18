@@ -127,7 +127,7 @@ defmodule CodeCorps.User do
   defp put_slugged_route(changeset) do
     case changeset do
       %Changeset{valid?: true, changes: %{username: username}} ->
-        slugged_route_changeset = SluggedRoute.changeset(%SluggedRoute{}, %{slug: username})
+        slugged_route_changeset = SluggedRoute.create_changeset(%SluggedRoute{}, %{slug: username})
         put_assoc(changeset, :slugged_route, slugged_route_changeset)
       _ ->
         changeset

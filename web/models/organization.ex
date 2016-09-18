@@ -59,7 +59,7 @@ defmodule CodeCorps.Organization do
   defp put_slugged_route(changeset) do
     case changeset do
       %Ecto.Changeset{valid?: true, changes: %{slug: slug}} ->
-        slugged_route_changeset = SluggedRoute.changeset(%SluggedRoute{}, %{slug: slug})
+        slugged_route_changeset = SluggedRoute.create_changeset(%SluggedRoute{}, %{slug: slug})
         put_assoc(changeset, :slugged_route, slugged_route_changeset)
       _ ->
         changeset
