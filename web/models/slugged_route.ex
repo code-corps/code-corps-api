@@ -6,6 +6,7 @@ defmodule CodeCorps.SluggedRoute do
 
   use CodeCorps.Web, :model
 
+  import CodeCorps.ModelHelpers
   import CodeCorps.Validators.SlugValidator
 
   schema "slugged_routes" do
@@ -25,5 +26,11 @@ defmodule CodeCorps.SluggedRoute do
     |> cast(params, [:slug])
     |> validate_required(:slug)
     |> validate_slug(:slug)
+  end
+
+  def create_changeset(struct, params) do
+    struct
+    |> changeset(params)
+    |> generate_slug(:slug, :slug)
   end
 end

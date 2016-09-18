@@ -61,6 +61,9 @@ config :segment,
 # Configures random icon color generator
 config :code_corps, :icon_color_generator, CodeCorps.RandomIconColor.Generator
 
+# Set Corsica logging to output a console warning when rejecting a request
+config :code_corps, :corsica_log_level, [rejected: :warn]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"
