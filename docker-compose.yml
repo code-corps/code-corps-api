@@ -33,11 +33,10 @@ services:
     ports:
       - 49235:4000
     volumes:
-      - .:/code-corps-api
+      - code-corps-api:/code-corps-api
 
   test:
     <<: *api_base
-    command: bash -c "mix do deps.get, compile"
     depends_on:
       - web
     environment:
@@ -53,7 +52,8 @@ services:
     ports:
       - 8081:8080
     volumes:
-      - .:/code-corps-api
+      - code-corps-api:/code-corps-api
 
 volumes:
+  code-corps-api:
   postgres-data:
