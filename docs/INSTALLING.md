@@ -10,7 +10,8 @@ Follow those download instructions. Once you can run the `docker` command, you c
 
 ### Clone this repository
 
-You'll want to [clone this repository](https://help.github.com/articles/cloning-a-repository/) with `git clone https://github.com/code-corps/code-corps-api.git`.
+You'll want to [clone this repository](https://help.github.com/articles/cloning-a-repository/) with `git clone https://github.com/code-corps/code-corps-api.git`. If you plan on contributing, you'll want to fork it too!
+
 
 The directory structure will look like the following:
 
@@ -52,6 +53,27 @@ Docker will set up your base Elixir container, as well as containers for:
 - `apiary` runs an [Apiary client](https://github.com/apiaryio/apiary-client) server on port `8081`
 
 You can view more detailed information about these services in the `docker-compose.yml` file, but you shouldn't need to edit it unless you're intentionally contributing changes to our Docker workflow.
+
+#### Troubleshooting
+If you see an error like this at the bottom of the output:
+
+```shell
+Unchecked dependencies for environment dev:
+* httpoison (Hex package)
+  lock mismatch: the dependency is out of date (run "mix deps.get" to fetch locked version)
+** (Mix) Can't continue due to errors on dependencies
+```
+
+It means you need to fetch your dependencies:
+```shell
+docker-compose run web mix deps.get
+```
+
+Then re-run the previous command:
+```shell
+docker-compose build
+docker-compose up
+```
 
 ### Seed the database
 
