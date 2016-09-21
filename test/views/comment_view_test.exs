@@ -33,7 +33,7 @@ defmodule CodeCorps.CommentViewTest do
                     type: "user"}
           },
           "post" => %{
-            data: %{id:comment.post_id |> Integer.to_string,
+            data: %{id: comment.post_id |> Integer.to_string,
                     type: "post"}
           }
         }
