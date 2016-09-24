@@ -12,11 +12,19 @@ Then update your refs to be sure you have the latest code:
 
 Rather than merge develop into your branch, we prefer to rebase off of develop. Depending on how you are working with the repo, this step may be different.
 
-If you are working from a forked copy run:
+If you are working from a forked copy on a branch other than develop (i.e. you created a feature branch) run:
 
 ```shell
 git rebase -i develop
 ```
+
+If you are working from a forked copy on the develop branch run:
+
+```shell
+git rebase -i HEAD~X
+```
+With `X` being the number of commits you have added.
+
 If you are working from the main repo run:
 
 ```shell
