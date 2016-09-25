@@ -3,7 +3,7 @@ defmodule CodeCorps.UserView do
   use JaSerializer.PhoenixView
 
   attributes [
-    :biography, :email, :first_name, :last_name,
+    :biography, :email, :name, :first_name, :last_name,
     :photo_large_url, :photo_thumb_url, :twitter,
     :username, :website, :state,
     :inserted_at, :updated_at
@@ -20,11 +20,16 @@ defmodule CodeCorps.UserView do
   has_many :user_skills, serializer: CodeCorps.UserSkillView
 
   def photo_large_url(user, _conn) do
+    IO.inspect user
     CodeCorps.UserPhoto.url({user.photo, user}, :large)
   end
 
   def photo_thumb_url(user, _conn) do
     CodeCorps.UserPhoto.url({user.photo, user}, :thumb)
+  end
+
+  def name(user, _conn) do
+    user.first_name <> " " <> user.last_name
   end
 
   @doc """
