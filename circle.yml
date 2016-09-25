@@ -13,7 +13,7 @@ dependencies:
     - mix compile
 test:
   override:
-    - mix test
+    - mix coveralls.circle
 
 deployment:
   staging:
