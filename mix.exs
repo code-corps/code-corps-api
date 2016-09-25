@@ -10,7 +10,8 @@ defmodule CodeCorps.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      aliases: aliases(),
-     deps: deps()]
+     deps: deps(),
+     test_coverage: [tool: ExCoveralls]]
   end
 
   # Configuration for the OTP application.
@@ -69,6 +70,7 @@ defmodule CodeCorps.Mixfile do
       {:arc, git: "https://github.com/stavro/arc.git", ref: "354d4d2e1b86bcd6285db3528118fe3f5db36cf5", override: true}, # Photo uploads
       {:arc_ecto, "~> 0.4.3"},
       {:ex_aws, "~> 0.4.10"}, # Amazon AWS
+      {:excoveralls, "~> 0.5", only: :test}, # Test coverage
       {:httpoison, "~> 0.7"},
       {:poison, "~> 1.2"},
       {:canary, "~> 0.14.2"}, # Authorization
