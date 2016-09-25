@@ -64,6 +64,9 @@ config :code_corps, :icon_color_generator, CodeCorps.RandomIconColor.Generator
 # Set Corsica logging to output a console warning when rejecting a request
 config :code_corps, :corsica_log_level, [rejected: :warn]
 
+config :stripity_stripe, secret_key: System.get_env("STRIPE_SECRET_KEY")
+config :stripity_stripe, platform_client_id: System.get_env("STRIPE_PLATFORM_CLIENT_ID")
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"
