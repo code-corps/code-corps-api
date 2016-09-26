@@ -7,14 +7,11 @@ defmodule CodeCorps.OrganizationMembership do
 
   import CodeCorps.ModelHelpers
 
-  alias CodeCorps.Organization
-  alias CodeCorps.User
-
   schema "organization_memberships" do
     field :role, :string
 
-    belongs_to :organization, Organization
-    belongs_to :member, User
+    belongs_to :organization, CodeCorps.Organization
+    belongs_to :member, CodeCorps.User
 
     timestamps()
   end

@@ -7,7 +7,6 @@ defmodule CodeCorps.Organization do
   use CodeCorps.Web, :model
 
   alias CodeCorps.SluggedRoute
-  alias CodeCorps.Project
 
   import CodeCorps.Base64ImageUploader
   import CodeCorps.ModelHelpers
@@ -22,7 +21,7 @@ defmodule CodeCorps.Organization do
 
     has_one :slugged_route, SluggedRoute
 
-    has_many :projects, Project
+    has_many :projects, CodeCorps.Project
 
     has_many :organization_memberships, CodeCorps.OrganizationMembership
     has_many :members, through: [:organization_memberships, :member]
