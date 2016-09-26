@@ -68,6 +68,7 @@ defmodule CodeCorps.Mixfile do
       {:earmark, "~> 1.0"}, # Markdown rendering
       {:ex_aws, "~> 0.4"}, # Amazon AWS
       {:excoveralls, "~> 0.5", only: :test}, # Test coverage
+      {:ex_doc, "~> 0.13", only: [:dev, :test]},
       {:ex_machina, "~> 1.0", only: :test}, # test factories
       {:guardian, "~> 0.13"}, # Authentication (JWT)
       {:inch_ex, "~> 0.5", only: [:dev, :test]}, # Inch CI
