@@ -29,12 +29,16 @@ defmodule CodeCorps.CommentViewTest do
         },
         relationships: %{
           "user" => %{
-            data: %{id: comment.user_id |> Integer.to_string,
-                    type: "user"}
+            data: %{
+              id: comment.user_id |> Integer.to_string,
+              type: "user"
+            }
           },
           "post" => %{
-            data: %{id: comment.post_id |> Integer.to_string,
-                    type: "post"}
+            data: %{
+              id: comment.post_id |> Integer.to_string,
+              type: "post"
+            }
           }
         }
       },
