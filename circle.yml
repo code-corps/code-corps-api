@@ -13,7 +13,7 @@ dependencies:
     - mix compile
 test:
   override:
-    - mix test --cover
+    - mix test --include requires_env --cover
   post:
     - mix inch.report
 
