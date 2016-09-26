@@ -13,7 +13,9 @@ dependencies:
     - mix compile
 test:
   override:
-    - mix coveralls.circle
+    - mix test --cover
+  post:
+    - mix inch.report
 
 deployment:
   staging:

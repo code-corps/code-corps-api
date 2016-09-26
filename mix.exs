@@ -66,11 +66,11 @@ defmodule CodeCorps.Mixfile do
       {:corsica, "~> 0.4"}, # CORS
       {:credo, "~> 0.4", only: [:dev, :test]}, # Code style suggestions
       {:earmark, "~> 1.0"}, # Markdown rendering
-      {:ex_aws, "~> 0.5"}, # Amazon AWS
+      {:ex_aws, "~> 0.4"}, # Amazon AWS
       {:excoveralls, "~> 0.5", only: :test}, # Test coverage
       {:ex_machina, "~> 1.0", only: :test}, # test factories
       {:guardian, "~> 0.13"}, # Authentication (JWT)
-      {:httpoison, "~> 0.7"},
+      {:inch_ex, "~> 0.5", only: [:dev, :test]}, # Inch CI
       {:inflex, "~> 1.7.0"},
       {:ja_serializer, "~> 0.10.1"}, # JSON API
       {:mix_test_watch, "~> 0.2", only: :dev}, # Test watcher
