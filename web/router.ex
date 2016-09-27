@@ -1,5 +1,7 @@
 defmodule CodeCorps.Router do
   use CodeCorps.Web, :router
+  use Plug.ErrorHandler
+  use Sentry.Plug
 
   pipeline :browser do
     plug :accepts, ["html"]
