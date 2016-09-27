@@ -21,6 +21,67 @@ defmodule CodeCorps.ProjectCategoryControllerTest do
     }
   end
 
+  describe "index" do
+    test "lists all entries on index", %{conn: conn} do
+      conn = get conn, project_category_path(conn, :index)
+      assert json_response(conn, 200)["data"] == []
+    end
+
+    test "filters resources on index", %{conn: conn} do
+      arts = insert(:category, name: "Arts")
+      society = insert(:category, name: "Society")
+      technology = insert(:category, name: "Technology")
+
+      project = insert(:project)
+      project_category_1 = insert(:project_category, project: project, category: arts)
+      project_category_2 = insert(:project_category, project: project, category: society)
+      insert(:project_category, project: project, category: technology)
+
+      json =
+        conn
+        |> get("project-categories/?filter[id]=#{project_category_1.id},#{project_category_2.id}")
+        |> json_response(200)
+      data = json["data"]
+      assert length(data) == 2
+      [first_result, second_result | _] = data
+
+      assert first_result["id"] == "#{project_category_1.id}"
+      assert first_result["relationships"]["project"]["data"]["id"] == "#{project.id}"
+      assert first_result["relationships"]["project"]["data"]["type"] == "project"
+      assert first_result["relationships"]["category"]["data"]["id"] == "#{arts.id}"
+      assert first_result["relationships"]["category"]["data"]["type"] == "category"
+
+      assert second_result["id"] == "#{project_category_2.id}"
+      assert second_result["relationships"]["project"]["data"]["id"] == "#{project.id}"
+      assert second_result["relationships"]["project"]["data"]["type"] == "project"
+      assert second_result["relationships"]["category"]["data"]["id"] == "#{society.id}"
+      assert second_result["relationships"]["category"]["data"]["type"] == "category"
+    end
+  end
+
+  describe "show" do
+    test "shows chosen resource", %{conn: conn} do
+      category = insert(:category)
+      project = insert(:project)
+      project_category = insert(:project_category, project: project, category: category)
+      conn = get conn, project_category_path(conn, :show, project_category)
+      data = json_response(conn, 200)["data"]
+      assert data["id"] == "#{project_category.id}"
+      assert data["type"] == "project-category"
+      assert data["attributes"] == %{}
+      assert data["relationships"]["project"]["data"]["id"] == "#{project.id}"
+      assert data["relationships"]["project"]["data"]["type"] == "project"
+      assert data["relationships"]["category"]["data"]["id"] == "#{category.id}"
+      assert data["relationships"]["category"]["data"]["type"] == "category"
+    end
+
+    test "does not show resource and instead throw error when id is nonexistent", %{conn: conn} do
+      assert_error_sent 404, fn ->
+        get conn, project_category_path(conn, :show, -1)
+      end
+    end
+  end
+
   describe "create" do
     @tag authenticated: :admin
     test "creates and renders resource when data is valid", %{conn: conn} do
