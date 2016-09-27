@@ -7,14 +7,12 @@ defmodule CodeCorps.RoleViewTest do
   import Phoenix.View
 
   test "renders all attributes and relationships properly" do
-    role = insert(:role)
-    skill = insert(:skill)
-    role_skill = insert(:role_skill, role: role, skill: skill)
+    role_skill = insert(:role_skill)
 
     role =
       CodeCorps.Role
-      |> Repo.get(role.id)
-      |> Repo.preload([:skills])
+      |> Repo.get(role_skill.role_id)
+      |> Repo.preload([:role_skills])
 
     rendered_json =  render(CodeCorps.RoleView, "show.json-api", data: role)
 
@@ -32,11 +30,6 @@ defmodule CodeCorps.RoleViewTest do
           "role-skills" => %{
             data: [
               %{id: role_skill.id |> Integer.to_string, type: "role-skill"}
-            ]
-          },
-          "skills" => %{
-            data: [
-              %{id: skill.id |> Integer.to_string, type: "skill"}
             ]
           }
         },

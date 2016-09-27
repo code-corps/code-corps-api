@@ -6,9 +6,7 @@ defmodule CodeCorps.OrganizationView do
 
   has_one :slugged_route, serializer: CodeCorps.SluggedRouteView
 
-  has_many :members, serializer: CodeCorps.UserView
-  has_many :organization_memberships,
-    serializer: CodeCorps.OrganizationMembershipView
+  has_many :organization_memberships, serializer: CodeCorps.OrganizationMembershipView
   has_many :projects, serializer: CodeCorps.ProjectView
 
   def icon_large_url(organization, _conn) do

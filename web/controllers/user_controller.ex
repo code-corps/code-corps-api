@@ -13,7 +13,7 @@ defmodule CodeCorps.UserController do
     users =
       User
       |> User.index_filters(params)
-      |> preload([:slugged_route, :categories, :organizations, :roles, :skills])
+      |> preload([:slugged_route, :organization_memberships, :user_categories, :user_roles, :user_skills])
       |> Repo.all
 
     render(conn, "index.json-api", data: users)
@@ -24,7 +24,7 @@ defmodule CodeCorps.UserController do
 
     case Repo.insert(changeset) do
       {:ok, user} ->
-        user = Repo.preload(user, [:slugged_route, :categories, :organizations, :roles, :skills])
+        user = Repo.preload(user, [:slugged_route, :organization_memberships, :user_categories, :user_roles, :user_skills])
 
         conn
         |> Plug.Conn.assign(:current_user, user)
@@ -42,7 +42,7 @@ defmodule CodeCorps.UserController do
   def show(conn, %{"id" => id}) do
     user =
       User
-      |> preload([:slugged_route, :categories, :organizations, :user_roles, :user_skills])
+      |> preload([:slugged_route, :organization_memberships, :user_categories, :user_roles, :user_skills])
       |> Repo.get!(id)
 
     render(conn, "show.json-api", data: user)
@@ -51,7 +51,7 @@ defmodule CodeCorps.UserController do
   def update(conn, %{"id" => id, "data" => data = %{"type" => "user", "attributes" => _user_params}}) do
     user =
       User
-      |> preload([:slugged_route, :categories, :organizations, :roles, :skills])
+      |> preload([:slugged_route, :organization_memberships, :user_categories, :user_roles, :user_skills])
       |> Repo.get!(id)
 
     changeset = User.update_changeset(user, Params.to_attributes(data))

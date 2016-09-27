@@ -10,11 +10,7 @@ defmodule CodeCorps.UserView do
   ]
 
   has_one :slugged_route, serializer: CodeCorps.SluggedRouteView
-
-  has_many :organization_memberships,
-    serializer: CodeCorps.OrganizationMembershipView
-  has_many :organizations, serializer: CodeCorps.OrganizationView
-
+  has_many :organization_memberships, serializer: CodeCorps.OrganizationMembershipView
   has_many :user_categories, serializer: CodeCorps.UserCategoryView
   has_many :user_roles, serializer: CodeCorps.UserRoleView
   has_many :user_skills, serializer: CodeCorps.UserSkillView

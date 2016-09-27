@@ -15,7 +15,7 @@ defmodule CodeCorps.OrganizationViewTest do
     organization =
       CodeCorps.Organization
       |> Repo.get(organization.id)
-      |> CodeCorps.Repo.preload([:members, :projects, :slugged_route])
+      |> CodeCorps.Repo.preload([:organization_memberships, :projects, :slugged_route])
 
     rendered_json =  render(CodeCorps.OrganizationView, "show.json-api", data: organization)
 
@@ -32,11 +32,6 @@ defmodule CodeCorps.OrganizationViewTest do
         },
         id: organization.id |> Integer.to_string,
         relationships: %{
-          "members" => %{
-            data: [
-              %{id: user.id |> Integer.to_string, type: "user"}
-            ]
-          },
           "organization-memberships" => %{
             data: [
               %{id: organization_membership.id |> Integer.to_string, type: "organization-membership"}
