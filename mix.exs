@@ -4,13 +4,14 @@ defmodule CodeCorps.Mixfile do
   def project do
     [app: :code_corps,
      version: "0.0.1",
-     elixir: "~> 1.2",
+     elixir: "1.3.2",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      aliases: aliases(),
-     deps: deps()]
+     deps: deps(),
+     test_coverage: [tool: ExCoveralls]]
   end
 
   # Configuration for the OTP application.
@@ -28,14 +29,16 @@ defmodule CodeCorps.Mixfile do
         :gettext,
         :phoenix_ecto,
         :postgrex,
+        :arc_ecto,
         :comeonin,
         :corsica,
         :earmark,
         :ex_aws,
         :httpoison,
-        :arc_ecto,
         :scrivener_ecto,
-        :segment
+        :segment,
+        :sentry,
+        :stripity_stripe
       ]
     ]
   end
@@ -49,7 +52,7 @@ defmodule CodeCorps.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.2.0"},
+      {:phoenix, "~> 1.2.1"},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 3.0"},
       {:postgrex, ">= 0.0.0"},
@@ -57,23 +60,28 @@ defmodule CodeCorps.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
-      {:ja_serializer, "~> 0.10"}, # JSON API
-      {:guardian, "~> 0.12.0"}, # Authentication (JWT)
-      {:comeonin, "~> 2.0"},
-      {:mix_test_watch, "~> 0.2", only: :dev}, # Test watcher
-      {:credo, "~> 0.4", only: [:dev, :test]}, # Code style suggestions
-      {:inflex, "~> 1.7.0"},
-      {:corsica, "~> 0.4"}, # CORS
-      {:earmark, "~> 1.0"}, # Markdown rendering
-      {:ex_machina, "~> 1.0", only: :test}, # test factories
       {:arc, git: "https://github.com/stavro/arc.git", ref: "354d4d2e1b86bcd6285db3528118fe3f5db36cf5", override: true}, # Photo uploads
-      {:arc_ecto, "~> 0.4.3"},
-      {:ex_aws, "~> 0.4.10"}, # Amazon AWS
-      {:httpoison, "~> 0.7"},
-      {:poison, "~> 1.2"},
-      {:canary, "~> 0.14.2"}, # Authorization
+      {:arc_ecto, "~> 0.4.4"},
+      {:canary, "~> 1.0"}, # Authorization
+      {:comeonin, "~> 2.0"},
+      {:corsica, "~> 0.4"}, # CORS
+      {:credo, "~> 0.4", only: [:dev, :test]}, # Code style suggestions
+      {:earmark, "~> 1.0"}, # Markdown rendering
+      {:ex_aws, "~> 0.4"}, # Amazon AWS
+      {:excoveralls, "~> 0.5", only: :test}, # Test coverage
+      {:ex_doc, "~> 0.13", only: [:dev, :test]},
+      {:ex_machina, "~> 1.0", only: :test}, # test factories
+      {:guardian, "~> 0.13"}, # Authentication (JWT)
+      {:hackney, ">= 1.4.4", override: true},
+      {:inch_ex, "~> 0.5", only: [:dev, :test]}, # Inch CI
+      {:inflex, "~> 1.7.0"},
+      {:ja_serializer, "~> 0.10.1"}, # JSON API
+      {:mix_test_watch, "~> 0.2", only: :dev}, # Test watcher
+      {:poison, "~> 1.2 or ~> 2.0"},
       {:scrivener_ecto, "~> 1.0"}, # DB query pagination
-      {:segment, github: "stueccles/analytics-elixir"} # Segment analytics
+      {:segment, github: "stueccles/analytics-elixir"}, # Segment analytics
+      {:sentry, "~> 1.0"}, # Sentry error tracking
+      {:stripity_stripe, "~> 1.3.0"} # Stripe
     ]
   end
 

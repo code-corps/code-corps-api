@@ -13,7 +13,7 @@ config :code_corps,
 config :code_corps, CodeCorps.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "eMl0+Byu0Zv7q48thBu23ChBVFO1+sdLqoMI8yZoxEviF1K3C5uIohbDfvM9felL",
-  render_errors: [view: CodeCorps.ErrorView, accepts: ~w(html json)],
+  render_errors: [view: CodeCorps.ErrorView, accepts: ~w(html json json-api)],
   pubsub: [name: CodeCorps.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
@@ -27,7 +27,7 @@ config :phoenix, :format_encoders,
   "json-api": Poison
 
 # Configures JSON API mime type
-config :plug, :mimes, %{
+config :mime, :types, %{
   "application/vnd.api+json" => ["json-api"]
 }
 
@@ -43,7 +43,7 @@ config :canary, unauthorized_handler: {CodeCorps.AuthenticationHelpers, :handle_
 config :canary, not_found_handler: {CodeCorps.AuthenticationHelpers, :handle_not_found}
 
 # Configures ex_aws with credentials
-config :ex_aws,
+config :ex_aws, :code_corps,
   access_key_id: [System.get_env("AWS_ACCESS_KEY_ID"), :instance_role],
   secret_access_key: [System.get_env("AWS_SECRET_ACCESS_KEY"), :instance_role]
 
@@ -63,6 +63,14 @@ config :code_corps, :icon_color_generator, CodeCorps.RandomIconColor.Generator
 
 # Set Corsica logging to output a console warning when rejecting a request
 config :code_corps, :corsica_log_level, [rejected: :warn]
+
+config :stripity_stripe, secret_key: System.get_env("STRIPE_SECRET_KEY")
+config :stripity_stripe, platform_client_id: System.get_env("STRIPE_PLATFORM_CLIENT_ID")
+
+config :sentry,
+  dsn: System.get_env("SENTRY_DSN"),
+  included_environments: ~w(prod staging),
+  use_error_logger: true
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

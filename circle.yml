@@ -13,7 +13,9 @@ dependencies:
     - mix compile
 test:
   override:
-    - mix test
+    - mix test --include requires_env --cover
+  post:
+    - mix inch.report
 
 deployment:
   staging:
@@ -23,6 +25,7 @@ deployment:
       - heroku run "POOL_SIZE=2 mix ecto.migrate" --app code-corps-staging
       - gem install apiaryio
       - apiary publish --api-name="codecorpsapidevelop" --path ./blueprint/api.apib
+      - ./deploy_docs.sh
   production:
     branch: master
     commands:

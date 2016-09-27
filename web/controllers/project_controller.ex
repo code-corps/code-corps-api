@@ -15,7 +15,7 @@ defmodule CodeCorps.ProjectController do
     projects =
       Project
       |> Repo.all(organization_id: slugged_route.organization_id)
-      |> Repo.preload([:categories, :organization, :posts, :skills])
+      |> Repo.preload([:organization, :posts, :project_categories, :project_skills])
 
     render(conn, "index.json-api", data: projects)
   end
@@ -24,7 +24,7 @@ defmodule CodeCorps.ProjectController do
     projects =
       Project
       |> Repo.all
-      |> Repo.preload([:categories, :organization, :posts, :skills])
+      |> Repo.preload([:organization, :posts, :project_categories, :project_skills])
 
     render(conn, "index.json-api", data: projects)
   end
@@ -33,7 +33,7 @@ defmodule CodeCorps.ProjectController do
     project =
       Project
       |> CodeCorps.ModelHelpers.slug_finder(project_slug)
-      |> Repo.preload([:categories, :organization, :posts, :skills])
+      |> Repo.preload([:organization, :posts, :project_categories, :project_skills])
 
     render(conn, "show.json-api", data: project)
   end
@@ -42,7 +42,7 @@ defmodule CodeCorps.ProjectController do
     project =
       Project
       |> Repo.get!(id)
-      |> Repo.preload([:categories, :organization, :posts, :skills])
+      |> Repo.preload([:organization, :posts, :project_categories, :project_skills])
 
     render(conn, "show.json-api", data: project)
   end
@@ -54,7 +54,7 @@ defmodule CodeCorps.ProjectController do
       {:ok, project} ->
         project =
           project
-          |> Repo.preload([:categories, :organization, :posts, :skills])
+          |> Repo.preload([:organization, :posts, :project_categories, :project_skills])
 
         conn
         |> put_status(:created)
@@ -77,7 +77,7 @@ defmodule CodeCorps.ProjectController do
       {:ok, project} ->
         project =
           project
-          |> Repo.preload([:categories, :organization, :posts, :skills])
+          |> Repo.preload([:organization, :posts, :project_categories, :project_skills])
 
         conn
         |> put_status(:created)

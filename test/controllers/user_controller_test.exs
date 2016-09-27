@@ -172,7 +172,10 @@ defmodule CodeCorps.UserControllerTest do
       user = insert(:user)
       photo_data = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
       attrs = Map.put(@valid_attrs, :base64_photo_data, photo_data)
-      conn = put conn, user_path(conn, :update, user), %{
+
+      path = user_path(conn, :update, user)
+
+      params = %{
         "meta" => %{},
         "data" => %{
           "type" => "user",
@@ -181,6 +184,11 @@ defmodule CodeCorps.UserControllerTest do
           "relationships" => relationships
         }
       }
+
+      conn =
+        conn
+        |> authenticate(user)
+        |> put(path, params)
 
       data = json_response(conn, 200)["data"]
       large_url = data["attributes"]["photo-large-url"]

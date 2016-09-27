@@ -85,9 +85,6 @@ defmodule CodeCorps.ProjectControllerTest do
       assert data["attributes"]["description"] == "Test project description"
       assert data["attributes"]["long-description-markdown"] == "A markdown **description**"
       assert data["relationships"]["organization"]["data"]["id"] == Integer.to_string(project.organization_id)
-      assert data["relationships"]["project-categories"]["data"] == []
-      assert data["relationships"]["project-skills"]["data"] == []
-      assert data["relationships"]["skills"]["data"] == []
     end
 
     test "shows chosen resource retrieved by slug", %{conn: conn} do

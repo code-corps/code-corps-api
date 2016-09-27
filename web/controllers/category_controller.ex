@@ -7,7 +7,7 @@ defmodule CodeCorps.CategoryController do
   plug :load_and_authorize_resource, model: Category, only: [:create, :update]
 
   def index(conn, _params) do
-    categories = Category |> Repo.all |> Repo.preload([:project_categories, :projects])
+    categories = Category |> Repo.all |> Repo.preload([:project_categories])
     render(conn, "index.json-api", data: categories)
   end
 
@@ -18,7 +18,7 @@ defmodule CodeCorps.CategoryController do
       {:ok, category} ->
         category =
           category
-          |> Repo.preload([:projects])
+          |> Repo.preload([:project_categories])
 
         conn
         |> put_status(:created)
@@ -34,7 +34,7 @@ defmodule CodeCorps.CategoryController do
   def show(conn, %{"id" => id}) do
     category =
       Category
-      |> preload([:projects])
+      |> preload([:project_categories])
       |> Repo.get!(id)
 
     render(conn, "show.json-api", data: category)
@@ -43,7 +43,7 @@ defmodule CodeCorps.CategoryController do
   def update(conn, %{"id" => id, "data" => data = %{"type" => "category", "attributes" => _category_params}}) do
     changeset =
       Category
-      |> preload([:projects])
+      |> preload([:project_categories])
       |> Repo.get!(id)
       |> Category.changeset(Params.to_attributes(data))
 
