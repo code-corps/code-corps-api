@@ -15,8 +15,8 @@ defmodule CodeCorps.UserViewTest do
 
     user =
       CodeCorps.User
+      |> preload([:slugged_route, :organization_memberships, :user_categories, :user_roles, :user_skills])
       |> Repo.get(db_user.id)
-      |> CodeCorps.Repo.preload([:categories, :organizations, :roles, :skills, :slugged_route])
 
     rendered_json = render(CodeCorps.UserView, "show.json-api", data: user)
 
@@ -39,11 +39,6 @@ defmodule CodeCorps.UserViewTest do
           "state" => "signed_up"
         },
         relationships: %{
-          "organizations" => %{
-            data: [
-              %{id: organization_membership.organization_id |> Integer.to_string, type: "organization"}
-            ]
-          },
           "organization-memberships" => %{
             data: [
               %{id: organization_membership.id |> Integer.to_string, type: "organization-membership"}

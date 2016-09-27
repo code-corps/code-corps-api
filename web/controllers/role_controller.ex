@@ -11,7 +11,7 @@ defmodule CodeCorps.RoleController do
     roles =
       Role
       |> Repo.all
-      |> Repo.preload([:skills])
+      |> Repo.preload([:role_skills])
     render(conn, "index.json-api", data: roles)
   end
 
@@ -20,7 +20,7 @@ defmodule CodeCorps.RoleController do
 
     case Repo.insert(changeset) do
       {:ok, role} ->
-        role = Repo.preload(role, [:skills])
+        role = Repo.preload(role, [:role_skills])
 
         conn
         |> put_status(:created)

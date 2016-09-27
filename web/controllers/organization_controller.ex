@@ -13,7 +13,7 @@ defmodule CodeCorps.OrganizationController do
     organizations =
       Organization
       |> Organization.index_filters(params)
-      |> preload([:members, :projects, :slugged_route])
+      |> preload([:organization_memberships, :projects, :slugged_route])
       |> Repo.all
 
     render(conn, "index.json-api", data: organizations)
@@ -40,7 +40,7 @@ defmodule CodeCorps.OrganizationController do
   def show(conn, %{"id" => id}) do
     organization =
       Organization
-      |> preload([:members, :projects, :slugged_route])
+      |> preload([:organization_memberships, :projects, :slugged_route])
       |> Repo.get!(id)
     render(conn, "show.json-api", data: organization)
   end
@@ -48,7 +48,7 @@ defmodule CodeCorps.OrganizationController do
   def update(conn, %{"id" => id, "data" => data = %{"type" => "organization", "attributes" => _organization_params}}) do
     changeset =
       Organization
-      |> preload([:members, :projects, :slugged_route])
+      |> preload([:organization_memberships, :projects, :slugged_route])
       |> Repo.get!(id)
       |> changeset(Params.to_attributes(data))
 

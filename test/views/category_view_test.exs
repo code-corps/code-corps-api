@@ -12,7 +12,7 @@ defmodule CodeCorps.CategoryViewTest do
     category =
       CodeCorps.Category
       |> Repo.get(project_category.category_id)
-      |> CodeCorps.Repo.preload([:project_categories, :projects])
+      |> CodeCorps.Repo.preload([:project_categories])
 
     rendered_json =  render(CodeCorps.CategoryView, "show.json-api", data: category)
 
@@ -28,11 +28,6 @@ defmodule CodeCorps.CategoryViewTest do
           "project-categories" => %{
             data: [
               %{id: project_category.id |> Integer.to_string, type: "project-category"}
-            ]
-          },
-          "projects" => %{
-            data: [
-              %{id: project_category.project_id |> Integer.to_string, type: "project"}
             ]
           }
         },

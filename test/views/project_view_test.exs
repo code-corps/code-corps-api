@@ -16,7 +16,7 @@ defmodule CodeCorps.ProjectViewTest do
     project =
       CodeCorps.Project
       |> Repo.get(project.id)
-      |> CodeCorps.Repo.preload([:categories, :organization, :posts, :skills])
+      |> CodeCorps.Repo.preload([:organization, :posts, :project_categories, :project_skills])
 
     rendered_json =  render(CodeCorps.ProjectView, "show.json-api", data: project)
 
@@ -35,14 +35,6 @@ defmodule CodeCorps.ProjectViewTest do
         },
         id: project.id |> Integer.to_string,
         relationships: %{
-          "categories" => %{
-            data: [
-              %{
-                id: project_category.category_id |> Integer.to_string,
-                type: "category"
-              }
-            ]
-          },
           "organization" => %{
             data: %{
               id: organization.id |> Integer.to_string,
@@ -72,15 +64,7 @@ defmodule CodeCorps.ProjectViewTest do
                 type: "project-skill"
               }
             ]
-          },
-          "skills" => %{
-            data: [
-              %{
-                id: project_skill.skill_id |> Integer.to_string,
-                type: "skill"
-              }
-            ]
-          },
+          }
         },
         type: "project",
       },

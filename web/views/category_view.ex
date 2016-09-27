@@ -5,5 +5,4 @@ defmodule CodeCorps.CategoryView do
   attributes [:name, :slug, :description]
 
   has_many :project_categories, serializer: CodeCorps.ProjectCategoryView
-  has_many :projects, serializer: CodeCorps.ProjectView
 end
