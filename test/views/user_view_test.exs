@@ -34,6 +34,7 @@ defmodule CodeCorps.UserViewTest do
           "photo-thumb-url" => CodeCorps.UserPhoto.url({user.photo, user}, :thumb),
           "twitter" => user.twitter,
           "username" => user.username,
+          "name" => user.first_name <> " " <> user.last_name,
           "updated-at" => user.updated_at,
           "website" => user.website,
           "state" => "signed_up"
