@@ -4,9 +4,8 @@ defmodule CodeCorps.UserView do
 
   attributes [
     :biography, :email, :first_name, :last_name,
-    :photo_large_url, :photo_thumb_url, :twitter,
-    :username, :website, :state,
-    :inserted_at, :updated_at
+    :photo_large_url, :photo_thumb_url, :state, :state_transition, :twitter,
+    :username, :website, :inserted_at, :updated_at
   ]
 
   has_one :slugged_route, serializer: CodeCorps.SluggedRouteView

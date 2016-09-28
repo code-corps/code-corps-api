@@ -233,6 +233,9 @@ defmodule CodeCorps.UserControllerTest do
       %{"data" => %{"id" => id}} = json_response(conn, 200)
       user = Repo.get(User, id)
       assert user.state == "edited_profile"
+      
+      # Transition was successful, so we should unset it
+      assert user.state_transition == nil
     end
   end
 
