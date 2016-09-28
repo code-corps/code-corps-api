@@ -36,7 +36,8 @@ defmodule CodeCorps.UserViewTest do
           "username" => user.username,
           "updated-at" => user.updated_at,
           "website" => user.website,
-          "state" => "signed_up"
+          "state" => "signed_up",
+          "state-transition" => nil
         },
         relationships: %{
           "organization-memberships" => %{
