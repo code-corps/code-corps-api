@@ -21,6 +21,8 @@ deployment:
   staging:
     branch: develop
     commands:
+      - git push git@heroku.com:code-corps-remote-development.git $CIRCLE_SHA1:master
+      - heroku run "POOL_SIZE=2 mix ecto.migrate" --app code-corps-remote-development
       - git push git@heroku.com:code-corps-staging.git $CIRCLE_SHA1:master
       - heroku run "POOL_SIZE=2 mix ecto.migrate" --app code-corps-staging
       - gem install apiaryio
