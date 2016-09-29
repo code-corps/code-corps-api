@@ -10,7 +10,7 @@ defmodule CodeCorps.Comment do
     field :markdown, :string
 
     belongs_to :user, CodeCorps.User
-    belongs_to :post, CodeCorps.Post
+    belongs_to :task, CodeCorps.Task
 
     timestamps()
   end
@@ -28,13 +28,13 @@ defmodule CodeCorps.Comment do
   def create_changeset(struct, params) do
     struct
     |> changeset(params)
-    |> cast(params, [:post_id, :user_id])
-    |> validate_required([:post_id, :user_id])
-    |> assoc_constraint(:post)
+    |> cast(params, [:task_id, :user_id])
+    |> validate_required([:task_id, :user_id])
+    |> assoc_constraint(:task)
     |> assoc_constraint(:user)
   end
 
   def index_filters(query, params) do
-    query |> post_filter(params)
+    query |> task_filter(params)
   end
 end

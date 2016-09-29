@@ -10,12 +10,12 @@ defmodule CodeCorps.CommentController do
 
   plug :scrub_params, "data" when action in [:create, :update]
 
-  def index(conn, params = %{"post_id" => _}) do
+  def index(conn, params = %{"task_id" => _}) do
     comments =
       Comment
       |> Comment.index_filters(params)
       |> Repo.all
-      |> Repo.preload(:post)
+      |> Repo.preload(:task)
 
     render(conn, "index.json-api", data: comments)
   end
@@ -25,7 +25,7 @@ defmodule CodeCorps.CommentController do
 
     case Repo.insert(changeset) do
       {:ok, comment} ->
-        comment = comment |> Repo.preload([:post])
+        comment = comment |> Repo.preload([:task])
 
         conn
         |> @analytics.track(:created, comment)
@@ -40,14 +40,14 @@ defmodule CodeCorps.CommentController do
   end
 
   def show(conn, %{"id" => id}) do
-    comment = Repo.get!(Comment, id, preload: [:post])
+    comment = Repo.get!(Comment, id, preload: [:task])
     render(conn, "show.json-api", data: comment)
   end
 
   def update(conn, %{"id" => id, "data" => data = %{"type" => "comment", "attributes" => _comment_params}}) do
     changeset =
       Comment
-      |> preload([:post])
+      |> preload([:task])
       |> Repo.get!(id)
       |> Comment.changeset(Params.to_attributes(data))
 
