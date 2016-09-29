@@ -69,7 +69,7 @@ config :stripity_stripe, platform_client_id: System.get_env("STRIPE_PLATFORM_CLI
 
 config :sentry,
   dsn: System.get_env("SENTRY_DSN"),
-  included_environments: ~w(prod staging),
+  included_environments: ~w(prod staging)a,
   use_error_logger: true
 
 # Import environment specific config. This must remain at the bottom
