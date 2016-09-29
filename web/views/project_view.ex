@@ -9,7 +9,7 @@ defmodule CodeCorps.ProjectView do
 
   has_one :organization, serializer: CodeCorps.OrganizationView
 
-  has_many :posts, serializer: CodeCorps.PostView
+  has_many :tasks, serializer: CodeCorps.TaskView
 
   has_many :project_categories, serializer: CodeCorps.ProjectCategoryView
   has_many :project_skills, serializer: CodeCorps.ProjectSkillView

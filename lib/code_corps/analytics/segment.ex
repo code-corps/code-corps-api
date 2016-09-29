@@ -1,7 +1,7 @@
 defmodule CodeCorps.Analytics.Segment do
   alias CodeCorps.Comment
   alias CodeCorps.OrganizationMembership
-  alias CodeCorps.Post
+  alias CodeCorps.Task
   alias CodeCorps.User
   alias CodeCorps.UserCategory
   alias CodeCorps.UserRole
@@ -29,14 +29,14 @@ defmodule CodeCorps.Analytics.Segment do
   def track(conn, :created, organization_membership = %OrganizationMembership{}) do
     conn |> do_track("Created Organization Membership", properties(organization_membership))
   end
-  def track(conn, :created, post = %Post{}) do
-    conn |> do_track("Created Post", properties(post))
+  def track(conn, :created, task = %Task{}) do
+    conn |> do_track("Created Task", properties(task))
   end
   def track(conn, :edited, comment = %Comment{}) do
     conn |> do_track("Edited Comment", properties(comment))
   end
-  def track(conn, :edited, post = %Post{}) do
-    conn |> do_track("Edited Post", properties(post))
+  def track(conn, :edited, task = %Task{}) do
+    conn |> do_track("Edited Task", properties(task))
   end
   def track(conn, :removed, user_category = %UserCategory{}) do
     conn |> do_track("Removed User Category", properties(user_category))
@@ -79,10 +79,10 @@ defmodule CodeCorps.Analytics.Segment do
   defp properties(comment = %Comment{}) do
     %{
       comment_id: comment.id,
-      post: comment.post.title,
-      post_id: comment.post.id,
-      post_type: comment.post.post_type,
-      project_id: comment.post.project_id
+      task: comment.task.title,
+      task_id: comment.task.id,
+      task_type: comment.task.task_type,
+      project_id: comment.task.project_id
     }
   end
   defp properties(organization_membership = %OrganizationMembership{}) do
@@ -91,12 +91,12 @@ defmodule CodeCorps.Analytics.Segment do
       organization_id: organization_membership.organization.id
     }
   end
-  defp properties(post = %Post{}) do
+  defp properties(task = %Task{}) do
     %{
-      post: post.title,
-      post_id: post.id,
-      post_type: post.post_type,
-      project_id: post.project_id
+      task: task.title,
+      task_id: task.id,
+      task_type: task.task_type,
+      project_id: task.project_id
     }
   end
   defp properties(user_category = %UserCategory{}) do

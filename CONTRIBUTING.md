@@ -32,7 +32,7 @@ One of the best ways to write a feature is in user story format:
 
 For example, let's say we wanted to write some Slack integration for new comments posted to a Code Corps project. That user story might look something like:
 
-> As a project maintainer, I want to see new comments on my project post in my Slack channel so that everyone can see and react to some of the latest changes in the project.
+> As a project maintainer, I want to see new comments on my project task in my Slack channel so that everyone can see and react to some of the latest changes in the project.
 
 You may want to go deeper into detail. Posting screenshots of designs or expected test cases and scenarios are even more helpful. Place yourself in the shoes of the person who's going to accomplish the task – even if that person is you. What steps should I be taking next to finish this task?
 

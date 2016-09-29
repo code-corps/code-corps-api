@@ -6,8 +6,8 @@ alias CodeCorps.ProjectCategory
 alias CodeCorps.ProjectSkill
 alias CodeCorps.Role
 alias CodeCorps.Skill
+alias CodeCorps.Task
 alias CodeCorps.User
-alias CodeCorps.Post
 
 # Users
 
@@ -279,18 +279,18 @@ cond do
     end)
 end
 
-# Posts
+# Tasks
 
 cond do
-  Repo.all(Post) != [] ->
-    IO.puts "Posts detected, aborting this seed."
+  Repo.all(Task) != [] ->
+    IO.puts "Tasks detected, aborting this seed."
   true ->
     for i <- 1..50 do
-      %Post{}
-      |> Post.create_changeset(%{
-        title: "test post #{i}",
+      %Task{}
+      |> Task.create_changeset(%{
+        title: "test task #{i}",
         markdown: "test *body* #{i}",
-        post_type: Enum.random(~w{idea issue task}),
+        task_type: Enum.random(~w{idea issue task}),
         status: "open",
         number: i,
         project_id: 1,

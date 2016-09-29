@@ -10,22 +10,22 @@ defmodule CodeCorps.CommentControllerTest do
   defp build_payload, do: %{ "data" => %{"type" => "comment"}}
   defp put_id(payload, id), do: payload |> put_in(["data", "id"], id)
   defp put_attributes(payload, attributes), do: payload |> put_in(["data", "attributes"], attributes)
-  defp put_relationships(payload, user, post) do
-    relationships = build_relationships(user, post)
+  defp put_relationships(payload, user, task) do
+    relationships = build_relationships(user, task)
     payload |> put_in(["data", "relationships"], relationships)
   end
 
-  defp build_relationships(user, post) do
+  defp build_relationships(user, task) do
     %{
       user: %{data: %{id: user.id}},
-      post: %{data: %{id: post.id}}
+      task: %{data: %{id: task.id}}
     }
   end
 
   describe "index" do
-    test "lists all entries for specified post on index", %{conn: conn} do
-      post = insert(:post)
-      path = conn |> post_comment_path(:index, post)
+    test "lists all entries for specified task on index", %{conn: conn} do
+      task = insert(:task)
+      path = conn |> task_comment_path(:index, task)
       conn = conn |> get(path)
       assert json_response(conn, 200)["data"] == []
     end
@@ -45,7 +45,7 @@ defmodule CodeCorps.CommentControllerTest do
       assert data["attributes"]["body"] == comment.body
       assert data["attributes"]["markdown"] == comment.markdown
       assert data["relationships"]["user"]["data"]["id"] == "#{comment.user_id}"
-      assert data["relationships"]["post"]["data"]["id"] == "#{comment.post_id}"
+      assert data["relationships"]["task"]["data"]["id"] == "#{comment.task_id}"
     end
 
     test "does not show resource and instead throw error when id is nonexistent", %{conn: conn} do
@@ -59,12 +59,12 @@ defmodule CodeCorps.CommentControllerTest do
     @tag :authenticated
     test "creates and renders resource when data is valid", %{conn: conn} do
       user = insert(:user)
-      post = insert(:post, user: user)
+      task = insert(:task, user: user)
 
       payload =
         build_payload
         |> put_attributes(@valid_attrs)
-        |> put_relationships(user, post)
+        |> put_relationships(user, task)
 
       path = conn |> comment_path(:create)
       conn = conn |> post(path, payload)
@@ -85,12 +85,12 @@ defmodule CodeCorps.CommentControllerTest do
 
     test "does not create resource and renders 401 when not authenticated", %{conn: conn} do
       user = insert(:user)
-      post = insert(:post, user: user)
+      task = insert(:task, user: user)
 
       payload =
         build_payload
         |> put_attributes(@valid_attrs)
-        |> put_relationships(user, post)
+        |> put_relationships(user, task)
 
       path = conn |> comment_path(:create)
       conn = conn |> post(path, payload)

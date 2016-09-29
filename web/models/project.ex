@@ -23,7 +23,7 @@ defmodule CodeCorps.Project do
 
     belongs_to :organization, CodeCorps.Organization
 
-    has_many :posts, CodeCorps.Post
+    has_many :tasks, CodeCorps.Task
 
     has_many :project_categories, CodeCorps.ProjectCategory
     has_many :categories, through: [:project_categories, :category]

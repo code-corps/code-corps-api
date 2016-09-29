@@ -53,12 +53,12 @@ defmodule CodeCorps.Router do
 
     resources "/organization-memberships", OrganizationMembershipController, only: [:index, :show]
 
-    resources "/posts", PostController, only: [:index, :show] do
+    resources "/tasks", TaskController, only: [:index, :show] do
       resources "/comments", CommentController, only: [:index, :show]
     end
 
     resources "/projects", ProjectController, only: [:index, :show] do
-      resources "/posts", PostController, only: [:index, :show]
+      resources "/tasks", TaskController, only: [:index, :show]
     end
 
     resources "/project-categories", ProjectCategoryController, only: [:index, :show]
@@ -86,7 +86,7 @@ defmodule CodeCorps.Router do
     resources "/comments", CommentController, only: [:create, :update]
     resources "/organizations", OrganizationController, only: [:create, :update]
     resources "/organization-memberships", OrganizationMembershipController, only: [:create, :update, :delete]
-    resources "/posts", PostController, only: [:create, :update]
+    resources "/tasks", TaskController, only: [:create, :update]
     resources "/previews", PreviewController, only: [:create]
     resources "/projects", ProjectController, only: [:create, :update]
     resources "/project-categories", ProjectCategoryController, only: [:create, :delete]

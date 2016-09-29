@@ -1,21 +1,21 @@
 defmodule CodeCorps.MarkdownRendererTest do
   use ExUnit.Case, async: true
 
-  alias CodeCorps.Post
+  alias CodeCorps.Task
 
   import CodeCorps.MarkdownRenderer
 
   @valid_attrs %{
-    title: "Test post",
-    post_type: "issue",
+    title: "Test task",
+    task_type: "issue",
     markdown: "A **strong** body",
     status: "open"
   }
 
   test "renders markdown to html" do
     changeset =
-      %Post{}
-      |> Post.changeset(@valid_attrs)
+      %Task{}
+      |> Task.changeset(@valid_attrs)
       |> render_markdown_to_html(:markdown, :body)
 
     assert changeset |> Ecto.Changeset.get_change(:body) == "<p>A <strong>strong</strong> body</p>\n"
@@ -23,8 +23,8 @@ defmodule CodeCorps.MarkdownRendererTest do
 
   test "returns changeset when changeset is invalid" do
     changeset =
-      %Post{}
-      |> Post.changeset
+      %Task{}
+      |> Task.changeset
       |> Ecto.Changeset.put_change(:markdown, "")
       |> render_markdown_to_html(:markdown, :body)
 

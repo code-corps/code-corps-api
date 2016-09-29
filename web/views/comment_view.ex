@@ -7,7 +7,7 @@ defmodule CodeCorps.CommentView do
   has_one :user,
     field: :user_id,
     type: "user"
-  has_one :post,
-    field: :post_id,
-    type: "post"
+  has_one :task,
+    field: :task_id,
+    type: "task"
 end

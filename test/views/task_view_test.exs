@@ -1,4 +1,4 @@
-defmodule CodeCorps.PostViewTest do
+defmodule CodeCorps.TaskViewTest do
   use CodeCorps.ConnCase, async: true
 
   alias CodeCorps.Repo
@@ -6,30 +6,30 @@ defmodule CodeCorps.PostViewTest do
   import Phoenix.View, only: [render: 3]
 
   test "renders all attributes and relationships properly" do
-    post = insert(:post)
-    comment = insert(:comment, post: post)
+    task = insert(:task)
+    comment = insert(:comment, task: task)
 
-    post =
-      CodeCorps.Post
-      |> Repo.get(post.id)
+    task =
+      CodeCorps.Task
+      |> Repo.get(task.id)
       |> CodeCorps.Repo.preload([:comments, :project, :user])
 
-    rendered_json =  render(CodeCorps.PostView, "show.json-api", data: post)
+    rendered_json =  render(CodeCorps.TaskView, "show.json-api", data: task)
 
     expected_json = %{
       data: %{
         attributes: %{
-          "body" => post.body,
-          "inserted-at" => post.inserted_at,
-          "markdown" => post.markdown,
-          "number" => post.number,
-          "post-type" => post.post_type,
-          "status" => post.status,
-          "state" => post.state,
-          "title" => post.title,
-          "updated-at" => post.updated_at,
+          "body" => task.body,
+          "inserted-at" => task.inserted_at,
+          "markdown" => task.markdown,
+          "number" => task.number,
+          "task-type" => task.task_type,
+          "status" => task.status,
+          "state" => task.state,
+          "title" => task.title,
+          "updated-at" => task.updated_at,
         },
-        id: post.id |> Integer.to_string,
+        id: task.id |> Integer.to_string,
         relationships: %{
           "comments" => %{
             data: [
@@ -41,18 +41,18 @@ defmodule CodeCorps.PostViewTest do
           },
           "project" => %{
             data: %{
-              id: post.project_id |> Integer.to_string,
+              id: task.project_id |> Integer.to_string,
               type: "project"
             }
           },
           "user" => %{
             data: %{
-              id: post.user_id |> Integer.to_string,
+              id: task.user_id |> Integer.to_string,
               type: "user"
             }
           }
         },
-        type: "post",
+        type: "task",
       },
       jsonapi: %{
         version: "1.0"
