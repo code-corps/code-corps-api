@@ -24,12 +24,7 @@ config :code_corps, CodeCorps.Repo,
   ssl: true
 
 # CORS allowed origins
-config :code_corps, allowed_origins: [
-  "http://pbqrpbecf-qri.org",
-  "http://www.pbqrpbecf-qri.org",
-  "https://pbqrpbecf-qri.org",
-  "https://www.pbqrpbecf-qri.org"
-]
+config :code_corps, allowed_origins: "*"
 
 config :guardian, Guardian,
   secret_key: System.get_env("GUARDIAN_SECRET_KEY")
