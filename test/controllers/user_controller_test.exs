@@ -22,9 +22,7 @@ defmodule CodeCorps.UserControllerTest do
     twitter: " @ testuser"
   }
 
-  defp relationships do
-    %{}
-  end
+  defp relationships, do: %{}
 
   describe "index" do
 
@@ -34,8 +32,7 @@ defmodule CodeCorps.UserControllerTest do
     end
 
     test "filters resources on index", %{conn: conn} do
-      user_1 = insert(:user, username: "user_1", email: "user_1@mail.com")
-      user_2 = insert(:user, username: "user_2", email: "user_2@mail.com")
+      [user_1, user_2] = insert_pair(:user)
       insert(:user, username: "user_3", email: "user_3@mail.com")
       conn = get conn, "users/?filter[id]=#{user_1.id},#{user_2.id}"
       data = json_response(conn, 200)["data"]
@@ -233,7 +230,7 @@ defmodule CodeCorps.UserControllerTest do
       %{"data" => %{"id" => id}} = json_response(conn, 200)
       user = Repo.get(User, id)
       assert user.state == "edited_profile"
-      
+
       # Transition was successful, so we should unset it
       assert user.state_transition == nil
     end

@@ -25,6 +25,7 @@ defmodule CodeCorps.ApiCase do
       import CodeCorps.AuthenticationTestHelpers
       import CodeCorps.Router.Helpers
       import CodeCorps.Factories
+      import CodeCorps.TestHelpers
 
       # The default endpoint for testing
       @endpoint CodeCorps.Endpoint
