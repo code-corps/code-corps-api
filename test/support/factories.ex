@@ -14,7 +14,7 @@ defmodule CodeCorps.Factories do
     %CodeCorps.Comment{
       body: "I love elixir!",
       markdown: "I love elixir!",
-      post: build(:post),
+      task: build(:task),
       user: build(:user)
     }
   end
@@ -34,11 +34,11 @@ defmodule CodeCorps.Factories do
     }
   end
 
-  def post_factory do
-    %CodeCorps.Post{
-      title: "Test post",
-      post_type: "issue",
-      markdown: "A test post",
+  def task_factory do
+    %CodeCorps.Task{
+      title: "Test task",
+      task_type: "issue",
+      markdown: "A test task",
       status: "open",
       state: "published",
       project: build(:project),

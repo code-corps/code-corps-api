@@ -148,11 +148,11 @@ Exchange email and password for `token`.
 
     + Attributes (Comments Response)
 
-## List comments for a specified post [GET /posts/{number}/comments]
+## List comments for a specified task [GET /tasks/{number}/comments]
 
 + Parameters
 
-    + number: 1 (number, required) - Post number, uniquely identifying a post
+    + number: 1 (number, required) - Task number, uniquely identifying a task
 
 + Request
 
@@ -436,11 +436,11 @@ Write privileges are for admin users only, read can be accessable by any user.
 
     + Attributes (Unprocessable Entity Response)
 
-# Group Posts
+# Group Tasks
 
-## Posts [/posts]
+## Tasks [/tasks]
 
-### Create a post [POST]
+### Create a task [POST]
 
 + Request
 
@@ -451,13 +451,13 @@ Write privileges are for admin users only, read can be accessable by any user.
 
 + Response 201 (application/json)
 
-    + Attributes (Post Response)
+    + Attributes (Task Response)
 
 + Response 422 (application/json)
 
     + Attributes (Unprocessable Entity Response)
 
-### List all posts [GET]
+### List all tasks [GET]
 
 + Request
 
@@ -468,15 +468,15 @@ Write privileges are for admin users only, read can be accessable by any user.
 
 + Response 200 (application/json)
 
-    + Attributes (Posts Response)
+    + Attributes (Tasks Response)
 
-## Post [/posts/{id}]
+## Task [/tasks/{id}]
 
-### Retrieve a post [GET /posts/{id}]
+### Retrieve a task [GET /tasks/{id}]
 
 + Parameters
 
-    + id (number) - Id of a post.
+    + id (number) - Id of a task.
 
 + Request
 
@@ -487,17 +487,17 @@ Write privileges are for admin users only, read can be accessable by any user.
 
 + Response 200 (application/json)
 
-    + Attributes (Post Response)
+    + Attributes (Task Response)
 
 + Response 404 (application/json)
 
     + Attributes (Record Not Found Response)
 
-### Update a post [PATCH /posts/{id}]
+### Update a task [PATCH /tasks/{id}]
 
 + Parameters
 
-    + id (number) - Id of a post.
+    + id (number) - Id of a task.
 
 + Request
 
@@ -508,7 +508,7 @@ Write privileges are for admin users only, read can be accessable by any user.
 
 + Response 201 (application/json)
 
-    + Attributes (Post Response)
+    + Attributes (Task Response)
 
 + Response 204 (application/json)
 
@@ -1358,8 +1358,8 @@ This resource identifies a relationship between a User and a Skill. For example,
 + include Comment Resource Identifier
 + attributes(Comment Attributes)
 + relationships
-    + posts
-        + data(Post Resource Identifier)
+    + tasks
+        + data(Task Resource Identifier)
         + links (object)
     + users
         + data(User Resource Identifier)
@@ -1387,8 +1387,8 @@ This resource identifies a relationship between a User and a Skill. For example,
 + attributes
     + markdown: `Markdown formatted string` (string)
 + relationships
-    + posts
-        + data(Post Resource Identifier)
+    + tasks
+        + data(Task Resource Identifier)
 
 ## Comment Update Request (object)
 + include Comment Resource Identifier
@@ -1581,21 +1581,21 @@ This resource identifies a relationship between a User and a Skill. For example,
 + include Organization Membership Resource Identifier
 + attributes(Organization Membership Attributes)
 
-## Post Resource Identifier
+## Task Resource Identifier
 + id: `1` (string)
-+ type: `post` (string)
++ type: `task` (string)
 
-## Post Response (object)
+## Task Response (object)
 + id: 1 (string)
 + status: `open` (string)
-+ post_type: `task` (string)
-+ title: `This is the title of a post` (string)
-+ body: `This is the body of of a post filled with lots of awesome details` (string)
++ task_type: `task` (string)
++ title: `This is the title of a task` (string)
++ body: `This is the body of of a task filled with lots of awesome details` (string)
 + user_id: 1 (string)
 
-## Posts Response (object)
-+ posts
-    + data(array[Post Response], required)
+## Tasks Response (object)
++ tasks
+    + data(array[Task Response], required)
 
 ## Preview (object)
 + body: `<p>A <strong>strong</strong> preview</p>` (string)

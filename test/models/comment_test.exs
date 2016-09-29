@@ -19,7 +19,7 @@ defmodule CodeCorps.CommentTest do
   test "create changeset with valid attributes" do
     attrs =
       @valid_attrs
-      |> Map.put(:post_id, 1)
+      |> Map.put(:task_id, 1)
       |> Map.put(:user_id, 1)
     changeset = Comment.create_changeset(%Comment{}, attrs)
     assert changeset.valid?

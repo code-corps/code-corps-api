@@ -3,7 +3,7 @@ defmodule Canary.Abilities do
   alias CodeCorps.Comment
   alias CodeCorps.Organization
   alias CodeCorps.OrganizationMembership
-  alias CodeCorps.Post
+  alias CodeCorps.Task
   alias CodeCorps.Preview
   alias CodeCorps.Project
   alias CodeCorps.ProjectCategory
@@ -20,7 +20,7 @@ defmodule Canary.Abilities do
   alias CodeCorps.CommentPolicy
   alias CodeCorps.OrganizationPolicy
   alias CodeCorps.OrganizationMembershipPolicy
-  alias CodeCorps.PostPolicy
+  alias CodeCorps.TaskPolicy
   alias CodeCorps.PreviewPolicy
   alias CodeCorps.ProjectPolicy
   alias CodeCorps.ProjectCategoryPolicy
@@ -58,8 +58,8 @@ defmodule Canary.Abilities do
     def can?(%User{} = user, :update, %OrganizationMembership{} = membership), do: OrganizationMembershipPolicy.update?(user, membership)
     def can?(%User{} = user, :delete, %OrganizationMembership{} = membership), do: OrganizationMembershipPolicy.delete?(user, membership)
 
-    def can?(%User{} = user, :create, Post), do: PostPolicy.create?(user)
-    def can?(%User{} = user, :update, %Post{} = post), do: PostPolicy.update?(user, post)
+    def can?(%User{} = user, :create, Task), do: TaskPolicy.create?(user)
+    def can?(%User{} = user, :update, %Task{} = task), do: TaskPolicy.update?(user, task)
 
     def can?(%User{} = user, :create, Preview), do: PreviewPolicy.create?(user)
 

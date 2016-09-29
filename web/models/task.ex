@@ -1,15 +1,15 @@
-defmodule CodeCorps.Post do
+defmodule CodeCorps.Task do
   use CodeCorps.Web, :model
 
   alias CodeCorps.MarkdownRenderer
 
   import CodeCorps.ModelHelpers
 
-  schema "posts" do
+  schema "tasks" do
     field :body, :string
     field :markdown, :string
     field :number, :integer
-    field :post_type, :string
+    field :task_type, :string
     field :state, :string
     field :status, :string, default: "open"
     field :title, :string
@@ -23,9 +23,9 @@ defmodule CodeCorps.Post do
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:title, :markdown, :post_type])
-    |> validate_required([:title, :markdown, :post_type])
-    |> validate_inclusion(:post_type, post_types)
+    |> cast(params, [:title, :markdown, :task_type])
+    |> validate_required([:title, :markdown, :task_type])
+    |> validate_inclusion(:task_type, task_types)
     |> MarkdownRenderer.render_markdown_to_html(:markdown, :body)
   end
 
@@ -49,7 +49,7 @@ defmodule CodeCorps.Post do
 
   end
 
-  defp post_types do
+  defp task_types do
     ~w{ idea issue task }
   end
 
@@ -63,15 +63,15 @@ defmodule CodeCorps.Post do
     |> newest_first_filter
   end
 
-  def post_type_filters(query, params) do
-    query |> post_type_filter(params)
+  def task_type_filters(query, params) do
+    query |> task_type_filter(params)
   end
 
-  def post_status_filters(query, params) do
-    query |> post_status_filter(params)
+  def task_status_filters(query, params) do
+    query |> task_status_filter(params)
   end
 
-  def show_project_post_filters(query, params) do
+  def show_project_task_filters(query, params) do
     query
     |> number_as_id_filter(params)
     |> project_filter(params)
