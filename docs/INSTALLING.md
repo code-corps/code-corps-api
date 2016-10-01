@@ -21,7 +21,7 @@ code-corps-api/          # → Root folder for this project
 ├── config/
 ├── ...                  # → More standard Phoenix files
 ├── docker-compose.yml   # → Compose file for configuring Docker containers
-└── Dockerfile           # → Creates base Ruby Docker container
+└── Dockerfile           # → Creates base Elixir Docker container
 ```
 
 ### Setup your Docker containers and run the server
