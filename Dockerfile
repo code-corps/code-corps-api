@@ -1,4 +1,4 @@
-FROM elixir:1.3.2
+FROM elixir:1.3.3
 
 RUN apt-get update -qq && apt-get install -y build-essential
 
