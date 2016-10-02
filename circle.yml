@@ -13,7 +13,9 @@ dependencies:
     - mix compile
 test:
   override:
-    - mix test --include requires_env --cover
+    - |
+      if [ ${CIRCLE_PR_USERNAME} ]; then MIX_ENV=test mix test --cover; else MIX_ENV=test mix test --include requires_env --cover; fi
+
   post:
     - mix inch.report
 
