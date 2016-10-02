@@ -30,12 +30,13 @@ defmodule CodeCorps.Validators.SlugValidator do
       integration integrations invite invitations ios issue issues jobs learn
       likes lists log-in log-out login logout mention mentions new news
       notification notifications oauth oauth_clients organization organizations
-      ping popular task-image task-images task-like task-likes task
+      ping popular
       press pricing privacy
       project projects repositories role roles rules search security session
       sessions settings shop showcases sidekiq sign-in sign-out signin signout
       signup sitemap slug slugs spotlight stars status tag tags
-      tasks team teams terms training trends trust tour twitter
+      task-image task-images task-like task-likes task
+      tasks team teams terms token tokens training trends trust tour twitter
       user-role user-roles user-skill user-skills user users watching year
     )
 
