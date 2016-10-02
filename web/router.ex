@@ -42,7 +42,8 @@ defmodule CodeCorps.Router do
   scope "/", CodeCorps, host: "api." do
     pipe_through [:api, :bearer_auth, :current_user, :analytics_identify]
 
-    post "/login", AuthController, :create
+    post "/token", TokenController, :create
+    post "/token/refresh", TokenController, :refresh
 
     resources "/categories", CategoryController, only: [:index, :show]
     resources "/comments", CommentController, only: [:show]
@@ -79,8 +80,6 @@ defmodule CodeCorps.Router do
 
   scope "/", CodeCorps, host: "api." do
     pipe_through [:api, :bearer_auth, :ensure_auth, :current_user, :analytics_identify]
-
-    delete "/logout", AuthController, :delete
 
     resources "/categories", CategoryController, only: [:create, :update]
     resources "/comments", CommentController, only: [:create, :update]

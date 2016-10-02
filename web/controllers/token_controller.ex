@@ -1,8 +1,9 @@
-defmodule CodeCorps.AuthController do
+defmodule CodeCorps.TokenController do
   @analytics Application.get_env(:code_corps, :analytics)
 
   use CodeCorps.Web, :controller
   import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
+  alias CodeCorps.GuardianSerializer
   alias CodeCorps.Repo
   alias CodeCorps.User
 
@@ -17,23 +18,27 @@ defmodule CodeCorps.AuthController do
         |> put_status(:created)
         |> render("show.json", token: token, user_id: user.id)
 
-      {:error, error_message} ->
-        conn
-        |> put_status(:unauthorized)
-        |> render("error.json", message: error_message)
+      {:error, reason} -> handle_unauthorized(conn, reason)
     end
   end
 
-  def delete(conn, _params) do
-    {:ok, claims} = Guardian.Plug.claims(conn)
+  def refresh(conn, %{"token" => current_token}) do
+    with {:ok, claims} <- Guardian.decode_and_verify(current_token),
+         {:ok, new_token, new_claims} <- Guardian.refresh!(current_token, claims, %{ttl: {30, :days}}),
+         {:ok, user} <- GuardianSerializer.from_token(new_claims["sub"]) do
+            conn
+            |> Plug.Conn.assign(:current_user, user)
+            |> put_status(:created)
+            |> render("show.json", token: new_token, user_id: user.id)
+    else
+      { :error, reason } -> handle_unauthorized(conn, reason)
+    end
+  end
 
+  defp handle_unauthorized(conn, reason) do
     conn
-    |> Guardian.Plug.current_token
-    |> Guardian.revoke!(claims)
-    |> @analytics.track(:signed_out)
-
-    conn
-    |> render("delete.json")
+    |> put_status(:unauthorized)
+    |> render("error.json", message: reason)
   end
 
   defp login_by_email_and_pass(%{"username" => email, "password" => password}) do

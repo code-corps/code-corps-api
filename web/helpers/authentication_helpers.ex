@@ -5,7 +5,7 @@ defmodule CodeCorps.AuthenticationHelpers do
   def handle_unauthorized(conn) do
     conn
     |> put_status(401)
-    |> render(CodeCorps.AuthView, "error.json", message: "Not authorized")
+    |> render(CodeCorps.TokenView, "error.json", message: "Not authorized")
     |> halt
   end
 
