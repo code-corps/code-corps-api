@@ -13,8 +13,7 @@ use Mix.Config
 # which you typically run after static files are built.
 config :code_corps, CodeCorps.Endpoint,
   http: [port: {:system, "PORT"}],
-  url: [scheme: "https", host: "api.codecorps.org", port: 443],
-  force_ssl: [rewrite_on: [:x_forwarded_proto]],
+  url: [scheme: "http", host: "api.pbqrpbecf-qri.org", port: 80],
   secret_key_base: System.get_env("SECRET_KEY_BASE")
 
 # Configure your database
@@ -25,21 +24,13 @@ config :code_corps, CodeCorps.Repo,
   ssl: true
 
 # CORS allowed origins
-config :code_corps, allowed_origins: [
-  "http://codecorps.org",
-  "http://www.codecorps.org",
-  "https://codecorps.org",
-  "https://www.codecorps.org"
-]
+config :code_corps, allowed_origins: "*"
 
 config :guardian, Guardian,
   secret_key: System.get_env("GUARDIAN_SECRET_KEY")
 
 # Do not print debug messages in production
 config :logger, level: :info
-
-config :sentry,
-  environment_name: Mix.env || :prod
 
 # ## SSL Support
 #

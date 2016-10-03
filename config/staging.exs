@@ -37,6 +37,9 @@ config :guardian, Guardian,
 # Do not print debug messages in production
 config :logger, level: :info
 
+config :sentry,
+  environment_name: Mix.env || :staging
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key

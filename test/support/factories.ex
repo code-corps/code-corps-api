@@ -128,4 +128,12 @@ defmodule CodeCorps.Factories do
       skill: build(:skill)
     }
   end
+
+  def preview_factory do
+    %CodeCorps.Preview{
+      body: "Bar",
+      markdown: "Bar",
+      user: build(:user)
+    }
+  end
 end
