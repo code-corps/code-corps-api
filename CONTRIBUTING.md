@@ -14,7 +14,7 @@ Thanks for thinking about helping! How would you like to help?
 
 2. Read and work through [the installation guide](docs/INSTALLING.md).
 
-3. Run the tests. We only take pull requests with passing tests, and it's great to know that you have a clean slate: `docker-compose run mix test`
+3. Run the tests. We only take pull requests with passing tests, and it's great to know that you have a clean slate: `docker-compose run test mix test`
 
 Okay, you're ready to go!
 
