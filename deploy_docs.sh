@@ -23,11 +23,17 @@ echo "Generating docs..."
 mix docs
 
 # Push to GitHub
-echo "Pushing to GitHub..."
+echo "Checking GitHub..."
 cd doc
 git add .
-git commit -m "Update docs"
-git push -u origin gh-pages:gh-pages --force
+if git diff-index --quiet HEAD;
+then
+  echo "Nothing to update."
+else
+  echo "Pushing to GitHub..."
+  git commit -m "Update docs"
+  git push -u origin gh-pages:gh-pages --force
+fi
 
 # Exit successfully
 exit 0
