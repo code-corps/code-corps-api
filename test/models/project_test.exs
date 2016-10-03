@@ -49,8 +49,8 @@ defmodule CodeCorps.ProjectTest do
     end
 
     test "validates slug is unique" do
-      insert(:project, slug: "used-slug")
-      changeset = Project.changeset(%Project{}, %{title: "Used Slug"})
+      project = insert(:project, slug: "used-slug")
+      changeset = Project.changeset(%Project{organization_id: project.organization_id}, %{title: "Used Slug"})
 
       {result, changeset} = Repo.insert(changeset)
       {message, _} = changeset.errors[:slug]

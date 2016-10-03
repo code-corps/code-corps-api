@@ -22,6 +22,7 @@ defmodule CodeCorps.Factories do
   def organization_factory do
     %CodeCorps.Organization{
       name: sequence(:username, &"Organization #{&1}"),
+      slug: sequence(:slug, &"organization-#{&1}"),
       description: sequence(:email, &"Description of organization #{&1}"),
     }
   end
