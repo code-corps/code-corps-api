@@ -41,7 +41,8 @@ end
 
 organizations = [
   %{
-    name: "Code Corps"
+    name: "Code Corps",
+    description: "Help build and fund public software projects for social good"
   },
 ]
 
