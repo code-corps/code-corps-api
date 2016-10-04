@@ -1,6 +1,5 @@
 defmodule CodeCorps.UserRole do
   use CodeCorps.Web, :model
-
   import CodeCorps.ModelHelpers
 
   schema "user_roles" do

@@ -1,8 +1,6 @@
 defmodule CodeCorps.ProjectSkillController do
   use CodeCorps.Web, :controller
-
   import CodeCorps.ControllerHelpers
-
   alias CodeCorps.ProjectSkill
   alias JaSerializer.Params
 
@@ -59,5 +57,4 @@ defmodule CodeCorps.ProjectSkillController do
 
     send_resp(conn, :no_content, "")
   end
-
 end

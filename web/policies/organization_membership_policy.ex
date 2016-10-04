@@ -1,11 +1,9 @@
 defmodule CodeCorps.OrganizationMembershipPolicy do
+  import Ecto.Query
   alias CodeCorps.User
   alias CodeCorps.Organization
   alias CodeCorps.OrganizationMembership
-
   alias CodeCorps.Repo
-
-  import Ecto.Query
 
   # TODO: Make it so validation handles the fact that membership role needs to be "pending" on create
   def create?(%User{} = _user), do: true
@@ -28,12 +26,11 @@ defmodule CodeCorps.OrganizationMembershipPolicy do
 
   # user can always leave the organization on their own
   def delete?(%User{} = user, %OrganizationMembership{} = current_membership) do
-    user_membership = cond do
-      user.id == current_membership.member_id ->
-        current_membership
-      true ->
-        organization = current_membership |> fetch_organization
-        user |> fetch_membership(organization)
+    user_membership = if user.id == current_membership.member_id do
+      current_membership
+    else
+      organization = current_membership |> fetch_organization
+      user |> fetch_membership(organization)
     end
 
     permitted? = case user_membership do

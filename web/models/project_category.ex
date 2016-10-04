@@ -1,6 +1,6 @@
 defmodule CodeCorps.ProjectCategory do
   @moduledoc """
-  Represents a category of a project.
+  Represents a category of a project.
   """
 
   use CodeCorps.Web, :model

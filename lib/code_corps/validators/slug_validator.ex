@@ -1,6 +1,6 @@
 defmodule CodeCorps.Validators.SlugValidator do
   @moduledoc """
-  Used for validating slug fields in a given changeset.
+  Used for validating slug fields in a given changeset.
   """
 
   alias Ecto.Changeset

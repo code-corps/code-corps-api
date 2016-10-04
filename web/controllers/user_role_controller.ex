@@ -1,12 +1,10 @@
 defmodule CodeCorps.UserRoleController do
-  @analytics Application.get_env(:code_corps, :analytics)
-
   use CodeCorps.Web, :controller
-
   import CodeCorps.AuthenticationHelpers, only: [authorize: 2, authorized?: 1]
-
   alias CodeCorps.UserRole
   alias JaSerializer.Params
+
+  @analytics Application.get_env(:code_corps, :analytics)
 
   plug :load_and_authorize_resource, model: UserRole, only: [:delete]
 

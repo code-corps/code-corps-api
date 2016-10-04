@@ -1,6 +1,5 @@
 defmodule CodeCorps.Skill do
   use CodeCorps.Web, :model
-
   import CodeCorps.ModelHelpers
 
   schema "skills" do

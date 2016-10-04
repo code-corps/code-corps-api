@@ -1,13 +1,11 @@
 defmodule CodeCorps.CommentController do
-  @analytics Application.get_env(:code_corps, :analytics)
-
   use CodeCorps.Web, :controller
-
   alias CodeCorps.Comment
   alias JaSerializer.Params
 
-  plug :load_and_authorize_resource, model: Comment, only: [:create, :update]
+  @analytics Application.get_env(:code_corps, :analytics)
 
+  plug :load_and_authorize_resource, model: Comment, only: [:create, :update]
   plug :scrub_params, "data" when action in [:create, :update]
 
   def index(conn, params = %{"task_id" => _}) do

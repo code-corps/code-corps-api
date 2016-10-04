@@ -1,10 +1,9 @@
 defmodule CodeCorps.Preview do
-    @moduledoc """
-    Represents an category on Code Corps, e.g. "Society" and "Technology".
-    """
+  @moduledoc """
+  Represents an category on Code Corps, e.g. "Society" and "Technology".
+  """
 
   use CodeCorps.Web, :model
-
   alias CodeCorps.MarkdownRenderer
 
   schema "previews" do

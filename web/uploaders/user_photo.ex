@@ -1,13 +1,10 @@
 defmodule CodeCorps.UserPhoto do
   use Arc.Definition
-
   # Include ecto support (requires package arc_ecto installed):
   use Arc.Ecto.Definition
 
   @versions [:original, :large, :thumb]
-
   @acl :public_read
-
   @icon_color_generator Application.get_env(:code_corps, :icon_color_generator)
 
   # Whitelist file extensions:
