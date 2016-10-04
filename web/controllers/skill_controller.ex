@@ -1,6 +1,5 @@
 defmodule CodeCorps.SkillController do
   use CodeCorps.Web, :controller
-
   alias CodeCorps.Skill
   alias JaSerializer.Params
 

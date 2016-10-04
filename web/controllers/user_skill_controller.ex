@@ -1,12 +1,10 @@
 defmodule CodeCorps.UserSkillController do
-  @analytics Application.get_env(:code_corps, :analytics)
-
   use CodeCorps.Web, :controller
-
   import CodeCorps.AuthenticationHelpers, only: [authorize: 2, authorized?: 1]
-
   alias CodeCorps.UserSkill
   alias JaSerializer.Params
+
+  @analytics Application.get_env(:code_corps, :analytics)
 
   plug :load_and_authorize_resource, model: UserSkill, only: [:delete]
   plug :scrub_params, "data" when action in [:create]

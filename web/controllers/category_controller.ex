@@ -1,6 +1,5 @@
 defmodule CodeCorps.CategoryController do
   use CodeCorps.Web, :controller
-
   alias CodeCorps.Category
   alias JaSerializer.Params
 

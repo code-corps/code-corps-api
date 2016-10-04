@@ -1,6 +1,5 @@
 defmodule CodeCorps.PreviewController do
   use CodeCorps.Web, :controller
-
   alias CodeCorps.Preview
   alias JaSerializer.Params
 

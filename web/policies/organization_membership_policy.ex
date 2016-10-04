@@ -1,11 +1,9 @@
 defmodule CodeCorps.OrganizationMembershipPolicy do
+  import Ecto.Query
   alias CodeCorps.User
   alias CodeCorps.Organization
   alias CodeCorps.OrganizationMembership
-
   alias CodeCorps.Repo
-
-  import Ecto.Query
 
   # TODO: Make it so validation handles the fact that membership role needs to be "pending" on create
   def create?(%User{} = _user), do: true

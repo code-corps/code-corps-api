@@ -1,11 +1,11 @@
 defmodule CodeCorps.TokenController do
-  @analytics Application.get_env(:code_corps, :analytics)
-
   use CodeCorps.Web, :controller
   import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
   alias CodeCorps.GuardianSerializer
   alias CodeCorps.Repo
   alias CodeCorps.User
+
+  @analytics Application.get_env(:code_corps, :analytics)
 
   def create(conn, params = %{"username" => _, "password" => _}) do
     case login_by_email_and_pass(params) do

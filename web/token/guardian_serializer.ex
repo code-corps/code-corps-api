@@ -1,8 +1,8 @@
 defmodule CodeCorps.GuardianSerializer do
-  @behaviour Guardian.Serializer
-
   alias CodeCorps.Repo
   alias CodeCorps.User
+
+  @behaviour Guardian.Serializer
 
   def for_token(user = %User{}), do: { :ok, "User:#{user.id}" }
   def for_token(_), do: { :error, "Unknown resource type" }

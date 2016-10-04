@@ -1,6 +1,5 @@
 defmodule CodeCorps.ModelHelpers do
   use CodeCorps.Web, :model
-
   import CodeCorps.ControllerHelpers
 
   def generate_slug(changeset, value_key, slug_key) do

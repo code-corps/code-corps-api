@@ -1,10 +1,9 @@
 defmodule CodeCorps.OrganizationMembershipController do
-  @analytics Application.get_env(:code_corps, :analytics)
-
   use CodeCorps.Web, :controller
-
   alias JaSerializer.Params
   alias CodeCorps.OrganizationMembership
+
+  @analytics Application.get_env(:code_corps, :analytics)
 
   plug :load_and_authorize_resource, model: OrganizationMembership, only: [:create, :update, :delete]
   plug :scrub_params, "data" when action in [:create, :update]

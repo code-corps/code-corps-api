@@ -1,11 +1,9 @@
 defmodule CodeCorps.ProjectPolicy do
+  import Ecto.Query
   alias CodeCorps.OrganizationMembership
   alias CodeCorps.Project
   alias CodeCorps.User
-
   alias CodeCorps.Repo
-
-  import Ecto.Query
 
   # TODO: ProjectPolicy needs testing for the case of user being at least admin
   # in project organization

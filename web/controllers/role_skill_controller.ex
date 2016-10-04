@@ -1,6 +1,5 @@
 defmodule CodeCorps.RoleSkillController do
   use CodeCorps.Web, :controller
-
   alias CodeCorps.RoleSkill
   alias JaSerializer.Params
 
@@ -46,5 +45,4 @@ defmodule CodeCorps.RoleSkillController do
 
     send_resp(conn, :no_content, "")
   end
-
 end

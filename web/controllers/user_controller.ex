@@ -1,10 +1,9 @@
 defmodule CodeCorps.UserController do
-  @analytics Application.get_env(:code_corps, :analytics)
-
   use CodeCorps.Web, :controller
-
   alias CodeCorps.User
   alias JaSerializer.Params
+
+  @analytics Application.get_env(:code_corps, :analytics)
 
   plug :load_and_authorize_resource, model: User, only: [:update]
   plug :scrub_params, "data" when action in [:create, :update]

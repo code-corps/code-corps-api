@@ -1,16 +1,14 @@
 defmodule CodeCorps.Organization do
   @moduledoc """
-  Represents an organization on Code Corps, e.g. "Code Corps" itself.
+  Represents an organization on Code Corps, e.g. "Code Corps" itself.
   """
 
   use Arc.Ecto.Schema
   use CodeCorps.Web, :model
-
-  alias CodeCorps.SluggedRoute
-
   import CodeCorps.Base64ImageUploader
   import CodeCorps.ModelHelpers
   import CodeCorps.Validators.SlugValidator
+  alias CodeCorps.SluggedRoute
 
   schema "organizations" do
     field :base64_icon_data, :string, virtual: true
@@ -40,7 +38,7 @@ defmodule CodeCorps.Organization do
   end
 
   @doc """
-  Builds a changeset for creating an organization.
+  Builds a changeset for creating an organization.
   """
   def create_changeset(struct, params) do
     struct

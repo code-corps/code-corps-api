@@ -1,12 +1,10 @@
-defmodule CodeCorps.UserCategoryController do
-  @analytics Application.get_env(:code_corps, :analytics)
-  
+defmodule CodeCorps.UserCategoryController do  
   use CodeCorps.Web, :controller
-
   import CodeCorps.AuthenticationHelpers, only: [authorize: 2, authorized?: 1]
-
   alias CodeCorps.UserCategory
   alias JaSerializer.Params
+
+  @analytics Application.get_env(:code_corps, :analytics)
 
   plug :load_and_authorize_resource, model: UserCategory, only: [:delete]
   plug :scrub_params, "data" when action in [:create]
