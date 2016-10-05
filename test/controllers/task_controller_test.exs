@@ -252,9 +252,7 @@ defmodule CodeCorps.TaskControllerTest do
     test "specifying a page size works", %{conn: conn} do
       project_1 = insert(:project)
       user = insert(:user)
-      insert(:task, project: project_1, user: user)
-      insert(:task, project: project_1, user: user)
-      insert(:task, project: project_1, user: user)
+      insert_list(3, :task, project: project_1, user: user)
 
       path = conn |> task_path(:index)
       json =
@@ -268,8 +266,8 @@ defmodule CodeCorps.TaskControllerTest do
     test "specifying a page number works", %{conn: conn} do
       project_1 = insert(:project)
       user = insert(:user)
-      insert(:task, project: project_1, user: user)
-      insert(:task, project: project_1, user: user)
+
+      insert_list(2, :task, project: project_1, user: user)
       task_to_test = insert(:task, project: project_1, user: user)
       insert(:task, project: project_1, user: user)
 
@@ -287,12 +285,7 @@ defmodule CodeCorps.TaskControllerTest do
     test "paginated results include a valid meta key", %{conn: conn} do
       project_1 = insert(:project)
       user = insert(:user)
-      insert(:task, project: project_1, user: user)
-      insert(:task, project: project_1, user: user)
-      insert(:task, project: project_1, user: user)
-      insert(:task, project: project_1, user: user)
-      insert(:task, project: project_1, user: user)
-      insert(:task, project: project_1, user: user)
+      insert_list(6, :task, project: project_1, user: user)
 
       meta = %{
         "total_records" => 6,

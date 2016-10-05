@@ -125,7 +125,7 @@ defmodule CodeCorps.ProjectSkillControllerTest do
   describe "delete" do
     @tag authenticated: :admin
     test "deletes chosen resource", %{conn: conn} do
-      project_skill = Repo.insert! %ProjectSkill{}
+      project_skill = insert(:project_skill)
       path = conn |> project_skill_path(:delete, project_skill)
       assert conn |> delete(path) |> response(204)
       refute Repo.get(ProjectSkill, project_skill.id)
