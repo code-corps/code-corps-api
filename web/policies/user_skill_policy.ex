@@ -1,12 +1,13 @@
 defmodule CodeCorps.UserSkillPolicy do
   alias CodeCorps.UserSkill
   alias CodeCorps.User
+  alias Ecto.Changeset
 
-  def create?(%User{admin: true}, %Ecto.Changeset{}), do: true
-  def create?(%User{} = user, %Ecto.Changeset{} = changeset) do
-    user.id == changeset |> Ecto.Changeset.get_change(:user_id)
-  end
+  def create?(%User{admin: true}, %Changeset{}), do: true
+  def create?(%User{id: id}, %Changeset{changes: %{user_id: user_id}}), do: id == user_id
+  def create?(%User{}, %Changeset{}), do: false
 
   def delete?(%User{admin: true}, %UserSkill{}), do: true
-  def delete?(%User{} = user, %UserSkill{} = user_skill), do: user.id == user_skill.user_id
+  def delete?(%User{id: id}, %UserSkill{user_id: user_id}), do: id == user_id
+  def delete?(%User{}, %UserSkill{}), do: false
 end

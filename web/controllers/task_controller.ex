@@ -6,7 +6,8 @@ defmodule CodeCorps.TaskController do
   alias CodeCorps.Task
   alias JaSerializer.Params
 
-  plug :load_and_authorize_resource, model: Task, only: [:create, :update]
+  plug :load_and_authorize_changeset, model: Task, only: [:create]
+  plug :load_and_authorize_resource, model: Task, only: [:update]
   plug :scrub_params, "data" when action in [:create, :update]
 
   def index(conn, params) do

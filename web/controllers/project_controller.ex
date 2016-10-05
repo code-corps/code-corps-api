@@ -4,7 +4,8 @@ defmodule CodeCorps.ProjectController do
   alias CodeCorps.Project
   alias JaSerializer.Params
 
-  plug :load_and_authorize_resource, model: Project, only: [:create, :update]
+  plug :load_and_authorize_changeset, model: Project, only: [:create]
+  plug :load_and_authorize_resource, model: Project, only: [:update]
   plug :scrub_params, "data" when action in [:create, :update]
 
   def index(conn, %{"slug" => slug}) do
@@ -43,10 +44,8 @@ defmodule CodeCorps.ProjectController do
     render(conn, "show.json-api", data: project)
   end
 
-  def create(conn, %{"data" => data = %{"type" => "project", "attributes" => _project_params}}) do
-    changeset = Project.create_changeset(%Project{}, Params.to_attributes(data))
-
-    case Repo.insert(changeset) do
+  def create(conn, %{"data" => %{"type" => "project", "attributes" => _project_params}}) do
+    case Repo.insert(conn.assigns.changeset) do
       {:ok, project} ->
         conn
         |> put_status(:created)
@@ -59,11 +58,8 @@ defmodule CodeCorps.ProjectController do
     end
   end
 
-  def update(conn, %{"id" => id, "data" => data = %{"type" => "project", "attributes" => _project_params}}) do
-    changeset =
-      Project
-      |> Repo.get!(id)
-      |> Project.update_changeset(Params.to_attributes(data))
+  def update(conn, %{"id" => _id, "data" => data = %{"type" => "project", "attributes" => _project_params}}) do
+    changeset = conn.assigns.project |> Project.update_changeset(Params.to_attributes(data))
 
     case Repo.update(changeset) do
       {:ok, project} ->

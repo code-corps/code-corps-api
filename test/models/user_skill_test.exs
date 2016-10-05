@@ -7,14 +7,14 @@ defmodule CodeCorps.UserSkillTest do
     user_id = insert(:user).id
     skill_id = insert(:skill).id
 
-    changeset = UserSkill.changeset(%UserSkill{}, %{user_id: user_id, skill_id: skill_id})
+    changeset = UserSkill.create_changeset(%UserSkill{}, %{user_id: user_id, skill_id: skill_id})
     assert changeset.valid?
   end
 
   test "changeset requires user_id" do
     skill_id = insert(:skill).id
 
-    changeset = UserSkill.changeset(%UserSkill{}, %{skill_id: skill_id})
+    changeset = UserSkill.create_changeset(%UserSkill{}, %{skill_id: skill_id})
 
     refute changeset.valid?
     assert changeset.errors[:user_id] == {"can't be blank", []}
@@ -23,7 +23,7 @@ defmodule CodeCorps.UserSkillTest do
   test "changeset requires skill_id" do
     user_id = insert(:user).id
 
-    changeset = UserSkill.changeset(%UserSkill{}, %{user_id: user_id})
+    changeset = UserSkill.create_changeset(%UserSkill{}, %{user_id: user_id})
 
     refute changeset.valid?
     assert changeset.errors[:skill_id] == {"can't be blank", []}
@@ -34,7 +34,7 @@ defmodule CodeCorps.UserSkillTest do
     skill_id = insert(:skill).id
 
     { result, changeset } =
-      UserSkill.changeset(%UserSkill{}, %{user_id: user_id, skill_id: skill_id})
+      UserSkill.create_changeset(%UserSkill{}, %{user_id: user_id, skill_id: skill_id})
       |> Repo.insert
 
     assert result == :error
@@ -47,7 +47,7 @@ defmodule CodeCorps.UserSkillTest do
     skill_id = -1
 
     { result, changeset } =
-      UserSkill.changeset(%UserSkill{}, %{user_id: user_id, skill_id: skill_id})
+      UserSkill.create_changeset(%UserSkill{}, %{user_id: user_id, skill_id: skill_id})
       |> Repo.insert
 
     assert result == :error

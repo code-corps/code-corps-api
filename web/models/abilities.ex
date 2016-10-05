@@ -33,6 +33,8 @@ defmodule Canary.Abilities do
   alias CodeCorps.UserRolePolicy
   alias CodeCorps.UserSkillPolicy
 
+  alias Ecto.Changeset
+
   defimpl Canada.Can, for: User do
     # NOTE: Canary sets an :unauthorized and a :not_found handler on a config level
     # The problem is, it will still go through the authorization process first and only call the
@@ -54,23 +56,23 @@ defmodule Canary.Abilities do
     def can?(%User{} = user, :create, Organization), do: OrganizationPolicy.create?(user)
     def can?(%User{} = user, :update, %Organization{} = organization), do: OrganizationPolicy.update?(user, organization)
 
-    def can?(%User{} = user, :create, OrganizationMembership), do: OrganizationMembershipPolicy.create?(user)
-    def can?(%User{} = user, :update, %OrganizationMembership{} = membership), do: OrganizationMembershipPolicy.update?(user, membership)
+    def can?(%User{} = user, :create, %Changeset{data: %OrganizationMembership{}} = changeset), do: OrganizationMembershipPolicy.create?(user, changeset)
+    def can?(%User{} = user, :update, %Changeset{data: %OrganizationMembership{}} = changeset), do: OrganizationMembershipPolicy.update?(user, changeset)
     def can?(%User{} = user, :delete, %OrganizationMembership{} = membership), do: OrganizationMembershipPolicy.delete?(user, membership)
 
-    def can?(%User{} = user, :create, Task), do: TaskPolicy.create?(user)
+    def can?(%User{} = user, :create, %Changeset{data: %Task{}} = changeset), do: TaskPolicy.create?(user, changeset)
     def can?(%User{} = user, :update, %Task{} = task), do: TaskPolicy.update?(user, task)
 
     def can?(%User{} = user, :create, Preview), do: PreviewPolicy.create?(user)
 
-    def can?(%User{} = user, :create, Project), do: ProjectPolicy.create?(user)
+    def can?(%User{} = user, :create, %Changeset{data: %Project{}} = changeset), do: ProjectPolicy.create?(user, changeset)
     def can?(%User{} = user, :update, %Project{} = project), do: ProjectPolicy.update?(user, project)
 
-    def can?(%User{} = user, :create, ProjectCategory), do: ProjectCategoryPolicy.create?(user)
-    def can?(%User{} = user, :delete, %ProjectCategory{}), do: ProjectCategoryPolicy.delete?(user)
+    def can?(%User{} = user, :create, %Changeset{data: %ProjectCategory{}} = changeset), do: ProjectCategoryPolicy.create?(user, changeset)
+    def can?(%User{} = user, :delete, %ProjectCategory{} = project_category), do: ProjectCategoryPolicy.delete?(user, project_category)
 
-    def can?(%User{} = user, :create, ProjectSkill), do: ProjectSkillPolicy.create?(user)
-    def can?(%User{} = user, :delete, %ProjectSkill{}), do: ProjectSkillPolicy.delete?(user)
+    def can?(%User{} = user, :create, %Changeset{data: %ProjectSkill{}} = changeset), do: ProjectSkillPolicy.create?(user, changeset)
+    def can?(%User{} = user, :delete, %ProjectSkill{} = project_skill), do: ProjectSkillPolicy.delete?(user, project_skill)
 
     def can?(%User{} = user, :create, Role), do: RolePolicy.create?(user)
 
@@ -79,13 +81,13 @@ defmodule Canary.Abilities do
 
     def can?(%User{} = user, :create, Skill), do: SkillPolicy.create?(user)
 
-    def can?(%User{} = user, :create, %Ecto.Changeset{data: %CodeCorps.UserCategory{}} = changeset), do: UserCategoryPolicy.create?(user, changeset)
+    def can?(%User{} = user, :create, %Changeset{data: %UserCategory{}} = changeset), do: UserCategoryPolicy.create?(user, changeset)
     def can?(%User{} = user, :delete, %UserCategory{} = user_category), do: UserCategoryPolicy.delete?(user, user_category)
 
-    def can?(%User{} = user, :create, %Ecto.Changeset{data: %CodeCorps.UserRole{}} = changeset), do: UserRolePolicy.create?(user, changeset)
+    def can?(%User{} = user, :create, %Changeset{data: %UserRole{}} = changeset), do: UserRolePolicy.create?(user, changeset)
     def can?(%User{} = user, :delete, %UserRole{} = user_role), do: UserRolePolicy.delete?(user, user_role)
 
-    def can?(%User{} = user, :create, %Ecto.Changeset{data: %CodeCorps.UserSkill{}} = changeset), do: UserSkillPolicy.create?(user, changeset)
+    def can?(%User{} = user, :create, %Changeset{data: %UserSkill{}} = changeset), do: UserSkillPolicy.create?(user, changeset)
     def can?(%User{} = user, :delete, %UserSkill{} = user_skill), do: UserSkillPolicy.delete?(user, user_skill)
   end
 end

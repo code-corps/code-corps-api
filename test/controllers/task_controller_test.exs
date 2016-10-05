@@ -12,7 +12,7 @@ defmodule CodeCorps.TaskControllerTest do
   }
 
   @invalid_attrs %{
-    task_type: "nonexistent",
+    task_type: "issue",
     status: "nonexistent"
   }
 
@@ -160,14 +160,13 @@ defmodule CodeCorps.TaskControllerTest do
 
   describe "create" do
     @tag :authenticated
-    test "creates and renders resource when data is valid", %{conn: conn} do
-      user = insert(:user)
+    test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
       project = insert(:project)
 
       payload =
         build_payload
         |> put_attributes(@valid_attrs)
-        |> put_relationships(user, project)
+        |> put_relationships(current_user, project)
 
       path = conn |> task_path(:create)
       json = conn |> post(path, payload) |> json_response(201)
@@ -181,8 +180,13 @@ defmodule CodeCorps.TaskControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders 422 when data is invalid", %{conn: conn} do
-      payload = build_payload |> put_attributes(@invalid_attrs)
+    test "does not create resource and renders 422 when data is invalid", %{conn: conn, current_user: current_user} do
+      project = insert(:project)
+
+      payload =
+        build_payload
+        |> put_attributes(@invalid_attrs)
+        |> put_relationships(current_user, project)
 
       path = conn |> task_path(:create)
       json = conn |> post(path, payload) |> json_response(422)

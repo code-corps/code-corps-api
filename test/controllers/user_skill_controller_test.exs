@@ -61,9 +61,8 @@ defmodule CodeCorps.UserSkillControllerTest do
     end
 
     test "does not show resource and instead throw error when id is nonexistent", %{conn: conn} do
-      assert_error_sent 404, fn ->
-        get conn, user_skill_path(conn, :show, -1)
-      end
+      path = conn |> user_skill_path(:show, -1)
+      assert conn |> get(path) |> json_response(:not_found)
     end
   end
 

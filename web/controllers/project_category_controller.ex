@@ -3,10 +3,11 @@ defmodule CodeCorps.ProjectCategoryController do
 
   import CodeCorps.ControllerHelpers
 
-  alias JaSerializer.Params
   alias CodeCorps.ProjectCategory
 
-  plug :load_and_authorize_resource, model: ProjectCategory, only: [:create, :delete]
+  plug :load_resource, model: ProjectCategory, only: [:show], preload: [:project, :category]
+  plug :load_and_authorize_changeset, model: ProjectCategory, only: [:create]
+  plug :load_and_authorize_resource, model: ProjectCategory, only: [:delete]
   plug :scrub_params, "data" when action in [:create]
 
   def index(conn, params) do
@@ -24,10 +25,8 @@ defmodule CodeCorps.ProjectCategoryController do
     render(conn, "index.json-api", data: project_categories)
   end
 
-  def create(conn, %{"data" => data = %{"type" => "project-category"}}) do
-    changeset = %ProjectCategory{} |> ProjectCategory.create_changeset(Params.to_attributes(data))
-
-    case Repo.insert(changeset) do
+  def create(conn, %{"data" => %{"type" => "project-category"}}) do
+    case Repo.insert(conn.assigns.changeset) do
       {:ok, project_category} ->
         conn
         |> put_status(:created)
@@ -39,15 +38,12 @@ defmodule CodeCorps.ProjectCategoryController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    project_category =
-      ProjectCategory
-      |> Repo.get!(id)
-    render(conn, "show.json-api", data: project_category)
+  def show(conn, %{"id" => _id}) do
+    render(conn, "show.json-api", data: conn.assigns.project_category)
   end
 
-  def delete(conn, %{"id" => id}) do
-    ProjectCategory |> Repo.get!(id) |> Repo.delete!
+  def delete(conn, %{"id" => _id}) do
+    conn.assigns.project_category |> Repo.delete!
 
     conn |> send_resp(:no_content, "")
   end

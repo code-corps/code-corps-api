@@ -38,6 +38,7 @@ defmodule CodeCorps.Web do
       import CodeCorps.Gettext
 
       import Canary.Plugs
+      import CodeCorps.AuthenticationHelpers, only: [load_and_authorize_changeset: 2]
     end
   end
 

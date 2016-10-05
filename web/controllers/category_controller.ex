@@ -28,11 +28,11 @@ defmodule CodeCorps.CategoryController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
+  def show(conn, %{"id" => _id}) do
     render(conn, "show.json-api", data: conn.assigns.category)
   end
 
-  def update(conn, %{"id" => id, "data" => data = %{"type" => "category", "attributes" => _category_params}}) do
+  def update(conn, %{"id" => _id, "data" => data = %{"type" => "category", "attributes" => _category_params}}) do
     changeset = conn.assigns.category |> Category.changeset(Params.to_attributes(data))
 
     case Repo.update(changeset) do
