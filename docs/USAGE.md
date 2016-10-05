@@ -35,6 +35,12 @@ If you ever need to rebuild you can run `docker-compose up --build`. Unless you'
 
 To run the tests you can run `docker-compose run test mix test`.
 
+### Linting Code with Credo
+
+[Credo](https://github.com/rrrene/credo) is a static code analysis tool for Elixir. In general, we conform to the [Credo Style Guide](https://github.com/rrrene/elixir-style-guide) when writing Elixir code. You can run `mix credo` to check your code for design, readability, and consistency against this guide.
+
+Credo's style guide is influenced by this more popular and exhaustive community [Elixir Style Guide](https://github.com/levionessa/elixir_style_guide). We defer to that guide where the Credo guide is ambiguous, e.g. [external module references](https://github.com/levionessa/elixir_style_guide#modules).
+
 ### Serving Ember
 
 The Code Corps API is intended to work alongside a client written in Ember. For that purpose, the Elixir application exposes all of its API endpoints behind an `api.` subdomain.
