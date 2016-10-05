@@ -25,7 +25,10 @@ defmodule CodeCorps.Base64Image do
   defp random_filename(length, extension), do: random_string(length) <> "." <> extension
 
   defp random_string(length) do
-    :crypto.strong_rand_bytes(length) |> Base.url_encode64 |> binary_part(0, length)
+    length
+    |> :crypto.strong_rand_bytes
+    |> Base.url_encode64
+    |> binary_part(0, length)
   end
 
   defp ensure_tmp_dir do
