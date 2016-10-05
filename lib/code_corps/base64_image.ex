@@ -9,7 +9,7 @@ defmodule CodeCorps.Base64Image do
       |> Base.decode64!
       |> save_as_image(content_type)
 
-    { path_to_image, content_type }
+    {path_to_image, content_type}
   end
 
   defp save_as_image(content, content_type) do

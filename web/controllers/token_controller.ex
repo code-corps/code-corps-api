@@ -31,7 +31,7 @@ defmodule CodeCorps.TokenController do
             |> put_status(:created)
             |> render("show.json", token: new_token, user_id: user.id)
     else
-      { :error, reason } -> handle_unauthorized(conn, reason)
+      {:error, reason} -> handle_unauthorized(conn, reason)
     end
   end
 
