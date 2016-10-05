@@ -33,7 +33,7 @@ services:
     ports:
       - 49235:4000
     volumes:
-      - code-corps-api:/code-corps-api
+      - .:/code-corps-api
 
   test:
     <<: *api_base
@@ -52,8 +52,7 @@ services:
     ports:
       - 8081:8080
     volumes:
-      - code-corps-api:/code-corps-api
+      - .:/code-corps-api
 
 volumes:
-  code-corps-api:
   postgres-data:

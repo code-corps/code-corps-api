@@ -25,96 +25,72 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
 
   describe "index" do
     test "lists all resources", %{conn: conn} do
-      membership_1 = insert(:organization_membership)
-      membership_2 = insert(:organization_membership)
+      [membership_1, membership_2] = insert_pair(:organization_membership)
 
       path = conn |> organization_membership_path(:index)
+      response = conn |> get(path) |> json_response(200)
 
-      data = conn |> get(path) |> json_response(200) |> Map.get("data")
-      assert data |> length == 2
-
-      [first_result, second_result] = data
-      assert first_result["id"] == "#{membership_1.id}"
-      assert second_result["id"] == "#{membership_2.id}"
+      assert ids_from_response(response) == [membership_1.id, membership_2.id]
     end
 
     test "lists all resources for specified organization", %{conn: conn} do
       organization = insert(:organization)
-      membership_1 = insert(:organization_membership, organization: organization)
-      membership_2 = insert(:organization_membership, organization: organization)
+      [membership_1, membership_2] = insert_pair(:organization_membership, organization: organization)
       insert(:organization_membership)
 
       path = conn |> organization_organization_membership_path(:index, organization)
+      response = conn |> get(path) |> json_response(200)
 
-      data = conn |> get(path) |> json_response(200) |> Map.get("data")
-      assert data |> length == 2
-
-      [first_result, second_result] = data
-      assert first_result["id"] == "#{membership_1.id}"
-      assert second_result["id"] == "#{membership_2.id}"
+      assert ids_from_response(response) == [membership_1.id, membership_2.id]
     end
 
     test "filters resources by membership id", %{conn: conn} do
-      membership_1 = insert(:organization_membership)
-      membership_2 = insert(:organization_membership)
+      [membership_1, membership_2] = insert_pair(:organization_membership)
       insert(:organization_membership)
 
       params = %{"filter" => %{"id" => "#{membership_1.id},#{membership_2.id}"}}
-      conn = get conn, organization_membership_path(conn, :index, params)
-      data = json_response(conn, 200)["data"]
-      assert data |> length == 2
+      response =
+        conn
+        |> get(organization_membership_path(conn, :index, params))
+        |> json_response(200)
 
-      [first_result, second_result] = data
-      assert first_result["id"] == "#{membership_1.id}"
-      assert second_result["id"] == "#{membership_2.id}"
+      assert ids_from_response(response) == [membership_1.id, membership_2.id]
     end
 
     test "filters resources by role", %{conn: conn} do
-      membership_1 = insert(:organization_membership, role: "admin")
-      membership_2 = insert(:organization_membership, role: "admin")
+      [membership_1, membership_2] = insert_pair(:organization_membership, role: "admin")
       insert(:organization_membership, role: "owner")
 
       params = %{"role" => "admin"}
-      path = conn |> organization_membership_path(:index, params)
+      response =
+        conn
+        |> get(organization_membership_path(conn, :index, params))
+        |> json_response(200)
 
-      data = conn |> get(path) |> json_response(200) |> Map.get("data")
-      assert data |> length == 2
-
-      [first_result, second_result] = data
-      assert first_result["id"] == "#{membership_1.id}"
-      assert second_result["id"] == "#{membership_2.id}"
+      assert ids_from_response(response) == [membership_1.id, membership_2.id]
     end
 
     test "filters resources by role and id", %{conn: conn} do
-      membership_1 = insert(:organization_membership, role: "admin")
-      insert(:organization_membership, role: "admin")
+      [membership_1, _] = insert_pair(:organization_membership, role: "admin")
       insert(:organization_membership, role: "owner")
 
       params = %{"role" => "admin", "filter" => %{"id" => "#{membership_1.id}"}}
       path = conn |> organization_membership_path(:index, params)
+      response = conn |> get(path) |> json_response(200)
 
-      data = conn |> get(path) |> json_response(200) |> Map.get("data")
-
-      assert data |> length == 1
-
-      [only_result] = data
-      assert only_result["id"] == "#{membership_1.id}"
+      assert ids_from_response(response) == [membership_1.id]
     end
 
     test "filters resources by role and id on specific organization", %{conn: conn} do
       organization = insert(:organization)
-      membership_1 = insert(:organization_membership, organization: organization, role: "admin")
-      insert(:organization_membership, organization: organization, role: "admin")
+      [membership_1, _] = insert_pair(:organization_membership, organization: organization, role: "admin")
       insert(:organization_membership, role: "owner")
 
       params = %{"role" => "admin", "filter" => %{"id" => "#{membership_1.id}"}}
       path = conn |> organization_organization_membership_path(:index, organization)
+      response = conn |> get(path, params) |> json_response(200)
 
-      data = conn |> get(path, params) |> json_response(200) |> Map.get("data")
-      assert data |> length == 1
-
-      [only_result] = data
-      assert only_result["id"] == "#{membership_1.id}"
+      assert ids_from_response(response) == [membership_1.id]
     end
   end
 
@@ -123,7 +99,6 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
       membership = insert(:organization_membership, role: "admin")
 
       path = conn |> organization_membership_path(:show, membership)
-
       data = conn |> get(path) |> json_response(200) |> Map.get("data")
 
       assert data["id"] == "#{membership.id}"
@@ -201,7 +176,7 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
     end
 
     @tag :authenticated
-    test "doesnt't update and renders 422 when data is invalid", %{conn: conn, current_user: current_user} do
+    test "doesn't update and renders 422 when data is invalid", %{conn: conn, current_user: current_user} do
       organization = insert(:organization)
       membership = insert(:organization_membership, organization: organization)
       insert(:organization_membership, organization: organization, member: current_user, role: "owner")
@@ -217,7 +192,7 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
       assert conn |> json_response(422)
     end
 
-    test "doesnt't update and renders 401 when unauthenticated", %{conn: conn} do
+    test "doesn't update and renders 401 when unauthenticated", %{conn: conn} do
       path = conn |> organization_membership_path(:update, "id doesn't matter")
       conn = conn |> put(path)
 
@@ -225,7 +200,7 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
     end
 
     @tag :authenticated
-    test "doesnt't update and renders 401 when not authorized", %{conn: conn} do
+    test "doesn't update and renders 401 when not authorized", %{conn: conn} do
       membership = insert(:organization_membership)
 
       payload =
@@ -262,7 +237,7 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
       assert Repo.get(User, membership.member_id)
     end
 
-    test "doesnt't delete and renders 401 when unauthenticated", %{conn: conn} do
+    test "doesn't delete and renders 401 when unauthenticated", %{conn: conn} do
       path = conn |> organization_membership_path(:delete, "id doesn't matter")
       conn = conn |> delete(path)
 
@@ -270,7 +245,7 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
     end
 
     @tag :authenticated
-    test "doesnt't delete and renders 401 when not authorized", %{conn: conn} do
+    test "doesn't delete and renders 401 when not authorized", %{conn: conn} do
       membership = insert(:organization_membership)
 
       payload =

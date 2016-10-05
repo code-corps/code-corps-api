@@ -33,7 +33,7 @@ defmodule CodeCorps.Organization do
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:name, :description, :slug, :base64_icon_data])
-    |> validate_required([:name])
+    |> validate_required([:name, :description])
     |> upload_image(:base64_icon_data, :icon)
   end
 
@@ -44,7 +44,7 @@ defmodule CodeCorps.Organization do
     struct
     |> changeset(params)
     |> generate_slug(:name, :slug)
-    |> validate_required([:slug])
+    |> validate_required([:slug, :description])
     |> validate_slug(:slug)
     |> put_slugged_route()
   end
