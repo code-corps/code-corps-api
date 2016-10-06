@@ -1,10 +1,7 @@
 defmodule CodeCorps.ProjectViewTest do
   use CodeCorps.ConnCase, async: true
 
-  alias CodeCorps.Repo
-
-  # Bring render/3 and render_to_string/3 for testing custom views
-  import Phoenix.View
+  import Phoenix.View, only: [render: 3]
 
   test "renders all attributes and relationships properly" do
     organization = insert(:organization)
@@ -13,16 +10,11 @@ defmodule CodeCorps.ProjectViewTest do
     project_category = insert(:project_category, project: project)
     project_skill = insert(:project_skill, project: project)
 
-    project =
-      CodeCorps.Project
-      |> Repo.get(project.id)
-      |> CodeCorps.Repo.preload([:organization, :tasks, :project_categories, :project_skills])
-
     rendered_json =  render(CodeCorps.ProjectView, "show.json-api", data: project)
 
     expected_json = %{
-      data: %{
-        attributes: %{
+      "data" => %{
+        "attributes" => %{
           "description" => project.description,
           "icon-large-url" => CodeCorps.ProjectIcon.url({project.icon, project}, :large),
           "icon-thumb-url" => CodeCorps.ProjectIcon.url({project.icon, project}, :thumb),
@@ -33,43 +25,43 @@ defmodule CodeCorps.ProjectViewTest do
           "title" => project.title,
           "updated-at" => project.updated_at,
         },
-        id: project.id |> Integer.to_string,
-        relationships: %{
+        "id" => project.id |> Integer.to_string,
+        "relationships" => %{
           "organization" => %{
-            data: %{
-              id: organization.id |> Integer.to_string,
-              type: "organization"
+            "data" => %{
+              "id" => organization.id |> Integer.to_string,
+              "type" => "organization"
             }
           },
           "tasks" => %{
-            data: [
+            "data" => [
               %{
-                id: task.id |> Integer.to_string,
-                type: "task"
+                "id" => task.id |> Integer.to_string,
+                "type" => "task"
               }
             ]
           },
           "project-categories" => %{
-            data: [
+            "data" => [
               %{
-                id: project_category.id |> Integer.to_string,
-                type: "project-category"
+                "id" => project_category.id |> Integer.to_string,
+                "type" => "project-category"
               }
             ]
           },
           "project-skills" => %{
-            data: [
+            "data" => [
               %{
-                id: project_skill.id |> Integer.to_string,
-                type: "project-skill"
+                "id" => project_skill.id |> Integer.to_string,
+                "type" => "project-skill"
               }
             ]
           }
         },
-        type: "project",
+        "type" => "project",
       },
-      jsonapi: %{
-        version: "1.0"
+      "jsonapi" => %{
+        "version" => "1.0"
       }
     }
 

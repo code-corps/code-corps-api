@@ -1,4 +1,5 @@
 defmodule CodeCorps.ProjectView do
+  use CodeCorps.PreloadHelpers, default_preloads: [:organization, :tasks, :project_categories, :project_skills]
   use CodeCorps.Web, :view
   use JaSerializer.PhoenixView
 
@@ -9,10 +10,9 @@ defmodule CodeCorps.ProjectView do
 
   has_one :organization, serializer: CodeCorps.OrganizationView
 
-  has_many :tasks, serializer: CodeCorps.TaskView
-
-  has_many :project_categories, serializer: CodeCorps.ProjectCategoryView
-  has_many :project_skills, serializer: CodeCorps.ProjectSkillView
+  has_many :tasks, serializer: CodeCorps.TaskView, identifiers: :always
+  has_many :project_categories, serializer: CodeCorps.ProjectCategoryView, identifiers: :always
+  has_many :project_skills, serializer: CodeCorps.ProjectSkillView, identifiers: :always
 
   def icon_large_url(project, _conn) do
     CodeCorps.ProjectIcon.url({project.icon, project}, :large)

@@ -13,7 +13,6 @@ defmodule CodeCorps.OrganizationMembershipController do
     memberships =
       OrganizationMembership
       |> OrganizationMembership.index_filters(params)
-      |> preload([:organization, :member])
       |> Repo.all
 
     render(conn, "index.json-api", data: memberships)
@@ -22,7 +21,6 @@ defmodule CodeCorps.OrganizationMembershipController do
   def show(conn, %{"id" => id}) do
     membership =
       OrganizationMembership
-      |> preload([:organization, :member])
       |> Repo.get!(id)
 
     render(conn, "show.json-api", data: membership)
@@ -33,8 +31,6 @@ defmodule CodeCorps.OrganizationMembershipController do
 
     case Repo.insert(changeset) do
       {:ok, membership} ->
-        membership = membership |> Repo.preload([:member, :organization])
-
         conn
         |> @analytics.track(:created, membership)
         |> put_status(:created)
@@ -50,7 +46,6 @@ defmodule CodeCorps.OrganizationMembershipController do
   def update(conn, %{"id" => id, "data" => data = %{"type" => "organization-membership", "attributes" => _params}}) do
     membership =
       OrganizationMembership
-      |> preload([:organization, :member])
       |> Repo.get!(id)
 
     changeset = membership |> OrganizationMembership.update_changeset(Params.to_attributes(data))

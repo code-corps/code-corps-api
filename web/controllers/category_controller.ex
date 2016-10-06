@@ -4,10 +4,11 @@ defmodule CodeCorps.CategoryController do
   alias CodeCorps.Category
   alias JaSerializer.Params
 
+  plug :load_resource, model: Category, only: [:show]
   plug :load_and_authorize_resource, model: Category, only: [:create, :update]
 
   def index(conn, _params) do
-    categories = Category |> Repo.all |> Repo.preload([:project_categories])
+    categories = Category |> Repo.all
     render(conn, "index.json-api", data: categories)
   end
 
@@ -16,10 +17,6 @@ defmodule CodeCorps.CategoryController do
 
     case Repo.insert(changeset) do
       {:ok, category} ->
-        category =
-          category
-          |> Repo.preload([:project_categories])
-
         conn
         |> put_status(:created)
         |> put_resp_header("location", category_path(conn, :show, category))
@@ -32,20 +29,11 @@ defmodule CodeCorps.CategoryController do
   end
 
   def show(conn, %{"id" => id}) do
-    category =
-      Category
-      |> preload([:project_categories])
-      |> Repo.get!(id)
-
-    render(conn, "show.json-api", data: category)
+    render(conn, "show.json-api", data: conn.assigns.category)
   end
 
   def update(conn, %{"id" => id, "data" => data = %{"type" => "category", "attributes" => _category_params}}) do
-    changeset =
-      Category
-      |> preload([:project_categories])
-      |> Repo.get!(id)
-      |> Category.changeset(Params.to_attributes(data))
+    changeset = conn.assigns.category |> Category.changeset(Params.to_attributes(data))
 
     case Repo.update(changeset) do
       {:ok, category} ->

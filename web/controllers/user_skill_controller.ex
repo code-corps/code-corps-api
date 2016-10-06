@@ -15,7 +15,6 @@ defmodule CodeCorps.UserSkillController do
     user_skills =
       UserSkill
       |> UserSkill.index_filters(params)
-      |> preload([:user, :skill])
       |> Repo.all
 
     render(conn, "index.json-api", data: user_skills)
@@ -29,7 +28,6 @@ defmodule CodeCorps.UserSkillController do
     if conn |> authorized? do
       case Repo.insert(changeset) do
         {:ok, user_skill} ->
-          user_skill = user_skill |> Repo.preload([:user, :skill])
           conn
           |> @analytics.track(:added, user_skill)
           |> put_status(:created)
@@ -48,7 +46,6 @@ defmodule CodeCorps.UserSkillController do
   def show(conn, %{"id" => id}) do
     user_skill =
       UserSkill
-      |> preload([:user, :skill])
       |> Repo.get!(id)
     render(conn, "show.json-api", data: user_skill)
   end
@@ -56,7 +53,6 @@ defmodule CodeCorps.UserSkillController do
   def delete(conn, %{"id" => id}) do
     user_skill =
       UserSkill
-      |> preload([:user, :skill])
       |> Repo.get!(id)
       |> Repo.delete!
 

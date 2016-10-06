@@ -13,7 +13,6 @@ defmodule CodeCorps.UserController do
     users =
       User
       |> User.index_filters(params)
-      |> preload([:slugged_route, :organization_memberships, :user_categories, :user_roles, :user_skills])
       |> Repo.all
 
     render(conn, "index.json-api", data: users)
@@ -24,8 +23,6 @@ defmodule CodeCorps.UserController do
 
     case Repo.insert(changeset) do
       {:ok, user} ->
-        user = Repo.preload(user, [:slugged_route, :organization_memberships, :user_categories, :user_roles, :user_skills])
-
         conn
         |> Plug.Conn.assign(:current_user, user)
         |> @analytics.track(:signed_up)
@@ -40,21 +37,12 @@ defmodule CodeCorps.UserController do
   end
 
   def show(conn, %{"id" => id}) do
-    user =
-      User
-      |> preload([:slugged_route, :organization_memberships, :user_categories, :user_roles, :user_skills])
-      |> Repo.get!(id)
-
+    user = User |> Repo.get!(id)
     render(conn, "show.json-api", data: user)
   end
 
   def update(conn, %{"id" => id, "data" => data = %{"type" => "user", "attributes" => _user_params}}) do
-    user =
-      User
-      |> preload([:slugged_route, :organization_memberships, :user_categories, :user_roles, :user_skills])
-      |> Repo.get!(id)
-
-    changeset = User.update_changeset(user, Params.to_attributes(data))
+    changeset = User |> Repo.get!(id) |> User.update_changeset(Params.to_attributes(data))
 
     case Repo.update(changeset) do
       {:ok, user} ->
@@ -71,14 +59,12 @@ defmodule CodeCorps.UserController do
   def email_available(conn, %{"email" => email}) do
     hash = User.check_email_availability(email)
 
-    conn
-    |> json(hash)
+    conn |> json(hash)
   end
 
   def username_available(conn, %{"username" => username}) do
     hash = User.check_username_availability(username)
 
-    conn
-    |> json(hash)
+    conn |> json(hash)
   end
 end

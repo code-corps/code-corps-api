@@ -14,7 +14,6 @@ defmodule CodeCorps.UserRoleController do
     user_roles =
       UserRole
       |> UserRole.index_filters(params)
-      |> preload([:user, :role])
       |> Repo.all
 
     render(conn, "index.json-api", data: user_roles)
@@ -28,7 +27,6 @@ defmodule CodeCorps.UserRoleController do
     if conn |> authorized? do
       case Repo.insert(changeset) do
         {:ok, user_role} ->
-          user_role = user_role |> Repo.preload([:user, :role])
           conn
           |> @analytics.track(:added, user_role)
           |> put_status(:created)
@@ -46,7 +44,6 @@ defmodule CodeCorps.UserRoleController do
   def show(conn, %{"id" => id}) do
     user_role =
       UserRole
-      |> preload([:user, :role])
       |> Repo.get!(id)
     render(conn, "show.json-api", data: user_role)
   end
@@ -54,7 +51,6 @@ defmodule CodeCorps.UserRoleController do
   def delete(conn, %{"id" => id}) do
     user_role =
       UserRole
-      |> preload([:user, :role])
       |> Repo.get!(id)
       |> Repo.delete!
 

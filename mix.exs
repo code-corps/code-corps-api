@@ -75,7 +75,7 @@ defmodule CodeCorps.Mixfile do
       {:hackney, ">= 1.4.4", override: true},
       {:inch_ex, "~> 0.5", only: [:dev, :test]}, # Inch CI
       {:inflex, "~> 1.7.0"},
-      {:ja_serializer, "~> 0.10.1"}, # JSON API
+      {:ja_serializer, "~> 0.11.0"}, # JSON API
       {:mix_test_watch, "~> 0.2", only: :dev}, # Test watcher
       {:poison, "~> 1.2 or ~> 2.0"},
       {:scrivener_ecto, "~> 1.0"}, # DB query pagination

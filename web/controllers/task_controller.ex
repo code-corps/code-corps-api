@@ -12,7 +12,6 @@ defmodule CodeCorps.TaskController do
   def index(conn, params) do
     tasks =
       Task
-      |> preload([:comments, :project, :user])
       |> Task.index_filters(params)
       |> Task.task_type_filters(params)
       |> Task.task_status_filters(params)
@@ -33,10 +32,8 @@ defmodule CodeCorps.TaskController do
 
     case Repo.insert(changeset) do
       {:ok, task} ->
-        task =
-          Task
-          |> Repo.get(task.id) # need to reload, due to number being added on database level
-          |> Repo.preload([:comments, :project, :user])
+        # need to reload, due to number being added on database level
+        task = Task |> Repo.get(task.id)
 
         conn
         |> @analytics.track(:created, task)
@@ -53,7 +50,6 @@ defmodule CodeCorps.TaskController do
   def show(conn, params = %{"project_id" => _project_id, "id" => _number}) do
     task =
       Task
-      |> preload([:comments, :project, :user])
       |> Task.show_project_task_filters(params)
       |> Repo.one!
     render(conn, "show.json-api", data: task)
@@ -61,7 +57,6 @@ defmodule CodeCorps.TaskController do
   def show(conn, %{"id" => id}) do
     task =
       Task
-      |> preload([:comments, :project, :user])
       |> Repo.get!(id)
     render(conn, "show.json-api", data: task)
   end
@@ -69,7 +64,6 @@ defmodule CodeCorps.TaskController do
   def update(conn, %{"id" => id, "data" => data = %{"type" => "task", "attributes" => _task_params}}) do
     changeset =
       Task
-      |> preload([:comments, :project, :user])
       |> Repo.get!(id)
       |> Task.update_changeset(Params.to_attributes(data))
 

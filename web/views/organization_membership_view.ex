@@ -1,4 +1,5 @@
 defmodule CodeCorps.OrganizationMembershipView do
+  use CodeCorps.PreloadHelpers, default_preloads: [:member, :organization]
   use CodeCorps.Web, :view
   use JaSerializer.PhoenixView
 
