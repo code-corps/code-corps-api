@@ -1,4 +1,5 @@
 defmodule CodeCorps.UserCategoryView do
+  use CodeCorps.PreloadHelpers, default_preloads: [:user, :category]
   use CodeCorps.Web, :view
   use JaSerializer.PhoenixView
 

@@ -1,4 +1,5 @@
 defmodule CodeCorps.SluggedRouteView do
+  use CodeCorps.PreloadHelpers, default_preloads: [:organization, :user]
   use CodeCorps.Web, :view
   use JaSerializer.PhoenixView
 

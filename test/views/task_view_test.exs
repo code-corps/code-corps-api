@@ -1,24 +1,17 @@
 defmodule CodeCorps.TaskViewTest do
   use CodeCorps.ConnCase, async: true
 
-  alias CodeCorps.Repo
-
   import Phoenix.View, only: [render: 3]
 
   test "renders all attributes and relationships properly" do
     task = insert(:task)
     comment = insert(:comment, task: task)
 
-    task =
-      CodeCorps.Task
-      |> Repo.get(task.id)
-      |> CodeCorps.Repo.preload([:comments, :project, :user])
-
     rendered_json =  render(CodeCorps.TaskView, "show.json-api", data: task)
 
     expected_json = %{
-      data: %{
-        attributes: %{
+      "data" => %{
+        "attributes" => %{
           "body" => task.body,
           "inserted-at" => task.inserted_at,
           "markdown" => task.markdown,
@@ -29,33 +22,33 @@ defmodule CodeCorps.TaskViewTest do
           "title" => task.title,
           "updated-at" => task.updated_at,
         },
-        id: task.id |> Integer.to_string,
-        relationships: %{
+        "id" => task.id |> Integer.to_string,
+        "relationships" => %{
           "comments" => %{
-            data: [
+            "data" => [
               %{
-                id: comment.id |> Integer.to_string,
-                type: "comment"
+                "id" => comment.id |> Integer.to_string,
+                "type" => "comment"
               }
             ]
           },
           "project" => %{
-            data: %{
-              id: task.project_id |> Integer.to_string,
-              type: "project"
+            "data" => %{
+              "id" => task.project_id |> Integer.to_string,
+              "type" => "project"
             }
           },
           "user" => %{
-            data: %{
-              id: task.user_id |> Integer.to_string,
-              type: "user"
+            "data" => %{
+              "id" => task.user_id |> Integer.to_string,
+              "type" => "user"
             }
           }
         },
-        type: "task",
+        "type" => "task",
       },
-      jsonapi: %{
-        version: "1.0"
+      "jsonapi" => %{
+        "version" => "1.0"
       }
     }
 

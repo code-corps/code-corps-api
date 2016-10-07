@@ -15,12 +15,10 @@ defmodule CodeCorps.ProjectSkillController do
         %{"filter" => %{"id" => id_list}} ->
           ids = id_list |> coalesce_id_string
           ProjectSkill
-          |> preload([:project, :skill])
           |> where([p], p.id in ^ids)
           |> Repo.all
         %{} ->
           ProjectSkill
-          |> preload([:user, :skill])
           |> Repo.all
       end
     render(conn, "index.json-api", data: project_skills)
@@ -34,7 +32,7 @@ defmodule CodeCorps.ProjectSkillController do
         conn
         |> put_status(:created)
         |> put_resp_header("location", project_skill_path(conn, :show, project_skill))
-        |> render("show.json-api", data: project_skill |> Repo.preload([:project, :skill]))
+        |> render("show.json-api", data: project_skill)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -45,7 +43,6 @@ defmodule CodeCorps.ProjectSkillController do
   def show(conn, %{"id" => id}) do
     project_skill =
       ProjectSkill
-      |> preload([:project, :skill])
       |> Repo.get!(id)
     render(conn, "show.json-api", data: project_skill)
   end

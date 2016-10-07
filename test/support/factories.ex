@@ -1,6 +1,8 @@
 defmodule CodeCorps.Factories do
+  use CodeCorps.JsonPayloadStrategy
   # with Ecto
   use ExMachina.Ecto, repo: CodeCorps.Repo
+
 
   def category_factory do
     %CodeCorps.Category{

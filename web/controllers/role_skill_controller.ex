@@ -11,7 +11,6 @@ defmodule CodeCorps.RoleSkillController do
     role_skills =
       RoleSkill
       |> RoleSkill.index_filters(params)
-      |> preload([:role, :skill])
       |> Repo.all
     render(conn, "index.json-api", data: role_skills)
   end
@@ -24,7 +23,7 @@ defmodule CodeCorps.RoleSkillController do
         conn
         |> put_status(:created)
         |> put_resp_header("location", role_skill_path(conn, :show, role_skill))
-        |> render("show.json-api", data: role_skill |> Repo.preload([:role, :skill]))
+        |> render("show.json-api", data: role_skill)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -35,7 +34,6 @@ defmodule CodeCorps.RoleSkillController do
   def show(conn, %{"id" => id}) do
     role_skill =
       RoleSkill
-      |> preload([:role, :skill])
       |> Repo.get!(id)
     render(conn, "show.json-api", data: role_skill)
   end

@@ -6,14 +6,18 @@ defmodule CodeCorps.CategoryControllerTest do
   @valid_attrs %{description: "You want to improve software tools and infrastructure.", name: "Technology"}
   @invalid_attrs %{name: nil}
 
-  defp build_payload(id, attributes, relationships \\ %{}) do
-    build_payload(attributes)
-    |> put_in(["data", "id"], id)
-    |> put_in(["data", "relationships"], relationships)
+  def request_create(conn, attrs) do
+    path = conn |> category_path(:create)
+    payload = json_payload(:category, attrs)
+    conn |> post(path, payload)
   end
 
-  defp build_payload(attributes) do
-    %{ "data" => %{"type" => "category", "attributes" => attributes}}
+  def request_update(conn, attrs) do
+    category = insert(:category)
+    payload = json_payload(:category, attrs)
+    path = conn |> category_path(:update, category)
+
+    conn |> put(path, payload)
   end
 
   test "lists all entries on index", %{conn: conn} do
@@ -37,17 +41,15 @@ defmodule CodeCorps.CategoryControllerTest do
     end
 
     test "renders page not found when id is nonexistent", %{conn: conn} do
-      assert_error_sent 404, fn ->
-        get conn, category_path(conn, :show, -1)
-      end
+      path = conn |> category_path(:show, -1)
+      assert conn |> get(path) |> json_response(404)
     end
   end
 
   describe "create" do
     @tag authenticated: :admin
     test "creates and renders resource when data is valid", %{conn: conn} do
-      conn = post conn, category_path(conn, :create), build_payload(@valid_attrs)
-      response = json_response(conn, 201)
+      response = conn |> request_create(@valid_attrs) |> json_response(201)
 
       assert response["data"]["id"]
       assert response["data"]["attributes"]["slug"] == "technology"
@@ -56,51 +58,45 @@ defmodule CodeCorps.CategoryControllerTest do
 
     @tag authenticated: :admin
     test "does not create resource and renders errors when data is invalid", %{conn: conn} do
-      conn = post conn, category_path(conn, :create), build_payload(@invalid_attrs)
-      assert json_response(conn, 422)["errors"] != %{}
+      response = conn |> request_create(@invalid_attrs) |> json_response(422)
+
+      assert response["errors"] != %{}
     end
 
     test "does not create resource and renders 401 when not authenticated", %{conn: conn} do
-      conn = post conn, category_path(conn, :create), build_payload(@valid_attrs)
-      assert json_response(conn, 401)
+      assert conn |> request_create(@valid_attrs) |> json_response(401)
     end
 
     @tag :authenticated
     test "does not create resource and renders 401 when not authorized", %{conn: conn} do
-      conn = post conn, category_path(conn, :create), build_payload(@valid_attrs)
-      assert json_response(conn, 401)
+      assert conn |> request_create(@valid_attrs) |> json_response(401)
     end
   end
 
   describe "update" do
     @tag authenticated: :admin
     test "updates and renders chosen resource when data is valid", %{conn: conn} do
-      category = insert(:category)
-      updated_attrs = %{@valid_attrs | description: "New Description"}
-      conn = put conn, category_path(conn, :update, category), build_payload(category.id, updated_attrs)
+      response = conn |> request_update(@valid_attrs) |> json_response(200)
 
-      assert json_response(conn, 200)["data"]["id"] == "#{category.id}"
-      assert Repo.get_by(Category, updated_attrs)
+      category = Repo.get_by(Category, @valid_attrs)
+      assert category
+      assert response["data"]["id"] == "#{category.id}"
     end
 
     @tag authenticated: :admin
     test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
-      category = insert(:category)
-      conn = put conn, category_path(conn, :update, category), build_payload(category.id, @invalid_attrs)
-      assert json_response(conn, 422)["errors"] != %{}
+      response = conn |> request_update(@invalid_attrs) |> json_response(422)
+
+      assert response["errors"] != %{}
     end
 
     test "does not update resource and renders 401 when not authenticated", %{conn: conn} do
-      category = insert(:category)
-      conn = put conn, category_path(conn, :update, category), build_payload(category.id, @invalid_attrs)
-      assert json_response(conn, 401)
+      assert conn |> request_update(@valid_attrs) |> json_response(401)
     end
 
     @tag :authenticated
     test "does not update resource and renders 401 when not authorized", %{conn: conn} do
-      category = insert(:category)
-      conn = put conn, category_path(conn, :update, category), build_payload(category.id, @invalid_attrs)
-      assert json_response(conn, 401)
+      assert conn |> request_update(@valid_attrs) |> json_response(401)
     end
   end
 end

@@ -1,4 +1,5 @@
 defmodule CodeCorps.PreviewView do
+  use CodeCorps.PreloadHelpers, default_preloads: [:user]
   use CodeCorps.Web, :view
   use JaSerializer.PhoenixView
 

@@ -1,4 +1,5 @@
 defmodule CodeCorps.TaskView do
+  use CodeCorps.PreloadHelpers, default_preloads: [:project, :user, :comments]
   use CodeCorps.Web, :view
   use JaSerializer.PhoenixView
 
@@ -7,5 +8,5 @@ defmodule CodeCorps.TaskView do
   has_one :project, serializer: CodeCorps.ProjectView
   has_one :user, serializer: CodeCorps.UserView
 
-  has_many :comments, serializer: CodeCorps.CommentView
+  has_many :comments, serializer: CodeCorps.CommentView, identifiers: :always
 end

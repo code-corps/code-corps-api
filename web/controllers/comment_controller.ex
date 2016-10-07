@@ -15,7 +15,6 @@ defmodule CodeCorps.CommentController do
       Comment
       |> Comment.index_filters(params)
       |> Repo.all
-      |> Repo.preload(:task)
 
     render(conn, "index.json-api", data: comments)
   end
@@ -25,8 +24,6 @@ defmodule CodeCorps.CommentController do
 
     case Repo.insert(changeset) do
       {:ok, comment} ->
-        comment = comment |> Repo.preload([:task])
-
         conn
         |> @analytics.track(:created, comment)
         |> put_status(:created)
@@ -47,7 +44,6 @@ defmodule CodeCorps.CommentController do
   def update(conn, %{"id" => id, "data" => data = %{"type" => "comment", "attributes" => _comment_params}}) do
     changeset =
       Comment
-      |> preload([:task])
       |> Repo.get!(id)
       |> Comment.changeset(Params.to_attributes(data))
 

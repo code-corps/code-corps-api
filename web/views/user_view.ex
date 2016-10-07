@@ -1,4 +1,5 @@
 defmodule CodeCorps.UserView do
+  use CodeCorps.PreloadHelpers, default_preloads: [:slugged_route, :organization_memberships, :user_categories, :user_roles, :user_skills]
   use CodeCorps.Web, :view
   use JaSerializer.PhoenixView
 
@@ -9,10 +10,10 @@ defmodule CodeCorps.UserView do
   ]
 
   has_one :slugged_route, serializer: CodeCorps.SluggedRouteView
-  has_many :organization_memberships, serializer: CodeCorps.OrganizationMembershipView
-  has_many :user_categories, serializer: CodeCorps.UserCategoryView
-  has_many :user_roles, serializer: CodeCorps.UserRoleView
-  has_many :user_skills, serializer: CodeCorps.UserSkillView
+  has_many :organization_memberships, serializer: CodeCorps.OrganizationMembershipView, identifiers: :always
+  has_many :user_categories, serializer: CodeCorps.UserCategoryView, identifiers: :always
+  has_many :user_roles, serializer: CodeCorps.UserRoleView, identifiers: :always
+  has_many :user_skills, serializer: CodeCorps.UserSkillView, identifiers: :always
 
   def photo_large_url(user, _conn) do
     CodeCorps.UserPhoto.url({user.photo, user}, :large)

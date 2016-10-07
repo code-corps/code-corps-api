@@ -13,14 +13,8 @@ defmodule CodeCorps.PreviewController do
 
     changeset = Preview.changeset(%Preview{}, Params.to_attributes(data), user)
 
-
-
     case Repo.insert(changeset) do
       {:ok, preview} ->
-        preview =
-          preview
-          |> Repo.preload([:user])
-
         conn
         |> put_status(:created)
         |> render("show.json-api", data: preview)

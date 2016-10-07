@@ -6,12 +6,12 @@ defmodule CodeCorps.ErrorViewTest do
 
   test "renders 404.json-api" do
     assert render(CodeCorps.ErrorView, "404.json-api", []) ==
-           %{errors: [%{status: 404, title: "404 Resource not found", id: "NOT_FOUND"}]}
+           %{"errors" => [%{status: 404, title: "404 Resource not found", id: "NOT_FOUND"}]}
   end
 
   test "renders 500.json-api" do
     assert render(CodeCorps.ErrorView, "500.json-api", []) ==
-           %{errors: [%{status: 500, title: "500 Internal server error", id: "INTERNAL_SERVER_ERROR"}]}
+           %{"errors" => [%{status: 500, title: "500 Internal server error", id: "INTERNAL_SERVER_ERROR"}]}
   end
 
   test "render any other" do

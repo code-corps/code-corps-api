@@ -15,12 +15,10 @@ defmodule CodeCorps.ProjectCategoryController do
         %{"filter" => %{"id" => id_list}} ->
           ids = id_list |> coalesce_id_string
           ProjectCategory
-          |> preload([:project, :category])
           |> where([p], p.id in ^ids)
           |> Repo.all
         %{} ->
           ProjectCategory
-          |> preload([:user, :category])
           |> Repo.all
       end
     render(conn, "index.json-api", data: project_categories)
@@ -31,8 +29,6 @@ defmodule CodeCorps.ProjectCategoryController do
 
     case Repo.insert(changeset) do
       {:ok, project_category} ->
-        project_category = project_category |> Repo.preload([:project, :category])
-
         conn
         |> put_status(:created)
         |> render("show.json-api", data: project_category)
@@ -46,7 +42,6 @@ defmodule CodeCorps.ProjectCategoryController do
   def show(conn, %{"id" => id}) do
     project_category =
       ProjectCategory
-      |> preload([:project, :category])
       |> Repo.get!(id)
     render(conn, "show.json-api", data: project_category)
   end

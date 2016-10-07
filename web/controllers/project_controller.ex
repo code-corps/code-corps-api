@@ -15,7 +15,6 @@ defmodule CodeCorps.ProjectController do
     projects =
       Project
       |> Repo.all(organization_id: slugged_route.organization_id)
-      |> Repo.preload([:organization, :tasks, :project_categories, :project_skills])
 
     render(conn, "index.json-api", data: projects)
   end
@@ -24,7 +23,6 @@ defmodule CodeCorps.ProjectController do
     projects =
       Project
       |> Repo.all
-      |> Repo.preload([:organization, :tasks, :project_categories, :project_skills])
 
     render(conn, "index.json-api", data: projects)
   end
@@ -33,7 +31,6 @@ defmodule CodeCorps.ProjectController do
     project =
       Project
       |> CodeCorps.ModelHelpers.slug_finder(project_slug)
-      |> Repo.preload([:organization, :tasks, :project_categories, :project_skills])
 
     render(conn, "show.json-api", data: project)
   end
@@ -42,7 +39,6 @@ defmodule CodeCorps.ProjectController do
     project =
       Project
       |> Repo.get!(id)
-      |> Repo.preload([:organization, :tasks, :project_categories, :project_skills])
 
     render(conn, "show.json-api", data: project)
   end
@@ -52,10 +48,6 @@ defmodule CodeCorps.ProjectController do
 
     case Repo.insert(changeset) do
       {:ok, project} ->
-        project =
-          project
-          |> Repo.preload([:organization, :tasks, :project_categories, :project_skills])
-
         conn
         |> put_status(:created)
         |> put_resp_header("location", project_path(conn, :show, project))
@@ -75,10 +67,6 @@ defmodule CodeCorps.ProjectController do
 
     case Repo.update(changeset) do
       {:ok, project} ->
-        project =
-          project
-          |> Repo.preload([:organization, :tasks, :project_categories, :project_skills])
-
         conn
         |> put_status(:created)
         |> put_resp_header("location", project_path(conn, :show, project))
