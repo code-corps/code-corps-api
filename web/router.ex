@@ -27,9 +27,7 @@ defmodule CodeCorps.Router do
 
   pipeline :current_user do
     plug CodeCorps.Plug.CurrentUser
-  end
-
-  pipeline :analytics_identify do
+    plug CodeCorps.Plug.SetSentryUserContext
     plug CodeCorps.Plug.AnalyticsIdentify
   end
 
@@ -40,7 +38,7 @@ defmodule CodeCorps.Router do
   end
 
   scope "/", CodeCorps, host: "api." do
-    pipe_through [:api, :bearer_auth, :current_user, :analytics_identify]
+    pipe_through [:api, :bearer_auth, :current_user]
 
     post "/token", TokenController, :create
     post "/token/refresh", TokenController, :refresh
@@ -79,7 +77,7 @@ defmodule CodeCorps.Router do
   end
 
   scope "/", CodeCorps, host: "api." do
-    pipe_through [:api, :bearer_auth, :ensure_auth, :current_user, :analytics_identify]
+    pipe_through [:api, :bearer_auth, :ensure_auth, :current_user]
 
     resources "/categories", CategoryController, only: [:create, :update]
     resources "/comments", CommentController, only: [:create, :update]
