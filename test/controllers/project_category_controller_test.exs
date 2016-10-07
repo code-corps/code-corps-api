@@ -76,17 +76,19 @@ defmodule CodeCorps.ProjectCategoryControllerTest do
     end
 
     test "does not show resource and instead throw error when id is nonexistent", %{conn: conn} do
-      assert_error_sent 404, fn ->
-        get conn, project_category_path(conn, :show, -1)
-      end
+      path = conn |> project_category_path(:show, -1)
+      assert conn |> get(path) |> json_response(:not_found)
     end
   end
 
   describe "create" do
-    @tag authenticated: :admin
-    test "creates and renders resource when data is valid", %{conn: conn} do
+    @tag :authenticated
+    test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
+      organization = insert(:organization)
       category = insert(:category)
-      project = insert(:project)
+      project = insert(:project, organization: organization)
+      insert(:organization_membership, role: "admin", member: current_user, organization: organization)
+
 
       payload = build_payload |> put_relationships(project, category)
 
@@ -120,8 +122,13 @@ defmodule CodeCorps.ProjectCategoryControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders 401 when not authorized", %{conn: conn} do
-      payload = build_payload()
+    test "does not create resource and renders 401 when not authorized", %{conn: conn, current_user: current_user} do
+      organization = insert(:organization)
+      project = insert(:project, organization: organization)
+      category = insert(:category)
+      insert(:organization_membership, role: "contributor", member: current_user, organization: organization)
+
+      payload = build_payload |> put_relationships(project, category)
 
       path = conn |> project_category_path(:create)
       assert conn |> post(path, payload) |> json_response(401)

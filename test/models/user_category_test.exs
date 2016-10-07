@@ -7,14 +7,14 @@ defmodule CodeCorps.UserCategoryTest do
       user_id = insert(:user).id
       category_id = insert(:category).id
 
-      changeset = UserCategory.changeset(%UserCategory{}, %{user_id: user_id, category_id: category_id})
+      changeset = UserCategory.create_changeset(%UserCategory{}, %{user_id: user_id, category_id: category_id})
       assert changeset.valid?
     end
 
     test "changeset requires user_id" do
       category_id = insert(:category).id
 
-      changeset = UserCategory.changeset(%UserCategory{}, %{category_id: category_id})
+      changeset = UserCategory.create_changeset(%UserCategory{}, %{category_id: category_id})
 
       refute changeset.valid?
       assert changeset.errors[:user_id] == {"can't be blank", []}
@@ -23,7 +23,7 @@ defmodule CodeCorps.UserCategoryTest do
     test "changeset requires category_id" do
       user_id = insert(:user).id
 
-      changeset = UserCategory.changeset(%UserCategory{}, %{user_id: user_id})
+      changeset = UserCategory.create_changeset(%UserCategory{}, %{user_id: user_id})
 
       refute changeset.valid?
       assert changeset.errors[:category_id] == {"can't be blank", []}
@@ -34,7 +34,7 @@ defmodule CodeCorps.UserCategoryTest do
       category_id = insert(:category).id
 
       { result, changeset } =
-        UserCategory.changeset(%UserCategory{}, %{user_id: user_id, category_id: category_id})
+        UserCategory.create_changeset(%UserCategory{}, %{user_id: user_id, category_id: category_id})
         |> Repo.insert
 
       assert result == :error
@@ -47,7 +47,7 @@ defmodule CodeCorps.UserCategoryTest do
       category_id = -1
 
       { result, changeset } =
-        UserCategory.changeset(%UserCategory{}, %{user_id: user_id, category_id: category_id})
+        UserCategory.create_changeset(%UserCategory{}, %{user_id: user_id, category_id: category_id})
         |> Repo.insert
 
       assert result == :error

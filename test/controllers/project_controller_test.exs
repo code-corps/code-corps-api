@@ -118,9 +118,10 @@ defmodule CodeCorps.ProjectControllerTest do
   end
 
   describe "create" do
-    @tag authenticated: :admin
-    test "creates and renders resource when attributes are valid", %{conn: conn} do
+    @tag :authenticated
+    test "creates and renders resource when attributes are valid", %{conn: conn, current_user: current_user} do
       organization = insert(:organization)
+      insert(:organization_membership, role: "admin", member: current_user, organization: organization)
 
       payload =
         build_payload
@@ -143,10 +144,18 @@ defmodule CodeCorps.ProjectControllerTest do
       assert project.organization_id == organization.id
     end
 
-    @tag authenticated: :admin
-    test "does not create resource and renders errors when attributes are invalid", %{conn: conn} do
-      payload = build_payload |> put_attributes(@invalid_attrs)
+    @tag :authenticated
+    test "does not create resource and renders errors when attributes are invalid", %{conn: conn, current_user: current_user} do
+      organization = insert(:organization)
+      insert(:organization_membership, role: "admin", member: current_user, organization: organization)
+
+      payload =
+        build_payload
+        |> put_attributes(@invalid_attrs)
+        |> put_relationships(organization)
+
       path = conn |> project_path(:create)
+
       errors = conn |> post(path, payload) |> json_response(422) |> Map.get("errors")
 
       assert errors != %{}
@@ -158,9 +167,17 @@ defmodule CodeCorps.ProjectControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders 401 when not authorized", %{conn: conn} do
+    test "does not create resource and renders 401 when not authorized", %{conn: conn, current_user: current_user} do
+      organization = insert(:organization)
+      insert(:organization_membership, role: "contributor", member: current_user, organization: organization)
+
+      payload =
+        build_payload
+        |> put_attributes(@valid_attrs)
+        |> put_relationships(organization)
+
       path = conn |> project_path(:create)
-      assert conn |> post(path) |> json_response(401)
+      assert conn |> post(path, payload) |> json_response(401)
     end
   end
 

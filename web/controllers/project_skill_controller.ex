@@ -6,7 +6,9 @@ defmodule CodeCorps.ProjectSkillController do
   alias CodeCorps.ProjectSkill
   alias JaSerializer.Params
 
-  plug :load_and_authorize_resource, model: ProjectSkill, only: [:create, :delete]
+  plug :load_resource, model: ProjectSkill, only: [:show], preload: [:project, :skill]
+  plug :load_and_authorize_changeset, model: ProjectSkill, only: [:create]
+  plug :load_and_authorize_resource, model: ProjectSkill, only: [:delete]
   plug :scrub_params, "data" when action in [:create, :update]
 
   def index(conn, params) do
@@ -24,10 +26,8 @@ defmodule CodeCorps.ProjectSkillController do
     render(conn, "index.json-api", data: project_skills)
   end
 
-  def create(conn, %{"data" => data = %{"type" => "project-skill", "attributes" => _project_skill_params}}) do
-    changeset = ProjectSkill.changeset(%ProjectSkill{}, Params.to_attributes(data))
-
-    case Repo.insert(changeset) do
+  def create(conn, %{"data" => %{"type" => "project-skill", "attributes" => _project_skill_params}}) do
+    case Repo.insert(conn.assigns.changeset) do
       {:ok, project_skill} ->
         conn
         |> put_status(:created)
@@ -40,19 +40,12 @@ defmodule CodeCorps.ProjectSkillController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    project_skill =
-      ProjectSkill
-      |> Repo.get!(id)
-    render(conn, "show.json-api", data: project_skill)
+  def show(conn, %{"id" => _id}) do
+    render(conn, "show.json-api", data: conn.assigns.project_skill)
   end
 
-  def delete(conn, %{"id" => id}) do
-    project_skill = Repo.get!(ProjectSkill, id)
-
-    # Here we use delete! (with a bang) because we expect
-    # it to always work (and if it does not, it will raise).
-    Repo.delete!(project_skill)
+  def delete(conn, %{"id" => _id}) do
+    conn.assigns.project_skill |> Repo.delete!
 
     send_resp(conn, :no_content, "")
   end

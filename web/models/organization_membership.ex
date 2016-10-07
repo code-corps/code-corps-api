@@ -18,6 +18,7 @@ defmodule CodeCorps.OrganizationMembership do
 
   @doc """
   Builds a changeset based on the `struct` and `params`, for creating a record.
+  The membership role is strictly set to "pending" by the system, regardless of parameters
   """
   def create_changeset(struct, params \\ %{}) do
     struct

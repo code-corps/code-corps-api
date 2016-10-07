@@ -3,11 +3,10 @@ defmodule CodeCorps.UserSkillController do
 
   use CodeCorps.Web, :controller
 
-  import CodeCorps.AuthenticationHelpers, only: [authorize: 2, authorized?: 1]
-
   alias CodeCorps.UserSkill
-  alias JaSerializer.Params
 
+  plug :load_resource, model: UserSkill, only: [:show], preload: [:user, :skill]
+  plug :load_and_authorize_changeset, model: UserSkill, only: [:create]
   plug :load_and_authorize_resource, model: UserSkill, only: [:delete]
   plug :scrub_params, "data" when action in [:create]
 
@@ -20,44 +19,30 @@ defmodule CodeCorps.UserSkillController do
     render(conn, "index.json-api", data: user_skills)
   end
 
-  def create(conn, %{"data" => data = %{"type" => "user-skill"}}) do
-    changeset = UserSkill.changeset(%UserSkill{}, Params.to_attributes(data))
-
-    conn = conn |> authorize(changeset)
-
-    if conn |> authorized? do
-      case Repo.insert(changeset) do
-        {:ok, user_skill} ->
-          conn
-          |> @analytics.track(:added, user_skill)
-          |> put_status(:created)
-          |> put_resp_header("location", user_skill_path(conn, :show, user_skill))
-          |> render("show.json-api", data: user_skill)
-        {:error, changeset} ->
-          conn
-          |> put_status(:unprocessable_entity)
-          |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
-      end
-    else
-      conn
+  def create(conn, %{"data" => %{"type" => "user-skill"}}) do
+    case Repo.insert(conn.assigns.changeset) do
+      {:ok, user_skill} ->
+        conn
+        |> @analytics.track(:added, user_skill)
+        |> put_status(:created)
+        |> put_resp_header("location", user_skill_path(conn, :show, user_skill))
+        |> render("show.json-api", data: user_skill)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    user_skill =
-      UserSkill
-      |> Repo.get!(id)
-    render(conn, "show.json-api", data: user_skill)
+  def show(conn, %{"id" => _id}) do
+    render(conn, "show.json-api", data: conn.assigns.user_skill)
   end
 
-  def delete(conn, %{"id" => id}) do
-    user_skill =
-      UserSkill
-      |> Repo.get!(id)
-      |> Repo.delete!
+  def delete(conn, %{"id" => _id}) do
+    conn.assigns.user_skill |> Repo.delete!
 
     conn
-    |> @analytics.track(:removed, user_skill)
+    |> @analytics.track(:removed, conn.assigns.user_skill)
     |> send_resp(:no_content, "")
   end
 end

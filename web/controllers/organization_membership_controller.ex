@@ -3,10 +3,12 @@ defmodule CodeCorps.OrganizationMembershipController do
 
   use CodeCorps.Web, :controller
 
-  alias JaSerializer.Params
   alias CodeCorps.OrganizationMembership
 
-  plug :load_and_authorize_resource, model: OrganizationMembership, only: [:create, :update, :delete]
+  plug :load_resource, model: OrganizationMembership, only: [:show], preload: [:organization, :member]
+  plug :load_and_authorize_resource, model: OrganizationMembership, only: [:delete]
+  plug :load_and_authorize_changeset, model: OrganizationMembership, only: [:create, :update], preload: [:organization, :member]
+
   plug :scrub_params, "data" when action in [:create, :update]
 
   def index(conn, params) do
@@ -18,18 +20,12 @@ defmodule CodeCorps.OrganizationMembershipController do
     render(conn, "index.json-api", data: memberships)
   end
 
-  def show(conn, %{"id" => id}) do
-    membership =
-      OrganizationMembership
-      |> Repo.get!(id)
-
-    render(conn, "show.json-api", data: membership)
+  def show(conn, %{"id" => _id}) do
+    render(conn, "show.json-api", data: conn.assigns.organization_membership)
   end
 
-  def create(conn, %{"data" => data = %{"type" => "organization-membership"}}) do
-    changeset = %OrganizationMembership{} |> OrganizationMembership.create_changeset(Params.to_attributes(data))
-
-    case Repo.insert(changeset) do
+  def create(conn, %{"data" => %{"type" => "organization-membership"}}) do
+    case Repo.insert(conn.assigns.changeset) do
       {:ok, membership} ->
         conn
         |> @analytics.track(:created, membership)
@@ -43,14 +39,8 @@ defmodule CodeCorps.OrganizationMembershipController do
     end
   end
 
-  def update(conn, %{"id" => id, "data" => data = %{"type" => "organization-membership", "attributes" => _params}}) do
-    membership =
-      OrganizationMembership
-      |> Repo.get!(id)
-
-    changeset = membership |> OrganizationMembership.update_changeset(Params.to_attributes(data))
-
-    case Repo.update(changeset) do
+  def update(conn, %{"id" => _id, "data" => %{"type" => "organization-membership", "attributes" => _params}}) do
+    case Repo.update(conn.assigns.changeset) do
       {:ok, membership} ->
         render(conn, "show.json-api", data: membership)
       {:error, changeset} ->
@@ -60,9 +50,8 @@ defmodule CodeCorps.OrganizationMembershipController do
     end
   end
 
-  def delete(conn, %{"id" => id}) do
-    OrganizationMembership |> Repo.get!(id) |> Repo.delete!
-
+  def delete(conn, %{"id" => _id}) do
+    conn.assigns.organization_membership |> Repo.delete!
     conn |> send_resp(:no_content, "")
   end
 end

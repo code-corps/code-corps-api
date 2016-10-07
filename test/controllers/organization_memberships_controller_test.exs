@@ -110,18 +110,15 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
     end
 
     test "renders page not found when id is nonexistent", %{conn: conn} do
-      assert_error_sent 404, fn ->
-        path = conn |> organization_membership_path(:show, -1)
-        conn |> get(path)
-      end
+      path = conn |> organization_membership_path(:show, -1)
+      assert conn |> get(path) |> json_response(:not_found)
     end
   end
 
   describe "create" do
     @tag :authenticated
-    test "creates and renders resource when data is valid", %{conn: conn} do
+    test "creates and renders resource when data is valid", %{conn: conn, current_user: member} do
       organization = insert(:organization)
-      member = insert(:user)
 
       payload = build_payload |> put_relationships(organization, member)
 
@@ -141,8 +138,11 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders 422 when data is invalid", %{conn: conn} do
-      payload = build_payload
+    test "does not create resource and renders 422 when data is invalid", %{conn: conn, current_user: member} do
+      # only way to trigger a validation error is to provide a non-existant organization
+      # anything else will fail on authorization level
+      organization = build(:organization)
+      payload = build_payload |> put_relationships(organization, member)
 
       path = conn |> organization_membership_path(:create)
       data = conn |> post(path, payload) |> json_response(422)
@@ -155,7 +155,7 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
     @tag :authenticated
     test "updates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
       organization = insert(:organization)
-      membership = insert(:organization_membership, organization: organization)
+      membership = insert(:organization_membership, organization: organization, role: "pending")
       insert(:organization_membership, organization: organization, member: current_user, role: "owner")
 
       payload = build_payload |> put_id(membership.id) |> put_attributes(@valid_attrs)
@@ -173,23 +173,6 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
       assert membership.role == "contributor"
       assert membership.organization_id == membership.organization_id
       assert membership.member_id == membership.member_id
-    end
-
-    @tag :authenticated
-    test "doesn't update and renders 422 when data is invalid", %{conn: conn, current_user: current_user} do
-      organization = insert(:organization)
-      membership = insert(:organization_membership, organization: organization)
-      insert(:organization_membership, organization: organization, member: current_user, role: "owner")
-
-      payload =
-        build_payload
-        |> put_id(membership.id)
-        |> put_attributes(@invalid_attrs)
-
-      path = conn |> organization_membership_path(:update, membership)
-      conn = conn |> put(path, payload)
-
-      assert conn |> json_response(422)
     end
 
     test "doesn't update and renders 401 when unauthenticated", %{conn: conn} do
@@ -216,8 +199,10 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
 
     @tag :authenticated
     test "renders page not found when id is nonexistent on update", %{conn: conn} do
+      payload = build_payload |> put_id(-1) |> put_attributes(@valid_attrs)
+
       path = conn |> organization_membership_path(:update, -1)
-      assert conn |> put(path) |> json_response(:not_found)
+      assert conn |> put(path, payload) |> json_response(:not_found)
     end
   end
 

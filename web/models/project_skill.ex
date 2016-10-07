@@ -11,7 +11,7 @@ defmodule CodeCorps.ProjectSkill do
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """
-  def changeset(struct, params \\ %{}) do
+  def create_changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:project_id, :skill_id])
     |> validate_required([:project_id, :skill_id])
