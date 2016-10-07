@@ -1,6 +1,5 @@
 defmodule CodeCorps.SluggedRouteController do
   use CodeCorps.Web, :controller
-
   alias CodeCorps.SluggedRoute
 
   def show(conn, %{"slug" => slug}) do

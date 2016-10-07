@@ -1,9 +1,8 @@
 defmodule CodeCorps.OrganizationPolicy do
+  import Ecto.Query
   alias CodeCorps.User
   alias CodeCorps.Organization
   alias CodeCorps.OrganizationMembership
-
-  import Ecto.Query
 
   def create?(%User{admin: true}), do: true
   def create?(%User{admin: false}), do: false

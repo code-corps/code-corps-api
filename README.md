@@ -37,6 +37,7 @@ Have everything installed and ready to work? Read [our usage guides](docs/USAGE.
 - [Run normal `mix` commands through Docker](docs/USAGE.md#interacting-with-the-app)
 - [Stop and start the server](docs/USAGE.md#stopping-and-starting-the-server)
 - [Run tests](docs/USAGE.md#running-tests)
+- [Linting and Style Guidelines](docs/USAGE.md#linting-code-with-credo)
 - [Rebuild Docker containers](docs/USAGE.md#rebuilding-docker-containers)
 - [Work with the Ember front-end](docs/USAGE.md#serving-ember)
 - [Set up environment variables](docs/USAGE.md#environment)

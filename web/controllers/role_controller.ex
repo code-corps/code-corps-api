@@ -1,6 +1,5 @@
 defmodule CodeCorps.RoleController do
   use CodeCorps.Web, :controller
-
   alias CodeCorps.Role
   alias JaSerializer.Params
 

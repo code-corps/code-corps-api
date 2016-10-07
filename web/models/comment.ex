@@ -1,9 +1,7 @@
 defmodule CodeCorps.Comment do
   use CodeCorps.Web, :model
-
-  alias CodeCorps.MarkdownRenderer
-
   import CodeCorps.ModelHelpers
+  alias CodeCorps.MarkdownRenderer
 
   schema "comments" do
     field :body, :string

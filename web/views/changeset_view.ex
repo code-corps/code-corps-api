@@ -1,6 +1,5 @@
 defmodule CodeCorps.ChangesetView do
   use CodeCorps.Web, :view
-
   alias Ecto.Changeset
 
   @doc """

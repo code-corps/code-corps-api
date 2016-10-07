@@ -1,6 +1,5 @@
 defmodule CodeCorps.ProjectController do
   use CodeCorps.Web, :controller
-
   alias CodeCorps.Project
   alias JaSerializer.Params
 
