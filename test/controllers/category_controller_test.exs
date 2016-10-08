@@ -1,18 +1,16 @@
 defmodule CodeCorps.CategoryControllerTest do
   use CodeCorps.ApiCase
 
-  alias CodeCorps.Category
-
   @valid_attrs %{description: "You want to improve software tools and infrastructure.", name: "Technology"}
   @invalid_attrs %{name: nil}
 
-  def request_create(conn, attrs) do
+  defp request_create(conn, attrs) do
     path = conn |> category_path(:create)
     payload = json_payload(:category, attrs)
     conn |> post(path, payload)
   end
 
-  def request_update(conn, attrs) do
+  defp request_update(conn, attrs) do
     category = insert(:category)
     payload = json_payload(:category, attrs)
     path = conn |> category_path(:update, category)
@@ -30,14 +28,7 @@ defmodule CodeCorps.CategoryControllerTest do
       category = insert(:category)
 
       path = conn |> category_path(:show, category)
-      data = conn |> get(path) |> json_response(200) |> Map.get("data")
-
-      assert data["id"] == category.id |> Integer.to_string
-      assert data["type"] == "category"
-
-      assert data["attributes"]["name"] == category.name
-      assert data["attributes"]["slug"] == category.slug
-      assert data["attributes"]["description"] == category.description
+      assert conn |> get(path) |> json_response(200)
     end
 
     test "renders page not found when id is nonexistent", %{conn: conn} do
@@ -49,11 +40,7 @@ defmodule CodeCorps.CategoryControllerTest do
   describe "create" do
     @tag authenticated: :admin
     test "creates and renders resource when data is valid", %{conn: conn} do
-      response = conn |> request_create(@valid_attrs) |> json_response(201)
-
-      assert response["data"]["id"]
-      assert response["data"]["attributes"]["slug"] == "technology"
-      assert Repo.get_by(Category, @valid_attrs)
+      assert conn |> request_create(@valid_attrs) |> json_response(201)
     end
 
     @tag authenticated: :admin
@@ -76,11 +63,7 @@ defmodule CodeCorps.CategoryControllerTest do
   describe "update" do
     @tag authenticated: :admin
     test "updates and renders chosen resource when data is valid", %{conn: conn} do
-      response = conn |> request_update(@valid_attrs) |> json_response(200)
-
-      category = Repo.get_by(Category, @valid_attrs)
-      assert category
-      assert response["data"]["id"] == "#{category.id}"
+      assert conn |> request_update(@valid_attrs) |> json_response(200)
     end
 
     @tag authenticated: :admin
