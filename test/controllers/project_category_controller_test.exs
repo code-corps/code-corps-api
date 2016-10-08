@@ -37,25 +37,22 @@ defmodule CodeCorps.ProjectCategoryControllerTest do
       project_category_2 = insert(:project_category, project: project, category: society)
       insert(:project_category, project: project, category: technology)
 
-      json =
+      response =
         conn
         |> get("project-categories/?filter[id]=#{project_category_1.id},#{project_category_2.id}")
         |> json_response(200)
-      data = json["data"]
-      assert length(data) == 2
-      [first_result, second_result | _] = data
 
-      assert first_result["id"] == "#{project_category_1.id}"
-      assert first_result["relationships"]["project"]["data"]["id"] == "#{project.id}"
-      assert first_result["relationships"]["project"]["data"]["type"] == "project"
-      assert first_result["relationships"]["category"]["data"]["id"] == "#{arts.id}"
-      assert first_result["relationships"]["category"]["data"]["type"] == "category"
+      [first_result, second_result] = response |> Map.get("data")
 
-      assert second_result["id"] == "#{project_category_2.id}"
-      assert second_result["relationships"]["project"]["data"]["id"] == "#{project.id}"
-      assert second_result["relationships"]["project"]["data"]["type"] == "project"
-      assert second_result["relationships"]["category"]["data"]["id"] == "#{society.id}"
-      assert second_result["relationships"]["category"]["data"]["type"] == "category"
+      first_result
+      |> assert_result_id(project_category_1.id)
+      |> assert_jsonapi_relationship("project", project.id)
+      |> assert_jsonapi_relationship("category", arts.id)
+
+      second_result
+      |> assert_result_id(project_category_2.id)
+      |> assert_jsonapi_relationship("project", project.id)
+      |> assert_jsonapi_relationship("category", society.id)
     end
   end
 
@@ -64,15 +61,14 @@ defmodule CodeCorps.ProjectCategoryControllerTest do
       category = insert(:category)
       project = insert(:project)
       project_category = insert(:project_category, project: project, category: category)
-      conn = get conn, project_category_path(conn, :show, project_category)
-      data = json_response(conn, 200)["data"]
-      assert data["id"] == "#{project_category.id}"
-      assert data["type"] == "project-category"
-      assert data["attributes"] == %{}
-      assert data["relationships"]["project"]["data"]["id"] == "#{project.id}"
-      assert data["relationships"]["project"]["data"]["type"] == "project"
-      assert data["relationships"]["category"]["data"]["id"] == "#{category.id}"
-      assert data["relationships"]["category"]["data"]["type"] == "category"
+
+      conn
+      |> get(project_category_path(conn, :show, project_category))
+      |> json_response(200)
+      |> Map.get("data")
+      |> assert_result_id(project_category.id)
+      |> assert_jsonapi_relationship("project", project.id)
+      |> assert_jsonapi_relationship("category", category.id)
     end
 
     test "does not show resource and instead throw error when id is nonexistent", %{conn: conn} do
@@ -93,13 +89,14 @@ defmodule CodeCorps.ProjectCategoryControllerTest do
       payload = build_payload |> put_relationships(project, category)
 
       path = conn |> project_category_path(:create)
-      data = conn |> post(path, payload) |> json_response(201) |> Map.get("data")
+      response = conn |> post(path, payload) |> json_response(201)
+      data = response |> Map.get("data")
 
-      id = data["id"]
-      assert data["relationships"]["project"]["data"]["id"] |> String.to_integer == project.id
-      assert data["relationships"]["category"]["data"]["id"] |> String.to_integer == category.id
+      data
+      |> assert_jsonapi_relationship("project", project.id)
+      |> assert_jsonapi_relationship("category", category.id)
 
-      project_category = ProjectCategory |> Repo.get(id)
+      project_category = ProjectCategory |> Repo.get(data["id"])
       assert project_category
       assert project_category.project_id == project.id
       assert project_category.category_id == category.id
