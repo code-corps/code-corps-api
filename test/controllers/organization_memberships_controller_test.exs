@@ -23,6 +23,11 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
     }
   end
 
+  defp assert_role(data, role) do
+    assert data["attributes"]["role"] == role
+    data
+  end
+
   describe "index" do
     test "lists all resources", %{conn: conn} do
       [membership_1, membership_2] = insert_pair(:organization_membership)
@@ -99,14 +104,16 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
       membership = insert(:organization_membership, role: "admin")
 
       path = conn |> organization_membership_path(:show, membership)
-      data = conn |> get(path) |> json_response(200) |> Map.get("data")
 
-      assert data["id"] == "#{membership.id}"
-      assert data["type"] == "organization-membership"
-
-      assert data["attributes"]["role"] == "admin"
-      assert data["relationships"]["organization"]["data"]["id"] |> String.to_integer == membership.organization_id
-      assert data["relationships"]["member"]["data"]["id"] |> String.to_integer == membership.member_id
+      response =
+        conn
+        |> get(path)
+        |> json_response(200)
+        |> assert_jsonapi_relationship("organization", membership.organization.id)
+        |> assert_jsonapi_relationship("member", membership.member.id)
+        |> Map.get("data")
+        |> assert_result_id(membership.id)
+        |> assert_role("admin")
     end
 
     test "renders page not found when id is nonexistent", %{conn: conn} do
@@ -123,14 +130,16 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
       payload = build_payload |> put_relationships(organization, member)
 
       path = conn |> organization_membership_path(:create)
-      data = conn |> post(path, payload) |> json_response(201) |> Map.get("data")
+      response =
+        conn
+        |> post(path, payload)
+        |> json_response(201)
+        |> assert_jsonapi_relationship("organization", organization.id)
+        |> assert_jsonapi_relationship("member", member.id)
 
-      id = data["id"]
-      assert data["attributes"]["role"] == "pending"
-      assert data["relationships"]["organization"]["data"]["id"] |> String.to_integer == organization.id
-      assert data["relationships"]["member"]["data"]["id"] |> String.to_integer == member.id
+      data = response |> Map.get("data") |> assert_role("pending")
 
-      membership = OrganizationMembership |> Repo.get(id)
+      membership = OrganizationMembership |> Repo.get(data["id"])
       assert membership
       assert membership.role == "pending"
       assert membership.organization_id == organization.id
@@ -161,14 +170,17 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
       payload = build_payload |> put_id(membership.id) |> put_attributes(@valid_attrs)
 
       path = conn |> organization_membership_path(:update, membership)
-      data = conn |> put(path, payload) |> json_response(200) |> Map.get("data")
 
-      id = data["id"]
-      assert data["attributes"]["role"] == "contributor"
-      assert data["relationships"]["organization"]["data"]["id"] |> String.to_integer == membership.organization_id
-      assert data["relationships"]["member"]["data"]["id"] |> String.to_integer == membership.member_id
+      response =
+        conn
+        |> put(path, payload)
+        |> json_response(200)
+        |> assert_jsonapi_relationship("organization", membership.organization.id)
+        |> assert_jsonapi_relationship("member", membership.member.id)
 
-      membership = OrganizationMembership |> Repo.get(id)
+      data = response |> Map.get("data") |> assert_role("contributor")
+
+      membership = OrganizationMembership |> Repo.get(data["id"])
       assert membership
       assert membership.role == "contributor"
       assert membership.organization_id == membership.organization_id
