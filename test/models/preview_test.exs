@@ -3,22 +3,21 @@ defmodule CodeCorps.PreviewTest do
 
   alias CodeCorps.Preview
 
-  test "changeset renders body html from markdown" do
-    changeset = Preview.changeset(%Preview{}, %{markdown: "A **strong** element"}, nil)
-    assert changeset.valid?
-    assert changeset |> get_change(:body) == "<p>A <strong>strong</strong> element</p>\n"
-  end
+  describe "create_changeset/2" do
+    test "renders body html from markdown" do
+      user = insert(:user)
+      changeset = Preview.create_changeset(%Preview{}, %{
+        markdown: "A **strong** element",
+        user_id: user.id
+      })
+      assert changeset.valid?
+      assert changeset |> get_change(:body) == "<p>A <strong>strong</strong> element</p>\n"
+    end
 
-  test "changeset requires markdown change" do
-    changeset = Preview.changeset(%Preview{}, %{}, nil)
-    refute changeset.valid?
-    assert changeset.errors[:markdown] == {"can't be blank", []}
-  end
-
-  test "assigns user_id if present" do
-    user = insert(:user)
-    changeset = Preview.changeset(%Preview{}, %{markdown: "A **strong** element"}, user)
-    assert changeset.valid?
-    assert Ecto.Changeset.get_change(changeset, :user).data == user
+    test "requires markdown change" do
+      changeset = Preview.create_changeset(%Preview{}, %{})
+      refute changeset.valid?
+      assert changeset.errors[:markdown] == {"can't be blank", []}
+    end
   end
 end

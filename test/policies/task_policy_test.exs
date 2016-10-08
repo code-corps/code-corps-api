@@ -7,32 +7,32 @@ defmodule CodeCorps.TaskPolicyTest do
   alias CodeCorps.Task
 
   describe "create" do
-    test "retuns true when user is an admin" do
+    test "returns true when user is an admin" do
       user = build(:user, admin: true)
       changeset = %Task{} |> create_changeset(%{})
 
-      assert create?(user, changeset) == true
+      assert create?(user, changeset) 
     end
 
     test "returns false when user is not the author" do
       user = build(:user)
       changeset = %Task{} |> create_changeset(%{task_type: "issue", user_id: "other"})
 
-      assert create?(user, changeset) == false
+      refute create?(user, changeset) 
     end
 
     test "returns true when task is an issue" do
       user = insert(:user)
       changeset = %Task{} |> create_changeset(%{task_type: "issue", user_id: user.id})
 
-      assert create?(user, changeset) == true
+      assert create?(user, changeset) 
     end
 
     test "returns true when task is an idea" do
       user = insert(:user)
       changeset = %Task{} |> create_changeset(%{task_type: "idea", user_id: user.id})
 
-      assert create?(user, changeset) == true
+      assert create?(user, changeset) 
     end
 
     test "returns true when user is at least contributor of organization" do
@@ -44,7 +44,7 @@ defmodule CodeCorps.TaskPolicyTest do
 
       changeset = %Task{} |> create_changeset(%{project_id: project.id, task_type: "task", user_id: user.id})
 
-      assert create?(user, changeset) == true
+      assert create?(user, changeset) 
     end
 
     test "returns false when user is not contributor and type is 'task'" do
@@ -54,16 +54,16 @@ defmodule CodeCorps.TaskPolicyTest do
 
       changeset = %Task{} |> create_changeset(%{project_id: project.id, task_type: "task", user_id: user.id})
 
-      assert create?(user, changeset) == false
+      refute create?(user, changeset) 
     end
   end
 
   describe "update" do
-    test "retuns true when user is an admin" do
+    test "returns true when user is an admin" do
       user = build(:user, admin: true)
       task = build(:task)
 
-      assert update?(user, task) == true
+      assert update?(user, task) 
     end
   end
 end

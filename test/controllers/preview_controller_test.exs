@@ -4,13 +4,22 @@ defmodule CodeCorps.PreviewControllerTest do
   alias CodeCorps.Preview
 
   defp build_payload do
-    %{"data" => %{"type" => "preview","attributes" => %{markdown: "A **strong** element"}}}
+    %{"data" => %{"type" => "preview", "attributes" => %{markdown: "A **strong** element"}}}
+  end
+  defp put_relationships(payload, user) do
+    relationships = build_relationships(user)
+    payload |> put_in(["data", "relationships"], relationships)
+  end
+  defp build_relationships(user) do
+    %{
+      user: %{data: %{id: user.id}}
+    }
   end
 
   describe "create" do
     @tag :authenticated
-    test "creates and renders resource, with body containing markdown rendered to html", %{conn: conn} do
-      payload = build_payload
+    test "creates and renders resource, with body containing markdown rendered to html", %{conn: conn, current_user: current_user} do
+      payload = build_payload |> put_relationships(current_user)
       path = conn |> preview_path(:create)
       json = conn |> post(path, payload) |> json_response(201)
 
@@ -31,7 +40,7 @@ defmodule CodeCorps.PreviewControllerTest do
 
     @tag :authenticated
     test "it assigns current user as owner of preview, if available", %{conn: conn, current_user: current_user} do
-      payload = build_payload
+      payload = build_payload |> put_relationships(current_user)
       path = conn |> preview_path(:create)
       json = conn |> post(path, payload) |> json_response(201)
 

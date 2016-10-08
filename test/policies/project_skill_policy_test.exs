@@ -7,11 +7,11 @@ defmodule CodeCorps.ProjectSkillPolicyTest do
   alias CodeCorps.ProjectSkill
 
   describe "create?" do
-    test "retuns true when user is an admin" do
+    test "returns true when user is an admin" do
       user = build(:user, admin: true)
       changeset = %ProjectSkill{} |> create_changeset(%{})
 
-      assert create?(user, changeset) == true
+      assert create?(user, changeset) 
     end
 
     test "returns false when user is not member of organization" do
@@ -20,7 +20,7 @@ defmodule CodeCorps.ProjectSkillPolicyTest do
       project = insert(:project, organization: organization)
 
       changeset = %ProjectSkill{} |> create_changeset(%{project_id: project.id})
-      assert create?(user, changeset) == false
+      refute create?(user, changeset) 
     end
 
     test "returns false when user is pending member of organization" do
@@ -31,7 +31,7 @@ defmodule CodeCorps.ProjectSkillPolicyTest do
       insert(:organization_membership, role: "pending", member: user, organization: organization)
 
       changeset = %ProjectSkill{} |> create_changeset(%{project_id: project.id})
-      assert create?(user, changeset) == false
+      refute create?(user, changeset) 
     end
 
     test "returns false when user is contributor of organization" do
@@ -42,7 +42,7 @@ defmodule CodeCorps.ProjectSkillPolicyTest do
       insert(:organization_membership, role: "contributor", member: user, organization: organization)
 
       changeset = %ProjectSkill{} |> create_changeset(%{project_id: project.id})
-      assert create?(user, changeset) == false
+      refute create?(user, changeset) 
     end
 
     test "returns true when user is admin of organization" do
@@ -53,7 +53,7 @@ defmodule CodeCorps.ProjectSkillPolicyTest do
       insert(:organization_membership, role: "admin", member: user, organization: organization)
 
       changeset = %ProjectSkill{} |> create_changeset(%{project_id: project.id})
-      assert create?(user, changeset) == true
+      assert create?(user, changeset) 
     end
 
     test "returns true when user is owner of organization" do
@@ -64,16 +64,16 @@ defmodule CodeCorps.ProjectSkillPolicyTest do
       insert(:organization_membership, role: "owner", member: user, organization: organization)
 
       changeset = %ProjectSkill{} |> create_changeset(%{project_id: project.id})
-      assert create?(user, changeset) == true
+      assert create?(user, changeset) 
     end
   end
 
   describe "delete?" do
-    test "retuns true when user is an admin" do
+    test "returns true when user is an admin" do
       user = build(:user, admin: true)
       project_skill = insert(:project_skill)
 
-      assert delete?(user, project_skill) == true
+      assert delete?(user, project_skill) 
     end
 
     test "returns false when user is not member of organization" do
@@ -82,7 +82,7 @@ defmodule CodeCorps.ProjectSkillPolicyTest do
       project = insert(:project, organization: organization)
       project_skill = insert(:project_skill, project: project)
 
-      assert delete?(user, project_skill) == false
+      refute delete?(user, project_skill) 
     end
 
     test "returns false when user is pending member of organization" do
@@ -93,7 +93,7 @@ defmodule CodeCorps.ProjectSkillPolicyTest do
 
       insert(:organization_membership, role: "pending", member: user, organization: organization)
 
-      assert delete?(user, project_skill) == false
+      refute delete?(user, project_skill) 
     end
 
     test "returns false when user is contributor of organization" do
@@ -104,7 +104,7 @@ defmodule CodeCorps.ProjectSkillPolicyTest do
 
       insert(:organization_membership, role: "contributor", member: user, organization: organization)
 
-      assert delete?(user, project_skill) == false
+      refute delete?(user, project_skill) 
     end
 
     test "returns true when user is admin of organization" do
@@ -115,7 +115,7 @@ defmodule CodeCorps.ProjectSkillPolicyTest do
 
       insert(:organization_membership, role: "admin", member: user, organization: organization)
 
-      assert delete?(user, project_skill) == true
+      assert delete?(user, project_skill) 
     end
 
     test "returns true when user is owner of organization" do
@@ -126,7 +126,7 @@ defmodule CodeCorps.ProjectSkillPolicyTest do
 
       insert(:organization_membership, role: "owner", member: user, organization: organization)
 
-      assert delete?(user, project_skill) == true
+      assert delete?(user, project_skill) 
     end
   end
 end

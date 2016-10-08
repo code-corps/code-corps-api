@@ -5,14 +5,15 @@ defmodule CodeCorps.TaskPolicy do
   alias CodeCorps.User
 
   alias CodeCorps.Repo
+  alias Ecto.Changeset
 
   import Ecto.Query
 
   # TODO: Need to be able to see what resource is being created here
   # Previously, any user could create issues and ideas, but only
   # approved members of organization could create other task types
-  def create?(%User{admin: true}, %Ecto.Changeset{}), do: true
-  def create?(%User{} = user, %Ecto.Changeset{changes: %{user_id: author_id, task_type: task_type}} = changeset) do
+  def create?(%User{admin: true}, %Changeset{}), do: true
+  def create?(%User{} = user, %Changeset{changes: %{user_id: author_id, task_type: task_type}} = changeset) do
     cond do
       # can't create for some other user
       user.id != author_id -> false
@@ -24,7 +25,7 @@ defmodule CodeCorps.TaskPolicy do
       true -> false
     end
   end
-  def create?(%User{}, %Ecto.Changeset{}), do: false
+  def create?(%User{}, %Changeset{}), do: false
 
   def update?(%User{} = user, %Task{user_id: author_id} = task) do
     cond do
@@ -37,7 +38,7 @@ defmodule CodeCorps.TaskPolicy do
     end
   end
 
-  defp get_project(%Ecto.Changeset{changes: %{project_id: project_id}}), do: Project |> Repo.get(project_id)
+  defp get_project(%Changeset{changes: %{project_id: project_id}}), do: Project |> Repo.get(project_id)
   defp get_project(%Task{project_id: project_id}), do: Project |> Repo.get(project_id)
 
   defp get_membership(%Project{organization_id: organization_id}, %User{id: user_id}) do

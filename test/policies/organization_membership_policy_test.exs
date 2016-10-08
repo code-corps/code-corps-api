@@ -7,36 +7,36 @@ defmodule CodeCorps.OrganizationMembershipPolicyTest do
   alias CodeCorps.OrganizationMembership
 
   describe "create" do
-    test "retuns true when user is an admin" do
+    test "returns true when user is an admin" do
       user = build(:user, admin: true)
       changeset = %OrganizationMembership{} |> create_changeset(%{})
 
-      assert create?(user, changeset) == true
+      assert create?(user, changeset) 
     end
 
     test "returns true when user is creating their own membership" do
       user = insert(:user, admin: true)
       changeset = %OrganizationMembership{} |> create_changeset(%{member_id: user.id})
 
-      assert create?(user, changeset) == true
+      assert create?(user, changeset) 
     end
 
     test "returns false for normal user, creating someone else's membership" do
       user = build(:user, admin: true)
       changeset = %OrganizationMembership{} |> create_changeset(%{member_id: "someone_else"})
 
-      assert create?(user, changeset) == true
+      assert create?(user, changeset) 
     end
   end
 
   describe "update" do
-    test "retuns true when user is site admin" do
+    test "returns true when user is site admin" do
       user = build(:user, admin: true)
       membership = build(:organization_membership)
 
       changeset = membership |> update_changeset(%{})
 
-      assert update?(user, changeset) == true
+      assert update?(user, changeset) 
     end
 
     test "returns false when user is non-member" do
@@ -45,7 +45,7 @@ defmodule CodeCorps.OrganizationMembershipPolicyTest do
 
       changeset = membership |> update_changeset(%{})
 
-      assert update?(user, changeset) == false
+      refute update?(user, changeset) 
     end
 
     test "returns false when user is pending" do
@@ -57,7 +57,7 @@ defmodule CodeCorps.OrganizationMembershipPolicyTest do
 
       changeset = membership |> update_changeset(%{})
 
-      assert update?(user, changeset) == false
+      refute update?(user, changeset) 
     end
 
     test "returns false when user is contributor" do
@@ -69,7 +69,7 @@ defmodule CodeCorps.OrganizationMembershipPolicyTest do
 
       changeset = membership |> update_changeset(%{})
 
-      assert update?(user, changeset) == false
+      refute update?(user, changeset) 
     end
 
     test "returns true when user is admin, approving a pending membership" do
@@ -81,7 +81,7 @@ defmodule CodeCorps.OrganizationMembershipPolicyTest do
 
       changeset = membership |> update_changeset(%{role: "contributor"})
 
-      assert update?(user, changeset) == true
+      assert update?(user, changeset) 
     end
 
     test "returns false when user is admin, doing something other than approving a pending membership" do
@@ -93,7 +93,7 @@ defmodule CodeCorps.OrganizationMembershipPolicyTest do
 
       changeset = membership |> update_changeset(%{})
 
-      assert update?(user, changeset) == false
+      refute update?(user, changeset) 
     end
 
     test "returns true when user is owner and is changing a role other than owner" do
@@ -105,7 +105,7 @@ defmodule CodeCorps.OrganizationMembershipPolicyTest do
 
       changeset = membership |> update_changeset(%{})
 
-      assert update?(user, changeset) == true
+      assert update?(user, changeset) 
     end
 
     test "returns false when user is owner and is changing another owner" do
@@ -117,16 +117,16 @@ defmodule CodeCorps.OrganizationMembershipPolicyTest do
 
       changeset = membership |> update_changeset(%{})
 
-      assert update?(user, changeset) == false
+      refute update?(user, changeset) 
     end
   end
 
   describe "delete" do
-    test "retuns true when user is site admin" do
+    test "returns true when user is site admin" do
       user = build(:user, admin: true)
       membership = build(:organization_membership)
 
-      assert delete?(user, membership) == true
+      assert delete?(user, membership) 
     end
 
     test "returns true when contributor is deleting their own membership" do
@@ -135,7 +135,7 @@ defmodule CodeCorps.OrganizationMembershipPolicyTest do
 
       membership = insert(:organization_membership, organization: organization, member: user, role: "contributor")
 
-      assert delete?(user, membership) == true
+      assert delete?(user, membership) 
     end
 
     test "returns true when admin is deleting a pending membership" do
@@ -145,7 +145,7 @@ defmodule CodeCorps.OrganizationMembershipPolicyTest do
 
       membership = insert(:organization_membership, organization: organization, role: "pending")
 
-      assert delete?(user, membership) == true
+      assert delete?(user, membership) 
     end
 
     test "returns true when admin is deleting a contributor" do
@@ -155,7 +155,7 @@ defmodule CodeCorps.OrganizationMembershipPolicyTest do
 
       membership = insert(:organization_membership, organization: organization, role: "contributor")
 
-      assert delete?(user, membership) == true
+      assert delete?(user, membership) 
     end
 
     test "returns false when admin is deleting another admin" do
@@ -165,7 +165,7 @@ defmodule CodeCorps.OrganizationMembershipPolicyTest do
 
       membership = insert(:organization_membership, organization: organization, role: "admin")
 
-      assert delete?(user, membership) == false
+      refute delete?(user, membership) 
     end
 
     test "returns false when admin is deleting an owner" do
@@ -175,7 +175,7 @@ defmodule CodeCorps.OrganizationMembershipPolicyTest do
 
       membership = insert(:organization_membership, organization: organization, role: "owner")
 
-      assert delete?(user, membership) == false
+      refute delete?(user, membership) 
     end
 
     test "returns true when owner is deleting an admin" do
@@ -185,7 +185,7 @@ defmodule CodeCorps.OrganizationMembershipPolicyTest do
 
       membership = insert(:organization_membership, organization: organization, role: "admin")
 
-      assert delete?(user, membership) == true
+      assert delete?(user, membership) 
     end
   end
 end

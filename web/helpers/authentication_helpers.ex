@@ -28,16 +28,21 @@ defmodule CodeCorps.AuthenticationHelpers do
   # This is partially adjusted code, taken from canary
   def load_and_authorize_changeset(conn, options) do
     action = conn.private.phoenix_action
-
     cond do
-      action in options[:only] -> conn |> load_resource(options) |> do_init_and_authorize_changeset(options[:model], action)
-      true -> conn
+      action in options[:only] ->
+        conn
+        |> load_resource(options)
+        |> do_init_and_authorize_changeset(options[:model], action)
+      true ->
+        conn
     end
   end
 
   defp do_init_and_authorize_changeset(conn, model, action) do
     changeset = init_changeset(conn, model, action)
-    conn |> assign(:changeset, changeset) |> authorize(changeset, action)
+    conn
+    |> assign(:changeset, changeset)
+    |> authorize(changeset, action)
   end
 
   defp init_changeset(conn, model, action) do
@@ -51,15 +56,23 @@ defmodule CodeCorps.AuthenticationHelpers do
   defp do_init_changeset(model, method, params), do: apply(model, method, params)
 
   defp get_resource(conn, model, :update) do
-    resource_name = model |> Module.split |> List.last |> Macro.underscore |> String.to_atom
+    resource_name =
+      model
+      |> Module.split
+      |> List.last
+      |> Macro.underscore
+      |> String.to_atom
+
     conn.assigns |> Map.get(resource_name)
   end
   defp get_resource(_conn, model, :create), do: model.__struct__
 
   defp get_changeset_method(action), do: "#{action}_changeset" |> String.to_atom
 
-  def authorize(conn, changeset, action) do
+  defp authorize(conn, changeset, action) do
     current_user = conn.assigns |> Map.get(:current_user)
-    conn |> assign(:authorized, can?(current_user, action, changeset)) |> handle_unauthorized
+    conn
+    |> assign(:authorized, can?(current_user, action, changeset))
+    |> handle_unauthorized
   end
 end

@@ -50,7 +50,7 @@ defmodule Canary.Abilities do
     def can?(%User{} = user, :create, Category), do: CategoryPolicy.create?(user)
     def can?(%User{} = user, :update, %Category{}), do: CategoryPolicy.update?(user)
 
-    def can?(%User{} = user, :create, Comment), do: CommentPolicy.create?(user)
+    def can?(%User{} = user, :create, %Changeset{data: %Comment{}} = changeset), do: CommentPolicy.create?(user, changeset)
     def can?(%User{} = user, :update, %Comment{} = comment), do: CommentPolicy.update?(user, comment)
 
     def can?(%User{} = user, :create, Organization), do: OrganizationPolicy.create?(user)
@@ -63,7 +63,7 @@ defmodule Canary.Abilities do
     def can?(%User{} = user, :create, %Changeset{data: %Task{}} = changeset), do: TaskPolicy.create?(user, changeset)
     def can?(%User{} = user, :update, %Task{} = task), do: TaskPolicy.update?(user, task)
 
-    def can?(%User{} = user, :create, Preview), do: PreviewPolicy.create?(user)
+    def can?(%User{} = user, :create, %Changeset{data: %Preview{}} = changeset), do: PreviewPolicy.create?(user, changeset)
 
     def can?(%User{} = user, :create, %Changeset{data: %Project{}} = changeset), do: ProjectPolicy.create?(user, changeset)
     def can?(%User{} = user, :update, %Project{} = project), do: ProjectPolicy.update?(user, project)
