@@ -4,14 +4,10 @@ defmodule CodeCorps.PreviewController do
   alias CodeCorps.Preview
   alias JaSerializer.Params
 
-  plug :load_and_authorize_resource, model: Preview, only: [:create]
+  plug :load_and_authorize_changeset, model: Preview, only: [:create]
 
-  def create(conn, %{"data" => data = %{"type" => "preview", "attributes" => _project_params}}) do
-    user =
-      conn
-      |> Guardian.Plug.current_resource
-
-    changeset = Preview.changeset(%Preview{}, Params.to_attributes(data), user)
+  def create(conn, %{"data" => data = %{"type" => "preview", "attributes" => _preview_params}}) do
+    changeset = Preview.create_changeset(%Preview{}, Params.to_attributes(data))
 
     case Repo.insert(changeset) do
       {:ok, preview} ->

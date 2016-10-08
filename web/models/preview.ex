@@ -19,17 +19,11 @@ defmodule CodeCorps.Preview do
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """
-  def changeset(struct, params \\ %{}, user) do
+  def create_changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:markdown])
-    |> validate_required([:markdown])
-    |> assign_user(user)
+    |> cast(params, [:markdown, :user_id])
+    |> validate_required([:markdown, :user_id])
+    |> assoc_constraint(:user)
     |> MarkdownRenderer.render_markdown_to_html(:markdown, :body)
-  end
-
-  defp assign_user(changeset, nil), do: changeset
-  defp assign_user(changeset, user) do
-    changeset
-    |> put_assoc(:user, user)
   end
 end

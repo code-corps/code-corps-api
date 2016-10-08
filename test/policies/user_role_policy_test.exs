@@ -7,48 +7,48 @@ defmodule CodeCorps.UserRolePolicyTest do
   alias CodeCorps.UserRole
 
   describe "create?" do
-    test "retuns true when user is an admin" do
+    test "returns true when user is an admin" do
       user = build(:user, admin: true)
       changeset = %UserRole{} |> create_changeset(%{})
 
-      assert create?(user, changeset) == true
+      assert create?(user, changeset) 
     end
 
     test "returns true if user is creating their own record" do
       user = insert(:user)
       changeset = %UserRole{} |> create_changeset(%{user_id: user.id})
 
-      assert create?(user, changeset) == true
+      assert create?(user, changeset) 
     end
 
     test "returns false if user is creating someone else's record" do
       user = build(:user)
       changeset = %UserRole{} |> create_changeset(%{user_id: "someone-else"})
 
-      assert create?(user, changeset) == false
+      refute create?(user, changeset) 
     end
   end
 
   describe "delete?" do
-    test "retuns true when user is an admin" do
+    test "returns true when user is an admin" do
       user = build(:user, admin: true)
       user_role = insert(:user_role)
 
-      assert delete?(user, user_role) == true
+      assert delete?(user, user_role) 
     end
 
     test "returns true if user is creating their own record" do
       user = insert(:user)
       user_role = insert(:user_role, user: user)
 
-      assert delete?(user, user_role) == true
+      assert delete?(user, user_role) 
     end
 
     test "returns false if user is creating someone else's record" do
       user = build(:user)
       user_role = insert(:user_role)
 
-      assert delete?(user, user_role) == false
+      refute delete?(user, user_role) 
     end
   end
 end

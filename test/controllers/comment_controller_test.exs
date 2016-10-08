@@ -57,14 +57,13 @@ defmodule CodeCorps.CommentControllerTest do
 
   describe "create" do
     @tag :authenticated
-    test "creates and renders resource when data is valid", %{conn: conn} do
-      user = insert(:user)
-      task = insert(:task, user: user)
+    test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
+      task = insert(:task, user: current_user)
 
       payload =
         build_payload
         |> put_attributes(@valid_attrs)
-        |> put_relationships(user, task)
+        |> put_relationships(current_user, task)
 
       path = conn |> comment_path(:create)
       conn = conn |> post(path, payload)
@@ -74,8 +73,13 @@ defmodule CodeCorps.CommentControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders errors when data is invalid", %{conn: conn} do
-      payload = build_payload |> put_attributes(@invalid_attrs)
+    test "does not create resource and renders errors when data is invalid", %{conn: conn, current_user: current_user} do
+      task = insert(:task, user: current_user)
+
+      payload =
+        build_payload
+        |> put_attributes(@invalid_attrs)
+        |> put_relationships(current_user, task)
 
       path = conn |> comment_path(:create)
       conn = conn |> post(path, payload)

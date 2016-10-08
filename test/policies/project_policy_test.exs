@@ -7,11 +7,11 @@ defmodule CodeCorps.ProjectPolicyTest do
   alias CodeCorps.Project
 
   describe "create" do
-    test "retuns true when user is an admin" do
+    test "returns true when user is an admin" do
       user = build(:user, admin: true)
       changeset = %Project{} |> create_changeset(%{})
 
-      assert create?(user, changeset) == true
+      assert create?(user, changeset) 
     end
 
     test "returns false when user is not member of organization" do
@@ -19,7 +19,7 @@ defmodule CodeCorps.ProjectPolicyTest do
       organization = insert(:organization)
 
       changeset = %Project{} |> create_changeset(%{organization_id: organization.id})
-      assert create?(user, changeset) == false
+      refute create?(user, changeset) 
     end
 
     test "returns false when user is pending member of organization" do
@@ -29,7 +29,7 @@ defmodule CodeCorps.ProjectPolicyTest do
       insert(:organization_membership, role: "pending", member: user, organization: organization)
 
       changeset = %Project{} |> create_changeset(%{organization_id: organization.id})
-      assert create?(user, changeset) == false
+      refute create?(user, changeset) 
     end
 
     test "returns false when user is contributor of organization" do
@@ -39,7 +39,7 @@ defmodule CodeCorps.ProjectPolicyTest do
       insert(:organization_membership, role: "contributor", member: user, organization: organization)
 
       changeset = %Project{} |> create_changeset(%{organization_id: organization.id})
-      assert create?(user, changeset) == false
+      refute create?(user, changeset) 
     end
 
     test "returns true when user is admin of organization" do
@@ -49,7 +49,7 @@ defmodule CodeCorps.ProjectPolicyTest do
       insert(:organization_membership, role: "admin", member: user, organization: organization)
 
       changeset = %Project{} |> create_changeset(%{organization_id: organization.id})
-      assert create?(user, changeset) == true
+      assert create?(user, changeset) 
     end
 
     test "returns true when user is owner of organization" do
@@ -59,16 +59,16 @@ defmodule CodeCorps.ProjectPolicyTest do
       insert(:organization_membership, role: "owner", member: user, organization: organization)
 
       changeset = %Project{} |> create_changeset(%{organization_id: organization.id})
-      assert create?(user, changeset) == true
+      assert create?(user, changeset) 
     end
   end
 
   describe "update" do
-    test "retuns true when user is an admin" do
+    test "returns true when user is an admin" do
       user = build(:user, admin: true)
       project = build(:project)
 
-      assert update?(user, project) == true
+      assert update?(user, project) 
     end
 
     test "returns false when user is not member of organization" do
@@ -76,7 +76,7 @@ defmodule CodeCorps.ProjectPolicyTest do
       organization = insert(:organization)
       project = insert(:project, organization: organization)
 
-      assert update?(user, project) == false
+      refute update?(user, project) 
     end
 
     test "returns false when user is pending member of organization" do
@@ -86,7 +86,7 @@ defmodule CodeCorps.ProjectPolicyTest do
 
       insert(:organization_membership, role: "pending", member: user, organization: organization)
 
-      assert update?(user, project) == false
+      refute update?(user, project) 
     end
 
     test "returns false when user is contributor of organization" do
@@ -96,7 +96,7 @@ defmodule CodeCorps.ProjectPolicyTest do
 
       insert(:organization_membership, role: "contributor", member: user, organization: organization)
 
-      assert update?(user, project) == false
+      refute update?(user, project) 
     end
 
     test "returns true when user is admin of organization" do
@@ -106,7 +106,7 @@ defmodule CodeCorps.ProjectPolicyTest do
 
       insert(:organization_membership, role: "admin", member: user, organization: organization)
 
-      assert update?(user, project) == true
+      assert update?(user, project) 
     end
 
     test "returns true when user is owner of organization" do
@@ -116,7 +116,7 @@ defmodule CodeCorps.ProjectPolicyTest do
 
       insert(:organization_membership, role: "owner", member: user, organization: organization)
 
-      assert update?(user, project) == true
+      assert update?(user, project) 
     end
   end
 end

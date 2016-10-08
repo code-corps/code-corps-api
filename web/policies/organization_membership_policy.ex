@@ -11,7 +11,6 @@ defmodule CodeCorps.OrganizationMembershipPolicy do
   def create?(%User{id: user_id}, %Changeset{changes: %{member_id: member_id}}), do:  user_id == member_id
   def create?(%User{}, %Changeset{}), do: false
 
-
   def update?(%User{admin: true}, %Changeset{}), do: true
   def update?(%User{} = user, %Changeset{data: %OrganizationMembership{} = current_membership} = changeset) do
     user_membership = current_membership |> get_user_membership(user)

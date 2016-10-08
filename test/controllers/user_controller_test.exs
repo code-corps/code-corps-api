@@ -139,8 +139,7 @@ defmodule CodeCorps.UserControllerTest do
     end
 
     test "does not update when authorized as different user", %{conn: conn} do
-      user = insert(:user)
-      another_user = insert(:user)
+      [user, another_user] = insert_pair(:user)
 
       attrs = Map.put(@valid_attrs, :password, "password")
 

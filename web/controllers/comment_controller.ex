@@ -6,7 +6,8 @@ defmodule CodeCorps.CommentController do
   alias CodeCorps.Comment
   alias JaSerializer.Params
 
-  plug :load_and_authorize_resource, model: Comment, only: [:create, :update]
+  plug :load_and_authorize_changeset, model: Comment, only: [:create]
+  plug :load_and_authorize_resource, model: Comment, only: [:update]
 
   plug :scrub_params, "data" when action in [:create, :update]
 
