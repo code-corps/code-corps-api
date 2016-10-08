@@ -1,8 +1,6 @@
 defmodule CodeCorps.UserRole do
   use CodeCorps.Web, :model
 
-  import CodeCorps.ModelHelpers
-
   schema "user_roles" do
     belongs_to :user, CodeCorps.User
     belongs_to :role, CodeCorps.Role
@@ -20,9 +18,5 @@ defmodule CodeCorps.UserRole do
     |> assoc_constraint(:user)
     |> assoc_constraint(:role)
     |> unique_constraint(:user_id, name: :index_projects_on_user_id_role_id)
-  end
-
-  def index_filters(query, params) do
-    query |> id_filter(params)
   end
 end

@@ -78,10 +78,10 @@ defmodule CodeCorps.RoleSkillControllerTest do
       assert data["relationships"]["skill"]["data"]["type"] == "skill"
     end
 
-    test "does not show resource and instead throw error when id is nonexistent", %{conn: conn} do
-      assert_error_sent 404, fn ->
-        get conn, role_skill_path(conn, :show, -1)
-      end
+    @tag :authenticated
+    test "renders 404 when id is nonexistent", %{conn: conn} do
+      path = conn |> role_skill_path(:delete, -1)
+      assert conn |> delete(path) |> json_response(404)
     end
 
     test "does not create resource and renders 401 when unauthenticated", %{conn: conn} do

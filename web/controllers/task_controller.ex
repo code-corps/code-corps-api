@@ -1,13 +1,12 @@
 defmodule CodeCorps.TaskController do
   use CodeCorps.Web, :controller
-  alias CodeCorps.Task
-  alias JaSerializer.Params
+  use JaResource
 
-  @analytics Application.get_env(:code_corps, :analytics)
+  alias CodeCorps.Task
 
   plug :load_and_authorize_changeset, model: Task, only: [:create]
   plug :load_and_authorize_resource, model: Task, only: [:update]
-  plug :scrub_params, "data" when action in [:create, :update]
+  plug JaResource, except: [:index]
 
   def index(conn, params) do
     tasks =
@@ -27,55 +26,26 @@ defmodule CodeCorps.TaskController do
     render(conn, "index.json-api", data: tasks, opts: [meta: meta])
   end
 
-  def create(conn, %{"data" => data = %{"type" => "task", "attributes" => _task_params}}) do
-    changeset = Task.create_changeset(%Task{}, Params.to_attributes(data))
+  def record(%Plug.Conn{params: %{"project_id" => _project_id} = params}, _number_as_id) do
+    Task |> Task.show_project_task_filters(params) |> Repo.one
+  end
+  def record(_conn, id), do: Task |> Repo.get(id)
 
-    case Repo.insert(changeset) do
-      {:ok, task} ->
-        # need to reload, due to number being added on database level
-        task = Task |> Repo.get(task.id)
-
-        conn
-        |> @analytics.track(:created, task)
-        |> put_status(:created)
-        |> put_resp_header("location", task_path(conn, :show, task))
-        |> render("show.json-api", data: task)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
-    end
+  def handle_create(conn, attributes) do
+    %Task{}
+    |> Task.create_changeset(attributes)
+    |> Repo.insert
+    |> reload_task # need to reload to get generated number
+    |> CodeCorps.Analytics.Segment.track(:created, conn)
   end
 
-  def show(conn, params = %{"project_id" => _project_id, "id" => _number}) do
-    task =
-      Task
-      |> Task.show_project_task_filters(params)
-      |> Repo.one!
-    render(conn, "show.json-api", data: task)
-  end
-  def show(conn, %{"id" => id}) do
-    task =
-      Task
-      |> Repo.get!(id)
-    render(conn, "show.json-api", data: task)
-  end
+  defp reload_task({:ok, new_task}), do: {:ok, Repo.get(Task, new_task.id)}
+  defp reload_task({:error, changeset}), do: {:error, changeset}
 
-  def update(conn, %{"id" => id, "data" => data = %{"type" => "task", "attributes" => _task_params}}) do
-    changeset =
-      Task
-      |> Repo.get!(id)
-      |> Task.update_changeset(Params.to_attributes(data))
-
-    case Repo.update(changeset) do
-      {:ok, task} ->
-        conn
-        |> @analytics.track(:edited, task)
-        |> render("show.json-api", data: task)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
-    end
+  def handle_update(conn, task, attributes) do
+    task
+    |> Task.update_changeset(attributes)
+    |> Repo.update
+    |> CodeCorps.Analytics.Segment.track(:edited, conn)
   end
 end

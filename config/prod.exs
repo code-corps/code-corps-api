@@ -38,6 +38,9 @@ config :guardian, Guardian,
 # Do not print debug messages in production
 config :logger, level: :info
 
+# Configures Segment for analytics
+config :code_corps, :analytics, CodeCorps.Analytics.SegmentAPI
+
 config :sentry,
   environment_name: Mix.env || :prod
 

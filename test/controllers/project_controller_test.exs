@@ -189,7 +189,7 @@ defmodule CodeCorps.ProjectControllerTest do
       payload = build_payload |> put_id(project.id) |> put_attributes(@valid_attrs)
       path = conn |> project_path(:update, project)
 
-      json = conn |> put(path, payload) |> json_response(201)
+      json = conn |> put(path, payload) |> json_response(200)
 
       id = json["data"]["id"]
       assert id
@@ -227,7 +227,7 @@ defmodule CodeCorps.ProjectControllerTest do
       payload = build_payload |> put_id(project.id) |> put_attributes(attrs)
       path = conn |> project_path(:update, project)
 
-      json = conn |> put(path, payload) |> json_response(201)
+      json = conn |> put(path, payload) |> json_response(200)
 
       data = json["data"]
       large_url = data["attributes"]["icon-large-url"]

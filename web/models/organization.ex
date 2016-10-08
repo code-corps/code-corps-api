@@ -6,7 +6,7 @@ defmodule CodeCorps.Organization do
   use Arc.Ecto.Schema
   use CodeCorps.Web, :model
   import CodeCorps.Base64ImageUploader
-  import CodeCorps.ModelHelpers
+  import CodeCorps.Helpers.Slug
   import CodeCorps.Validators.SlugValidator
   alias CodeCorps.SluggedRoute
 
@@ -47,10 +47,6 @@ defmodule CodeCorps.Organization do
     |> validate_required([:slug, :description])
     |> validate_slug(:slug)
     |> put_slugged_route()
-  end
-
-  def index_filters(query, params) do
-    query |> id_filter(params)
   end
 
   defp put_slugged_route(changeset) do

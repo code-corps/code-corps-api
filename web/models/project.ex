@@ -6,7 +6,7 @@ defmodule CodeCorps.Project do
   use Arc.Ecto.Schema
   use CodeCorps.Web, :model
   import CodeCorps.Base64ImageUploader
-  import CodeCorps.ModelHelpers
+  import CodeCorps.Helpers.Slug
   import CodeCorps.Validators.SlugValidator
   alias CodeCorps.MarkdownRenderer
 
