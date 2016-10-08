@@ -102,7 +102,7 @@ If you're just looking to improve the README, there's a couple things you should
 
 ## How to fix a bug
 
-If you're fixing a bug that's already been added to the issues, ask yourself whether the bug description is clear? Do you know what circumstances led to the bug? Does it seem easy to reproduce?
+If you're fixing a bug that's already been added to the issues, ask yourself whether the bug description is clear. Do you know what circumstances led to the bug? Does it seem easy to reproduce?
 
 If you've spotted a bug yourself, open an issue and try to answer those questions.
 
