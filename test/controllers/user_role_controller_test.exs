@@ -17,6 +17,55 @@ defmodule CodeCorps.UserRoleControllerTest do
     }
   end
 
+  describe "index" do
+    test "lists all entries on index", %{conn: conn} do
+      path = conn |> user_role_path(:index)
+      json = conn |> get(path) |> json_response(200)
+
+      assert json["data"] == []
+    end
+
+    test "filters resources on index", %{conn: conn} do
+      designer = insert(:role, name: "Designer")
+      lawyer = insert(:role, name: "Lawyer")
+      photographer = insert(:role, name: "Photographer")
+
+      user = insert(:user)
+      user_role_1 = insert(:user_role, user: user, role: designer)
+      user_role_2 = insert(:user_role, user: user, role: lawyer)
+      insert(:user_role, user: user, role: photographer)
+
+      path = "user-roles/?filter[id]=#{user_role_1.id},#{user_role_2.id}"
+      json = conn |> get(path) |> json_response(200)
+
+      data = json["data"]
+      assert length(data) == 2
+
+      [first_result, second_result | _] = data
+      assert first_result["id"] == "#{user_role_1.id}"
+      assert second_result["id"] == "#{user_role_2.id}"
+    end
+  end
+
+  describe "show" do
+    test "shows chosen resource", %{conn: conn} do
+      user_role = insert(:user_role)
+      path = conn |> user_role_path(:show, user_role)
+      json = conn |> get(path) |> json_response(200)
+
+      data = json["data"]
+      assert data["id"] == "#{user_role.id}"
+      assert data["type"] == "user-role"
+      assert data["relationships"]["user"]["data"]["id"] == "#{user_role.user_id}"
+      assert data["relationships"]["role"]["data"]["id"] == "#{user_role.role_id}"
+    end
+
+    test "renders 404 when id is nonexistent", %{conn: conn} do
+      path = conn |> user_role_path(:show, -1)
+      assert conn |> get(path) |> json_response(:not_found)
+    end
+  end
+
   describe "create" do
     @tag authenticated: :admin
     test "creates and renders resource when data is valid", %{conn: conn} do
