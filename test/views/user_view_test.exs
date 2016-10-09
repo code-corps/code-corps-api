@@ -20,16 +20,16 @@ defmodule CodeCorps.UserViewTest do
           "biography" => user.biography,
           "email" => "",
           "first-name" => user.first_name,
-          "last-name" => user.last_name,
           "inserted-at" => user.inserted_at,
+          "last-name" => user.last_name,
           "photo-large-url" => CodeCorps.UserPhoto.url({user.photo, user}, :large),
           "photo-thumb-url" => CodeCorps.UserPhoto.url({user.photo, user}, :thumb),
+          "state" => "signed_up",
+          "state-transition" => nil,
           "twitter" => user.twitter,
           "username" => user.username,
           "updated-at" => user.updated_at,
-          "website" => user.website,
-          "state" => "signed_up",
-          "state-transition" => nil
+          "website" => user.website
         },
         "relationships" => %{
           "organization-memberships" => %{
