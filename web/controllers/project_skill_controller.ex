@@ -4,7 +4,6 @@ defmodule CodeCorps.ProjectSkillController do
   import CodeCorps.ControllerHelpers
 
   alias CodeCorps.ProjectSkill
-  alias JaSerializer.Params
 
   plug :load_resource, model: ProjectSkill, only: [:show], preload: [:project, :skill]
   plug :load_and_authorize_changeset, model: ProjectSkill, only: [:create]
