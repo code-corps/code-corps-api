@@ -1,10 +1,9 @@
 defmodule CodeCorps.OrganizationMembership do
   @moduledoc """
-  Represents a membership of a user in an organization.
+  Represents a membership of a user in an organization.
   """
 
   use CodeCorps.Web, :model
-
   import CodeCorps.ModelHelpers
 
   schema "organization_memberships" do

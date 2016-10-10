@@ -1,13 +1,11 @@
 defmodule CodeCorps.TaskPolicy do
+  import Ecto.Query
   alias CodeCorps.OrganizationMembership
   alias CodeCorps.Project
   alias CodeCorps.Task
   alias CodeCorps.User
-
   alias CodeCorps.Repo
   alias Ecto.Changeset
-
-  import Ecto.Query
 
   # TODO: Need to be able to see what resource is being created here
   # Previously, any user could create issues and ideas, but only

@@ -1,9 +1,7 @@
 defmodule CodeCorps.Task do
   use CodeCorps.Web, :model
-
-  alias CodeCorps.MarkdownRenderer
-
   import CodeCorps.ModelHelpers
+  alias CodeCorps.MarkdownRenderer
 
   schema "tasks" do
     field :body, :string

@@ -1,10 +1,9 @@
 defmodule CodeCorps.TaskController do
-  @analytics Application.get_env(:code_corps, :analytics)
-
   use CodeCorps.Web, :controller
-
   alias CodeCorps.Task
   alias JaSerializer.Params
+
+  @analytics Application.get_env(:code_corps, :analytics)
 
   plug :load_and_authorize_changeset, model: Task, only: [:create]
   plug :load_and_authorize_resource, model: Task, only: [:update]

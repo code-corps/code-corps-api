@@ -1,9 +1,8 @@
 defmodule CodeCorps.UserRoleController do
-  @analytics Application.get_env(:code_corps, :analytics)
-
   use CodeCorps.Web, :controller
-
   alias CodeCorps.UserRole
+
+  @analytics Application.get_env(:code_corps, :analytics)
 
   plug :load_resource, model: UserRole, only: [:show], preload: [:user, :role]
   plug :load_and_authorize_changeset, model: UserRole, only: [:create]

@@ -1,10 +1,8 @@
 defmodule CodeCorps.OrganizationController do
   use CodeCorps.Web, :controller
-
+  import CodeCorps.Organization, only: [changeset: 2]
   alias CodeCorps.Organization
   alias JaSerializer.Params
-
-  import Organization, only: [changeset: 2]
 
   plug :load_and_authorize_resource, model: Organization, only: [:create, :update]
   plug :scrub_params, "data" when action in [:create, :update]
@@ -56,5 +54,4 @@ defmodule CodeCorps.OrganizationController do
         |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
     end
   end
-
 end

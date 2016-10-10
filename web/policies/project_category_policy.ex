@@ -1,12 +1,11 @@
 defmodule CodeCorps.ProjectCategoryPolicy do
+  import Ecto.Query
   alias CodeCorps.OrganizationMembership
   alias CodeCorps.Project
   alias CodeCorps.ProjectCategory
   alias CodeCorps.Repo
   alias CodeCorps.User
   alias Ecto.Changeset
-
-  import Ecto.Query
 
   def create?(%User{admin: true}, %Changeset{}), do: true
   def create?(%User{} = user, %Changeset{} = changeset) do

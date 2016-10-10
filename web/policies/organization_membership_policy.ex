@@ -1,11 +1,10 @@
 defmodule CodeCorps.OrganizationMembershipPolicy do
+  import Ecto.Query
   alias CodeCorps.Organization
   alias CodeCorps.OrganizationMembership
   alias CodeCorps.Repo
   alias CodeCorps.User
   alias Ecto.Changeset
-
-  import Ecto.Query
 
   def create?(%User{admin: true}, %Changeset{}), do: true
   def create?(%User{id: user_id}, %Changeset{changes: %{member_id: member_id}}), do:  user_id == member_id

@@ -1,18 +1,16 @@
 defmodule CodeCorps.User do
   @moduledoc """
-  This module defines a user of the Code Corps app.
+  This module defines a user of the Code Corps app.
   """
 
   use Arc.Ecto.Schema
   use CodeCorps.Web, :model
-
-  alias CodeCorps.SluggedRoute
-  alias Comeonin.Bcrypt
-  alias Ecto.Changeset
-
   import CodeCorps.Base64ImageUploader
   import CodeCorps.Validators.SlugValidator
   import CodeCorps.ModelHelpers
+  alias CodeCorps.SluggedRoute
+  alias Comeonin.Bcrypt
+  alias Ecto.Changeset
 
   schema "users" do
     field :admin, :boolean
