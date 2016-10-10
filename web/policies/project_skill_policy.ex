@@ -1,11 +1,9 @@
 defmodule CodeCorps.ProjectSkillPolicy do
+  import Ecto.Query
   alias CodeCorps.OrganizationMembership
   alias CodeCorps.ProjectSkill
   alias CodeCorps.User
-
   alias CodeCorps.Repo
-
-  import Ecto.Query
 
   # TODO: Need to figure out how to pass in params. We need to know
   # if user is at least admin in organization, before they can assign

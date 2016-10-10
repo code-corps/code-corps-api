@@ -1,6 +1,5 @@
 defmodule CodeCorps.RoleSkill do
   use CodeCorps.Web, :model
-
   import CodeCorps.ModelHelpers
 
   schema "role_skills" do
@@ -25,7 +24,7 @@ defmodule CodeCorps.RoleSkill do
   end
 
   @doc """
-  Builds a changeset for importing a category.
+  Builds a changeset for importing a category.
   """
   def import_changeset(struct, params) do
     struct
