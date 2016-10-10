@@ -85,7 +85,7 @@ docker-compose run web mix run priv/repo/seeds.exs
 
 ### Verify it worked
 
-Point your browser (or make a direct request) to `http://api.localhost:49235/users`. You'll get the following response (although you might have data if you seeded the database):
+Point your browser (or make a direct request) to `http://api.lvh.me:49235/users` (`lvh.me` resolves itself and all subdomains to your `localhost` accordingly). You'll get the following response (although you might have data if you seeded the database):
 
 ```json
 {
@@ -95,6 +95,8 @@ Point your browser (or make a direct request) to `http://api.localhost:49235/use
   "data": []
 }
 ```
+
+Note: some browsers like Safari and Firefox may ask to download a file instead of displaying its contents directly. This is a [known issue for JSON API](https://github.com/json-api/json-api/issues/1048) and if you find this inconvenient, please use Chrome or Opera. We recommend to use specialised tools for API development and discovery like [Postman](https://www.getpostman.com/) or [Paw](https://paw.cloud/).
 
 ### Next steps
 
