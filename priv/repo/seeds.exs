@@ -318,7 +318,7 @@ cond do
     IO.puts "Project skills detected, aborting this seed."
   true ->
     %ProjectSkill{}
-    |> ProjectSkill.changeset(%{
+    |> ProjectSkill.create_changeset(%{
       project_id: 1,
       skill_id: 1
     })
