@@ -30,10 +30,7 @@ defmodule CodeCorps.UserView do
   Users can only see their own emails. Everyone else's are private.
   """
   def email(user, %Plug.Conn{assigns: %{current_user: current_user}}) do
-    cond do
-      user.id == current_user.id -> user.email
-      user.id != current_user.id -> ""
-    end
+    if user.id == current_user.id, do: user.email, else: ""
   end
   def email(_user, _conn), do: ""
 end

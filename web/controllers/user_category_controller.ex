@@ -1,9 +1,8 @@
 defmodule CodeCorps.UserCategoryController do
-  @analytics Application.get_env(:code_corps, :analytics)
-
   use CodeCorps.Web, :controller
-
   alias CodeCorps.UserCategory
+
+  @analytics Application.get_env(:code_corps, :analytics)
 
   plug :load_resource, model: UserCategory, only: [:show], preload: [:user, :category]
   plug :load_and_authorize_changeset, model: UserCategory, only: [:create]

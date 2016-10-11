@@ -1,10 +1,9 @@
 defmodule CodeCorps.Category do
-    @moduledoc """
-    Represents an category on Code Corps, e.g. "Society" and "Technology".
-    """
+  @moduledoc """
+  Represents a category on Code Corps, e.g. "Society" and "Technology".
+  """
 
   use CodeCorps.Web, :model
-
   import CodeCorps.ModelHelpers
 
   schema "categories" do
@@ -28,7 +27,7 @@ defmodule CodeCorps.Category do
   end
 
   @doc """
-  Builds a changeset for creating an organization.
+  Builds a changeset for creating an organization.
   """
   def create_changeset(struct, params) do
     struct

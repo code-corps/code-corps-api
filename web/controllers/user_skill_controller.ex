@@ -1,9 +1,8 @@
 defmodule CodeCorps.UserSkillController do
-  @analytics Application.get_env(:code_corps, :analytics)
-
   use CodeCorps.Web, :controller
-
   alias CodeCorps.UserSkill
+
+  @analytics Application.get_env(:code_corps, :analytics)
 
   plug :load_resource, model: UserSkill, only: [:show], preload: [:user, :skill]
   plug :load_and_authorize_changeset, model: UserSkill, only: [:create]

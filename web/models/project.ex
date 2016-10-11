@@ -1,16 +1,14 @@
 defmodule CodeCorps.Project do
   @moduledoc """
-  Represents a project on Code Corps, e.g. the "Code Corps" project itself.
+  Represents a project on Code Corps, e.g. the "Code Corps" project itself.
   """
 
   use Arc.Ecto.Schema
   use CodeCorps.Web, :model
-
-  alias CodeCorps.MarkdownRenderer
-
   import CodeCorps.Base64ImageUploader
   import CodeCorps.ModelHelpers
   import CodeCorps.Validators.SlugValidator
+  alias CodeCorps.MarkdownRenderer
 
   schema "projects" do
     field :base64_icon_data, :string, virtual: true
@@ -46,7 +44,7 @@ defmodule CodeCorps.Project do
   end
 
   @doc """
-  Builds a changeset for creating a project.
+  Builds a changeset for creating a project.
   """
   def create_changeset(struct, params) do
     struct
@@ -56,7 +54,7 @@ defmodule CodeCorps.Project do
   end
 
   @doc """
-  Builds a changeset for updating a project.
+  Builds a changeset for updating a project.
   """
   def update_changeset(struct, params) do
     struct
