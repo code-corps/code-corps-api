@@ -77,7 +77,7 @@ defmodule CodeCorps.UserRoleControllerTest do
       json = conn |> post(path, payload) |> json_response(201)
 
       id = json["data"]["id"] |> String.to_integer
-      user_role = UserRole |> Repo.get!(id)
+      user_role = UserRole |> Repo.get(id)
 
       assert json["data"]["id"] == "#{user_role.id}"
       assert json["data"]["type"] == "user-role"

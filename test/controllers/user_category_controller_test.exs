@@ -80,7 +80,7 @@ defmodule CodeCorps.UserCategoryControllerTest do
       json = conn |> post(path, payload) |> json_response(201)
 
       id = json["data"]["id"] |> String.to_integer
-      user_category = UserCategory |> Repo.get!(id)
+      user_category = UserCategory |> Repo.get(id)
 
       assert json["data"]["id"] == "#{user_category.id}"
       assert json["data"]["type"] == "user-category"

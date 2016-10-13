@@ -108,7 +108,7 @@ defmodule CodeCorps.RoleSkillControllerTest do
       json = conn |> post(path, payload) |> json_response(201)
 
       id = json["data"]["id"] |> String.to_integer
-      role_skill = RoleSkill |> Repo.get!(id)
+      role_skill = RoleSkill |> Repo.get(id)
 
       assert json["data"]["id"] == "#{role_skill.id}"
       assert json["data"]["type"] == "role-skill"

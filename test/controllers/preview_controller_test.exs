@@ -32,7 +32,7 @@ defmodule CodeCorps.PreviewControllerTest do
       assert attributes["body"] == "<p>A <strong>strong</strong> element</p>\n"
       assert attributes["markdown"] == "A **strong** element"
 
-      preview = Preview |> Repo.get!(id)
+      preview = Preview |> Repo.get(id)
 
       assert preview.body == "<p>A <strong>strong</strong> element</p>\n"
       assert preview.markdown == "A **strong** element"
@@ -47,7 +47,7 @@ defmodule CodeCorps.PreviewControllerTest do
 
       id = json["data"]["id"] |> String.to_integer
 
-      preview = Preview |> Repo.get!(id)
+      preview = Preview |> Repo.get(id)
 
       assert preview.user_id == current_user.id
     end

@@ -92,7 +92,7 @@ defmodule CodeCorps.ProjectSkillControllerTest do
       json = conn |> post(path, payload) |> json_response(201)
 
       id = json["data"]["id"] |> String.to_integer
-      project_skill = ProjectSkill |> Repo.get!(id)
+      project_skill = ProjectSkill |> Repo.get(id)
 
       assert json["data"]["id"] == "#{project_skill.id}"
       assert json["data"]["type"] == "project-skill"

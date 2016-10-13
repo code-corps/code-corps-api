@@ -77,7 +77,7 @@ defmodule CodeCorps.UserSkillControllerTest do
       json = conn |> post(path, payload) |> json_response(201)
 
       id = json["data"]["id"] |> String.to_integer
-      user_skill = UserSkill |> Repo.get!(id)
+      user_skill = UserSkill |> Repo.get(id)
 
       assert json["data"]["id"] == "#{user_skill.id}"
       assert json["data"]["type"] == "user-skill"
