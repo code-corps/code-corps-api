@@ -4,7 +4,6 @@ defmodule CodeCorps.OrganizationMembership do
   """
 
   use CodeCorps.Web, :model
-  import CodeCorps.ModelHelpers
 
   schema "organization_memberships" do
     field :role, :string
@@ -36,13 +35,6 @@ defmodule CodeCorps.OrganizationMembership do
     |> cast(params, [:role])
     |> validate_required([:role])
     |> validate_inclusion(:role, roles)
-  end
-
-  def index_filters(query, params) do
-    query
-    |> id_filter(params)
-    |> organization_filter(params)
-    |> role_filter(params)
   end
 
   defp roles do

@@ -1,18 +1,18 @@
 defmodule CodeCorps.RoleSkillController do
   use CodeCorps.Web, :controller
+  use JaResource
 
   alias CodeCorps.RoleSkill
   alias JaSerializer.Params
 
+  import CodeCorps.Helpers.Query, only: [id_filter: 2]
+
   plug :load_and_authorize_resource, model: RoleSkill, only: [:create, :delete]
   plug :scrub_params, "data" when action in [:create]
+  plug JaResource, except: [:create]
 
-  def index(conn, params) do
-    role_skills =
-      RoleSkill
-      |> RoleSkill.index_filters(params)
-      |> Repo.all
-    render(conn, "index.json-api", data: role_skills)
+  def filter(_conn, query, "id", id_list) do
+    query |> id_filter(id_list)
   end
 
   def create(conn, %{"data" => data = %{"type" => "role-skill", "attributes" => _role_skill_params}}) do
@@ -30,19 +30,4 @@ defmodule CodeCorps.RoleSkillController do
         |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
     end
   end
-
-  def show(conn, %{"id" => id}) do
-    role_skill =
-      RoleSkill
-      |> Repo.get!(id)
-    render(conn, "show.json-api", data: role_skill)
-  end
-
-  def delete(conn, %{"id" => id}) do
-    role_skill = Repo.get!(RoleSkill, id)
-    Repo.delete!(role_skill)
-
-    send_resp(conn, :no_content, "")
-  end
-
 end

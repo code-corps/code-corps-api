@@ -1,28 +1,18 @@
 defmodule CodeCorps.ProjectSkillController do
   use CodeCorps.Web, :controller
+  use JaResource
 
-  import CodeCorps.ControllerHelpers
+  import CodeCorps.Helpers.Query, only: [id_filter: 2]
 
   alias CodeCorps.ProjectSkill
 
   plug :load_resource, model: ProjectSkill, only: [:show], preload: [:project, :skill]
   plug :load_and_authorize_changeset, model: ProjectSkill, only: [:create]
   plug :load_and_authorize_resource, model: ProjectSkill, only: [:delete]
-  plug :scrub_params, "data" when action in [:create, :update]
+  plug JaResource, except: [:create]
 
-  def index(conn, params) do
-    project_skills =
-      case params do
-        %{"filter" => %{"id" => id_list}} ->
-          ids = id_list |> coalesce_id_string
-          ProjectSkill
-          |> where([p], p.id in ^ids)
-          |> Repo.all
-        %{} ->
-          ProjectSkill
-          |> Repo.all
-      end
-    render(conn, "index.json-api", data: project_skills)
+  def filter(_conn, query, "id", id_list) do
+    query |> id_filter(id_list)
   end
 
   def create(conn, %{"data" => %{"type" => "project-skill", "attributes" => _project_skill_params}}) do
@@ -38,15 +28,4 @@ defmodule CodeCorps.ProjectSkillController do
         |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
     end
   end
-
-  def show(conn, %{"id" => _id}) do
-    render(conn, "show.json-api", data: conn.assigns.project_skill)
-  end
-
-  def delete(conn, %{"id" => _id}) do
-    conn.assigns.project_skill |> Repo.delete!
-
-    send_resp(conn, :no_content, "")
-  end
-
 end

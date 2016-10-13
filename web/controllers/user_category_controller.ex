@@ -1,47 +1,30 @@
 defmodule CodeCorps.UserCategoryController do
   use CodeCorps.Web, :controller
-  alias CodeCorps.UserCategory
+  use JaResource
 
-  @analytics Application.get_env(:code_corps, :analytics)
+  import CodeCorps.Helpers.Query, only: [id_filter: 2]
+
+  alias CodeCorps.UserCategory
 
   plug :load_resource, model: UserCategory, only: [:show], preload: [:user, :category]
   plug :load_and_authorize_changeset, model: UserCategory, only: [:create]
   plug :load_and_authorize_resource, model: UserCategory, only: [:delete]
-  plug :scrub_params, "data" when action in [:create]
+  plug JaResource
 
-  def index(conn, params) do
-    user_categories =
-      UserCategory
-      |> UserCategory.index_filters(params)
-      |> Repo.all
-
-    render(conn, "index.json-api", data: user_categories)
+  def filter(_conn, query, "id", id_list) do
+    query |> id_filter(id_list)
   end
 
-  def create(conn, %{"data" => %{"type" => "user-category"}}) do
-    case Repo.insert(conn.assigns.changeset) do
-      {:ok, user_category} ->
-        conn
-        |> @analytics.track(:added, user_category)
-        |> put_status(:created)
-        |> put_resp_header("location", user_category_path(conn, :show, user_category))
-        |> render("show.json-api", data: user_category)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
-    end
+  def handle_create(conn, attributes) do
+    %UserCategory{}
+    |> UserCategory.create_changeset(attributes)
+    |> Repo.insert
+    |> CodeCorps.Analytics.Segment.track(:created, conn)
   end
 
-  def show(conn, %{"id" => _id}) do
-    render(conn, "show.json-api", data: conn.assigns.user_category)
-  end
-
-  def delete(conn, %{"id" => _id}) do
-    conn.assigns.user_category |> Repo.delete!
-
-    conn
-    |> @analytics.track(:removed, conn.assigns.user_category)
-    |> send_resp(:no_content, "")
+  def handle_delete(conn, record) do
+    record
+    |> Repo.delete
+    |> CodeCorps.Analytics.Segment.track(:deleted, conn)
   end
 end

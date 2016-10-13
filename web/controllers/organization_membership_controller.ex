@@ -1,55 +1,40 @@
 defmodule CodeCorps.OrganizationMembershipController do
   use CodeCorps.Web, :controller
-  alias CodeCorps.OrganizationMembership
+  use JaResource
 
-  @analytics Application.get_env(:code_corps, :analytics)
+  import CodeCorps.Helpers.Query, only: [id_filter: 2, organization_filter: 2, role_filter: 2]
+
+  alias CodeCorps.OrganizationMembership
 
   plug :load_resource, model: OrganizationMembership, only: [:show], preload: [:organization, :member]
   plug :load_and_authorize_resource, model: OrganizationMembership, only: [:delete]
   plug :load_and_authorize_changeset, model: OrganizationMembership, only: [:create, :update], preload: [:organization, :member]
-  plug :scrub_params, "data" when action in [:create, :update]
+  plug JaResource
 
-  def index(conn, params) do
-    memberships =
-      OrganizationMembership
-      |> OrganizationMembership.index_filters(params)
-      |> Repo.all
-
-    render(conn, "index.json-api", data: memberships)
+  def filter(_conn, query, "id", id_list) do
+    query |> id_filter(id_list)
   end
 
-  def show(conn, %{"id" => _id}) do
-    render(conn, "show.json-api", data: conn.assigns.organization_membership)
+  def filter(_conn, query, "role", roles_list) do
+    query |> role_filter(roles_list)
   end
 
-  def create(conn, %{"data" => %{"type" => "organization-membership"}}) do
-    case Repo.insert(conn.assigns.changeset) do
-      {:ok, membership} ->
-        conn
-        |> @analytics.track(:created, membership)
-        |> put_status(:created)
-        |> put_resp_header("location", organization_membership_path(conn, :show, membership))
-        |> render("show.json-api", data: membership)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
-    end
+  def handle_index(_conn, %{"organization_id" => organization_id}) do
+    OrganizationMembership |> organization_filter(organization_id)
+  end
+  def handle_index(_conn, _params), do: OrganizationMembership
+
+  def handle_create(conn, attributes) do
+    %OrganizationMembership{}
+    |> OrganizationMembership.create_changeset(attributes)
+    |> Repo.insert
+    |> CodeCorps.Analytics.Segment.track(:created, conn)
   end
 
-  def update(conn, %{"id" => _id, "data" => %{"type" => "organization-membership", "attributes" => _params}}) do
-    case Repo.update(conn.assigns.changeset) do
-      {:ok, membership} ->
-        render(conn, "show.json-api", data: membership)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
-    end
-  end
-
-  def delete(conn, %{"id" => _id}) do
-    conn.assigns.organization_membership |> Repo.delete!
-    conn |> send_resp(:no_content, "")
+  def handle_update(conn, model, attributes) do
+    model
+    |> OrganizationMembership.update_changeset(attributes)
+    |> Repo.update
+    |> CodeCorps.Analytics.Segment.track(:edited, conn)
   end
 end

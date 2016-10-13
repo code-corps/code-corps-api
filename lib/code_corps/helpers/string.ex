@@ -1,4 +1,4 @@
-defmodule CodeCorps.ControllerHelpers do
+defmodule CodeCorps.Helpers.String do
   def coalesce_id_string(string) do
     string
     |> String.split(",")

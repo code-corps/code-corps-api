@@ -5,8 +5,6 @@ defmodule CodeCorps.TokenController do
   alias CodeCorps.Repo
   alias CodeCorps.User
 
-  @analytics Application.get_env(:code_corps, :analytics)
-
   def create(conn, params = %{"username" => _, "password" => _}) do
     case login_by_email_and_pass(params) do
       {:ok, user} ->
@@ -14,7 +12,7 @@ defmodule CodeCorps.TokenController do
 
         conn
         |> Plug.Conn.assign(:current_user, user)
-        |> @analytics.track(:signed_in)
+        |> CodeCorps.Analytics.Segment.track_sign_in
         |> put_status(:created)
         |> render("show.json", token: token, user_id: user.id)
 

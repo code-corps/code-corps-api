@@ -4,7 +4,8 @@ defmodule CodeCorps.Category do
   """
 
   use CodeCorps.Web, :model
-  import CodeCorps.ModelHelpers
+
+  import CodeCorps.Helpers.Slug
 
   schema "categories" do
     field :name, :string
@@ -27,7 +28,7 @@ defmodule CodeCorps.Category do
   end
 
   @doc """
-  Builds a changeset for creating an organization.
+  Builds a changeset for creating an category.
   """
   def create_changeset(struct, params) do
     struct

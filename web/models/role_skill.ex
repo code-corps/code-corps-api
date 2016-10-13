@@ -1,6 +1,5 @@
 defmodule CodeCorps.RoleSkill do
   use CodeCorps.Web, :model
-  import CodeCorps.ModelHelpers
 
   schema "role_skills" do
     field :cat, :integer
@@ -31,10 +30,6 @@ defmodule CodeCorps.RoleSkill do
     |> changeset(params)
     |> cast(params, [:cat])
     |> validate_inclusion(:cat, cats)
-  end
-
-  def index_filters(query, params) do
-    query |> id_filter(params)
   end
 
   defp cats do

@@ -53,11 +53,9 @@ defmodule CodeCorps.OrganizationControllerTest do
       assert data["attributes"]["slug"] == organization.slug
     end
 
-    test "does not show resource and instead throw error when id is nonexistent", %{conn: conn} do
-      assert_error_sent 404, fn ->
-        path = conn |> organization_path(:show, -1)
-        conn |> get(path)
-      end
+    test "renders 404 when id is nonexistent", %{conn: conn} do
+      path = conn |> organization_path(:show, -1)
+      assert conn |> get(path) |> json_response(404)
     end
   end
 
