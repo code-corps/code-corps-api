@@ -33,14 +33,6 @@ defmodule CodeCorps.ProjectViewTest do
               "type" => "organization"
             }
           },
-          "tasks" => %{
-            "data" => [
-              %{
-                "id" => task.id |> Integer.to_string,
-                "type" => "task"
-              }
-            ]
-          },
           "project-categories" => %{
             "data" => [
               %{
@@ -54,6 +46,14 @@ defmodule CodeCorps.ProjectViewTest do
               %{
                 "id" => project_skill.id |> Integer.to_string,
                 "type" => "project-skill"
+              }
+            ]
+          },
+          "tasks" => %{
+            "data" => [
+              %{
+                "id" => task.id |> Integer.to_string,
+                "type" => "task"
               }
             ]
           }
