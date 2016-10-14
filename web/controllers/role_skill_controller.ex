@@ -2,6 +2,7 @@ defmodule CodeCorps.RoleSkillController do
   use CodeCorps.Web, :controller
   use JaResource
 
+  alias CodeCorps.RoleSkill
   import CodeCorps.Helpers.Query, only: [id_filter: 2]
 
   alias CodeCorps.RoleSkill
