@@ -1,6 +1,5 @@
 defmodule CodeCorps.Task do
   use CodeCorps.Web, :model
-  import CodeCorps.ModelHelpers
   alias CodeCorps.MarkdownRenderer
 
   schema "tasks" do
@@ -53,25 +52,5 @@ defmodule CodeCorps.Task do
 
   defp statuses do
     ~w{ open closed }
-  end
-
-  def index_filters(query, params) do
-    query
-    |> project_filter(params)
-    |> newest_first_filter
-  end
-
-  def task_type_filters(query, params) do
-    query |> task_type_filter(params)
-  end
-
-  def task_status_filters(query, params) do
-    query |> task_status_filter(params)
-  end
-
-  def show_project_task_filters(query, params) do
-    query
-    |> number_as_id_filter(params)
-    |> project_filter(params)
   end
 end
