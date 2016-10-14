@@ -15,6 +15,13 @@ defmodule CodeCorps.AuthenticationHelpers do
     |> halt
   end
 
+  def handle_not_authorized(%Plug.Conn{} = conn) do
+    conn
+    |> put_status(403)
+    |> render(CodeCorps.ErrorView, "403.json-api", message: "Not authorized")
+    |> halt
+  end
+
   def handle_not_found(conn) do
     conn
     |> put_status(:not_found)

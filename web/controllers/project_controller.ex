@@ -5,6 +5,7 @@ defmodule CodeCorps.ProjectController do
   import CodeCorps.Helpers.Query, only: [slug_finder: 2]
 
   alias CodeCorps.Project
+  alias CodeCorps.SluggedRoute
 
   plug :load_and_authorize_changeset, model: Project, only: [:create]
   plug :load_and_authorize_resource, model: Project, only: [:update]
@@ -16,7 +17,7 @@ defmodule CodeCorps.ProjectController do
   def record(%Plug.Conn{} = conn, id), do: super(conn, id)
 
   def handle_index(_conn, %{"slug" => slug}) do
-    slugged_route = CodeCorps.SluggedRoute |> slug_finder(slug)
+    slugged_route = SluggedRoute |> slug_finder(slug)
 
     Project
     |> Repo.all(organization_id: slugged_route.organization_id)
