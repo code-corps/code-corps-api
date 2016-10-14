@@ -1,13 +1,14 @@
 defmodule CodeCorps.SluggedRouteController do
   use CodeCorps.Web, :controller
+  use JaResource
+
+  import CodeCorps.Helpers.Query, only: [slug_finder: 2]
 
   alias CodeCorps.SluggedRoute
 
-  def show(conn, %{"slug" => slug}) do
-    slugged_route =
-      SluggedRoute
-      |> CodeCorps.ModelHelpers.slug_finder(slug)
+  plug JaResource
 
-    render(conn, "show.json-api", data: slugged_route)
+  def record(%Plug.Conn{params: %{"slug" => slug}}, _id) do
+    SluggedRoute |> slug_finder(slug)
   end
 end

@@ -6,7 +6,6 @@ defmodule CodeCorps.CommentController do
 
   plug :load_and_authorize_changeset, model: Comment, only: [:create]
   plug :load_and_authorize_resource, model: Comment, only: [:update]
-
   plug JaResource
 
   def handle_create(conn, attributes) do

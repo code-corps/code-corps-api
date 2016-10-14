@@ -9,22 +9,13 @@ defmodule CodeCorps.ProjectCategoryController do
   plug :load_resource, model: ProjectCategory, only: [:show], preload: [:project, :category]
   plug :load_and_authorize_changeset, model: ProjectCategory, only: [:create]
   plug :load_and_authorize_resource, model: ProjectCategory, only: [:delete]
-  plug JaResource, except: [:create]
+  plug JaResource
 
   def filter(_conn, query, "id", id_list) do
     query |> id_filter(id_list)
   end
 
-  def create(conn, %{"data" => %{"type" => "project-category"}}) do
-    case Repo.insert(conn.assigns.changeset) do
-      {:ok, project_category} ->
-        conn
-        |> put_status(:created)
-        |> render("show.json-api", data: project_category)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
-    end
+  def handle_create(_conn, attributes) do
+    %ProjectCategory{} |> ProjectCategory.create_changeset(attributes)
   end
 end

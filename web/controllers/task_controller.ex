@@ -2,32 +2,48 @@ defmodule CodeCorps.TaskController do
   use CodeCorps.Web, :controller
   use JaResource
 
+  import CodeCorps.Helpers.Query, only: [
+    project_filter: 2, number_as_id_filter: 2, sort_by_newest_first: 1,
+    task_type_filter: 2, task_status_filter: 2
+  ]
+
   alias CodeCorps.Task
 
   plug :load_and_authorize_changeset, model: Task, only: [:create]
   plug :load_and_authorize_resource, model: Task, only: [:update]
-  plug JaResource, except: [:index]
+  plug JaResource
 
-  def index(conn, params) do
-    tasks =
-      Task
-      |> Task.index_filters(params)
-      |> Task.task_type_filters(params)
-      |> Task.task_status_filters(params)
-      |> Repo.paginate(params["page"])
+  def handle_index(conn, params) do
+    page = Task
+    |> project_filter(params)
+    |> task_type_filter(params)
+    |> task_status_filter(params)
+    |> sort_by_newest_first
+    |> Repo.paginate(params["page"] || %{})
+
+    # TODO: Once we are able to more easily add top-level meta
+    # from within ja_resource or ja_serializer
+    # we can split up all of this into
+    # handle_index
+    # handle_index_query
+    # serialization_opts
 
     meta = %{
-      current_page: tasks.page_number,
-      page_size: tasks.page_size,
-      total_pages: tasks.total_pages,
-      total_records: tasks.total_entries
+      current_page: page.page_number,
+      page_size: page.page_size,
+      total_pages: page.total_pages,
+      total_records: page.total_entries
     }
 
-    render(conn, "index.json-api", data: tasks, opts: [meta: meta])
+    conn
+    |> render("index.json-api", data: page, opts: [meta: meta])
   end
 
   def record(%Plug.Conn{params: %{"project_id" => _project_id} = params}, _number_as_id) do
-    Task |> Task.show_project_task_filters(params) |> Repo.one
+    Task
+    |> project_filter(params)
+    |> number_as_id_filter(params)
+    |> Repo.one
   end
   def record(_conn, id), do: Task |> Repo.get(id)
 
