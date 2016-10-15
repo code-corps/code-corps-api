@@ -61,14 +61,14 @@ defmodule CodeCorps.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
-      {:arc, git: "https://github.com/stavro/arc.git", ref: "354d4d2e1b86bcd6285db3528118fe3f5db36cf5", override: true}, # Photo uploads
+      {:arc, "~> 0.6.0-rc1", override: true}, # Photo uploads
       {:arc_ecto, "~> 0.4.4"},
       {:canary, "~> 1.0"}, # Authorization
       {:comeonin, "~> 2.0"},
       {:corsica, "~> 0.4"}, # CORS
       {:credo, "~> 0.4", only: [:dev, :test]}, # Code style suggestions
       {:earmark, "~> 1.0"}, # Markdown rendering
-      {:ex_aws, "~> 0.4"}, # Amazon AWS
+      {:ex_aws, "~> 1.0.0-rc.1"}, # Amazon AWS
       {:excoveralls, "~> 0.5", only: :test}, # Test coverage
       {:ex_doc, "~> 0.13", only: [:dev, :test]},
       {:ex_machina, "~> 1.0", only: :test}, # test factories
@@ -83,7 +83,7 @@ defmodule CodeCorps.Mixfile do
       {:scrivener_ecto, "~> 1.0"}, # DB query pagination
       {:segment, github: "stueccles/analytics-elixir"}, # Segment analytics
       {:sentry, "~> 1.0"}, # Sentry error tracking
-      {:stripity_stripe, "~> 1.3.0"} # Stripe
+      {:stripity_stripe, "~> 1.4.0"} # Stripe
     ]
   end
 
