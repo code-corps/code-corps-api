@@ -91,6 +91,20 @@ defmodule CodeCorps.UserControllerTest do
       assert user.id == slugged_route.user_id
     end
 
+    test "calls segment tracking after user is created", %{conn: conn} do
+      conn = post conn, user_path(conn, :create), %{
+        "meta" => %{},
+        "data" => %{
+          "type" => "user",
+          "attributes" => Map.put(@valid_attrs, :password, "password"),
+          "relationships" => relationships
+        }
+      }
+      id = json_response(conn, 201)["data"]["id"]
+
+      assert_received {:track, id, "Signed Up", %{}}
+    end
+
     test "does not create resource and renders errors when data is invalid", %{conn: conn} do
       conn = post conn, user_path(conn, :create), %{
         "meta" => %{},
@@ -135,6 +149,32 @@ defmodule CodeCorps.UserControllerTest do
       assert user.last_name == "User"
       assert user.website == "http://www.example.com"
       assert user.biography == "Just a test user"
+    end
+
+    test "tracks authentication & update profile events in Segment", %{conn: conn} do
+      user = insert(:user)
+      attrs = Map.put(@valid_attrs, :password, "password")
+
+      params = %{
+        "meta" => %{},
+        "data" => %{
+          "type" => "user",
+          "id" => user.id,
+          "attributes" => attrs,
+          "relationships" => relationships
+        }
+      }
+
+      path = user_path(conn, :update, user)
+
+      conn =
+        conn
+        |> authenticate(user)
+        |> put(path, params)
+
+      id = json_response(conn, 200)["data"]["id"]
+      assert_received {:identify, id, attrs}
+      assert_received {:track, id, "Updated Profile", %{}}
     end
 
     test "does not update when authorized as different user", %{conn: conn} do
