@@ -9,9 +9,7 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
   @invalid_attrs %{role: "invalid_role"}
 
   defp build_payload, do: %{ "data" => %{"type" => "organization-membership"}}
-  defp put_id(payload, id), do: payload |> put_in(["data", "id"], id)
-  defp put_attributes(payload, attributes), do: payload |> put_in(["data", "attributes"], attributes)
-  defp put_relationships(payload, organization, member) do
+  defp put_relationships_with_member(payload, organization, member) do
     relationships = build_relationships(organization, member)
     payload |> put_in(["data", "relationships"], relationships)
   end
@@ -79,7 +77,7 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
     test "creates and renders resource when data is valid", %{conn: conn, current_user: member} do
       organization = insert(:organization)
 
-      payload = build_payload |> put_relationships(organization, member)
+      payload = build_payload |> put_relationships_with_member(organization, member)
 
       path = conn |> organization_membership_path(:create)
       response =
@@ -103,7 +101,7 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
       # only way to trigger a validation error is to provide a non-existant organization
       # anything else will fail on authorization level
       organization = build(:organization)
-      payload = build_payload |> put_relationships(organization, member)
+      payload = build_payload |> put_relationships_with_member(organization, member)
 
       path = conn |> organization_membership_path(:create)
       data = conn |> post(path, payload) |> json_response(422)

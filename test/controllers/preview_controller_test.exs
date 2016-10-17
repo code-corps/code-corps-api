@@ -6,15 +6,6 @@ defmodule CodeCorps.PreviewControllerTest do
   defp build_payload do
     %{"data" => %{"type" => "preview", "attributes" => %{markdown: "A **strong** element"}}}
   end
-  defp put_relationships(payload, user) do
-    relationships = build_relationships(user)
-    payload |> put_in(["data", "relationships"], relationships)
-  end
-  defp build_relationships(user) do
-    %{
-      user: %{data: %{id: user.id}}
-    }
-  end
 
   describe "create" do
     @tag :authenticated

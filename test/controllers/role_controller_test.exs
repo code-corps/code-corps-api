@@ -8,7 +8,6 @@ defmodule CodeCorps.RoleControllerTest do
   @invalid_attrs %{ability: "Juggling", kind: "circus", name: "Juggler"}
 
   defp build_payload, do: %{ "data" => %{"type" => "role"}}
-  defp put_attributes(payload, attributes), do: payload |> put_in(["data", "attributes"], attributes)
 
   describe "index" do
     test "lists all entries on index", %{conn: conn} do

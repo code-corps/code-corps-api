@@ -5,17 +5,6 @@ defmodule CodeCorps.UserSkillControllerTest do
   alias CodeCorps.Repo
 
   defp build_payload, do: %{ "data" => %{"type" => "user-skill", "attributes" => %{}}}
-  defp put_relationships(payload, user, skill) do
-    relationships = build_relationships(user, skill)
-    payload |> put_in(["data", "relationships"], relationships)
-  end
-
-  defp build_relationships(user, skill) do
-    %{
-      user: %{data: %{id: user.id}},
-      skill: %{data: %{id: skill.id}}
-    }
-  end
 
   describe "index" do
     test "lists all entries on index", %{conn: conn} do

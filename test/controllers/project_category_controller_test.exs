@@ -9,17 +9,6 @@ defmodule CodeCorps.ProjectCategoryControllerTest do
   @attrs %{}
 
   defp build_payload, do: %{ "data" => %{"type" => "project-category", "attributes" => %{}}}
-  defp put_relationships(payload, project, category) do
-    relationships = build_relationships(project, category)
-    payload |> put_in(["data", "relationships"], relationships)
-  end
-
-  defp build_relationships(project, category) do
-    %{
-      project: %{data: %{id: project.id}},
-      category: %{data: %{id: category.id}}
-    }
-  end
 
   describe "index" do
     test "lists all entries on index", %{conn: conn} do

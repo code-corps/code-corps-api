@@ -5,17 +5,6 @@ defmodule CodeCorps.UserRoleControllerTest do
   alias CodeCorps.Repo
 
   defp build_payload, do: %{ "data" => %{"type" => "user-role", "attributes" => %{}}}
-  defp put_relationships(payload, user, role) do
-    relationships = build_relationships(user, role)
-    payload |> put_in(["data", "relationships"], relationships)
-  end
-
-  defp build_relationships(user, role) do
-    %{
-      user: %{data: %{id: user.id}},
-      role: %{data: %{id: role.id}}
-    }
-  end
 
   describe "index" do
     test "lists all entries on index", %{conn: conn} do

@@ -8,19 +8,6 @@ defmodule CodeCorps.CommentControllerTest do
   @invalid_attrs %{markdown: ""}
 
   defp build_payload, do: %{ "data" => %{"type" => "comment"}}
-  defp put_id(payload, id), do: payload |> put_in(["data", "id"], id)
-  defp put_attributes(payload, attributes), do: payload |> put_in(["data", "attributes"], attributes)
-  defp put_relationships(payload, user, task) do
-    relationships = build_relationships(user, task)
-    payload |> put_in(["data", "relationships"], relationships)
-  end
-
-  defp build_relationships(user, task) do
-    %{
-      user: %{data: %{id: user.id}},
-      task: %{data: %{id: task.id}}
-    }
-  end
 
   describe "index" do
     test "lists all entries for specified task on index", %{conn: conn} do

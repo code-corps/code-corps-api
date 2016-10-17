@@ -7,17 +7,6 @@ defmodule CodeCorps.UserCategoryControllerTest do
   @attrs %{}
 
   defp build_payload, do: %{ "data" => %{"type" => "user-category", "attributes" => %{}}}
-  defp put_relationships(payload, user, category) do
-    relationships = build_relationships(user, category)
-    payload |> put_in(["data", "relationships"], relationships)
-  end
-
-  defp build_relationships(user, category) do
-    %{
-      user: %{data: %{id: user.id}},
-      category: %{data: %{id: category.id}}
-    }
-  end
 
   describe "index" do
     test "lists all entries on index", %{conn: conn} do
