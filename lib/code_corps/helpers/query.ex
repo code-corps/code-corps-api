@@ -7,15 +7,6 @@ defmodule CodeCorps.Helpers.Query do
     query |> where([object], object.id in ^ids)
   end
 
-  def organization_filter(query, organization_id) do
-    query |> where([object], object.organization_id == ^organization_id)
-  end
-
-  def role_filter(query, roles_list) do
-    roles = roles_list |> coalesce_string
-    query |> where([object], object.role in ^roles)
-  end
-
   # skill queries
 
   def limit_filter(query, %{"limit" => count}) do

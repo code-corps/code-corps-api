@@ -38,18 +38,6 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
       assert ids_from_response(response) == [membership_1.id, membership_2.id]
     end
 
-    test "lists all resources for specified organization", %{conn: conn} do
-      organization = insert(:organization)
-      [membership_1, membership_2] = insert_pair(:organization_membership, organization: organization)
-      insert(:organization_membership)
-
-      path = conn |> organization_membership_path(:index)
-      params = %{"organization_id" => organization.id}
-      response = conn |> get(path, params) |> json_response(200)
-
-      assert ids_from_response(response) == [membership_1.id, membership_2.id]
-    end
-
     test "filters resources by membership id", %{conn: conn} do
       [membership_1, membership_2] = insert_pair(:organization_membership)
       insert(:organization_membership)
@@ -61,42 +49,6 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
         |> json_response(200)
 
       assert ids_from_response(response) == [membership_1.id, membership_2.id]
-    end
-
-    test "filters resources by role", %{conn: conn} do
-      [membership_1, membership_2] = insert_pair(:organization_membership, role: "admin")
-      insert(:organization_membership, role: "owner")
-
-      params = %{"filter" => %{"role" => "admin"}}
-      response =
-        conn
-        |> get(organization_membership_path(conn, :index, params))
-        |> json_response(200)
-
-      assert ids_from_response(response) == [membership_1.id, membership_2.id]
-    end
-
-    test "filters resources by role and id", %{conn: conn} do
-      [membership_1, _] = insert_pair(:organization_membership, role: "admin")
-      insert(:organization_membership, role: "owner")
-
-      params = %{"filter" => %{"id" => "#{membership_1.id}", "role" => "admin"}}
-      path = conn |> organization_membership_path(:index)
-      response = conn |> get(path, params) |> json_response(200)
-
-      assert ids_from_response(response) == [membership_1.id]
-    end
-
-    test "filters resources by role and id on specific organization", %{conn: conn} do
-      organization = insert(:organization)
-      [membership_1, _] = insert_pair(:organization_membership, organization: organization, role: "admin")
-      insert(:organization_membership, role: "owner")
-
-      params = %{"filter" => %{"id" => "#{membership_1.id}", "role" => "admin"}, "organization_id" => organization.id}
-      path = conn |> organization_membership_path(:index)
-      response = conn |> get(path, params) |> json_response(200)
-
-      assert ids_from_response(response) == [membership_1.id]
     end
   end
 

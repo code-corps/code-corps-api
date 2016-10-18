@@ -2,7 +2,7 @@ defmodule CodeCorps.OrganizationMembershipController do
   use CodeCorps.Web, :controller
   use JaResource
 
-  import CodeCorps.Helpers.Query, only: [id_filter: 2, organization_filter: 2, role_filter: 2]
+  import CodeCorps.Helpers.Query, only: [id_filter: 2]
 
   alias CodeCorps.OrganizationMembership
 
@@ -14,15 +14,6 @@ defmodule CodeCorps.OrganizationMembershipController do
   def filter(_conn, query, "id", id_list) do
     query |> id_filter(id_list)
   end
-
-  def filter(_conn, query, "role", roles_list) do
-    query |> role_filter(roles_list)
-  end
-
-  def handle_index(_conn, %{"organization_id" => organization_id}) do
-    OrganizationMembership |> organization_filter(organization_id)
-  end
-  def handle_index(_conn, _params), do: OrganizationMembership
 
   def handle_create(conn, attributes) do
     %OrganizationMembership{}
