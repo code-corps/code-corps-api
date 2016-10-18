@@ -3,7 +3,7 @@ defmodule CodeCorps.TaskController do
   use JaResource
 
   import CodeCorps.Helpers.Query, only: [
-    project_filter: 2, number_as_id_filter: 2, sort_by_newest_first: 1,
+    project_filter: 2, project_id_with_number_filter: 2, sort_by_newest_first: 1,
     task_type_filter: 2, task_status_filter: 2
   ]
 
@@ -41,8 +41,7 @@ defmodule CodeCorps.TaskController do
 
   def record(%Plug.Conn{params: %{"project_id" => _project_id} = params}, _number_as_id) do
     Task
-    |> project_filter(params)
-    |> number_as_id_filter(params)
+    |> project_id_with_number_filter(params)
     |> Repo.one
   end
   def record(_conn, id), do: Task |> Repo.get(id)
