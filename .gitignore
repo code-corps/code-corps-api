@@ -5,6 +5,7 @@
 /*.ez
 /tmp
 /doc
+/bench
 
 # Generated on crash by the VM
 erl_crash.dump
