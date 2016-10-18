@@ -32,10 +32,10 @@ defmodule CodeCorps.Helpers.Query do
 
   # task queries
 
-  def number_as_id_filter(query, %{"id" => number}) do
-    query |> where([object], object.number == ^number)
+  def project_id_with_number_filter(query, %{"id" => number, "project_id" => project_id}) do
+    query |> where([object], object.number == ^number and object.project_id == ^project_id)
   end
-  def number_as_id_filter(query, _), do: query
+  def project_id_with_number_filter(query, _), do: query
 
   def project_filter(query, %{"project_id" => project_id}) do
     query |> where([object], object.project_id == ^project_id)
