@@ -100,9 +100,8 @@ defmodule CodeCorps.UserControllerTest do
           "relationships" => relationships
         }
       }
-      id = json_response(conn, 201)["data"]["id"]
-
-      assert_received {:track, id, "Signed Up", %{}}
+      id = json_response(conn, 201)["data"]["id"] |> String.to_integer
+      assert_received {:track, ^id, "Signed Up", %{}}
     end
 
     test "does not create resource and renders errors when data is invalid", %{conn: conn} do
@@ -152,7 +151,7 @@ defmodule CodeCorps.UserControllerTest do
     end
 
     test "tracks authentication & update profile events in Segment", %{conn: conn} do
-      user = insert(:user)
+      user = insert(:user, email: "original@mail.com")
       attrs = Map.put(@valid_attrs, :password, "password")
 
       params = %{
@@ -172,9 +171,9 @@ defmodule CodeCorps.UserControllerTest do
         |> authenticate(user)
         |> put(path, params)
 
-      id = json_response(conn, 200)["data"]["id"]
-      assert_received {:identify, id, attrs}
-      assert_received {:track, id, "Updated Profile", %{}}
+      id = json_response(conn, 200)["data"]["id"] |> String.to_integer
+      assert_received {:identify, ^id, %{email: "original@mail.com"}}
+      assert_received {:track, ^id, "Updated Profile", %{}}
     end
 
     test "does not update when authorized as different user", %{conn: conn} do
