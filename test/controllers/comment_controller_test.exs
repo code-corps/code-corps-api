@@ -10,11 +10,24 @@ defmodule CodeCorps.CommentControllerTest do
   defp build_payload, do: %{ "data" => %{"type" => "comment"}}
 
   describe "index" do
-    test "lists all entries for specified task on index", %{conn: conn} do
-      task = insert(:task)
-      path = conn |> task_comment_path(:index, task)
+    test "lists all entries on index", %{conn: conn} do
+      path = conn |> comment_path(:index)
       conn = conn |> get(path)
+
       assert json_response(conn, 200)["data"] == []
+    end
+
+    test "filters resources on index", %{conn: conn} do
+      first_comment = insert(:comment)
+      second_comment = insert(:comment)
+      insert(:comment)
+
+      path = "comments/?filter[id]=#{first_comment.id},#{second_comment.id}"
+
+      conn
+      |> get(path)
+      |> json_response(200)
+      |> assert_ids_from_response([first_comment.id, second_comment.id])
     end
   end
 

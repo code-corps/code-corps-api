@@ -44,7 +44,7 @@ defmodule CodeCorps.Router do
     post "/token/refresh", TokenController, :refresh
 
     resources "/categories", CategoryController, only: [:index, :show]
-    resources "/comments", CommentController, only: [:show]
+    resources "/comments", CommentController, only: [:index, :show]
     resources "/donation-goals", DonationGoalController, only: [:index, :show]
     resources "/organizations", OrganizationController, only: [:index, :show]
     resources "/organization-memberships", OrganizationMembershipController, only: [:index, :show]
@@ -56,9 +56,7 @@ defmodule CodeCorps.Router do
     resources "/roles", RoleController, only: [:index, :show]
     resources "/role-skills", RoleSkillController, only: [:index, :show]
     resources "/skills", SkillController, only: [:index, :show]
-    resources "/tasks", TaskController, only: [:index, :show] do
-      resources "/comments", CommentController, only: [:index, :show]
-    end
+    resources "/tasks", TaskController, only: [:index, :show]
     get "/users/email_available", UserController, :email_available
     get "/users/username_available", UserController, :username_available
     resources "/users", UserController, only: [:index, :show, :create]
