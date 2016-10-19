@@ -68,7 +68,6 @@ defmodule CodeCorps.TaskTest do
       })
       changeset = Task.create_changeset(%Task{}, changes)
       {:ok, result} = Repo.insert(changeset)
-      result = Repo.get(Task, result.id)
       assert result.number == 3
 
       changes = Map.merge(@valid_attrs, %{
@@ -77,7 +76,6 @@ defmodule CodeCorps.TaskTest do
       })
       changeset = Task.create_changeset(%Task{}, changes)
       {:ok, result} = Repo.insert(changeset)
-      result = Repo.get(Task, result.id)
       assert result.number == 2
     end
 

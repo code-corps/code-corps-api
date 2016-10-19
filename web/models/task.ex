@@ -5,7 +5,7 @@ defmodule CodeCorps.Task do
   schema "tasks" do
     field :body, :string
     field :markdown, :string
-    field :number, :integer
+    field :number, :integer, read_after_writes: true
     field :task_type, :string
     field :state, :string
     field :status, :string, default: "open"
