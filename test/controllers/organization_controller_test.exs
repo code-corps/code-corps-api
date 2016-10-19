@@ -9,8 +9,6 @@ defmodule CodeCorps.OrganizationControllerTest do
   @invalid_attrs %{name: ""}
 
   defp build_payload, do: %{ "data" => %{"type" => "organization"}}
-  defp put_id(payload, id), do: payload |> put_in(["data", "id"], id)
-  defp put_attributes(payload, attributes), do: payload |> put_in(["data", "attributes"], attributes)
 
   describe "index" do
     test "lists all entries on index", %{conn: conn} do

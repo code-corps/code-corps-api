@@ -17,19 +17,6 @@ defmodule CodeCorps.TaskControllerTest do
   }
 
   defp build_payload, do: %{ "data" => %{"type" => "task"}}
-  defp put_id(payload, id), do: payload |> put_in(["data", "id"], id)
-  defp put_attributes(payload, attributes), do: payload |> put_in(["data", "attributes"], attributes)
-  defp put_relationships(payload, user, project) do
-    relationships = build_relationships(user, project)
-    payload |> put_in(["data", "relationships"], relationships)
-  end
-
-  defp build_relationships(user, project) do
-    %{
-      user: %{data: %{id: user.id}},
-      project: %{data: %{id: project.id}}
-    }
-  end
 
   describe "index" do
     test "lists all entries", %{conn: conn} do

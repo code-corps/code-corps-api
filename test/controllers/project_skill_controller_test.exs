@@ -7,17 +7,6 @@ defmodule CodeCorps.ProjectSkillControllerTest do
   @attrs %{}
 
   defp build_payload, do: %{ "data" => %{"type" => "project-skill", "attributes" => %{}}}
-  defp put_relationships(payload, project, skill) do
-    relationships = build_relationships(project, skill)
-    payload |> put_in(["data", "relationships"], relationships)
-  end
-
-  defp build_relationships(project, skill) do
-    %{
-      project: %{data: %{id: project.id}},
-      skill: %{data: %{id: skill.id}}
-    }
-  end
 
   describe "index" do
     test "lists all entries on index", %{conn: conn} do

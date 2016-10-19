@@ -8,17 +8,6 @@ defmodule CodeCorps.RoleSkillControllerTest do
   @invalid_attrs %{}
 
   defp build_payload, do: %{ "data" => %{"type" => "role-skill", "attributes" => %{}}}
-  defp put_relationships(payload, role, skill) do
-    relationships = build_relationships(role, skill)
-    payload |> put_in(["data", "relationships"], relationships)
-  end
-
-  defp build_relationships(role, skill) do
-    %{
-      role: %{data: %{id: role.id}},
-      skill: %{data: %{id: skill.id}}
-    }
-  end
 
   describe "index" do
     test "lists all entries on index", %{conn: conn} do

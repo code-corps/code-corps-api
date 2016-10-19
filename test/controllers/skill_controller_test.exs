@@ -12,7 +12,6 @@ defmodule CodeCorps.SkillControllerTest do
   @invalid_attrs %{}
 
   defp build_payload, do: %{ "data" => %{"type" => "skill"}}
-  defp put_attributes(payload, attributes), do: payload |> put_in(["data", "attributes"], attributes)
 
   describe "index" do
     test "lists all entries on index", %{conn: conn} do
