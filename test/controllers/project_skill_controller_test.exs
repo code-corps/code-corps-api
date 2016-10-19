@@ -47,14 +47,13 @@ defmodule CodeCorps.ProjectSkillControllerTest do
       project_skill = insert(:project_skill, project: project, skill: skill)
       conn = get conn, project_skill_path(conn, :show, project_skill)
 
-      data =
-        conn
-        |> json_response(200)
-        |> Map.get("data")
-        |> assert_result_id(project_skill.id)
-        |> assert_jsonapi_relationship("project", project.id)
-        |> assert_jsonapi_relationship("skill", skill.id)
-        |> assert_attributes(%{})
+      conn
+      |> json_response(200)
+      |> Map.get("data")
+      |> assert_result_id(project_skill.id)
+      |> assert_jsonapi_relationship("project", project.id)
+      |> assert_jsonapi_relationship("skill", skill.id)
+      |> assert_attributes(%{})
     end
 
     test "does not show resource and instead throw error when id is nonexistent", %{conn: conn} do
