@@ -21,12 +21,12 @@ defmodule CodeCorps.Project do
 
     belongs_to :organization, CodeCorps.Organization
 
+    has_many :donation_goals, CodeCorps.DonationGoal
+    has_many :project_categories, CodeCorps.ProjectCategory
+    has_many :project_skills, CodeCorps.ProjectSkill
     has_many :tasks, CodeCorps.Task
 
-    has_many :project_categories, CodeCorps.ProjectCategory
     has_many :categories, through: [:project_categories, :category]
-
-    has_many :project_skills, CodeCorps.ProjectSkill
     has_many :skills, through: [:project_skills, :skill]
 
     timestamps()

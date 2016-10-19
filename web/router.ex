@@ -45,6 +45,7 @@ defmodule CodeCorps.Router do
 
     resources "/categories", CategoryController, only: [:index, :show]
     resources "/comments", CommentController, only: [:show]
+    resources "/donation-goals", DonationGoalController, only: [:index, :show]
     resources "/organizations", OrganizationController, only: [:index, :show]
     resources "/organization-memberships", OrganizationMembershipController, only: [:index, :show]
     resources "/projects", ProjectController, only: [:index, :show] do
@@ -74,6 +75,7 @@ defmodule CodeCorps.Router do
 
     resources "/categories", CategoryController, only: [:create, :update]
     resources "/comments", CommentController, only: [:create, :update]
+    resources "/donation-goals", DonationGoalController, only: [:create, :update, :delete]
     resources "/organizations", OrganizationController, only: [:create, :update]
     resources "/organization-memberships", OrganizationMembershipController, only: [:create, :update, :delete]
     resources "/previews", PreviewController, only: [:create]

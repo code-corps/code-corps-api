@@ -9,6 +9,7 @@ defmodule CodeCorps.ProjectViewTest do
     task = insert(:task, project: project)
     project_category = insert(:project_category, project: project)
     project_skill = insert(:project_skill, project: project)
+    donation_goal = insert(:donation_goal, project: project)
 
     rendered_json =  render(CodeCorps.ProjectView, "show.json-api", data: project)
 
@@ -27,6 +28,12 @@ defmodule CodeCorps.ProjectViewTest do
         },
         "id" => project.id |> Integer.to_string,
         "relationships" => %{
+          "donation-goals" => %{"data" => [
+            %{
+              "id" => donation_goal.id |> Integer.to_string,
+              "type" => "donation-goal"
+            }
+          ]},
           "organization" => %{
             "data" => %{
               "id" => organization.id |> Integer.to_string,

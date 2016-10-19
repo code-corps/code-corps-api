@@ -1,5 +1,6 @@
 defmodule CodeCorps.OrganizationMembershipPolicy do
-  import Ecto.Query
+  import CodeCorps.Helpers.Policy, only: [get_membership: 2, get_role: 1]
+
   alias CodeCorps.Organization
   alias CodeCorps.OrganizationMembership
   alias CodeCorps.Repo
@@ -49,15 +50,4 @@ defmodule CodeCorps.OrganizationMembershipPolicy do
   defp get_user_membership(%OrganizationMembership{} = membership, %User{} = user), do: membership |> get_organization |> get_membership(user)
 
   defp get_organization(%OrganizationMembership{organization_id: organization_id}), do: Organization |> Repo.get(organization_id)
-
-  defp get_membership(nil, %User{}), do: nil
-  defp get_membership(%Organization{id: organization_id}, %User{id: user_id}) do
-    OrganizationMembership
-    |> where([m], m.member_id == ^user_id and m.organization_id == ^organization_id)
-    |> Repo.one
-  end
-
-  defp get_role(nil), do: nil
-  defp get_role(%OrganizationMembership{role: role} ), do: role
-  defp get_role(%Changeset{} = changeset), do: changeset |> Changeset.get_field(:role)
 end
