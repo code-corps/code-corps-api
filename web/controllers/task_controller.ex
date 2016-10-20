@@ -50,12 +50,8 @@ defmodule CodeCorps.TaskController do
     %Task{}
     |> Task.create_changeset(attributes)
     |> Repo.insert
-    |> reload_task # need to reload to get generated number
     |> CodeCorps.Analytics.Segment.track(:created, conn)
   end
-
-  defp reload_task({:ok, new_task}), do: {:ok, Repo.get(Task, new_task.id)}
-  defp reload_task({:error, changeset}), do: {:error, changeset}
 
   def handle_update(conn, task, attributes) do
     task

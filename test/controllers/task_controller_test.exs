@@ -115,7 +115,6 @@ defmodule CodeCorps.TaskControllerTest do
       path = conn |> task_path(:show, task)
 
       data = conn |> get(path) |> json_response(200) |> Map.get("data")
-      task = Task |> Repo.get(task.id)
 
       assert data["id"] == "#{task.id}"
       assert data["type"] == "task"
@@ -129,7 +128,6 @@ defmodule CodeCorps.TaskControllerTest do
 
     test "shows task by number for project", %{conn: conn} do
       task = insert(:task)
-      task = Task |> Repo.get(task.id)
 
       path = conn |> project_task_path(:show, task.project_id, task.number)
       data = conn |> get(path) |> json_response(200) |> Map.get("data")
@@ -158,7 +156,6 @@ defmodule CodeCorps.TaskControllerTest do
       json = conn |> post(path, payload) |> json_response(201)
 
       assert json["data"]["id"]
-      assert Repo.get_by(Task, @valid_attrs)
 
       # ensure record is reloaded from database before serialized, since number is added
       # on database level upon insert
