@@ -279,6 +279,169 @@ You can list all comments or retrieve individual comments, as well as create and
 
     + Attributes (Unprocessable Entity Response)
 
+# Group Donation Goals
+
+This resource describes one of any number of donation goals a project might have. A project cannot create a donation goal until they have started accepting payment with Stripe.
+
+## Donation Goals [/donation-goals]
+
+### Create a donation goal [POST]
+
+To create a donation goal the user must be a site admin or the owner of the referenced project.
+
++ Parameters
+
+    + id (number) - The `id` of a donation goal.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
+    + Attributes (Donation Goal Create Request)
+
++ Response 201 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Donation Goal Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
++ Response 404 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Record Not Found Response)
+
++ Response 422 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Unprocessable Entity Response)
+
+### List all donation goals [GET]
+
++ Request
+
+  + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Donation Goals Response)
+
+### Filter donation goals by id [GET /donation-goals{?filter[id]}]
+
++ Parameters
+
+    + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
+
+        Technically, the parameter is `filter: { id: '1,2,3' }`, which ends up being serialized into `filter[id]`. However, syntax constraints do not allow us to define it in the documentation this way.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Donation Goals Response)
+
++ Response 404 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Record Not Found Response)
+
+## Donation Goal [/donation-goals/{id}]
+
+### Retrieve a donation goal [GET]
+
++ Request
+
+    + Headers
+
+          Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Donation Goal Response)
+
++ Response 404 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Record Not Found Response)
+
+### Update a donation goal [PATCH]
+
+To update a donation goal the user must be a site admin or the owner of the referenced project.
+
++ Parameters
+
+    + id (number) - The `id` of a donation goal.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
+    + Attributes (Donation Goal Update Request)
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Donation Goal Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
++ Response 404 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Record Not Found Response)
+
++ Response 422 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Unprocessable Entity Response)
+
+### Delete a donation goal [DELETE]
+
+To delete a donation goal the user must be a site admin or the owner of the referenced project.
+
++ Parameters
+
+    + id (number) - The `id` of a donation goal.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 204 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (No Content Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
++ Response 404 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Record Not Found Response)
+
 # Group Organization Memberships
 
 ## Organization Memberships [/organization-memberships]
@@ -1797,6 +1960,48 @@ This endpoint allows you to check whether a username is valid (by running a vali
 ## Comment Relationship (object)
 + id: 1 (string)
 + type: `comment` (string, required)
+
+## Donation Goal Attributes (object)
++ title: `Support the core team` (required, string)
++ description: `Will provide all the basic overhead costs needed to run Code Corps.` (required, string) - Several lines describing the reasons for the goal
++ amount: `1500000` (required, number) - The amount, in cents, for the goal.
++ current: `true` (required, boolean) - Indicates whether this is the current donation goal. This is determined by whether 1) this is the highest goal and the total monthly raised is higher than that amount or 2) the total monthly raised is between the lower goal's amount (if it exists) and this goal's amount.
+
+## Donation Goal Resource (object)
++ include Donation Goal Resource Identifier
++ attributes(Donation Goal Attributes)
++ relationships
+    + project
+        + data(Project Resource Identifier)
+
+## Donation Goal Resource Identifier
++ id: `1` (string, required)
++ type: `donation-goal` (string, required)
+
+## Donation Goal Response (object)
++ data(Donation Goal Resource)
++ include JSON API Version
+
+## Donation Goals Response (object)
++ data(array[Donation Goal Resource])
++ include JSON API Version
+
+## Donation Goal Create Request
++ data
+    + attributes
+        + title (string) - A title for the donation
+        + description (string) - A short plain text description for the donation
+        + amount (number) - the amount of money in cents for the goal
+    + relationships
+        + project
+            + data(Project Resource Identifier) - Identifier of project this donation goal is being created for
+
+## Donation Goal Update Request
++ data
+    + attributes
+        + title (string) - A title for the donation
+        + description (string) - A short plain text description for the donation
+        + amount (number) - the amount of money in cents for the goal
 
 ## Filter Missing Response (object)
 + errors (array)
