@@ -107,6 +107,13 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def stripe_plan_factory do
+    %CodeCorps.StripePlan{
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
+      project: build(:project)
+    }
+  end
+
   def user_factory do
     %CodeCorps.User{
       username: sequence(:username, &"user#{&1}"),
