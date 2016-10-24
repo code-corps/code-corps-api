@@ -1227,6 +1227,66 @@ This endpoint will return one of two possible responses, depending on if the slu
 
     + Attributes (Slugged Route Organization Response)
 
+# Group Stripe Card
+
+This resource identifies a card created on the [Stripe API](https://stripe.com/docs/api#cards).
+
+A Stripe card belongs to a user.
+
+## Stripe Cards [/stripe-cards]
+
+### List all stripe cards [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Stripe Cards Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
+## Stripe Card [/stripe-cards/{id}]
+
+### Retrieve a stripe card [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Parameters
+
+    + id (number) - Id of a stripe card.
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Stripe Card Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
++ Response 404 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Record Not Found Response)
+
 # Group Stripe Plans
 
 This endpoint is for creating and returning Stripe plans available for projects.
@@ -2425,19 +2485,72 @@ This endpoint allows you to check whether a username is valid (by running a vali
 ## Stripe Auth Response (object)
 + data(Stripe Auth Resource)
 
+## Stripe Card (object)
++ data(Stripe Card Resource)
++ include JSON API Version
+
+## Stripe Card Attributes (object)
++ brand: (enum[string]) - Card brand.
+    + Members
+        + `Visa`
+        + `American Express`
+        + `MasterCard`
+        + `Discover`
+        + `JCB`
+        + `Diners Club`
+        + `Unknown`
++ cvc_check: (enum[string]) - If a CVC was provided, results of the check.
+    + Members
+        + `pass`
+        + `fail`
+        + `unavailable`
+        + `unchecked`
++ exp_month: 12 (number)
++ exp_year: 2017 (number)
++ `id-from-stripe`: `card_18Emd52eZvKYlo2C1s9DYdv8` (required, string)
++ `inserted-at`: `2014-07-07T18:01:26.000Z` (string)
++ last4: `4242` (string)
++ name: `John Doe` (string) - Cardholder name
++ `updated-at`: `2014-07-07T18:01:26.000Z` (string)
+
+## Stripe Card Relationships (object)
++ user
+    + data(User Resource Identifier)
+
+## Stripe Card Resource (object)
++ include Stripe Card Resource Identifier
++ attributes(Stripe Card Attributes)
++ relationships(Stripe Card Relationships)
+
+## Stripe Card Resource Identifier (object)
++ id: `1` (string, required)
++ type: `stripe-card`
+
+## Stripe Card Response (object)
++ data(Stripe Card Resource)
++ include JSON API Version
+
+## Stripe Cards Response (object)
++ data(array[Stripe Card Resource])
++ include JSON API Version
+
+## Stripe Customer Resource Identifier (object)
++ id: `1` (string, required)
++ type: `stripe-customer`
+
 ## Stripe Plan Attributes (object)
 + amount: 999 (number) - Describes the amount of a plan in cents.
-+ created: `2016-07-08T03:03:51.967Z` (string)
++ created: `2016-07-08T03:03:51.967Z` (string) - A timestamp, indicating when the plan was created by Stripe
 + `id-from-stripe`: `monthly-donation-1` (string, required)
 + `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
 + name: `Monthly Donation` (string) - Name of the plan, to be displayed on invoices and in the web interface.
 + `updated-at`: `2014-07-07T18:01:26.000Z` (string)
 
-##Stripe Plan Resource Identifier
+## Stripe Plan Resource Identifier
 + id: `1` (string, required)
 + type: `stripe-plan` (string, required)
 
-##Stripe Plan Resource (object)
+## Stripe Plan Resource (object)
 + include Stripe Plan Resource Identifier
 + attributes(Stripe Plan Attributes)
 + relationships
@@ -2536,6 +2649,8 @@ This endpoint allows you to check whether a username is valid (by running a vali
     + data(array[Organization Membership Resource Identifier])
 + `slugged-route` (object)
     + data(Slugged Route Resource Identifier)
++ `stripe-cards` (object)
+    + data(array[Stripe Card Resource Identifier])
 + `user-categories` (object)
     + data(array[User Category Resource Identifier])
 + `user-roles` (object)
