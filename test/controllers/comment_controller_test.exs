@@ -44,7 +44,7 @@ defmodule CodeCorps.CommentControllerTest do
   describe "create" do
     @tag :authenticated
     test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
-      task = insert(:task, user: current_user)
+      task = insert(:task)
 
       payload =
         build_payload
@@ -60,7 +60,7 @@ defmodule CodeCorps.CommentControllerTest do
 
     @tag :authenticated
     test "does not create resource and renders errors when data is invalid", %{conn: conn, current_user: current_user} do
-      task = insert(:task, user: current_user)
+      task = insert(:task)
 
       payload =
         build_payload
@@ -75,12 +75,28 @@ defmodule CodeCorps.CommentControllerTest do
 
     test "does not create resource and renders 401 when not authenticated", %{conn: conn} do
       user = insert(:user)
-      task = insert(:task, user: user)
+      task = insert(:task)
 
       payload =
         build_payload
         |> put_attributes(@valid_attrs)
         |> put_relationships(user, task)
+
+      path = conn |> comment_path(:create)
+      conn = conn |> post(path, payload)
+
+      assert json_response(conn, 401)
+    end
+
+    @tag :authenticated
+    test "does not create resource and renders 401 when not authorized", %{conn: conn} do
+      comment_user = insert(:user)
+      task = insert(:task)
+
+      payload =
+        build_payload
+        |> put_attributes(@valid_attrs)
+        |> put_relationships(comment_user, task)
 
       path = conn |> comment_path(:create)
       conn = conn |> post(path, payload)
