@@ -4,8 +4,6 @@ defmodule CodeCorps.ProjectSkillControllerTest do
   alias CodeCorps.ProjectSkill
   alias CodeCorps.Repo
 
-  @attrs %{}
-
   defp build_payload, do: %{ "data" => %{"type" => "project-skill", "attributes" => %{}}}
 
   describe "index" do
@@ -27,21 +25,18 @@ defmodule CodeCorps.ProjectSkillControllerTest do
         conn
         |> get("project-skills/?filter[id]=#{project_skill_1.id},#{project_skill_2.id}")
         |> json_response(200)
-      data = json["data"]
-      assert length(data) == 2
-      [first_result, second_result | _] = data
 
-      assert first_result["id"] == "#{project_skill_1.id}"
-      assert first_result["relationships"]["project"]["data"]["id"] == "#{project.id}"
-      assert first_result["relationships"]["project"]["data"]["type"] == "project"
-      assert first_result["relationships"]["skill"]["data"]["id"] == "#{elixir.id}"
-      assert first_result["relationships"]["skill"]["data"]["type"] == "skill"
+      [first_result, second_result | _rest] = json |> Map.get("data")
 
-      assert second_result["id"] == "#{project_skill_2.id}"
-      assert second_result["relationships"]["project"]["data"]["id"] == "#{project.id}"
-      assert second_result["relationships"]["project"]["data"]["type"] == "project"
-      assert second_result["relationships"]["skill"]["data"]["id"] == "#{phoenix.id}"
-      assert second_result["relationships"]["skill"]["data"]["type"] == "skill"
+      first_result
+      |> assert_result_id(project_skill_1.id)
+      |> assert_jsonapi_relationship("project", project.id)
+      |> assert_jsonapi_relationship("skill", elixir.id)
+
+      second_result
+      |> assert_result_id(project_skill_2.id)
+      |> assert_jsonapi_relationship("project", project.id)
+      |> assert_jsonapi_relationship("skill", phoenix.id)
     end
   end
 
@@ -51,14 +46,15 @@ defmodule CodeCorps.ProjectSkillControllerTest do
       project = insert(:project)
       project_skill = insert(:project_skill, project: project, skill: skill)
       conn = get conn, project_skill_path(conn, :show, project_skill)
-      data = json_response(conn, 200)["data"]
-      assert data["id"] == "#{project_skill.id}"
-      assert data["type"] == "project-skill"
-      assert data["attributes"] == %{}
-      assert data["relationships"]["project"]["data"]["id"] == "#{project.id}"
-      assert data["relationships"]["project"]["data"]["type"] == "project"
-      assert data["relationships"]["skill"]["data"]["id"] == "#{skill.id}"
-      assert data["relationships"]["skill"]["data"]["type"] == "skill"
+
+      data =
+        conn
+        |> json_response(200)
+        |> Map.get("data")
+        |> assert_result_id(project_skill.id)
+        |> assert_jsonapi_relationship("project", project.id)
+        |> assert_jsonapi_relationship("skill", skill.id)
+        |> assert_attributes(%{})
     end
 
     test "does not show resource and instead throw error when id is nonexistent", %{conn: conn} do
@@ -83,13 +79,12 @@ defmodule CodeCorps.ProjectSkillControllerTest do
       id = json["data"]["id"] |> String.to_integer
       project_skill = ProjectSkill |> Repo.get(id)
 
-      assert json["data"]["id"] == "#{project_skill.id}"
-      assert json["data"]["type"] == "project-skill"
-      assert json["data"]["attributes"] == %{}
-      assert json["data"]["relationships"]["project"]["data"]["id"] == "#{project.id}"
-      assert json["data"]["relationships"]["project"]["data"]["type"] == "project"
-      assert json["data"]["relationships"]["skill"]["data"]["id"] == "#{skill.id}"
-      assert json["data"]["relationships"]["skill"]["data"]["type"] == "skill"
+      json
+      |> Map.get("data")
+      |> assert_result_id(project_skill.id)
+      |> assert_jsonapi_relationship("project", project.id)
+      |> assert_jsonapi_relationship("skill", skill.id)
+      |> assert_attributes(%{})
     end
 
     @tag authenticated: :admin

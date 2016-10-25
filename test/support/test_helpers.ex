@@ -8,6 +8,16 @@ defmodule CodeCorps.TestHelpers do
     end
   end
 
+  def assert_ids_from_response(response, ids) do
+    assert ids_from_response(response) == ids
+    response
+  end
+
+  def assert_attributes(response, expected) do
+    assert response["attributes"] == expected
+    response
+  end
+
   def assert_jsonapi_relationship(json = %{"relationships" => relationships}, relationship_name, id) do
     assert relationships[relationship_name]["data"]["id"] == Integer.to_string(id)
     json
