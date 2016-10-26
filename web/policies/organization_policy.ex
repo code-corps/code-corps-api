@@ -1,21 +1,13 @@
 defmodule CodeCorps.OrganizationPolicy do
-  import Ecto.Query
+  import CodeCorps.Helpers.Policy,
+    only: [get_membership: 2, get_role: 1, admin_or_higher?: 1]
+
   alias CodeCorps.User
   alias CodeCorps.Organization
-  alias CodeCorps.OrganizationMembership
 
   def create?(%User{admin: true}), do: true
   def create?(%User{admin: false}), do: false
 
   def update?(%User{admin: true}, %Organization{}), do: true
-  def update?(%User{} = user, %Organization{} = organization), do: user |> role_is_at_least_admin(organization)
-
-  defp role_is_at_least_admin(%User{} = user, %Organization{} = organization) do
-    count =
-      OrganizationMembership
-      |> where([m], m.member_id == ^user.id and m.organization_id == ^organization.id and m.role in ["admin", "owner"])
-      |> CodeCorps.Repo.aggregate(:count, :id)
-
-    count > 0
-  end
+  def update?(%User{} = user, %Organization{} = organization), do: organization |> get_membership(user) |> get_role |> admin_or_higher?
 end

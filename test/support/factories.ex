@@ -21,6 +21,16 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def donation_goal_factory do
+    %CodeCorps.DonationGoal{
+      amount: 100,
+      current: false,
+      description: sequence(:description, &"A description for a donation goal #{&1}"),
+      title: sequence(:title, &"Donation goal #{&1}"),
+      project: build(:project)
+    }
+  end
+
   def organization_factory do
     %CodeCorps.Organization{
       name: sequence(:username, &"Organization #{&1}"),

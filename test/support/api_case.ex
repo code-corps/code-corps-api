@@ -6,13 +6,21 @@ defmodule CodeCorps.ApiCase do
 
   It's basically a clone of CodeCorps.ConnCase, with some extras,
   mainly authentication and proper headers, added.
+
+  If provided with a :resource_name option, it dynamically
+  generates higher level request helper methods
+
+  ## Examples
+
+    use ApiCase, resource_name: :task
+    use ApiCase, resource_name: :comment
   """
 
   import CodeCorps.Factories
   use ExUnit.CaseTemplate
   use Phoenix.ConnTest
 
-  using do
+  using(opts) do
     quote do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
@@ -29,6 +37,8 @@ defmodule CodeCorps.ApiCase do
 
       # The default endpoint for testing
       @endpoint CodeCorps.Endpoint
+
+      CodeCorps.ApiCase.define_request_helper_methods(unquote(opts))
     end
   end
 
@@ -66,4 +76,54 @@ defmodule CodeCorps.ApiCase do
     {conn, admin}
   end
 
+  defmacro define_request_helper_methods(resource_name: resource_name), do: do_add_request_helper_methods(resource_name)
+  defmacro define_request_helper_methods(_), do: nil
+
+  defp do_add_request_helper_methods(resource_name) do
+    quote do
+      defp factory_name, do: unquote(resource_name)
+      defp path_helper_method, do: "#{unquote(resource_name)}_path" |> String.to_atom
+      defp default_record, do: insert(unquote(resource_name))
+
+      defp path_for(conn, action, resource_or_id) do
+        apply(CodeCorps.Router.Helpers, path_helper_method, [conn, action, resource_or_id])
+      end
+
+      defp path_for(conn, action) do
+        apply(CodeCorps.Router.Helpers, path_helper_method, [conn, action])
+      end
+
+      def request_index(conn) do
+        path = conn |> path_for(:index)
+        conn |> get(path)
+      end
+
+      def request_show(conn, :not_found), do: conn |> request_show(-1)
+      def request_show(conn, resource_or_id) do
+        path = conn |> path_for(:show, resource_or_id)
+        conn |> get(path)
+      end
+
+      def request_create(conn, attrs) do
+        path = conn |> path_for(:create)
+        payload = json_payload(factory_name, attrs)
+        conn |> post(path, payload)
+      end
+
+      def request_update(conn, :not_found), do: conn |> request_update(-1, %{})
+      def request_update(conn, attrs), do: conn |> request_update(default_record, attrs)
+      def request_update(conn, resource_or_id, attrs) do
+        payload = json_payload(factory_name, attrs)
+        path = conn |> path_for(:update, resource_or_id)
+        conn |> put(path, payload)
+      end
+
+      def request_delete(conn), do: conn |> request_delete(default_record)
+      def request_delete(conn, :not_found), do: conn |> request_delete(-1)
+      def request_delete(conn, resource_or_id) do
+        path = conn |> path_for(:delete, resource_or_id)
+        conn |> delete(path)
+      end
+    end
+  end
 end
