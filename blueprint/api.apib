@@ -25,12 +25,12 @@ Exchange email and password for `token`.
 
 ### Exchange email and password for token [POST]
 
-+ Parameters
-
-    + username: `me@testuser.org` (string, required) - The user's email address.
-    + password: `password` (string, required)
-
 + Request
+
+    + Attributes
+
+        + username: `me@testuser.org` (string, required) - The user's email address.
+        + password: `password` (string, required)
 
     + Headers
 
@@ -52,11 +52,11 @@ Exchange email and password for `token`.
 
 ### Refresh the token [POST]
 
-+ Parameters
-
-    + token: `eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJVc2VyOjEiLCJleHAiOjE0NzY3NTQ2MTcsImlhdCI6MTQ3NDE2MjYxNywiaXNzIjoiQ29kZUNvcnBzIiwianRpIjoiMDY2ODQ0OWYtNWY5OC00ODVkLWI4NTktNjRhZDhmZDU3NWQ4IiwicGVtIjp7fSwic3ViIjoiVXNlcjoxIiwidHlwIjoidG9rZW4ifQ.Y80alu1UEmk4uxGgA7ORVdS8ikuUJFxCozyK6S9UeaLW392Vhti4d1Y1IXivWA_j9TKjADhqTQnMihbCzUiLsA` (string, required) - The JSON Web Token provided in the create step.
-
 + Request
+
+    + Attributes
+
+        + token: `eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJVc2VyOjEiLCJleHAiOjE0NzY3NTQ2MTcsImlhdCI6MTQ3NDE2MjYxNywiaXNzIjoiQ29kZUNvcnBzIiwianRpIjoiMDY2ODQ0OWYtNWY5OC00ODVkLWI4NTktNjRhZDhmZDU3NWQ4IiwicGVtIjp7fSwic3ViIjoiVXNlcjoxIiwidHlwIjoidG9rZW4ifQ.Y80alu1UEmk4uxGgA7ORVdS8ikuUJFxCozyK6S9UeaLW392Vhti4d1Y1IXivWA_j9TKjADhqTQnMihbCzUiLsA` (string, required) - The JSON Web Token provided in the create step.
 
     + Headers
 
@@ -175,13 +175,11 @@ You can list all comments or retrieve individual comments, as well as create and
 
 ### Filter comments by list of ids [GET /comments{?filter[id]}]
 
-+ Parameters
-
-    + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
-
-        Technically, the parameter is `filter: { id: '1,2,3' }`, which ends up being serialized into `filter[id]`. However, syntax constraints do not allow us to define it in the documentation this way.
-
 + Request
+
+    + Attributes
+
+        + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
 
     + Headers
 
@@ -195,7 +193,7 @@ You can list all comments or retrieve individual comments, as well as create and
 
 + Parameters
 
-    + id (number) - Id of a comment.
+    + id (number, required)
 
 ### Update a comment [PATCH]
 
@@ -229,10 +227,6 @@ This resource describes one of any number of donation goals a project might have
 ### Create a donation goal [POST]
 
 To create a donation goal the user must be a site admin or the owner of the referenced project.
-
-+ Parameters
-
-    + id (number) - The `id` of a donation goal.
 
 + Request
 
@@ -275,15 +269,13 @@ To create a donation goal the user must be a site admin or the owner of the refe
 
     + Attributes (Donation Goals Response)
 
-### Filter donation goals by id [GET /donation-goals{?filter[id]}]
-
-+ Parameters
-
-    + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
-
-        Technically, the parameter is `filter: { id: '1,2,3' }`, which ends up being serialized into `filter[id]`. However, syntax constraints do not allow us to define it in the documentation this way.
+### Filter by id [GET /donation-goals{?filter[id]}]
 
 + Request
+
+    + Attributes
+
+        + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
 
     + Headers
 
@@ -299,13 +291,17 @@ To create a donation goal the user must be a site admin or the owner of the refe
 
 ## Donation Goal [/donation-goals/{id}]
 
++ Parameters
+
+    + id (number, required)
+
 ### Retrieve a donation goal [GET]
 
 + Request
 
     + Headers
 
-          Accept: application/vnd.api+json
+            Accept: application/vnd.api+json
 
 + Response 200 (application/vnd.api+json; charset=utf-8)
 
@@ -318,10 +314,6 @@ To create a donation goal the user must be a site admin or the owner of the refe
 ### Update a donation goal [PATCH]
 
 To update a donation goal the user must be a site admin or the owner of the referenced project.
-
-+ Parameters
-
-    + id (number) - The `id` of a donation goal.
 
 + Request
 
@@ -355,10 +347,6 @@ To update a donation goal the user must be a site admin or the owner of the refe
 ### Delete a donation goal [DELETE]
 
 To delete a donation goal the user must be a site admin or the owner of the referenced project.
-
-+ Parameters
-
-    + id (number) - The `id` of a donation goal.
 
 + Request
 
@@ -426,14 +414,13 @@ To delete a donation goal the user must be a site admin or the owner of the refe
 
     + Attributes (Organization Memberships Response)
 
-### Filter organization memberships by id [GET]
-
-+ Parameters
-
-    + filter
-        + id: `1,2,...` (string, required) - Comma separated string of `ids` to filter by.
+### Filter by id [GET /organization-memberships{?filter[id]}]
 
 + Request
+
+    + Attributes
+
+        + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
 
     + Headers
 
@@ -443,7 +430,11 @@ To delete a donation goal the user must be a site admin or the owner of the refe
 
     + Attributes (Organization Memberships Response)
 
-## Organization Membership [/organization-memberships/:id]
+## Organization Membership [/organization-memberships/{id}]
+
++ Parameters
+
+    + id (number, required)
 
 ### Retrieve an organization membership [GET]
 
@@ -511,7 +502,7 @@ This endpoint retrieves Organizations on Code Corps. Organizations usually have 
 
 Until the Code Corps platform is open to new organizations, only admin users can create new organizations.
 
-## Organizations [/organizations{?filter[id]}]
+## Organizations [/organizations]
 
 ### Create an organization [POST]
 
@@ -538,15 +529,13 @@ Until the Code Corps platform is open to new organizations, only admin users can
 
     + Attributes (Unprocessable Entity Response)
 
-### Filter organizations by id [GET]
-
-+ Parameters
-
-    + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
-
-        Technically, the parameter is `filter: { id: '1,2,3' }`, which ends up being serialized into `filter[id]`. However, syntax constraints do not allow us to define it in the documentation this way.
+### Filter by id [GET /organizations{?filter[id]}]
 
 + Request
+
+    + Attributes
+
+        + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
 
     + Headers
 
@@ -562,11 +551,11 @@ Until the Code Corps platform is open to new organizations, only admin users can
 
 ## Organization [/organizations/{id}]
 
-### Retrieve an organization [GET]
-
 + Parameters
 
-    + id (number) - Id of an organization.
+    + id (number, required)
+
+### Retrieve an organization [GET]
 
 + Request
 
@@ -583,10 +572,6 @@ Until the Code Corps platform is open to new organizations, only admin users can
     + Attributes (Record Not Found Response)
 
 ### Update an organization [PATCH]
-
-+ Parameters
-
-    + id (number) - Id of an organization.
 
 + Request (application/vnd.api+json; charset=utf-8)
 
@@ -685,11 +670,11 @@ This resource identifies a relationship between a Project and a Category. For ex
 
 ## Project Category [/project-categories/{id}]
 
-### Retrieve a project category [GET]
-
 + Parameters
 
-    + id (number) - Id of a project category.
+    + id (number, required)
+
+### Retrieve a project category [GET]
 
 + Request
 
@@ -706,10 +691,6 @@ This resource identifies a relationship between a Project and a Category. For ex
     + Attributes (Record Not Found Response)
 
 ### Delete a project category [DELETE]
-
-+ Parameters
-
-    + id (number) - Id of a project category.
 
 + Request
 
@@ -773,11 +754,11 @@ This resource identifies a relationship between a Project and a Skill. For examp
 
 ## Project Skill [/project-skills/{id}]
 
-### Retrieve a project skill [GET]
-
 + Parameters
 
-    + id (number) - Id of a project skill.
+    + id (number, required)
+
+### Retrieve a project skill [GET]
 
 + Request
 
@@ -794,10 +775,6 @@ This resource identifies a relationship between a Project and a Skill. For examp
     + Attributes (Record Not Found Response)
 
 ### Delete a project skill [DELETE]
-
-+ Parameters
-
-    + id (number) - Id of a project skill.
 
 + Request
 
@@ -888,6 +865,10 @@ This resource identifies a relationship between a Project and a Skill. For examp
 
 ## Project [/projects/{id}]
 
++ Parameters
+
+    + id (number, required)
+
 ### Retrieve a project [GET]
 
 + Request
@@ -906,11 +887,11 @@ This endpoint allows you to get a Stripe Connect authorization URL used for crea
 
 See https://stripe.com/docs/connect/reference#get-authorize
 
-The URL includes a `state` CSRF token which is a Guardian generated JSON Web Token which contains the project's ID. This JWT will be used when the user returns to Code Corps in order to associate Stripe's `code` with the project that initiated the Stripe Connect authorization.
-
+The URL includes a `state` CSRF token which is a Guardian generated JSON Web Token which contains the project's ID. This JWT will be used when the
 + Parameters
 
-    + id: 1 (integer, required)
+    + id (number, required)
+user returns to Code Corps in order to associate Stripe's `code` with the project that initiated the Stripe Connect authorization.
 
 + Response 200 (application/vnd.api+json; charset=utf-8)
 
@@ -986,11 +967,11 @@ A user is able to have multiple roles through their user roles.
 
 ## Role [/roles/{id}]
 
-### Retrieve a role [GET]
-
 + Parameters
 
-    + id (number) - Id of a role.
+    + id (number, required)
+
+### Retrieve a role [GET]
 
 + Request
 
@@ -1053,11 +1034,11 @@ We can use the many skills grouped under a role to suggest popular skills to use
 
 ## Role Skill [/role-skills/{id}]
 
-### Retrieve a role skill [GET]
-
 + Parameters
 
-    + id (number) - Id of a role skill.
+    + id (number, required)
+
+### Retrieve a role skill [GET]
 
 + Request
 
@@ -1074,10 +1055,6 @@ We can use the many skills grouped under a role to suggest popular skills to use
     + Attributes (Record Not Found Response)
 
 ### Delete a role skill [DELETE]
-
-+ Parameters
-
-    + id (number) - Id of a role skill.
 
 + Request
 
@@ -1143,13 +1120,11 @@ This endpoint retrieves Skills that can relate to Projects, Roles, or Users. Thi
 
 ### Filter by id [GET /skills{?filter[id]}]
 
-+ Parameters
-
-    + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
-
-        Technically, the parameter is `filter: { id: '1,2,3' }`, which ends up being serialized into `filter[id]`. However, syntax constraints do not allow us to define it in the documentation this way.
-
 + Request
+
+    + Attributes
+
+        + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
 
     + Headers
 
@@ -1181,11 +1156,11 @@ For example, if we wanted to return skills like "Java" and "JavaScript", we may 
 
 ## Skill [/skills/{id}]
 
-### Retrieve a skill [GET]
-
 + Parameters
 
-    + id (number) - Id of a skill.
+    + id (number, required)
+
+### Retrieve a skill [GET]
 
 + Request
 
@@ -1260,6 +1235,10 @@ A Stripe account belongs to an organization.
 
 ## Stripe Account [/stripe-accounts/{id}]
 
++ Parameters
+
+    + id (number, required)
+
 ### Retrieve a Stripe account [GET]
 
 + Request
@@ -1268,10 +1247,6 @@ A Stripe account belongs to an organization.
 
             Accept: application/vnd.api+json
             Authorization: Bearer {token}
-
-+ Parameters
-
-    + id (number) - Id of a Stripe card.
 
 + Response 200 (application/vnd.api+json; charset=utf-8)
 
@@ -1297,7 +1272,7 @@ A Stripe card belongs to a user.
 
 ## Stripe Cards [/stripe-cards]
 
-### List all stripe cards [GET]
+### List all Stripe cards [GET]
 
 + Request
 
@@ -1320,7 +1295,11 @@ A Stripe card belongs to a user.
 
 ## Stripe Card [/stripe-cards/{id}]
 
-### Retrieve a stripe card [GET]
++ Parameters
+
+    + id (number, required)
+
+### Retrieve a Stripe card [GET]
 
 + Request
 
@@ -1328,10 +1307,6 @@ A Stripe card belongs to a user.
 
             Accept: application/vnd.api+json
             Authorization: Bearer {token}
-
-+ Parameters
-
-    + id (number) - Id of a stripe card.
 
 + Response 200 (application/vnd.api+json; charset=utf-8)
 
@@ -1357,15 +1332,13 @@ A Stripe customer can have many subscriptions, which are the donations they make
 
 ## Stripe Customers [/stripe-customers]
 
-### Filter Stripe customers by id [GET /stripe-customers{?filter[id]}]
-
-+ Parameters
-
-    + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
-
-        Technically, the parameter is `filter: { id: '1,2,3' }`, which ends up being serialized into `filter[id]`. However, syntax constraints do not allow us to define it in the documentation this way.
+### Filter by id [GET /stripe-customers{?filter[id]}]
 
 + Request
+
+    + Attributes
+
+        + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
 
     + Headers
 
@@ -1386,6 +1359,10 @@ A Stripe customer can have many subscriptions, which are the donations they make
 
 ## Stripe Customer [/stripe-customers/{id}]
 
++ Parameters
+
+    + id (number, required)
+
 ### Retrieve a Stripe customer [GET]
 
 + Request
@@ -1394,10 +1371,6 @@ A Stripe customer can have many subscriptions, which are the donations they make
 
             Accept: application/vnd.api+json
             Authorization: Bearer {token}
-
-+ Parameters
-
-    + id (number) - Id of a Stripe customer.
 
 + Response 200 (application/vnd.api+json; charset=utf-8)
 
@@ -1424,10 +1397,6 @@ The Stripe plan resource allows users to select a monthly donation amount for a 
 ## Stripe Plans [/stripe-plans]
 
 ### Create a Stripe plan [POST]
-
-+ Parameters
-
-    + id (number) - Id of a Stripe plan.
 
 + Request
 
@@ -1466,11 +1435,11 @@ The Stripe plan resource allows users to select a monthly donation amount for a 
 
 ## Stripe Plan [/stripe-plans/{id}]
 
-### Retrieve a Stripe plan [GET]
-
 + Parameters
 
-    + id (number) - Id of a Stripe plan.
+    + id (number, required)
+
+### Retrieve a Stripe plan [GET]
 
 + Request
 
@@ -1519,15 +1488,13 @@ Stripe subscriptions allow us to charge a customer's card on a recurring basis. 
 
     + Attributes (Unprocessable Entity Response)
 
-### Filter Stripe subscriptions by id [GET /stripe-subscriptions{?filter[id]}]
-
-+ Parameters
-
-    + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
-
-        Technically, the parameter is `filter: { id: '1,2,3' }`, which ends up being serialized into `filter[id]`. However, syntax constraints do not allow us to define it in the documentation this way.
+### Filter by id [GET /stripe-subscriptions{?filter[id]}]
 
 + Request
+
+    + Attributes
+
+        + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
 
     + Headers
 
@@ -1548,11 +1515,11 @@ Stripe subscriptions allow us to charge a customer's card on a recurring basis. 
 
 ## Stripe Subscription [/stripe-subscriptions/{id}]
 
-### Retrieve a Stripe subscription [GET]
-
 + Parameters
 
-    + id (number) - Id of a Stripe subscription.
+    + id (number, required)
+
+### Retrieve a Stripe subscription [GET]
 
 + Request
 
@@ -1578,10 +1545,6 @@ Stripe subscriptions allow us to charge a customer's card on a recurring basis. 
     + Attributes (Record Not Found Response)
 
 ### Update a Stripe subscription [PATCH /subscriptions/{id}]
-
-+ Parameters
-
-    + id (number) - Id of a Stripe subscription.
 
 + Request
 
@@ -1688,11 +1651,11 @@ This allows us to have a logical numbering scheme for the project rather than ex
 
 ## Task [/tasks/{id}]
 
-### Retrieve a task [GET /tasks/{id}]
-
 + Parameters
 
-    + id (number) - Id of a task.
+    + id (number, required)
+
+### Retrieve a task [GET]
 
 + Request
 
@@ -1708,11 +1671,7 @@ This allows us to have a logical numbering scheme for the project rather than ex
 
     + Attributes (Record Not Found Response)
 
-### Update a task [PATCH /tasks/{id}]
-
-+ Parameters
-
-    + id (number) - Id of a task.
+### Update a task [PATCH]
 
 + Request
 
@@ -1783,15 +1742,13 @@ It may help to think of a User Category as an interest. A user may have interest
 
     + Attributes (User Categories Response)
 
-### Filter user categories by id [GET /user-categories{?filter[id]}}]
-
-+ Parameters
-
-    + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
-
-        Technically, the parameter is `filter: { id: '1,2,3' }`, which ends up being serialized into `filter[id]`. However, syntax constraints do not allow us to define it in the documentation this way.
+### Filter by id [GET /user-categories{?filter[id]}}]
 
 + Request
+
+    + Attributes
+
+        + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
 
     + Headers
 
@@ -1803,11 +1760,11 @@ It may help to think of a User Category as an interest. A user may have interest
 
 ## User Category [/user-categories/{id}]
 
-### Retrieve a user category [GET]
-
 + Parameters
 
-    + id (number) - Id of a user category.
+    + id (number, required)
+
+### Retrieve a user category [GET]
 
 + Request
 
@@ -1881,11 +1838,11 @@ This resource identifies a relationship between a User and a Role. For example, 
 
 ## User Role [/user-roles/{id}]
 
-### Retrieve a user role [GET]
-
 + Parameters
 
-    + id (number) - Id of a user role.
+    + id (number, required)
+
+### Retrieve a user role [GET]
 
 + Request
 
@@ -1902,10 +1859,6 @@ This resource identifies a relationship between a User and a Role. For example, 
     + Attributes (Record Not Found Response)
 
 ### Delete a user role [DELETE]
-
-+ Parameters
-
-    + id (number) - Id of a user role.
 
 + Request
 
@@ -1969,15 +1922,13 @@ This resource identifies a relationship between a User and a Skill. For example,
 
     + Attributes (User Skills Response)
 
-### Filter user skills by id [GET /user-skills{?filter[id]}]
-
-+ Parameters
-
-    + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
-
-        Technically, the parameter is `filter: { id: '1,2,3' }`, which ends up being serialized into `filter[id]`. However, syntax constraints do not allow us to define it in the documentation this way.
+### Filter by id [GET /user-skills{?filter[id]}]
 
 + Request
+
+    + Attributes
+
+        + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
 
     + Headers
 
@@ -1989,11 +1940,11 @@ This resource identifies a relationship between a User and a Skill. For example,
 
 ## User Skill [/user-skills/{id}]
 
-### Retrieve a user skill [GET]
-
 + Parameters
 
-    + id (number) - Id of a user skill.
+    + id (number, required)
+
+### Retrieve a user skill [GET]
 
 + Request
 
@@ -2007,10 +1958,6 @@ This resource identifies a relationship between a User and a Skill. For example,
 
 
 ### Delete a user skill [DELETE]
-
-+ Parameters
-
-    + id (number) - Id of a user skill.
 
 + Request
 
@@ -2081,15 +2028,17 @@ This endpoint handles the User resources for Code Corps.
 
     + Attributes (Users Response)
 
-### Filter users by id [GET /users{}?filter[id]}]
+### Filter by id [GET /users{?filter[id]}]
 
-+ Parameters
++ Request
 
-    + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
+    + Attributes
 
-        Technically, the parameter is `filter: { id: '1,2,3' }`, which ends up being serialized into `filter[id]`. However, syntax constraints do not allow us to define it in the documentation this way.
+        + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
 
-+ Request (application/vnd.api+json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.api+json
 
 + Response 200 (application/vnd.api+json; charset=utf-8)
 
@@ -2131,11 +2080,11 @@ This endpoint allows you to check whether a username is valid (by running a vali
 
 ## User [/users/{id}]
 
-### Retrieve a user [GET /users/{id}]
-
 + Parameters
 
-    + id (number) - Id of a user.
+    + id (number, required)
+
+### Retrieve a user [GET]
 
 + Request
 
@@ -2151,11 +2100,7 @@ This endpoint allows you to check whether a username is valid (by running a vali
 
     + Attributes (Record Not Found Response)
 
-### Update a user [PATCH /users/{id}]
-
-+ Parameters
-
-    + id (number) - Id of a user.
+### Update a user [PATCH]
 
 + Request (application/vnd.api+json; charset=utf-8)
 
@@ -2196,25 +2141,9 @@ This endpoint allows you to check whether a username is valid (by running a vali
 # Data Structures
 
 ## Category Attributes (object)
-+ name: `Category` (required, string)
-+ slug: `cat1` (required, string)
++ name: `Category` (string, required)
++ slug: `cat1` (string, required)
 + description: `This is the category description` (string)
-
-## Categories Relationship (object)
-+ data
-  + id: 1 (string)
-  + type: `category` (string, required)
-
-## Categories Relationships (object)
-+ categories
-  + data(array[Categories Relationship], required)
-
-## Category Relationships Base (object)
-+ include Project Category Resource Identifier
-
-## Category Resource Identifier
-+ id: `1` (string, required)
-+ type: `category`
 
 ## Category Resource (object)
 + include Category Resource Identifier
@@ -2223,6 +2152,10 @@ This endpoint allows you to check whether a username is valid (by running a vali
     + `project-categories`
         + data(array[Project Category Resource Identifier])
 
+## Category Resource Identifier
++ id: `1` (string, required)
++ type: `category` (string, required)
+
 ## Category Response (object)
 + data(Category Resource)
 + include JSON API Version
@@ -2230,6 +2163,24 @@ This endpoint allows you to check whether a username is valid (by running a vali
 ## Categories Response (object)
 + data(array[Category Resource])
 + include JSON API Version
+
+## Comment Attributes (object)
++ body: `Html string rendered from markdown` (string)
++ `inserted-at`: `2014-07-07T18:01:26.000Z` (string)
++ markdown: `Markdown formatted string` (string)
++ state: `published` (enum[string])
+    + Members
+        + `published`
+        + `edited`
++ `updated-at`: `2014-07-07T18:01:26.000Z` (string)
+
+## Comment Create Request (object)
++ type: `comment` (string, required)
++ attributes
+    + markdown: `Markdown formatted string` (string)
++ relationships
+    + tasks
+        + data(Task Resource Identifier)
 
 ## Comment Resource (object)
 + include Comment Resource Identifier
@@ -2240,27 +2191,9 @@ This endpoint allows you to check whether a username is valid (by running a vali
     + user
         + data(User Resource Identifier)
 
-## Comment Attributes (object)
-+ body: `Html string rendered from markdown` (string)
-+ `inserted-at`: `2014-07-07T18:01:26.000Z` (string)
-+ markdown: `Markdown formatted string` (string)
-+ state: (enum[string])
-    + Members
-        + `published`
-        + `edited`
-+ `updated-at`: `2014-07-07T18:01:26.000Z` (string)
-
 ## Comment Resource Identifier (object)
 + id: `1` (string, required)
 + type: `comment` (string, required)
-
-## Comment Create Request (object)
-+ type: `comment` (string, required)
-+ attributes
-    + markdown: `Markdown formatted string` (string)
-+ relationships
-    + tasks
-        + data(Task Resource Identifier)
 
 ## Comment Update Request (object)
 + include Comment Resource Identifier
@@ -2268,24 +2201,28 @@ This endpoint allows you to check whether a username is valid (by running a vali
     + markdown: `Markdown formatted content` (string)
 
 ## Comment Response (object)
-+ data
-    + include Comment Resource
++ data(Comment Resource)
 + include JSON API Version
 
 ## Comments Response (object)
-+ comments
-    + data(array[Comment Response])
++ data(array[Comment Resource])
 + include JSON API Version
 
-## Comment Relationship (object)
-+ id: 1 (string)
-+ type: `comment` (string, required)
-
 ## Donation Goal Attributes (object)
-+ title: `Support the core team` (required, string)
-+ description: `Will provide all the basic overhead costs needed to run Code Corps.` (required, string) - Several lines describing the reasons for the goal
++ title: `Support the core team` (string, required)
++ description: `Will provide all the basic overhead costs needed to run Code Corps.` (string, required) - Several lines describing the reasons for the goal
 + amount: `1500000` (required, number) - The amount, in cents, for the goal.
 + current: `true` (required, boolean) - Indicates whether this is the current donation goal. This is determined by whether 1) this is the highest goal and the total monthly raised is higher than that amount or 2) the total monthly raised is between the lower goal's amount (if it exists) and this goal's amount.
+
+## Donation Goal Create Request
++ data
+    + attributes
+        + title (string) - A title for the donation
+        + description (string) - A short plain text description for the donation
+        + amount (number) - the amount of money in cents for the goal
+    + relationships
+        + project
+            + data(Project Resource Identifier) - Identifier of project this donation goal is being created for
 
 ## Donation Goal Resource (object)
 + include Donation Goal Resource Identifier
@@ -2306,16 +2243,6 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + data(array[Donation Goal Resource])
 + include JSON API Version
 
-## Donation Goal Create Request
-+ data
-    + attributes
-        + title (string) - A title for the donation
-        + description (string) - A short plain text description for the donation
-        + amount (number) - the amount of money in cents for the goal
-    + relationships
-        + project
-            + data(Project Resource Identifier) - Identifier of project this donation goal is being created for
-
 ## Donation Goal Update Request
 + data
     + attributes
@@ -2324,28 +2251,18 @@ This endpoint allows you to check whether a username is valid (by running a vali
         + amount (number) - the amount of money in cents for the goal
 
 ## Filter Missing Response (object)
-+ errors (array)
-    + Attributes
-        + id: `PARAMETER_MISSING` (string)
-        + title: `Filter is missing` (string)
-        + detail: `You must specify a Filter.` (string) - Details of what record was not found.
-        + status: 400 (number) - HTTP status code
++ errors
+    + id: `PARAMETER_MISSING` (string)
+    + title: `Filter is missing` (string)
+    + detail: `You must specify a Filter.` (string) - Details of what record was not found.
+    + status: 400 (number) - HTTP status code
 
 ## Forbidden Response (object)
-+ errors (array)
-    + Attributes
-        + id: `FORBIDDEN` (string)
-        + title: `Forbidden` (string)
-        + detail: `You are not authorized to perform this action on {subject_name}` (string) - Details of what record was not found.
-        + status: 403 (number) - HTTP status code
-
-## Id Filter (object)
-+ filter:
-    + id: `1,2,3,...` (string, required) - A list of ids, in a single string, comma-separated
-
-## Github Repository Resource Identifier
-+ id: `1` (string, required)
-+ type: `github-repository` (string, required)
++ errors
+    + id: `FORBIDDEN` (string)
+    + title: `Forbidden` (string)
+    + detail: `You are not authorized to perform this action on {subject_name}` (string) - Details of what record was not found.
+    + status: 403 (number) - HTTP status code
 
 ## No Content Response (object)
 
@@ -2356,40 +2273,56 @@ This endpoint allows you to check whether a username is valid (by running a vali
   + version: `1.0` (string)
 
 ## JSON Web Token Expired Response (object)
-+ errors (array)
-    + Attributes
-        + id: `UNAUTHORIZED` (string, required)
-        + title: `401 Unauthorized` (string, required)
-        + detail: `token_expired` (string, required)
-        + status: 401 (number, required)
++ errors
+    + id: `UNAUTHORIZED` (string, required)
+    + title: `401 Unauthorized` (string, required)
+    + detail: `token_expired` (string, required)
+    + status: 401 (number, required)
 
 ## JSON Web Token Invalid Response (object)
-+ errors (array)
-    + Attributes
-        + id: `UNAUTHORIZED` (string, required)
-        + title: `401 Unauthorized` (string, required)
-        + detail: `We couldn't find a user with the email {email}.` (string, required)
-        + status: 401 (number, required)
-
-## JSON Web Token No User With Email Response (object)
-+ errors (array)
-    + Attributes
-        + id: `UNAUTHORIZED` (string, required)
-        + title: `401 Unauthorized` (string, required)
-        + detail: `We couldn't find a user with the email {email}.` (string, required)
-        + status: 401 (number, required)
++ errors
+    + id: `UNAUTHORIZED` (string, required)
+    + title: `401 Unauthorized` (string, required)
+    + detail: `We couldn't find a user with the email {email}.` (string, required)
+    + status: 401 (number, required)
 
 ## JSON Web Token Invalid Password Response (object)
-+ errors (array)
-    + Attributes
-        + id: `UNAUTHORIZED` (string, required)
-        + title: `401 Unauthorized` (string, required)
-        + detail: `Your password doesn't match the email {email}.` (string, required)
-        + status: 401 (number, required)
++ errors
+    + id: `UNAUTHORIZED` (string, required)
+    + title: `401 Unauthorized` (string, required)
+    + detail: `Your password doesn't match the email {email}.` (string, required)
+    + status: 401 (number, required)
+
+## JSON Web Token No User With Email Response (object)
++ errors
+    + id: `UNAUTHORIZED` (string, required)
+    + title: `401 Unauthorized` (string, required)
+    + detail: `We couldn't find a user with the email {email}.` (string, required)
+    + status: 401 (number, required)
 
 ## JSON Web Token Valid Response (object)
 + token: `eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJVc2VyOjEiLCJleHAiOjE0NzY3NTQ2MTcsImlhdCI6MTQ3NDE2MjYxNywiaXNzIjoiQ29kZUNvcnBzIiwianRpIjoiMDY2ODQ0OWYtNWY5OC00ODVkLWI4NTktNjRhZDhmZDU3NWQ4IiwicGVtIjp7fSwic3ViIjoiVXNlcjoxIiwidHlwIjoidG9rZW4ifQ.Y80alu1UEmk4uxGgA7ORVdS8ikuUJFxCozyK6S9UeaLW392Vhti4d1Y1IXivWA_j9TKjADhqTQnMihbCzUiLsA` (string, required)
 + user_id: 1 (number, required)
+
+## Organization Attributes (object)
++ description: `Build a better future.`
++ `icon-large-url`: `https://random_string.cloundfront.net/organizations/1/large.png`
++ `icon-thumb-url`: `https://random_string.cloundfront.net/organizations/1/thumb.png`
++ `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
++ name: `Code Corps`
++ slug: `code_corps`
++ `updated-at`: `2016-07-08T03:03:51.967Z` (string)
+
+## Organization Resource (object)
++ include Organization Resource Identifier
++ attributes(Organization Attributes)
++ relationships
+    + organization-memberships
+        + data(array[Organization Membership Resource Identifier])
+    + projects
+        + data(array[Project Resource Identifier])
+    + slugged-route
+        + data(Slugged Route Resource Identifier)
 
 ## Organization Resource Identifier
 + id: `1` (string, required)
@@ -2403,40 +2336,31 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + data(array[Organization Resource])
 + include JSON API Version
 
-## Organization Resource (object)
-+ include Organization Resource Identifier
-+ attributes
-    + description: `Build a better future.`
-    + `icon-large-url`: `https://random_string.cloundfront.net/organizations/1/large.png`
-    + `icon-thumb-url`: `https://random_string.cloundfront.net/organizations/1/thumb.png`
-    + `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
-    + name: `Code Corps`
-    + slug: `code_corps`
-    + `updated-at`: `2016-07-08T03:03:51.967Z` (string)
-+ relationships
-    + organization-memberships
-        + data(array[Organization Membership Resource Identifier])
-    + projects
-        + data(array[Project Resource Identifier])
-    + slugged-route
-        + data(Slugged Route Resource Identifier)
-
-## Organization Membership Resource (object)
-+ include Organization Membership Resource Identifier
-+ attributes(Organization Membership Attributes)
-+ relationships
-    + members (object)
-        + data(User Resource Identifier)
-    + organizations
-        + data(Organization Resource Identifier)
-
 ## Organization Membership Attributes (object)
-+ role: (enum[string])
++ role: `pending` (enum[string])
     + Members
         + `pending`
         + `contributor`
         + `admin`
         + `owner`
+
+## Organization Membership Create Request (object)
++ type: `organization-membership` (string, required)
++ attributes(Organization Membership Attributes)
++ relationships
+    + member
+        + data(User Resource Identifier)
+    + organization
+        + data(Organization Resource Identifier)
+
+## Organization Membership Resource (object)
++ include Organization Membership Resource Identifier
++ attributes(Organization Membership Attributes)
++ relationships
+    + member
+        + data(User Resource Identifier)
+    + organization
+        + data(Organization Resource Identifier)
 
 ## Organization Membership Resource Identifier (object)
 + id: `1` (string, required)
@@ -2449,15 +2373,6 @@ This endpoint allows you to check whether a username is valid (by running a vali
 ## Organization Memberships Response (object)
 + data(array[Organization Membership Resource])
 + include JSON API Version
-
-## Organization Membership Create Request (object)
-+ type: `organization-membership` (string, required)
-+ attributes(Organization Membership Attributes)
-+ relationships
-    + members
-        + data(User Recource Identifier)
-    + organizations
-        + data(Organization Resource Identifier)
 
 ## Organization Membership Update Request (object)
 + include Organization Membership Resource Identifier
@@ -2491,13 +2406,6 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + data(Preview Resource)
 + include JSON API Version
 
-## Previews Relationship (object)
-+ id: 1 (string)
-+ type: `preview` (string, required)
-
-## Preview Relationships Base (object)
-+ include User Resource Identifier
-
 ## Project Attributes (object)
 + description: 'Help build and fund public software projects for social good.' (string) - A short plain text description for the project
 + `icon-large-url`: 'example.com/icon_large.png' (string) - A url pointing to a large icon for the project
@@ -2508,6 +2416,18 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + slug: 'code-corps' (string) - Case insensitive unique string identifier for the project
 + title: 'Code Corps' (string) - A title for the project
 + `updated-at`: `2016-07-08T03:03:51.967Z` (string)
+
+## Project Create Request
++ data
+    + attributes
+        + `base64-icon-data` (string) - A base64 encoded string containing the project icon
+        + title (string, required) - A title for the project
+        + description (string) - A short plain text description for the project
+        + slug (string) - Case insensitive unique string identifier for the project
+        + `long-description-markdown` (string) - Markdown formatted string containing the project long description
+    + relationships
+        + organizations
+            + data(Organization Resource Identifier) - Identifier of organization this project is being created for
 
 ## Project Resource (object)
 + include Project Resource Identifier
@@ -2534,18 +2454,6 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + data(array[Project Resource])
 + include JSON API Version
 
-## Project Create Request
-+ data
-    + attributes
-        + base64_icon_data (string) - A base64 encoded string containing the project icon
-        + title (string) - A title for the project
-        + description (string) - A short plain text description for the project
-        + slug (string) - Case insensitive unique string identifier for the project
-        + long_description_markdown (string) - Markdown formatted string containing the project long description
-    + relationships
-        + organizations
-            + data(Organization Resource Identifier) - Identifier of organization this project is being created for
-
 ## Project Update Request
 + data
     + attributes
@@ -2554,6 +2462,9 @@ This endpoint allows you to check whether a username is valid (by running a vali
         + description (string) - A short plain text description for the project
         + slug (string) - Case insensitive unique string identifier for the project
         + long_description_markdown (string) - Markdown formatted string containing the project long description
+
+## Project Category Create Request (object)
++ data(Project Category Resource)
 
 ## Project Category Resource (object)
 + include Project Category Resource Identifier
@@ -2564,11 +2475,8 @@ This endpoint allows you to check whether a username is valid (by running a vali
         + data(Project Resource Identifier)
 
 ## Project Category Resource Identifier (object)
-+ id: 1 (string)
++ id: `1` (string, required)
 + type: `project-category` (string, required)
-
-## Project Category Create Request (object)
-+ data(Project Category Resource)
 
 ## Project Category Response (object)
 + data(Project Category Resource)
@@ -2587,7 +2495,7 @@ This endpoint allows you to check whether a username is valid (by running a vali
         + data(Skill Resource Identifier)
 
 ## Project Skill Resource Identifier (object)
-+ id: 1 (string)
++ id: `1` (string, required)
 + type: `project-skill` (string, required)
 
 ## Project Skill Create Request (object)
@@ -2602,11 +2510,10 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + include JSON API Version
 
 ## Record Not Found Response (object)
-+ errors (array)
-    + Attributes
-        + id: `NOT_FOUND` (string)
-        + title: `404 Resource not found` (string)
-        + status: 404 (number) - HTTP status code
++ errors
+    + id: `NOT_FOUND` (string)
+    + title: `404 Resource not found` (string)
+    + status: 404 (number) - HTTP status code
 
 ## Role Attributes
 + ability: `Backend Development` (string)
@@ -2619,16 +2526,16 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + name: `Backend Developer` (string)
 + `updated-at`: `2016-07-08T03:03:51.967Z` (string)
 
-## Role Resource Identifier
-+ id: `1` (string, required)
-+ type: `role` (string, required)
-
 ## Role Resource (object)
 + include Role Resource Identifier
 + attributes(Role Attributes)
 + relationships
     + `role-skills`
         + data(array[Role Skill Resource Identifier])
+
+## Role Resource Identifier
++ id: `1` (string, required)
++ type: `role` (string, required)
 
 ## Role Response (object)
 + data(Role Resource)
@@ -2683,52 +2590,56 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + data(array[Skill Resource])
 + include JSON API Version
 
-## Slugged Route User Resource (object)
-+ include Slugged Route Resource Identifier
-+ attributes
-    + `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
-    + slug: `joshsmith`
-    + `updated-at`: `2016-07-08T03:03:51.967Z` (string)
-+ relationships
-    + organization
-        + data: nil
-    + user
-        + data(User Resource Identifier)
+## Slugged Route Organization Attributes
++ `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
++ slug: `joshsmith`
++ `updated-at`: `2016-07-08T03:03:51.967Z` (string)
 
 ## Slugged Route Organization Resource (object)
 + include Slugged Route Resource Identifier
-+ attributes
-    + `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
-    + slug: `code-corps`
-    + `updated-at`: `2016-07-08T03:03:51.967Z` (string)
++ attributes(Slugged Route Organization Attributes)
 + relationships
     + organization
         + data(Organization Resource Identifier)
     + user
         + data: nil
 
+## Slugged Route Organization Response (object)
++ data(Slugged Route Organization Resource)
++ include JSON API Version
+
 ## Slugged Route Resource Identifier (object)
 + id: `1` (string, required)
 + type: `slugged-route` (string, required)
+
+## Slugged Route User Attributes
++ `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
++ slug: `joshsmith`
++ `updated-at`: `2016-07-08T03:03:51.967Z` (string)
+
+## Slugged Route User Resource (object)
++ include Slugged Route Resource Identifier
++ attributes(Slugged Route User Attributes)
++ relationships
+    + organization
+        + data: nil
+    + user
+        + data(User Resource Identifier)
 
 ## Slugged Route User Response (object)
 + data(Slugged Route User Resource)
 + include JSON API Version
 
-## Slugged Route Organization Response (object)
-+ data(Slugged Route Organization Resource)
-+ include JSON API Version
-
 ## Stripe Auth Attributes (object)
 + url: `https://connect.stripe.com/oauth/authorize?response_type=code&scope=read_write&client_id=ca_APP_CLIENT_ID&state=JWT_STRING` (string, required)
-
-## Stripe Auth Resource Identifier (object)
-+ id: `1` (string, required)
-+ type: `stripe-auth`
 
 ## Stripe Auth Resource (object)
 + include Stripe Auth Resource Identifier
 + attributes(Stripe Auth Attributes)
+
+## Stripe Auth Resource Identifier (object)
++ id: `1` (string, required)
++ type: `stripe-auth` (string, required)
 
 ## Stripe Auth Response (object)
 + data(Stripe Auth Resource)
@@ -2751,10 +2662,6 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + `transfers-enabled`: false (boolean) - Whether or not Stripe will send automatic transfers for this account. This is only false when Stripe is waiting for additional information from the account holder.
 + `updated-at`: `2014-07-07T18:01:26.000Z` (string)
 
-## Stripe Account Resource Identifier
-+ id: `1` (string, required)
-+ type: `stripe-account` (string, required)
-
 ## Stripe Account Resource (object)
 + include Stripe Account Resource Identifier
 + attributes(Stripe Account Attributes)
@@ -2762,16 +2669,16 @@ This endpoint allows you to check whether a username is valid (by running a vali
     + organization
         + data(Organization Resource Identifier)
 
+## Stripe Account Resource Identifier
++ id: `1` (string, required)
++ type: `stripe-account` (string, required)
+
 ## Stripe Account Response
 + data(Stripe Account Resource)
 + include JSON API Version
 
 ## Stripe Accounts Response
 + data(array[Stripe Account Resource])
-+ include JSON API Version
-
-## Stripe Card (object)
-+ data(Stripe Card Resource)
 + include JSON API Version
 
 ## Stripe Card Attributes (object)
@@ -2784,32 +2691,30 @@ This endpoint allows you to check whether a username is valid (by running a vali
         + `JCB`
         + `Diners Club`
         + `Unknown`
-+ cvc_check: (enum[string]) - If a CVC was provided, results of the check.
++ `cvc-check`: (enum[string]) - If a CVC was provided, results of the check.
     + Members
         + `pass`
         + `fail`
         + `unavailable`
         + `unchecked`
-+ exp_month: 12 (number)
-+ exp_year: 2017 (number)
-+ `id-from-stripe`: `card_18Emd52eZvKYlo2C1s9DYdv8` (required, string)
++ `exp-month`: 12 (number)
++ `exp-year`: 2017 (number)
++ `id-from-stripe`: `card_18Emd52eZvKYlo2C1s9DYdv8` (string, required)
 + `inserted-at`: `2014-07-07T18:01:26.000Z` (string)
 + last4: `4242` (string)
 + name: `John Doe` (string) - Cardholder name
 + `updated-at`: `2014-07-07T18:01:26.000Z` (string)
 
-## Stripe Card Relationships (object)
-+ user
-    + data(User Resource Identifier)
-
 ## Stripe Card Resource (object)
 + include Stripe Card Resource Identifier
 + attributes(Stripe Card Attributes)
-+ relationships(Stripe Card Relationships)
++ relationships
+    + user
+        + data(User Resource Identifier)
 
 ## Stripe Card Resource Identifier (object)
 + id: `1` (string, required)
-+ type: `stripe-card`
++ type: `stripe-card` (string, required)
 
 ## Stripe Card Response (object)
 + data(Stripe Card Resource)
@@ -2839,7 +2744,7 @@ This endpoint allows you to check whether a username is valid (by running a vali
 
 ## Stripe Customer Resource Identifier (object)
 + id: `1` (string, required)
-+ type: `stripe-customer`
++ type: `stripe-customer` (string, required)
 
 ## Stripe Customer Response (object)
 + data(Stripe Customer Resource)
@@ -2857,10 +2762,6 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + name: `Monthly Donation` (string) - Name of the plan, to be displayed on invoices and in the web interface.
 + `updated-at`: `2014-07-07T18:01:26.000Z` (string)
 
-## Stripe Plan Resource Identifier
-+ id: `1` (string, required)
-+ type: `stripe-plan` (string, required)
-
 ## Stripe Plan Resource (object)
 + include Stripe Plan Resource Identifier
 + attributes(Stripe Plan Attributes)
@@ -2868,12 +2769,16 @@ This endpoint allows you to check whether a username is valid (by running a vali
     + project
         + data(Project Resource Identifier)
 
+## Stripe Plan Resource Identifier
++ id: `1` (string, required)
++ type: `stripe-plan` (string, required)
+
 ## Stripe Plan Response
 + data(Stripe Plan Resource)
 + include JSON API Version
 
 ## Stripe Plans Response
-+ data(array[Stripe Plan Resource], required)
++ data(array[Stripe Plan Resource])
 + include JSON API Version
 
 ## Stripe Subscription Attributes (object)
@@ -2896,10 +2801,6 @@ This endpoint allows you to check whether a username is valid (by running a vali
       + `unpaid`
 + `updated-at`: `2014-07-07T18:01:26.000Z` (string)
 
-## Stripe Subscription Resource Identifier
-+ id: `1` (string, required)
-+ type: `stripe-subscription` (string, required)
-
 ## Stripe Subscription Resource (object)
 + include Stripe Subscription Resource Identifier
 + attributes(Stripe Subscription Attributes)
@@ -2908,6 +2809,10 @@ This endpoint allows you to check whether a username is valid (by running a vali
         + data(Stripe Customer Resource Identifier)
     + `stripe-plan`
         + data(Stripe Plan Resource Identifier)
+
+## Stripe Subscription Resource Identifier
++ id: `1` (string, required)
++ type: `stripe-subscription` (string, required)
 
 ## Stripe Subscription Response
 + data(Stripe Subscription Resource)
@@ -2924,13 +2829,9 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + number: 1 (string)
 + status: `open` (string)
 + state: `published` (string)
-+ task-type: `task` (string)
++ `task-type`: `task` (string)
 + title: `Example task` (string)
 + `updated-at`: `2016-07-08T03:03:51.967Z` (string)
-
-## Task Resource Identifier
-+ id: `1` (string, required)
-+ type: `task` (string, required)
 
 ## Task Resource (object)
 + include Task Resource Identifier
@@ -2943,6 +2844,10 @@ This endpoint allows you to check whether a username is valid (by running a vali
     + user (object)
         + data(User Resource Identifier)
 
+## Task Resource Identifier
++ id: `1` (string, required)
++ type: `task` (string, required)
+
 ## Task Response (object)
 + data(Task Resource)
 + include JSON API Version
@@ -2952,13 +2857,12 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + include JSON API Version
 
 ## Unprocessable Entity Response (object)
-+ errors (array)
-    + Attributes
-        + id: `VALIDATION_ERROR` (string)
-        + detail: `can't be blank` (string)
-        + source
-            + pointer: `data/attributes/attribute` - The attribute in question.
-        + status: 422 (number) - HTTP status code
++ errors
+    + id: `VALIDATION_ERROR` (string)
+    + detail: `can't be blank` (string)
+    + source
+        + pointer: `data/attributes/attribute` - The attribute in question.
+    + status: 422 (number) - HTTP status code
 
 ## User Category Resource (object)
 + include User Category Resource Identifier
@@ -2996,21 +2900,28 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + username: `testuser` (string)
 + website: `https://testuser.org` (string)
 
-## User Relationships (object)
-+ `organization-memberships` (object)
-    + data(array[Organization Membership Resource Identifier])
-+ `slugged-route` (object)
-    + data(Slugged Route Resource Identifier)
-+ `stripe-cards` (object)
-    + data(array[Stripe Card Resource Identifier])
-+ `stripe-customer` (object)
-    + data(Stripe Customer Resource Identifier)
-+ `user-categories` (object)
-    + data(array[User Category Resource Identifier])
-+ `user-roles` (object)
-    + data(array[User Role Resource Identifier])
-+ `user-skills` (object)
-    + data(array[User Skill Resource Identifier])
+## User Resource (object)
++ Include User Resource Identifier
++ attributes (User Attributes)
++ relationships
+  + `organization-memberships` (object)
+      + data(array[Organization Membership Resource Identifier])
+  + `slugged-route` (object)
+      + data(Slugged Route Resource Identifier)
+  + `stripe-cards` (object)
+      + data(array[Stripe Card Resource Identifier])
+  + `stripe-customer` (object)
+      + data(Stripe Customer Resource Identifier)
+  + `user-categories` (object)
+      + data(array[User Category Resource Identifier])
+  + `user-roles` (object)
+      + data(array[User Role Resource Identifier])
+  + `user-skills` (object)
+      + data(array[User Skill Resource Identifier])
+
+## User Resource Identifier (object)
++ id: `1` (string, required)
++ type: `user` (string, required)
 
 ## User Response (object)
 + data (User Resource)
@@ -3020,26 +2931,17 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + data(array[User Resource])
 + include JSON API Version
 
-## User Resource (object)
-+ Include User Resource Identifier
-+ attributes (User Attributes)
-+ relationships(User Relationships)
-
-## User Resource Identifier (object)
-+ id: `1` (string, required)
-+ type: `user` (string, required)
-
-## User Relationship (object)
-+ id: 1 (string)
-+ type: `user` (string, required)
-
-## User Roles Relationship (object)
-+ id: 1 (string)
-+ type: `user-role` (string, required)
-
 ## User Role Resource Identifier
 + id: `1` (string, required)
 + type: `user-role` (string, required)
+
+## User Role Resource (object)
++ include User Role Resource Identifier
++ relationships
+    + role
+        + data(Role Resource Identifier)
+    + user
+        + data(User Resource Identifier)
 
 ## User Role Response (object)
 + data(User Role Resource)
@@ -3049,11 +2951,11 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + data(array[User Role Resource])
 + include JSON API Version
 
-## User Role Resource (object)
-+ include User Role Resource Identifier
+## User Skill Resource (object)
++ include User Skill Resource Identifier
 + relationships
-    + role
-        + data(Role Resource Identifier)
+    + skill
+        + data(Skill Resource Identifier)
     + user
         + data(User Resource Identifier)
 
@@ -3068,11 +2970,3 @@ This endpoint allows you to check whether a username is valid (by running a vali
 ## User Skills Response (object)
 + data(array[User Skill Resource])
 + include JSON API Version
-
-## User Skill Resource (object)
-+ include User Skill Resource Identifier
-+ relationships
-    + skill
-        + data(Skill Resource Identifier)
-    + user
-        + data(User Resource Identifier)
