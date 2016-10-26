@@ -64,6 +64,7 @@ defmodule CodeCorps.Mixfile do
       {:arc, git: "https://github.com/stavro/arc.git", ref: "354d4d2e1b86bcd6285db3528118fe3f5db36cf5", override: true}, # Photo uploads
       {:arc_ecto, "~> 0.4.4"},
       {:canary, "~> 1.0"}, # Authorization
+      {:bodyguard, "~> 0.2.0"}, # Authorization
       {:comeonin, "~> 2.0"},
       {:corsica, "~> 0.4"}, # CORS
       {:credo, "~> 0.4", only: [:dev, :test]}, # Code style suggestions

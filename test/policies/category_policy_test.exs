@@ -1,7 +1,7 @@
-defmodule CodeCorps.CategoryPolicyTest do
+defmodule CodeCorps.Category.PolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.CategoryPolicy, only: [create?: 1, update?: 1]
+  import CodeCorps.Category.Policy, only: [create?: 1, update?: 1]
 
   describe "create?" do
     test "returns true when user is an admin" do
@@ -11,7 +11,7 @@ defmodule CodeCorps.CategoryPolicyTest do
 
     test "returns false if user is not an admin" do
       user = build(:user, admin: false)
-      refute create?(user) 
+      refute create?(user)
     end
   end
 
