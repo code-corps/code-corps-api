@@ -1286,6 +1286,77 @@ This endpoint will return one of two possible responses, depending on if the slu
 
     + Attributes (Slugged Route Organization Response)
 
+# Group Stripe Plans
+
+This endpoint is for creating and returning Stripe plans available for projects.
+
+The Stripe plan resource allows users to select a monthly donation amount for a project. Stripe plans contain the pricing information for different projects and donation levels.
+
+## Stripe Plans [/stripe-plans]
+
+### Create a Stripe plan [POST]
+
++ Parameters
+
+    + id (number) - Id of a Stripe plan.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 201 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Stripe Plan Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
++ Response 422 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Unprocessable Entity Response)
+
+### List all Stripe plans [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Stripe Plans Response)
+
+## Stripe Plan [/stripe-plans/{id}]
+
+### Retrieve a Stripe plan [GET]
+
++ Parameters
+
+    + id (number) - Id of a Stripe plan.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Stripe Plan Response)
+
++ Response 404 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Record Not Found Response)
+
 # Group Tasks
 
 ## Project Tasks [/projects/{project_id}/tasks]
@@ -1954,7 +2025,7 @@ This endpoint allows you to check whether a username is valid (by running a vali
 
 ## Comments Response (object)
 + comments
-    + data(array[Comment Response], required)
+    + data(array[Comment Response])
 + include JSON API Version
 
 ## Comment Relationship (object)
@@ -2412,6 +2483,32 @@ This endpoint allows you to check whether a username is valid (by running a vali
 
 ## Stripe Auth Response (object)
 + data(Stripe Auth Resource)
+
+## Stripe Plan Attributes (object)
++ amount: 999 (number) - Describes the amount of a plan in cents.
++ created: `2016-07-08T03:03:51.967Z` (string)
++ `id-from-stripe`: `monthly-donation-1` (string, required)
++ `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
++ name: `Monthly Donation` (string) - Name of the plan, to be displayed on invoices and in the web interface.
++ `updated-at`: `2014-07-07T18:01:26.000Z` (string)
+
+##Stripe Plan Resource Identifier
++ id: `1` (string, required)
++ type: `stripe-plan` (string, required)
+
+##Stripe Plan Resource (object)
++ include Stripe Plan Resource Identifier
++ attributes(Stripe Plan Attributes)
++ relationships
+    + project
+        + data(Project Resource Identifier)
+
+## Stripe Plan Response
++ data(Stripe Plan Resource)
++ include JSON API Version
+
+## Stripe Plans Response
++ data(array[Stripe Plan Resource], required)
 + include JSON API Version
 
 ## Task Attributes (object)
@@ -2445,7 +2542,7 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + include JSON API Version
 
 ## Tasks Response (object)
-+ data(array[Task Response], required)
++ data(array[Task Response])
 + include JSON API Version
 
 ## Unprocessable Entity Response (object)
