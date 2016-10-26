@@ -78,6 +78,7 @@ defmodule CodeCorps.Router do
     resources "/organization-memberships", OrganizationMembershipController, only: [:create, :update, :delete]
     resources "/previews", PreviewController, only: [:create]
     resources "/projects", ProjectController, only: [:create, :update]
+    get "/projects/:id/stripe-auth", StripeAuthController, :stripe_auth
     resources "/project-categories", ProjectCategoryController, only: [:create, :delete]
     resources "/project-skills", ProjectSkillController, only: [:create, :delete]
     resources "/roles", RoleController, only: [:create]

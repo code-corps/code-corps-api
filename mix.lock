@@ -1,6 +1,7 @@
 %{"arc": {:git, "https://github.com/stavro/arc.git", "354d4d2e1b86bcd6285db3528118fe3f5db36cf5", [ref: "354d4d2e1b86bcd6285db3528118fe3f5db36cf5"]},
   "arc_ecto": {:hex, :arc_ecto, "0.4.4", "2ea481a546ceb79090e90984de1a423a1a8a04fe78c871ab05b09f1dffcf9e35", [:mix], [{:arc, "~> 0.5.3", [hex: :arc, optional: false]}, {:ecto, "~> 2.0", [hex: :ecto, optional: false]}]},
   "base64url": {:hex, :base64url, "0.0.1", "36a90125f5948e3afd7be97662a1504b934dd5dac78451ca6e9abf85a10286be", [:rebar], []},
+  "benchfella": {:hex, :benchfella, "0.3.3", "bbde48b5fe1ef556baa7ad933008e214e050e81ddb0916350715f5759fb35c0c", [:mix], []},
   "bunt": {:hex, :bunt, "0.1.6", "5d95a6882f73f3b9969fdfd1953798046664e6f77ec4e486e6fafc7caad97c6f", [:mix], []},
   "canada": {:hex, :canada, "1.0.1", "da96d0ff101a0c2a6cc7b07d92b8884ff6508f058781d3679999416feacf41c5", [:mix], []},
   "canary": {:hex, :canary, "1.0.0", "55e130bd015001d2fcdc16be23994c6bb711205a625f340d7a74f1c29825d4ba", [:mix], [{:canada, "~> 1.0.0", [hex: :canada, optional: false]}, {:ecto, ">= 1.1.0", [hex: :ecto, optional: false]}, {:plug, "~> 1.0", [hex: :plug, optional: false]}]},

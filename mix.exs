@@ -63,6 +63,7 @@ defmodule CodeCorps.Mixfile do
       {:cowboy, "~> 1.0"},
       {:arc, git: "https://github.com/stavro/arc.git", ref: "354d4d2e1b86bcd6285db3528118fe3f5db36cf5", override: true}, # Photo uploads
       {:arc_ecto, "~> 0.4.4"},
+      {:benchfella, "~> 0.3.0", only: :dev},
       {:canary, "~> 1.0"}, # Authorization
       {:comeonin, "~> 2.0"},
       {:corsica, "~> 0.4"}, # CORS
