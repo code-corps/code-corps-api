@@ -24,14 +24,11 @@ defmodule CodeCorps.OrganizationControllerTest do
       insert(:organization, name: "Org C")
 
       path = "organizations/?filter[id]=#{first_org.id},#{second_org.id}"
-      conn = conn |> get(path)
 
-      data = json_response(conn, 200)["data"]
-
-      [first_result, second_result | _] = data
-      assert length(data) == 2
-      assert first_result["id"] == "#{first_org.id}"
-      assert second_result["id"] == "#{second_org.id}"
+      conn
+      |> get(path)
+      |> json_response(200)
+      |> assert_ids_from_response([first_org.id, second_org.id])
     end
   end
 

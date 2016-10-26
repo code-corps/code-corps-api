@@ -29,24 +29,21 @@ defmodule CodeCorps.RoleSkillControllerTest do
       path = "role-skills/?filter[id]=#{role_skill_1.id},#{role_skill_2.id}"
       json = conn |> get(path) |> json_response(200)
 
-      data = json["data"]
-      assert length(data) == 2
+      [first_result, second_result | _rest] = json |> Map.get("data")
 
-      [first_result, second_result | _] = data
+      first_result
+      |> assert_result_id(role_skill_1.id)
+      |> assert_jsonapi_relationship("role", role.id)
+      |> assert_jsonapi_relationship("skill", elixir.id)
 
-      assert first_result["id"] == "#{role_skill_1.id}"
       assert first_result["attributes"] == %{}
-      assert first_result["relationships"]["role"]["data"]["id"] == "#{role.id}"
-      assert first_result["relationships"]["role"]["data"]["type"] == "role"
-      assert first_result["relationships"]["skill"]["data"]["id"] == "#{elixir.id}"
-      assert first_result["relationships"]["skill"]["data"]["type"] == "skill"
 
-      assert second_result["id"] == "#{role_skill_2.id}"
+      second_result
+      |> assert_result_id(role_skill_2.id)
+      |> assert_jsonapi_relationship("role", role.id)
+      |> assert_jsonapi_relationship("skill", phoenix.id)
+
       assert second_result["attributes"] == %{}
-      assert second_result["relationships"]["role"]["data"]["id"] == "#{role.id}"
-      assert second_result["relationships"]["role"]["data"]["type"] == "role"
-      assert second_result["relationships"]["skill"]["data"]["id"] == "#{phoenix.id}"
-      assert second_result["relationships"]["skill"]["data"]["type"] == "skill"
     end
   end
 
@@ -57,14 +54,13 @@ defmodule CodeCorps.RoleSkillControllerTest do
       path = conn |> role_skill_path(:show, role_skill)
       json = conn |> get(path) |> json_response(200)
 
-      data = json["data"]
-      assert data["id"] == "#{role_skill.id}"
-      assert data["type"] == "role-skill"
-      assert data["attributes"] == %{}
-      assert data["relationships"]["role"]["data"]["id"] == "#{role_skill.role_id}"
-      assert data["relationships"]["role"]["data"]["type"] == "role"
-      assert data["relationships"]["skill"]["data"]["id"] == "#{role_skill.skill_id}"
-      assert data["relationships"]["skill"]["data"]["type"] == "skill"
+      json
+      |> Map.get("data")
+      |> assert_result_id(role_skill.id)
+      |> assert_jsonapi_relationship("role", role_skill.role_id)
+      |> assert_jsonapi_relationship("skill", role_skill.skill_id)
+
+      assert json["data"]["attributes"] == %{}
     end
 
     @tag :authenticated
@@ -99,13 +95,13 @@ defmodule CodeCorps.RoleSkillControllerTest do
       id = json["data"]["id"] |> String.to_integer
       role_skill = RoleSkill |> Repo.get(id)
 
-      assert json["data"]["id"] == "#{role_skill.id}"
-      assert json["data"]["type"] == "role-skill"
+      json
+      |> Map.get("data")
+      |> assert_result_id(role_skill.id)
+      |> assert_jsonapi_relationship("role", role.id)
+      |> assert_jsonapi_relationship("skill", skill.id)
+
       assert json["data"]["attributes"] == %{}
-      assert json["data"]["relationships"]["role"]["data"]["id"] == "#{role.id}"
-      assert json["data"]["relationships"]["role"]["data"]["type"] == "role"
-      assert json["data"]["relationships"]["skill"]["data"]["id"] == "#{skill.id}"
-      assert json["data"]["relationships"]["skill"]["data"]["type"] == "skill"
     end
 
     @tag authenticated: :admin
