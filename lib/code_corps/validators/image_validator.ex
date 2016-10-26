@@ -4,8 +4,6 @@ defmodule CodeCorps.Validators.ImageStats do
   """
   @magnitudes [:bytes, :kilobytes, :megabytes, :gigabytes, :terabytes]
 
-  @doc """
-  """
   defstruct [
     filetype: nil,
     bytes: nil,
@@ -48,8 +46,6 @@ defmodule CodeCorps.Validators.ImageValidator do
   @gif_87_signature "GIF87a"
   @ihdr_label "IHDR"
 
-  @doc """
-  """
   def find_image_stats(image_binary) do
     image_stats = parse_image_stats(image_binary)
     if image_stats == nil do
@@ -95,7 +91,6 @@ defmodule CodeCorps.Validators.ImageValidator do
       height: height }
   end
 
-  # jpeg images will 
   defp parse_image_stats(<< 0xFF, 0xD8, image_binary::binary >>) do
     pieces_if_baseline = String.split(image_binary, << 0xFF, 0xC0 >>)
     pieces_if_progressive = String.split(image_binary, << 0xFF, 0xC2 >>)
@@ -103,7 +98,7 @@ defmodule CodeCorps.Validators.ImageValidator do
     baseline_piece_count = len_func.(pieces_if_baseline)
     progressive_piece_count = len_func.(pieces_if_progressive)
     if baseline_piece_count == progressive_piece_count == 1 do
-      # fail if neither baseline or progressive indicators are present
+      # jpeg images will fail if neither baseline or progressive indicators are present
       nil
     else
       # otherwise, go by the more frequent indicator
@@ -123,9 +118,9 @@ defmodule CodeCorps.Validators.ImageValidator do
 
   # for jpegs, it's not easy to tell which size height and width refers to the base image
   # as opposed to the thumbnail(s), so we'll just go by the biggest one we find
-  defp parse_jpeg_pieces([ _prefix_piece | tail ]), do: parse_jpeg_pieces(tail, 0, 0, 0)
+  defp parse_jpeg_pieces([_prefix_piece | tail]), do: parse_jpeg_pieces(tail, 0, 0, 0)
   defp parse_jpeg_pieces([], height, width, _area), do: {height, width}
-  defp parse_jpeg_pieces([ current_piece | tail ], height, width, area) do
+  defp parse_jpeg_pieces([current_piece | tail], height, width, area) do
     << _skipped_stats::size(24),
       current_height::little-integer-size(16),
       current_width::little-integer-size(16),

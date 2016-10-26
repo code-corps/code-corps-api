@@ -8,7 +8,7 @@ defmodule CodeCorps.OrganizationIcon do
   @versions [:original, :large, :thumb]
   @acl :public_read
   @icon_color_generator Application.get_env(:code_corps, :icon_color_generator)
-  @max_filesize_MB 16
+  @max_filesize_mb 16
   @max_height 10_000
   @max_width 10_000
   @max_aspect_ratio 4
@@ -20,7 +20,7 @@ defmodule CodeCorps.OrganizationIcon do
     if ~w(.jpg .jpeg .gif .png) |> Enum.member?(file_extension) do
       image = File.read!(file)
       image_stats = ImageValidator.find_image_stats(image)
-      image_stats != nil && ImageStats.size_in(:megabytes, image_stats) > @max_filesize_MB
+      image_stats != nil && ImageStats.size_in(:megabytes, image_stats) > @max_filesize_mb
       && image_stats.height <= @max_height && image_stats.width <= @max_width
       && @max_aspect_ratio >= ImageStats.aspect_ratio(image_stats) >= @min_aspect_ratio
     else
