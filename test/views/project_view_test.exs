@@ -11,7 +11,7 @@ defmodule CodeCorps.ProjectViewTest do
     project_skill = insert(:project_skill, project: project)
     donation_goal = insert(:donation_goal, project: project)
 
-    rendered_json =  render(CodeCorps.ProjectView, "show.json-api", data: project)
+    rendered_json = render(CodeCorps.ProjectView, "show.json-api", data: project)
 
     expected_json = %{
       "data" => %{
