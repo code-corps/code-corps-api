@@ -1227,6 +1227,68 @@ This endpoint will return one of two possible responses, depending on if the slu
 
     + Attributes (Slugged Route Organization Response)
 
+# Group Stripe Accounts
+
+This resource represents a Stripe account. It can be retrieved to see properties on the account like its current e-mail address or if the account is enabled yet to make live charges.
+
+A Stripe account belongs to an organization.
+
+[Stripe API](https://stripe.com/docs/api#account)
+
+## Stripe Accounts [/stripe-accounts]
+
+### List all Stripe accounts [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Stripe Accounts Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
+## Stripe Account [/stripe-accounts/{id}]
+
+### Retrieve a Stripe account [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Parameters
+
+    + id (number) - Id of a Stripe card.
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Stripe Account Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
++ Response 404 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Record Not Found Response)
+
 # Group Stripe Card
 
 This resource identifies a card created on the [Stripe API](https://stripe.com/docs/api#cards).
@@ -2550,6 +2612,43 @@ This endpoint allows you to check whether a username is valid (by running a vali
 
 ## Stripe Auth Response (object)
 + data(Stripe Auth Resource)
+
+## Stripe Account Attributes (object)
++ `business-name`: `Stripe.com` (string) - The publicly visible name of the business
++ `business-url`: null (string) - The publicly visible website of the business
++ `charges-enabled`: false (boolean) - Whether or not the account can create live charges
++ country: `US` (string)
++ `default-currency`: `usd` (string)
++ `details-submitted`: false (boolean) - Whether or not account details have been submitted yet. Standalone accounts cannot receive transfers before this is true.
++ `display-name`: `Stripe.com` (string) - The display name for this account. This is used on the Stripe dashboard to help differentiate between accounts.
++ email: `site@stripe.com` (string) - The primary user’s email address
++ `id-from-stripe`: `acct_1032D82eZvKYlo2C` (string)
++ `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
++ managed: false (boolean) - Whether or not the account is managed by your platform.
++ `support-email`: null (string) - A publicly shareable email address that can be reached for support for this account
++ `support-phone`: null (string) - The publicly visible support phone number for the business
++ `support-url`: null (string) - A publicly shareable URL that can be reached for support for this account
++ `transfers-enabled`: false (boolean) - Whether or not Stripe will send automatic transfers for this account. This is only false when Stripe is waiting for additional information from the account holder.
++ `updated-at`: `2014-07-07T18:01:26.000Z` (string)
+
+## Stripe Account Resource Identifier
++ id: `1` (string, required)
++ type: `stripe-account` (string, required)
+
+## Stripe Account Resource (object)
++ include Stripe Account Resource Identifier
++ attributes(Stripe Account Attributes)
++ relationships
+    + organization
+        + data(Organization Resource Identifier)
+
+## Stripe Account Response
++ data(Stripe Account Resource)
++ include JSON API Version
+
+## Stripe Accounts Response
++ data(array[Stripe Account Resource])
++ include JSON API Version
 
 ## Stripe Card (object)
 + data(Stripe Card Resource)
