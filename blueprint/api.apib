@@ -150,49 +150,6 @@ The Category resource allows us to categorize projects (Project Category), as we
 
 This endpoint is for creating and returning comments.
 
-## Task Comments [/tasks/{task_id}/comments]
-
-You can list all comments or retrieve individual comments for a single task.
-
-### List all of a task's comments [GET]
-
-+ Parameters
-
-    + task_id (number) - Id of a task.
-
-+ Request
-
-    + Headers
-
-            Accept: application/vnd.api+json
-
-+ Response 200 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Comments Response)
-
-## Task Comment [/tasks/{task_id}/comments/{id}]
-
-### Retrieve a task's comment [GET]
-
-+ Parameters
-
-    + task_id (number) - Id of a task.
-    + id (number) - The `id` of a comment.
-
-+ Request
-
-    + Headers
-
-            Accept: application/vnd.api+json
-
-+ Response 200 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Comment Response)
-
-+ Response 404 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Record Not Found Response)
-
 ## Comments [/comments]
 
 You can list all comments or retrieve individual comments, as well as create and update comments.
@@ -215,22 +172,6 @@ You can list all comments or retrieve individual comments, as well as create and
 + Response 422 (application/vnd.api+json; charset=utf-8)
 
     + Attributes (Unprocessable Entity Response)
-
-## List comments for a specified task [GET /tasks/{task_id}/comments]
-
-+ Parameters
-
-    + task_id: 1 (number, required) - Task id, uniquely identifying a task
-
-+ Request
-
-    + Headers
-
-            Accept: application/vnd.api+json
-
-+ Response 200 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Comments Response)
 
 ### Filter comments by list of ids [GET /comments{?filter[id]}]
 
