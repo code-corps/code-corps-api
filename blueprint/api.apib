@@ -1293,7 +1293,7 @@ This resource identifies a customer created on the [Stripe API](https://stripe.c
 
 A Stripe customer can have many subscriptions.
 
-## Stripe Customer [/stripe-customers]
+## Stripe Customers [/stripe-customers]
 
 ### List all Stripe customers [GET]
 
@@ -1316,7 +1316,7 @@ A Stripe customer can have many subscriptions.
 
     + Attributes (Forbidden Response)
 
-## Stripe Customers [/stripe-customers/{id}]
+## Stripe Customer [/stripe-customers/{id}]
 
 ### Retrieve a Stripe customer [GET]
 
@@ -2594,10 +2594,6 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + data(array[Stripe Card Resource])
 + include JSON API Version
 
-## Stripe Customer (object)
-+ data(Stripe Customer Resource)
-+ include JSON API Version
-
 ## Stripe Customer Resource (object)
 + include Stripe Customer Resource Identifier
 + attributes(Stripe Customer Attributes)
@@ -2612,11 +2608,11 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + type: `stripe-customer`
 
 ## Stripe Customer Attributes (object)
-+ created: `1477586543` (string)
++ created: `016-07-08T03:03:51.967Z` (string) - A timestamp, indicating when the customer was created by Stripe
 + currency: `usd` (string)
-+ delinquent: `true` (boolean) - Whether or not the latest charge for the customer’s latest invoice has failed
++ delinquent: `true` (boolean) - Whether or not the latest charge for the customer’s latest invoice has failed.
 + email: `johndoe@email.com` (string)
-+ id-from-stripe: `cus_9SBK9vXBkZEdfe` (string) - This is the ID that Stripe assigned the customer
++ `id-from-stripe`: `cus_9SBK9vXBkZEdfe` (string) - The ID that Stripe assigned the customer.
 
 ## Stripe Customer Response (object)
 + data(Stripe Customer Resource)
