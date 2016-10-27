@@ -1287,6 +1287,72 @@ A Stripe card belongs to a user.
 
     + Attributes (Record Not Found Response)
 
+# Group Stripe Customers
+
+This resource identifies a customer created on the [Stripe API](https://stripe.com/docs/api#customers).
+
+A Stripe customer can have many subscriptions, which are the donations they make to a project.
+
+## Stripe Customers [/stripe-customers]
+
+### Filter Stripe customers by id [GET /stripe-customers{?filter[id]}]
+
++ Parameters
+
+    + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
+
+        Technically, the parameter is `filter: { id: '1,2,3' }`, which ends up being serialized into `filter[id]`. However, syntax constraints do not allow us to define it in the documentation this way.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Stripe Customers Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
+## Stripe Customer [/stripe-customers/{id}]
+
+### Retrieve a Stripe customer [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Parameters
+
+    + id (number) - Id of a Stripe customer.
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Stripe Customer Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
++ Response 404 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Record Not Found Response)
+
 # Group Stripe Plans
 
 This endpoint is for creating and returning Stripe plans available for projects.
@@ -2534,9 +2600,35 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + data(array[Stripe Card Resource])
 + include JSON API Version
 
+## Stripe Customer Attributes (object)
++ created: `2016-07-08T03:03:51.967Z` (string) - A timestamp, indicating when the customer was created by Stripe.
++ currency: `usd` (string)
++ delinquent: `true` (boolean) - Whether or not the latest charge for the customer’s latest invoice has failed.
++ email: `johndoe@email.com` (string) - The email that the user used to create their Stripe account.
++ `id-from-stripe`: `cus_9SBK9vXBkZEdfe` (string) - The ID that Stripe assigned the customer.
++ `inserted-at`: `2014-07-07T18:01:26.000Z` (string)
++ `updated-at`: `2014-07-07T18:01:26.000Z` (string)
+
+## Stripe Customer Resource (object)
++ include Stripe Customer Resource Identifier
++ attributes(Stripe Customer Attributes)
++ relationships
+    + subscriptions
+      + data(Stripe Subscription Resource Identifier)
+    + user
+      + data(User Resource Identifier)
+
 ## Stripe Customer Resource Identifier (object)
 + id: `1` (string, required)
 + type: `stripe-customer`
+
+## Stripe Customer Response (object)
++ data(Stripe Customer Resource)
++ include JSON API Version
+
+## Stripe Customers Response (object)
++ data(array[Stripe Customer Resource])
++ include JSON API Version
 
 ## Stripe Plan Attributes (object)
 + amount: 999 (number) - Describes the amount of a plan in cents.
@@ -2564,6 +2656,10 @@ This endpoint allows you to check whether a username is valid (by running a vali
 ## Stripe Plans Response
 + data(array[Stripe Plan Resource], required)
 + include JSON API Version
+
+## Stripe Subscription Resource Identifier
++ id: `1` (string, required)
++ type: `stripe-customer`
 
 ## Task Attributes (object)
 + body: `<p>A <b>strong</b> body.</p>` (string)
@@ -2651,6 +2747,8 @@ This endpoint allows you to check whether a username is valid (by running a vali
     + data(Slugged Route Resource Identifier)
 + `stripe-cards` (object)
     + data(array[Stripe Card Resource Identifier])
++ `stripe-customer` (object)
+    + data(Stripe Customer Resource Identifier)
 + `user-categories` (object)
     + data(array[User Category Resource Identifier])
 + `user-roles` (object)
