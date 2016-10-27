@@ -1227,15 +1227,15 @@ This endpoint will return one of two possible responses, depending on if the slu
 
     + Attributes (Slugged Route Organization Response)
 
-# Group Stripe Card
+# Group Stripe Customers
 
-This resource identifies a card created on the [Stripe API](https://stripe.com/docs/api#cards).
+This resource identifies a customer created on the [Stripe API](https://stripe.com/docs/api#customers).
 
-A Stripe card belongs to a user.
+A Stripe customer can have many subscriptions.
 
-## Stripe Cards [/stripe-cards]
+## Stripe Customer [/stripe-customers]
 
-### List all stripe cards [GET]
+### List all Stripe customers [GET]
 
 + Request
 
@@ -1246,7 +1246,7 @@ A Stripe card belongs to a user.
 
 + Response 200 (application/vnd.api+json; charset=utf-8)
 
-    + Attributes (Stripe Cards Response)
+    + Attributes (Stripe Customers Response)
 
 + Response 401 (application/vnd.api+json; charset=utf-8)
 
@@ -1256,9 +1256,9 @@ A Stripe card belongs to a user.
 
     + Attributes (Forbidden Response)
 
-## Stripe Card [/stripe-cards/{id}]
+## Stripe Customers [/stripe-customers/{id}]
 
-### Retrieve a stripe card [GET]
+### Retrieve a Stripe customer [GET]
 
 + Request
 
@@ -1269,11 +1269,11 @@ A Stripe card belongs to a user.
 
 + Parameters
 
-    + id (number) - Id of a stripe card.
+    + id (number) - Id of a Stripe customer.
 
 + Response 200 (application/vnd.api+json; charset=utf-8)
 
-    + Attributes (Stripe Card Response)
+    + Attributes (Stripe Customer Response)
 
 + Response 401 (application/vnd.api+json; charset=utf-8)
 
@@ -2534,9 +2534,37 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + data(array[Stripe Card Resource])
 + include JSON API Version
 
+## Stripe Customer (object)
++ data(Stripe Customer Resource)
++ include JSON API Version
+
+## Stripe Customer Resource (object)
++ include Stripe Customer Resource Identifier
++ attributes(Stripe Customer Attributes)
++ relationships
+    + subscriptions
+      + data(Stripe Subscription Resource Identifier)
+    + user
+      + data(User Resource Identifier)
+
 ## Stripe Customer Resource Identifier (object)
 + id: `1` (string, required)
 + type: `stripe-customer`
+
+## Stripe Customer Attributes (object)
++ created: `1477586543` (string)
++ currency: `usd` (string)
++ delinquent: `true` (boolean) - Whether or not the latest charge for the customer’s latest invoice has failed
++ email: `johndoe@email.com` (string)
++ id-from-stripe: `cus_9SBK9vXBkZEdfe` (string) - This is the ID that Stripe assigned the customer
+
+## Stripe Customer Response (object)
++ data(Stripe Customer Resource)
++ include JSON API Version
+
+## Stripe Customers Response (object)
++ data(array[Stripe Customer Resource])
++ include JSON API Version
 
 ## Stripe Plan Attributes (object)
 + amount: 999 (number) - Describes the amount of a plan in cents.
@@ -2564,6 +2592,10 @@ This endpoint allows you to check whether a username is valid (by running a vali
 ## Stripe Plans Response
 + data(array[Stripe Plan Resource], required)
 + include JSON API Version
+
+## Stripe Subscription Resource Identifier
++ id: `1` (string, required)
++ type: `stripe-customer`
 
 ## Task Attributes (object)
 + body: `<p>A <b>strong</b> body.</p>` (string)
@@ -2651,6 +2683,8 @@ This endpoint allows you to check whether a username is valid (by running a vali
     + data(Slugged Route Resource Identifier)
 + `stripe-cards` (object)
     + data(array[Stripe Card Resource Identifier])
++ `stripe-customer` (object)
+    + data(Stripe Customer Resource Identifier)
 + `user-categories` (object)
     + data(array[User Category Resource Identifier])
 + `user-roles` (object)
