@@ -1486,6 +1486,126 @@ The Stripe plan resource allows users to select a monthly donation amount for a 
 
     + Attributes (Record Not Found Response)
 
+# Group Stripe Subscriptions
+
+This endpoint is for creating, editing and returning Stripe Subscriptions.
+
+Stripe subscriptions allow us to charge a customer's card on a recurring basis. A subscription ties a customer to a particular plan. The default plans will be monthly $0.01 cent plans with an X multiplier to set the actual donation amount.
+
+## Stripe Subscriptions [/stripe-subscriptions]
+
+### Create a Stripe subscription [POST]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 201 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Stripe Subscription Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
++ Response 422 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Unprocessable Entity Response)
+
+### Filter Stripe subscriptions by id [GET /stripe-subscriptions{?filter[id]}]
+
++ Parameters
+
+    + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
+
+        Technically, the parameter is `filter: { id: '1,2,3' }`, which ends up being serialized into `filter[id]`. However, syntax constraints do not allow us to define it in the documentation this way.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Stripe Subscriptions Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
+## Stripe Subscription [/stripe-subscriptions/{id}]
+
+### Retrieve a Stripe subscription [GET]
+
++ Parameters
+
+    + id (number) - Id of a Stripe subscription.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Stripe Subscription Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
++ Response 404 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Record Not Found Response)
+
+### Update a Stripe subscription [PATCH /subscriptions/{id}]
+
++ Parameters
+
+    + id (number) - Id of a Stripe subscription.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 201 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Stripe Subscription Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
++ Response 404 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Record Not Found Response)
+
++ Response 422 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Unprocessable Entity Response)
+
 # Group Tasks
 
 ## Project Tasks [/projects/{project_id}/tasks]
@@ -2756,9 +2876,46 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + data(array[Stripe Plan Resource], required)
 + include JSON API Version
 
+## Stripe Subscription Attributes (object)
++ `cancelled-at`: null (string) - If the subscription has been canceled, the date of that cancellation.
++ created: `2016-07-08T03:03:51.967Z` (string) - A timestamp, indicating when the plan was created by Stripe
++ `current-period-end`: `2016-08-08T03:03:51.967Z` (string) - End of the current period that the subscription has been invoiced for. At the end of this period, a new invoice will be created.
++ `current-period-start`: `2016-07-08T03:03:51.967Z` (string) - Start of the current period that the subscription has been invoiced for
++ `customer-id-from-stripe`: 'cus_9RnUvtsb41mD1g'  (string) - ID of the customer who owns the subscription
++ `ended-at`: null(string) - If the subscription has ended (either because it was canceled or because the customer was switched to a subscription to a new plan), the date the subscription ended
++ `id-from-stripe`: `sub_9RnVc9Cd03wV8X` (string, required)
++ `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
++ `plan-id-from-stripe`: `monthly-donation-1` (string)
++ start: `2014-07-07T18:01:26.000Z` (string) - Date the most recent update to this subscription started.
++ status: `active` (enum[string])
+    + Members
+      + `trialing`
+      + `active`
+      + `past_due`
+      + `canceled`
+      + `unpaid`
++ `updated-at`: `2014-07-07T18:01:26.000Z` (string)
+
 ## Stripe Subscription Resource Identifier
 + id: `1` (string, required)
-+ type: `stripe-customer`
++ type: `stripe-subscription` (string, required)
+
+## Stripe Subscription Resource (object)
++ include Stripe Subscription Resource Identifier
++ attributes(Stripe Subscription Attributes)
++ relationships
+    + `stripe-customer`
+        + data(Stripe Customer Resource Identifier)
+    + `stripe-plan`
+        + data(Stripe Plan Resource Identifier)
+
+## Stripe Subscription Response
++ data(Stripe Subscription Resource)
++ include JSON API Version
+
+## Stripe Subscriptions Response
++ data(array[Stripe Subscription Resource])
++ include JSON API Version
 
 ## Task Attributes (object)
 + body: `<p>A <b>strong</b> body.</p>` (string)
