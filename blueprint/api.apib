@@ -1227,6 +1227,66 @@ This endpoint will return one of two possible responses, depending on if the slu
 
     + Attributes (Slugged Route Organization Response)
 
+# Group Stripe Card
+
+This resource identifies a card created on the [Stripe API](https://stripe.com/docs/api#cards).
+
+A Stripe card belongs to a user.
+
+## Stripe Cards [/stripe-cards]
+
+### List all stripe cards [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Stripe Cards Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
+## Stripe Card [/stripe-cards/{id}]
+
+### Retrieve a stripe card [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Parameters
+
+    + id (number) - Id of a stripe card.
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Stripe Card Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
++ Response 404 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Record Not Found Response)
+
 # Group Stripe Customers
 
 This resource identifies a customer created on the [Stripe API](https://stripe.com/docs/api#customers).
