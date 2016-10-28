@@ -23,11 +23,11 @@ defmodule CodeCorps.StripeAuthControllerTest do
 
     @tag :requires_env
     @tag :authenticated
-    test "renders a 401 when not authorized", %{conn: conn} do
+    test "renders a 403 when not authorized", %{conn: conn} do
       project = insert(:project)
 
       conn = get conn, stripe_auth_path(conn, :stripe_auth, project)
-      assert json_response(conn, 401)
+      assert json_response(conn, 403)
     end
   end
 end

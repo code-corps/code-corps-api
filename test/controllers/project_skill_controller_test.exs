@@ -101,7 +101,7 @@ defmodule CodeCorps.ProjectSkillControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders 401 when not authorized", %{conn: conn, current_user: current_user} do
+    test "does not create resource and renders 403 when not authorized", %{conn: conn, current_user: current_user} do
       organization = insert(:organization)
       project = insert(:project, organization: organization)
       skill = insert(:skill)
@@ -111,7 +111,7 @@ defmodule CodeCorps.ProjectSkillControllerTest do
       payload = build_payload |> put_relationships(project, skill)
 
       path = conn |> project_skill_path(:create)
-      assert conn |> post(path, payload) |> json_response(401)
+      assert conn |> post(path, payload) |> json_response(403)
     end
   end
 
@@ -130,10 +130,10 @@ defmodule CodeCorps.ProjectSkillControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders 401 when not authorized", %{conn: conn} do
+    test "does not create resource and renders 403 when not authorized", %{conn: conn} do
       project_skill = insert(:project_skill)
       path = conn |> project_skill_path(:delete, project_skill)
-      assert conn |> delete(path) |> json_response(401)
+      assert conn |> delete(path) |> json_response(403)
     end
 
     @tag :authenticated

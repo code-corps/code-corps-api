@@ -198,7 +198,7 @@ defmodule CodeCorps.UserControllerTest do
         |> authenticate(another_user)
         |> put(path, params)
 
-      assert json_response(conn, 401)
+      assert json_response(conn, 403)
     end
 
     @tag :requires_env

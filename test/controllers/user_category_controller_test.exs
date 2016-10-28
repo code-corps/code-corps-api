@@ -92,9 +92,9 @@ defmodule CodeCorps.UserCategoryControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders 401 when not authorized", %{conn: conn} do
+    test "does not create resource and renders 403 when not authorized", %{conn: conn} do
       path = conn |> user_category_path(:create)
-      assert conn |> post(path, build_payload) |> json_response(401)
+      assert conn |> post(path, build_payload) |> json_response(403)
     end
   end
 
@@ -112,10 +112,10 @@ defmodule CodeCorps.UserCategoryControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders 401 when not authorized", %{conn: conn} do
+    test "does not create resource and renders 403 when not authorized", %{conn: conn} do
       user_category = insert(:user_category)
       path = conn |> user_category_path(:delete, user_category)
-      assert conn |> delete(path) |> json_response(401)
+      assert conn |> delete(path) |> json_response(403)
     end
 
     @tag :authenticated

@@ -68,8 +68,8 @@ defmodule CodeCorps.CategoryControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders 401 when not authorized", %{conn: conn} do
-      assert conn |> request_create(@valid_attrs) |> json_response(401)
+    test "does not create resource and renders 403 when not authorized", %{conn: conn} do
+      assert conn |> request_create(@valid_attrs) |> json_response(403)
     end
   end
 
@@ -95,8 +95,8 @@ defmodule CodeCorps.CategoryControllerTest do
     end
 
     @tag :authenticated
-    test "does not update resource and renders 401 when not authorized", %{conn: conn} do
-      assert conn |> request_update(@valid_attrs) |> json_response(401)
+    test "does not update resource and renders 403 when not authorized", %{conn: conn} do
+      assert conn |> request_update(@valid_attrs) |> json_response(403)
     end
   end
 end

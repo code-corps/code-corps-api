@@ -2259,10 +2259,10 @@ This endpoint allows you to check whether a username is valid (by running a vali
 
 ## Forbidden Response (object)
 + errors
+    + detail: `You are not authorized to perform this action.` (string)
     + id: `FORBIDDEN` (string)
-    + title: `Forbidden` (string)
-    + detail: `You are not authorized to perform this action on {subject_name}` (string) - Details of what record was not found.
     + status: 403 (number) - HTTP status code
+    + title: `403 Forbidden` (string)
 
 ## No Content Response (object)
 

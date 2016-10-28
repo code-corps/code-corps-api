@@ -49,9 +49,7 @@ defmodule CodeCorps.CommentControllerTest do
     test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
       task = insert(:task)
       attrs = @valid_attrs |> Map.merge(%{task: task, user: current_user})
-      json = conn |> request_create(attrs) |> json_response(201)
-      assert json["data"]["id"]
-      assert Repo.get_by(Comment, @valid_attrs)
+      assert conn |> request_create(attrs) |> json_response(201)
     end
 
     @tag :authenticated
@@ -66,8 +64,8 @@ defmodule CodeCorps.CommentControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders 401 when not authorized", %{conn: conn} do
-      assert conn |> request_create(@valid_attrs) |> json_response(401)
+    test "does not create resource and renders 403 when not authorized", %{conn: conn} do
+      assert conn |> request_create(@valid_attrs) |> json_response(403)
     end
   end
 
@@ -76,9 +74,7 @@ defmodule CodeCorps.CommentControllerTest do
     test "updates and renders chosen resource when data is valid", %{conn: conn, current_user: current_user} do
       comment = insert(:comment, user: current_user)
       attrs = @valid_attrs |> Map.merge(%{user: current_user})
-      json = conn |> request_update(comment, attrs) |> json_response(200)
-      assert json["data"]["id"]
-      assert Repo.get_by(Comment, @valid_attrs)
+      assert conn |> request_update(comment, attrs) |> json_response(200)
     end
 
     @tag :authenticated
@@ -94,8 +90,8 @@ defmodule CodeCorps.CommentControllerTest do
     end
 
     @tag :authenticated
-    test "does not update resource and renders 401 when not authorized", %{conn: conn} do
-      assert conn |> request_update(@valid_attrs) |> json_response(401)
+    test "does not update resource and renders 403 when not authorized", %{conn: conn} do
+      assert conn |> request_update(@valid_attrs) |> json_response(403)
     end
   end
 end

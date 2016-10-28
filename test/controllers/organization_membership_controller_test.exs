@@ -145,7 +145,7 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
     end
 
     @tag :authenticated
-    test "doesn't update and renders 401 when not authorized", %{conn: conn} do
+    test "doesn't update and renders 403 when not authorized", %{conn: conn} do
       membership = insert(:organization_membership)
 
       payload =
@@ -156,7 +156,7 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
       path = conn |> organization_membership_path(:update, membership)
       conn = conn |> put(path, payload)
 
-      assert conn |> json_response(401)
+      assert conn |> json_response(403)
     end
 
     @tag :authenticated
@@ -192,7 +192,7 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
     end
 
     @tag :authenticated
-    test "doesn't delete and renders 401 when not authorized", %{conn: conn} do
+    test "doesn't delete and renders 403 when not authorized", %{conn: conn} do
       membership = insert(:organization_membership)
 
       payload =
@@ -203,7 +203,7 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
       path = conn |> organization_membership_path(:delete, membership)
       conn = conn |> delete(path, payload)
 
-      assert conn |> json_response(401)
+      assert conn |> json_response(403)
     end
 
     @tag :authenticated

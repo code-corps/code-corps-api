@@ -34,7 +34,7 @@ defmodule CodeCorps.TokenControllerTest do
       response = json_response(conn, 401)
       [error | _] = response["errors"]
       assert error["detail"] == "Your password doesn't match the email #{user.email}."
-      assert is_unauthorized?(error)
+      assert renders_401_unauthorized?(error)
       refute response["token"]
       refute response["user_id"]
     end
@@ -45,7 +45,7 @@ defmodule CodeCorps.TokenControllerTest do
       response = json_response(conn, 401)
       [error | _] = response["errors"]
       assert error["detail"] == "We couldn't find a user with the email notauser@test.com."
-      assert is_unauthorized?(error)
+      assert renders_401_unauthorized?(error)
       refute response["token"]
       refute response["user_id"]
     end
@@ -73,11 +73,11 @@ defmodule CodeCorps.TokenControllerTest do
       refute response["token"]
       refute response["user_id"]
       [error | _] = response["errors"]
-      assert is_unauthorized?(error)
+      assert renders_401_unauthorized?(error)
       assert error["detail"] == "token_expired"
     end
   end
 
-  defp is_unauthorized?(%{"id" => "UNAUTHORIZED", "title" => "401 Unauthorized", "status" => 401}), do: true
-  defp is_unauthorized?(_), do: false
+  defp renders_401_unauthorized?(%{"id" => "UNAUTHORIZED", "title" => "401 Unauthorized", "status" => 401}), do: true
+  defp renders_401_unauthorized?(_), do: false
 end

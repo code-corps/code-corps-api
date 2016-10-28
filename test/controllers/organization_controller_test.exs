@@ -97,7 +97,7 @@ defmodule CodeCorps.OrganizationControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders 401 when not authorized", %{conn: conn} do
+    test "does not create resource and renders 403 when not authorized", %{conn: conn} do
       payload =
         build_payload
         |> put_attributes(@invalid_attrs)
@@ -105,7 +105,7 @@ defmodule CodeCorps.OrganizationControllerTest do
       path = conn |> organization_path(:create)
       conn = conn |> post(path, payload)
 
-      assert json_response(conn, 401)
+      assert json_response(conn, 403)
     end
   end
 
@@ -158,7 +158,7 @@ defmodule CodeCorps.OrganizationControllerTest do
     end
 
     @tag :authenticated
-    test "does not update resource and renders 401 when not authorized", %{conn: conn, current_user: current_user} do
+    test "does not update resource and renders 403 when not authorized", %{conn: conn, current_user: current_user} do
       organization = insert(:organization)
       insert(:organization_membership, organization: organization, member: current_user, role: "member")
 
@@ -170,7 +170,7 @@ defmodule CodeCorps.OrganizationControllerTest do
       path = conn |> organization_path(:update, organization)
       conn = conn |> put(path, payload)
 
-      assert json_response(conn, 401)
+      assert json_response(conn, 403)
     end
 
     @tag :requires_env
