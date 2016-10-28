@@ -75,9 +75,9 @@ defmodule CodeCorps.RoleSkillControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders 401 when not authorized", %{conn: conn} do
+    test "does not create resource and renders 403 when not authorized", %{conn: conn} do
       path = conn |> role_skill_path(:create)
-      assert conn |> post(path) |> json_response(401)
+      assert conn |> post(path) |> json_response(403)
     end
   end
 
@@ -133,10 +133,10 @@ defmodule CodeCorps.RoleSkillControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders 401 when not authorized", %{conn: conn} do
+    test "does not create resource and renders 403 when not authorized", %{conn: conn} do
       role_skill = insert(:role_skill)
       path = conn |> role_skill_path(:delete, role_skill)
-      assert conn |> delete(path) |> json_response(401)
+      assert conn |> delete(path) |> json_response(403)
     end
 
     @tag :authenticated

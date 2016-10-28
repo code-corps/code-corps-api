@@ -108,7 +108,7 @@ defmodule CodeCorps.ProjectCategoryControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders 401 when not authorized", %{conn: conn, current_user: current_user} do
+    test "does not create resource and renders 403 when not authorized", %{conn: conn, current_user: current_user} do
       organization = insert(:organization)
       project = insert(:project, organization: organization)
       category = insert(:category)
@@ -117,7 +117,7 @@ defmodule CodeCorps.ProjectCategoryControllerTest do
       payload = build_payload |> put_relationships(project, category)
 
       path = conn |> project_category_path(:create)
-      assert conn |> post(path, payload) |> json_response(401)
+      assert conn |> post(path, payload) |> json_response(403)
     end
   end
 
@@ -142,10 +142,10 @@ defmodule CodeCorps.ProjectCategoryControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders 401 when not authorized", %{conn: conn} do
+    test "does not create resource and renders 403 when not authorized", %{conn: conn} do
       project_category = insert(:project_category)
       path = conn |> project_category_path(:delete, project_category)
-      assert conn |> delete(path) |> json_response(401)
+      assert conn |> delete(path) |> json_response(403)
     end
 
     @tag :authenticated

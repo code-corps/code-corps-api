@@ -155,7 +155,7 @@ defmodule CodeCorps.ProjectControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders 401 when not authorized", %{conn: conn, current_user: current_user} do
+    test "does not create resource and renders 403 when not authorized", %{conn: conn, current_user: current_user} do
       organization = insert(:organization)
       insert(:organization_membership, role: "contributor", member: current_user, organization: organization)
 
@@ -165,7 +165,7 @@ defmodule CodeCorps.ProjectControllerTest do
         |> put_relationships(organization)
 
       path = conn |> project_path(:create)
-      assert conn |> post(path, payload) |> json_response(401)
+      assert conn |> post(path, payload) |> json_response(403)
     end
   end
 
@@ -232,10 +232,10 @@ defmodule CodeCorps.ProjectControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders 401 when not authorized", %{conn: conn} do
+    test "does not create resource and renders 403 when not authorized", %{conn: conn} do
       project = insert(:project)
       path = conn |> project_path(:update, project)
-      assert conn |> put(path) |> json_response(401)
+      assert conn |> put(path) |> json_response(403)
     end
 
     @tag :authenticated

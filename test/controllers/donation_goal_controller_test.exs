@@ -51,8 +51,8 @@ defmodule CodeCorps.DonationGoalControllerTest do
     end
 
     @tag :authenticated
-    test "renders 401 when not authorized", %{conn: conn} do
-      assert conn |> request_create(@valid_attrs) |> json_response(401)
+    test "renders 403 when not authorized", %{conn: conn} do
+      assert conn |> request_create(@valid_attrs) |> json_response(403)
     end
   end
 
@@ -80,8 +80,8 @@ defmodule CodeCorps.DonationGoalControllerTest do
     end
 
     @tag :authenticated
-    test "renders 401 when not authorized", %{conn: conn} do
-      assert conn |> request_update(@valid_attrs) |> json_response(401)
+    test "renders 403 when not authorized", %{conn: conn} do
+      assert conn |> request_update(@valid_attrs) |> json_response(403)
     end
   end
 
@@ -103,8 +103,8 @@ defmodule CodeCorps.DonationGoalControllerTest do
     end
 
     @tag :authenticated
-    test "renders 401 when not authorized", %{conn: conn} do
-      assert conn |> request_delete |> json_response(401)
+    test "renders 403 when not authorized", %{conn: conn} do
+      assert conn |> request_delete |> json_response(403)
     end
   end
 end

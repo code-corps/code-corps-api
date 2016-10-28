@@ -226,12 +226,12 @@ defmodule CodeCorps.TaskControllerTest do
     end
 
     @tag :authenticated
-    test "does not update resource and renders 401 when not authorized", %{conn: conn} do
+    test "does not update resource and renders 403 when not authorized", %{conn: conn} do
       task = insert(:task)
       payload = build_payload |> put_id(task.id) |> put_attributes(@invalid_attrs)
 
       path = conn |> task_path(:update, task)
-      assert conn |> put(path, payload) |> json_response(401)
+      assert conn |> put(path, payload) |> json_response(403)
     end
   end
 

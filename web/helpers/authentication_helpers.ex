@@ -10,8 +10,8 @@ defmodule CodeCorps.AuthenticationHelpers do
   def handle_unauthorized(conn = %{assigns: %{authorized: true}}), do: conn
   def handle_unauthorized(conn = %{assigns: %{authorized: false}}) do
     conn
-    |> put_status(401)
-    |> render(CodeCorps.TokenView, "error.json", message: "Not authorized")
+    |> put_status(403)
+    |> render(CodeCorps.TokenView, "403.json", message: "You are not authorized to perform this action.")
     |> halt
   end
 

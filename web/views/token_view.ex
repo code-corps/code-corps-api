@@ -8,7 +8,7 @@ defmodule CodeCorps.TokenView do
     }
   end
 
-  def render("error.json", %{message: message}) do
+  def render("401.json", %{message: message}) do
     %{
       errors: [
         %{
@@ -16,6 +16,19 @@ defmodule CodeCorps.TokenView do
           title: "401 Unauthorized",
           detail: message,
           status: 401,
+        }
+      ]
+    }
+  end
+
+  def render("403.json", %{message: message}) do
+    %{
+      errors: [
+        %{
+          id: "FORBIDDEN",
+          title: "403 Forbidden",
+          detail: message,
+          status: 403,
         }
       ]
     }

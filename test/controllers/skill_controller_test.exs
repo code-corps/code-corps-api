@@ -115,10 +115,10 @@ defmodule CodeCorps.SkillControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders 401 when not authorized", %{conn: conn} do
+    test "does not create resource and renders 403 when not authorized", %{conn: conn} do
       path = conn |> skill_path(:create)
       payload = build_payload |> put_attributes(@valid_attrs)
-      assert conn |> post(path, payload) |> json_response(401)
+      assert conn |> post(path, payload) |> json_response(403)
     end
   end
 end
