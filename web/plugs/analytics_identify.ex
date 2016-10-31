@@ -5,12 +5,11 @@ defmodule CodeCorps.Plug.AnalyticsIdentify do
 
   def init(opts), do: opts
 
-  def call(conn, _opts) do
-    if current_user = conn.assigns[:current_user] do
-      CodeCorps.Analytics.Segment.identify(current_user)
-      conn
-    else
-      conn
-    end
+  def call(conn, _opts), do: conn |> identify
+
+  defp identify(%{assigns: %{current_user: user}} = conn) do
+    CodeCorps.Analytics.Segment.identify(user)
+    conn
   end
+  defp identify(conn), do: conn
 end
