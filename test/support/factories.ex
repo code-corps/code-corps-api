@@ -26,7 +26,6 @@ defmodule CodeCorps.Factories do
       amount: 100,
       current: false,
       description: sequence(:description, &"A description for a donation goal #{&1}"),
-      title: sequence(:title, &"Donation goal #{&1}"),
       project: build(:project)
     }
   end
