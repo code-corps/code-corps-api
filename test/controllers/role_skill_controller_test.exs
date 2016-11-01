@@ -1,49 +1,25 @@
 defmodule CodeCorps.RoleSkillControllerTest do
-  use CodeCorps.ApiCase
-
-  alias CodeCorps.RoleSkill
-  alias CodeCorps.Repo
-
-  @valid_attrs %{}
-  @invalid_attrs %{}
-
-  defp build_payload, do: %{ "data" => %{"type" => "role-skill", "attributes" => %{}}}
+  use CodeCorps.ApiCase, resource_name: :role_skill
 
   describe "index" do
     test "lists all entries on index", %{conn: conn} do
-      path = conn |> role_skill_path(:index)
-      json = conn |> get(path) |> json_response(200)
-      assert json["data"] == []
+      [role_skill_1, role_skill_2] = insert_pair(:role_skill)
+
+      conn
+      |> request_index
+      |> json_response(200)
+      |> assert_ids_from_response([role_skill_1.id, role_skill_2.id])
     end
 
     test "filters resources on index", %{conn: conn} do
-      elixir = insert(:skill, title: "Elixir")
-      phoenix = insert(:skill, title: "Phoenix")
-      rails = insert(:skill, title: "Rails")
-
-      role = insert(:role)
-      role_skill_1 = insert(:role_skill, role: role, skill: elixir)
-      role_skill_2 = insert(:role_skill, role: role, skill: phoenix)
-      insert(:role_skill, role: role, skill: rails)
+      [role_skill_1, role_skill_2 | _] = insert_list(3, :role_skill)
 
       path = "role-skills/?filter[id]=#{role_skill_1.id},#{role_skill_2.id}"
-      json = conn |> get(path) |> json_response(200)
 
-      [first_result, second_result | _rest] = json |> Map.get("data")
-
-      first_result
-      |> assert_result_id(role_skill_1.id)
-      |> assert_jsonapi_relationship("role", role.id)
-      |> assert_jsonapi_relationship("skill", elixir.id)
-
-      assert first_result["attributes"] == %{}
-
-      second_result
-      |> assert_result_id(role_skill_2.id)
-      |> assert_jsonapi_relationship("role", role.id)
-      |> assert_jsonapi_relationship("skill", phoenix.id)
-
-      assert second_result["attributes"] == %{}
+      conn
+      |> get(path)
+      |> json_response(200)
+      |> assert_ids_from_response([role_skill_1.id, role_skill_2.id])
     end
   end
 
@@ -51,98 +27,62 @@ defmodule CodeCorps.RoleSkillControllerTest do
     test "shows chosen resource", %{conn: conn} do
       role_skill = insert(:role_skill)
 
-      path = conn |> role_skill_path(:show, role_skill)
-      json = conn |> get(path) |> json_response(200)
-
-      json
+      conn
+      |> request_show(role_skill)
+      |> json_response(200)
       |> Map.get("data")
       |> assert_result_id(role_skill.id)
-      |> assert_jsonapi_relationship("role", role_skill.role_id)
-      |> assert_jsonapi_relationship("skill", role_skill.skill_id)
-
-      assert json["data"]["attributes"] == %{}
     end
 
-    @tag :authenticated
-    test "renders 404 when id is nonexistent", %{conn: conn} do
-      path = conn |> role_skill_path(:delete, -1)
-      assert conn |> delete(path) |> json_response(404)
-    end
-
-    test "does not create resource and renders 401 when unauthenticated", %{conn: conn} do
-      path = conn |> role_skill_path(:create)
-      assert conn |> post(path) |> json_response(401)
-    end
-
-    @tag :authenticated
-    test "does not create resource and renders 403 when not authorized", %{conn: conn} do
-      path = conn |> role_skill_path(:create)
-      assert conn |> post(path) |> json_response(403)
+    test "renders 404", %{conn: conn} do
+      assert conn |> request_show(:not_found) |> json_response(404)
     end
   end
 
   describe "create" do
     @tag authenticated: :admin
     test "creates and renders resource when data is valid", %{conn: conn} do
-      role = insert(:role, name: "Frontend Developer")
-      skill = insert(:skill, title: "test skill")
+      role = insert(:role)
+      skill = insert(:skill)
 
-      path = conn |> role_skill_path(:create)
-      payload = build_payload |> put_relationships(role, skill)
-
-      json = conn |> post(path, payload) |> json_response(201)
-
-      id = json["data"]["id"] |> String.to_integer
-      role_skill = RoleSkill |> Repo.get(id)
-
-      json
-      |> Map.get("data")
-      |> assert_result_id(role_skill.id)
-      |> assert_jsonapi_relationship("role", role.id)
-      |> assert_jsonapi_relationship("skill", skill.id)
-
-      assert json["data"]["attributes"] == %{}
+      attrs = %{role: role, skill: skill}
+      assert conn |> request_create(attrs) |> json_response(201)
     end
 
     @tag authenticated: :admin
-    test "does not create resource and renders errors when data is invalid", %{conn: conn} do
-      path = conn |> role_skill_path(:create)
-      payload = build_payload
+    test "renders 422 when data is invalid", %{conn: conn} do
+      invalid_attrs = %{}
+      assert conn |> request_create(invalid_attrs) |> json_response(422)
+    end
 
-      json = conn |> post(path, payload) |> json_response(422)
-      assert json["errors"] != %{}
+    test "renders 401 when unauthenticated", %{conn: conn} do
+      assert conn |> request_create |> json_response(401)
+    end
+
+    @tag :authenticated
+    test "renders 403 when not authorized", %{conn: conn} do
+      assert conn |> request_create |> json_response(403)
     end
   end
 
   describe "delete" do
     @tag authenticated: :admin
     test "deletes resource", %{conn: conn} do
-      role_skill = insert(:role_skill)
-      path = conn |> role_skill_path(:delete, role_skill)
-
-      assert conn |> delete(path) |> response(204)
-
-      refute Repo.get(RoleSkill, role_skill.id)
-      assert Repo.get(CodeCorps.Role, role_skill.role_id)
-      assert Repo.get(CodeCorps.Skill, role_skill.skill_id)
+      assert conn |> request_delete |> response(204)
     end
 
-    test "does not delete resource and renders 401 when unauthenticated", %{conn: conn} do
-      path = conn |> role_skill_path(:delete, "id not important")
-      assert conn |> delete(path) |> json_response(401)
+    test "renders 401 when unauthenticated", %{conn: conn} do
+      assert conn |> request_delete |> json_response(401)
     end
 
     @tag :authenticated
-    test "does not create resource and renders 403 when not authorized", %{conn: conn} do
-      role_skill = insert(:role_skill)
-      path = conn |> role_skill_path(:delete, role_skill)
-      assert conn |> delete(path) |> json_response(403)
+    test "renders 403 when not authorized", %{conn: conn} do
+      assert conn |> request_delete |> json_response(403)
     end
 
     @tag :authenticated
-    test "renders page not found when id is nonexistent on delete", %{conn: conn} do
-      path = conn |> role_skill_path(:delete, -1)
-      assert conn |> delete(path) |> json_response(404)
+    test "renders 404", %{conn: conn} do
+      assert conn |> request_delete(:not_found) |> json_response(404)
     end
   end
 end
