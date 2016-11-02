@@ -104,7 +104,7 @@ defmodule CodeCorps.ApiCase do
         conn |> get(path)
       end
 
-      def request_create(conn, attrs) do
+      def request_create(conn, attrs \\ %{}) do
         path = conn |> path_for(:create)
         payload = json_payload(factory_name, attrs)
         conn |> post(path, payload)
