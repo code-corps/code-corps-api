@@ -111,7 +111,7 @@ defmodule CodeCorps.ApiCase do
       end
 
       def request_update(conn, :not_found), do: conn |> request_update(-1, %{})
-      def request_update(conn, attrs), do: conn |> request_update(default_record, attrs)
+      def request_update(conn, attrs \\ %{}), do: conn |> request_update(default_record, attrs)
       def request_update(conn, resource_or_id, attrs) do
         payload = json_payload(factory_name, attrs)
         path = conn |> path_for(:update, resource_or_id)
