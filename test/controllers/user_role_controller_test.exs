@@ -54,12 +54,12 @@ defmodule CodeCorps.UserRoleControllerTest do
     end
 
     test "does not create resource and renders 401 when unauthenticated", %{conn: conn} do
-      assert conn |> request_create(%{}) |> json_response(401)
+      assert conn |> request_create |> json_response(401)
     end
 
     @tag :authenticated
     test "does not create resource and renders 403 when not authorized", %{conn: conn} do
-      assert conn |> request_create(%{}) |>  json_response(403)
+      assert conn |> request_create |>  json_response(403)
     end
   end
 
