@@ -110,16 +110,17 @@ defmodule CodeCorps.ApiCase do
         conn |> post(path, payload)
       end
 
-      def request_update(conn, :not_found), do: conn |> request_update(-1, %{})
-      def request_update(conn, attrs \\ %{}), do: conn |> request_update(default_record, attrs)
+      def request_update(conn), do: request_update(conn, %{})
+      def request_update(conn, :not_found), do: request_update(conn, -1, %{})
+      def request_update(conn, attrs), do: request_update(conn, default_record, attrs)
       def request_update(conn, resource_or_id, attrs) do
         payload = json_payload(factory_name, attrs)
         path = conn |> path_for(:update, resource_or_id)
         conn |> put(path, payload)
       end
 
-      def request_delete(conn), do: conn |> request_delete(default_record)
-      def request_delete(conn, :not_found), do: conn |> request_delete(-1)
+      def request_delete(conn), do: request_delete(conn, default_record)
+      def request_delete(conn, :not_found), do: request_delete(conn, -1)
       def request_delete(conn, resource_or_id) do
         path = conn |> path_for(:delete, resource_or_id)
         conn |> delete(path)
