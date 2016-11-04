@@ -3,8 +3,8 @@ defmodule CodeCorps.DonationGoalControllerTest do
 
   alias CodeCorps.DonationGoal
 
-  @valid_attrs %{amount: 200, current: false, description: "A description", title: "A donation"}
-  @invalid_attrs %{description: nil, title: nil}
+  @valid_attrs %{amount: 200, current: false, description: "A description"}
+  @invalid_attrs %{description: nil}
 
   describe "index" do
     test "lists all entries on index", %{conn: conn} do

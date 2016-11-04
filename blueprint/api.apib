@@ -2221,7 +2221,6 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + include JSON API Version
 
 ## Donation Goal Attributes (object)
-+ title: `Support the core team` (string, required)
 + description: `Will provide all the basic overhead costs needed to run Code Corps.` (string, required) - Several lines describing the reasons for the goal
 + amount: `1500000` (required, number) - The amount, in cents, for the goal.
 + current: `true` (required, boolean) - Indicates whether this is the current donation goal. This is determined by whether 1) this is the highest goal and the total monthly raised is higher than that amount or 2) the total monthly raised is between the lower goal's amount (if it exists) and this goal's amount.
@@ -2229,12 +2228,11 @@ This endpoint allows you to check whether a username is valid (by running a vali
 ## Donation Goal Create Request
 + data
     + attributes
-        + title (string) - A title for the donation
         + description (string) - A short plain text description for the donation
         + amount (number) - the amount of money in cents for the goal
     + relationships
         + project
-            + data(Project Resource Identifier) - Identifier of project this donation goal is being created for
+            + data(Project Resource Identifier)
 
 ## Donation Goal Resource (object)
 + include Donation Goal Resource Identifier
@@ -2258,7 +2256,6 @@ This endpoint allows you to check whether a username is valid (by running a vali
 ## Donation Goal Update Request
 + data
     + attributes
-        + title (string) - A title for the donation
         + description (string) - A short plain text description for the donation
         + amount (number) - the amount of money in cents for the goal
 

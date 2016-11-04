@@ -6,7 +6,6 @@ defmodule CodeCorps.DonationGoal do
   * amount - donation amount, in cents, needed to reach the goal
   * current - indicates if the goal is currently active
   * description - a longer, more informative description of the goal
-  * title - a short, but descriptive goal title
   """
 
   use CodeCorps.Web, :model
@@ -15,7 +14,6 @@ defmodule CodeCorps.DonationGoal do
     field :amount, :integer
     field :current, :boolean
     field :description, :string
-    field :title, :string
 
     belongs_to :project, CodeCorps.Project
 
@@ -27,8 +25,8 @@ defmodule CodeCorps.DonationGoal do
   """
   def create_changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:amount, :current, :description, :project_id, :title])
-    |> validate_required([:amount, :current, :description, :project_id, :title])
+    |> cast(params, [:amount, :current, :description, :project_id])
+    |> validate_required([:amount, :current, :description, :project_id])
     |> assoc_constraint(:project)
   end
 
@@ -37,7 +35,7 @@ defmodule CodeCorps.DonationGoal do
   """
   def update_changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:amount, :current, :description, :title])
-    |> validate_required([:amount, :current, :description, :title])
+    |> cast(params, [:amount, :current, :description])
+    |> validate_required([:amount, :current, :description])
   end
 end
