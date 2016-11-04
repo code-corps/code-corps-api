@@ -115,14 +115,19 @@ defmodule CodeCorps.ProjectControllerTest do
     end
 
     test "renders 401 when unauthenticated", %{conn: conn} do
-      assert conn |> request_create |> json_response(401)
+      assert conn |> request_update |> json_response(401)
     end
 
     @tag :authenticated
     test "renders 403 when not authorized", %{conn: conn} do
       organization = insert(:organization)
       attrs = @invalid_attrs |> Map.merge(%{organization: organization})
-      assert conn |> request_create(attrs) |> json_response(403)
+      assert conn |> request_update(attrs) |> json_response(403)
+    end
+
+    @tag authenticated: :admin
+    test "renders 404 when not found", %{conn: conn} do
+      assert conn |> request_update(:not_found) |> json_response(404)
     end
   end
 end
