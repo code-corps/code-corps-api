@@ -109,7 +109,7 @@ defmodule CodeCorps.ProjectControllerTest do
     test "uploads a icon to S3", %{conn: conn} do
       organization = insert(:organization)
       icon_data = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
-      attrs = @valid_attrs |> Map.merge(%{:base64_icon_data, icon_data, organization: organization})
+      attrs = @valid_attrs |> Map.merge(%{base64_icon_data: icon_data, organization: organization})
 
       assert conn |> request_create(attrs) |> json_response(201)
     end
