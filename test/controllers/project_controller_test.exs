@@ -21,24 +21,12 @@ defmodule CodeCorps.ProjectControllerTest do
       project_1 = insert(:project, title: "Test Project 1", organization: organization)
       project_2 = insert(:project, title: "Test Project 2", organization: organization)
 
-      conn = conn |> get("/#{organization_slug}/projects")
+      path = "/#{organization_slug}/projects"
 
-      data = conn |> json_response(200) |> Map.get("data")
-
-      assert Enum.count(data) == 2
-
-      actual_ids =
-        data
-        |> Enum.map(& &1["id"])
-        |> Enum.map(&Integer.parse(&1) |> elem(0))
-        |> Enum.sort
-
-      expected_ids =
-        [project_1, project_2]
-        |> Enum.map(& &1.id)
-        |> Enum.sort
-
-      assert expected_ids == actual_ids
+      conn
+      |> get(path)
+      |> json_response(200)
+      |> assert_ids_from_response([project_1.id, project_2.id])
     end
 
     test "listing by organization slug is case insensitive", %{conn: conn} do
@@ -82,21 +70,26 @@ defmodule CodeCorps.ProjectControllerTest do
   describe "create" do
     @tag authenticated: :admin
     test "creates and renders resource when attributes are valid", %{conn: conn, current_user: current_user} do
-      assert conn |> request_create(@valid_attrs) |> json_response(201)
+      organization = insert(:organization)
+      insert(:organization_membership, role: "admin", member: current_user, organization: organization)
+      attrs = @valid_attrs |> Map.merge(%{organization: organization})
+      assert conn |> request_create(attrs) |> json_response(201)
     end
 
     @tag authenticated: :admin
-    test "does not create resource and renders errors when attributes are invalid", %{conn: conn, current_user: current_user} do
+    test "renders 422 when attributes are invalid", %{conn: conn} do
       assert conn |> request_create(@invalid_attrs) |> json_response(422)
     end
 
-    test "does not create resource and renders 401 when unauthenticated", %{conn: conn} do
+    test "renders 401 when unauthenticated", %{conn: conn} do
       assert conn |> request_create |> json_response(401)
     end
 
     @tag :authenticated
-    test "does not create resource and renders 403 when not authorized", %{conn: conn, current_user: current_user} do
-      assert conn |> request_create |> json_response(403)
+    test "renders 403 when not authorized", %{conn: conn} do
+      organization = insert(:organization)
+      attrs = @invalid_attrs |> Map.merge(%{organization: organization})
+      assert conn |> request_create(attrs) |> json_response(403)
     end
   end
 
@@ -114,37 +107,21 @@ defmodule CodeCorps.ProjectControllerTest do
     @tag :requires_env
     @tag authenticated: :admin
     test "uploads a icon to S3", %{conn: conn} do
-      project = insert(:project)
-
       icon_data = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
       attrs = Map.put(@valid_attrs, :base64_icon_data, icon_data)
 
-      payload = build_payload |> put_id(project.id) |> put_attributes(attrs)
-      path = conn |> project_path(:update, project)
-
-      json = conn |> put(path, payload) |> json_response(200)
-
-      data = json["data"]
-      large_url = data["attributes"]["icon-large-url"]
-      assert large_url
-      assert String.contains? large_url, "/projects/#{project.id}/large"
-      thumb_url = data["attributes"]["icon-thumb-url"]
-      assert thumb_url
-      assert String.contains? thumb_url, "/projects/#{project.id}/thumb"
+      assert conn |> request_create(attrs) |> json_response(201)
     end
 
-    test "does not create resource and renders 401 when unauthenticated", %{conn: conn} do
-      assert conn |> request_update |> json_response(401)
+    test "renders 401 when unauthenticated", %{conn: conn} do
+      assert conn |> request_create |> json_response(401)
     end
 
     @tag :authenticated
-    test "does not create resource and renders 403 when not authorized", %{conn: conn} do
-      assert conn |> request_update |> json_response(403)
-    end
-
-    @tag authenticated: :admin
-    test "does not update resource and renders 404 when not found", %{conn: conn} do
-      assert conn |> request_update(:not_found) |> json_response(404)
+    test "renders 403 when not authorized", %{conn: conn} do
+      organization = insert(:organization)
+      attrs = @invalid_attrs |> Map.merge(%{organization: organization})
+      assert conn |> request_create(attrs) |> json_response(403)
     end
   end
 end
