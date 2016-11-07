@@ -13,7 +13,7 @@ defmodule CodeCorps.UserCategoryControllerTest do
 
     test "filters resources on index", %{conn: conn} do
       [user_category_1, user_category_2 | _] = insert_list(3, :user_category)
-
+      
       path = "user-categories/?filter[id]=#{user_category_1.id},#{user_category_2.id}"
 
       conn
