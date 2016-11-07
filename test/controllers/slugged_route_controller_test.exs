@@ -1,5 +1,5 @@
 defmodule CodeCorps.SluggedRouteControllerTest do
-  use CodeCorps.ApiCase
+  use CodeCorps.ApiCase, resource_name: :slugged_route
 
   @valid_attrs %{organization_id: 42, slug: "some content", user_id: 42}
   @invalid_attrs %{}
@@ -7,13 +7,11 @@ defmodule CodeCorps.SluggedRouteControllerTest do
   test "shows chosen resource", %{conn: conn} do
     slug = "test-slug"
     slugged_route = insert(:slugged_route, slug: slug)
-    conn = get conn, "/#{slug}"
-    data = json_response(conn, 200)["data"]
-    assert data["id"] == "#{slugged_route.id}"
-    assert data["type"] == "slugged-route"
-    assert data["attributes"]["slug"] == slugged_route.slug
-    assert data["attributes"]["organization_id"] == slugged_route.organization_id
-    assert data["attributes"]["user_id"] == slugged_route.user_id
+    conn
+    |> get("/#{slug}")
+    |> json_response(200)
+    |> Map.get("data")
+    |> assert_result_id(slugged_route.id)
   end
 
   test "is case insensitive", %{conn: conn} do
@@ -24,8 +22,7 @@ defmodule CodeCorps.SluggedRouteControllerTest do
     assert conn |> get("/tEst") |> json_response(200)
   end
 
-  test "does not show resource and instead throw error when id is nonexistent", %{conn: conn} do
-    path = conn |> slugged_route_path(:show, -1)
-    assert conn |> get(path) |> json_response(:not_found)
+  test "renders 404 when id is nonexistent", %{conn: conn} do
+    assert conn |> request_show(:not_found) |> json_response(404)
   end
 end
