@@ -105,6 +105,13 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def stripe_account_factory do
+    %CodeCorps.StripeAccount{
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
+      organization: build(:organization),
+    }
+  end
+
   def stripe_customer_factory do
     %CodeCorps.StripeCustomer{
       created: Timex.now,
