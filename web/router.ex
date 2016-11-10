@@ -53,6 +53,7 @@ defmodule CodeCorps.Router do
     resources "/roles", RoleController, only: [:create]
     resources "/role-skills", RoleSkillController, only: [:create, :delete]
     resources "/skills", SkillController, only: [:create]
+    resources "/stripe-platform-cards", StripePlatformCardController, only: [:show, :create, :delete]
     resources "/stripe-platform-customers", StripePlatformCustomerController, only: [:show, :create]
     resources "/tasks", TaskController, only: [:create, :update]
     resources "/users", UserController, only: [:update]
@@ -91,6 +92,4 @@ defmodule CodeCorps.Router do
     get "/:slug/projects", ProjectController, :index
     get "/:slug/:project_slug", ProjectController, :show
   end
-
-
 end

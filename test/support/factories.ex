@@ -99,6 +99,13 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def stripe_platform_card_factory do
+    %CodeCorps.StripePlatformCard{
+      id_from_stripe: sequence(:id_from_stripe, &"card_testDataMiscCaps#{&1}"),
+      user: build(:user)
+    }
+  end
+
   def slugged_route_factory do
     %CodeCorps.SluggedRoute{
       slug: sequence(:slug, &"slug-#{&1}")

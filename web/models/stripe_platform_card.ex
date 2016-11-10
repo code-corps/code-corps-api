@@ -1,7 +1,7 @@
-defmodule CodeCorps.StripeCard do
+defmodule CodeCorps.StripePlatformCard do
   use CodeCorps.Web, :model
 
-  schema "stripe_cards" do
+  schema "stripe_platform_cards" do
     field :brand, :string
     field :customer_id_from_stripe, :string
     field :cvc_check, :string
@@ -11,6 +11,8 @@ defmodule CodeCorps.StripeCard do
     field :last4, :string
     field :name, :string
 
+    field :stripe_token, :string, virtual: true
+
     belongs_to :user, CodeCorps.User
 
     timestamps()
@@ -18,8 +20,9 @@ defmodule CodeCorps.StripeCard do
 
   def create_changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:id_from_stripe, :user_id])
-    |> validate_required([:id_from_stripe, :user_id])
+    |> cast(params, [:brand, :customer_id_from_stripe, :cvc_check, :exp_month, :exp_year, :last4, :name, :id_from_stripe, :user_id])
+    |> validate_required([:brand, :exp_month, :exp_year, :cvc_check, :last4, :id_from_stripe, :user_id])
     |> assoc_constraint(:user)
+    |> unique_constraint(:id_from_stripe)
   end
 end

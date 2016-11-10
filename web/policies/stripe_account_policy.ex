@@ -4,10 +4,7 @@ defmodule CodeCorps.StripeAccountPolicy do
 
   alias CodeCorps.StripeAccount
   alias CodeCorps.User
-  alias CodeCorps.OrganizationMembership
-  alias Ecto.Changeset
 
   def show?(%User{admin: true}, %StripeAccount{}), do: true
   def show?(%User{} = user, %StripeAccount{} = stripe_account), do: stripe_account |> get_membership(user) |> get_role |> owner?
-  def show?(%User{}, %StripeAccount{}), do: false
 end
