@@ -2,7 +2,7 @@ defmodule CodeCorps.StripeCustomer do
   use CodeCorps.Web, :model
 
   schema "stripe_customers" do
-    field :created, Ecto.DateTime
+    field :created, Timex.Ecto.DateTime
     field :currency, :string
     field :delinquent, :boolean
     field :email, :string
@@ -17,7 +17,7 @@ defmodule CodeCorps.StripeCustomer do
 
   def create_changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:id_from_stripe, :user_id])
+    |> cast(params, [:created, :currency, :delinquent, :id_from_stripe, :user_id])
     |> validate_required([:id_from_stripe, :user_id])
     |> assoc_constraint(:user)
   end

@@ -1,5 +1,6 @@
 defmodule CodeCorps.UserView do
-  use CodeCorps.PreloadHelpers, default_preloads: [:slugged_route, :organization_memberships, :user_categories, :user_roles, :user_skills]
+  use CodeCorps.PreloadHelpers,
+      default_preloads: [:slugged_route, :stripe_customer, :organization_memberships, :user_categories, :user_roles, :user_skills]
   use CodeCorps.Web, :view
   use JaSerializer.PhoenixView
 
@@ -10,6 +11,7 @@ defmodule CodeCorps.UserView do
   ]
 
   has_one :slugged_route, serializer: CodeCorps.SluggedRouteView
+  has_one :stripe_customer, serializer: CodeCorps.StripeCustomerView
   has_many :organization_memberships, serializer: CodeCorps.OrganizationMembershipView, identifiers: :always
   has_many :user_categories, serializer: CodeCorps.UserCategoryView, identifiers: :always
   has_many :user_roles, serializer: CodeCorps.UserRoleView, identifiers: :always

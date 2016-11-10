@@ -6,6 +6,8 @@ defmodule CodeCorps.UserViewTest do
   test "renders all attributes and relationships properly" do
     user = insert(:user)
     organization_membership = insert(:organization_membership, member: user)
+    slugged_route = insert(:slugged_route, user: user)
+    stripe_customer = insert(:stripe_customer, user: user)
     user_category = insert(:user_category, user: user)
     user_role = insert(:user_role, user: user)
     user_skill = insert(:user_skill, user: user)
@@ -38,7 +40,10 @@ defmodule CodeCorps.UserViewTest do
             ]
           },
           "slugged-route" => %{
-            "data" => nil
+            "data" => %{"id" => slugged_route.id |> Integer.to_string, "type" => "slugged-route"}
+          },
+          "stripe-customer" => %{
+            "data" => %{"id" => stripe_customer.id |> Integer.to_string, "type" => "stripe-customer"}
           },
           "user-categories" => %{
             "data" => [

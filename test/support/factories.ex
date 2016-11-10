@@ -3,7 +3,6 @@ defmodule CodeCorps.Factories do
   # with Ecto
   use ExMachina.Ecto, repo: CodeCorps.Repo
 
-
   def category_factory do
     %CodeCorps.Category{
       name: sequence(:name, &"Category #{&1}"),
@@ -103,6 +102,15 @@ defmodule CodeCorps.Factories do
   def slugged_route_factory do
     %CodeCorps.SluggedRoute{
       slug: sequence(:slug, &"slug-#{&1}")
+    }
+  end
+
+  def stripe_customer_factory do
+    %CodeCorps.StripeCustomer{
+      created: Timex.now,
+      email: sequence(:email, &"email_#{&1}@mail.com"),
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
+      user: build(:user)
     }
   end
 

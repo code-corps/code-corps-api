@@ -3,7 +3,6 @@ defmodule CodeCorps.UserControllerTest do
 
   alias CodeCorps.User
   alias CodeCorps.Repo
-  alias CodeCorps.SluggedRoute
 
   @valid_attrs %{
     email: "test@user.com",

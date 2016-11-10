@@ -6,6 +6,7 @@
   "canada": {:hex, :canada, "1.0.1", "da96d0ff101a0c2a6cc7b07d92b8884ff6508f058781d3679999416feacf41c5", [:mix], []},
   "canary": {:hex, :canary, "1.0.0", "55e130bd015001d2fcdc16be23994c6bb711205a625f340d7a74f1c29825d4ba", [:mix], [{:canada, "~> 1.0.0", [hex: :canada, optional: false]}, {:ecto, ">= 1.1.0", [hex: :ecto, optional: false]}, {:plug, "~> 1.0", [hex: :plug, optional: false]}]},
   "certifi": {:hex, :certifi, "0.7.0", "861a57f3808f7eb0c2d1802afeaae0fa5de813b0df0979153cbafcd853ababaf", [:rebar3], []},
+  "combine": {:hex, :combine, "0.9.3", "192e609b48b3f2210494e26f85db1712657be1a8f15795656710317ea43fc449", [:mix], []},
   "comeonin": {:hex, :comeonin, "2.6.0", "74c288338b33205f9ce97e2117bb9a2aaab103a1811d243443d76fdb62f904ac", [:make, :make, :mix], []},
   "connection": {:hex, :connection, "1.0.4", "a1cae72211f0eef17705aaededacac3eb30e6625b04a6117c1b2db6ace7d5976", [:mix], []},
   "corsica": {:hex, :corsica, "0.5.0", "eb5b2fccc5bc4f31b8e2b77dd15f5f302aca5d63286c953e8e916f806056d50c", [:mix], [{:cowboy, ">= 1.0.0", [hex: :cowboy, optional: false]}, {:plug, ">= 0.9.0", [hex: :plug, optional: false]}]},
@@ -52,5 +53,8 @@
   "segment": {:git, "https://github.com/stueccles/analytics-elixir.git", "8fe520c16a8a9290d55c849bf4d67420396e1cdd", []},
   "sentry": {:hex, :sentry, "1.1.0", "7a035a02d24578e26c55fbea36f52d8705925ee7d5ce0ca766245ca78c91226f", [:mix], [{:hackney, "~> 1.6.1", [hex: :hackney, optional: false]}, {:plug, "~> 1.0", [hex: :plug, optional: true]}, {:poison, "~> 1.5 or ~> 2.0", [hex: :poison, optional: false]}, {:uuid, "~> 1.0", [hex: :uuid, optional: false]}]},
   "ssl_verify_fun": {:hex, :ssl_verify_fun, "1.1.1", "28a4d65b7f59893bc2c7de786dec1e1555bd742d336043fe644ae956c3497fbe", [:make, :rebar], []},
-  "stripity_stripe": {:hex, :stripity_stripe, "2.0.0-alpha.1", "d86faf49639cf8963c06fb92ce3f010c52f3710ef902a986e6a9391ab48ec27e", [:mix], [{:hackney, "~> 1.6", [hex: :hackney, optional: false]}, {:poison, "~> 2.0 or ~> 3.0", [hex: :poison, optional: false]}]},
+  "stripity_stripe": {:hex, :stripity_stripe, "2.0.0-alpha.2", "dd40e85bc0ca375c442e71a875855d9106106bbbf1508604126d3c0aecce1305", [:mix], [{:hackney, "~> 1.6", [hex: :hackney, optional: false]}, {:poison, "~> 2.0 or ~> 3.0", [hex: :poison, optional: false]}]},
+  "timex": {:hex, :timex, "3.1.5", "413d6d8d6f0162a5d47080cb8ca520d790184ac43e097c95191c7563bf25b428", [:mix], [{:combine, "~> 0.7", [hex: :combine, optional: false]}, {:gettext, "~> 0.10", [hex: :gettext, optional: false]}, {:tzdata, "~> 0.1.8 or ~> 0.5", [hex: :tzdata, optional: false]}]},
+  "timex_ecto": {:hex, :timex_ecto, "3.0.5", "3ec6c25e10d2c0020958e5df64d2b5e690e441faa2c2259da8bc6bd3d7f39256", [:mix], [{:ecto, "~> 2.0", [hex: :ecto, optional: false]}, {:timex, "~> 3.0", [hex: :timex, optional: false]}]},
+  "tzdata": {:hex, :tzdata, "0.5.9", "575be217b039057a47e133b72838cbe104fb5329b19906ea4e66857001c37edb", [:mix], [{:hackney, "~> 1.0", [hex: :hackney, optional: false]}]},
   "uuid": {:hex, :uuid, "1.1.5", "96cb36d86ee82f912efea4d50464a5df606bf3f1163d6bdbb302d98474969369", [:mix], []}}

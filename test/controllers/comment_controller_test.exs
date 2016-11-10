@@ -1,9 +1,6 @@
 defmodule CodeCorps.CommentControllerTest do
   use CodeCorps.ApiCase, resource_name: :comment
 
-  alias CodeCorps.Comment
-  alias CodeCorps.Repo
-
   @valid_attrs %{markdown: "I love elixir!"}
   @invalid_attrs %{markdown: ""}
 
