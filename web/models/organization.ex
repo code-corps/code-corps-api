@@ -9,6 +9,7 @@ defmodule CodeCorps.Organization do
   import CodeCorps.Helpers.Slug
   import CodeCorps.Validators.SlugValidator
   alias CodeCorps.SluggedRoute
+  alias CodeCorps.StripeConnectAccount
 
   schema "organizations" do
     field :base64_icon_data, :string, virtual: true
@@ -18,6 +19,7 @@ defmodule CodeCorps.Organization do
     field :slug, :string
 
     has_one :slugged_route, SluggedRoute
+    has_one :stripe_connect_account, StripeConnectAccount
 
     has_many :projects, CodeCorps.Project
 

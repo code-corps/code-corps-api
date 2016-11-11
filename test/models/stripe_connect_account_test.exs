@@ -1,7 +1,7 @@
-defmodule CodeCorps.StripeAccountTest do
+defmodule CodeCorps.StripeConnectAccountTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.StripeAccount
+  alias CodeCorps.StripeConnectAccount
 
   @valid_attrs %{
     id_from_stripe: "abc123"
@@ -14,12 +14,12 @@ defmodule CodeCorps.StripeAccountTest do
       organization_id = insert(:organization).id
 
       changes = Map.merge(@valid_attrs, %{organization_id: organization_id})
-      changeset = StripeAccount.create_changeset(%StripeAccount{}, changes)
+      changeset = StripeConnectAccount.create_changeset(%StripeConnectAccount{}, changes)
       assert changeset.valid?
     end
 
     test "reports as invalid when attributes are invalid" do
-      changeset = StripeAccount.create_changeset(%StripeAccount{}, @invalid_attrs)
+      changeset = StripeConnectAccount.create_changeset(%StripeConnectAccount{}, @invalid_attrs)
       refute changeset.valid?
 
       assert changeset.errors[:id_from_stripe] == {"can't be blank", []}
@@ -30,7 +30,7 @@ defmodule CodeCorps.StripeAccountTest do
       attrs =  @valid_attrs |> Map.merge(%{organization_id: -1})
 
       { result, changeset } =
-        StripeAccount.create_changeset(%StripeAccount{}, attrs)
+        StripeConnectAccount.create_changeset(%StripeConnectAccount{}, attrs)
         |> Repo.insert
 
       assert result == :error

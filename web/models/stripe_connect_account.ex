@@ -1,11 +1,11 @@
-defmodule CodeCorps.StripeAccount do
+defmodule CodeCorps.StripeConnectAccount do
   @moduledoc """
-  Represents a StripeAccount stored on Code Corps.
+  Represents a StripeConnectAccount stored on Code Corps.
   """
 
   use CodeCorps.Web, :model
 
-  schema "stripe_accounts" do
+  schema "stripe_connect_accounts" do
     field :business_name, :string
     field :business_url, :string
     field :charges_enabled, :boolean
@@ -21,14 +21,22 @@ defmodule CodeCorps.StripeAccount do
     field :support_url, :string
     field :transfers_enabled, :boolean
 
+    field :access_code, :string, virtual: true
+
     belongs_to :organization, CodeCorps.Organization
 
     timestamps()
   end
 
+  @insert_params [
+    :business_name, :business_url, :charges_enabled, :country, :default_currency,
+    :details_submitted, :email, :id_from_stripe, :managed, :organization_id,
+    :support_email, :support_phone, :support_url, :transfers_enabled
+  ]
+
   def create_changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:id_from_stripe, :organization_id])
+    |> cast(params, @insert_params)
     |> validate_required([:id_from_stripe, :organization_id])
     |> assoc_constraint(:organization)
   end

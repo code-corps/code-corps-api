@@ -68,26 +68,4 @@ defmodule CodeCorps.StripePlatformCardControllerTest do
       assert conn |> make_create_request |>  json_response(403)
     end
   end
-
-  describe "delete" do
-    @tag :authenticated
-    test "deletes resource", %{conn: conn, current_user: current_user} do
-      stripe_platform_card = insert(:stripe_platform_card, user: current_user)
-      assert conn |> request_delete(stripe_platform_card) |> response(204)
-    end
-
-    test "renders 401 when unauthenticated", %{conn: conn} do
-      assert conn |> request_delete |> json_response(401)
-    end
-
-    @tag :authenticated
-    test "403 when not authorized", %{conn: conn} do
-      assert conn |> request_delete |> json_response(403)
-    end
-
-    @tag :authenticated
-    test "renders 404 when record not found", %{conn: conn} do
-      assert conn |> request_delete(:not_found) |> json_response(404)
-    end
-  end
 end

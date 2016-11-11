@@ -8,6 +8,8 @@ defmodule CodeCorps.OrganizationViewTest do
     project = insert(:project, organization: organization)
     user = insert(:user)
     organization_membership = insert(:organization_membership, member: user, organization: organization)
+    slugged_route = insert(:slugged_route, organization: organization)
+    stripe_connect_account = insert(:stripe_connect_account, organization: organization)
 
     rendered_json =  render(CodeCorps.OrganizationView, "show.json-api", data: organization)
 
@@ -35,7 +37,10 @@ defmodule CodeCorps.OrganizationViewTest do
             ]
           },
           "slugged-route" => %{
-            "data" => nil
+            "data" => %{"id" => slugged_route.id |> Integer.to_string, "type" => "slugged-route"}
+          },
+          "stripe-connect-account" => %{
+            "data" => %{"id" => stripe_connect_account.id |> Integer.to_string, "type" => "stripe-connect-account"}
           },
         },
         "type" => "organization",

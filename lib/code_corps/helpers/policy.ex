@@ -6,7 +6,7 @@ defmodule CodeCorps.Helpers.Policy do
 
   import Ecto.Query
 
-  alias CodeCorps.{Organization, OrganizationMembership, Project, Repo, StripeAccount, User}
+  alias CodeCorps.{Organization, OrganizationMembership, Project, Repo, StripeConnectAccount, User}
   alias Ecto.Changeset
 
   @doc """
@@ -19,7 +19,7 @@ defmodule CodeCorps.Helpers.Policy do
   def get_membership(%Changeset{changes: %{organization_id: organization_id}}, %User{id: user_id}), do: do_get_membership(organization_id, user_id)
   def get_membership(%Project{organization_id: organization_id}, %User{id: user_id}), do: do_get_membership(organization_id, user_id)
   def get_membership(%Organization{id: organization_id}, %User{id: user_id}), do: do_get_membership(organization_id, user_id)
-  def get_membership(%StripeAccount{organization_id: organization_id}, %User{id: user_id}), do: do_get_membership(organization_id, user_id)
+  def get_membership(%StripeConnectAccount{organization_id: organization_id}, %User{id: user_id}), do: do_get_membership(organization_id, user_id)
   defp do_get_membership(organization_id, user_id) do
     OrganizationMembership
     |> where([m], m.member_id == ^user_id and m.organization_id == ^organization_id)
