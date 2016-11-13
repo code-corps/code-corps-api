@@ -1,4 +1,8 @@
 defmodule CodeCorps.StripeAuth do
+  @moduledoc """
+  Provides a virtual resource for data needed for Stripe Connect OAuth flows.
+  """
+
   use Ecto.Schema
 
   schema "" do
@@ -13,10 +17,10 @@ defmodule CodeCorps.StripeAuth do
 
   Returns either an `:ok` or `:error` tuple.
   """
-  def generate_button_url(project) do
+  def authorize_url(project) do
     case Guardian.encode_and_sign(project, :token) do
       {:ok, token, _claims} ->
-        url = Stripe.Connect.generate_button_url(token)
+        url = Stripe.Connect.OAuth.authorize_url(token)
         {:ok, url}
       {:error, reason} ->
         {:error, reason}

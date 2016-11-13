@@ -10,7 +10,7 @@ defmodule CodeCorps.StripeAuthController do
   # policy for authorization
   def stripe_auth(conn, %{"id" => project_id}) do
     project = Repo.get(Project, project_id)
-    case StripeAuth.generate_button_url(project) do
+    case StripeAuth.authorize_url(project) do
       {:ok, url} ->
         stripe_auth = %StripeAuth{url: url}
 
