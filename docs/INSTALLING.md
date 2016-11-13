@@ -8,6 +8,8 @@ Here are some direct links if you're on [Mac OS X](https://docs.docker.com/docke
 
 Follow those download instructions. Once you can run the `docker` command, you can safely move on.
 
+>Note: If you are using Docker in Windows, it is recommended you use PowerShell. If you run into permission issues, try running Docker from PowerShell as an Admin.
+
 ### Clone this repository
 
 You'll want to [clone this repository](https://help.github.com/articles/cloning-a-repository/) with `git clone https://github.com/code-corps/code-corps-api.git`. If you plan on contributing, you'll want to fork it too!
