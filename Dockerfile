@@ -1,4 +1,4 @@
-FROM elixir:1.3.3
+FROM elixir:1.3.4
 ENV APP_HOME /code-corps-api
 RUN mkdir $APP_HOME
 
