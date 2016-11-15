@@ -1,8 +1,5 @@
 defmodule CodeCorps.TaskControllerTest do
-  use CodeCorps.ApiCase
-
-  alias CodeCorps.Task
-  alias CodeCorps.Repo
+  use CodeCorps.ApiCase, resource_name: :task
 
   @valid_attrs %{
     title: "Test task",
@@ -12,17 +9,19 @@ defmodule CodeCorps.TaskControllerTest do
   }
 
   @invalid_attrs %{
+    title: nil,
     task_type: "issue",
     status: "nonexistent"
   }
 
-  defp build_payload, do: %{ "data" => %{"type" => "task"}}
-
   describe "index" do
     test "lists all entries", %{conn: conn} do
-      path = conn |> task_path(:index)
-      json = conn |> get(path) |> json_response(200)
-      assert json["data"] == []
+      [task_1, task_2] = insert_pair(:task)
+
+      conn
+      |> request_index
+      |> json_response(200)
+      |> assert_ids_from_response([task_1.id, task_2.id])
     end
 
     test "lists all entries newest first", %{conn: conn} do
@@ -112,18 +111,12 @@ defmodule CodeCorps.TaskControllerTest do
   describe "show" do
     test "shows chosen resource", %{conn: conn} do
       task = insert(:task)
-      path = conn |> task_path(:show, task)
 
-      data = conn |> get(path) |> json_response(200) |> Map.get("data")
-
-      assert data["id"] == "#{task.id}"
-      assert data["type"] == "task"
-      assert data["attributes"]["body"] == task.body
-      assert data["attributes"]["markdown"] == task.markdown
-      assert data["attributes"]["number"] == task.number
-      assert data["attributes"]["task-type"] == task.task_type
-      assert data["attributes"]["status"] == task.status
-      assert data["attributes"]["title"] == task.title
+      conn
+      |> request_show(task)
+      |> json_response(200)
+      |> Map.get("data")
+      |> assert_result_id(task.id)
     end
 
     test "shows task by number for project", %{conn: conn} do
@@ -136,9 +129,8 @@ defmodule CodeCorps.TaskControllerTest do
       assert data["type"] == "task"
     end
 
-    test "does not show resource and instead throw error when id is nonexistent", %{conn: conn} do
-      path = conn |> task_path(:show, -1)
-      assert conn |> get(path) |> json_response(:not_found)
+    test "renders 404 when id is nonexistent", %{conn: conn} do
+      assert conn |> request_show(:not_found) |> json_response(404)
     end
   end
 
@@ -146,16 +138,8 @@ defmodule CodeCorps.TaskControllerTest do
     @tag :authenticated
     test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
       project = insert(:project)
-
-      payload =
-        build_payload
-        |> put_attributes(@valid_attrs)
-        |> put_relationships(current_user, project)
-
-      path = conn |> task_path(:create)
-      json = conn |> post(path, payload) |> json_response(201)
-
-      assert json["data"]["id"]
+      attrs = @valid_attrs |> Map.merge(%{project: project, user: current_user})
+      json = conn |> request_create(attrs) |> json_response(201)
 
       # ensure record is reloaded from database before serialized, since number is added
       # on database level upon insert
@@ -163,25 +147,14 @@ defmodule CodeCorps.TaskControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders 422 when data is invalid", %{conn: conn, current_user: current_user} do
+    test "renders 422 when data is invalid", %{conn: conn, current_user: current_user} do
       project = insert(:project)
-
-      payload =
-        build_payload
-        |> put_attributes(@invalid_attrs)
-        |> put_relationships(current_user, project)
-
-      path = conn |> task_path(:create)
-      json = conn |> post(path, payload) |> json_response(422)
-
-      assert json["errors"] != %{}
+      attrs = @invalid_attrs |> Map.merge(%{project: project, user: current_user})
+      assert conn |> request_create(attrs) |> json_response(422)
     end
 
-    test "does not create resource and renders 401 when unauthenticated", %{conn: conn} do
-      payload = build_payload |> put_attributes(@invalid_attrs)
-
-      path = conn |> task_path(:create)
-      assert conn |> post(path, payload) |> json_response(401)
+    test "renders 401 when unauthenticated", %{conn: conn} do
+      assert conn |> request_create |> json_response(401)
     end
   end
 
@@ -189,49 +162,22 @@ defmodule CodeCorps.TaskControllerTest do
     @tag :authenticated
     test "updates and renders chosen resource when data is valid", %{conn: conn, current_user: current_user} do
       task = insert(:task, user: current_user)
-
-      payload =
-        build_payload
-        |> put_id(task.id)
-        |> put_attributes(@valid_attrs)
-
-      path = conn |> task_path(:update, task)
-      json = conn |> put(path, payload) |> json_response(200)
-
-      assert json["data"]["id"]
-      assert Repo.get_by(Task, @valid_attrs)
+      assert conn |> request_update(task, @valid_attrs) |> json_response(200)
     end
 
     @tag :authenticated
-    test "does not update chosen resource and renders errors when data is invalid", %{conn: conn, current_user: current_user} do
+    test "renders 422 when data is invalid", %{conn: conn, current_user: current_user} do
       task = insert(:task, user: current_user)
-
-      payload =
-        build_payload
-        |> put_id(task.id)
-        |> put_attributes(@invalid_attrs)
-
-      path = conn |> task_path(:update, task)
-      json = conn |> put(path, payload) |> json_response(422)
-
-      assert json["errors"] != %{}
+      assert conn |> request_update(task, @invalid_attrs) |> json_response(422)
     end
 
-    test "does not update resource and renders 401 when unauthenticated", %{conn: conn} do
-      task = insert(:task)
-      payload = build_payload |> put_id(task.id) |> put_attributes(@invalid_attrs)
-
-      path = conn |> task_path(:update, task)
-      assert conn |> put(path, payload) |> json_response(401)
+    test "renders 401 when unauthenticated", %{conn: conn} do
+      assert conn |> request_update |> json_response(401)
     end
 
     @tag :authenticated
     test "does not update resource and renders 403 when not authorized", %{conn: conn} do
-      task = insert(:task)
-      payload = build_payload |> put_id(task.id) |> put_attributes(@invalid_attrs)
-
-      path = conn |> task_path(:update, task)
-      assert conn |> put(path, payload) |> json_response(403)
+      assert conn |> request_update |> json_response(403)
     end
   end
 
