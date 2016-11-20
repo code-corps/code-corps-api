@@ -1,8 +1,6 @@
 defmodule CodeCorps.PreviewControllerTest do
   use CodeCorps.ApiCase, resource_name: :preview
 
-  alias CodeCorps.Preview
-
   @valid_attrs %{markdown: "A **strong** element"}
 
   describe "create" do

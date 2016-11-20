@@ -27,9 +27,9 @@ defmodule CodeCorps.TaskControllerTest do
     test "lists all entries newest first", %{conn: conn} do
       # Has to be done manually. Inserting as a list is too quick.
       # Field lacks the resolution to differentiate.
-      task_1 = insert(:task, inserted_at: Ecto.DateTime.cast!("2000-01-15T00:00:10"))
-      task_2 = insert(:task, inserted_at: Ecto.DateTime.cast!("2000-01-15T00:00:20"))
-      task_3 = insert(:task, inserted_at: Ecto.DateTime.cast!("2000-01-15T00:00:30"))
+      task_1 = insert(:task, inserted_at: Timex.to_date({2000, 1, 1}))
+      task_2 = insert(:task, inserted_at: Timex.to_date({2000, 1, 2}))
+      task_3 = insert(:task, inserted_at: Timex.to_date({2000, 1, 3}))
 
       path = conn |> task_path(:index)
       json = conn |> get(path) |> json_response(200)

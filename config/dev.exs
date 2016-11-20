@@ -12,7 +12,6 @@ config :code_corps, CodeCorps.Endpoint,
   code_reloader: true,
   check_origin: false
 
-
 # Watch static and templates for browser reloading.
 config :code_corps, CodeCorps.Endpoint,
   live_reload: [
@@ -47,6 +46,7 @@ config :guardian, Guardian,
   secret_key: "e62fb6e2746f6b1bf8b5b735ba816c2eae1d5d76e64f18f3fc647e308b0c159e"
 
 config :code_corps, :analytics, CodeCorps.Analytics.InMemoryAPI
+config :code_corps, :stripe, Stripe
 
 config :sentry,
   environment_name: Mix.env || :dev

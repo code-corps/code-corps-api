@@ -39,7 +39,8 @@ defmodule CodeCorps.Mixfile do
         :scrivener_ecto,
         :segment,
         :sentry,
-        :stripity_stripe
+        :stripity_stripe,
+        :timex_ecto
       ]
     ]
   end
@@ -84,7 +85,9 @@ defmodule CodeCorps.Mixfile do
       {:scrivener_ecto, "~> 1.0"}, # DB query pagination
       {:segment, github: "stueccles/analytics-elixir"}, # Segment analytics
       {:sentry, "~> 1.0"}, # Sentry error tracking
-      {:stripity_stripe, "~> 2.0.0-alpha.1"} # Stripe
+      {:stripity_stripe, "~> 2.0.0-alpha.2"}, # Stripe
+      {:timex, "~> 3.0"},
+      {:timex_ecto, "~> 3.0"}
     ]
   end
 

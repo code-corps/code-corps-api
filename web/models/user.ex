@@ -31,10 +31,9 @@ defmodule CodeCorps.User do
     field :state_transition, :string, virtual: true
 
     has_one :slugged_route, SluggedRoute
+    has_one :stripe_customer, CodeCorps.StripeCustomer
 
-    has_many :organization_memberships,
-      CodeCorps.OrganizationMembership,
-      foreign_key: :member_id
+    has_many :organization_memberships, CodeCorps.OrganizationMembership, foreign_key: :member_id
     has_many :organizations, through: [:organization_memberships, :organization]
 
     has_many :user_categories, CodeCorps.UserCategory

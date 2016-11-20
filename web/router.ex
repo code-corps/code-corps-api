@@ -38,6 +38,30 @@ defmodule CodeCorps.Router do
   end
 
   scope "/", CodeCorps, host: "api." do
+    pipe_through [:api, :bearer_auth, :ensure_auth, :current_user]
+
+    resources "/categories", CategoryController, only: [:create, :update]
+    resources "/comments", CommentController, only: [:create, :update]
+    resources "/donation-goals", DonationGoalController, only: [:create, :update, :delete]
+    resources "/organizations", OrganizationController, only: [:create, :update]
+    resources "/organization-memberships", OrganizationMembershipController, only: [:create, :update, :delete]
+    resources "/previews", PreviewController, only: [:create]
+    resources "/projects", ProjectController, only: [:create, :update]
+    get "/projects/:id/stripe-auth", StripeAuthController, :stripe_auth
+    resources "/project-categories", ProjectCategoryController, only: [:create, :delete]
+    resources "/project-skills", ProjectSkillController, only: [:create, :delete]
+    resources "/roles", RoleController, only: [:create]
+    resources "/role-skills", RoleSkillController, only: [:create, :delete]
+    resources "/skills", SkillController, only: [:create]
+    resources "/stripe-customers", StripeCustomerController, only: [:show, :create]
+    resources "/tasks", TaskController, only: [:create, :update]
+    resources "/users", UserController, only: [:update]
+    resources "/user-categories", UserCategoryController, only: [:create, :delete]
+    resources "/user-roles", UserRoleController, only: [:create, :delete]
+    resources "/user-skills", UserSkillController, only: [:create, :delete]
+  end
+
+  scope "/", CodeCorps, host: "api." do
     pipe_through [:api, :bearer_auth, :current_user]
 
     post "/token", TokenController, :create
@@ -68,26 +92,5 @@ defmodule CodeCorps.Router do
     get "/:slug/:project_slug", ProjectController, :show
   end
 
-  scope "/", CodeCorps, host: "api." do
-    pipe_through [:api, :bearer_auth, :ensure_auth, :current_user]
 
-    resources "/categories", CategoryController, only: [:create, :update]
-    resources "/comments", CommentController, only: [:create, :update]
-    resources "/donation-goals", DonationGoalController, only: [:create, :update, :delete]
-    resources "/organizations", OrganizationController, only: [:create, :update]
-    resources "/organization-memberships", OrganizationMembershipController, only: [:create, :update, :delete]
-    resources "/previews", PreviewController, only: [:create]
-    resources "/projects", ProjectController, only: [:create, :update]
-    get "/projects/:id/stripe-auth", StripeAuthController, :stripe_auth
-    resources "/project-categories", ProjectCategoryController, only: [:create, :delete]
-    resources "/project-skills", ProjectSkillController, only: [:create, :delete]
-    resources "/roles", RoleController, only: [:create]
-    resources "/role-skills", RoleSkillController, only: [:create, :delete]
-    resources "/skills", SkillController, only: [:create]
-    resources "/tasks", TaskController, only: [:create, :update]
-    resources "/users", UserController, only: [:update]
-    resources "/user-categories", UserCategoryController, only: [:create, :delete]
-    resources "/user-roles", UserRoleController, only: [:create, :delete]
-    resources "/user-skills", UserSkillController, only: [:create, :delete]
-  end
 end
