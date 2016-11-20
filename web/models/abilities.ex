@@ -12,6 +12,7 @@ defmodule Canary.Abilities do
   alias CodeCorps.Role
   alias CodeCorps.RoleSkill
   alias CodeCorps.Skill
+  alias CodeCorps.StripeAccount
   alias CodeCorps.StripeCustomer
   alias CodeCorps.User
   alias CodeCorps.UserCategory
@@ -91,6 +92,8 @@ defmodule Canary.Abilities do
     def can?(%User{} = user, :delete, %RoleSkill{}), do: RoleSkillPolicy.delete?(user)
 
     def can?(%User{} = user, :create, Skill), do: SkillPolicy.create?(user)
+
+    def can?(%User{} = user, :show, %StripeAccount{}=stripe_account), do: StripeAccountPolicy.show?(user, stripe_account)
 
     def can?(%User{} = user, :create, %Changeset{data: %StripeCustomer{}} = changeset), do: StripeCustomerPolicy.create?(user, changeset)
     def can?(%User{} = user, :show, %StripeCustomer{} = stripe_customer), do: StripeCustomerPolicy.show?(user, stripe_customer)
