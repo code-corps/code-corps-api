@@ -1224,7 +1224,7 @@ A Stripe account belongs to an organization.
 
 ## Stripe Accounts [/stripe-accounts]
 
-### List all Stripe accounts [GET]
+### Create a Stripe account [POST]
 
 + Request
 
@@ -1233,9 +1233,9 @@ A Stripe account belongs to an organization.
             Accept: application/vnd.api+json
             Authorization: Bearer {token}
 
-+ Response 200 (application/vnd.api+json; charset=utf-8)
++ Response 201 (application/vnd.api+json; charset=utf-8)
 
-    + Attributes (Stripe Accounts Response)
+    + Attributes (Stripe Account Response)
 
 + Response 401 (application/vnd.api+json; charset=utf-8)
 
@@ -1245,11 +1245,11 @@ A Stripe account belongs to an organization.
 
     + Attributes (Forbidden Response)
 
++ Response 422 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Unprocessable Entity Response)
+
 ## Stripe Account [/stripe-accounts/{id}]
-
-+ Parameters
-
-    + id (number, required)
 
 ### Retrieve a Stripe account [GET]
 
@@ -1284,7 +1284,7 @@ A Stripe card belongs to a user.
 
 ## Stripe Cards [/stripe-cards]
 
-### List all Stripe cards [GET]
+### Create a Stripe card [POST]
 
 + Request
 
@@ -1293,9 +1293,9 @@ A Stripe card belongs to a user.
             Accept: application/vnd.api+json
             Authorization: Bearer {token}
 
-+ Response 200 (application/vnd.api+json; charset=utf-8)
++ Response 201 (application/vnd.api+json; charset=utf-8)
 
-    + Attributes (Stripe Cards Response)
+    + Attributes (Stripe Card Response)
 
 + Response 401 (application/vnd.api+json; charset=utf-8)
 
@@ -1304,6 +1304,10 @@ A Stripe card belongs to a user.
 + Response 403 (application/vnd.api+json; charset=utf-8)
 
     + Attributes (Forbidden Response)
+
++ Response 422 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Unprocessable Entity Response)
 
 ## Stripe Card [/stripe-cards/{id}]
 
@@ -1344,22 +1348,18 @@ A Stripe customer can have many subscriptions, which are the donations they make
 
 ## Stripe Customers [/stripe-customers]
 
-### Filter by id [GET /stripe-customers{?filter[id]}]
+### Create a Stripe customer [POST]
 
 + Request
-
-    + Attributes
-
-        + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
 
     + Headers
 
             Accept: application/vnd.api+json
             Authorization: Bearer {token}
 
-+ Response 200 (application/vnd.api+json; charset=utf-8)
++ Response 201 (application/vnd.api+json; charset=utf-8)
 
-    + Attributes (Stripe Customers Response)
+    + Attributes (Stripe Customer Response)
 
 + Response 401 (application/vnd.api+json; charset=utf-8)
 
@@ -1369,11 +1369,11 @@ A Stripe customer can have many subscriptions, which are the donations they make
 
     + Attributes (Forbidden Response)
 
++ Response 422 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Unprocessable Entity Response)
+
 ## Stripe Customer [/stripe-customers/{id}]
-
-+ Parameters
-
-    + id (number, required)
 
 ### Retrieve a Stripe customer [GET]
 
@@ -1433,23 +1433,7 @@ The Stripe plan resource allows users to select a monthly donation amount for a 
 
     + Attributes (Unprocessable Entity Response)
 
-### List all Stripe plans [GET]
-
-+ Request
-
-    + Headers
-
-            Accept: application/vnd.api+json
-
-+ Response 200 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Stripe Plans Response)
-
 ## Stripe Plan [/stripe-plans/{id}]
-
-+ Parameters
-
-    + id (number, required)
 
 ### Retrieve a Stripe plan [GET]
 
@@ -1499,31 +1483,6 @@ Stripe subscriptions allow us to charge a customer's card on a recurring basis. 
 + Response 422 (application/vnd.api+json; charset=utf-8)
 
     + Attributes (Unprocessable Entity Response)
-
-### Filter by id [GET /stripe-subscriptions{?filter[id]}]
-
-+ Request
-
-    + Attributes
-
-        + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
-
-    + Headers
-
-            Accept: application/vnd.api+json
-            Authorization: Bearer {token}
-
-+ Response 200 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Stripe Subscriptions Response)
-
-+ Response 401 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (JSON Web Token Invalid Response)
-
-+ Response 403 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Forbidden Response)
 
 ## Stripe Subscription [/stripe-subscriptions/{id}]
 
