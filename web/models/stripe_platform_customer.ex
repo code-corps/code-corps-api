@@ -1,7 +1,7 @@
-defmodule CodeCorps.StripeCustomer do
+defmodule CodeCorps.StripePlatformCustomer do
   use CodeCorps.Web, :model
 
-  schema "stripe_customers" do
+  schema "stripe_platform_customers" do
     field :created, Timex.Ecto.DateTime
     field :currency, :string
     field :delinquent, :boolean
@@ -10,7 +10,7 @@ defmodule CodeCorps.StripeCustomer do
 
     belongs_to :user, CodeCorps.User
 
-    has_many :stripe_cards, CodeCorps.StripeCard, foreign_key: :stripe_customer_id
+    has_many :stripe_cards, CodeCorps.StripeCard, foreign_key: :stripe_platform_customer_id
 
     timestamps()
   end

@@ -1,11 +1,11 @@
-defmodule CodeCorps.Stripe.Adapters.StripeCustomerTest do
+defmodule CodeCorps.Stripe.Adapters.StripePlatformCustomerTest do
   use ExUnit.Case, async: true
 
-  import CodeCorps.Stripe.Adapters.StripeCustomer, only: [to_params: 1, add_non_stripe_attributes: 2]
+  import CodeCorps.Stripe.Adapters.StripePlatformCustomer, only: [to_params: 1, add_non_stripe_attributes: 2]
 
   {:ok, timestamp} = DateTime.from_unix(1479472835)
 
-  @stripe_customer %Stripe.Customer{
+  @stripe_platform_customer %Stripe.Customer{
     id: "cus_9aMOFmqy1esIRE",
     account_balance: 0,
     created: timestamp,
@@ -28,7 +28,7 @@ defmodule CodeCorps.Stripe.Adapters.StripeCustomerTest do
 
   describe "to_params/1" do
     test "converts from stripe map to local properly" do
-      assert @stripe_customer |> to_params == @local_map
+      assert @stripe_platform_customer |> to_params == @local_map
     end
   end
 

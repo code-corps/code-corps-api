@@ -1340,15 +1340,13 @@ A Stripe card belongs to a user.
 
     + Attributes (Record Not Found Response)
 
-# Group Stripe Customers
+# Group Stripe Platform Customers
 
-This resource identifies a customer created on the [Stripe API](https://stripe.com/docs/api#customers).
+This resource identifies a customer created on the [Stripe API](https://stripe.com/docs/api#customers) for the Code Corps platform.
 
-A Stripe customer can have many subscriptions, which are the donations they make to a project.
+## Stripe Platform Customers [/stripe-platform-customers]
 
-## Stripe Customers [/stripe-customers]
-
-### Create a Stripe customer [POST]
+### Create a Stripe platform customer [POST]
 
 + Request
 
@@ -1359,7 +1357,7 @@ A Stripe customer can have many subscriptions, which are the donations they make
 
 + Response 201 (application/vnd.api+json; charset=utf-8)
 
-    + Attributes (Stripe Customer Response)
+    + Attributes (Stripe Platform Customer Response)
 
 + Response 401 (application/vnd.api+json; charset=utf-8)
 
@@ -1373,9 +1371,9 @@ A Stripe customer can have many subscriptions, which are the donations they make
 
     + Attributes (Unprocessable Entity Response)
 
-## Stripe Customer [/stripe-customers/{id}]
+## Stripe Platform Customer [/stripe-platform-customers/{id}]
 
-### Retrieve a Stripe customer [GET]
+### Retrieve a Stripe platform customer [GET]
 
 + Request
 
@@ -1386,7 +1384,7 @@ A Stripe customer can have many subscriptions, which are the donations they make
 
 + Response 200 (application/vnd.api+json; charset=utf-8)
 
-    + Attributes (Stripe Customer Response)
+    + Attributes (Stripe Platform Customer Response)
 
 + Response 401 (application/vnd.api+json; charset=utf-8)
 
@@ -2692,7 +2690,7 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + data(array[Stripe Card Resource])
 + include JSON API Version
 
-## Stripe Customer Attributes (object)
+## Stripe Platform Customer Attributes (object)
 + created: `2016-07-08T03:03:51.967Z` (string) - A timestamp, indicating when the customer was created by Stripe.
 + currency: `usd` (string)
 + delinquent: `true` (boolean) - Whether or not the latest charge for the customer’s latest invoice has failed.
@@ -2701,25 +2699,23 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + `inserted-at`: `2014-07-07T18:01:26.000Z` (string)
 + `updated-at`: `2014-07-07T18:01:26.000Z` (string)
 
-## Stripe Customer Resource (object)
-+ include Stripe Customer Resource Identifier
-+ attributes(Stripe Customer Attributes)
+## Stripe Platform Customer Resource (object)
++ include Stripe Platform Customer Resource Identifier
++ attributes(Stripe Platform Customer Attributes)
 + relationships
-    + subscriptions
-      + data(Stripe Subscription Resource Identifier)
     + user
       + data(User Resource Identifier)
 
-## Stripe Customer Resource Identifier (object)
+## Stripe Platform Customer Resource Identifier (object)
 + id: `1` (string, required)
-+ type: `stripe-customer` (string, required)
++ type: `stripe-platform-customer` (string, required)
 
-## Stripe Customer Response (object)
-+ data(Stripe Customer Resource)
+## Stripe Platform Customer Response (object)
++ data(Stripe Platform Customer Resource)
 + include JSON API Version
 
-## Stripe Customers Response (object)
-+ data(array[Stripe Customer Resource])
+## Stripe Platform Customers Response (object)
++ data(array[Stripe Platform Customer Resource])
 + include JSON API Version
 
 ## Stripe Plan Attributes (object)
@@ -2773,8 +2769,8 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + include Stripe Subscription Resource Identifier
 + attributes(Stripe Subscription Attributes)
 + relationships
-    + `stripe-customer`
-        + data(Stripe Customer Resource Identifier)
+    + `stripe-platform-customer`
+        + data(Stripe Platform Customer Resource Identifier)
     + `stripe-plan`
         + data(Stripe Plan Resource Identifier)
 
@@ -2878,8 +2874,8 @@ This endpoint allows you to check whether a username is valid (by running a vali
       + data(Slugged Route Resource Identifier)
   + `stripe-cards` (object)
       + data(array[Stripe Card Resource Identifier])
-  + `stripe-customer` (object)
-      + data(Stripe Customer Resource Identifier)
+  + `stripe-platform-customer` (object)
+      + data(Stripe Platform Customer Resource Identifier)
   + `user-categories` (object)
       + data(array[User Category Resource Identifier])
   + `user-roles` (object)

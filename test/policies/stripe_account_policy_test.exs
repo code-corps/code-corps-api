@@ -1,10 +1,7 @@
 defmodule CodeCorps.StripeAccountPolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.StripeAccount
   import CodeCorps.StripeAccountPolicy, only: [show?: 2]
-
-  alias CodeCorps.StripeAccount
 
   describe "show?" do
     test "returns true when user is an admin" do
