@@ -1,12 +1,12 @@
-defmodule CodeCorps.StripeCustomerController do
+defmodule CodeCorps.StripePlatformCustomerController do
   use CodeCorps.Web, :controller
   use JaResource
 
-  alias CodeCorps.StripeCustomer
+  alias CodeCorps.StripePlatformCustomer
   alias CodeCorps.Stripe.Adapters
 
-  plug :load_and_authorize_resource, model: StripeCustomer, only: [:show]
-  plug :load_and_authorize_changeset, model: StripeCustomer, only: [:create]
+  plug :load_and_authorize_resource, model: StripePlatformCustomer, only: [:show]
+  plug :load_and_authorize_changeset, model: StripePlatformCustomer, only: [:create]
   plug JaResource
 
   def handle_create(conn, attributes) do
@@ -17,8 +17,8 @@ defmodule CodeCorps.StripeCustomerController do
 
   defp handle_stripe_response({:ok, stripe_response}, attributes, _conn) do
     stripe_response
-    |> Adapters.StripeCustomer.to_params
-    |> Adapters.StripeCustomer.add_non_stripe_attributes(attributes)
+    |> Adapters.StripePlatformCustomer.to_params
+    |> Adapters.StripePlatformCustomer.add_non_stripe_attributes(attributes)
     |> create_record
   end
 
@@ -29,8 +29,8 @@ defmodule CodeCorps.StripeCustomerController do
   end
 
   defp create_record(attributes) do
-    %StripeCustomer{}
-    |> StripeCustomer.create_changeset(attributes)
+    %StripePlatformCustomer{}
+    |> StripePlatformCustomer.create_changeset(attributes)
     |> Repo.insert
   end
 end

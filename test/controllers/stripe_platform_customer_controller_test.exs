@@ -1,27 +1,27 @@
-defmodule CodeCorps.StripeCustomerControllerTest do
-  use CodeCorps.ApiCase, resource_name: :stripe_customer
+defmodule CodeCorps.StripePlatformCustomerControllerTest do
+  use CodeCorps.ApiCase, resource_name: :stripe_platform_customer
 
   describe "show" do
     @tag :authenticated
     test "shows chosen resource when user is authenticated and authorized", %{conn: conn, current_user: current_user} do
-      stripe_customer = insert(:stripe_customer, user: current_user)
+      stripe_platform_customer = insert(:stripe_platform_customer, user: current_user)
 
       conn
-      |> request_show(stripe_customer)
+      |> request_show(stripe_platform_customer)
       |> json_response(200)
       |> Map.get("data")
-      |> assert_result_id(stripe_customer.id)
+      |> assert_result_id(stripe_platform_customer.id)
     end
 
     test "renders 401 when unauthenticated", %{conn: conn} do
-      stripe_customer = insert(:stripe_customer)
-      assert conn |> request_show(stripe_customer) |> json_response(401)
+      stripe_platform_customer = insert(:stripe_platform_customer)
+      assert conn |> request_show(stripe_platform_customer) |> json_response(401)
     end
 
     @tag :authenticated
     test "renders 403 when not authorized", %{conn: conn} do
-      stripe_customer = insert(:stripe_customer)
-      assert conn |> request_show(stripe_customer) |> json_response(403)
+      stripe_platform_customer = insert(:stripe_platform_customer)
+      assert conn |> request_show(stripe_platform_customer) |> json_response(403)
     end
 
     @tag :authenticated

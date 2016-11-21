@@ -1,7 +1,7 @@
-defmodule CodeCorps.StripeCustomerTest do
+defmodule CodeCorps.StripePlatformCustomerTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.StripeCustomer
+  alias CodeCorps.StripePlatformCustomer
 
   @valid_attrs %{
     id_from_stripe: "abc123"
@@ -14,12 +14,12 @@ defmodule CodeCorps.StripeCustomerTest do
       user_id = insert(:user).id
 
       changes = Map.merge(@valid_attrs, %{user_id: user_id})
-      changeset = StripeCustomer.create_changeset(%StripeCustomer{}, changes)
+      changeset = StripePlatformCustomer.create_changeset(%StripePlatformCustomer{}, changes)
       assert changeset.valid?
     end
 
     test "reports as invalid when attributes are invalid" do
-      changeset = StripeCustomer.create_changeset(%StripeCustomer{}, @invalid_attrs)
+      changeset = StripePlatformCustomer.create_changeset(%StripePlatformCustomer{}, @invalid_attrs)
       refute changeset.valid?
 
       assert changeset.errors[:id_from_stripe] == {"can't be blank", []}
@@ -29,8 +29,9 @@ defmodule CodeCorps.StripeCustomerTest do
     test "ensures associations link to records that exist" do
       attrs =  @valid_attrs |> Map.merge(%{user_id: -1})
 
-      { result, changeset } =
-        StripeCustomer.create_changeset(%StripeCustomer{}, attrs)
+      {result, changeset} =
+        %StripePlatformCustomer{}
+        |> StripePlatformCustomer.create_changeset(attrs)
         |> Repo.insert
 
       assert result == :error

@@ -1344,7 +1344,7 @@ A Stripe card belongs to a user.
 
 This resource identifies a customer created on the [Stripe API](https://stripe.com/docs/api#customers) for the Code Corps platform.
 
-## Stripe Platform Customers [/stripe-customers]
+## Stripe Platform Customers [/stripe-platform-customers]
 
 ### Create a Stripe platform customer [POST]
 
@@ -1371,7 +1371,7 @@ This resource identifies a customer created on the [Stripe API](https://stripe.c
 
     + Attributes (Unprocessable Entity Response)
 
-## Stripe Platform Customer [/stripe-customers/{id}]
+## Stripe Platform Customer [/stripe-platform-customers/{id}]
 
 ### Retrieve a Stripe platform customer [GET]
 
@@ -2708,7 +2708,7 @@ This endpoint allows you to check whether a username is valid (by running a vali
 
 ## Stripe Platform Customer Resource Identifier (object)
 + id: `1` (string, required)
-+ type: `stripe-customer` (string, required)
++ type: `stripe-platform-customer` (string, required)
 
 ## Stripe Platform Customer Response (object)
 + data(Stripe Platform Customer Resource)
@@ -2769,7 +2769,7 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + include Stripe Subscription Resource Identifier
 + attributes(Stripe Subscription Attributes)
 + relationships
-    + `stripe-customer`
+    + `stripe-platform-customer`
         + data(Stripe Platform Customer Resource Identifier)
     + `stripe-plan`
         + data(Stripe Plan Resource Identifier)
@@ -2874,7 +2874,7 @@ This endpoint allows you to check whether a username is valid (by running a vali
       + data(Slugged Route Resource Identifier)
   + `stripe-cards` (object)
       + data(array[Stripe Card Resource Identifier])
-  + `stripe-customer` (object)
+  + `stripe-platform-customer` (object)
       + data(Stripe Platform Customer Resource Identifier)
   + `user-categories` (object)
       + data(array[User Category Resource Identifier])
