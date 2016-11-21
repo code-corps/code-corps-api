@@ -32,6 +32,7 @@ defmodule Canary.Abilities do
   alias CodeCorps.RolePolicy
   alias CodeCorps.RoleSkillPolicy
   alias CodeCorps.SkillPolicy
+  alias CodeCorps.StripeAccountPolicy
   alias CodeCorps.StripePlatformCustomerPolicy
   alias CodeCorps.UserPolicy
   alias CodeCorps.UserCategoryPolicy
