@@ -19,12 +19,12 @@ defmodule CodeCorps.Helpers.Policy do
   def get_membership(%Changeset{changes: %{organization_id: organization_id}}, %User{id: user_id}), do: do_get_membership(organization_id, user_id)
   def get_membership(%Project{organization_id: organization_id}, %User{id: user_id}), do: do_get_membership(organization_id, user_id)
   def get_membership(%Organization{id: organization_id}, %User{id: user_id}), do: do_get_membership(organization_id, user_id)
+  def get_membership(%StripeAccount{organization_id: organization_id}, %User{id: user_id}), do: do_get_membership(organization_id, user_id)
   defp do_get_membership(organization_id, user_id) do
     OrganizationMembership
     |> where([m], m.member_id == ^user_id and m.organization_id == ^organization_id)
     |> Repo.one
   end
-  def get_membership(%StripeAccount{organization_id: organization_id}, %User{id: user_id}), do: do_get_membership(organization_id, user_id)
 
   @doc """
   Retrieves a project record, from a model struct, or an `Ecto.Changeset` containing a `project_id` field

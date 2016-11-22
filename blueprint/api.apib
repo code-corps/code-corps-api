@@ -1276,15 +1276,15 @@ A Stripe account belongs to an organization.
 
     + Attributes (Record Not Found Response)
 
-# Group Stripe Card
+# Group Stripe Platform Card
 
 This resource identifies a card created on the [Stripe API](https://stripe.com/docs/api#cards).
 
-A Stripe card belongs to a user.
+A Stripe platform card belongs to a user.
 
-## Stripe Cards [/stripe-cards]
+## Stripe Platform Cards [/stripe-platform-cards]
 
-### Create a Stripe card [POST]
+### Create a Stripe platform card [POST]
 
 + Request
 
@@ -1295,7 +1295,7 @@ A Stripe card belongs to a user.
 
 + Response 201 (application/vnd.api+json; charset=utf-8)
 
-    + Attributes (Stripe Card Response)
+    + Attributes (Stripe Platform Card Response)
 
 + Response 401 (application/vnd.api+json; charset=utf-8)
 
@@ -1309,13 +1309,13 @@ A Stripe card belongs to a user.
 
     + Attributes (Unprocessable Entity Response)
 
-## Stripe Card [/stripe-cards/{id}]
+## Stripe Platform Card [/stripe-platform-cards/{id}]
 
 + Parameters
 
     + id (number, required)
 
-### Retrieve a Stripe card [GET]
+### Retrieve a Stripe platform card [GET]
 
 + Request
 
@@ -1326,7 +1326,7 @@ A Stripe card belongs to a user.
 
 + Response 200 (application/vnd.api+json; charset=utf-8)
 
-    + Attributes (Stripe Card Response)
+    + Attributes (Stripe Platform Card Response)
 
 + Response 401 (application/vnd.api+json; charset=utf-8)
 
@@ -2647,7 +2647,7 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + data(array[Stripe Account Resource])
 + include JSON API Version
 
-## Stripe Card Attributes (object)
+## Stripe Platform Card Attributes (object)
 + brand: (enum[string]) - Card brand.
     + Members
         + `Visa`
@@ -2671,23 +2671,23 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + name: `John Doe` (string) - Cardholder name
 + `updated-at`: `2014-07-07T18:01:26.000Z` (string)
 
-## Stripe Card Resource (object)
-+ include Stripe Card Resource Identifier
-+ attributes(Stripe Card Attributes)
+## Stripe Platform Card Resource (object)
++ include Stripe Platform Card Resource Identifier
++ attributes(Stripe Platform Card Attributes)
 + relationships
     + user
         + data(User Resource Identifier)
 
-## Stripe Card Resource Identifier (object)
+## Stripe Platform Card Resource Identifier (object)
 + id: `1` (string, required)
-+ type: `stripe-card` (string, required)
++ type: `stripe-platform-card` (string, required)
 
-## Stripe Card Response (object)
-+ data(Stripe Card Resource)
+## Stripe Platform Card Response (object)
++ data(Stripe Platform Card Resource)
 + include JSON API Version
 
-## Stripe Cards Response (object)
-+ data(array[Stripe Card Resource])
+## Stripe Platform Cards Response (object)
++ data(array[Stripe Platform Card Resource])
 + include JSON API Version
 
 ## Stripe Platform Customer Attributes (object)
@@ -2872,8 +2872,8 @@ This endpoint allows you to check whether a username is valid (by running a vali
       + data(array[Organization Membership Resource Identifier])
   + `slugged-route` (object)
       + data(Slugged Route Resource Identifier)
-  + `stripe-cards` (object)
-      + data(array[Stripe Card Resource Identifier])
+  + `stripe-platform-cards` (object)
+      + data(array[Stripe Platform Card Resource Identifier])
   + `stripe-platform-customer` (object)
       + data(Stripe Platform Customer Resource Identifier)
   + `user-categories` (object)
