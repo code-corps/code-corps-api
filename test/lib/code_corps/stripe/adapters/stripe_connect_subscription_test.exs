@@ -1,7 +1,7 @@
-defmodule CodeCorps.Stripe.Adapters.StripeSubscriptionTest do
+defmodule CodeCorps.Stripe.Adapters.StripeConnectSubscriptionTest do
   use ExUnit.Case, async: true
 
-  import CodeCorps.Stripe.Adapters.StripeSubscription, only: [params_from_stripe: 1]
+  import CodeCorps.Stripe.Adapters.StripeConnectSubscription, only: [params_from_stripe: 1]
 
   @stripe_map %{"id" => "str_123", "stripe_connect_plan" => "pln_123", "foo" => "bar", "customer" => "cus_123"}
   @local_map %{"id_from_stripe" => "str_123", "plan_id_from_stripe" => "pln_123", "foo" => "bar", "customer_id_from_stripe" => "cus_123"}

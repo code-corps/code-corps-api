@@ -1449,15 +1449,15 @@ The Stripe Connect plan resource allows users to select a monthly donation amoun
 
     + Attributes (Record Not Found Response)
 
-# Group Stripe Subscriptions
+# Group Stripe Connect Subscriptions
 
-This endpoint is for creating, editing and returning Stripe Subscriptions.
+This endpoint is for creating, editing and returning Stripe Connect Subscriptions.
 
-Stripe subscriptions allow us to charge a customer's card on a recurring basis. A subscription ties a customer to a particular plan. The default plans will be monthly $0.01 cent plans with an X multiplier to set the actual donation amount.
+Stripe Connect subscriptions allow us to charge a customer's card on a recurring basis. A subscription ties a customer to a particular plan. The default plans will be monthly $0.01 cent plans with an X multiplier to set the actual donation amount.
 
-## Stripe Subscriptions [/stripe-subscriptions]
+## Stripe Connect Subscriptions [/stripe-connect-subscriptions]
 
-### Create a Stripe subscription [POST]
+### Create a Stripe Connect subscription [POST]
 
 + Request
 
@@ -1468,7 +1468,7 @@ Stripe subscriptions allow us to charge a customer's card on a recurring basis. 
 
 + Response 201 (application/vnd.api+json; charset=utf-8)
 
-    + Attributes (Stripe Subscription Response)
+    + Attributes (Stripe Connect Subscription Response)
 
 + Response 401 (application/vnd.api+json; charset=utf-8)
 
@@ -1482,13 +1482,13 @@ Stripe subscriptions allow us to charge a customer's card on a recurring basis. 
 
     + Attributes (Unprocessable Entity Response)
 
-## Stripe Subscription [/stripe-subscriptions/{id}]
+## Stripe Connect Subscription [/stripe-connect-subscriptions/{id}]
 
 + Parameters
 
     + id (number, required)
 
-### Retrieve a Stripe subscription [GET]
+### Retrieve a Stripe Connect subscription [GET]
 
 + Request
 
@@ -1499,7 +1499,7 @@ Stripe subscriptions allow us to charge a customer's card on a recurring basis. 
 
 + Response 200 (application/vnd.api+json; charset=utf-8)
 
-    + Attributes (Stripe Subscription Response)
+    + Attributes (Stripe Connect Subscription Response)
 
 + Response 401 (application/vnd.api+json; charset=utf-8)
 
@@ -1513,7 +1513,7 @@ Stripe subscriptions allow us to charge a customer's card on a recurring basis. 
 
     + Attributes (Record Not Found Response)
 
-### Update a Stripe subscription [PATCH /subscriptions/{id}]
+### Update a Stripe Connect subscription [PATCH /subscriptions/{id}]
 
 + Request
 
@@ -1524,7 +1524,7 @@ Stripe subscriptions allow us to charge a customer's card on a recurring basis. 
 
 + Response 201 (application/vnd.api+json; charset=utf-8)
 
-    + Attributes (Stripe Subscription Response)
+    + Attributes (Stripe Connect Subscription Response)
 
 + Response 403 (application/vnd.api+json; charset=utf-8)
 
@@ -2745,7 +2745,7 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + data(array[Stripe Connect Plan Resource])
 + include JSON API Version
 
-## Stripe Subscription Attributes (object)
+## Stripe Connect Subscription Attributes (object)
 + `cancelled-at`: null (string) - If the subscription has been canceled, the date of that cancellation.
 + created: `2016-07-08T03:03:51.967Z` (string) - A timestamp, indicating when the plan was created by Stripe
 + `current-period-end`: `2016-08-08T03:03:51.967Z` (string) - End of the current period that the subscription has been invoiced for. At the end of this period, a new invoice will be created.
@@ -2765,25 +2765,25 @@ This endpoint allows you to check whether a username is valid (by running a vali
       + `unpaid`
 + `updated-at`: `2014-07-07T18:01:26.000Z` (string)
 
-## Stripe Subscription Resource (object)
-+ include Stripe Subscription Resource Identifier
-+ attributes(Stripe Subscription Attributes)
+## Stripe Connect Subscription Resource (object)
++ include Stripe Connect Subscription Resource Identifier
++ attributes(Stripe Connect Subscription Attributes)
 + relationships
     + `stripe-platform-customer`
         + data(Stripe Platform Customer Resource Identifier)
     + `stripe-connect-plan`
         + data(Stripe Connect Plan Resource Identifier)
 
-## Stripe Subscription Resource Identifier
+## Stripe Connect Subscription Resource Identifier
 + id: `1` (string, required)
-+ type: `stripe-subscription` (string, required)
++ type: `stripe-connect-subscription` (string, required)
 
-## Stripe Subscription Response
-+ data(Stripe Subscription Resource)
+## Stripe Connect Subscription Response
++ data(Stripe Connect Subscription Resource)
 + include JSON API Version
 
-## Stripe Subscriptions Response
-+ data(array[Stripe Subscription Resource])
+## Stripe Connect Subscriptions Response
++ data(array[Stripe Connect Subscription Resource])
 + include JSON API Version
 
 ## Task Attributes (object)

@@ -1,7 +1,7 @@
-defmodule CodeCorps.StripeSubscriptionTest do
+defmodule CodeCorps.StripeConnectSubscriptionTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.StripeSubscription
+  alias CodeCorps.StripeConnectSubscription
 
   @valid_attrs %{
     id_from_stripe: "abc123",
@@ -16,12 +16,12 @@ defmodule CodeCorps.StripeSubscriptionTest do
       user_id = insert(:user).id
 
       changes = Map.merge(@valid_attrs, %{stripe_connect_plan_id: stripe_connect_plan_id, user_id: user_id})
-      changeset = StripeSubscription.create_changeset(%StripeSubscription{}, changes)
+      changeset = StripeConnectSubscription.create_changeset(%StripeConnectSubscription{}, changes)
       assert changeset.valid?
     end
 
     test "reports as invalid when attributes are invalid" do
-      changeset = StripeSubscription.create_changeset(%StripeSubscription{}, @invalid_attrs)
+      changeset = StripeConnectSubscription.create_changeset(%StripeConnectSubscription{}, @invalid_attrs)
       refute changeset.valid?
 
       assert changeset.errors[:id_from_stripe] == {"can't be blank", []}
@@ -34,7 +34,7 @@ defmodule CodeCorps.StripeSubscriptionTest do
       attrs =  @valid_attrs |> Map.merge(%{stripe_connect_plan_id: -1, user_id: user_id})
 
       { result, changeset } =
-        StripeSubscription.create_changeset(%StripeSubscription{}, attrs)
+        StripeConnectSubscription.create_changeset(%StripeConnectSubscription{}, attrs)
         |> Repo.insert
 
       assert result == :error
@@ -47,7 +47,7 @@ defmodule CodeCorps.StripeSubscriptionTest do
       attrs =  @valid_attrs |> Map.merge(%{stripe_connect_plan_id: stripe_connect_plan_id, user_id: -1})
 
       { result, changeset } =
-        StripeSubscription.create_changeset(%StripeSubscription{}, attrs)
+        StripeConnectSubscription.create_changeset(%StripeConnectSubscription{}, attrs)
         |> Repo.insert
 
       assert result == :error
