@@ -1,7 +1,7 @@
-defmodule CodeCorps.Stripe.Adapters.StripePlanTest do
+defmodule CodeCorps.Stripe.Adapters.StripeConnectPlanTest do
   use ExUnit.Case, async: true
 
-  import CodeCorps.Stripe.Adapters.StripePlan, only: [params_from_stripe: 1]
+  import CodeCorps.Stripe.Adapters.StripeConnectPlan, only: [params_from_stripe: 1]
 
   @stripe_map %{"id" => "str_123", "foo" => "bar"}
   @local_map %{"id_from_stripe" => "str_123", "foo" => "bar"}

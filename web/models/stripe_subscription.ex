@@ -41,21 +41,21 @@ defmodule CodeCorps.StripeSubscription do
     field :start, Ecto.DateTime
     field :status, :string
 
-    belongs_to :stripe_plan, CodeCorps.StripePlan
+    belongs_to :stripe_connect_plan, CodeCorps.StripeConnectPlan
     belongs_to :user, CodeCorps.User
 
     timestamps()
   end
 
-  @permitted_params [:customer_id_from_stripe, :id_from_stripe, :plan_id_from_stripe, :stripe_plan_id, :user_id]
-  @required_params [:id_from_stripe, :plan_id_from_stripe, :stripe_plan_id, :user_id]
+  @permitted_params [:customer_id_from_stripe, :id_from_stripe, :plan_id_from_stripe, :stripe_connect_plan_id, :user_id]
+  @required_params [:id_from_stripe, :plan_id_from_stripe, :stripe_connect_plan_id, :user_id]
 
   def create_changeset(struct, params \\ %{}) do
     struct
     |> cast(params, @permitted_params)
     |> validate_required(@required_params)
     |> unique_constraint(:id_from_stripe)
-    |> assoc_constraint(:stripe_plan)
+    |> assoc_constraint(:stripe_connect_plan)
     |> assoc_constraint(:user)
   end
 end
