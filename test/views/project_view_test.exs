@@ -6,10 +6,12 @@ defmodule CodeCorps.ProjectViewTest do
   test "renders all attributes and relationships properly" do
     organization = insert(:organization)
     project = insert(:project, organization: organization)
-    task = insert(:task, project: project)
+
+    donation_goal = insert(:donation_goal, project: project)
     project_category = insert(:project_category, project: project)
     project_skill = insert(:project_skill, project: project)
-    donation_goal = insert(:donation_goal, project: project)
+    stripe_connect_plan = insert(:stripe_connect_plan, project: project)
+    task = insert(:task, project: project)
 
     rendered_json = render(CodeCorps.ProjectView, "show.json-api", data: project)
 
@@ -55,6 +57,12 @@ defmodule CodeCorps.ProjectViewTest do
                 "type" => "project-skill"
               }
             ]
+          },
+          "stripe-connect-plan" => %{
+            "data" => %{
+              "id" => stripe_connect_plan.id |> Integer.to_string,
+              "type" => "stripe-connect-plan"
+            }
           },
           "tasks" => %{
             "data" => [

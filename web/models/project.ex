@@ -20,6 +20,7 @@ defmodule CodeCorps.Project do
     field :title, :string
 
     belongs_to :organization, CodeCorps.Organization
+    has_one :stripe_connect_plan, CodeCorps.StripeConnectPlan
 
     has_many :donation_goals, CodeCorps.DonationGoal
     has_many :project_categories, CodeCorps.ProjectCategory
