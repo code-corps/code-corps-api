@@ -1398,15 +1398,15 @@ This resource identifies a customer created on the [Stripe API](https://stripe.c
 
     + Attributes (Record Not Found Response)
 
-# Group Stripe Plans
+# Group Stripe Connect Plans
 
-This endpoint is for creating and returning Stripe plans available for projects.
+This endpoint is for creating and returning Stripe Connect plans available for projects.
 
-The Stripe plan resource allows users to select a monthly donation amount for a project. Stripe plans contain the pricing information for different projects and donation levels.
+The Stripe Connect plan resource allows users to select a monthly donation amount for a project. Stripe Connect plans contain the pricing information for different projects and donation levels.
 
-## Stripe Plans [/stripe-plans]
+## Stripe Connect Plans [/stripe-connect-plans]
 
-### Create a Stripe plan [POST]
+### Create a Stripe Connect plan [POST]
 
 + Request
 
@@ -1417,7 +1417,7 @@ The Stripe plan resource allows users to select a monthly donation amount for a 
 
 + Response 201 (application/vnd.api+json; charset=utf-8)
 
-    + Attributes (Stripe Plan Response)
+    + Attributes (Stripe Connect Plan Response)
 
 + Response 401 (application/vnd.api+json; charset=utf-8)
 
@@ -1431,9 +1431,9 @@ The Stripe plan resource allows users to select a monthly donation amount for a 
 
     + Attributes (Unprocessable Entity Response)
 
-## Stripe Plan [/stripe-plans/{id}]
+## Stripe Connect Plan [/stripe-connect-plans/{id}]
 
-### Retrieve a Stripe plan [GET]
+### Retrieve a Stripe Connect plan [GET]
 
 + Request
 
@@ -1443,7 +1443,7 @@ The Stripe plan resource allows users to select a monthly donation amount for a 
 
 + Response 200 (application/vnd.api+json; charset=utf-8)
 
-    + Attributes (Stripe Plan Response)
+    + Attributes (Stripe Connect Plan Response)
 
 + Response 404 (application/vnd.api+json; charset=utf-8)
 
@@ -2718,7 +2718,7 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + data(array[Stripe Platform Customer Resource])
 + include JSON API Version
 
-## Stripe Plan Attributes (object)
+## Stripe Connect Plan Attributes (object)
 + amount: 999 (number) - Describes the amount of a plan in cents.
 + created: `2016-07-08T03:03:51.967Z` (string) - A timestamp, indicating when the plan was created by Stripe
 + `id-from-stripe`: `monthly-donation-1` (string, required)
@@ -2726,23 +2726,23 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + name: `Monthly Donation` (string) - Name of the plan, to be displayed on invoices and in the web interface.
 + `updated-at`: `2014-07-07T18:01:26.000Z` (string)
 
-## Stripe Plan Resource (object)
-+ include Stripe Plan Resource Identifier
-+ attributes(Stripe Plan Attributes)
+## Stripe Connect Plan Resource (object)
++ include Stripe Connect Plan Resource Identifier
++ attributes(Stripe Connect Plan Attributes)
 + relationships
     + project
         + data(Project Resource Identifier)
 
-## Stripe Plan Resource Identifier
+## Stripe Connect Plan Resource Identifier
 + id: `1` (string, required)
-+ type: `stripe-plan` (string, required)
++ type: `stripe-connect-plan` (string, required)
 
-## Stripe Plan Response
-+ data(Stripe Plan Resource)
+## Stripe Connect Plan Response
++ data(Stripe Connect Plan Resource)
 + include JSON API Version
 
-## Stripe Plans Response
-+ data(array[Stripe Plan Resource])
+## Stripe Connect Plans Response
++ data(array[Stripe Connect Plan Resource])
 + include JSON API Version
 
 ## Stripe Subscription Attributes (object)
@@ -2771,8 +2771,8 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + relationships
     + `stripe-platform-customer`
         + data(Stripe Platform Customer Resource Identifier)
-    + `stripe-plan`
-        + data(Stripe Plan Resource Identifier)
+    + `stripe-connect-plan`
+        + data(Stripe Connect Plan Resource Identifier)
 
 ## Stripe Subscription Resource Identifier
 + id: `1` (string, required)

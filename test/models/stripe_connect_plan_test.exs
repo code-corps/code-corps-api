@@ -1,7 +1,7 @@
-defmodule CodeCorps.StripePlanTest do
+defmodule CodeCorps.StripeConnectPlanTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.StripePlan
+  alias CodeCorps.StripeConnectPlan
 
   @valid_attrs %{
     id_from_stripe: "abc123"
@@ -14,12 +14,12 @@ defmodule CodeCorps.StripePlanTest do
       project_id = insert(:project).id
 
       changes = Map.merge(@valid_attrs, %{project_id: project_id})
-      changeset = StripePlan.create_changeset(%StripePlan{}, changes)
+      changeset = StripeConnectPlan.create_changeset(%StripeConnectPlan{}, changes)
       assert changeset.valid?
     end
 
     test "reports as invalid when attributes are invalid" do
-      changeset = StripePlan.create_changeset(%StripePlan{}, @invalid_attrs)
+      changeset = StripeConnectPlan.create_changeset(%StripeConnectPlan{}, @invalid_attrs)
       refute changeset.valid?
 
       assert changeset.errors[:id_from_stripe] == {"can't be blank", []}
@@ -30,7 +30,7 @@ defmodule CodeCorps.StripePlanTest do
       attrs =  @valid_attrs |> Map.merge(%{project_id: -1})
 
       { result, changeset } =
-        StripePlan.create_changeset(%StripePlan{}, attrs)
+        StripeConnectPlan.create_changeset(%StripeConnectPlan{}, attrs)
         |> Repo.insert
 
       assert result == :error

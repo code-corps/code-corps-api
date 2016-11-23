@@ -1,4 +1,4 @@
-defmodule CodeCorps.StripePlan do
+defmodule CodeCorps.StripeConnectPlan do
   @moduledoc """
   Represents a `Plan` object created using the Stripe API
 
@@ -11,7 +11,7 @@ defmodule CodeCorps.StripePlan do
 
   use CodeCorps.Web, :model
 
-  schema "stripe_plans" do
+  schema "stripe_connect_plans" do
     field :amount, :integer
     field :created, Ecto.DateTime
     field :id_from_stripe, :string, null: false
