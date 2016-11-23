@@ -6,7 +6,7 @@ defmodule CodeCorps.Stripe.Adapters.StripeConnectPlanTest do
   {:ok, timestamp} = DateTime.from_unix(1479472835)
 
   @stripe_connect_plan %Stripe.Plan{
-    id: "plan_9aMOFmqy1esIRE",
+    id: "month",
     amount: 5000,
     created: timestamp,
     currency: "usd",
@@ -22,7 +22,7 @@ defmodule CodeCorps.Stripe.Adapters.StripeConnectPlanTest do
   @local_map %{
     "amount" => 5000,
     "created" => timestamp,
-    "id_from_stripe" => "plan_9aMOFmqy1esIRE",
+    "id_from_stripe" => "month",
     "name" => "Monthly subscription for Code Corps"
   }
 

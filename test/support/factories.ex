@@ -119,6 +119,16 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def stripe_connect_subscription_factory do
+    stripe_connect_plan = build(:stripe_connect_plan)
+    %CodeCorps.StripeConnectSubscription{
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
+      plan_id_from_stripe: stripe_connect_plan.id_from_stripe,
+      stripe_connect_plan: stripe_connect_plan,
+      user: build(:user)
+    }
+  end
+
   def stripe_platform_customer_factory do
     %CodeCorps.StripePlatformCustomer{
       created: Timex.now,

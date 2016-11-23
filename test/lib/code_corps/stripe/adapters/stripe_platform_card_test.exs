@@ -4,7 +4,7 @@ defmodule CodeCorps.Stripe.Adapters.StripePlatformCardTest do
   import CodeCorps.Stripe.Adapters.StripePlatformCard, only: [to_params: 2]
 
   @stripe_platform_card %Stripe.Card{
-    id: "card_19IHPnBKl1F6IRFf8w7gpdOe",
+    id: "card_123",
     metadata: %{},
     address_city: nil,
     address_country: nil,
@@ -16,7 +16,7 @@ defmodule CodeCorps.Stripe.Adapters.StripePlatformCardTest do
     address_zip_check: nil,
     brand: "Visa",
     country: "US",
-    customer: "cus_123456",
+    customer: "cus_123",
     cvc_check: "unchecked",
     dynamic_last4: nil,
     exp_month: 11,
@@ -29,12 +29,12 @@ defmodule CodeCorps.Stripe.Adapters.StripePlatformCardTest do
   }
 
   @local_map %{
-    "id_from_stripe" => "card_19IHPnBKl1F6IRFf8w7gpdOe",
+    "id_from_stripe" => "card_123",
     "brand" => "Visa",
     "exp_month" => 11,
     "exp_year" => 2016,
     "last4" => "4242",
-    "customer_id_from_stripe" => "cus_123456",
+    "customer_id_from_stripe" => "cus_123",
     "cvc_check" => "unchecked",
     "name" => nil
   }
