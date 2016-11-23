@@ -54,6 +54,7 @@ defmodule CodeCorps.Router do
     resources "/role-skills", RoleSkillController, only: [:create, :delete]
     resources "/skills", SkillController, only: [:create]
     resources "/stripe-connect-accounts", StripeConnectAccountController, only: [:show, :create]
+    resources "/stripe-connect-plans", StripeConnectPlanController, only: [:show, :create]
     resources "/stripe-platform-cards", StripePlatformCardController, only: [:show, :create]
     resources "/stripe-platform-customers", StripePlatformCustomerController, only: [:show, :create]
     resources "/tasks", TaskController, only: [:create, :update]

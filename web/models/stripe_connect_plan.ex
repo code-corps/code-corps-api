@@ -24,7 +24,7 @@ defmodule CodeCorps.StripeConnectPlan do
 
   def create_changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:id_from_stripe, :project_id])
+    |> cast(params, [:amount, :created, :id_from_stripe, :name, :project_id])
     |> validate_required([:id_from_stripe, :project_id])
     |> unique_constraint(:id_from_stripe)
     |> assoc_constraint(:project)
