@@ -11,26 +11,18 @@ defmodule CodeCorps.StripePlatformCustomerController do
 
   def handle_create(conn, attributes) do
     attributes
-    |> CodeCorps.StripeService.create_customer
-    |> handle_stripe_response(attributes, conn)
+    |> CodeCorps.Stripe.StripePlatformCustomer.create
+    |> handle_create_result(conn)
   end
 
-  defp handle_stripe_response({:ok, stripe_response}, attributes, _conn) do
-    stripe_response
-    |> Adapters.StripePlatformCustomer.to_params
-    |> Adapters.StripePlatformCustomer.add_non_stripe_attributes(attributes)
-    |> create_record
+  defp handle_create_result({:ok, %StripePlatformCustomer{}} = result, conn) do
+    result |> CodeCorps.Analytics.Segment.track(:created, conn)
   end
 
-  defp handle_stripe_response({:error, %Stripe.APIError{}}, _, conn) do
+  defp handle_create_result({:error, %Stripe.APIErrorResponse{}}, conn) do
     conn
     |> put_status(500)
     |> render(CodeCorps.ErrorView, "500.json-api")
   end
-
-  defp create_record(attributes) do
-    %StripePlatformCustomer{}
-    |> StripePlatformCustomer.create_changeset(attributes)
-    |> Repo.insert
-  end
+  defp handle_create_result({:error, %Ecto.Changeset{} = changeset}, _conn), do: changeset
 end

@@ -2,6 +2,15 @@ defmodule CodeCorps.ErrorView do
   use CodeCorps.Web, :view
   use JaSerializer.PhoenixView
 
+  def render("stripe-400.json-api", _assigns) do
+    %{
+      id: "INVALID_GRANT",
+      title: "This authorization code has already been used. All tokens issued with this code have been revoked.",
+      status: 400
+    }
+    |> JaSerializer.ErrorSerializer.format
+  end
+
   def render("404.json-api", _assigns) do
     %{
       id: "NOT_FOUND",

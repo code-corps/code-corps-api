@@ -1,11 +1,12 @@
 defmodule CodeCorps.OrganizationView do
-  use CodeCorps.PreloadHelpers, default_preloads: [:slugged_route, :organization_memberships, :projects]
+  use CodeCorps.PreloadHelpers, default_preloads: [:slugged_route, :stripe_connect_account, :organization_memberships, :projects]
   use CodeCorps.Web, :view
   use JaSerializer.PhoenixView
 
   attributes [:name, :description, :icon_thumb_url, :icon_large_url, :slug, :inserted_at, :updated_at]
 
   has_one :slugged_route, serializer: CodeCorps.SluggedRouteView
+  has_one :stripe_connect_account, serializer: CodeCorps.StripeConnectAccountView
 
   has_many :organization_memberships, serializer: CodeCorps.OrganizationMembershipView, identifiers: :always
   has_many :projects, serializer: CodeCorps.ProjectView, identifiers: :always

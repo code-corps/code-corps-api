@@ -1214,17 +1214,17 @@ This endpoint will return one of two possible responses, depending on if the slu
 
     + Attributes (Slugged Route Organization Response)
 
-# Group Stripe Accounts
+# Group Stripe Connect Accounts
 
-This resource represents a Stripe account. It can be retrieved to see properties on the account like its current e-mail address or if the account is enabled yet to make live charges.
+This resource represents a Stripe Connect account. It can be retrieved to see properties on the account like its current e-mail address or if the account is enabled yet to make live charges.
 
-A Stripe account belongs to an organization.
+A Stripe Connect account belongs to an organization.
 
 [Stripe API](https://stripe.com/docs/api#account)
 
-## Stripe Accounts [/stripe-accounts]
+## Stripe Connect Accounts [/stripe-connect-accounts]
 
-### Create a Stripe account [POST]
+### Create a Stripe Connect account [POST]
 
 + Request
 
@@ -1235,7 +1235,7 @@ A Stripe account belongs to an organization.
 
 + Response 201 (application/vnd.api+json; charset=utf-8)
 
-    + Attributes (Stripe Account Response)
+    + Attributes (Stripe Connect Account Response)
 
 + Response 401 (application/vnd.api+json; charset=utf-8)
 
@@ -1249,9 +1249,9 @@ A Stripe account belongs to an organization.
 
     + Attributes (Unprocessable Entity Response)
 
-## Stripe Account [/stripe-accounts/{id}]
+## Stripe Connect Account [/stripe-connect-accounts/{id}]
 
-### Retrieve a Stripe account [GET]
+### Retrieve a Stripe Connect account [GET]
 
 + Request
 
@@ -1262,7 +1262,7 @@ A Stripe account belongs to an organization.
 
 + Response 200 (application/vnd.api+json; charset=utf-8)
 
-    + Attributes (Stripe Account Response)
+    + Attributes (Stripe Connect Account Response)
 
 + Response 401 (application/vnd.api+json; charset=utf-8)
 
@@ -2610,7 +2610,7 @@ This endpoint allows you to check whether a username is valid (by running a vali
 ## Stripe Auth Response (object)
 + data(Stripe Auth Resource)
 
-## Stripe Account Attributes (object)
+## Stripe Connect Account Attributes (object)
 + `business-name`: `Stripe.com` (string) - The publicly visible name of the business
 + `business-url`: null (string) - The publicly visible website of the business
 + `charges-enabled`: false (boolean) - Whether or not the account can create live charges
@@ -2628,23 +2628,23 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + `transfers-enabled`: false (boolean) - Whether or not Stripe will send automatic transfers for this account. This is only false when Stripe is waiting for additional information from the account holder.
 + `updated-at`: `2014-07-07T18:01:26.000Z` (string)
 
-## Stripe Account Resource (object)
-+ include Stripe Account Resource Identifier
-+ attributes(Stripe Account Attributes)
+## Stripe Connect Account Resource (object)
++ include Stripe Connect Account Resource Identifier
++ attributes(Stripe Connect Account Attributes)
 + relationships
     + organization
         + data(Organization Resource Identifier)
 
-## Stripe Account Resource Identifier
+## Stripe Connect Account Resource Identifier
 + id: `1` (string, required)
-+ type: `stripe-account` (string, required)
++ type: `stripe-connect-account` (string, required)
 
-## Stripe Account Response
-+ data(Stripe Account Resource)
+## Stripe Connect Account Response
++ data(Stripe Connect Account Resource)
 + include JSON API Version
 
-## Stripe Accounts Response
-+ data(array[Stripe Account Resource])
+## Stripe Connect Accounts Response
++ data(array[Stripe Connect Account Resource])
 + include JSON API Version
 
 ## Stripe Platform Card Attributes (object)
@@ -2694,7 +2694,7 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + created: `2016-07-08T03:03:51.967Z` (string) - A timestamp, indicating when the customer was created by Stripe.
 + currency: `usd` (string)
 + delinquent: `true` (boolean) - Whether or not the latest charge for the customer’s latest invoice has failed.
-+ email: `johndoe@email.com` (string) - The email that the user used to create their Stripe account.
++ email: `johndoe@email.com` (string) - The email that the user used to create their Stripe Connect account.
 + `id-from-stripe`: `cus_9SBK9vXBkZEdfe` (string) - The ID that Stripe assigned the customer.
 + `inserted-at`: `2014-07-07T18:01:26.000Z` (string)
 + `updated-at`: `2014-07-07T18:01:26.000Z` (string)

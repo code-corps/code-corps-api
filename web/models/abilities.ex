@@ -12,7 +12,7 @@ defmodule Canary.Abilities do
   alias CodeCorps.Role
   alias CodeCorps.RoleSkill
   alias CodeCorps.Skill
-  alias CodeCorps.StripeAccount
+  alias CodeCorps.StripeConnectAccount
   alias CodeCorps.StripePlatformCard
   alias CodeCorps.StripePlatformCustomer
   alias CodeCorps.User
@@ -33,7 +33,7 @@ defmodule Canary.Abilities do
   alias CodeCorps.RolePolicy
   alias CodeCorps.RoleSkillPolicy
   alias CodeCorps.SkillPolicy
-  alias CodeCorps.StripeAccountPolicy
+  alias CodeCorps.StripeConnectAccountPolicy
   alias CodeCorps.StripePlatformCardPolicy
   alias CodeCorps.StripePlatformCustomerPolicy
   alias CodeCorps.UserPolicy
@@ -96,7 +96,8 @@ defmodule Canary.Abilities do
 
     def can?(%User{} = user, :create, Skill), do: SkillPolicy.create?(user)
 
-    def can?(%User{} = user, :show, %StripeAccount{}=stripe_account), do: StripeAccountPolicy.show?(user, stripe_account)
+    def can?(%User{} = user, :show, %StripeConnectAccount{} = stripe_connect_account), do: StripeConnectAccountPolicy.show?(user, stripe_connect_account)
+    def can?(%User{} = user, :create, %Changeset{ data: %StripeConnectAccount{}} = changeset), do: StripeConnectAccountPolicy.create?(user, changeset)
 
     def can?(%User{} = user, :show, %StripePlatformCard{} = stripe_platform_card), do: StripePlatformCardPolicy.show?(user, stripe_platform_card)
     def can?(%User{} = user, :create, %Changeset{ data: %StripePlatformCard{}} = changeset), do: StripePlatformCardPolicy.create?(user, changeset)
