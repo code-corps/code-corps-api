@@ -1,4 +1,4 @@
-defmodule CodeCorps.StripeSubscription do
+defmodule CodeCorps.StripeConnectSubscription do
   @moduledoc """
   Represents a `Subscription` object created using the Stripe API
 
@@ -27,7 +27,7 @@ defmodule CodeCorps.StripeSubscription do
 
   use CodeCorps.Web, :model
 
-  schema "stripe_subscriptions" do
+  schema "stripe_connect_subscriptions" do
     field :application_fee_percent, :decimal
     field :cancelled_at, Ecto.DateTime
     field :created, Ecto.DateTime
