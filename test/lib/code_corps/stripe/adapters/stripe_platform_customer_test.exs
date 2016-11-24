@@ -6,7 +6,7 @@ defmodule CodeCorps.Stripe.Adapters.StripePlatformCustomerTest do
   {:ok, timestamp} = DateTime.from_unix(1479472835)
 
   @stripe_platform_customer %Stripe.Customer{
-    id: "cus_9aMOFmqy1esIRE",
+    id: "cus_123",
     account_balance: 0,
     created: timestamp,
     currency: "usd",
@@ -19,7 +19,7 @@ defmodule CodeCorps.Stripe.Adapters.StripePlatformCustomerTest do
   }
 
   @local_map %{
-    "id_from_stripe" => "cus_9aMOFmqy1esIRE",
+    "id_from_stripe" => "cus_123",
     "created" => timestamp,
     "currency" => "usd",
     "delinquent" => false,

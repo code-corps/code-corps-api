@@ -23,13 +23,13 @@ defmodule CodeCorps.Stripe.StripeConnectPlan do
     end
   end
 
-  defp to_create_attributes(%Project{id: id, slug: slug, title: title}) do
+  defp to_create_attributes(%Project{title: title}) do
     %{
       amount: 1,
       currency: "usd",
-      id: "plan_#{slug}_#{id}",
+      id: "month",
       interval: "month",
-      name: "Monthly donation plan to #{title} on CodeCorps"
+      name: "Monthly donation to #{title}."
     }
   end
 
