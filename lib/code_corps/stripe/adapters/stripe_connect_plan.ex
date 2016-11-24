@@ -12,17 +12,21 @@ defmodule CodeCorps.Stripe.Adapters.StripeConnectPlan do
   """
   @stripe_attributes [:amount, :created, :id, :name]
 
-  def to_params(%Stripe.Plan{} = stripe_plan) do
-    stripe_plan
-    |> Map.from_struct
-    |> Map.take(@stripe_attributes)
-    |> rename(:id, :id_from_stripe)
-    |> keys_to_string
+  def to_params(%Stripe.Plan{} = stripe_plan, %{} = attributes) do
+    result =
+      stripe_plan
+      |> Map.from_struct
+      |> Map.take(@stripe_attributes)
+      |> rename(:id, :id_from_stripe)
+      |> keys_to_string
+      |> add_non_stripe_attributes(attributes)
+
+    {:ok, result}
   end
 
   @non_stripe_attributes ["project_id"]
 
-  def add_non_stripe_attributes(%{} = params, %{} = attributes) do
+  defp add_non_stripe_attributes(%{} = params, %{} = attributes) do
     attributes
     |> get_non_stripe_attributes
     |> add_to(params)

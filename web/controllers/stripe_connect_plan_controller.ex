@@ -18,7 +18,6 @@ defmodule CodeCorps.StripeConnectPlanController do
     result |> CodeCorps.Analytics.Segment.track(:created, conn)
   end
   defp handle_create_result({:error, %Stripe.APIErrorResponse{}} = error, conn) do
-    error |> IO.inspect
     conn
     |> put_status(500)
     |> render(CodeCorps.ErrorView, "500.json-api")
@@ -29,4 +28,9 @@ defmodule CodeCorps.StripeConnectPlanController do
     |> render(CodeCorps.ErrorView, "stripe-400.json-api")
   end
   defp handle_create_result({:error, %Ecto.Changeset{} = changeset}, _conn), do: changeset
+  defp handle_create_result({:error, _error}, conn) do
+    conn
+    |> put_status(500)
+    |> render(CodeCorps.ErrorView, "500.json-api")
+  end
 end
