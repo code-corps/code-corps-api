@@ -1,5 +1,4 @@
 defmodule CodeCorps.Stripe.StripeConnectSubscription do
-  alias CodeCorps.Organization
   alias CodeCorps.Project
   alias CodeCorps.Repo
   alias CodeCorps.Stripe.Adapters
@@ -11,23 +10,25 @@ defmodule CodeCorps.Stripe.StripeConnectSubscription do
   alias CodeCorps.StripePlatformCard
   alias CodeCorps.StripePlatformCustomer
 
+  import Ecto.Query
+
   @api Application.get_env(:code_corps, :stripe)
 
   def create(%{"project_id" => project_id, "quantity" => quantity, "stripe_platform_card_id" => stripe_platform_card_id, "user_id" => user_id} = attributes) do
-    with %Project{} = project <-
+    with %Project{stripe_connect_plan: %StripeConnectPlan{} = plan} = project <-
            get_project(project_id),
          %StripeConnectAccount{} = connect_account <-
            get_account_from_project(project),
          %StripePlatformCard{} = platform_card <-
-           get_platform_card(user_id),
+           get_platform_card(stripe_platform_card_id),
          %StripePlatformCustomer{} = platform_customer <-
            get_platform_customer(user_id),
          {:ok, connect_customer} <-
            find_or_create_connect_customer(platform_customer, connect_account),
          {:ok, connect_card} <-
-           find_or_create_connect_card(platform_card, connect_customer),
+           find_or_create_connect_card(platform_card, connect_customer, platform_customer, connect_account),
          create_attributes <-
-           to_create_attributes(connect_card, connect_customer, project.stripe_connect_plan, quantity),
+           to_create_attributes(connect_card, connect_customer, plan, quantity),
          {:ok, subscription} <-
            @api.Subscription.create(create_attributes, connect_account: connect_account.id_from_stripe),
          {:ok, params} <-
@@ -45,7 +46,7 @@ defmodule CodeCorps.Stripe.StripeConnectSubscription do
   defp get_project(project_id) do
     Project
     |> Repo.get(project_id)
-    |> Repo.preload([organization: :stripe_connect_account], :stripe_connect_plan)
+    |> Repo.preload([:stripe_connect_plan, [{:organization, :stripe_connect_account}]])
   end
 
   defp get_platform_card(id) do
@@ -64,28 +65,48 @@ defmodule CodeCorps.Stripe.StripeConnectSubscription do
   end
 
   defp find_or_create_connect_customer(%StripePlatformCustomer{} = customer, %StripeConnectAccount{} = account) do
-
+    case get_connect_customer(account.id, customer.id) do
+      %StripeConnectCustomer{} = existing_customer ->
+        {:ok, existing_customer}
+      nil ->
+        CodeCorps.Stripe.StripeConnectCustomer.create(customer, account)
+    end
   end
 
-  defp get_connect_customer do
-
+  defp get_connect_customer(account_id, customer_id) do
+    StripeConnectCustomer
+    |> where([c], c.stripe_connect_account_id == ^account_id)
+    |> where([c], c.stripe_platform_customer_id == ^customer_id)
+    |> Repo.one
   end
 
-  defp find_or_create_connect_card(%StripePlatformCard{} = card, %StripeConnectCustomer{} = customer) do
-
+  defp find_or_create_connect_card(%StripePlatformCard{} = card, %StripeConnectCustomer{} = connect_customer, %StripePlatformCustomer{} = platform_customer, %StripeConnectAccount{} = account) do
+    case get_connect_card(account.id, card.id) do
+      %StripeConnectCard{} = existing_card ->
+        {:ok, existing_card}
+      nil ->
+        CodeCorps.Stripe.StripeConnectCard.create(card, connect_customer, platform_customer, account)
+    end
   end
 
-  defp get_connect_card do
-
+  defp get_connect_card(account_id, card_id) do
+    StripeConnectCard
+    |> where([c], c.stripe_connect_account_id == ^account_id)
+    |> where([c], c.stripe_platform_card_id == ^card_id)
+    |> Repo.one
   end
 
   defp to_create_attributes(%StripeConnectCard{} = card, %StripeConnectCustomer{} = customer, %StripeConnectPlan{} = plan, quantity) do
     %{
       application_fee_percent: 5,
-      customer: customer.id,
-      plan: plan.id,
+      customer: customer.id_from_stripe,
+      plan: plan.id_from_stripe,
       quantity: quantity,
-      source: card.id
+      source: card.id_from_stripe
     }
+  end
+
+  defp to_create_attributes(arg1, arg2, arg3, arg4) do
+    IO.inspect {arg1, arg2, arg3, arg4}
   end
 end
