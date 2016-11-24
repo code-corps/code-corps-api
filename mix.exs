@@ -86,7 +86,6 @@ defmodule CodeCorps.Mixfile do
       {:segment, github: "stueccles/analytics-elixir"}, # Segment analytics
       {:sentry, "~> 1.0"}, # Sentry error tracking
       {:stripity_stripe, "~> 2.0.0-alpha.3"}, # Stripe
-      {:stripe_eventex, "~> 1.0.0"}, # Stripe webhooks
       {:timex, "~> 3.0"},
       {:timex_ecto, "~> 3.0"}
     ]
