@@ -1,7 +1,7 @@
 defmodule CodeCorps.Stripe.Adapters.StripePlatformCardTest do
   use ExUnit.Case, async: true
 
-  import CodeCorps.Stripe.Adapters.StripePlatformCard, only: [to_params: 1, add_non_stripe_attributes: 2]
+  import CodeCorps.Stripe.Adapters.StripePlatformCard, only: [to_params: 2]
 
   @stripe_platform_card %Stripe.Card{
     id: "card_19IHPnBKl1F6IRFf8w7gpdOe",
@@ -39,21 +39,20 @@ defmodule CodeCorps.Stripe.Adapters.StripePlatformCardTest do
     "name" => nil
   }
 
-  describe "to_params/1" do
+  describe "to_params/2" do
     test "converts from stripe map to local properly" do
-      assert @stripe_platform_card |> to_params == @local_map
-    end
-  end
+      test_attributes = %{
+        "user_id" => 123,
+        "foo" => "bar"
+      }
+      expected_attributes = %{
+        "user_id" => 123,
+      }
 
-  describe "add_non_stripe_attributes/2" do
-    test "adds 'user_id' from second hash into first hash" do
-      params = %{"id_from_stripe" => "card_123"}
-      attributes = %{"user_id" =>123, "foo" => "bar"}
+      {:ok, result} = to_params(@stripe_platform_card, test_attributes)
+      expected_map = Map.merge(@local_map, expected_attributes)
 
-      actual_output = params |> add_non_stripe_attributes(attributes)
-      expected_output = %{"id_from_stripe" => "card_123", "user_id" => 123}
-
-      assert actual_output == expected_output
+      assert result == expected_map
     end
   end
 end

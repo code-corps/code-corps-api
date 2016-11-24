@@ -1,17 +1,21 @@
 defmodule CodeCorps.Stripe.Adapters.StripePlatformCustomer do
   import CodeCorps.MapUtils, only: [rename: 3, keys_to_string: 1]
 
-  def to_params(%Stripe.Customer{} = customer) do
-    customer
-    |> Map.from_struct
-    |> Map.take([:created, :currency, :delinquent, :id, :email])
-    |> rename(:id, :id_from_stripe)
-    |> keys_to_string
+  def to_params(%Stripe.Customer{} = customer, %{} = attributes) do
+    result =
+      customer
+      |> Map.from_struct
+      |> Map.take([:created, :currency, :delinquent, :id, :email])
+      |> rename(:id, :id_from_stripe)
+      |> keys_to_string
+      |> add_non_stripe_attributes(attributes)
+
+    {:ok, result}
   end
 
   @non_stripe_attribute_keys ["user_id"]
 
-  def add_non_stripe_attributes(%{} = params, %{} = attributes) do
+  defp add_non_stripe_attributes(%{} = params, %{} = attributes) do
     attributes
     |> get_non_stripe_attributes
     |> add_to(params)

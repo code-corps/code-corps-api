@@ -1,7 +1,7 @@
 defmodule CodeCorps.Stripe.Adapters.StripeConnectAccountTest do
   use ExUnit.Case, async: true
 
-  import CodeCorps.Stripe.Adapters.StripeConnectAccount, only: [to_params: 1, add_non_stripe_attributes: 2]
+  import CodeCorps.Stripe.Adapters.StripeConnectAccount, only: [to_params: 2]
 
   @stripe_connect_account %Stripe.Account{
     business_name: "Code Corps PBC",
@@ -40,22 +40,20 @@ defmodule CodeCorps.Stripe.Adapters.StripeConnectAccountTest do
     "transfers_enabled" => true
   }
 
-  describe "to_params/1" do
+  describe "to_params/2" do
     test "converts from stripe map to local properly" do
-      assert @stripe_connect_account |> to_params == @local_map
-    end
-  end
+      test_attributes = %{
+        "organization_id" => 123,
+        "foo" => "bar"
+      }
+      expected_attributes = %{
+        "organization_id" => 123,
+      }
 
-  describe "add_non_stripe_attributes/2" do
-    test "adds 'organization_id' from second hash into first hash" do
-      params = %{"id_from_stripe" => "acct_123"}
-      attributes = %{"organization_id" =>123,
-      "foo" => "bar"}
+      {:ok, result} = to_params(@stripe_connect_account, test_attributes)
+      expected_map = Map.merge(@local_map, expected_attributes)
 
-      actual_output = params |> add_non_stripe_attributes(attributes)
-      expected_output = %{"id_from_stripe" => "acct_123", "organization_id" => 123}
-
-      assert actual_output == expected_output
+      assert result == expected_map
     end
   end
 end

@@ -1,40 +1,27 @@
 defmodule CodeCorps.Stripe.StripePlatformCard do
+  alias CodeCorps.Repo
   alias CodeCorps.Stripe.Adapters
+  alias CodeCorps.StripePlatformCard
+  alias CodeCorps.StripePlatformCustomer
 
   @api Application.get_env(:code_corps, :stripe)
 
   def create(%{"stripe_token" => stripe_token, "user_id" => user_id} = attributes) do
-    user_id
-    |> get_customer
-    |> create_on_stripe(stripe_token)
-    |> handle_create_response(attributes)
+    with %StripePlatformCustomer{} = customer <- get_customer(user_id),
+         {:ok, card} <- @api.Card.create(:customer, customer.id_from_stripe, stripe_token),
+         {:ok, params} <- Adapters.StripePlatformCard.to_params(card, attributes)
+    do
+      %StripePlatformCard{}
+      |> StripePlatformCard.create_changeset(params)
+      |> Repo.insert
+    else
+      {:error, error} -> {:error, error}
+      nil -> {:error, :not_found}
+    end
   end
-
-  defp handle_create_response({:ok, %Stripe.Card{} = card}, attributes) do
-    card
-    |> get_attributes(attributes)
-    |> insert
-  end
-  defp handle_create_response(result, _attributes), do: result
 
   defp get_customer(user_id) do
-    CodeCorps.StripePlatformCustomer
+    StripePlatformCustomer
     |> CodeCorps.Repo.get_by(user_id: user_id)
-  end
-
-  defp create_on_stripe(customer, stripe_token) do
-    @api.Card.create(:customer, customer.id_from_stripe, stripe_token)
-  end
-
-  defp get_attributes(%Stripe.Card{} = stripe_card, %{} = attributes) do
-    stripe_card
-    |> Adapters.StripePlatformCard.to_params
-    |> Adapters.StripePlatformCard.add_non_stripe_attributes(attributes)
-  end
-
-  defp insert(%{} = attributes) do
-    %CodeCorps.StripePlatformCard{}
-    |> CodeCorps.StripePlatformCard.create_changeset(attributes)
-    |> CodeCorps.Repo.insert
   end
 end
