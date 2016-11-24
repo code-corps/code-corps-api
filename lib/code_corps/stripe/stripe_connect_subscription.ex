@@ -9,20 +9,22 @@ defmodule CodeCorps.Stripe.StripeConnectSubscription do
   alias CodeCorps.StripeConnectSubscription
   alias CodeCorps.StripePlatformCard
   alias CodeCorps.StripePlatformCustomer
+  alias CodeCorps.User
 
   import Ecto.Query
 
   @api Application.get_env(:code_corps, :stripe)
 
-  def create(%{"project_id" => project_id, "quantity" => quantity, "stripe_platform_card_id" => stripe_platform_card_id, "user_id" => user_id} = attributes) do
+  def create(%{"project_id" => project_id, "quantity" => quantity, "user_id" => user_id} = attributes) do
     with %Project{stripe_connect_plan: %StripeConnectPlan{} = plan} = project <-
            get_project(project_id),
+         %User{
+          stripe_platform_card: %StripePlatformCard{} = platform_card,
+          stripe_platform_customer: %StripePlatformCustomer{} = platform_customer
+         } <-
+           get_user(user_id),
          %StripeConnectAccount{} = connect_account <-
            get_account_from_project(project),
-         %StripePlatformCard{} = platform_card <-
-           get_platform_card(stripe_platform_card_id),
-         %StripePlatformCustomer{} = platform_customer <-
-           get_platform_customer(user_id),
          {:ok, connect_customer} <-
            find_or_create_connect_customer(platform_customer, connect_account),
          {:ok, connect_card} <-
@@ -51,15 +53,11 @@ defmodule CodeCorps.Stripe.StripeConnectSubscription do
     |> Repo.preload([:stripe_connect_plan, [{:organization, :stripe_connect_account}]])
   end
 
-  defp get_platform_card(id) do
-    StripePlatformCard
-    |> Repo.get(id)
-    |> Repo.preload(:stripe_connect_cards)
-  end
-
-  defp get_platform_customer(user_id) do
-    StripePlatformCustomer
-    |> Repo.get_by(user_id: user_id)
+  defp get_user(user_id) do
+    User
+    |> Repo.get(user_id)
+    |> Repo.preload([stripe_platform_card: :stripe_connect_cards])
+    |> Repo.preload(:stripe_platform_customer)
   end
 
   defp get_account_from_project(project) do
@@ -123,9 +121,8 @@ defmodule CodeCorps.Stripe.StripeConnectSubscription do
     create(%{
       "project_id" => project.id,
       "quantity" => quantity,
-      "user_id" => user.id,
-      "stripe_platform_card_id" => stripe_platform_card.id}
-    )
+      "user_id" => user.id
+    })
   end
 
   def test_reset do
