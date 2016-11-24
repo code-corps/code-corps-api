@@ -50,3 +50,9 @@ config :code_corps, :stripe, Stripe
 
 config :sentry,
   environment_name: Mix.env || :dev
+
+config :stripe_eventex, api_key: System.get_env("STRIPE_SECRET_KEY")
+config :stripe_eventex, subscibed_events: [
+  {"account.updated", CodeCorps.Stripe.Events.AccountUpdated},
+  {"customer.subscription.updated", CodeCorps.Stripe.Events.CustomerSubscriptionUpdated}
+]
