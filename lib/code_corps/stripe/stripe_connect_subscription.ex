@@ -117,7 +117,7 @@ defmodule CodeCorps.Stripe.StripeConnectSubscription do
   def test do
     project = Project |> Repo.get(1)
     quantity = 10000
-    user = CodeCorps.User |> Repo.get(4) |> Repo.preload([:stripe_platform_card])
+    user = CodeCorps.User |> Repo.get(5) |> Repo.preload([:stripe_platform_card])
     stripe_platform_card = user.stripe_platform_card
 
     create(%{
