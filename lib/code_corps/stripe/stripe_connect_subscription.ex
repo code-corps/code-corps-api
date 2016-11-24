@@ -31,8 +31,10 @@ defmodule CodeCorps.Stripe.StripeConnectSubscription do
            to_create_attributes(connect_card, connect_customer, plan, quantity),
          {:ok, subscription} <-
            @api.Subscription.create(create_attributes, connect_account: connect_account.id_from_stripe),
+         insert_attributes <-
+           to_insert_attributes(attributes, plan),
          {:ok, params} <-
-           Adapters.StripeConnectSubscription.to_params(subscription, attributes)
+           Adapters.StripeConnectSubscription.to_params(subscription, insert_attributes)
     do
       %StripeConnectSubscription{}
       |> StripeConnectSubscription.create_changeset(params)
@@ -106,7 +108,37 @@ defmodule CodeCorps.Stripe.StripeConnectSubscription do
     }
   end
 
-  defp to_create_attributes(arg1, arg2, arg3, arg4) do
-    IO.inspect {arg1, arg2, arg3, arg4}
+  defp to_insert_attributes(attrs, %StripeConnectPlan{id: stripe_connect_plan_id}) do
+    attrs |> Map.merge(%{"stripe_connect_plan_id" => stripe_connect_plan_id})
+  end
+
+  # TODO: Manual testing helpers, remove before merge
+
+  def test do
+    project = Project |> Repo.get(1)
+    quantity = 10000
+    user = CodeCorps.User |> Repo.get(4) |> Repo.preload([:stripe_platform_card])
+    stripe_platform_card = user.stripe_platform_card
+
+    create(%{
+      "project_id" => project.id,
+      "quantity" => quantity,
+      "user_id" => user.id,
+      "stripe_platform_card_id" => stripe_platform_card.id}
+    )
+  end
+
+  def test_reset do
+    CodeCorps.StripeConnectCard |> CodeCorps.Repo.all |> Enum.each(&CodeCorps.Repo.delete(&1))
+    CodeCorps.StripeConnectCustomer |> CodeCorps.Repo.all |> Enum.each(&CodeCorps.Repo.delete(&1))
+    CodeCorps.StripeConnectSubscription |> CodeCorps.Repo.all |> Enum.each(&CodeCorps.Repo.delete(&1))
+  end
+
+  def test_status do
+    cards = CodeCorps.StripeConnectCard |> CodeCorps.Repo.aggregate(:count, :id)
+    customers = CodeCorps.StripeConnectCustomer |> CodeCorps.Repo.aggregate(:count, :id)
+    subscriptions = CodeCorps.StripeConnectSubscription |> CodeCorps.Repo.aggregate(:count, :id)
+
+    IO.puts("\nCustomers: #{customers}, Cards: #{cards}, Subscriptions: #{subscriptions}\n")
   end
 end

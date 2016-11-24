@@ -13,18 +13,18 @@ defmodule CodeCorps.Stripe.StripeConnectCard do
 
   def create(%StripePlatformCard{} = platform_card, %StripeConnectCustomer{} = connect_customer, %StripePlatformCustomer{} = platform_customer, %StripeConnectAccount{} = connect_account) do
     platform_customer_id = platform_customer.id_from_stripe
+    platform_card_id = platform_card.id_from_stripe
     connect_customer_id = connect_customer.id_from_stripe
-    card_id = platform_card.id_from_stripe
-    connect_id = connect_account.id_from_stripe
+    connect_account_id = connect_account.id_from_stripe
 
     attributes =
       platform_card
       |> create_non_stripe_attributes(connect_account)
 
     with {:ok, token} <-
-           @api.Token.create_on_connect_account(platform_customer_id, card_id, connect_account: connect_id),
+           @api.Token.create_on_connect_account(platform_customer_id, platform_card_id, connect_account: connect_account_id),
          {:ok, customer} <-
-           @api.Card.create(:customer, connect_customer_id, token.id, connect_account: connect_id),
+           @api.Card.create(:customer, connect_customer_id, token.id, connect_account: connect_account_id),
          {:ok, params} <-
            Adapters.StripeConnectCard.to_params(customer, attributes)
     do
