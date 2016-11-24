@@ -47,8 +47,15 @@ defmodule CodeCorps.StripeConnectSubscription do
     timestamps()
   end
 
-  @permitted_params [:customer_id_from_stripe, :id_from_stripe, :plan_id_from_stripe, :stripe_connect_plan_id, :user_id]
-  @required_params [:id_from_stripe, :plan_id_from_stripe, :stripe_connect_plan_id, :user_id]
+  @permitted_params [
+    :application_fee_percent, :cancelled_at, :created, :current_period_end, :current_period_start,
+    :customer_id_from_stripe, :ended_at, :id_from_stripe, :plan_id_from_stripe, :quantity,
+    :start, :status, :stripe_connect_plan_id, :user_id
+  ]
+  @required_params [
+    :application_fee_percent, :id_from_stripe, :plan_id_from_stripe,
+    :quantity, :stripe_connect_plan_id, :user_id
+  ]
 
   def create_changeset(struct, params \\ %{}) do
     struct

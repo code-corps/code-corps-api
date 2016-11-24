@@ -4,8 +4,6 @@ defmodule CodeCorps.Stripe.Adapters.StripeConnectSubscription do
   usable for creation of StripeConnectSubscription records locally
   """
 
-  alias CodeCorps.Stripe.Adapters
-
   import CodeCorps.MapUtils, only: [rename: 3, keys_to_string: 1]
 
   @stripe_attributes [
@@ -50,7 +48,7 @@ defmodule CodeCorps.Stripe.Adapters.StripeConnectSubscription do
     |> Map.merge(attributes)
   end
 
-  defp add_plan(subscription, %Stripe.Plan{id: id} = plan) do
+  defp add_plan(subscription, %Stripe.Plan{id: id}) do
     subscription |> Map.put("plan_id_from_stripe", id)
   end
 end
