@@ -2,8 +2,6 @@ defmodule CodeCorps.StripePlatformCardController do
   use CodeCorps.Web, :controller
   use JaResource
 
-  import CodeCorps.Helpers.Query, only: [id_filter: 2]
-
   alias CodeCorps.StripePlatformCard
 
   plug :load_and_authorize_resource, model: StripePlatformCard, only: [:show,], preload: [:user]

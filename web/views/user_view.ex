@@ -1,7 +1,7 @@
 defmodule CodeCorps.UserView do
   use CodeCorps.PreloadHelpers,
       default_preloads: [
-        :slugged_route, :stripe_platform_cards, :stripe_platform_customer,
+        :slugged_route, :stripe_platform_card, :stripe_platform_customer,
         :organization_memberships, :user_categories, :user_roles, :user_skills
       ]
   use CodeCorps.Web, :view
@@ -14,10 +14,10 @@ defmodule CodeCorps.UserView do
   ]
 
   has_one :slugged_route, serializer: CodeCorps.SluggedRouteView
+  has_one :stripe_platform_card, serializer: CodeCorps.StripePlatformCardView, identifiers: :always
   has_one :stripe_platform_customer, serializer: CodeCorps.StripePlatformCustomerView
 
   has_many :organization_memberships, serializer: CodeCorps.OrganizationMembershipView, identifiers: :always
-  has_many :stripe_platform_cards, serializer: CodeCorps.StripePlatformCardView, identifiers: :always
   has_many :user_categories, serializer: CodeCorps.UserCategoryView, identifiers: :always
   has_many :user_roles, serializer: CodeCorps.UserRoleView, identifiers: :always
   has_many :user_skills, serializer: CodeCorps.UserSkillView, identifiers: :always

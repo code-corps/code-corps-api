@@ -10,8 +10,6 @@ defmodule CodeCorps.StripePlatformCustomer do
 
     belongs_to :user, CodeCorps.User
 
-    has_many :stripe_platform_cards, CodeCorps.StripePlatformCard, foreign_key: :stripe_platform_customer_id
-
     timestamps()
   end
 

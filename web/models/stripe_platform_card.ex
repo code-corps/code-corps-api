@@ -22,7 +22,8 @@ defmodule CodeCorps.StripePlatformCard do
     struct
     |> cast(params, [:brand, :customer_id_from_stripe, :cvc_check, :exp_month, :exp_year, :last4, :name, :id_from_stripe, :user_id])
     |> validate_required([:brand, :exp_month, :exp_year, :cvc_check, :last4, :id_from_stripe, :user_id])
-    |> assoc_constraint(:user)
     |> unique_constraint(:id_from_stripe)
+    |> unique_constraint(:user_id)
+    |> assoc_constraint(:user)
   end
 end

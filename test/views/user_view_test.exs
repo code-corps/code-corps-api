@@ -43,10 +43,8 @@ defmodule CodeCorps.UserViewTest do
           "slugged-route" => %{
             "data" => %{"id" => slugged_route.id |> Integer.to_string, "type" => "slugged-route"}
           },
-          "stripe-platform-cards" => %{
-            "data" => [
-              %{"id" => stripe_platform_card.id |> Integer.to_string, "type" => "stripe-platform-card"}
-            ]
+          "stripe-platform-card" => %{
+            "data" => %{"id" => stripe_platform_card.id |> Integer.to_string, "type" => "stripe-platform-card"}
           },
           "stripe-platform-customer" => %{
             "data" => %{"id" => stripe_platform_customer.id |> Integer.to_string, "type" => "stripe-platform-customer"}
