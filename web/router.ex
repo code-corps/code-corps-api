@@ -31,6 +31,22 @@ defmodule CodeCorps.Router do
     plug CodeCorps.Plug.AnalyticsIdentify
   end
 
+
+  # start webhooks - move somewhere once working
+
+  pipeline :webhooks do
+    plug :accepts ["json"]
+    plug StripeEventex, path: "/stripe_webhooks", validation: &CodeCorps.Router.valid/1
+  end
+
+  scope "/", CodeCorps do
+    pipe_through [:webhooks]
+  end
+
+  def valid(_), do: true
+
+  # end webhooks
+
   scope "/", CodeCorps do
     pipe_through :browser # Use the default browser stack
 
