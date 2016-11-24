@@ -4,8 +4,10 @@ defmodule CodeCorps.StripeConnectSubscriptionTest do
   alias CodeCorps.StripeConnectSubscription
 
   @valid_attrs %{
+    application_fee_percent: 5,
     id_from_stripe: "abc123",
-    plan_id_from_stripe: "abc123"
+    plan_id_from_stripe: "abc123",
+    quantity: 1000
   }
 
   @invalid_attrs %{}
@@ -24,8 +26,10 @@ defmodule CodeCorps.StripeConnectSubscriptionTest do
       changeset = StripeConnectSubscription.create_changeset(%StripeConnectSubscription{}, @invalid_attrs)
       refute changeset.valid?
 
+      assert changeset.errors[:application_fee_percent] == {"can't be blank", []}
       assert changeset.errors[:id_from_stripe] == {"can't be blank", []}
       assert changeset.errors[:plan_id_from_stripe] == {"can't be blank", []}
+      assert changeset.errors[:quantity] == {"can't be blank", []}
       assert changeset.errors[:stripe_connect_plan_id] == {"can't be blank", []}
     end
 

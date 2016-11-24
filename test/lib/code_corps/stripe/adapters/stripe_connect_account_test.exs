@@ -1,7 +1,7 @@
-defmodule CodeCorps.Stripe.Adapters.StripeConnectAccountTest do
+defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTest do
   use ExUnit.Case, async: true
 
-  import CodeCorps.Stripe.Adapters.StripeConnectAccount, only: [to_params: 2]
+  import CodeCorps.StripeService.Adapters.StripeConnectAccount, only: [to_params: 2]
 
   @stripe_connect_account %Stripe.Account{
     business_name: "Code Corps PBC",

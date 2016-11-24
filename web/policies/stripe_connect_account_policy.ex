@@ -9,5 +9,5 @@ defmodule CodeCorps.StripeConnectAccountPolicy do
   def show?(%User{} = user, %StripeConnectAccount{} = stripe_connect_account), do: stripe_connect_account |> get_membership(user) |> get_role |> owner?
 
   def create?(%User{} = user, %Ecto.Changeset{} = changeset), do: changeset |> get_membership(user) |> get_role |> owner?
-  def create?(user, changeset), do: false
+  def create?(_, _), do: false
 end

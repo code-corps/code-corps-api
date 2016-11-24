@@ -1,7 +1,7 @@
-defmodule CodeCorps.Stripe.Adapters.StripePlatformCardTest do
+defmodule CodeCorps.StripeService.Adapters.StripePlatformCardTest do
   use ExUnit.Case, async: true
 
-  import CodeCorps.Stripe.Adapters.StripePlatformCard, only: [to_params: 2]
+  import CodeCorps.StripeService.Adapters.StripePlatformCard, only: [to_params: 2]
 
   @stripe_platform_card %Stripe.Card{
     id: "card_123",

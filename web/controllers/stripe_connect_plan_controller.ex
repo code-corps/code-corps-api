@@ -10,7 +10,7 @@ defmodule CodeCorps.StripeConnectPlanController do
 
   def handle_create(conn, attributes) do
     attributes
-    |> CodeCorps.Stripe.StripeConnectPlan.create
+    |> CodeCorps.StripeService.StripeConnectPlan.create
     |> handle_create_result(conn)
   end
 

@@ -7,6 +7,7 @@ defmodule CodeCorps.UserViewTest do
     user = insert(:user)
     organization_membership = insert(:organization_membership, member: user)
     slugged_route = insert(:slugged_route, user: user)
+    stripe_connect_subscription = insert(:stripe_connect_subscription, user: user)
     stripe_platform_card = insert(:stripe_platform_card, user: user)
     stripe_platform_customer = insert(:stripe_platform_customer, user: user)
     user_category = insert(:user_category, user: user)
@@ -42,6 +43,11 @@ defmodule CodeCorps.UserViewTest do
           },
           "slugged-route" => %{
             "data" => %{"id" => slugged_route.id |> Integer.to_string, "type" => "slugged-route"}
+          },
+          "stripe-connect-subscriptions" => %{
+            "data" => [
+              %{"id" => stripe_connect_subscription.id |> Integer.to_string, "type" => "stripe-connect-subscription"}
+            ]
           },
           "stripe-platform-card" => %{
             "data" => %{"id" => stripe_platform_card.id |> Integer.to_string, "type" => "stripe-platform-card"}

@@ -15,6 +15,8 @@ defmodule CodeCorps.StripePlatformCard do
 
     belongs_to :user, CodeCorps.User
 
+    has_many :stripe_connect_cards, CodeCorps.StripeConnectCard, foreign_key: :stripe_platform_card_id
+
     timestamps()
   end
 

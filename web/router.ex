@@ -31,10 +31,21 @@ defmodule CodeCorps.Router do
     plug CodeCorps.Plug.AnalyticsIdentify
   end
 
+  pipeline :stripe_webhooks do
+    plug :accepts, ["json"]
+  end
+
   scope "/", CodeCorps do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
+  end
+
+  scope "/", CodeCorps, host: "api." do
+    pipe_through [:stripe_webhooks]
+
+    post "/webooks/stripe/connect", StripeConnectEventsController, :create
+    post "/webooks/stripe/platform", StripePlatformEventsController, :create
   end
 
   scope "/", CodeCorps, host: "api." do
@@ -55,6 +66,7 @@ defmodule CodeCorps.Router do
     resources "/skills", SkillController, only: [:create]
     resources "/stripe-connect-accounts", StripeConnectAccountController, only: [:show, :create]
     resources "/stripe-connect-plans", StripeConnectPlanController, only: [:show, :create]
+    resources "/stripe-connect-subscriptions", StripeConnectSubscriptionController, only: [:show, :create]
     resources "/stripe-platform-cards", StripePlatformCardController, only: [:show, :create]
     resources "/stripe-platform-customers", StripePlatformCustomerController, only: [:show, :create]
     resources "/tasks", TaskController, only: [:create, :update]

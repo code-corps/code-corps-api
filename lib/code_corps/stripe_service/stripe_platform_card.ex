@@ -1,6 +1,6 @@
-defmodule CodeCorps.Stripe.StripePlatformCard do
+defmodule CodeCorps.StripeService.StripePlatformCard do
   alias CodeCorps.Repo
-  alias CodeCorps.Stripe.Adapters
+  alias CodeCorps.StripeService.Adapters
   alias CodeCorps.StripePlatformCard
   alias CodeCorps.StripePlatformCustomer
 

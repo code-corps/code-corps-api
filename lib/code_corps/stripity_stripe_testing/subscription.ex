@@ -1,5 +1,5 @@
 defmodule CodeCorps.StripityStripeTesting.Subscription do
-  def create(map, _opts) do
+  def create(map, _opts \\ []) do
     {:ok, do_create(map)}
   end
 

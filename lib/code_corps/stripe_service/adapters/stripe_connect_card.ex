@@ -1,20 +1,11 @@
-defmodule CodeCorps.Stripe.Adapters.StripeConnectPlan do
-  @moduledoc """
-  Used for conversion between stripe api payload maps and maps
-  usable for creation of `StripeConnectPlan` records locally
-  """
-
+defmodule CodeCorps.StripeService.Adapters.StripeConnectCard do
   import CodeCorps.MapUtils, only: [rename: 3, keys_to_string: 1]
 
-  @doc """
-  Converts a map received from the Stripe API into a map that can be used
-  to create a `CodeCorps.StripeConnectPlan` record
-  """
-  @stripe_attributes [:amount, :created, :id, :name]
+  @stripe_attributes [:id]
 
-  def to_params(%Stripe.Plan{} = stripe_plan, %{} = attributes) do
+  def to_params(%Stripe.Card{} = stripe_card, %{} = attributes) do
     result =
-      stripe_plan
+      stripe_card
       |> Map.from_struct
       |> Map.take(@stripe_attributes)
       |> rename(:id, :id_from_stripe)
@@ -24,7 +15,7 @@ defmodule CodeCorps.Stripe.Adapters.StripeConnectPlan do
     {:ok, result}
   end
 
-  @non_stripe_attributes ["project_id"]
+  @non_stripe_attributes ["stripe_connect_account_id", "stripe_platform_card_id"]
 
   defp add_non_stripe_attributes(%{} = params, %{} = attributes) do
     attributes
