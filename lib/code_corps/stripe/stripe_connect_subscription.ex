@@ -16,11 +16,11 @@ defmodule CodeCorps.Stripe.StripeConnectSubscription do
   def create(%{"project_id" => project_id, "quantity" => quantity, "stripe_platform_card_id" => stripe_platform_card_id, "user_id" => user_id} = attributes) do
     with %Project{} = project <-
            get_project(project_id),
-         connect_account <-
+         %StripeConnectAccount{} = connect_account <-
            get_account_from_project(project),
-         platform_card <-
+         %StripePlatformCard{} = platform_card <-
            get_platform_card(user_id),
-         platform_customer <-
+         %StripePlatformCustomer{} = platform_customer <-
            get_platform_customer(user_id),
          {:ok, connect_customer} <-
            find_or_create_connect_customer(platform_customer, connect_account),
