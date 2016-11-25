@@ -4,18 +4,17 @@ defmodule CodeCorps.DonationGoalTest do
   alias CodeCorps.DonationGoal
 
   describe "%create_changeset/2" do
-    test "requires amount, current, description and project_id" do
+    test "requires amount, description and project_id" do
       changeset = DonationGoal.create_changeset(%DonationGoal{}, %{})
 
       refute changeset.valid?
       assert changeset.errors[:amount] == {"can't be blank", []}
-      assert changeset.errors[:current] == {"can't be blank", []}
       assert changeset.errors[:description] == {"can't be blank", []}
       assert changeset.errors[:project_id] == {"can't be blank", []}
     end
 
     test "ensures project with specified id actually exists" do
-      attrs = %{amount: 100, current: true, description: "Bar", project_id: -1}
+      attrs = %{amount: 100, description: "Bar", project_id: -1}
       { result, changeset } =
         DonationGoal.create_changeset(%DonationGoal{}, attrs)
         |> Repo.insert
@@ -27,14 +26,13 @@ defmodule CodeCorps.DonationGoalTest do
   end
 
   describe "&update_changeset/2" do
-    test "requires amount, current, description" do
-      attrs = %{amount: nil, current: nil, description: nil}
+    test "requires amount, description" do
+      attrs = %{amount: nil, description: nil}
       donation_goal = insert(:donation_goal)
       changeset = DonationGoal.update_changeset(donation_goal, attrs)
 
       refute changeset.valid?
       assert changeset.errors[:amount] == {"can't be blank", []}
-      assert changeset.errors[:current] == {"can't be blank", []}
       assert changeset.errors[:description] == {"can't be blank", []}
     end
   end

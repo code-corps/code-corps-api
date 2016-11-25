@@ -15,7 +15,6 @@ defmodule CodeCorps.DonationGoalViewTest do
         "type" => "donation-goal",
         "attributes" => %{
           "amount" => donation_goal.amount,
-          "current" => donation_goal.current,
           "description" => donation_goal.description
         },
         "relationships" => %{

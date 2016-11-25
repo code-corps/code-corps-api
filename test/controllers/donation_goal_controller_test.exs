@@ -1,7 +1,7 @@
 defmodule CodeCorps.DonationGoalControllerTest do
   use CodeCorps.ApiCase, resource_name: :donation_goal
 
-  @valid_attrs %{amount: 200, current: false, description: "A description"}
+  @valid_attrs %{amount: 200, description: "A description"}
   @invalid_attrs %{description: nil}
 
   describe "index" do
@@ -67,7 +67,9 @@ defmodule CodeCorps.DonationGoalControllerTest do
   describe "update" do
     @tag authenticated: :admin
     test "updates and renders chosen resource when data is valid", %{conn: conn} do
-      assert conn |> request_update(@valid_attrs) |> json_response(200)
+      project = insert(:project)
+      attrs = @valid_attrs |> Map.merge(%{project: project})
+      assert conn |> request_update(attrs) |> json_response(200)
     end
 
     @tag authenticated: :admin

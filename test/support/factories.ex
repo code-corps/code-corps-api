@@ -23,7 +23,6 @@ defmodule CodeCorps.Factories do
   def donation_goal_factory do
     %CodeCorps.DonationGoal{
       amount: 100,
-      current: false,
       description: sequence(:description, &"A description for a donation goal #{&1}"),
       project: build(:project)
     }

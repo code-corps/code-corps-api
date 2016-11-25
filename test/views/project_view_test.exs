@@ -3,6 +3,10 @@ defmodule CodeCorps.ProjectViewTest do
 
   import Phoenix.View, only: [render: 3]
 
+  def set_current_donation_goal(project, donation_goal) do
+    %{project | current_donation_goal_id: donation_goal.id}
+  end
+
   test "renders all attributes and relationships properly" do
     organization = insert(:organization)
     project = insert(:project, organization: organization)
@@ -12,6 +16,8 @@ defmodule CodeCorps.ProjectViewTest do
     project_skill = insert(:project_skill, project: project)
     stripe_connect_plan = insert(:stripe_connect_plan, project: project)
     task = insert(:task, project: project)
+
+    project = project |> set_current_donation_goal(donation_goal)
 
     rendered_json = render(CodeCorps.ProjectView, "show.json-api", data: project)
 
@@ -30,6 +36,12 @@ defmodule CodeCorps.ProjectViewTest do
         },
         "id" => project.id |> Integer.to_string,
         "relationships" => %{
+          "current-donation-goal" => %{
+            "data" => %{
+              "id" => donation_goal.id |> Integer.to_string,
+              "type" => "donation-goal"
+            }
+          },
           "donation-goals" => %{"data" => [
             %{
               "id" => donation_goal.id |> Integer.to_string,
