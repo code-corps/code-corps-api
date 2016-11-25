@@ -1,6 +1,6 @@
-defmodule CodeCorps.Stripe.StripePlatformCustomer do
+defmodule CodeCorps.StripeService.StripePlatformCustomer do
   alias CodeCorps.Repo
-  alias CodeCorps.Stripe.Adapters
+  alias CodeCorps.StripeService.Adapters
   alias CodeCorps.StripePlatformCustomer
 
   @api Application.get_env(:code_corps, :stripe)

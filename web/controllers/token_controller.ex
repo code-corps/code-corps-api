@@ -8,7 +8,7 @@ defmodule CodeCorps.TokenController do
   def create(conn, params = %{"username" => _, "password" => _}) do
     case login_by_email_and_pass(params) do
       {:ok, user} ->
-        {:ok, token, claims} = user |> Guardian.encode_and_sign(:token)
+        {:ok, token, _claims} = user |> Guardian.encode_and_sign(:token)
 
         conn
         |> Plug.Conn.assign(:current_user, user)

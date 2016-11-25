@@ -1,18 +1,23 @@
-defmodule CodeCorps.Stripe.StripeConnectPlan do
+defmodule CodeCorps.StripeService.StripeConnectPlan do
   alias CodeCorps.Organization
   alias CodeCorps.Project
   alias CodeCorps.Repo
-  alias CodeCorps.Stripe.Adapters
+  alias CodeCorps.StripeService.Adapters
   alias CodeCorps.StripeConnectPlan
 
   @api Application.get_env(:code_corps, :stripe)
 
   def create(%{"project_id" => project_id} = attributes) do
-    with %Project{} = project <- Repo.get(Project, project_id),
-         create_attributes <- to_create_attributes(project),
-         %Organization{} = organization <- get_organization(project),
-         {:ok, plan} <- @api.Plan.create(create_attributes, connect_account: organization.stripe_connect_account.id_from_stripe),
-         {:ok, params} <- Adapters.StripeConnectPlan.to_params(plan, attributes)
+    with %Project{} = project <-
+           Repo.get(Project, project_id),
+         %{} = create_attributes <-
+           get_create_attributes(),
+         %Organization{} = organization <-
+           get_organization(project),
+         {:ok, plan} <-
+           @api.Plan.create(create_attributes, connect_account: organization.stripe_connect_account.id_from_stripe),
+         {:ok, params} <-
+           Adapters.StripeConnectPlan.to_params(plan, attributes)
     do
       %StripeConnectPlan{}
       |> StripeConnectPlan.create_changeset(params)
@@ -23,13 +28,13 @@ defmodule CodeCorps.Stripe.StripeConnectPlan do
     end
   end
 
-  defp to_create_attributes(%Project{title: title}) do
+  defp get_create_attributes do
     %{
-      amount: 1,
+      amount: 1, # in cents
       currency: "usd",
       id: "month",
       interval: "month",
-      name: "Monthly donation to #{title}."
+      name: "Monthly donation"
     }
   end
 

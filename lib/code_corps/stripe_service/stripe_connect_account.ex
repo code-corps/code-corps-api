@@ -1,5 +1,5 @@
-defmodule CodeCorps.Stripe.StripeConnectAccount do
-  alias CodeCorps.Stripe.Adapters
+defmodule CodeCorps.StripeService.StripeConnectAccount do
+  alias CodeCorps.StripeService.Adapters
   alias Stripe.Connect.OAuth.TokenResponse
 
   @api Application.get_env(:code_corps, :stripe)
