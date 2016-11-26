@@ -6,7 +6,7 @@ defmodule CodeCorps.ProjectTest do
   @valid_attrs %{title: "A title"}
   @invalid_attrs %{}
 
-  describe "changeset/3" do
+  describe "changeset/2" do
     test "with valid attributes is valid" do
       changeset = Project.changeset(%Project{}, @valid_attrs)
       assert changeset.valid?
@@ -60,17 +60,45 @@ defmodule CodeCorps.ProjectTest do
     end
   end
 
-  describe "create_changeset/3" do
+  describe "create_changeset/2" do
     test "accepts setting of organization_id" do
       changeset = Project.create_changeset(%Project{}, %{organization_id: 1})
       assert {:ok, 1} == changeset |> fetch_change(:organization_id)
     end
   end
 
-  describe "update_changeset/3" do
+  describe "update_changeset/2" do
     test "rejects setting of organization id" do
       changeset = Project.update_changeset(%Project{}, %{organization_id: 1})
       assert :error == changeset |> fetch_change(:organization_id)
+    end
+  end
+
+  describe "set_current_donation_goal_changeset/2" do
+    test "requires current_donation_goal_id" do
+      changeset = Project.set_current_donation_goal_changeset(%Project{}, %{})
+      refute changeset.valid?
+
+      assert changeset.errors[:current_donation_goal_id] == {"can't be blank", []}
+    end
+
+    test "accepts setting of current_donation_goal_id" do
+      changeset = Project.set_current_donation_goal_changeset(%Project{}, %{current_donation_goal_id: 1})
+      assert {:ok, 1} == changeset |> fetch_change(:current_donation_goal_id)
+    end
+
+    test "ensures associations link to records that exist" do
+      project = insert(:project)
+      attrs = %{current_donation_goal_id: -1}
+
+      { result, changeset } =
+        project
+        |> Project.set_current_donation_goal_changeset(attrs)
+        |> Repo.update
+
+      assert result == :error
+      refute changeset.valid?
+      assert changeset.errors[:current_donation_goal] == {"does not exist", []}
     end
   end
 end

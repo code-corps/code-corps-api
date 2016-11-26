@@ -19,7 +19,9 @@ defmodule CodeCorps.Project do
     field :slug, :string
     field :title, :string
 
+    belongs_to :current_donation_goal, CodeCorps.DonationGoal
     belongs_to :organization, CodeCorps.Organization
+
     has_one :stripe_connect_plan, CodeCorps.StripeConnectPlan
 
     has_many :donation_goals, CodeCorps.DonationGoal
@@ -29,6 +31,7 @@ defmodule CodeCorps.Project do
 
     has_many :categories, through: [:project_categories, :category]
     has_many :skills, through: [:project_skills, :skill]
+    has_many :stripe_connect_subscriptions, through: [:stripe_connect_plan, :stripe_connect_subscriptions]
 
     timestamps()
   end
@@ -59,6 +62,17 @@ defmodule CodeCorps.Project do
   """
   def update_changeset(struct, params) do
     struct
+    |> changeset(params)
+  end
+
+  @doc """
+  Builds a changeset for setting the current donation goal.
+  """
+  def set_current_donation_goal_changeset(struct, params) do
+    struct
+    |> cast(params, [:current_donation_goal_id])
+    |> validate_required(:current_donation_goal_id)
+    |> assoc_constraint(:current_donation_goal)
     |> changeset(params)
   end
 end

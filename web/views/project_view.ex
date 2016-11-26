@@ -1,8 +1,8 @@
 defmodule CodeCorps.ProjectView do
   use CodeCorps.PreloadHelpers,
     default_preloads: [
-      :donation_goals, :organization, :project_categories,
-      :stripe_connect_plan, :project_skills, :tasks
+      :current_donation_goal, :donation_goals, :organization,
+      :project_categories, :stripe_connect_plan, :project_skills, :tasks
     ]
   use CodeCorps.Web, :view
   use JaSerializer.PhoenixView
@@ -12,6 +12,7 @@ defmodule CodeCorps.ProjectView do
   	:long_description_body, :long_description_markdown,
   	:inserted_at, :updated_at]
 
+  has_one :current_donation_goal, serializer: CodeCorps.DonationGoalView
   has_one :organization, serializer: CodeCorps.OrganizationView
   has_one :stripe_connect_plan, serializer: CodeCorps.StripeConnectPlanView
 
