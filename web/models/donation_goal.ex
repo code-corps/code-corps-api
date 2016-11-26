@@ -12,6 +12,7 @@ defmodule CodeCorps.DonationGoal do
 
   schema "donation_goals" do
     field :amount, :integer
+    field :current, :boolean, default: false
     field :description, :string
 
     belongs_to :project, CodeCorps.Project
@@ -36,5 +37,15 @@ defmodule CodeCorps.DonationGoal do
     struct
     |> cast(params, [:amount, :description])
     |> validate_required([:amount, :description])
+  end
+
+  @doc """
+  Builds a changeset based on the `struct` and `params`.
+  """
+  def set_current_changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, [:current])
+    |> validate_required([:current])
+    |> unique_constraint(:current, [:project_id])
   end
 end

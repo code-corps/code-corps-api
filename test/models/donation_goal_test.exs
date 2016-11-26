@@ -36,4 +36,15 @@ defmodule CodeCorps.DonationGoalTest do
       assert changeset.errors[:description] == {"can't be blank", []}
     end
   end
+
+  describe "&set_current_changeset/2" do
+    test "requires current" do
+      attrs = %{current: nil}
+      donation_goal = insert(:donation_goal)
+      changeset = DonationGoal.set_current_changeset(donation_goal, attrs)
+
+      refute changeset.valid?
+      assert changeset.errors[:current] == {"can't be blank", []}
+    end
+  end
 end

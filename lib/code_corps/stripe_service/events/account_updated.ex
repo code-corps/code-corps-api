@@ -13,7 +13,7 @@ defmodule CodeCorps.StripeService.Events.AccountUpdated do
     local_account |> update(stripe_account)
   end
 
-  defp retrieve_account(%{"object" => %{"id" => id_from_stripe,}}) do
+  defp retrieve_account(%{"object" => %{"id" => id_from_stripe}}) do
     # hardcoded for testing
     id_from_stripe = "acct_19JlxsFTVVt7Lv80"
 
@@ -30,7 +30,9 @@ defmodule CodeCorps.StripeService.Events.AccountUpdated do
   end
 
   defp update(%StripeConnectAccount{} = record, %Stripe.Account{} = stripe_account) do
-    {:ok, params} = stripe_account |> Adapters.StripeConnectAccount.to_params(%{})
+    {:ok, params} =
+      stripe_account
+      |> Adapters.StripeConnectAccount.to_params(%{})
 
     record
     |> StripeConnectAccount.webhook_update_changeset(params)

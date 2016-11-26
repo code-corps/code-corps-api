@@ -10,17 +10,17 @@ defmodule CodeCorps.StripeService.Events.CustomerSubscriptionUpdated do
   @api Application.get_env(:code_corps, :stripe)
 
   # def handle(%{"data" => %{"object" => %{"livemode" => false}}}), do: {:ok, :ignored_not_live}
-  def handle(%{"data" => data}) do
-    {:ok, stripe_subscription} = data |> retrieve_subscription
+  def handle(%{"data" => %{"object" => %{"id" => connect_subscription_id, "customer" => connect_customer_id}}}) do
+    {:ok, stripe_subscription} = retrieve_subscription(connect_subscription_id, connect_customer_id)
     {:ok, params} = stripe_subscription |> Adapters.StripeConnectSubscription.to_params(%{})
 
-    {:ok, subscription} = data |> load_subscription |> update_subscription(params)
+    {:ok, subscription} = connect_customer_id |> load_subscription |> update_subscription(params)
     {:ok, project} = subscription |> get_project |> update_project_totals
 
     {:ok, subscription, project}
   end
 
-  defp retrieve_subscription(%{"object" => %{"id" => connect_subscription_id, "customer" => connect_customer_id}}) do
+  defp retrieve_subscription(connect_subscription_id,  connect_customer_id) do
     # hardcoded for testing
     connect_subscription_id = "sub_9d23Hm0TiyrMY4"
     connect_customer_id = "cus_9d23RTnbRtp5mk"
@@ -35,7 +35,7 @@ defmodule CodeCorps.StripeService.Events.CustomerSubscriptionUpdated do
     @api.Subscription.retrieve(connect_subscription_id, connect_account: connect_account_id)
   end
 
-  defp load_subscription(%{"object" => %{"id" => id_from_stripe}}) do
+  defp load_subscription(id_from_stripe) do
      # hardcoded for testing
     id_from_stripe = "sub_9d23Hm0TiyrMY4"
 
@@ -59,13 +59,13 @@ defmodule CodeCorps.StripeService.Events.CustomerSubscriptionUpdated do
   end
 
   defp update_project_totals(%Project{id: project_id} = project) do
-    total_donated =
+    total_monthly_donated =
       StripeConnectSubscription
       |> where([s], s.status=="active")
       |> Repo.aggregate(:sum, :quantity)
 
     project
-    |> Project.update_total_changeset(%{total_donated: total_donated})
+    |> Project.update_total_changeset(%{total_monthly_donated: total_monthly_donated})
     |> Repo.update
   end
 end
@@ -135,5 +135,3 @@ event = %{
   "pending_webhooks" => 1, "request" => nil,
   "type" => "customer.subscription.updated"
 }
-
-

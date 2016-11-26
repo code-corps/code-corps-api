@@ -1,4 +1,4 @@
-defmodule CodeCorps.StripityStripeTesting.Card do
+defmodule CodeCorps.StripeTesting.Card do
   def create(:customer, _stripe_id, _stripe_token, _opts \\ []) do
     {:ok, do_create}
   end

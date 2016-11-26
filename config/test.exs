@@ -30,7 +30,7 @@ config :guardian, Guardian,
 
 config :code_corps, :analytics, CodeCorps.Analytics.TestAPI
 
-config :code_corps, :stripe, CodeCorps.StripityStripeTesting
+config :code_corps, :stripe, CodeCorps.StripeTesting
 
 config :code_corps, :icon_color_generator, CodeCorps.RandomIconColor.TestGenerator
 

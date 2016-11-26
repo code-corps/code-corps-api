@@ -18,9 +18,8 @@ defmodule CodeCorps.Project do
     field :long_description_markdown, :string
     field :slug, :string
     field :title, :string
-    field :total_donated, :integer
+    field :total_monthly_donated, :integer
 
-    belongs_to :current_donation_goal, CodeCorps.DonationGoal
     belongs_to :organization, CodeCorps.Organization
 
     has_one :stripe_connect_plan, CodeCorps.StripeConnectPlan
@@ -66,19 +65,8 @@ defmodule CodeCorps.Project do
     |> changeset(params)
   end
 
-  @doc """
-  Builds a changeset for setting the current donation goal.
-  """
-  def set_current_donation_goal_changeset(struct, params) do
-    struct
-    |> cast(params, [:current_donation_goal_id])
-    |> validate_required(:current_donation_goal_id)
-    |> assoc_constraint(:current_donation_goal)
-    |> changeset(params)
-  end
-
   def update_total_changeset(struct, params) do
     struct
-    |> cast(params, [:total_donated])
+    |> cast(params, [:total_monthly_donated])
   end
 end

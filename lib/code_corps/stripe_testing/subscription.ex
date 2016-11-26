@@ -1,4 +1,4 @@
-defmodule CodeCorps.StripityStripeTesting.Subscription do
+defmodule CodeCorps.StripeTesting.Subscription do
   def create(map, _opts \\ []) do
     {:ok, do_create(map)}
   end
@@ -18,7 +18,7 @@ defmodule CodeCorps.StripityStripeTesting.Subscription do
       id: "sub_123",
       livemode: false,
       metadata: %{},
-      plan: CodeCorps.StripityStripeTesting.Plan.create(%{}, []),
+      plan: CodeCorps.StripeTesting.Plan.create(%{}, []),
       quantity: 1000,
       source: nil,
       start: date,

@@ -1,4 +1,4 @@
-defmodule CodeCorps.StripityStripeTesting.Connect.OAuth do
+defmodule CodeCorps.StripeTesting.Connect.OAuth do
   def token(_code) do
     {:ok, do_token}
   end

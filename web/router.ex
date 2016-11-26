@@ -36,12 +36,6 @@ defmodule CodeCorps.Router do
   end
 
   scope "/", CodeCorps do
-    pipe_through :stripe_webhooks
-    post "/stripe_connect_webhooks", StripeConnectWebhooksController, :webhook
-    post "/stripe_account_webhooks", StripeAccountWebhooksController, :webhook
-  end
-
-  scope "/", CodeCorps do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
