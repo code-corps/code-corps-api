@@ -19,6 +19,7 @@ defmodule CodeCorps.ProjectViewTest do
       "data" => %{
         "attributes" => %{
           "description" => project.description,
+          "donations-active" => true,
           "icon-large-url" => CodeCorps.ProjectIcon.url({project.icon, project}, :large),
           "icon-thumb-url" => CodeCorps.ProjectIcon.url({project.icon, project}, :thumb),
           "inserted-at" => project.inserted_at,
@@ -82,5 +83,32 @@ defmodule CodeCorps.ProjectViewTest do
     }
 
     assert rendered_json == expected_json
+  end
+
+  test "renders donations-active true when project has donations and a plan" do
+    project = insert(:project)
+    insert(:donation_goal, project: project)
+    insert(:stripe_connect_plan, project: project)
+
+    conn = Phoenix.ConnTest.build_conn
+    rendered_json = render(CodeCorps.ProjectView, "show.json-api", data: project, conn: conn)
+    assert rendered_json["data"]["attributes"]["donations-active"] == true
+  end
+
+  test "renders donations-active false when project has donations and no plan" do
+    project = insert(:project)
+    insert(:donation_goal, project: project)
+
+    conn = Phoenix.ConnTest.build_conn
+    rendered_json = render(CodeCorps.ProjectView, "show.json-api", data: project, conn: conn)
+    assert rendered_json["data"]["attributes"]["donations-active"] == false
+  end
+
+  test "renders donations-active false when project has no donations and no plan" do
+    project = insert(:project)
+
+    conn = Phoenix.ConnTest.build_conn
+    rendered_json = render(CodeCorps.ProjectView, "show.json-api", data: project, conn: conn)
+    assert rendered_json["data"]["attributes"]["donations-active"] == false
   end
 end
