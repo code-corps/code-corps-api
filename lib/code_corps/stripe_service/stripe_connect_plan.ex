@@ -3,19 +3,18 @@ defmodule CodeCorps.StripeService.StripeConnectPlan do
   alias CodeCorps.Project
   alias CodeCorps.Repo
   alias CodeCorps.StripeService.Adapters
+  alias CodeCorps.StripeConnectAccount
   alias CodeCorps.StripeConnectPlan
 
   @api Application.get_env(:code_corps, :stripe)
 
   def create(%{"project_id" => project_id} = attributes) do
-    with %Project{} = project <-
-           Repo.get(Project, project_id),
+    with %Project{donation_goals: [_h | _t], organization: %Organization{stripe_connect_account: %StripeConnectAccount{id_from_stripe: connect_account_id}}} <-
+           get_records(project_id),
          %{} = create_attributes <-
            get_create_attributes(),
-         %Organization{} = organization <-
-           get_organization(project),
          {:ok, plan} <-
-           @api.Plan.create(create_attributes, connect_account: organization.stripe_connect_account.id_from_stripe),
+           @api.Plan.create(create_attributes, connect_account: connect_account_id),
          {:ok, params} <-
            Adapters.StripeConnectPlan.to_params(plan, attributes)
     do
@@ -23,6 +22,7 @@ defmodule CodeCorps.StripeService.StripeConnectPlan do
       |> StripeConnectPlan.create_changeset(params)
       |> Repo.insert
     else
+      %Project{donation_goals: []} -> {:error, :donation_goals_not_found}
       {:error, error} -> {:error, error}
       nil -> {:error, :not_found}
     end
@@ -38,9 +38,9 @@ defmodule CodeCorps.StripeService.StripeConnectPlan do
     }
   end
 
-  defp get_organization(%Project{organization_id: organization_id}) do
-    Organization
-    |> Repo.get(organization_id)
-    |> Repo.preload([:stripe_connect_account])
+  defp get_records(project_id) do
+    Project
+    |> Repo.get(project_id)
+    |> Repo.preload([:donation_goals, {:organization, :stripe_connect_account}])
   end
 end

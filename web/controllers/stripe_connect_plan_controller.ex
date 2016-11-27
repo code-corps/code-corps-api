@@ -17,6 +17,11 @@ defmodule CodeCorps.StripeConnectPlanController do
   defp handle_create_result({:ok, %StripeConnectPlan{}} = result, conn) do
     result |> CodeCorps.Analytics.Segment.track(:created, conn)
   end
+  defp handle_create_result({:error, :donation_goals_not_found}, conn) do
+    conn
+    |> put_status(422)
+    |> render(CodeCorps.ErrorView, "422.json-api")
+  end
   defp handle_create_result({:error, %Stripe.APIErrorResponse{}}, conn) do
     conn
     |> put_status(500)
