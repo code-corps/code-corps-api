@@ -11,6 +11,7 @@ defmodule CodeCorps.Mixfile do
      start_permanent: Mix.env == :prod,
      aliases: aliases(),
      deps: deps(),
+     docs: docs(),
      test_coverage: [tool: ExCoveralls]]
   end
 
@@ -88,6 +89,17 @@ defmodule CodeCorps.Mixfile do
       {:stripity_stripe, "~> 2.0.0-alpha.3"}, # Stripe
       {:timex, "~> 3.0"},
       {:timex_ecto, "~> 3.0"}
+    ]
+  end
+
+  defp docs do
+    [
+      extras: [
+        "README.md": [title: "README"],
+        "LICENSE.md": [title: "LICENSE"]
+      ],
+      main: "README",
+      source_url: "https://github.com/code-corps/code-corps-api/doc"
     ]
   end
 

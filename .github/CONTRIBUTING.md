@@ -204,4 +204,4 @@ Some tests are tagged like so:
 
 These tests do not run by default when running `mix test` because you do not have access to the environment variables listed in `.env.example` by default.
 
-To read more about the environment variables, see the "Environment" section of our [usage docs](docs/USAGE.md#environment).
+To read more about the environment variables, see the "Environment" section of our [usage docs](USAGE.md#environment).
