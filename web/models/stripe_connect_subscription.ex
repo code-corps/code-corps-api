@@ -52,7 +52,7 @@ defmodule CodeCorps.StripeConnectSubscription do
     :customer_id_from_stripe, :ended_at, :id_from_stripe, :plan_id_from_stripe, :quantity,
     :start, :status, :stripe_connect_plan_id, :user_id
   ]
-  
+
   @required_params [
     :application_fee_percent, :id_from_stripe, :plan_id_from_stripe,
     :quantity, :stripe_connect_plan_id, :user_id
@@ -65,5 +65,12 @@ defmodule CodeCorps.StripeConnectSubscription do
     |> unique_constraint(:id_from_stripe)
     |> assoc_constraint(:stripe_connect_plan)
     |> assoc_constraint(:user)
+  end
+
+  @update_params [:cancelled_at, :current_period_end, :current_period_start, :ended_at, :quantity, :start, :status]
+
+  def webhook_update_changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, @update_params)
   end
 end

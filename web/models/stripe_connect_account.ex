@@ -40,4 +40,15 @@ defmodule CodeCorps.StripeConnectAccount do
     |> validate_required([:id_from_stripe, :organization_id])
     |> assoc_constraint(:organization)
   end
+
+  @webhook_update_params [
+    :business_name, :business_url, :charges_enabled, :country, :default_currency,
+    :details_submitted, :email, :managed, :support_email, :support_phone,
+    :support_url, :transfers_enabled
+  ]
+
+  def webhook_update_changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, @webhook_update_params)
+  end
 end

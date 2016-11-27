@@ -73,32 +73,4 @@ defmodule CodeCorps.ProjectTest do
       assert :error == changeset |> fetch_change(:organization_id)
     end
   end
-
-  describe "set_current_donation_goal_changeset/2" do
-    test "requires current_donation_goal_id" do
-      changeset = Project.set_current_donation_goal_changeset(%Project{}, %{})
-      refute changeset.valid?
-
-      assert changeset.errors[:current_donation_goal_id] == {"can't be blank", []}
-    end
-
-    test "accepts setting of current_donation_goal_id" do
-      changeset = Project.set_current_donation_goal_changeset(%Project{}, %{current_donation_goal_id: 1})
-      assert {:ok, 1} == changeset |> fetch_change(:current_donation_goal_id)
-    end
-
-    test "ensures associations link to records that exist" do
-      project = insert(:project)
-      attrs = %{current_donation_goal_id: -1}
-
-      { result, changeset } =
-        project
-        |> Project.set_current_donation_goal_changeset(attrs)
-        |> Repo.update
-
-      assert result == :error
-      refute changeset.valid?
-      assert changeset.errors[:current_donation_goal] == {"does not exist", []}
-    end
-  end
 end

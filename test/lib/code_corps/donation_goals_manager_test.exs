@@ -5,14 +5,12 @@ defmodule CodeCorps.DonationGoalsManagerTest do
 
   alias CodeCorps.DonationGoal
   alias CodeCorps.DonationGoalsManager
-  alias CodeCorps.Project
 
   defp assert_current_goal_id(goal_id) do
-    project =
-      Project
-      |> Repo.get_by(current_donation_goal_id: goal_id)
-      |> Repo.preload([:current_donation_goal])
-    assert project.current_donation_goal.id == goal_id
+    current_goal =
+      DonationGoal
+      |> Repo.get_by(current: true)
+    assert current_goal.id == goal_id
   end
 
   defp donate(plan, amount) do
@@ -33,30 +31,49 @@ defmodule CodeCorps.DonationGoalsManagerTest do
       refute changeset.valid?
     end
 
+    test "sets current goal correctly when amount exists already" do
+      project = insert(:project)
+      plan = insert(:stripe_connect_plan, project: project)
+      insert(:stripe_connect_subscription, quantity: 10, stripe_connect_plan: plan)
+
+      {:ok, first_goal} = DonationGoalsManager.create(%{amount: 20, description: "Test", project_id: project.id})
+
+      assert_current_goal_id(first_goal.id)
+
+      {:ok, second_goal} = DonationGoalsManager.create(%{amount: 15, description: "Test", project_id: project.id})
+
+      assert_current_goal_id(second_goal.id)
+    end
+
     test "sets current goal correctly" do
       project = insert(:project)
       plan = insert(:stripe_connect_plan, project: project)
 
+      insert(:stripe_connect_subscription, quantity: 5, stripe_connect_plan: plan)
+
       {:ok, first_goal} = DonationGoalsManager.create(%{amount: 10, description: "Test", project_id: project.id})
 
-      # total donated is 0,
+      # total donated is 5,
       # only goal inserted is the first goal
       assert_current_goal_id(first_goal.id)
 
-      {:ok, second_goal} = DonationGoalsManager.create(%{amount: 20, description: "Test", project_id: project.id})
+      {:ok, second_goal} = DonationGoalsManager.create(%{amount: 7, description: "Test", project_id: project.id})
 
-      # total donated is still 0
-      # first goal larger than 0 is the very first goal
-      assert_current_goal_id(first_goal.id)
+      assert_current_goal_id(second_goal.id)
+
+      {:ok, _} = DonationGoalsManager.create(%{amount: 20, description: "Test", project_id: project.id})
+
+      # total donated is still 5
+      # first goal larger than 5 is the second goal
+      assert_current_goal_id(second_goal.id)
 
       insert(:stripe_connect_subscription, quantity: 15, stripe_connect_plan: plan)
 
-      {:ok, _} = DonationGoalsManager.create(%{amount: 30, description: "Test", project_id: project.id})
+      {:ok, fourth_goal} = DonationGoalsManager.create(%{amount: 30, description: "Test", project_id: project.id})
 
-      # total donated is 15.
-      # first applicable goal is second goal, with an amount of 20
-      # third goal has an amount of 30, which is not applicable
-      assert_current_goal_id(second_goal.id)
+      # total donated is 20.
+      # first applicable goal is fourth goal, with an amount of 30
+      assert_current_goal_id(fourth_goal.id)
 
       insert(:stripe_connect_subscription, quantity: 30, stripe_connect_plan: plan)
 
@@ -140,27 +157,27 @@ defmodule CodeCorps.DonationGoalsManagerTest do
       goal_3 = insert(:donation_goal, amount: 20, project: project)
 
       plan |> donate(5)
-      DonationGoalsManager.set_current_goal_for_project(project)
+      DonationGoalsManager.update_related_goals(goal_1)
       assert_current_goal_id(goal_1.id)
 
       plan |> donate(5) # total is now 10
-      DonationGoalsManager.set_current_goal_for_project(project)
+      DonationGoalsManager.update_related_goals(goal_2)
       assert_current_goal_id(goal_2.id)
 
       plan |> donate(5) # total is now 15
-      DonationGoalsManager.set_current_goal_for_project(project)
+      DonationGoalsManager.update_related_goals(goal_3)
       assert_current_goal_id(goal_3.id)
 
       plan |> donate(5) # total is now 20
-      DonationGoalsManager.set_current_goal_for_project(project)
+      DonationGoalsManager.update_related_goals(goal_3)
       assert_current_goal_id(goal_3.id)
 
       plan |> donate(5) # total is now 25
-      DonationGoalsManager.set_current_goal_for_project(project)
+      DonationGoalsManager.update_related_goals(goal_3)
       assert_current_goal_id(goal_3.id)
 
       goal_4 = insert(:donation_goal, amount: 30, project: project) # 30 is more than the current 25 total
-      DonationGoalsManager.set_current_goal_for_project(project)
+      DonationGoalsManager.update_related_goals(goal_4)
       assert_current_goal_id(goal_4.id)
     end
   end

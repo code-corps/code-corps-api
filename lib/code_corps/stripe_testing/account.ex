@@ -1,4 +1,4 @@
-defmodule CodeCorps.StripityStripeTesting.Account do
+defmodule CodeCorps.StripeTesting.Account do
   def retrieve(_id) do
     {:ok, do_retrieve}
   end
