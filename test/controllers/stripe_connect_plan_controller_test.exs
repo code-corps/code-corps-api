@@ -1,8 +1,6 @@
 defmodule CodeCorps.StripeConnectPlanControllerTest do
   use CodeCorps.ApiCase, resource_name: :stripe_connect_plan
 
-
-
   describe "show" do
     @tag :authenticated
     test "shows resource when authenticated and authorized", %{conn: conn, current_user: current_user} do
@@ -43,6 +41,7 @@ defmodule CodeCorps.StripeConnectPlanControllerTest do
       insert(:organization_membership, role: "owner", member: current_user, organization: organization)
       insert(:stripe_connect_account, organization: organization)
       project = insert(:project, organization: organization)
+      insert(:donation_goal, project: project)
 
       assert conn |> request_create(%{project: project}) |> json_response(201)
     end
@@ -58,6 +57,16 @@ defmodule CodeCorps.StripeConnectPlanControllerTest do
       project = insert(:project, organization: organization)
 
       assert conn |> request_create(%{project: project}) |> json_response(403)
+    end
+
+    @tag :authenticated
+    test "does not create resource and renders 422 when no donation goals exist", %{conn: conn, current_user: current_user} do
+      organization = insert(:organization)
+      insert(:organization_membership, role: "owner", member: current_user, organization: organization)
+      insert(:stripe_connect_account, organization: organization)
+      project = insert(:project, organization: organization)
+      
+      assert conn |> request_create(%{project: project}) |> json_response(422)
     end
   end
 end
