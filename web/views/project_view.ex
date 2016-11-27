@@ -8,8 +8,8 @@ defmodule CodeCorps.ProjectView do
   use JaSerializer.PhoenixView
 
   attributes [
-  	:slug, :title, :description, :icon_thumb_url, :icon_large_url,
-  	:long_description_body, :long_description_markdown,
+  	:slug, :title, :description, :donations_active, :icon_thumb_url,
+    :icon_large_url, :long_description_body, :long_description_markdown,
   	:inserted_at, :total_monthly_donated, :updated_at]
 
   has_one :organization, serializer: CodeCorps.OrganizationView
@@ -19,6 +19,10 @@ defmodule CodeCorps.ProjectView do
   has_many :project_categories, serializer: CodeCorps.ProjectCategoryView, identifiers: :always
   has_many :project_skills, serializer: CodeCorps.ProjectSkillView, identifiers: :always
   has_many :tasks, serializer: CodeCorps.TaskView, identifiers: :always
+
+  def donations_active(project, _conn) do
+    Enum.any?(project.donation_goals) && project.stripe_connect_plan != nil
+  end
 
   def icon_large_url(project, _conn) do
     CodeCorps.ProjectIcon.url({project.icon, project}, :large)
