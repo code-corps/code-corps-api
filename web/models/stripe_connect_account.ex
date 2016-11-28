@@ -42,9 +42,9 @@ defmodule CodeCorps.StripeConnectAccount do
   end
 
   @webhook_update_params [
-    :business_name, :business_url, :charges_enabled, :country, :default_currency,
-    :details_submitted, :email, :managed, :support_email, :support_phone,
-    :support_url, :transfers_enabled
+    :business_name, :business_url, :charges_enabled, :country,
+    :default_currency, :details_submitted, :email, :managed, :support_email,
+    :support_phone, :support_url, :transfers_enabled
   ]
 
   def webhook_update_changeset(struct, params \\ %{}) do

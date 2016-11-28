@@ -1,13 +1,13 @@
-defmodule CodeCorps.StripeService.StripePlatformCustomer do
+defmodule CodeCorps.StripeService.StripePlatformCustomerService do
   alias CodeCorps.Repo
-  alias CodeCorps.StripeService.Adapters
+  alias CodeCorps.StripeService.Adapters.StripePlatformCustomerAdapter
   alias CodeCorps.StripePlatformCustomer
 
   @api Application.get_env(:code_corps, :stripe)
 
   def create(attributes) do
     with {:ok, customer} <- @api.Customer.create(attributes),
-         {:ok, params} <- Adapters.StripePlatformCustomer.to_params(customer, attributes)
+         {:ok, params} <- StripePlatformCustomerAdapter.to_params(customer, attributes)
     do
       %StripePlatformCustomer{}
       |> StripePlatformCustomer.create_changeset(params)

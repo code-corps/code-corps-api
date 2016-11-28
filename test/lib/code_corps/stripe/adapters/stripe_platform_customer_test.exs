@@ -1,7 +1,7 @@
-defmodule CodeCorps.StripeService.Adapters.StripePlatformCustomerTest do
+defmodule CodeCorps.StripeService.Adapters.StripePlatformCustomerTestAdapter do
   use ExUnit.Case, async: true
 
-  import CodeCorps.StripeService.Adapters.StripePlatformCustomer, only: [to_params: 2]
+  import CodeCorps.StripeService.Adapters.StripePlatformCustomerAdapter, only: [to_params: 2]
 
   {:ok, timestamp} = DateTime.from_unix(1479472835)
 

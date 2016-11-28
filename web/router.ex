@@ -44,8 +44,8 @@ defmodule CodeCorps.Router do
   scope "/", CodeCorps, host: "api." do
     pipe_through [:stripe_webhooks]
 
-    post "/webooks/stripe/connect", StripeConnectEventsController, :create
-    post "/webooks/stripe/platform", StripePlatformEventsController, :create
+    post "/webhooks/stripe/connect", StripeConnectEventsController, :create
+    post "/webhooks/stripe/platform", StripePlatformEventsController, :create
   end
 
   scope "/", CodeCorps, host: "api." do

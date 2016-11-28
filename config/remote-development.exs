@@ -32,6 +32,11 @@ config :guardian, Guardian,
 # Do not print debug messages in production
 config :logger, level: :info
 
+
+# Configures stripe for remote dev
+config :code_corps, :stripe, Stripe
+config :code_corps, :stripe_env, :remote_dev
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key

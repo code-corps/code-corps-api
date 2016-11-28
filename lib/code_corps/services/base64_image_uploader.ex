@@ -1,6 +1,8 @@
-defmodule CodeCorps.Base64ImageUploader do
+defmodule CodeCorps.Services.Base64ImageUploaderService do
   use Arc.Ecto.Schema
   import Ecto.Changeset, only: [cast: 3, validate_required: 2]
+
+  alias CodeCorps.Services.Base64ImageService
 
   @doc """
   Takes a changeset, a virtual origin field containing base64 image
@@ -18,7 +20,7 @@ defmodule CodeCorps.Base64ImageUploader do
   defp do_upload_image(changeset, image_content, destination_field) do
     plug_upload =
       image_content
-      |> CodeCorps.Base64Image.save_to_file()
+      |> Base64ImageService.save_to_file()
       |> build_plug_upload
 
     changeset

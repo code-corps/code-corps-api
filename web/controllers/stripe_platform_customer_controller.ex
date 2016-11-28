@@ -3,6 +3,7 @@ defmodule CodeCorps.StripePlatformCustomerController do
   use JaResource
 
   alias CodeCorps.StripePlatformCustomer
+  alias CodeCorps.StripeService.StripePlatformCustomerService
 
   plug :load_and_authorize_resource, model: StripePlatformCustomer, only: [:show]
   plug :load_and_authorize_changeset, model: StripePlatformCustomer, only: [:create]
@@ -10,7 +11,7 @@ defmodule CodeCorps.StripePlatformCustomerController do
 
   def handle_create(conn, attributes) do
     attributes
-    |> CodeCorps.StripeService.StripePlatformCustomer.create
+    |> StripePlatformCustomerService.create
     |> handle_create_result(conn)
   end
 

@@ -1,4 +1,4 @@
-defmodule CodeCorps.StripeService.Adapters.StripeConnectSubscription do
+defmodule CodeCorps.StripeService.Adapters.StripeConnectSubscriptionAdapter do
   @moduledoc """
   Used for conversion between stripe api payload maps and maps
   usable for creation of StripeConnectSubscription records locally

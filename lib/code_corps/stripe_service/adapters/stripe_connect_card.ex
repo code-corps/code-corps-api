@@ -1,4 +1,4 @@
-defmodule CodeCorps.StripeService.Adapters.StripeConnectCard do
+defmodule CodeCorps.StripeService.Adapters.StripeConnectCardAdapter do
   import CodeCorps.MapUtils, only: [rename: 3, keys_to_string: 1]
 
   @stripe_attributes [:id]

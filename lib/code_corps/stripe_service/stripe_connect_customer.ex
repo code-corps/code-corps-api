@@ -1,6 +1,6 @@
-defmodule CodeCorps.StripeService.StripeConnectCustomer do
+defmodule CodeCorps.StripeService.StripeConnectCustomerService do
   alias CodeCorps.Repo
-  alias CodeCorps.StripeService.Adapters
+  alias CodeCorps.StripeService.Adapters.StripeConnectCustomerAdapter
   alias CodeCorps.StripeConnectAccount
   alias CodeCorps.StripeConnectCustomer
   alias CodeCorps.StripePlatformCustomer
@@ -25,7 +25,7 @@ defmodule CodeCorps.StripeService.StripeConnectCustomer do
     with {:ok, customer} <-
            @api.Customer.create(%{}, connect_account: connect_account.id_from_stripe),
          {:ok, params} <-
-           Adapters.StripeConnectCustomer.to_params(customer, attributes)
+           StripeConnectCustomerAdapter.to_params(customer, attributes)
     do
       %StripeConnectCustomer{}
       |> StripeConnectCustomer.create_changeset(params)

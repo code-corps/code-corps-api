@@ -1,4 +1,4 @@
-defmodule CodeCorps.StripeService.Adapters.StripeConnectPlan do
+defmodule CodeCorps.StripeService.Adapters.StripeConnectPlanAdapter do
   @moduledoc """
   Used for conversion between stripe api payload maps and maps
   usable for creation of `StripeConnectPlan` records locally

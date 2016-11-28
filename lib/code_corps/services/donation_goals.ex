@@ -1,4 +1,4 @@
-defmodule CodeCorps.DonationGoalsManager do
+defmodule CodeCorps.Services.DonationGoalsService do
   @moduledoc """
   Handles CRUD operations for donation goals.
 
@@ -71,7 +71,6 @@ defmodule CodeCorps.DonationGoalsManager do
   Updates sibling goals for a `CodeCorps.DonationGoal` by:
 
   - Finding this goal's project
-  - Calculating the total donations for the project
   - Finding the current goal for that project
   - Setting `current` on every sibling goal to `false`
   - Setting `current` on the found goal to `true`
@@ -98,51 +97,50 @@ defmodule CodeCorps.DonationGoalsManager do
     end
   end
 
-  defp aggregate_donations(nil), do: 0
-  defp aggregate_donations(%CodeCorps.StripeConnectPlan{id: plan_id}) do
-    CodeCorps.StripeConnectSubscription
-    |> where([s], s.stripe_connect_plan_id == ^plan_id)
-    |> Repo.aggregate(:sum, :quantity)
+  @doc """
+  Updates all `CodeCorpes.DonationGoal` records for a project.
+
+  To be used when something related to the project's donation goals changes,
+  but not any of the donation goals directly.
+
+  For example, a customer could update their subscription, which would change the total
+  amount in monthly donations to a project, so the current goal might need updating.
+
+  It updates all goals for a project by
+  - finding the current goal for a project
+  - setting `current` for each of its siblings to false
+  - setting `current` for the current goal to true
+  """
+  def update_project_goals(%Project{} = project) do
+    with current_goal <- find_current_goal(project)
+    do
+      update_goals(project, current_goal)
+    end
   end
 
-  defp default_to_zero(nil), do: 0
-  defp default_to_zero(value), do: value
-
   defp find_current_goal(%Project{} = project) do
-    amount_donated = get_amount_donated(project)
-    case find_lowest_not_yet_reached(project, amount_donated) do
+    case find_lowest_not_yet_reached(project) do
       nil ->
-        find_largest_goal(project, amount_donated)
+        find_largest_goal(project)
       %DonationGoal{} = donation_goal ->
         donation_goal
     end
   end
 
-  defp find_largest_goal(%Project{id: project_id}, amount_donated) do
+  defp find_largest_goal(%Project{id: project_id, total_monthly_donated: total_monthly_donated}) do
     DonationGoal
-    |> where([d], d.project_id == ^project_id and d.amount <= ^amount_donated)
+    |> where([d], d.project_id == ^project_id and d.amount <= ^total_monthly_donated)
     |> order_by(desc: :amount)
     |> limit(1)
     |> Repo.one
   end
 
-  defp find_lowest_not_yet_reached(%Project{id: project_id}, amount_donated) do
+  defp find_lowest_not_yet_reached(%Project{id: project_id, total_monthly_donated: total_monthly_donated}) do
     DonationGoal
-    |> where([d], d.project_id == ^project_id and d.amount > ^amount_donated)
+    |> where([d], d.project_id == ^project_id and d.amount > ^total_monthly_donated)
     |> order_by(asc: :amount)
     |> limit(1)
     |> Repo.one
-  end
-
-  defp get_amount_donated(%Project{id: project_id}) do
-    # TODO: This should be simplified by having
-    # subscriptions relate to projects instead of plans
-    # and by caching the total amount on the project itself
-
-    CodeCorps.StripeConnectPlan
-    |> Repo.get_by(project_id: project_id)
-    |> aggregate_donations
-    |> default_to_zero
   end
 
   defp update_goals(%Project{id: project_id}, %DonationGoal{} = donation_goal) do
@@ -155,4 +153,7 @@ defmodule CodeCorps.DonationGoalsManager do
     |> DonationGoal.set_current_changeset(%{current: true})
     |> Repo.update()
   end
+  # if there is no candidate for a current goal,
+  # then there are no goals at all, so we do nothing
+  defp update_goals(%Project{}, nil), do: nil
 end

@@ -1,4 +1,4 @@
-defmodule CodeCorps.Base64Image do
+defmodule CodeCorps.Services.Base64ImageService do
   def save_to_file("data:" <> data_string) do
     [content_type, content_string] =
       data_string

@@ -1,4 +1,4 @@
-defmodule CodeCorps.StripeService.Adapters.StripeConnectCustomer do
+defmodule CodeCorps.StripeService.Adapters.StripeConnectCustomerAdapter do
   import CodeCorps.MapUtils, only: [rename: 3, keys_to_string: 1]
 
   def to_params(%Stripe.Customer{} = customer, %{} = attributes) do

@@ -1,8 +1,8 @@
 defmodule CodeCorps.StripePlatformEventsController do
   use CodeCorps.Web, :controller
 
-  def webhook(conn, json) do
-    handle(json) |> IO.inspect
+  def create(conn, json) do
+    handle(json)
     conn |> respond
   end
 

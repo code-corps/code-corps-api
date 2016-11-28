@@ -1,11 +1,7 @@
-defmodule CodeCorps.StripeService.StripeConnectCard do
-  alias CodeCorps.Repo
-  alias CodeCorps.StripeService.Adapters
-  alias CodeCorps.StripeConnectAccount
-  alias CodeCorps.StripeConnectCard
-  alias CodeCorps.StripeConnectCustomer
-  alias CodeCorps.StripePlatformCard
-  alias CodeCorps.StripePlatformCustomer
+defmodule CodeCorps.StripeService.StripeConnectCardService do
+  alias CodeCorps.{Repo, StripeConnectAccount, StripeConnectCard,
+  StripeConnectCustomer, StripePlatformCard, StripePlatformCustomer}
+  alias CodeCorps.StripeService.Adapters.StripeConnectCardAdapter
 
   import CodeCorps.MapUtils, only: [rename: 3, keys_to_string: 1]
   import Ecto.Query # needed for match
@@ -36,7 +32,7 @@ defmodule CodeCorps.StripeService.StripeConnectCard do
          {:ok, %Stripe.Card{} = connect_card} <-
            @api.Card.create(:customer, connect_customer_id, connect_token.id, connect_account: connect_account_id),
          {:ok, params} <-
-           Adapters.StripeConnectCard.to_params(connect_card, attributes)
+           StripeConnectCardAdapter.to_params(connect_card, attributes)
     do
       %StripeConnectCard{}
       |> StripeConnectCard.create_changeset(params)
