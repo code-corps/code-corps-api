@@ -1,5 +1,5 @@
 defmodule CodeCorps.StripeTesting.Connect.OAuth do
-  def token(_code) do
+  def token(_map) do
     {:ok, do_token}
   end
 
