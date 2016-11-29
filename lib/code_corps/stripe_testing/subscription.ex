@@ -7,7 +7,7 @@ defmodule CodeCorps.StripeTesting.Subscription do
     {:ok, do_retrieve(map)}
   end
 
-  defp do_create(_) do
+  defp do_create(%{quantity: quantity}) do
     {:ok, date} = DateTime.from_unix(1479472835)
 
     {:ok, plan} = CodeCorps.StripeTesting.Plan.create(%{}, [])
@@ -25,7 +25,7 @@ defmodule CodeCorps.StripeTesting.Subscription do
       livemode: false,
       metadata: %{},
       plan: plan,
-      quantity: 1000,
+      quantity: quantity,
       source: nil,
       start: date,
       status: "active",

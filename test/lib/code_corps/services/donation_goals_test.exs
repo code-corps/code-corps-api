@@ -1,6 +1,4 @@
 defmodule CodeCorps.Services.DonationGoalsServiceTest do
-  use ExUnit.Case, async: true
-
   use CodeCorps.ModelCase
 
   import CodeCorps.Project, only: [update_total_changeset: 2]

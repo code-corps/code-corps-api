@@ -1,5 +1,4 @@
 defmodule CodeCorps.Services.ProjectServiceTest do
-  use ExUnit.Case, async: true
   use CodeCorps.ModelCase
 
   alias CodeCorps.Project
