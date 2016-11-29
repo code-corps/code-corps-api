@@ -5,10 +5,10 @@ defmodule CodeCorps.Project do
 
   use Arc.Ecto.Schema
   use CodeCorps.Web, :model
-  import CodeCorps.Base64ImageUploader
+  import CodeCorps.Services.Base64ImageUploaderService
   import CodeCorps.Helpers.Slug
   import CodeCorps.Validators.SlugValidator
-  alias CodeCorps.MarkdownRenderer
+  alias CodeCorps.Services.MarkdownRendererService
 
   schema "projects" do
     field :base64_icon_data, :string, virtual: true
@@ -18,7 +18,7 @@ defmodule CodeCorps.Project do
     field :long_description_markdown, :string
     field :slug, :string
     field :title, :string
-    field :total_monthly_donated, :integer
+    field :total_monthly_donated, :integer, default: 0
 
     belongs_to :organization, CodeCorps.Organization
 
@@ -43,7 +43,7 @@ defmodule CodeCorps.Project do
     |> generate_slug(:title, :slug)
     |> validate_slug(:slug)
     |> unique_constraint(:slug, name: :index_projects_on_slug)
-    |> MarkdownRenderer.render_markdown_to_html(:long_description_markdown, :long_description_body)
+    |> MarkdownRendererService.render_markdown_to_html(:long_description_markdown, :long_description_body)
     |> upload_image(:base64_icon_data, :icon)
   end
 

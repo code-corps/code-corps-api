@@ -8,7 +8,7 @@ defmodule CodeCorps.DonationGoalViewTest do
     plan = insert(:stripe_connect_plan, project: project)
     insert(:stripe_connect_subscription, stripe_connect_plan: plan, quantity: 100)
     donation_goal = insert(:donation_goal, project: project, amount: 500)
-    CodeCorps.DonationGoalsManager.update_related_goals(donation_goal)
+    CodeCorps.Services.DonationGoalsService.update_related_goals(donation_goal)
 
     rendered_json = render(CodeCorps.DonationGoalView, "show.json-api", data: donation_goal)
 
@@ -17,7 +17,7 @@ defmodule CodeCorps.DonationGoalViewTest do
         "id" => donation_goal.id |> Integer.to_string,
         "type" => "donation-goal",
         "attributes" => %{
-          "achieved" => true,
+          "achieved" => false,
           "amount" => donation_goal.amount,
           "current" => donation_goal.current,
           "description" => donation_goal.description

@@ -1,8 +1,8 @@
-defmodule CodeCorps.StripeService.StripeConnectPlan do
+defmodule CodeCorps.StripeService.StripeConnectPlanService do
   alias CodeCorps.Organization
   alias CodeCorps.Project
   alias CodeCorps.Repo
-  alias CodeCorps.StripeService.Adapters
+  alias CodeCorps.StripeService.Adapters.StripeConnectPlanAdapter
   alias CodeCorps.StripeConnectAccount
   alias CodeCorps.StripeConnectPlan
 
@@ -16,7 +16,7 @@ defmodule CodeCorps.StripeService.StripeConnectPlan do
          {:ok, plan} <-
            @api.Plan.create(create_attributes, connect_account: connect_account_id),
          {:ok, params} <-
-           Adapters.StripeConnectPlan.to_params(plan, attributes)
+           StripeConnectPlanAdapter.to_params(plan, attributes)
     do
       %StripeConnectPlan{}
       |> StripeConnectPlan.create_changeset(params)

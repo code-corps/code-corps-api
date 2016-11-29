@@ -1,7 +1,7 @@
 defmodule CodeCorps.Comment do
   use CodeCorps.Web, :model
 
-  alias CodeCorps.MarkdownRenderer
+  alias CodeCorps.Services.MarkdownRendererService
 
   schema "comments" do
     field :body, :string
@@ -20,7 +20,7 @@ defmodule CodeCorps.Comment do
     struct
     |> cast(params, [:markdown])
     |> validate_required([:markdown])
-    |> MarkdownRenderer.render_markdown_to_html(:markdown, :body)
+    |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
   end
 
   def create_changeset(struct, params) do

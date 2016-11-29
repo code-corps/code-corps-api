@@ -8,11 +8,11 @@ defmodule CodeCorps.StripeAuthController do
 
   plug :load_and_authorize_resource, model: Project, only: [:stripe_auth]
 
-  # We're using `stripe_auth` instead of `show` to use the Organization
+  # We're using `stripe_auth` instead of `show` to use the Project
   # policy for authorization
   def stripe_auth(conn, %{"id" => project_id}) do
     user = conn.assigns[:current_user]
-    
+
     project =
       Project
       |> Repo.get(project_id)

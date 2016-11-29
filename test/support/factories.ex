@@ -111,6 +111,12 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def stripe_connect_customer_factory do
+    %CodeCorps.StripeConnectCustomer{
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}")
+    }
+  end
+
   def stripe_connect_plan_factory do
     %CodeCorps.StripeConnectPlan{
       id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),

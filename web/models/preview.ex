@@ -4,7 +4,7 @@ defmodule CodeCorps.Preview do
   """
 
   use CodeCorps.Web, :model
-  alias CodeCorps.MarkdownRenderer
+  alias CodeCorps.Services.MarkdownRendererService
 
   schema "previews" do
     field :body, :string
@@ -23,6 +23,6 @@ defmodule CodeCorps.Preview do
     |> cast(params, [:markdown, :user_id])
     |> validate_required([:markdown, :user_id])
     |> assoc_constraint(:user)
-    |> MarkdownRenderer.render_markdown_to_html(:markdown, :body)
+    |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
   end
 end

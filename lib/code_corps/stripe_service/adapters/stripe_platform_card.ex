@@ -1,4 +1,4 @@
-defmodule CodeCorps.StripeService.Adapters.StripePlatformCard do
+defmodule CodeCorps.StripeService.Adapters.StripePlatformCardAdapter do
   import CodeCorps.MapUtils, only: [rename: 3, keys_to_string: 1]
 
   @stripe_attributes [:brand, :customer, :cvc_check, :exp_month, :exp_year, :id, :last4, :name, :user_id]

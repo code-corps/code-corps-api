@@ -3,6 +3,7 @@ defmodule CodeCorps.StripeConnectSubscriptionController do
   use JaResource
 
   alias CodeCorps.StripeConnectSubscription
+  alias CodeCorps.StripeService.StripeConnectSubscriptionService
 
   plug :load_and_authorize_resource, model: StripeConnectSubscription, only: [:show,], preload: [:user]
   plug :load_and_authorize_changeset, model: StripeConnectSubscription, only: [:create]
@@ -11,7 +12,7 @@ defmodule CodeCorps.StripeConnectSubscriptionController do
 
   def handle_create(conn, attributes) do
     attributes
-    |> CodeCorps.StripeService.StripeConnectSubscription.create
+    |> StripeConnectSubscriptionService.find_or_create
     |> handle_create_result(conn)
   end
 

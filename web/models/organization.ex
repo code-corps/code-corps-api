@@ -5,7 +5,7 @@ defmodule CodeCorps.Organization do
 
   use Arc.Ecto.Schema
   use CodeCorps.Web, :model
-  import CodeCorps.Base64ImageUploader
+  import CodeCorps.Services.Base64ImageUploaderService
   import CodeCorps.Helpers.Slug
   import CodeCorps.Validators.SlugValidator
   alias CodeCorps.SluggedRoute

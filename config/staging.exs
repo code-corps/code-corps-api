@@ -43,6 +43,10 @@ config :code_corps, :analytics, CodeCorps.Analytics.SegmentAPI
 config :sentry,
   environment_name: Mix.env || :staging
 
+# Configures stripe for staging
+config :code_corps, :stripe, Stripe
+config :code_corps, :stripe_env, :staging
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key

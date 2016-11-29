@@ -30,7 +30,9 @@ config :guardian, Guardian,
 
 config :code_corps, :analytics, CodeCorps.Analytics.TestAPI
 
+# Configures stripe for test mode
 config :code_corps, :stripe, CodeCorps.StripeTesting
+config :code_corps, :stripe_env, :test
 
 config :code_corps, :icon_color_generator, CodeCorps.RandomIconColor.TestGenerator
 

@@ -1,7 +1,7 @@
-defmodule CodeCorps.StripeService.Adapters.StripeConnectPlanTest do
+defmodule CodeCorps.StripeService.Adapters.StripeConnectPlanTestAdapter do
   use ExUnit.Case, async: true
 
-  import CodeCorps.StripeService.Adapters.StripeConnectPlan, only: [to_params: 2]
+  import CodeCorps.StripeService.Adapters.StripeConnectPlanAdapter, only: [to_params: 2]
 
   {:ok, timestamp} = DateTime.from_unix(1479472835)
 
