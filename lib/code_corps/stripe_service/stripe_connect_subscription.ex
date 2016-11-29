@@ -39,9 +39,18 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
     end
   end
 
-  defp do_find_or_create(%{"project_id" => _, "quantity" => _, "user_id" => _} = attributes, %StripeConnectAccount{} = connect_account, %StripeConnectPlan{} = plan, %Project{} = project, %StripePlatformCard{} = platform_card, %StripePlatformCustomer{} = platform_customer, quantity, %User{} = user) do
+  defp do_find_or_create(
+    %{"project_id" => _, "quantity" => _, "user_id" => _} = attributes,
+    %StripeConnectAccount{} = connect_account,
+    %StripeConnectPlan{} = plan,
+    %Project{} = project,
+    %StripePlatformCard{} = platform_card,
+    %StripePlatformCustomer{} = platform_customer,
+    quantity,
+    %User{} = user
+  ) do
     case find(plan, user) do
-      nil -> create(attributes, connect_account, plan, project, user, platform_card, platform_customer, quantity)
+      nil -> create(attributes, connect_account, plan, project, platform_card, platform_customer, quantity, user)
       %StripeConnectSubscription{} = subscription -> {:ok, subscription}
     end
   end
@@ -52,7 +61,16 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
     |> Repo.one
   end
 
-  defp create(%{"project_id" => _, "quantity" => _, "user_id" => _} = attributes, %StripeConnectAccount{} = connect_account, %StripeConnectPlan{} = plan, %Project{} = project, %StripePlatformCard{} = platform_card, %StripePlatformCustomer{} = platform_customer, quantity, %User{} = user) do
+  defp create(
+    %{"project_id" => _, "quantity" => _, "user_id" => _} = attributes,
+    %StripeConnectAccount{} = connect_account,
+    %StripeConnectPlan{} = plan,
+    %Project{} = project,
+    %StripePlatformCard{} = platform_card,
+    %StripePlatformCustomer{} = platform_customer,
+    quantity,
+    %User{} = user
+  ) do
     with {:ok, connect_customer} <-
            StripeConnectCustomerService.find_or_create(platform_customer, connect_account),
          {:ok, connect_card} <-
