@@ -5,6 +5,9 @@ defmodule CodeCorps.StripeAuth do
 
   use Ecto.Schema
 
+  alias CodeCorps.Organization
+  alias CodeCorps.Project
+
   schema "" do
     field :url, :string, virtual: true
   end
@@ -17,13 +20,31 @@ defmodule CodeCorps.StripeAuth do
 
   Returns either an `:ok` or `:error` tuple.
   """
-  def authorize_url(project) do
+  def authorize_url(user, %Project{organization: %Organization{} = organization} = project) do
     case Guardian.encode_and_sign(project, :token) do
       {:ok, token, _claims} ->
-        url = Stripe.Connect.OAuth.authorize_url(token)
+        url =
+          organization
+          |> url_params(user, token)
+          |> Stripe.Connect.OAuth.authorize_url()
         {:ok, url}
       {:error, reason} ->
         {:error, reason}
     end
+  end
+
+  defp url_params(organization, user, token) do
+    %{
+      state: token,
+      stripe_user: %{
+        "business_name" => organization.name,
+        "email" => user.email,
+        "first_name" => user.first_name,
+        "last_name" => user.last_name,
+        "product_category" => "software",
+        "product_description" => organization.name <> " accepts donations on the Code Corps platform in order to build and sustain open source software for public good. Donations usually happen once a month, although the frequency may vary.",
+        "url" => "https://www.codecorps.org/" <> organization.slug
+      }
+    }
   end
 end
