@@ -4,7 +4,6 @@ defmodule CodeCorps.StripeAuthController do
   alias CodeCorps.Project
   alias CodeCorps.Repo
   alias CodeCorps.StripeAuth
-  alias CodeCorps.User
 
   plug :load_and_authorize_resource, model: Project, only: [:stripe_auth]
 

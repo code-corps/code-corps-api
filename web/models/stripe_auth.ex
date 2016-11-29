@@ -36,6 +36,7 @@ defmodule CodeCorps.StripeAuth do
   defp url_params(organization, user, token) do
     %{
       state: token,
+      redirect_uri: redirect_uri,
       stripe_user: %{
         "business_name" => organization.name,
         "email" => user.email,
@@ -46,5 +47,9 @@ defmodule CodeCorps.StripeAuth do
         "url" => "https://www.codecorps.org/" <> organization.slug
       }
     }
+  end
+
+  defp redirect_uri do
+    Application.get_env(:code_corps, :stripe_redirect_uri)
   end
 end
