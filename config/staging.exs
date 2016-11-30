@@ -46,6 +46,7 @@ config :sentry,
 # Configures stripe for staging
 config :code_corps, :stripe, Stripe
 config :code_corps, :stripe_env, :staging
+config :code_corps, :stripe_redirect_uri, "http://www.pbqrpbecf.org/oauth/stripe"
 
 # ## SSL Support
 #

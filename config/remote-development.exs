@@ -36,6 +36,7 @@ config :logger, level: :info
 # Configures stripe for remote dev
 config :code_corps, :stripe, Stripe
 config :code_corps, :stripe_env, :remote_dev
+config :code_corps, :stripe_redirect_uri, "http://www.pbqrpbecf-qri.org/oauth/stripe"
 
 # ## SSL Support
 #
