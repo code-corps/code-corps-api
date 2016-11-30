@@ -1,4 +1,4 @@
-defmodule CodeCorps.StripeService.Events.CustomerSubscriptionUpdated do
+defmodule CodeCorps.StripeService.Events.CustomerSubscriptionDeleted do
   alias CodeCorps.Project
   alias CodeCorps.Repo
   alias CodeCorps.Services.DonationGoalsService
