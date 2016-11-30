@@ -34,7 +34,8 @@ defmodule CodeCorps.StripeService.StripeConnectPlanService do
       currency: "usd",
       id: "month",
       interval: "month",
-      name: "Monthly donation"
+      name: "Monthly donation",
+      statement_descriptor: "CODECORPS.ORG Monthly Donation"
     }
   end
 
