@@ -23,6 +23,7 @@ defmodule CodeCorps.StripeConnectEventsController do
   end
 
   def do_handle(%{"type" => "account.updated"} = attributes), do: Events.AccountUpdated.handle(attributes)
+  def do_handle(%{"type" => "customer.subscription.deleted"} = attributes), do: Events.CustomerSubscriptionDeleted.handle(attributes)
   def do_handle(%{"type" => "customer.subscription.updated"} = attributes), do: Events.CustomerSubscriptionUpdated.handle(attributes)
   def do_handle(_attributes), do: {:ok, :unhandled_event}
 

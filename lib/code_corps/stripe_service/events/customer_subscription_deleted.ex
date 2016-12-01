@@ -1,4 +1,4 @@
-defmodule CodeCorps.StripeService.Events.CustomerSubscriptionUpdated do
+defmodule CodeCorps.StripeService.Events.CustomerSubscriptionDeleted do
   @api Application.get_env(:code_corps, :stripe)
 
   def handle(%{"data" => %{"object" => %{"id" => stripe_sub_id, "customer" => connect_customer_id}}}) do

@@ -50,27 +50,23 @@ defmodule CodeCorps.StripeConnectEventsControllerTest do
         transfers_enabled: false
       )
 
-      conn = post conn, stripe_connect_events_path(conn, :create), event
+      path = stripe_connect_events_path(conn, :create)
+      assert conn |> post(path, event) |> response(200)
 
-      assert response(conn, 200)
-
-      updated_account =
-        StripeConnectAccount
-        |> Repo.get_by(id_from_stripe: stripe_id)
-
+      updated_account = Repo.get_by(StripeConnectAccount, id_from_stripe: stripe_id)
       assert updated_account.transfers_enabled
     end
 
     test "returns 400 when doesn't match an existing account", %{conn: conn} do
       event = event_for(@account, "account.updated")
-      conn = post conn, stripe_connect_events_path(conn, :create), event
 
-      assert response(conn, 400)
+      path = stripe_connect_events_path(conn, :create)
+      assert conn |> post(path, event) |> response(400)
     end
   end
 
   describe "customer.subscription.updated" do
-    test "returns 200 and updates account when one matches", %{conn: conn} do
+    test "returns 200 and updates subscription when one matches", %{conn: conn} do
       event = event_for(@subscription, "customer.subscription.updated")
       stripe_id =  @subscription["id"]
       connect_customer_id = @subscription["customer"]
@@ -90,14 +86,39 @@ defmodule CodeCorps.StripeConnectEventsControllerTest do
         id_from_stripe: stripe_id,
         stripe_connect_plan: plan)
 
-      conn = post conn, stripe_connect_events_path(conn, :create), event
+      path = stripe_connect_events_path(conn, :create)
+      assert conn |> post(path, event) |> response(200)
 
-      assert response(conn, 200)
+      updated_project = Repo.get_by(Project, id: project.id)
+      assert updated_project.total_monthly_donated == 0
+    end
+  end
 
-      updated_project =
-        Project
-        |> Repo.get_by(id: project.id)
+  describe "customer.subscription.deleted" do
+    test "returns 200 and sets subscription to inactive when one matches", %{conn: conn} do
+      event = event_for(@subscription, "customer.subscription.deleted")
+      stripe_id =  @subscription["id"]
+      connect_customer_id = @subscription["customer"]
 
+      project = insert(:project, total_monthly_donated: 1000)
+      account = insert(:stripe_connect_account)
+      platform_customer = insert(:stripe_platform_customer)
+
+      insert(:stripe_connect_customer,
+        id_from_stripe: connect_customer_id,
+        stripe_connect_account: account,
+        stripe_platform_customer: platform_customer)
+
+      plan = insert(:stripe_connect_plan, project: project)
+
+      insert(:stripe_connect_subscription,
+        id_from_stripe: stripe_id,
+        stripe_connect_plan: plan)
+
+      path = stripe_connect_events_path(conn, :create)
+      assert conn |> post(path, event) |> response(200)
+
+      updated_project = Repo.get_by(Project, id: project.id)
       assert updated_project.total_monthly_donated == 0
     end
   end
