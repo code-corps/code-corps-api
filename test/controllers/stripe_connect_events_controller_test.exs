@@ -50,22 +50,18 @@ defmodule CodeCorps.StripeConnectEventsControllerTest do
         transfers_enabled: false
       )
 
-      conn = post conn, stripe_connect_events_path(conn, :create), event
+      path = stripe_connect_events_path(conn, :create)
+      assert conn |> post(path, event) |> response(200)
 
-      assert response(conn, 200)
-
-      updated_account =
-        StripeConnectAccount
-        |> Repo.get_by(id_from_stripe: stripe_id)
-
+      updated_account = Repo.get_by(StripeConnectAccount, id_from_stripe: stripe_id)
       assert updated_account.transfers_enabled
     end
 
     test "returns 400 when doesn't match an existing account", %{conn: conn} do
       event = event_for(@account, "account.updated")
-      conn = post conn, stripe_connect_events_path(conn, :create), event
 
-      assert response(conn, 400)
+      path = stripe_connect_events_path(conn, :create)
+      assert conn |> post(path, event) |> response(400)
     end
   end
 
@@ -90,19 +86,15 @@ defmodule CodeCorps.StripeConnectEventsControllerTest do
         id_from_stripe: stripe_id,
         stripe_connect_plan: plan)
 
-      conn = post conn, stripe_connect_events_path(conn, :create), event
+      path = stripe_connect_events_path(conn, :create)
+      assert conn |> post(path, event) |> response(200)
 
-      assert response(conn, 200)
-
-      updated_project =
-        Project
-        |> Repo.get_by(id: project.id)
-
+      updated_project = Repo.get_by(Project, id: project.id)
       assert updated_project.total_monthly_donated == 0
     end
   end
 
-  describe "customer.subscription.updated" do
+  describe "customer.subscription.deleted" do
     test "returns 200 and sets subscription to inactive when one matches", %{conn: conn} do
       event = event_for(@subscription, "customer.subscription.deleted")
       stripe_id =  @subscription["id"]
@@ -123,14 +115,10 @@ defmodule CodeCorps.StripeConnectEventsControllerTest do
         id_from_stripe: stripe_id,
         stripe_connect_plan: plan)
 
-      conn = post conn, stripe_connect_events_path(conn, :create), event
+      path = stripe_connect_events_path(conn, :create)
+      assert conn |> post(path, event) |> response(200)
 
-      assert response(conn, 200)
-
-      updated_project =
-        Project
-        |> Repo.get_by(id: project.id)
-
+      updated_project = Repo.get_by(Project, id: project.id)
       assert updated_project.total_monthly_donated == 0
     end
   end
