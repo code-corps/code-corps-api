@@ -102,7 +102,7 @@ Note: some browsers like Safari and Firefox may ask to download a file instead o
 
 ### Next steps
 
-Now that you're set up, you should [read more about how to develop with the API](USAGE.md).
+Now that you're set up, you should [read more about how to develop with the API](../USAGE.md).
 
 ### Issues installing?
 
