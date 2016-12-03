@@ -2,7 +2,7 @@
 
 ### Requirements
 
-You will need to install [Docker](https://docs.docker.com/engine/installation/).
+You will need to install [Docker](https://docs.docker.com/engine/installation/) with at least Docker Compose version 1.9.
 
 Here are some direct links if you're on [Mac OS X](https://docs.docker.com/docker-for-mac/) or [Windows](https://docs.docker.com/docker-for-windows/).
 
@@ -74,6 +74,23 @@ docker-compose run web mix deps.get
 Then re-run the previous command:
 ```shell
 docker-compose build
+docker-compose up
+```
+
+If you see an error like this at the bottom of the output:
+
+```shell
+== Compilation error on file lib/phoenix/token.ex ==
+** (CompileError) lib/phoenix/token.ex:144: Phoenix.Socket.__struct__/0 is undefined, cannot expand struct Phoenix.Socket
+     (stdlib) lists.erl:1354: :lists.mapfoldl/3
+
+ could not compile dependency :phoenix, "mix compile" failed. You can recompile this dependency with "mix deps.compile phoenix", update it with "mix deps.update phoenix" or clean it with "mix deps.clean phoenix"
+```
+
+Try stopping the Docker processes and then running:
+
+```shell
+docker-compose run web mix deps.clean --all phoenix
 docker-compose up
 ```
 
