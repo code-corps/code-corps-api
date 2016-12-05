@@ -11,6 +11,7 @@ defmodule CodeCorps.Project do
   alias CodeCorps.Services.MarkdownRendererService
 
   schema "projects" do
+    field :approved, :boolean
     field :base64_icon_data, :string, virtual: true
     field :description, :string
     field :icon, CodeCorps.ProjectIcon.Type
