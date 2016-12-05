@@ -22,6 +22,7 @@ defmodule CodeCorps.Mixfile do
     [
       mod: {CodeCorps, []},
       applications: [
+        :bamboo,
         :phoenix,
         :phoenix_pubsub,
         :phoenix_html,
@@ -55,6 +56,7 @@ defmodule CodeCorps.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:bamboo, "~> 0.7"}, # emails
       {:phoenix, "~> 1.2.1"},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 3.0"},

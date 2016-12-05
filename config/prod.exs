@@ -49,6 +49,10 @@ config :code_corps, :stripe_redirect_uri, "http://www.codecorps.org/oauth/stripe
 config :sentry,
   environment_name: Mix.env || :prod
 
+# TODO: Replace with actual adapter
+config :code_corps, CodeCorps.Mailer,
+  adapter: Bamboo.LocalAdapter
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key
