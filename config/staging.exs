@@ -48,6 +48,9 @@ config :code_corps, :stripe, Stripe
 config :code_corps, :stripe_env, :staging
 config :code_corps, :stripe_redirect_uri, "http://www.pbqrpbecf.org/oauth/stripe"
 
+config :code_corps, CodeCorps.Mailer,
+  adapter: Bamboo.LocalAdapter
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key

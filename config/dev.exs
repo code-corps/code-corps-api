@@ -54,3 +54,6 @@ config :code_corps, :stripe_redirect_uri, "http://localhost:4200/oauth/stripe"
 
 config :sentry,
   environment_name: Mix.env || :dev
+
+config :code_corps, CodeCorps.Mailer,
+  adapter: Bamboo.LocalAdapter
