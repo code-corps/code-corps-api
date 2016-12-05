@@ -59,33 +59,33 @@ defmodule CodeCorps.Mixfile do
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 3.0"},
       {:postgrex, ">= 0.0.0"},
-      {:phoenix_html, "~> 2.6"},
+      {:phoenix_html, "~> 2.8"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
-      {:gettext, "~> 0.11"},
+      {:gettext, "~> 0.12"},
       {:cowboy, "~> 1.0"},
       {:arc, git: "https://github.com/stavro/arc.git", ref: "354d4d2e1b86bcd6285db3528118fe3f5db36cf5", override: true}, # Photo uploads
       {:arc_ecto, "~> 0.4.4"},
       {:benchfella, "~> 0.3.0", only: :dev},
-      {:canary, "~> 1.0"}, # Authorization
+      {:canary, "~> 1.1"}, # Authorization
       {:comeonin, "~> 2.0"},
       {:corsica, "~> 0.4"}, # CORS
-      {:credo, "~> 0.4", only: [:dev, :test]}, # Code style suggestions
+      {:credo, "~> 0.5", only: [:dev, :test]}, # Code style suggestions
       {:earmark, "~> 1.0"}, # Markdown rendering
       {:ex_aws, "~> 0.4"}, # Amazon AWS
       {:excoveralls, "~> 0.5", only: :test}, # Test coverage
-      {:ex_doc, "~> 0.13", only: [:dev, :test]},
+      {:ex_doc, "~> 0.14", only: [:dev, :test]},
       {:ex_machina, "~> 1.0", only: :test}, # test factories
       {:guardian, "~> 0.13"}, # Authentication (JWT)
       {:hackney, ">= 1.4.4"},
       {:inch_ex, "~> 0.5", only: [:dev, :test]}, # Inch CI
-      {:inflex, "~> 1.7.0"},
-      {:ja_resource, "~> 0.1.0"},
+      {:inflex, "~> 1.8"},
+      {:ja_resource, "~> 0.2"},
       {:ja_serializer, "~> 0.11.0"}, # JSON API
       {:mix_test_watch, "~> 0.2", only: :dev}, # Test watcher
       {:poison, "~> 2.0"},
       {:scrivener_ecto, "~> 1.0"}, # DB query pagination
       {:segment, github: "stueccles/analytics-elixir"}, # Segment analytics
-      {:sentry, "~> 1.0"}, # Sentry error tracking
+      {:sentry, "~> 2.0"}, # Sentry error tracking
       {:stripity_stripe, "~> 2.0.0-alpha.5"}, # Stripe
       {:timex, "~> 3.0"},
       {:timex_ecto, "~> 3.0"}
