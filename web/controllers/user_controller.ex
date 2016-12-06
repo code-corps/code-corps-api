@@ -5,6 +5,7 @@ defmodule CodeCorps.UserController do
   import CodeCorps.Helpers.Query, only: [id_filter: 2]
 
   alias CodeCorps.User
+  alias CodeCorps.Services.UserService
 
   plug :load_and_authorize_resource, model: User, only: [:update]
   plug JaResource
@@ -14,27 +15,24 @@ defmodule CodeCorps.UserController do
   end
 
   def handle_create(conn, attributes) do
-    %User{}
-    |> User.registration_changeset(attributes)
-    |> Repo.insert
-    |> login(conn)
-    |> track_signup
+    with {:ok, user} <- %User{} |> User.registration_changeset(attributes) |> Repo.insert,
+         conn        <- login(user, conn)
+    do
+      CodeCorps.Analytics.Segment.track({:ok, user}, :signed_up, conn)
+    else
+      {:error, changeset} -> changeset
+    end
   end
 
-  defp login({:error, changeset}, conn), do: {:error, changeset, conn}
-  defp login({:ok, model}, conn) do
-    {:ok, model, conn |> Plug.Conn.assign(:current_user, model)}
-  end
+  defp login(user, conn), do: Plug.Conn.assign(conn, :current_user, user)
 
-  defp track_signup({status, model_or_changeset, conn}) do
-    CodeCorps.Analytics.Segment.track({status, model_or_changeset}, :signed_up, conn)
-  end
-
-  def handle_update(conn, model, attributes) do
-    model
-    |> User.update_changeset(attributes)
-    |> Repo.update
-    |> CodeCorps.Analytics.Segment.track(:updated_profile, conn)
+  def handle_update(conn, record, attributes) do
+    with {:ok, user, _, _} <- UserService.update(record, attributes)
+    do
+      {:ok, user} |> CodeCorps.Analytics.Segment.track(:updated_profile, conn)
+    else
+      {:error, changeset} -> changeset
+    end
   end
 
   def email_available(conn, %{"email" => email}) do

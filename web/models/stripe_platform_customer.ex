@@ -10,6 +10,8 @@ defmodule CodeCorps.StripePlatformCustomer do
 
     belongs_to :user, CodeCorps.User
 
+    has_many :stripe_connect_customers, CodeCorps.StripeConnectCustomer
+
     timestamps()
   end
 
@@ -18,5 +20,11 @@ defmodule CodeCorps.StripePlatformCustomer do
     |> cast(params, [:created, :currency, :delinquent, :id_from_stripe, :user_id])
     |> validate_required([:id_from_stripe, :user_id])
     |> assoc_constraint(:user)
+  end
+
+  def update_changeset(struct, params) do
+    struct
+    |> cast(params, [:email])
+    |> validate_required([:email])
   end
 end

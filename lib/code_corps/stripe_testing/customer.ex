@@ -3,6 +3,10 @@ defmodule CodeCorps.StripeTesting.Customer do
     {:ok, do_create(map)}
   end
 
+  def update(id, map, _opts \\ []) do
+    {:ok, do_update(id, map)}
+  end
+
   defp do_create(_) do
     {:ok, created} = DateTime.from_unix(1479472835)
 
@@ -15,6 +19,23 @@ defmodule CodeCorps.StripeTesting.Customer do
       delinquent: false,
       description: nil,
       email: "mail@test.com",
+      livemode: false,
+      metadata: %{}
+    }
+  end
+
+  defp do_update(id, map) do
+    {:ok, created} = DateTime.from_unix(1479472835)
+
+    %Stripe.Customer{
+      id: id,
+      account_balance: 0,
+      created: created,
+      currency: "usd",
+      default_source: nil,
+      delinquent: false,
+      description: nil,
+      email: map.email,
       livemode: false,
       metadata: %{}
     }

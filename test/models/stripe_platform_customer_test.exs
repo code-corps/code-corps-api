@@ -39,4 +39,22 @@ defmodule CodeCorps.StripePlatformCustomerTest do
       assert changeset.errors[:user] == {"does not exist", []}
     end
   end
+
+  describe "update_changeset/2" do
+    test "reports as valid when attributes are valid" do
+      platform_customer = insert(:stripe_platform_customer)
+
+      changeset = StripePlatformCustomer.update_changeset(platform_customer, %{email: "changed@mail.com"})
+      assert changeset.valid?
+    end
+
+    test "requires email" do
+      platform_customer = insert(:stripe_platform_customer)
+
+      changeset = StripePlatformCustomer.update_changeset(platform_customer, %{email: nil})
+      refute changeset.valid?
+
+      assert changeset.errors[:email] == {"can't be blank", []}
+    end
+  end
 end
