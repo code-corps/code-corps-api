@@ -23,12 +23,9 @@ defmodule CodeCorps.StripePlatformEventsController do
   end
 
   def do_handle(%{"type" => "customer.updated"} = attributes), do: Events.CustomerUpdated.handle(attributes)
+  def do_handle(%{"type" => "customer.source.updated"} = attributes), do: Events.CustomerSourceUpdated.handle(attributes)
   def do_handle(_attributes), do: {:ok, :unhandled_event}
 
-  def respond(conn, {:error, _error}) do
-    conn |> send_resp(400, "")
-  end
-  def respond(conn, _) do
-    conn |> send_resp(200, "")
-  end
+  def respond(conn, {:error, _error}), do: conn |> send_resp(400, "")
+  def respond(conn, _), do: conn |> send_resp(200, "")
 end

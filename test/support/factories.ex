@@ -111,6 +111,14 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def stripe_connect_card_factory do
+    %CodeCorps.StripeConnectCard{
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
+      stripe_connect_account: build(:stripe_connect_account),
+      stripe_platform_card: build(:stripe_platform_card)
+    }
+  end
+
   def stripe_connect_customer_factory do
     %CodeCorps.StripeConnectCustomer{
       id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),

@@ -17,6 +17,16 @@ defmodule CodeCorps.StripeService.StripeConnectCardService do
     end
   end
 
+  def update(%StripeConnectCard{} = record, %{} = attributes) do
+    with {:ok, %Stripe.Card{} = updated_stripe_card} <- update_on_stripe(record, attributes)
+    do
+      {:ok, updated_stripe_card}
+    else
+      {:error, %Stripe.APIErrorResponse{} = error} -> {:error, error}
+      _ -> {:error, :unhandled}
+    end
+  end
+
   defp create(%StripePlatformCard{} = platform_card, %StripeConnectCustomer{} = connect_customer, %StripePlatformCustomer{} = platform_customer, %StripeConnectAccount{} = connect_account) do
     platform_customer_id = platform_customer.id_from_stripe
     platform_card_id = platform_card.id_from_stripe
@@ -54,5 +64,14 @@ defmodule CodeCorps.StripeService.StripeConnectCardService do
     |> rename(:id, :stripe_platform_card_id)
     |> Map.put(:stripe_connect_account_id, connect_account.id)
     |> keys_to_string
+  end
+
+  defp update_on_stripe(%StripeConnectCard{} = record, attributes) do
+    @api.Card.update(
+      :customer,
+      record.stripe_platform_card.customer_id_from_stripe,
+      record.id_from_stripe,
+      attributes,
+      connect_account: record.stripe_connect_account.id_from_stripe)
   end
 end
