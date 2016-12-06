@@ -28,4 +28,10 @@ defmodule CodeCorps.StripePlatformCard do
     |> unique_constraint(:user_id)
     |> assoc_constraint(:user)
   end
+
+  def update_changeset(struct, params) do
+    struct
+    |> cast(params, [:exp_month, :exp_year, :name])
+    |> validate_required([:exp_month, :exp_year, :name])
+  end
 end

@@ -46,4 +46,28 @@ defmodule CodeCorps.StripePlatformCardTest do
       assert changeset.errors[:user] == {"does not exist", []}
     end
   end
+
+  describe "update_changeset/2" do
+    @valid_attrs %{name: "John Doe", exp_month: 12, exp_year: 2020}
+
+    test "reports as valid when attributes are valid" do
+      platform_card = insert(:stripe_platform_card)
+
+      changeset = StripePlatformCard.update_changeset(platform_card, @valid_attrs)
+      assert changeset.valid?
+    end
+
+    @invalid_attrs %{name: nil, exp_month: nil, exp_year: nil}
+
+    test "requires name, exp_month and exp_year" do
+      platform_card = insert(:stripe_platform_card)
+
+      changeset = StripePlatformCard.update_changeset(platform_card, @invalid_attrs)
+
+      refute changeset.valid?
+      assert changeset.errors[:exp_month] == {"can't be blank", []}
+      assert changeset.errors[:exp_year] == {"can't be blank", []}
+      assert changeset.errors[:name] == {"can't be blank", []}
+    end
+  end
 end
