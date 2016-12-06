@@ -29,7 +29,7 @@ defmodule CodeCorps.StripeService.StripeConnectPlanService do
       id: "month",
       interval: "month",
       name: "Monthly donation",
-      statement_descriptor: "CODECORPS.ORG Monthly Donation"
+      statement_descriptor: "CODECORPS.ORG Donation" # No more than 22 chars
     }
   end
 
