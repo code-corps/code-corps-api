@@ -1,12 +1,34 @@
 defmodule CodeCorps.StripePlatformEventsController do
   use CodeCorps.Web, :controller
 
+  alias CodeCorps.StripeService.Events
+
   def create(conn, json) do
-    handle(json)
-    conn |> respond
+    result = handle(json)
+    respond(conn, result)
   end
 
-  def handle(_attributes), do: {:ok, :unhandled_event}
+  def handle(%{"livemode" => false} = attributes) do
+    case Application.get_env(:code_corps, :stripe_env) do
+      :prod -> {:ok, :ignored}
+      _ -> do_handle(attributes)
+    end
+  end
 
-  def respond(conn), do: conn |> send_resp(200, "")
+  def handle(%{"livemode" => true} = attributes) do
+    case Application.get_env(:code_corps, :stripe_env) do
+      :prod -> do_handle(attributes)
+      _ -> {:ok, :ignored}
+    end
+  end
+
+  def do_handle(%{"type" => "customer.updated"} = attributes), do: Events.CustomerUpdated.handle(attributes)
+  def do_handle(_attributes), do: {:ok, :unhandled_event}
+
+  def respond(conn, {:error, _error}) do
+    conn |> send_resp(400, "")
+  end
+  def respond(conn, _) do
+    conn |> send_resp(200, "")
+  end
 end
