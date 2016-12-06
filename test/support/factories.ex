@@ -113,7 +113,8 @@ defmodule CodeCorps.Factories do
 
   def stripe_connect_customer_factory do
     %CodeCorps.StripeConnectCustomer{
-      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}")
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
+      stripe_connect_account: build(:stripe_connect_account)
     }
   end
 
