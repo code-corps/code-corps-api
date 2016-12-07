@@ -4,7 +4,7 @@ defmodule CodeCorps.UserViewTest do
   import Phoenix.View, only: [render: 3]
 
   test "renders all attributes and relationships properly" do
-    user = insert(:user)
+    user = insert(:user, first_name: "First", last_name: "Last")
     organization_membership = insert(:organization_membership, member: user)
     slugged_route = insert(:slugged_route, user: user)
     stripe_connect_subscription = insert(:stripe_connect_subscription, user: user)
@@ -23,9 +23,10 @@ defmodule CodeCorps.UserViewTest do
         "attributes" => %{
           "biography" => user.biography,
           "email" => "",
-          "first-name" => user.first_name,
+          "first-name" => "First",
           "inserted-at" => user.inserted_at,
-          "last-name" => user.last_name,
+          "last-name" => "Last",
+          "name" => "First Last",
           "photo-large-url" => CodeCorps.UserPhoto.url({user.photo, user}, :large),
           "photo-thumb-url" => CodeCorps.UserPhoto.url({user.photo, user}, :thumb),
           "state" => "signed_up",
@@ -96,11 +97,44 @@ defmodule CodeCorps.UserViewTest do
     rendered_json = render(CodeCorps.UserView, "show.json-api", data: users, conn: conn)
 
     emails =
-      rendered_json["data"]
-      |> Enum.map(&Map.get(&1, "attributes"))
-      |> Enum.map(&Map.get(&1, "email"))
-      |> Enum.filter(fn(email) -> email != "" end)
+    rendered_json["data"]
+    |> Enum.map(&Map.get(&1, "attributes"))
+    |> Enum.map(&Map.get(&1, "email"))
+    |> Enum.filter(fn(email) -> email != "" end)
 
     assert emails == [auth_user.email]
+  end
+
+  test "renders first and last name as name" do
+    user = build(:user, first_name: "First", last_name: "Last")
+
+    assert render_user_json(user)["data"]["attributes"]["name"] == "First Last"
+  end
+
+  test "renders first name only as name" do
+    user = build(:user, first_name: "", last_name: "Last")
+
+    assert render_user_json(user)["data"]["attributes"]["name"] == "Last"
+  end
+
+  test "renders last name only as name" do
+    user = build(:user, first_name: "First", last_name: "")
+
+    assert render_user_json(user)["data"]["attributes"]["name"] == "First"
+  end
+
+  test "renders nil name if first or last name blank" do
+    user = build(:user, first_name: "", last_name: "")
+
+    assert render_user_json(user)["data"]["attributes"]["name"] == nil
+
+    user = build(:user, first_name: nil, last_name: nil)
+
+    assert render_user_json(user)["data"]["attributes"]["name"] == nil
+  end
+
+  defp render_user_json(user) do
+    conn = Phoenix.ConnTest.build_conn |> assign(:current_user, user)
+    render(CodeCorps.UserView, "show.json-api", data: user, conn: conn)
   end
 end
