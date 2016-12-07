@@ -27,7 +27,7 @@ defmodule CodeCorps.StripeService.StripePlatformCustomerService do
 
   - `{:ok, %CodeCorps.StriePlatformCustomer{}, %Stripe.Customer{}}` if everything was updated
   - `{:error, %Ecto.Changeset{}}` -if there was a validation issue while updating the local record
-  - `{:error, %Stripe.APIErrorResposne{}}` - if there was a problem with updating the API record
+  - `{:error, %Stripe.APIErrorResponse{}}` - if there was a problem with updating the API record
   - `{:error, :unhandled}` -if something unexpected went wrong
   """
   def update(%StripePlatformCustomer{id_from_stripe: id_from_stripe} = customer, attributes) do
