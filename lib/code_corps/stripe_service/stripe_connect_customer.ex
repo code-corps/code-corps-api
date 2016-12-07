@@ -19,7 +19,7 @@ defmodule CodeCorps.StripeService.StripeConnectCustomerService do
     end
   end
 
-  def update(%StripeConnectCustomer{id_from_stripe: id_from_stripe, stripe_connect_account: connect_account} = connect_customer, attributes) do
+  def update(%StripeConnectCustomer{id_from_stripe: id_from_stripe, stripe_connect_account: connect_account}, attributes) do
     @api.Customer.update(id_from_stripe, attributes, connect_account: connect_account.id_from_stripe)
   end
 

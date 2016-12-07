@@ -81,7 +81,7 @@ defmodule CodeCorps.StripeService.StripePlatformCardService do
     stripe_platform_card |> Map.take([:exp_month, :exp_year, :name])
   end
 
-  defp do_update_connect_cards(stripe_platform_card, attributes) when attributes == %{}, do: []
+  defp do_update_connect_cards(_stripe_platform_card, attributes) when attributes == %{}, do: []
   defp do_update_connect_cards(stripe_platform_card, attributes) do
     stripe_platform_card
     |> Repo.preload([stripe_connect_cards: [:stripe_connect_account, :stripe_platform_card]])
