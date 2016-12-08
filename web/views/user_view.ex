@@ -8,7 +8,7 @@ defmodule CodeCorps.UserView do
   use JaSerializer.PhoenixView
 
   attributes [
-    :biography, :email, :first_name, :last_name,
+    :biography, :email, :first_name, :last_name, :name,
     :photo_large_url, :photo_thumb_url, :state, :state_transition, :twitter,
     :username, :website, :inserted_at, :updated_at
   ]
@@ -41,4 +41,15 @@ defmodule CodeCorps.UserView do
     if user.id == current_user.id, do: user.email, else: ""
   end
   def email(_user, _conn), do: ""
+
+  @doc """
+  Returns the user's full name when both first and last name are present.
+  Returns the only user's first name or last name when the other is missing,
+  otherwise returns nil.
+  """
+  def name(%{first_name: first_name, last_name: last_name}, _conn) do
+    "#{first_name} #{last_name}" |> String.trim |> normalize_name
+  end
+  defp normalize_name(name) when name in ["", nil], do: nil
+  defp normalize_name(name), do: name
 end
