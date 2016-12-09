@@ -56,7 +56,7 @@ defmodule CodeCorps.StripeService.StripePlatformCustomerService do
   - `{:error, :unhandled}` -if something unexpected went wrong
   """
   def update_from_stripe(id_from_stripe) do
-    with customer                                            <- Repo.get_by(StripePlatformCustomer, id_from_stripe: id_from_stripe),
+    with %StripePlatformCustomer{} = customer                <- Repo.get_by(StripePlatformCustomer, id_from_stripe: id_from_stripe),
          {:ok, %Stripe.Customer{} = stripe_customer}         <- @api.Customer.retrieve(id_from_stripe),
          {:ok, params}                                       <- StripePlatformCustomerAdapter.to_params(stripe_customer, %{}),
          {:ok, %StripePlatformCustomer{} = platform_customer, connect_customer_updates} <- perform_update(customer, params)

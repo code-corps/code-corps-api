@@ -143,6 +143,14 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def stripe_event_factory do
+    %CodeCorps.StripeEvent{
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
+      status: sequence(:status, fn(_) -> Enum.random(~w{ unprocessed processed errored }) end),
+      type: "test.type"
+    }
+  end
+
   def stripe_platform_customer_factory do
     %CodeCorps.StripePlatformCustomer{
       created: Timex.now,
