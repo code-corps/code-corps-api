@@ -7,6 +7,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter do
   ]
 
   def to_params(%Stripe.Account{} = stripe_account, %{} = attributes) do
+
     result =
       stripe_account
       |> Map.from_struct
@@ -18,7 +19,53 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter do
     {:ok, result}
   end
 
-  def to_managed_params(%{
+  def to_managed_params(%Stripe.Account{} = stripe_account, %{} = attributes) do
+    params = %{
+      email: stripe_account.email,
+      managed: stripe_account.managed,
+      # TODO: A stripe response will not return the business_ein. instead,
+      # it will return business_tax_id_provided, which is a boolean. we should probably store that,
+      # not this
+      business_ein: attributes |> Map.get("business_ein"),
+      business_name: stripe_account.legal_entity.business_name, # or stripe_account.business_name
+
+      # as far as I can tell, stripe does not store this. might wanna remove it from the whole process.
+      # added it due to looking at kickstarter form
+      business_type: attributes |> Map.get("business_type"),
+
+      first_name: stripe_account.legal_entity.first_name,
+      last_name: stripe_account.legal_entity.last_name,
+      # TODO: A stripe response will not return the ssn_last4. instead,
+      # it will return ssn_last4_provided, which is a boolean. we should probably store that,
+      # not this
+      ssn_last4: attributes |> Map.get("ssn_last4"),
+      recipient_type: stripe_account.legal_entity.type,
+
+      # TODO: decide on getting legal_entity.address or legal_entity.personal_address
+      address1: stripe_account.legal_entity.address.line1,
+      address2: stripe_account.legal_entity.address.line2,
+      city: stripe_account.legal_entity.address.city,
+      country: stripe_account.legal_entity.address.country,
+      state: stripe_account.legal_entity.address.state,
+      # we maybe wanna rename this one
+      zip: stripe_account.legal_entity.address.postal_code,
+
+      dob_day: stripe_account.legal_entity.dob.day,
+      dob_month: stripe_account.legal_entity.dob.month,
+      dob_year: stripe_account.legal_entity.dob.year,
+
+      id_from_stripe: stripe_account.id,
+      charges_enabled: stripe_account.charges_enabled,
+      transfers_enabled: stripe_account.transfers_enabled,
+
+      organization_id: attributes |> Map.get("organization_id"),
+    }
+
+    IO.inspect(params)
+    {:ok, params}
+  end
+
+  def to_stripe_params(%{
     "address1" => address1,
     "address2" => address2,
     "business_ein" => business_ein,
@@ -41,29 +88,32 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter do
 
     address = %{city: city, country: country, line1: address1, line2: address2, postal_code: zip, state: state}
 
+    legal_entity = %{
+      business_name: business_name,
+      business_tax_id: business_ein,
+      dob: %{day: dob_day, month: dob_month, year: dob_year},
+      first_name: first_name,
+      last_name: last_name,
+      ssn_last_4: ssn_last4,
+      type: recipient_type,
+      # TODO: Decide on setting legal_entity.address or legal_entity.personal_address
+      address: address,
+      personal_address: address
+    }
+
     params = %{
       country: country,
       email: email,
       managed: true,
-      legal_entity: %{
-        business_name: business_name,
-        business_tax_id: business_ein,
-        dob: %{day: dob_day, month: dob_month, year: dob_year},
-        first_name: first_name,
-        last_name: last_name,
-        ssn_last4: ssn_last4
-      }
-    } |> put_address(recipient_type, address)
+      legal_entity: legal_entity
+    }
 
+    IO.inspect(params, pretty: true)
     {:ok, params}
   end
-  def to_managed_params(attributes) do
-    IO.inspect(attributes, pretty: true)
+  def to_stripe_managed_params(attributes) do
     {:error, :fields_missing}
   end
-
-  defp put_address(params, "individual", address), do: params |> Map.put(:personal_address, address)
-  defp put_address(params, "company", address), do: params |> Map.put(:address, address)
 
   @non_stripe_attributes ["organization_id"]
 

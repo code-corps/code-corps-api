@@ -29,9 +29,9 @@ defmodule CodeCorps.StripeConnectAccount do
     field :business_type, :string, virtual: true
     field :city, :string, virtual: true
     field :country, :string
-    field :dob_day, :string, virtual: true
-    field :dob_month, :string, virtual: true
-    field :dob_year, :string, virtual: true
+    field :dob_day, :integer, virtual: true
+    field :dob_month, :integer, virtual: true
+    field :dob_year, :integer, virtual: true
     field :email, :string
     field :first_name, :string, virtual: true
     field :last_name, :string, virtual: true
