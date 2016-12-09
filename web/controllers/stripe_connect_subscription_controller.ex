@@ -16,13 +16,8 @@ defmodule CodeCorps.StripeConnectSubscriptionController do
     |> handle_create_result(conn)
   end
 
+  defp handle_create_result({:error, %Ecto.Changeset{} = changeset}, _conn), do: changeset
   defp handle_create_result({:ok, %StripeConnectSubscription{}} = result, conn) do
     result |> CodeCorps.Analytics.Segment.track(:created, conn)
   end
-  defp handle_create_result({:error, %Stripe.APIErrorResponse{}}, conn) do
-    conn
-    |> put_status(500)
-    |> render(CodeCorps.ErrorView, "500.json-api")
-  end
-  defp handle_create_result({:error, %Ecto.Changeset{} = changeset}, _conn), do: changeset
 end

@@ -27,7 +27,7 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
       # {:error, :project_not_ready} - `CodeCorps.ProjectSubscribable.validate/1` failed
       # {:error, :user_not_ready} - `CodeCorps.UserCanSubscribe.validate/1` failed
       # {:error, %Ecto.Changeset{}} - Record creation failed due to validation errors
-      # {:error, %Stripe.APIError{}} - Stripe request failed
+      # {:error, %Stripe.APIErrorResponse{}} - Stripe request failed
       # {:error, :not_found} - One of the associated records was not found
       {:error, error} -> {:error, error}
       nil -> {:error, :not_found}
@@ -51,7 +51,7 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
     else
       # possible errors
       # {:error, %Ecto.Changeset{}} - Record creation failed due to validation errors
-      # {:error, %Stripe.APIError{}} - Stripe request failed
+      # {:error, %Stripe.APIErrorResponse{}} - Stripe request failed
       # {:error, :not_found} - One of the associated records was not found
       {:error, error} -> {:error, error}
       nil -> {:error, :not_found}
