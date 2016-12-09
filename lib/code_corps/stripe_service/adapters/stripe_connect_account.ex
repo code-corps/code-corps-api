@@ -18,6 +18,53 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter do
     {:ok, result}
   end
 
+  def to_managed_params(%{
+    "address1" => address1,
+    "address2" => address2,
+    "business_ein" => business_ein,
+    "business_name" => business_name,
+    "business_type" => _,
+    "city" => city,
+    "country" => country,
+    "dob_day" => dob_day,
+    "dob_month" => dob_month,
+    "dob_year" => dob_year,
+    "email" => email,
+    "first_name" => first_name,
+    "last_name" => last_name,
+    "recipient_type" => recipient_type,
+    "ssn_last4" => ssn_last4,
+    "state" => state,
+    "zip" => zip,
+    "organization_id" => _
+  } = attributes) do
+
+    address = %{city: city, country: country, line1: address1, line2: address2, postal_code: zip, state: state}
+
+    params = %{
+      country: country,
+      email: email,
+      managed: true,
+      legal_entity: %{
+        business_name: business_name,
+        business_tax_id: business_ein,
+        dob: %{day: dob_day, month: dob_month, year: dob_year},
+        first_name: first_name,
+        last_name: last_name,
+        ssn_last4: ssn_last4
+      }
+    } |> put_address(recipient_type, address)
+
+    {:ok, params}
+  end
+  def to_managed_params(attributes) do
+    IO.inspect(attributes, pretty: true)
+    {:error, :fields_missing}
+  end
+
+  defp put_address(params, "individual", address), do: params |> Map.put(:personal_address, address)
+  defp put_address(params, "company", address), do: params |> Map.put(:address, address)
+
   @non_stripe_attributes ["organization_id"]
 
   defp add_non_stripe_attributes(%{} = params, %{} = attributes) do
