@@ -90,7 +90,8 @@ defmodule CodeCorps.Mixfile do
       {:sentry, "~> 2.0"}, # Sentry error tracking
       {:stripity_stripe, "~> 2.0.0-alpha.5"}, # Stripe
       {:timex, "~> 3.0"},
-      {:timex_ecto, "~> 3.0"}
+      {:timex_ecto, "~> 3.0"},
+      {:ecto_ordered, "0.2.0-beta1"}
     ]
   end
 

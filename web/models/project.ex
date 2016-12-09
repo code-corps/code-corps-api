@@ -9,6 +9,7 @@ defmodule CodeCorps.Project do
   import CodeCorps.Helpers.Slug
   import CodeCorps.Validators.SlugValidator
   alias CodeCorps.Services.MarkdownRendererService
+  alias CodeCorps.TaskList
 
   schema "projects" do
     field :approved, :boolean
@@ -28,6 +29,7 @@ defmodule CodeCorps.Project do
     has_many :donation_goals, CodeCorps.DonationGoal
     has_many :project_categories, CodeCorps.ProjectCategory
     has_many :project_skills, CodeCorps.ProjectSkill
+    has_many :task_lists, CodeCorps.TaskList
     has_many :tasks, CodeCorps.Task
 
     has_many :categories, through: [:project_categories, :category]
@@ -55,7 +57,7 @@ defmodule CodeCorps.Project do
     struct
     |> cast(params, [:organization_id])
     |> changeset(params)
-
+    |> put_assoc(:task_lists, TaskList.default_task_lists())
   end
 
   @doc """

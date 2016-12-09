@@ -1,5 +1,6 @@
 defmodule CodeCorps.Task do
   use CodeCorps.Web, :model
+  import EctoOrdered
   alias CodeCorps.Services.MarkdownRendererService
 
   schema "tasks" do
@@ -10,9 +11,12 @@ defmodule CodeCorps.Task do
     field :state, :string
     field :status, :string, default: "open"
     field :title, :string
+    field :position, :integer, virtual: true
+    field :rank, :integer
 
     belongs_to :project, CodeCorps.Project
     belongs_to :user, CodeCorps.User
+    belongs_to :task_list, CodeCorps.TaskList
     has_many :comments, CodeCorps.Comment
 
     timestamps()
@@ -20,9 +24,11 @@ defmodule CodeCorps.Task do
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:title, :markdown, :task_type])
+    |> cast(params, [:title, :markdown, :task_type, :task_list_id])
     |> validate_required([:title, :markdown, :task_type])
     |> validate_inclusion(:task_type, task_types)
+    |> assoc_constraint(:task_list)
+    |> set_order(:position, :rank, :task_list_id)
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
   end
 
@@ -30,7 +36,7 @@ defmodule CodeCorps.Task do
     struct
     |> changeset(params)
     |> cast(params, [:project_id, :user_id])
-    |> validate_required([:project_id, :user_id])
+    |> validate_required([:project_id, :user_id, :task_list_id])
     |> assoc_constraint(:project)
     |> assoc_constraint(:user)
     |> put_change(:state, "published")

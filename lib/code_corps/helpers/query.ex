@@ -33,6 +33,12 @@ defmodule CodeCorps.Helpers.Query do
   end
   def project_filter(query, _), do: query
 
+  def task_list_filter(query, %{"task_list_ids" => task_list_ids}) do
+    task_list_ids = task_list_ids |> coalesce_id_string
+    query |> where([object], object.task_list_id in ^task_list_ids)
+  end
+  def task_list_filter(query, _), do: query
+
   def task_type_filter(query, %{"task_type" => task_type_list}) do
     task_types = task_type_list |> coalesce_string
     query |> where([object], object.task_type in ^task_types)
