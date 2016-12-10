@@ -45,7 +45,16 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
     test "creates and renders resource when data is valid", %{conn: conn, current_user: member} do
       organization = insert(:organization)
       attrs = @valid_attrs |> Map.merge(%{organization: organization, member: member})
+
       assert conn |> request_create(attrs) |> json_response(201)
+
+      user_id = member.id
+      tracking_properties = %{
+        organization: organization.name,
+        organization_id: organization.id
+      }
+
+      assert_received {:track, ^user_id, "Requested Organization Membership", ^tracking_properties}
     end
 
     @tag :authenticated
@@ -75,6 +84,14 @@ defmodule CodeCorps.OrganizationMembershipControllerTest do
       insert(:organization_membership, organization: organization, member: current_user, role: "owner")
 
       assert conn |> request_update(membership, @valid_attrs) |> json_response(200)
+
+      user_id = current_user.id
+      tracking_properties = %{
+        organization: organization.name,
+        organization_id: organization.id
+      }
+
+      assert_received {:track, ^user_id, "Approved Organization Membership", ^tracking_properties}
     end
 
     test "doesn't update and renders 401 when unauthenticated", %{conn: conn} do

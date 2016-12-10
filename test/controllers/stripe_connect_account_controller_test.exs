@@ -37,6 +37,9 @@ defmodule CodeCorps.StripeConnectAccountControllerTest do
         organization: organization
       }
       assert conn |> request_create(attrs) |> json_response(201)
+
+      user_id = current_user.id
+      assert_received {:track, ^user_id, "Created Stripe Connect Account", %{}}
     end
 
     test "does not create resource and renders 401 when unauthenticated", %{conn: conn} do

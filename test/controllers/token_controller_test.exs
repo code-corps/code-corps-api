@@ -22,9 +22,12 @@ defmodule CodeCorps.TokenControllerTest do
       user = build(:user, %{password: "password"}) |> set_password("password") |> insert
       conn = post conn, token_path(conn, :create), create_payload(user.email, user.password)
 
+      user_id = user.id
       response = json_response(conn, 201)
       assert response["token"]
-      assert response["user_id"] == user.id
+      assert response["user_id"] == user_id
+
+      assert_received {:track, ^user_id, "Signed In", %{}}
     end
 
     test "does not authenticate and renders errors when the password is wrong", %{conn: conn} do

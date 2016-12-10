@@ -34,6 +34,9 @@ defmodule CodeCorps.StripePlatformCustomerControllerTest do
     @tag :authenticated
     test "creates and renders resource user is authenticated and authorized", %{conn: conn, current_user: current_user} do
       assert conn |> request_create(%{user: current_user}) |> json_response(201)
+
+      user_id = current_user.id
+      assert_received {:track, ^user_id, "Created Stripe Platform Customer", %{}}
     end
 
     test "does not create resource and renders 401 when unauthenticated", %{conn: conn} do

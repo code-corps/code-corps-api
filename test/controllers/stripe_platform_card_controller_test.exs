@@ -56,7 +56,11 @@ defmodule CodeCorps.StripePlatformCardControllerTest do
     test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
       insert(:stripe_platform_customer, user: current_user)
       valid_attrs = %{stripe_token: "tok_test123456", user: current_user}
+
       assert conn |> make_create_request(valid_attrs) |> json_response(201)
+
+      user_id = current_user.id
+      assert_received {:track, ^user_id, "Created Stripe Platform Card", %{}}
     end
 
     test "renders 401 when unauthenticated", %{conn: conn} do

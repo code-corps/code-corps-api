@@ -41,12 +41,19 @@ defmodule CodeCorps.UserSkillControllerTest do
 
   describe "create" do
     @tag authenticated: :admin
-    test "creates and renders resource when data is valid", %{conn: conn} do
+    test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
       user = insert(:user)
       skill = insert(:skill, title: "test-skill")
 
       attrs = %{user: user, skill: skill}
       assert conn |> request_create(attrs) |> json_response(201)
+
+      user_id = current_user.id
+      tracking_properties = %{
+        skill: skill.title,
+        skill_id: skill.id
+      }
+      assert_received {:track, ^user_id, "Added User Skill", ^tracking_properties}
     end
 
     @tag authenticated: :admin
@@ -67,8 +74,16 @@ defmodule CodeCorps.UserSkillControllerTest do
 
   describe "delete" do
     @tag authenticated: :admin
-    test "deletes resource", %{conn: conn} do
-      assert conn |> request_delete |> response(204)
+    test "deletes resource", %{conn: conn, current_user: current_user} do
+      user_skill = insert(:user_skill)
+      assert conn |> request_delete(user_skill.id) |> response(204)
+
+      user_id = current_user.id
+      tracking_properties = %{
+        skill: user_skill.skill.title,
+        skill_id: user_skill.skill.id
+      }
+      assert_received {:track, ^user_id, "Removed User Skill", ^tracking_properties}
     end
 
     test "does not delete resource and renders 401 when unauthenticated", %{conn: conn} do
