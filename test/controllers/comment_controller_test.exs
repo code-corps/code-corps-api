@@ -71,6 +71,8 @@ defmodule CodeCorps.CommentControllerTest do
 
       assert json_response(conn, 201)["data"]["id"]
       assert Repo.get_by(Comment, @valid_attrs)
+
+      assert_received {:track, :created, @valid_attrs}
     end
 
     @tag :authenticated
