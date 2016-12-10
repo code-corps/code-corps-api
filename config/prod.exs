@@ -13,6 +13,7 @@ use Mix.Config
 # which you typically run after static files are built.
 config :code_corps, CodeCorps.Endpoint,
   http: [port: {:system, "PORT"}],
+  instrumenters: [Timber.PhoenixInstrumenter],
   url: [scheme: "https", host: "api.codecorps.org", port: 443],
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
   secret_key_base: System.get_env("SECRET_KEY_BASE")
@@ -20,6 +21,7 @@ config :code_corps, CodeCorps.Endpoint,
 # Configure your database
 config :code_corps, CodeCorps.Repo,
   adapter: Ecto.Adapters.Postgres,
+  loggers: [{Timber.Ecto, :log, [:info]}],
   url: System.get_env("DATABASE_URL"),
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
   ssl: true
@@ -35,8 +37,11 @@ config :code_corps, allowed_origins: [
 config :guardian, Guardian,
   secret_key: System.get_env("GUARDIAN_SECRET_KEY")
 
-# Do not print debug messages in production
-config :logger, level: :info
+# Timber logging
+config :logger,
+  level: :info,
+  backends: [Timber.Logger]
+config :timber, :transport, Timber.Transports.IODevice
 
 # Configures Segment for analytics
 config :code_corps, :analytics, CodeCorps.Analytics.SegmentAPI
