@@ -11,6 +11,11 @@ defmodule CodeCorps.Router do
     plug :put_secure_browser_headers
   end
 
+  pipeline :logging do
+    plug Timber.ContextPlug
+    plug Timber.EventPlug
+  end
+
   pipeline :api do
     plug :accepts, ["json-api", "json"]
     plug JaSerializer.Deserializer
@@ -36,20 +41,20 @@ defmodule CodeCorps.Router do
   end
 
   scope "/", CodeCorps do
-    pipe_through :browser # Use the default browser stack
+    pipe_through [:logging, :browser] # Use the default browser stack
 
     get "/", PageController, :index
   end
 
   scope "/", CodeCorps, host: "api." do
-    pipe_through [:stripe_webhooks]
+    pipe_through [:logging, :stripe_webhooks]
 
     post "/webhooks/stripe/connect", StripeConnectEventsController, :create
     post "/webhooks/stripe/platform", StripePlatformEventsController, :create
   end
 
   scope "/", CodeCorps, host: "api." do
-    pipe_through [:api, :bearer_auth, :ensure_auth, :current_user]
+    pipe_through [:logging, :api, :bearer_auth, :ensure_auth, :current_user]
 
     resources "/categories", CategoryController, only: [:create, :update]
     resources "/comments", CommentController, only: [:create, :update]
@@ -78,7 +83,7 @@ defmodule CodeCorps.Router do
   end
 
   scope "/", CodeCorps, host: "api." do
-    pipe_through [:api, :bearer_auth, :current_user]
+    pipe_through [:logging, :api, :bearer_auth, :current_user]
 
     post "/token", TokenController, :create
     post "/token/refresh", TokenController, :refresh
