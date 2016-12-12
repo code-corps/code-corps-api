@@ -66,53 +66,51 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter do
   end
 
   def to_stripe_params(%{
-    "address1" => address1,
-    "address2" => address2,
-    "business_ein" => business_ein,
-    "business_name" => business_name,
-    "business_type" => _,
-    "city" => city,
     "country" => country,
-    "dob_day" => dob_day,
-    "dob_month" => dob_month,
-    "dob_year" => dob_year,
-    "email" => email,
-    "first_name" => first_name,
-    "last_name" => last_name,
-    "recipient_type" => recipient_type,
-    "ssn_last4" => ssn_last4,
-    "state" => state,
-    "zip" => zip,
-    "organization_id" => _
+    "email" => email
   } = attributes) do
-
-    address = %{city: city, country: country, line1: address1, line2: address2, postal_code: zip, state: state}
-
-    legal_entity = %{
-      business_name: business_name,
-      business_tax_id: business_ein,
-      dob: %{day: dob_day, month: dob_month, year: dob_year},
-      first_name: first_name,
-      last_name: last_name,
-      ssn_last_4: ssn_last4,
-      type: recipient_type,
-      # TODO: Decide on setting legal_entity.address or legal_entity.personal_address
-      address: address,
-      personal_address: address
-    }
-
-    params = %{
-      country: country,
-      email: email,
-      managed: true,
-      legal_entity: legal_entity
-    }
-
-    IO.inspect(params, pretty: true)
-    {:ok, params}
+    with legal_entity <- build_legal_entity(attributes)
+    do
+      params = %{ country: country, email: email, managed: true, legal_entity: legal_entity}
+      {:ok, params}
+    end
   end
   def to_stripe_managed_params(attributes) do
     {:error, :fields_missing}
+  end
+
+  defp build_legal_entity(%{
+    "business_ein" => business_ein, "business_name" => business_name, "business_type" => _,
+    "first_name" => first_name, "last_name" => last_name, "ssn_last4" => ssn_last4,
+    "recipient_type" => recipient_type
+  } = attributes) do
+    with address <- build_address(attributes),
+         dob <- build_dob(attributes)
+    do
+      %{
+        business_name: business_name,
+        business_tax_id: business_ein,
+        dob: dob,
+        first_name: first_name,
+        last_name: last_name,
+        ssn_last_4: ssn_last4,
+        type: recipient_type,
+        # TODO: Decide which address to set
+        address: address,
+        personal_address: address
+      }
+    end
+  end
+
+  defp build_dob(%{"dob_day" => dob_day, "dob_month" => dob_month, "dob_year" => dob_year}) do
+    %{day: dob_day, month: dob_month, year: dob_year}
+  end
+
+  defp build_address(%{
+    "address1" => address1, "address2" => address2, "city" => city,
+    "country" => country, "state" => state,"zip" => zip
+  }) do
+    %{city: city, country: country, line1: address1, line2: address2, postal_code: zip, state: state}
   end
 
   @non_stripe_attributes ["organization_id"]
