@@ -50,7 +50,6 @@ config :code_corps, :analytics, CodeCorps.Analytics.InMemoryAPI
 # Configures stripe for dev mode
 config :code_corps, :stripe, Stripe
 config :code_corps, :stripe_env, :dev
-config :code_corps, :stripe_redirect_uri, "http://localhost:4200/oauth/stripe"
 
 config :sentry,
   environment_name: Mix.env || :dev
