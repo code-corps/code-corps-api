@@ -52,7 +52,16 @@ defmodule CodeCorps.Factories do
       status: "open",
       state: "published",
       project: build(:project),
-      user: build(:user)
+      user: build(:user),
+      task_list: build(:task_list)
+    }
+  end
+
+  def task_list_factory do
+    %CodeCorps.TaskList{
+      name: "Test task list",
+      rank: 1000,
+      project: build(:project)
     }
   end
 

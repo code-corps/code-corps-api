@@ -42,12 +42,14 @@ defmodule CodeCorps.TaskTest do
     test "is valid with valid attributes" do
       user = insert(:user)
       project = insert(:project)
+      task_list = insert(:task_list)
       changeset = Task.create_changeset(%Task{}, %{
         markdown: "some content",
         task_type: "issue",
         title: "some content",
         project_id: project.id,
         user_id: user.id,
+        task_list_id: task_list.id
       })
       assert changeset.valid?
     end
@@ -56,15 +58,18 @@ defmodule CodeCorps.TaskTest do
       user = insert(:user)
       project_a = insert(:project, title: "Project A")
       project_b = insert(:project, title: "Project B")
+      task_list_a = insert(:task_list, name: "Task List A", project: project_a)
+      task_list_b = insert(:task_list, name: "Task List B", project: project_b)
 
-      insert(:task, project: project_a, user: user, title: "Project A Task 1")
-      insert(:task, project: project_a, user: user, title: "Project A Task 2")
+      insert(:task, project: project_a, user: user, task_list: task_list_a, title: "Project A Task 1")
+      insert(:task, project: project_a, user: user, task_list: task_list_b, title: "Project A Task 2")
 
-      insert(:task, project: project_b, user: user, title: "Project B Task 1")
+      insert(:task, project: project_b, user: user, task_list: task_list_b, title: "Project B Task 1")
 
       changes = Map.merge(@valid_attrs, %{
         project_id: project_a.id,
-        user_id: user.id
+        user_id: user.id,
+        task_list_id: task_list_a.id
       })
       changeset = Task.create_changeset(%Task{}, changes)
       {:ok, result} = Repo.insert(changeset)
@@ -72,7 +77,8 @@ defmodule CodeCorps.TaskTest do
 
       changes = Map.merge(@valid_attrs, %{
         project_id: project_b.id,
-        user_id: user.id
+        user_id: user.id,
+        task_list_id: task_list_b.id
       })
       changeset = Task.create_changeset(%Task{}, changes)
       {:ok, result} = Repo.insert(changeset)
