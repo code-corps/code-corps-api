@@ -142,6 +142,12 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def stripe_file_upload_factory do
+    %CodeCorps.StripeFileUpload{
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
+    }
+  end
+
   def stripe_connect_subscription_factory do
     stripe_connect_plan = build(:stripe_connect_plan)
     %CodeCorps.StripeConnectSubscription{
