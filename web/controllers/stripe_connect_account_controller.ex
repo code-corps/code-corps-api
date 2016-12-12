@@ -3,7 +3,7 @@ defmodule CodeCorps.StripeConnectAccountController do
   use JaResource
 
   alias CodeCorps.StripeConnectAccount
-  alias CodeCorps.StripeService.StripeManagedConnectAccountService
+  alias CodeCorps.StripeService.StripeConnectAccountService
 
   plug :load_and_authorize_changeset, model: StripeConnectAccount, only: [:create]
   plug :load_and_authorize_resource, model: StripeConnectAccount, only: [:show]
@@ -11,7 +11,7 @@ defmodule CodeCorps.StripeConnectAccountController do
 
   def handle_create(conn, attributes) do
     attributes
-    |> StripeManagedConnectAccountService.create
+    |> StripeConnectAccountService.create
     |> handle_create_result(conn)
   end
 

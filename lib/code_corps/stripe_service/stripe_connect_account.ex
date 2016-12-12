@@ -4,13 +4,13 @@ defmodule CodeCorps.StripeService.StripeConnectAccountService do
 
   @api Application.get_env(:code_corps, :stripe)
 
-  def create(%{"access_code" => code, "organization_id" => _organization_id} = attributes) do
-    with {:ok, %TokenResponse{stripe_user_id: account_id}} <- @api.Connect.OAuth.token(code),
-         {:ok, account} <- @api.Account.retrieve(account_id),
-         {:ok, params} <- StripeConnectAccountAdapter.to_params(account, attributes)
+  def create(%{} = attributes) do
+    with {:ok, stripe_params} <- StripeConnectAccountAdapter.to_stripe_params(attributes),
+         {:ok, %Stripe.Account{} = stripe_account} <- @api.Account.create(stripe_params),
+         {:ok, params} <- StripeConnectAccountAdapter.to_managed_params(stripe_account, attributes)
     do
       %CodeCorps.StripeConnectAccount{}
-      |> CodeCorps.StripeConnectAccount.create_changeset(params)
+      |> CodeCorps.StripeConnectAccount.managed_create_changeset(params)
       |> CodeCorps.Repo.insert
     end
   end
