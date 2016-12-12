@@ -84,9 +84,6 @@ defmodule Canary.Abilities do
     def can?(%User{} = user, :create, %Changeset{data: %Project{}} = changeset), do: ProjectPolicy.create?(user, changeset)
     def can?(%User{} = user, :update, %Project{} = project), do: ProjectPolicy.update?(user, project)
 
-    # Policy for StripeAuthController
-    def can?(%User{} = user, :stripe_auth, %Project{} = project), do: ProjectPolicy.stripe_auth?(user, project)
-
     def can?(%User{} = user, :create, %Changeset{data: %ProjectCategory{}} = changeset), do: ProjectCategoryPolicy.create?(user, changeset)
     def can?(%User{} = user, :delete, %ProjectCategory{} = project_category), do: ProjectCategoryPolicy.delete?(user, project_category)
 

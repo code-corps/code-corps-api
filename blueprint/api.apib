@@ -893,26 +893,6 @@ This resource identifies a relationship between a Project and a Skill. For examp
 
     + Attributes (Project Response)
 
-### Get Stripe authorization [GET /projects/{id}/stripe-auth]
-
-This endpoint allows you to get a Stripe Connect authorization URL used for creating a Stripe Connect account for the given project.
-
-See https://stripe.com/docs/connect/reference#get-authorize
-
-The URL includes a `state` CSRF token which is a Guardian generated JSON Web Token which contains the project's ID. This JWT will be used when the
-+ Parameters
-
-    + id (number, required)
-user returns to Code Corps in order to associate Stripe's `code` with the project that initiated the Stripe Connect authorization.
-
-+ Response 200 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Stripe Auth Response)
-
-+ Response 401 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (JSON Web Token Invalid Response)
-
 ### Update a project [PATCH]
 
 + Request
@@ -2595,20 +2575,6 @@ This endpoint allows you to check whether a username is valid (by running a vali
 ## Slugged Route User Response (object)
 + data(Slugged Route User Resource)
 + include JSON API Version
-
-## Stripe Auth Attributes (object)
-+ url: `https://connect.stripe.com/oauth/authorize?response_type=code&scope=read_write&client_id=ca_APP_CLIENT_ID&state=JWT_STRING` (string, required)
-
-## Stripe Auth Resource (object)
-+ include Stripe Auth Resource Identifier
-+ attributes(Stripe Auth Attributes)
-
-## Stripe Auth Resource Identifier (object)
-+ id: `1` (string, required)
-+ type: `stripe-auth` (string, required)
-
-## Stripe Auth Response (object)
-+ data(Stripe Auth Resource)
 
 ## Stripe Connect Account Attributes (object)
 + `business-name`: `Stripe.com` (string) - The publicly visible name of the business
