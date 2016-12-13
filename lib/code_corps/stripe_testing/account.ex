@@ -1,9 +1,13 @@
 defmodule CodeCorps.StripeTesting.Account do
-  def retrieve(_id) do
-    {:ok, do_retrieve}
+  def create(_map) do
+    {:ok, do_create}
   end
 
-  defp do_retrieve do
+  def retrieve(_id) do
+    {:ok, do_create}
+  end
+
+  defp do_create do
     %Stripe.Account{
       business_name: "Code Corps PBC",
       business_primary_color: nil,

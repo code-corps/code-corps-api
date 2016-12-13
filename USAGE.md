@@ -77,7 +77,7 @@ You can register for a Stripe account here: [https://dashboard.stripe.com/regist
 In your `.env` you should have a `STRIPE_SECRET_KEY` and `STRIPE_PLATFORM_CLIENT_ID`.
 
 - `STRIPE_SECRET_KEY` should be set to your "Test Secret Key" from the [API Keys section of your Stripe dashboard](https://dashboard.stripe.com/account/apikeys).
-- `STRIPE_PLATFORM_CLIENT_ID` should be set to "Development `client_id`" key from the [Connect section of your Stripe dashboard](https://dashboard.stripe.com/account/applications/settings). You'll want to set the redirect URI to `http://localhost:4200/oauth/stripe`.
+- `STRIPE_PLATFORM_CLIENT_ID` should be set to "Development `client_id`" key from the [Connect section of your Stripe dashboard](https://dashboard.stripe.com/account/applications/settings).
 
 ### Pushing changes
 

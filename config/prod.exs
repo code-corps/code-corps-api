@@ -49,7 +49,6 @@ config :code_corps, :analytics, CodeCorps.Analytics.SegmentAPI
 # Configures stripe for production
 config :code_corps, :stripe, Stripe
 config :code_corps, :stripe_env, :prod
-config :code_corps, :stripe_redirect_uri, "https://www.codecorps.org/oauth/stripe"
 
 config :sentry,
   environment_name: Mix.env || :prod

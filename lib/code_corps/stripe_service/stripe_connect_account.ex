@@ -1,12 +1,12 @@
 defmodule CodeCorps.StripeService.StripeConnectAccountService do
   alias CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter
-  alias Stripe.Connect.OAuth.TokenResponse
 
   @api Application.get_env(:code_corps, :stripe)
 
-  def create(%{"access_code" => code, "organization_id" => _organization_id} = attributes) do
-    with {:ok, %TokenResponse{stripe_user_id: account_id}} <- @api.Connect.OAuth.token(code),
-         {:ok, account} <- @api.Account.retrieve(account_id),
+  # TODO: Replace with code that implements issue #564
+
+  def create(%{"country" => country_code, "organization_id" => organization_id} = attributes) do
+    with {:ok, %Stripe.Account{} = account} <- @api.Account.create(%{country: country_code, managed: true}),
          {:ok, params} <- StripeConnectAccountAdapter.to_params(account, attributes)
     do
       %CodeCorps.StripeConnectAccount{}
