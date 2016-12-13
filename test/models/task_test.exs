@@ -61,8 +61,8 @@ defmodule CodeCorps.TaskTest do
       task_list_a = insert(:task_list, name: "Task List A", project: project_a)
       task_list_b = insert(:task_list, name: "Task List B", project: project_b)
 
-      insert(:task, project: project_a, user: user, task_list: task_list_a, title: "Project A Task 1")
-      insert(:task, project: project_a, user: user, task_list: task_list_b, title: "Project A Task 2")
+      insert(:task, project: project_a, user: user, task_list: task_list_a, rank: 2000, title: "Project A Task 1")
+      insert(:task, project: project_a, user: user, task_list: task_list_a, rank: 1000, title: "Project A Task 2")
 
       insert(:task, project: project_b, user: user, task_list: task_list_b, title: "Project B Task 1")
 
@@ -83,6 +83,41 @@ defmodule CodeCorps.TaskTest do
       changeset = Task.create_changeset(%Task{}, changes)
       {:ok, result} = Repo.insert(changeset)
       assert result.number == 2
+    end
+
+    test "auto-assigns rank, beginning of list, scoped to task list" do
+      user = insert(:user)
+      project_a = insert(:project, title: "Project A")
+      task_list_a = insert(:task_list, name: "Task List A", project: project_a)
+      task_list_b = insert(:task_list, name: "Task List B", project: project_a)
+
+      task_a_1 = insert(:task, project: project_a, user: user, task_list: task_list_a, rank: 2000, title: "Project A Task 1")
+      task_a_2 = insert(:task, project: project_a, user: user, task_list: task_list_a, rank: 1000, title: "Project A Task 2")
+
+      task_b_1 = insert(:task, project: project_a, user: user, task_list: task_list_b, rank: 2000, title: "Project B Task 1")
+      task_b_2 = insert(:task, project: project_a, user: user, task_list: task_list_b, rank: 1000, title: "Project B Task 2")
+
+      changes = Map.merge(@valid_attrs, %{
+        project_id: project_a.id,
+        user_id: user.id,
+        task_list_id: task_list_a.id
+      })
+      changeset = Task.create_changeset(%Task{}, changes)
+      {:ok, result_a} = Repo.insert(changeset)
+      assert result_a.rank < task_a_1.rank && result_a.rank < task_a_2.rank
+
+      changes = Map.merge(@valid_attrs, %{
+        project_id: project_a.id,
+        user_id: user.id,
+        task_list_id: task_list_b.id
+      })
+      changeset = Task.create_changeset(%Task{}, changes)
+      {:ok, result_b} = Repo.insert(changeset)
+      assert result_b.rank < task_b_1.rank && result_b.rank < task_b_2.rank
+
+      # Make sure that, given the same rank configuration between task lists,
+      # the auto-assigned rank is the same, meaning the ranking is correctly scoped
+      assert result_a.rank == result_b.rank
     end
 
     test "sets state to 'published'" do

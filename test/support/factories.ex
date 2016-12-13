@@ -60,7 +60,7 @@ defmodule CodeCorps.Factories do
   def task_list_factory do
     %CodeCorps.TaskList{
       name: "Test task list",
-      rank: 1000,
+      position: 1,
       project: build(:project)
     }
   end

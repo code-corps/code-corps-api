@@ -24,10 +24,11 @@ defmodule CodeCorps.Task do
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:title, :markdown, :task_type, :task_list_id])
+    |> cast(params, [:title, :markdown, :task_type, :task_list_id, :position])
     |> validate_required([:title, :markdown, :task_type])
     |> validate_inclusion(:task_type, task_types)
     |> assoc_constraint(:task_list)
+    |> apply_position()
     |> set_order(:position, :rank, :task_list_id)
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
   end
@@ -49,7 +50,14 @@ defmodule CodeCorps.Task do
     |> cast(params, [:status])
     |> validate_inclusion(:status, statuses)
     |> put_change(:state, "edited")
+  end
 
+  def apply_position(changeset) do
+    case get_field(changeset, :position) do
+      nil ->
+        put_change(changeset, :position, 0)
+      _ -> changeset
+    end
   end
 
   defp task_types do

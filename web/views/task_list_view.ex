@@ -1,18 +1,11 @@
 defmodule CodeCorps.TaskListView do
+  use CodeCorps.PreloadHelpers, default_preloads: [:project, :tasks]
   use CodeCorps.Web, :view
+  use JaSerializer.PhoenixView
 
-  def render("index.json", %{task_lists: task_lists}) do
-    %{data: render_many(task_lists, CodeCorps.TaskListView, "task_list.json")}
-  end
+  attributes [:name, :rank, :inserted_at, :updated_at]
 
-  def render("show.json", %{task_list: task_list}) do
-    %{data: render_one(task_list, CodeCorps.TaskListView, "task_list.json")}
-  end
+  has_one :project, serializer: CodeCorps.ProjectView
 
-  def render("task_list.json", %{task_list: task_list}) do
-    %{id: task_list.id,
-      name: task_list.name,
-      position: task_list.position,
-      project_id: task_list.project_id}
-  end
+  has_many :tasks, serializer: CodeCorps.TaskView, identifiers: :always
 end

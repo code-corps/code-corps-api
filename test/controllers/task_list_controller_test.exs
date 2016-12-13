@@ -1,62 +1,83 @@
 defmodule CodeCorps.TaskListControllerTest do
-  use CodeCorps.ConnCase
+  use CodeCorps.ApiCase, resource_name: :task_list
 
-  alias CodeCorps.TaskList
-  @valid_attrs %{name: "some content", position: 42}
-  @invalid_attrs %{}
+  @valid_attrs %{
+    name: "Test task"
+  }
 
-  setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
-  end
+  @invalid_attrs %{
+    name: nil
+  }
 
-  test "lists all entries on index", %{conn: conn} do
-    conn = get conn, task_list_path(conn, :index)
-    assert json_response(conn, 200)["data"] == []
-  end
+  describe "index" do
+    test "lists all entries", %{conn: conn} do
+      [task_list_1, task_list_2] = insert_pair(:task_list)
 
-  test "shows chosen resource", %{conn: conn} do
-    task_list = Repo.insert! %TaskList{}
-    conn = get conn, task_list_path(conn, :show, task_list)
-    assert json_response(conn, 200)["data"] == %{"id" => task_list.id,
-      "name" => task_list.name,
-      "position" => task_list.position,
-      "project_id" => task_list.project_id}
-  end
+      conn
+      |> request_index
+      |> json_response(200)
+      |> assert_ids_from_response([task_list_1.id, task_list_2.id])
+    end
 
-  test "renders page not found when id is nonexistent", %{conn: conn} do
-    assert_error_sent 404, fn ->
-      get conn, task_list_path(conn, :show, -1)
+    test "lists all entries by rank", %{conn: conn} do
+      # Has to be done manually. Inserting as a list is too quick.
+      # Field lacks the resolution to differentiate.
+      project = insert(:project)
+      task_list_1 = insert(:task_list, project: project, rank: 2000)
+      task_list_2 = insert(:task_list, project: project, rank: 1000)
+      task_list_3 = insert(:task_list, project: project, rank: 3000)
+
+      path = conn |> task_list_path(:index)
+      json = conn |> get(path) |> json_response(200)
+
+      ids =
+        json["data"]
+        |> Enum.map(&Map.get(&1, "id"))
+        |> Enum.map(&Integer.parse/1)
+        |> Enum.map(fn({id, _rem}) -> id end)
+
+      assert ids == [task_list_2.id, task_list_1.id, task_list_3.id]
+    end
+
+    test "lists all task lists for a project", %{conn: conn} do
+      project_1 = insert(:project)
+      project_2 = insert(:project)
+      insert(:task_list, project: project_1)
+      insert(:task_list, project: project_1)
+      insert(:task_list, project: project_2)
+
+      json =
+        conn
+        |> get("projects/#{project_1.id}/task-lists")
+        |> json_response(200)
+
+      assert json["data"] |> Enum.count == 2
     end
   end
 
-  test "creates and renders resource when data is valid", %{conn: conn} do
-    conn = post conn, task_list_path(conn, :create), task_list: @valid_attrs
-    assert json_response(conn, 201)["data"]["id"]
-    assert Repo.get_by(TaskList, @valid_attrs)
-  end
+  describe "show" do
+    test "shows chosen resource", %{conn: conn} do
+      task_list = insert(:task_list)
 
-  test "does not create resource and renders errors when data is invalid", %{conn: conn} do
-    conn = post conn, task_list_path(conn, :create), task_list: @invalid_attrs
-    assert json_response(conn, 422)["errors"] != %{}
-  end
+      conn
+      |> request_show(task_list)
+      |> json_response(200)
+      |> Map.get("data")
+      |> assert_result_id(task_list.id)
+    end
 
-  test "updates and renders chosen resource when data is valid", %{conn: conn} do
-    task_list = Repo.insert! %TaskList{}
-    conn = put conn, task_list_path(conn, :update, task_list), task_list: @valid_attrs
-    assert json_response(conn, 200)["data"]["id"]
-    assert Repo.get_by(TaskList, @valid_attrs)
-  end
+    test "shows task list by id for project", %{conn: conn} do
+      task_list = insert(:task_list)
 
-  test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
-    task_list = Repo.insert! %TaskList{}
-    conn = put conn, task_list_path(conn, :update, task_list), task_list: @invalid_attrs
-    assert json_response(conn, 422)["errors"] != %{}
-  end
+      path = conn |> project_task_list_path(:show, task_list.project_id, task_list.id)
+      data = conn |> get(path) |> json_response(200) |> Map.get("data")
 
-  test "deletes chosen resource", %{conn: conn} do
-    task_list = Repo.insert! %TaskList{}
-    conn = delete conn, task_list_path(conn, :delete, task_list)
-    assert response(conn, 204)
-    refute Repo.get(TaskList, task_list.id)
+      assert data["id"] == "#{task_list.id}"
+      assert data["type"] == "task-list"
+    end
+
+    test "renders 404 when id is nonexistent", %{conn: conn} do
+      assert conn |> request_show(:not_found) |> json_response(404)
+    end
   end
 end
