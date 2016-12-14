@@ -29,7 +29,6 @@ defmodule CodeCorps.Helpers.Query do
   def project_id_with_number_filter(query, _), do: query
 
   def task_list_id_with_number_filter(query, %{"id" => number, "task_list_id" => task_list_id}) do
-    IO.puts "YAY"
     query |> where([object], object.number == ^number and object.task_list_id == ^task_list_id)
   end
   def task_list_id_with_number_filter(query, _), do: query
@@ -42,9 +41,6 @@ defmodule CodeCorps.Helpers.Query do
   def task_list_filter(query, %{"task_list_ids" => task_list_ids}) do
     task_list_ids = task_list_ids |> coalesce_id_string
     query |> where([object], object.task_list_id in ^task_list_ids)
-  end
-  def task_list_filter(query, %{"task_list_id" => task_list_id}) do
-    query |> where([object], object.task_list_id == ^task_list_id)
   end
   def task_list_filter(query, _), do: query
 

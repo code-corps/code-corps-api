@@ -28,15 +28,11 @@ defmodule CodeCorps.TaskListControllerTest do
       task_list_3 = insert(:task_list, project: project, rank: 3000)
 
       path = conn |> task_list_path(:index)
-      json = conn |> get(path) |> json_response(200)
 
-      ids =
-        json["data"]
-        |> Enum.map(&Map.get(&1, "id"))
-        |> Enum.map(&Integer.parse/1)
-        |> Enum.map(fn({id, _rem}) -> id end)
-
-      assert ids == [task_list_2.id, task_list_1.id, task_list_3.id]
+      conn
+      |> get(path)
+      |> json_response(200)
+      |> assert_ids_from_response([task_list_2.id, task_list_1.id, task_list_3.id])
     end
 
     test "lists all task lists for a project", %{conn: conn} do

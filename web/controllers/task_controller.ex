@@ -47,7 +47,6 @@ defmodule CodeCorps.TaskController do
   end
 
   def record(%Plug.Conn{params: %{"task_list_id" => _task_list_id} = params}, _number_as_id) do
-    IO.inspect params
     Task
     |> task_list_id_with_number_filter(params)
     |> Repo.one

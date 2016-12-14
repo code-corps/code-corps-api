@@ -16,12 +16,12 @@ defmodule CodeCorps.TaskViewTest do
           "inserted-at" => task.inserted_at,
           "markdown" => task.markdown,
           "number" => task.number,
+          "rank" => task.rank,
           "status" => task.status,
           "state" => task.state,
           "task-type" => task.task_type,
           "title" => task.title,
-          "updated-at" => task.updated_at,
-          "rank" => task.rank
+          "updated-at" => task.updated_at
         },
         "id" => task.id |> Integer.to_string,
         "relationships" => %{

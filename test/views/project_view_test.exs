@@ -68,10 +68,12 @@ defmodule CodeCorps.ProjectViewTest do
             }
           },
           "task-lists" => %{
-            "data" => [%{
-              "id" => task_list.id |> Integer.to_string,
-              "type" => "task-list"
-            }]
+            "data" => [
+              %{
+                "id" => task_list.id |> Integer.to_string,
+                "type" => "task-list"
+              }
+            ]
           },
           "tasks" => %{
             "data" => [
