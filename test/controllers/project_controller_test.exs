@@ -74,7 +74,9 @@ defmodule CodeCorps.ProjectControllerTest do
       organization = insert(:organization)
       insert(:organization_membership, role: "admin", member: current_user, organization: organization)
       attrs = @valid_attrs |> Map.merge(%{organization: organization})
-      assert conn |> request_create(attrs) |> json_response(201)
+      response = conn |> request_create(attrs)
+      assert %{assigns: %{data: %{task_lists: [_inbox, _backlog, _in_progress, _done]}}} = response
+      assert response |> json_response(201)
     end
 
     @tag authenticated: :admin

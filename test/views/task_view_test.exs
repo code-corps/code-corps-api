@@ -4,7 +4,7 @@ defmodule CodeCorps.TaskViewTest do
   import Phoenix.View, only: [render: 3]
 
   test "renders all attributes and relationships properly" do
-    task = insert(:task)
+    task = insert(:task, order: 1000)
     comment = insert(:comment, task: task)
 
     rendered_json =  render(CodeCorps.TaskView, "show.json-api", data: task)
@@ -16,11 +16,12 @@ defmodule CodeCorps.TaskViewTest do
           "inserted-at" => task.inserted_at,
           "markdown" => task.markdown,
           "number" => task.number,
+          "order" => task.order,
           "status" => task.status,
           "state" => task.state,
           "task-type" => task.task_type,
           "title" => task.title,
-          "updated-at" => task.updated_at,
+          "updated-at" => task.updated_at
         },
         "id" => task.id |> Integer.to_string,
         "relationships" => %{
@@ -42,6 +43,12 @@ defmodule CodeCorps.TaskViewTest do
             "data" => %{
               "id" => task.user_id |> Integer.to_string,
               "type" => "user"
+            }
+          },
+          "task-list" => %{
+            "data" => %{
+              "id" => task.task_list_id |> Integer.to_string,
+              "type" => "task-list"
             }
           }
         },

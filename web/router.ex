@@ -92,6 +92,7 @@ defmodule CodeCorps.Router do
     resources "/organizations", OrganizationController, only: [:index, :show]
     resources "/organization-memberships", OrganizationMembershipController, only: [:index, :show]
     resources "/projects", ProjectController, only: [:index, :show] do
+      resources "/task-lists", TaskListController, only: [:index, :show]
       resources "/tasks", TaskController, only: [:index, :show]
     end
     resources "/project-categories", ProjectCategoryController, only: [:index, :show]
@@ -99,6 +100,9 @@ defmodule CodeCorps.Router do
     resources "/roles", RoleController, only: [:index, :show]
     resources "/role-skills", RoleSkillController, only: [:index, :show]
     resources "/skills", SkillController, only: [:index, :show]
+    resources "/task-lists", TaskListController, only: [:index, :show] do
+      resources "/tasks", TaskController, only: [:index, :show]
+    end
     resources "/tasks", TaskController, only: [:index, :show]
     get "/users/email_available", UserController, :email_available
     get "/users/username_available", UserController, :username_available

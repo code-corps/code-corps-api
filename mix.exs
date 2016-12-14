@@ -92,7 +92,8 @@ defmodule CodeCorps.Mixfile do
       {:stripity_stripe, "~> 2.0.0-alpha.5"}, # Stripe
       {:timber, "~> 0.4"}, # Logging
       {:timex, "~> 3.0"},
-      {:timex_ecto, "~> 3.0"}
+      {:timex_ecto, "~> 3.0"},
+      {:ecto_ordered, "0.2.0-beta1"}
     ]
   end
 

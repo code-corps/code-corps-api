@@ -24,12 +24,12 @@ defmodule CodeCorps.TaskControllerTest do
       |> assert_ids_from_response([task_1.id, task_2.id])
     end
 
-    test "lists all entries newest first", %{conn: conn} do
+    test "lists all entries, ordered correctly", %{conn: conn} do
       # Has to be done manually. Inserting as a list is too quick.
       # Field lacks the resolution to differentiate.
-      task_1 = insert(:task, inserted_at: Timex.to_date({2000, 1, 1}))
-      task_2 = insert(:task, inserted_at: Timex.to_date({2000, 1, 2}))
-      task_3 = insert(:task, inserted_at: Timex.to_date({2000, 1, 3}))
+      task_1 = insert(:task, order: 3000)
+      task_2 = insert(:task, order: 2000)
+      task_3 = insert(:task, order: 1000)
 
       path = conn |> task_path(:index)
       json = conn |> get(path) |> json_response(200)
@@ -138,7 +138,8 @@ defmodule CodeCorps.TaskControllerTest do
     @tag :authenticated
     test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
       project = insert(:project)
-      attrs = @valid_attrs |> Map.merge(%{project: project, user: current_user})
+      task_list = insert(:task_list, project: project)
+      attrs = @valid_attrs |> Map.merge(%{project: project, user: current_user, task_list: task_list})
       json = conn |> request_create(attrs) |> json_response(201)
 
       # ensure record is reloaded from database before serialized, since number is added

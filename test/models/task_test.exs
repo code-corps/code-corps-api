@@ -42,12 +42,14 @@ defmodule CodeCorps.TaskTest do
     test "is valid with valid attributes" do
       user = insert(:user)
       project = insert(:project)
+      task_list = insert(:task_list)
       changeset = Task.create_changeset(%Task{}, %{
         markdown: "some content",
         task_type: "issue",
         title: "some content",
         project_id: project.id,
         user_id: user.id,
+        task_list_id: task_list.id
       })
       assert changeset.valid?
     end
@@ -56,15 +58,18 @@ defmodule CodeCorps.TaskTest do
       user = insert(:user)
       project_a = insert(:project, title: "Project A")
       project_b = insert(:project, title: "Project B")
+      task_list_a = insert(:task_list, name: "Task List A", project: project_a)
+      task_list_b = insert(:task_list, name: "Task List B", project: project_b)
 
-      insert(:task, project: project_a, user: user, title: "Project A Task 1")
-      insert(:task, project: project_a, user: user, title: "Project A Task 2")
+      insert(:task, project: project_a, user: user, task_list: task_list_a, order: 2000, title: "Project A Task 1")
+      insert(:task, project: project_a, user: user, task_list: task_list_a, order: 1000, title: "Project A Task 2")
 
-      insert(:task, project: project_b, user: user, title: "Project B Task 1")
+      insert(:task, project: project_b, user: user, task_list: task_list_b, title: "Project B Task 1")
 
       changes = Map.merge(@valid_attrs, %{
         project_id: project_a.id,
-        user_id: user.id
+        user_id: user.id,
+        task_list_id: task_list_a.id
       })
       changeset = Task.create_changeset(%Task{}, changes)
       {:ok, result} = Repo.insert(changeset)
@@ -72,11 +77,47 @@ defmodule CodeCorps.TaskTest do
 
       changes = Map.merge(@valid_attrs, %{
         project_id: project_b.id,
-        user_id: user.id
+        user_id: user.id,
+        task_list_id: task_list_b.id
       })
       changeset = Task.create_changeset(%Task{}, changes)
       {:ok, result} = Repo.insert(changeset)
       assert result.number == 2
+    end
+
+    test "auto-assigns order, beginning of list, scoped to task list" do
+      user = insert(:user)
+      project_a = insert(:project, title: "Project A")
+      task_list_a = insert(:task_list, name: "Task List A", project: project_a)
+      task_list_b = insert(:task_list, name: "Task List B", project: project_a)
+
+      task_a_1 = insert(:task, project: project_a, user: user, task_list: task_list_a, order: 2000, title: "Project A Task 1")
+      task_a_2 = insert(:task, project: project_a, user: user, task_list: task_list_a, order: 1000, title: "Project A Task 2")
+
+      task_b_1 = insert(:task, project: project_a, user: user, task_list: task_list_b, order: 2000, title: "Project B Task 1")
+      task_b_2 = insert(:task, project: project_a, user: user, task_list: task_list_b, order: 1000, title: "Project B Task 2")
+
+      changes = Map.merge(@valid_attrs, %{
+        project_id: project_a.id,
+        user_id: user.id,
+        task_list_id: task_list_a.id
+      })
+      changeset = Task.create_changeset(%Task{}, changes)
+      {:ok, result_a} = Repo.insert(changeset)
+      assert result_a.order < task_a_1.order && result_a.order < task_a_2.order
+
+      changes = Map.merge(@valid_attrs, %{
+        project_id: project_a.id,
+        user_id: user.id,
+        task_list_id: task_list_b.id
+      })
+      changeset = Task.create_changeset(%Task{}, changes)
+      {:ok, result_b} = Repo.insert(changeset)
+      assert result_b.order < task_b_1.order && result_b.order < task_b_2.order
+
+      # Make sure that, given the same order configuration between task lists,
+      # the auto-assigned order is the same, meaning the order is correctly scoped
+      assert result_a.order == result_b.order
     end
 
     test "sets state to 'published'" do

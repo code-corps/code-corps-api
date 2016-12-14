@@ -28,10 +28,21 @@ defmodule CodeCorps.Helpers.Query do
   end
   def project_id_with_number_filter(query, _), do: query
 
+  def task_list_id_with_number_filter(query, %{"id" => number, "task_list_id" => task_list_id}) do
+    query |> where([object], object.number == ^number and object.task_list_id == ^task_list_id)
+  end
+  def task_list_id_with_number_filter(query, _), do: query
+
   def project_filter(query, %{"project_id" => project_id}) do
     query |> where([object], object.project_id == ^project_id)
   end
   def project_filter(query, _), do: query
+
+  def task_list_filter(query, %{"task_list_ids" => task_list_ids}) do
+    task_list_ids = task_list_ids |> coalesce_id_string
+    query |> where([object], object.task_list_id in ^task_list_ids)
+  end
+  def task_list_filter(query, _), do: query
 
   def task_type_filter(query, %{"task_type" => task_type_list}) do
     task_types = task_type_list |> coalesce_string
@@ -57,6 +68,8 @@ defmodule CodeCorps.Helpers.Query do
   # sorting
 
   def sort_by_newest_first(query), do: query |> order_by([desc: :inserted_at])
+
+  def sort_by_order(query), do: query |> order_by([asc: :order])
 
   # end sorting
 
