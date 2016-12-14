@@ -3,7 +3,7 @@ defmodule CodeCorps.TaskListController do
   use JaResource
 
   import CodeCorps.Helpers.Query, only: [
-    project_filter: 2, sort_by_rank: 1,
+    project_filter: 2, sort_by_order: 1,
   ]
 
   alias CodeCorps.TaskList
@@ -14,7 +14,7 @@ defmodule CodeCorps.TaskListController do
   def handle_index(conn, params) do
     tasks = TaskList
     |> project_filter(params)
-    |> sort_by_rank
+    |> sort_by_order
     |> Repo.all()
 
     conn

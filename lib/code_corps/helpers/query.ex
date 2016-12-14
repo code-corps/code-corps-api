@@ -69,7 +69,7 @@ defmodule CodeCorps.Helpers.Query do
 
   def sort_by_newest_first(query), do: query |> order_by([desc: :inserted_at])
 
-  def sort_by_rank(query), do: query |> order_by([asc: :rank])
+  def sort_by_order(query), do: query |> order_by([asc: :order])
 
   # end sorting
 

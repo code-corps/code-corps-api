@@ -5,8 +5,8 @@ defmodule CodeCorps.TaskListViewTest do
 
   test "renders all attributes and relationships properly" do
     project = insert(:project)
-    task_list = insert(:task_list, rank: 1000, project: project)
-    task = insert(:task, rank: 1000, task_list: task_list)
+    task_list = insert(:task_list, order: 1000, project: project)
+    task = insert(:task, order: 1000, task_list: task_list)
 
     rendered_json =  render(CodeCorps.TaskListView, "show.json-api", data: task_list)
 
@@ -14,7 +14,7 @@ defmodule CodeCorps.TaskListViewTest do
       "data" => %{
         "attributes" => %{
           "name" => task_list.name,
-          "rank" => 1000,
+          "order" => 1000,
           "inserted-at" => task_list.inserted_at,
           "updated-at" => task_list.updated_at,
         },

@@ -11,7 +11,7 @@ defmodule CodeCorps.Repo.Migrations.CreateTaskList do
   def change do
     create table(:task_lists) do
       add :name, :string
-      add :rank, :integer
+      add :order, :integer
       add :project_id, references(:projects, on_delete: :nothing)
 
       timestamps()
@@ -21,7 +21,7 @@ defmodule CodeCorps.Repo.Migrations.CreateTaskList do
 
     alter table(:tasks) do
       add :task_list_id, references(:task_lists, on_delete: :nothing)
-      add :rank, :integer
+      add :order, :integer
     end
 
     flush

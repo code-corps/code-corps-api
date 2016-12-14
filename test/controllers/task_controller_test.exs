@@ -24,12 +24,12 @@ defmodule CodeCorps.TaskControllerTest do
       |> assert_ids_from_response([task_1.id, task_2.id])
     end
 
-    test "lists all entries, ordered by rank", %{conn: conn} do
+    test "lists all entries, ordered correctly", %{conn: conn} do
       # Has to be done manually. Inserting as a list is too quick.
       # Field lacks the resolution to differentiate.
-      task_1 = insert(:task, rank: 3000)
-      task_2 = insert(:task, rank: 2000)
-      task_3 = insert(:task, rank: 1000)
+      task_1 = insert(:task, order: 3000)
+      task_2 = insert(:task, order: 2000)
+      task_3 = insert(:task, order: 1000)
 
       path = conn |> task_path(:index)
       json = conn |> get(path) |> json_response(200)

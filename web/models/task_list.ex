@@ -5,7 +5,7 @@ defmodule CodeCorps.TaskList do
   schema "task_lists" do
     field :name, :string
     field :position, :integer, virtual: true
-    field :rank, :integer
+    field :order, :integer
 
     belongs_to :project, CodeCorps.Project
     has_many :tasks, CodeCorps.Task
@@ -38,6 +38,6 @@ defmodule CodeCorps.TaskList do
     struct
     |> cast(params, [:name, :position])
     |> validate_required([:name, :position])
-    |> set_order(:position, :rank, :project_id)
+    |> set_order(:position, :order, :project_id)
   end
 end

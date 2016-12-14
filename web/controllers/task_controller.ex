@@ -4,7 +4,7 @@ defmodule CodeCorps.TaskController do
 
   import CodeCorps.Helpers.Query, only: [
     project_filter: 2, project_id_with_number_filter: 2, task_list_id_with_number_filter: 2,
-    sort_by_rank: 1, task_list_filter: 2, task_type_filter: 2, task_status_filter: 2
+    sort_by_order: 1, task_list_filter: 2, task_type_filter: 2, task_status_filter: 2
   ]
 
   alias CodeCorps.Task
@@ -19,7 +19,7 @@ defmodule CodeCorps.TaskController do
     |> task_list_filter(params)
     |> task_type_filter(params)
     |> task_status_filter(params)
-    |> sort_by_rank
+    |> sort_by_order
     |> Repo.paginate(params["page"] || %{})
 
     # TODO: Once we are able to more easily add top-level meta

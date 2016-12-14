@@ -19,13 +19,13 @@ defmodule CodeCorps.TaskListControllerTest do
       |> assert_ids_from_response([task_list_1.id, task_list_2.id])
     end
 
-    test "lists all entries by rank", %{conn: conn} do
+    test "lists all entries by order", %{conn: conn} do
       # Has to be done manually. Inserting as a list is too quick.
       # Field lacks the resolution to differentiate.
       project = insert(:project)
-      task_list_1 = insert(:task_list, project: project, rank: 2000)
-      task_list_2 = insert(:task_list, project: project, rank: 1000)
-      task_list_3 = insert(:task_list, project: project, rank: 3000)
+      task_list_1 = insert(:task_list, project: project, order: 2000)
+      task_list_2 = insert(:task_list, project: project, order: 1000)
+      task_list_3 = insert(:task_list, project: project, order: 3000)
 
       path = conn |> task_list_path(:index)
 

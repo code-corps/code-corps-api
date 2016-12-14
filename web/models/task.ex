@@ -12,7 +12,7 @@ defmodule CodeCorps.Task do
     field :status, :string, default: "open"
     field :title, :string
     field :position, :integer, virtual: true
-    field :rank, :integer
+    field :order, :integer
 
     belongs_to :project, CodeCorps.Project
     belongs_to :user, CodeCorps.User
@@ -29,7 +29,7 @@ defmodule CodeCorps.Task do
     |> validate_inclusion(:task_type, task_types)
     |> assoc_constraint(:task_list)
     |> apply_position()
-    |> set_order(:position, :rank, :task_list_id)
+    |> set_order(:position, :order, :task_list_id)
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
   end
 
