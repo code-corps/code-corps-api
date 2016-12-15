@@ -5,8 +5,8 @@ defmodule CodeCorps.StripePlatformEventsController do
 
   def create(conn, params) do
     case WebhookProcessor.process_async(params, PlatformEventHandler) do
-      {:ok, :ignored_by_environment}  -> conn |> send_resp(400, "")
       {:ok, _pid} -> conn |> send_resp(200, "")
+      {:error, :ignored_by_environment}  -> conn |> send_resp(400, "")
     end
   end
 end

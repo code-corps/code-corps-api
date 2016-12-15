@@ -4,7 +4,7 @@ defmodule CodeCorps.StripeEventTest do
   alias CodeCorps.StripeEvent
 
   describe "create_changeset/2" do
-    @valid_attrs %{id_from_stripe: "evt_123", type: "any.event"}
+    @valid_attrs %{endpoint: "connect", id_from_stripe: "evt_123", type: "any.event"}
 
     test "reports as valid when attributes are valid" do
       changeset = StripeEvent.create_changeset(%StripeEvent{}, @valid_attrs)
@@ -15,6 +15,7 @@ defmodule CodeCorps.StripeEventTest do
       changeset = StripeEvent.create_changeset(%StripeEvent{}, %{})
 
       refute changeset.valid?
+      assert changeset.errors[:endpoint] == {"can't be blank", []}
       assert changeset.errors[:id_from_stripe] == {"can't be blank", []}
       assert changeset.errors[:type] == {"can't be blank", []}
     end
@@ -26,6 +27,16 @@ defmodule CodeCorps.StripeEventTest do
         |> Repo.insert
 
       assert record.status == "processing"
+    end
+
+    test "prevents :endpoint from being invalid" do
+      event = insert(:stripe_event)
+
+      attrs = %{endpoint: "random", id_from_stripe: "evt_123", type: "any.event"}
+      changeset = StripeEvent.create_changeset(event, attrs)
+
+      refute changeset.valid?
+      assert changeset.errors[:endpoint] == {"is invalid", []}
     end
   end
 
@@ -51,7 +62,7 @@ defmodule CodeCorps.StripeEventTest do
     test "prevents :status from being invalid" do
       event = insert(:stripe_event)
 
-      changeset = StripeEvent.update_changeset(event, %{status: "invalid"})
+      changeset = StripeEvent.update_changeset(event, %{status: "random"})
 
       refute changeset.valid?
       assert changeset.errors[:status] == {"is invalid", []}

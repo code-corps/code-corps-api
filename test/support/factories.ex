@@ -142,12 +142,6 @@ defmodule CodeCorps.Factories do
     }
   end
 
-  def stripe_file_upload_factory do
-    %CodeCorps.StripeFileUpload{
-      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
-    }
-  end
-
   def stripe_connect_subscription_factory do
     stripe_connect_plan = build(:stripe_connect_plan)
     %CodeCorps.StripeConnectSubscription{
@@ -160,9 +154,16 @@ defmodule CodeCorps.Factories do
 
   def stripe_event_factory do
     %CodeCorps.StripeEvent{
+    endpoint: sequence(:endpoint, fn(_) -> Enum.random(~w{ connect platform }) end),
       id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
       status: sequence(:status, fn(_) -> Enum.random(~w{ unprocessed processed errored }) end),
       type: "test.type"
+    }
+  end
+
+  def stripe_file_upload_factory do
+    %CodeCorps.StripeFileUpload{
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
     }
   end
 
