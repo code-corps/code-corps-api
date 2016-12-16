@@ -4,6 +4,7 @@ defmodule CodeCorps.StripeEvent do
 
   ## Fields
 
+  * `endpoint` - "connect" or "platform"
   * `id_from_stripe` - Stripe's `id`
   * `status` - "unprocessed", "processed", or "errored"
 
@@ -21,24 +22,26 @@ defmodule CodeCorps.StripeEvent do
   use CodeCorps.Web, :model
 
   schema "stripe_events" do
+    field :endpoint, :string, null: false
     field :id_from_stripe, :string, null: false
     field :status, :string, default: "unprocessed"
     field :type, :string, null: false
+    field :user_id, :string
 
     timestamps()
   end
 
   @doc """
   Builds a changeset for storing a new event reference into the database.
-  Accepts `:id_from_stripe` only. The `status` field is set to "unprocessed"
-  by default.
+  The `status` field is set to "unprocessed" by default.
   """
   def create_changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:id_from_stripe, :type])
-    |> validate_required([:id_from_stripe, :type])
+    |> cast(params, [:endpoint, :id_from_stripe, :type, :user_id])
+    |> validate_required([:endpoint, :id_from_stripe, :type])
     |> put_change(:status, "processing")
     |> validate_inclusion(:status, states)
+    |> validate_inclusion(:endpoint, endpoints)
     |> unique_constraint(:id_from_stripe)
   end
 
@@ -52,6 +55,10 @@ defmodule CodeCorps.StripeEvent do
     |> cast(params, [:status])
     |> validate_required([:status])
     |> validate_inclusion(:status, states)
+  end
+
+  defp endpoints do
+    ~w{ connect platform }
   end
 
   defp states do

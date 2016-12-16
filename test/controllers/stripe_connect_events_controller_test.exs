@@ -35,7 +35,8 @@ defmodule CodeCorps.StripeConnectEventsControllerTest do
       "object" => "event",
       "pending_webhooks" => 1,
       "request" => nil,
-      "type" => type
+      "type" => type,
+      "user_id" => "acct_123"
     }
   end
 
