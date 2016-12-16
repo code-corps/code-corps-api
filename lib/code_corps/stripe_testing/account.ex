@@ -19,7 +19,7 @@ defmodule CodeCorps.StripeTesting.Account do
       display_name: "Code Corps Customer",
       email: "volunteers@codecorps.org",
       id: "acct_123",
-      managed: false,
+      managed: true,
       metadata: %{},
       statement_descriptor: "CODECORPS.ORG",
       support_email: nil,
