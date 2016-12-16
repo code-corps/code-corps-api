@@ -44,6 +44,9 @@ defmodule CodeCorps.StripeConnectPlanControllerTest do
       insert(:donation_goal, project: project)
 
       assert conn |> request_create(%{project: project}) |> json_response(201)
+
+      user_id = current_user.id
+      assert_received {:track, ^user_id, "Created Stripe Connect Plan", %{}}
     end
 
     test "does not create resource and renders 401 when unauthenticated", %{conn: conn} do

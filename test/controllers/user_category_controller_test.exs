@@ -13,7 +13,7 @@ defmodule CodeCorps.UserCategoryControllerTest do
 
     test "filters resources on index", %{conn: conn} do
       [user_category_1, user_category_2 | _] = insert_list(3, :user_category)
-      
+
       path = "user-categories/?filter[id]=#{user_category_1.id},#{user_category_2.id}"
 
       conn
@@ -40,11 +40,18 @@ defmodule CodeCorps.UserCategoryControllerTest do
 
   describe "create" do
     @tag authenticated: :admin
-    test "creates and renders resource when data is valid", %{conn: conn} do
+    test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
       user = insert(:user)
       category = insert(:category)
       attrs = (%{user: user, category: category})
       assert conn |> request_create(attrs) |> json_response(201)
+
+      user_id = current_user.id
+      tracking_properties = %{
+        category: category.name,
+        category_id: category.id
+      }
+      assert_received {:track, ^user_id, "Added User Category", ^tracking_properties}
     end
 
     @tag authenticated: :admin
@@ -64,8 +71,16 @@ defmodule CodeCorps.UserCategoryControllerTest do
 
   describe "delete" do
     @tag authenticated: :admin
-    test "deletes resource", %{conn: conn} do
-      assert conn |> request_delete |> response(204)
+    test "deletes resource", %{conn: conn, current_user: current_user} do
+      user_category = insert(:user_category)
+      assert conn |> request_delete(user_category.id) |> response(204)
+
+      user_id = current_user.id
+      tracking_properties = %{
+        category: user_category.category.name,
+        category_id: user_category.category.id
+      }
+      assert_received {:track, ^user_id, "Removed User Category", ^tracking_properties}
     end
 
     test "renders 401 when unauthenticated", %{conn: conn} do

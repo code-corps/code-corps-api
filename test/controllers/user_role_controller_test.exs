@@ -40,11 +40,18 @@ defmodule CodeCorps.UserRoleControllerTest do
 
   describe "create" do
     @tag authenticated: :admin
-    test "creates and renders resource when data is valid", %{conn: conn} do
+    test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
       user = insert(:user)
       role = insert(:role)
       attrs = (%{user: user, role: role})
       assert conn |> request_create(attrs) |> json_response(201)
+
+      user_id = current_user.id
+      tracking_properties = %{
+        role: role.name,
+        role_id: role.id
+      }
+      assert_received {:track, ^user_id, "Added User Role", ^tracking_properties}
     end
 
     @tag authenticated: :admin
@@ -65,8 +72,16 @@ defmodule CodeCorps.UserRoleControllerTest do
 
   describe "delete" do
     @tag authenticated: :admin
-    test "deletes resource", %{conn: conn} do
-      assert conn |> request_delete |> response(204)
+    test "deletes resource", %{conn: conn, current_user: current_user} do
+      user_role = insert(:user_role)
+      assert conn |> request_delete(user_role.id) |> response(204)
+
+      user_id = current_user.id
+      tracking_properties = %{
+        role: user_role.role.name,
+        role_id: user_role.role.id
+      }
+      assert_received {:track, ^user_id, "Removed User Role", ^tracking_properties}
     end
 
     test "does not delete resource and renders 401 when unauthenticated", %{conn: conn} do

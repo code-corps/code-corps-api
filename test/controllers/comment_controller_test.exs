@@ -46,7 +46,21 @@ defmodule CodeCorps.CommentControllerTest do
     test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
       task = insert(:task)
       attrs = @valid_attrs |> Map.merge(%{task: task, user: current_user})
-      assert conn |> request_create(attrs) |> json_response(201)
+
+      json = conn |> request_create(attrs) |> json_response(201)
+      assert json
+
+      user_id = current_user.id
+
+      tracking_properties = %{
+        comment_id: String.to_integer(json["data"]["id"]),
+        task: task.title,
+        task_id: task.id,
+        task_type: task.task_type,
+        project_id: task.project_id
+      }
+
+      assert_received {:track, ^user_id, "Created Comment", ^tracking_properties}
     end
 
     @tag :authenticated
@@ -71,7 +85,20 @@ defmodule CodeCorps.CommentControllerTest do
     test "updates and renders chosen resource when data is valid", %{conn: conn, current_user: current_user} do
       comment = insert(:comment, user: current_user)
       attrs = @valid_attrs |> Map.merge(%{user: current_user})
+
       assert conn |> request_update(comment, attrs) |> json_response(200)
+
+      user_id = current_user.id
+      task = comment.task
+      tracking_properties = %{
+        comment_id: comment.id,
+        task: task.title,
+        task_id: task.id,
+        task_type: task.task_type,
+        project_id: task.project_id
+      }
+
+      assert_received {:track, ^user_id, "Edited Comment", ^tracking_properties}
     end
 
     @tag :authenticated

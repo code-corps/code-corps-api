@@ -145,6 +145,16 @@ defmodule CodeCorps.TaskControllerTest do
       # ensure record is reloaded from database before serialized, since number is added
       # on database level upon insert
       assert json["data"]["attributes"]["number"] == 1
+
+      user_id = current_user.id
+      tracking_properties = %{
+        task: @valid_attrs.title,
+        task_id: String.to_integer(json["data"]["id"]),
+        task_type: @valid_attrs.task_type,
+        project_id: project.id
+      }
+
+      assert_received {:track, ^user_id, "Created Task", ^tracking_properties}
     end
 
     @tag :authenticated
@@ -164,6 +174,16 @@ defmodule CodeCorps.TaskControllerTest do
     test "updates and renders chosen resource when data is valid", %{conn: conn, current_user: current_user} do
       task = insert(:task, user: current_user)
       assert conn |> request_update(task, @valid_attrs) |> json_response(200)
+
+      user_id = current_user.id
+      tracking_properties = %{
+        task: task.title,
+        task_id: task.id,
+        task_type: task.task_type,
+        project_id: task.project.id
+      }
+
+      assert_received {:track, ^user_id, "Edited Task", ^tracking_properties}
     end
 
     @tag :authenticated
