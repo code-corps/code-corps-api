@@ -26,7 +26,7 @@ You can also always come :wave: hello [in our Slack](http://slack.codecorps.org)
 
 We highlight everyone who's contributed to [the Code Corps team page](https://www.codecorps.org/team). If we've missed you for some reason, please [open an issue in the Ember app](https://github.com/code-corps/code-corps-ember/issues/new)!
 
-**At the moment, our focus is integration with Stripe**, so if you want to help, that would be the most useful spot. Check our [Donations milestone](https://github.com/code-corps/code-corps-api/blob/develop/milestone/1) to see which parts we need help on. Of course, help with other areas is always welcome, so if that sort of thing isn't your cup of tea, feel free to pick anything else.
+**At the moment, our focus is integration with Stripe**, so if you want to help, that would be the most useful spot. Check our [Donations project](https://github.com/code-corps/code-corps-api/projects/2) to see which parts we need help on. Of course, help with other areas is always welcome, so if that sort of thing isn't your cup of tea, feel free to pick anything else.
 
 ## Installing with Docker
 
