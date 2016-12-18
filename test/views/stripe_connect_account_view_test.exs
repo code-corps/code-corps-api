@@ -5,7 +5,11 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
 
   test "renders all attributes and relationships properly" do
     organization = insert(:organization)
-    account = insert(:stripe_connect_account, organization: organization)
+    account = insert(:stripe_connect_account,
+      organization: organization,
+      verification_disabled_reason: "fields_needed",
+      verification_fields_needed: ["legal_entity.first_name", "legal_entity.last_name"]
+    )
 
     rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
 
@@ -29,7 +33,10 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
           "support-phone" => account.support_phone,
           "support-url" => account.support_url,
           "transfers-enabled" => account.transfers_enabled,
-          "updated-at" => account.updated_at
+          "updated-at" => account.updated_at,
+          "verification-disabled-reason" => account.verification_disabled_reason,
+          "verification-due-by" => account.verification_due_by,
+          "verification-fields-needed" => account.verification_fields_needed
         },
         "id" => account.id |> Integer.to_string,
         "relationships" => %{
