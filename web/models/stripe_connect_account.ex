@@ -20,6 +20,9 @@ defmodule CodeCorps.StripeConnectAccount do
     field :support_phone, :string
     field :support_url, :string
     field :transfers_enabled, :boolean
+    field :verification_disabled_reason, :string
+    field :verification_due_by, Ecto.DateTime
+    field :verification_fields_needed, {:array, :string}
 
     field :access_code, :string, virtual: true
 
@@ -31,7 +34,9 @@ defmodule CodeCorps.StripeConnectAccount do
   @insert_params [
     :business_name, :business_url, :charges_enabled, :country, :default_currency,
     :details_submitted, :email, :id_from_stripe, :managed, :organization_id,
-    :support_email, :support_phone, :support_url, :transfers_enabled
+    :support_email, :support_phone, :support_url, :transfers_enabled,
+    :verification_disabled_reason, :verification_due_by,
+    :verification_fields_needed
   ]
 
   def create_changeset(struct, params \\ %{}) do
@@ -44,7 +49,9 @@ defmodule CodeCorps.StripeConnectAccount do
   @webhook_update_params [
     :business_name, :business_url, :charges_enabled, :country,
     :default_currency, :details_submitted, :email, :managed, :support_email,
-    :support_phone, :support_url, :transfers_enabled
+    :support_phone, :support_url, :transfers_enabled,
+    :verification_disabled_reason, :verification_due_by,
+    :verification_fields_needed
   ]
 
   def webhook_update_changeset(struct, params \\ %{}) do

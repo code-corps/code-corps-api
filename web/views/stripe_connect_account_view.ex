@@ -8,7 +8,8 @@ defmodule CodeCorps.StripeConnectAccountView do
     :charges_enabled, :country, :default_currency, :details_submitted,
     :display_name, :email, :id_from_stripe, :inserted_at, :managed,
     :support_email, :support_phone, :support_url, :transfers_enabled,
-    :updated_at
+    :updated_at, :verification_disabled_reason, :verification_due_by,
+    :verification_fields_needed
   ]
 
   has_one :organization, serializer: CodeCorps.OrganizationView
