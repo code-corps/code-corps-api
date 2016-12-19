@@ -15,7 +15,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTestAdapter do
     email: "volunteers@codecorps.org",
     external_accounts: %{
       object: "list",
-      data: [],
+      data: [%{"id" => "ba_123"}],
       has_more: false,
       total_count: 0,
       url: "/v1/accounts/acct_123/external_accounts"
@@ -56,6 +56,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTestAdapter do
         status: "unverified"
       }
     },
+    id: "acct_123",
     managed: false,
     statement_descriptor: nil,
     support_email: nil,
@@ -86,6 +87,8 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTestAdapter do
     "details_submitted" => false,
     "display_name" => "Code Corps",
     "email" => "volunteers@codecorps.org",
+
+    "external_account" => "ba_123",
 
     "legal_entity_address_city" => nil,
     "legal_entity_address_country" => "US",

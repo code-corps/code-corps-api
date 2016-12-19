@@ -119,6 +119,15 @@ defmodule CodeCorps.ApiCase do
         conn |> put(path, payload)
       end
 
+      # A temporary request_update that skips building a payload
+      # using our faulty json_payload strategy
+      # Only works with attributes, not relationships
+      def request_update(conn, resource_or_id, attrs, :skip_strategy) do
+        payload = %{data: %{attributes: attrs}, type: "#{factory_name}"}
+        path = conn |> path_for(:update, resource_or_id)
+        conn |> put(path, payload)
+      end
+
       def request_delete(conn), do: request_delete(conn, default_record)
       def request_delete(conn, :not_found), do: request_delete(conn, -1)
       def request_delete(conn, resource_or_id) do

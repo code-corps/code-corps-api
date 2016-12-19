@@ -66,6 +66,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter do
       stripe_account
       |> Map.from_struct
       |> transform_map(@stripe_mapping)
+      |> add_nested_attributes(stripe_account)
       |> keys_to_string
       |> add_non_stripe_attributes(attributes)
 
@@ -91,4 +92,13 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter do
     params
     |> Map.merge(attributes)
   end
+
+  defp add_nested_attributes(map, stripe_account) do
+    map
+    |> add_external_account(stripe_account)
+  end
+
+  defp add_external_account(map, %Stripe.Account{external_accounts: %{data: []}}), do: map
+  defp add_external_account(map, %Stripe.Account{external_accounts: %{data: [head | _]}}), do: map |> do_add_external_account(head)
+  defp do_add_external_account(map, %{"id" => id}), do: map |> Map.put(:external_account, id)
 end

@@ -19,4 +19,21 @@ defmodule CodeCorps.StripeConnectAccountController do
   defp handle_create_result({:ok, %StripeConnectAccount{}} = result, conn) do
     result |> CodeCorps.Analytics.Segment.track(:created, conn)
   end
+
+  def handle_update(conn, record, %{"external_account" => external_account}) do
+    with {:ok, _} = result <- StripeConnectAccountService.add_external_account(record, external_account)
+    do
+      CodeCorps.Analytics.Segment.track(result, :created, conn)
+    else
+      {:error, %Ecto.Changeset{} = changeset} -> changeset
+    end
+  end
+
+  def handle_update(conn, _record, _attributes), do: conn |> unauthorized
+
+  defp unauthorized(conn) do
+    conn
+    |> Plug.Conn.assign(:authorized, false)
+    |> CodeCorps.AuthenticationHelpers.handle_unauthorized
+  end
 end
