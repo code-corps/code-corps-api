@@ -21,6 +21,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter do
     {:details_submitted, [:details_submitted]},
     {:display_name, [:display_name]},
     {:email, [:email]},
+    {:external_account, [:external_account]},
     {:legal_entity_address_city, [:legal_entity, :address, :city]},
     {:legal_entity_address_country, [:legal_entity, :address, :country]},
     {:legal_entity_address_line1, [:legal_entity, :address, :line1]},
@@ -34,8 +35,8 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter do
     {:legal_entity_dob_month, [:legal_entity, :dob, :month]},
     {:legal_entity_dob_year, [:legal_entity, :dob, :year]},
     {:legal_entity_first_name, [:legal_entity, :first_name]},
-    {:legal_entity_last_name, [:legal_entity, :last_name]},
     {:legal_entity_gender, [:legal_entity, :gender]},
+    {:legal_entity_last_name, [:legal_entity, :last_name]},
     {:legal_entity_maiden_name, [:legal_entity, :maiden_name]},
     {:legal_entity_personal_address_city, [:legal_entity, :personal_address, :city]},
     {:legal_entity_personal_address_country, [:legal_entity, :personal_address, :country]},
@@ -47,6 +48,10 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter do
     {:legal_entity_personal_id_number_provided, [:legal_entity, :personal_id_number_provided]},
     {:legal_entity_ssn_last_4_provided, [:legal_entity, :ssn_last_4_provided]},
     {:legal_entity_type, [:legal_entity, :type]},
+    {:legal_entity_verification_details, [:legal_entity, :verification, :details]},
+    {:legal_entity_verification_details_code, [:legal_entity, :verification, :details_code]},
+    {:legal_entity_verification_document, [:legal_entity, :verification, :document]},
+    {:legal_entity_verification_status, [:legal_entity, :verification, :status]},
     {:managed, [:managed]},
     {:support_email, [:support_email]},
     {:support_phone, [:support_phone]},
@@ -94,9 +99,9 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter do
   end
 
   defp add_nested_attributes(map, stripe_account) do
-    map
-    |> add_external_account(stripe_account)
-  end
+  map
+  |> add_external_account(stripe_account)
+end
 
   defp add_external_account(map, %Stripe.Account{external_accounts: %{data: []}}), do: map
   defp add_external_account(map, %Stripe.Account{external_accounts: %{data: [head | _]}}), do: map |> do_add_external_account(head)
