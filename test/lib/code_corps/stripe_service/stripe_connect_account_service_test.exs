@@ -3,7 +3,6 @@ defmodule CodeCorps.StripeService.StripeConnectAccountServiceTest do
 
   use CodeCorps.ModelCase
 
-  alias CodeCorps.StripeConnectAccount
   alias CodeCorps.StripeService.StripeConnectAccountService
 
   describe "create" do

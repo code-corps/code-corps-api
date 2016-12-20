@@ -1,7 +1,7 @@
 defmodule CodeCorps.StripeConnectEventsControllerTest do
   use CodeCorps.ConnCase
 
-  alias CodeCorps.{Project, StripeConnectAccount, StripeEvent}
+  alias CodeCorps.{Project, StripeConnectAccount, StripeEvent, StripeExternalAccount}
 
   setup do
     conn =
@@ -21,6 +21,11 @@ defmodule CodeCorps.StripeConnectEventsControllerTest do
     "customer" => "cus_123",
     "id" => "acct_123",
     "status" => "canceled"
+  }
+
+  @bank_account %{
+    "id" => "ba_19SSZG2eZvKYlo2CXnmzYU5H",
+    "account" => "acct_1032D82eZvKYlo2C"
   }
 
   defp event_for(object, type) do
@@ -134,6 +139,23 @@ defmodule CodeCorps.StripeConnectEventsControllerTest do
 
       updated_project = Repo.get_by(Project, id: project.id)
       assert updated_project.total_monthly_donated == 0
+    end
+  end
+
+  describe "account.external_account.created" do
+    test "creates an external account record, using stripe params", %{conn: conn} do
+      event = event_for(@bank_account, "account.external_account.created")
+      path = stripe_connect_events_path(conn, :create)
+
+      assert conn |> post(path, event) |> response(200)
+
+      wait_for_supervisor
+
+      event = Repo.one(StripeEvent)
+      assert event.status == "processed"
+
+      created_account = Repo.one(StripeExternalAccount)
+      assert created_account
     end
   end
 

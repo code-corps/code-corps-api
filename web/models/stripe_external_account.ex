@@ -9,7 +9,7 @@ defmodule CodeCorps.StripeExternalAccount do
     field :bank_name, :string
     field :country, :string
     field :currency, :string
-    field :default_for_currency, :string
+    field :default_for_currency, :boolean
     field :fingerprint, :string
     field :last4, :string
     field :routing_number, :string
@@ -18,12 +18,19 @@ defmodule CodeCorps.StripeExternalAccount do
     timestamps()
   end
 
+  @create_params [
+    :id_from_stripe, :account_id_from_stripe, :account_holder_name, :account_holder_type, :bank_name,
+    :country, :currency, :default_for_currency, :fingerprint, :last4, :routing_number, :status
+  ]
+
+  @required_create_params [:id_from_stripe, :account_id_from_stripe]
+
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:id_from_stripe, :account_id_from_stripe, :account_holder_name, :account_holder_type, :bank_name, :country, :currency, :default_for_currency, :fingerprint, :last4, :routing_number, :status])
-    |> validate_required([:id_from_stripe, :account_id_from_stripe])
+    |> cast(params, @create_params)
+    |> validate_required(@required_create_params)
   end
 end
