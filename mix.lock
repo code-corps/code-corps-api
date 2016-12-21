@@ -55,7 +55,7 @@
   "segment": {:git, "https://github.com/stueccles/analytics-elixir.git", "8fe520c16a8a9290d55c849bf4d67420396e1cdd", []},
   "sentry": {:hex, :sentry, "2.0.2", "f08638758f7bf891e238466009f6cd702fc26d87286663af26927a78ed149346", [:mix], [{:hackney, "~> 1.6.1", [hex: :hackney, optional: false]}, {:plug, "~> 1.0", [hex: :plug, optional: true]}, {:poison, "~> 1.5 or ~> 2.0 or ~> 3.0", [hex: :poison, optional: false]}, {:uuid, "~> 1.0", [hex: :uuid, optional: false]}]},
   "ssl_verify_fun": {:hex, :ssl_verify_fun, "1.1.1", "28a4d65b7f59893bc2c7de786dec1e1555bd742d336043fe644ae956c3497fbe", [:rebar, :make], []},
-  "stripity_stripe": {:git, "https://github.com/code-corps/stripity_stripe.git", "df6c770882d74d76807e3aa91ba7ee2763a80e49", [branch: "2.0"]},
+  "stripity_stripe": {:git, "https://github.com/code-corps/stripity_stripe.git", "b9c2262377bb0300423cc4d44e9d4414870bb0b4", [branch: "2.0"]},
   "timber": {:hex, :timber, "0.4.7", "df3fcd79bcb4eb4b53874d906ef5f3a212937b4bc7b7c5b244745202cc389443", [:mix], [{:ecto, "~> 2.0", [hex: :ecto, optional: true]}, {:phoenix, "~> 1.2", [hex: :phoenix, optional: true]}, {:plug, "~> 1.2", [hex: :plug, optional: true]}, {:poison, "~> 2.0 or ~> 3.0", [hex: :poison, optional: false]}]},
   "timex": {:hex, :timex, "3.1.5", "413d6d8d6f0162a5d47080cb8ca520d790184ac43e097c95191c7563bf25b428", [:mix], [{:combine, "~> 0.7", [hex: :combine, optional: false]}, {:gettext, "~> 0.10", [hex: :gettext, optional: false]}, {:tzdata, "~> 0.1.8 or ~> 0.5", [hex: :tzdata, optional: false]}]},
   "timex_ecto": {:hex, :timex_ecto, "3.0.5", "3ec6c25e10d2c0020958e5df64d2b5e690e441faa2c2259da8bc6bd3d7f39256", [:mix], [{:ecto, "~> 2.0", [hex: :ecto, optional: false]}, {:timex, "~> 3.0", [hex: :timex, optional: false]}]},

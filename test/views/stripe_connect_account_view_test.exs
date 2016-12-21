@@ -16,7 +16,6 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
     expected_json = %{
       "data" => %{
         "attributes" => %{
-          "access-code" => account.access_code,
           "business-name" => account.business_name,
           "business-url" => account.business_url,
           "can-accept-donations" => true,

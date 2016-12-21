@@ -32,10 +32,7 @@ defmodule CodeCorps.StripeConnectAccountControllerTest do
     test "creates and renders resource user is authenticated and authorized", %{conn: conn, current_user: current_user} do
       organization = insert(:organization)
       insert(:organization_membership, member: current_user, organization: organization, role: "owner")
-      attrs = %{
-        access_code: "ac_123",
-        organization: organization
-      }
+      attrs = %{ organization: organization }
       assert conn |> request_create(attrs) |> json_response(201)
 
       user_id = current_user.id
@@ -49,10 +46,7 @@ defmodule CodeCorps.StripeConnectAccountControllerTest do
     @tag :authenticated
     test "does not create resource and renders 403 when not authorized", %{conn: conn} do
       organization = insert(:organization)
-      attrs = %{
-        access_code: "ac_123",
-        organization: organization
-      }
+      attrs = %{ organization: organization }
       assert conn |> request_create(attrs) |> json_response(403)
     end
   end

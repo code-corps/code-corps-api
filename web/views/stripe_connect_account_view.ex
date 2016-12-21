@@ -4,7 +4,7 @@ defmodule CodeCorps.StripeConnectAccountView do
   use JaSerializer.PhoenixView
 
   attributes [
-    :access_code, :business_name, :business_url, :can_accept_donations,
+    :business_name, :business_url, :can_accept_donations,
     :charges_enabled, :country, :default_currency, :details_submitted,
     :display_name, :email, :id_from_stripe, :inserted_at, :managed,
     :support_email, :support_phone, :support_url, :transfers_enabled,
