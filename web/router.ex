@@ -68,7 +68,7 @@ defmodule CodeCorps.Router do
     resources "/roles", RoleController, only: [:create]
     resources "/role-skills", RoleSkillController, only: [:create, :delete]
     resources "/skills", SkillController, only: [:create]
-    resources "/stripe-connect-accounts", StripeConnectAccountController, only: [:show, :create]
+    resources "/stripe-connect-accounts", StripeConnectAccountController, only: [:show, :create, :update]
     resources "/stripe-connect-plans", StripeConnectPlanController, only: [:show, :create]
     resources "/stripe-connect-subscriptions", StripeConnectSubscriptionController, only: [:show, :create]
     resources "/stripe-platform-cards", StripePlatformCardController, only: [:show, :create]

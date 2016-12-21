@@ -15,6 +15,8 @@ defmodule CodeCorps.StripeConnectAccount do
     field :display_name, :string
     field :email, :string
 
+    field :external_account, :string
+
     field :legal_entity_address_city, :string
     field :legal_entity_address_country, :string
     field :legal_entity_address_line1, :string
@@ -114,5 +116,18 @@ defmodule CodeCorps.StripeConnectAccount do
   def webhook_update_changeset(struct, params \\ %{}) do
     struct
     |> cast(params, @webhook_update_params)
+  end
+
+  @update_params [
+    :business_name, :business_url, :charges_enabled, :country, :default_currency,
+    :details_submitted, :email, :external_account, :id_from_stripe,
+    :support_email, :support_phone, :support_url, :transfers_enabled,
+    :verification_disabled_reason, :verification_due_by,
+    :verification_fields_needed
+  ]
+
+  def stripe_update_changeset(struct, params) do
+    struct
+    |> cast(params, @update_params)
   end
 end
