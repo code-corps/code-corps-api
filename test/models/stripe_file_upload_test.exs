@@ -9,15 +9,15 @@ defmodule CodeCorps.StripeFileUploadTest do
 
   @invalid_attrs %{}
 
-  describe "create_identity_document_changeset/2" do
+  describe "create_changeset/2" do
     test "reports as valid when attributes are valid" do
-      changeset = StripeFileUpload.create_identity_document_changeset(%StripeFileUpload{}, @valid_attrs)
+      changeset = StripeFileUpload.create_changeset(%StripeFileUpload{}, @valid_attrs)
 
       assert changeset.valid?
     end
 
     test "reports as invalid when attributes are invalid" do
-      changeset = StripeFileUpload.create_identity_document_changeset(%StripeFileUpload{}, @invalid_attrs)
+      changeset = StripeFileUpload.create_changeset(%StripeFileUpload{}, @invalid_attrs)
       refute changeset.valid?
 
       assert changeset.errors[:id_from_stripe] == {"can't be blank", []}
@@ -26,7 +26,7 @@ defmodule CodeCorps.StripeFileUploadTest do
     test "can optionally belong to a StripeConnectAccount" do
       stripe_connect_account_id = insert(:stripe_connect_account).id
       changes = Map.merge(@valid_attrs, %{stripe_connect_account_id: stripe_connect_account_id})
-      changeset = StripeFileUpload.create_identity_document_changeset(%StripeFileUpload{}, changes)
+      changeset = StripeFileUpload.create_changeset(%StripeFileUpload{}, changes)
 
       assert changeset.valid?
     end
@@ -34,7 +34,7 @@ defmodule CodeCorps.StripeFileUploadTest do
     test "existing StripeConnectAccount association is required" do
       stripe_connect_account_id = "abc456"
       changes = Map.merge(@valid_attrs, %{stripe_connect_account_id: stripe_connect_account_id})
-      changeset = StripeFileUpload.create_identity_document_changeset(%StripeFileUpload{}, changes)
+      changeset = StripeFileUpload.create_changeset(%StripeFileUpload{}, changes)
 
       refute changeset.valid?
       assert changeset.errors[:stripe_connect_account_id] == {"is invalid", [type: :id]}
