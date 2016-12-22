@@ -26,8 +26,8 @@ defmodule CodeCorps.StripeService.StripeConnectAccountServiceTest do
       account = insert(:stripe_connect_account)
 
       {:ok, %StripeConnectAccount{} = updated_account} =
-        StripeConnectAccountService.add_external_account(account, "ba_test123")
-      assert updated_account.external_account == "ba_test123"
+        StripeConnectAccountService.add_external_account(account, "ba_123")
+      assert updated_account.external_account == "ba_123"
     end
   end
 end

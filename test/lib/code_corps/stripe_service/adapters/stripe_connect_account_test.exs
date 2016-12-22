@@ -79,6 +79,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTestAdapter do
 
   @local_map %{
     "id_from_stripe" => "acct_123",
+
     "business_name" => "Code Corps PBC",
     "business_url" => "codecorps.org",
     "charges_enabled" => false,
@@ -105,6 +106,11 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTestAdapter do
     "legal_entity_dob_month" => nil,
     "legal_entity_dob_year" => nil,
 
+    "legal_entity_first_name" => nil,
+    "legal_entity_gender" => nil,
+    "legal_entity_last_name" => nil,
+    "legal_entity_maiden_name" => nil,
+
     "legal_entity_personal_address_city" => nil,
     "legal_entity_personal_address_country" => "US",
     "legal_entity_personal_address_line2" => nil,
@@ -113,21 +119,24 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTestAdapter do
     "legal_entity_personal_address_state" => nil,
 
     "legal_entity_personal_id_number_provided" => false,
-    "legal_entity_ssn_last_4_provided" => false,
 
     "legal_entity_phone_number" => nil,
 
+    "legal_entity_ssn_last_4_provided" => false,
+
     "legal_entity_type" => nil,
 
-    "legal_entity_first_name" => nil,
-    "legal_entity_last_name" => nil,
-    "legal_entity_gender" => nil,
-    "legal_entity_maiden_name" => nil,
+    "legal_entity_verification_details" => nil,
+    "legal_entity_verification_details_code" => "failed_other",
+    "legal_entity_verification_document" => "fil_12345",
+    "legal_entity_verification_status" => "unverified",
 
     "managed" => false,
+
     "support_email" => nil,
     "support_phone" => "1234567890",
     "support_url" => nil,
+
     "transfers_enabled" => false,
 
     "verification_disabled_reason" => "fields_needed",

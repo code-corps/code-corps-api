@@ -19,7 +19,7 @@ defmodule CodeCorps.StripeService.StripeConnectAccountService do
          {:ok, params} <- StripeConnectAccountAdapter.to_params(stripe_account, %{})
     do
       record
-      |> StripeConnectAccount.stripe_update_changeset(params)
+      |> StripeConnectAccount.webhook_update_changeset(params)
       |> Repo.update
     end
   end
