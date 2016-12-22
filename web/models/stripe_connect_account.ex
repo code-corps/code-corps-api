@@ -136,9 +136,6 @@ defmodule CodeCorps.StripeConnectAccount do
     |> assoc_constraint(:organization)
   end
 
-  @doc """
-  Changeset used to update the record while handling an "account.updated" webhook
-  """
   def webhook_update_changeset(struct, params \\ %{}) do
     struct
     |> cast(params, @stripe_params)
