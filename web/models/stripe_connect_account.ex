@@ -6,7 +6,6 @@ defmodule CodeCorps.StripeConnectAccount do
   use CodeCorps.Web, :model
 
   schema "stripe_connect_accounts" do
-    field :bank_account_status, :string
     field :business_name, :string
     field :business_url, :string
     field :charges_enabled, :boolean
@@ -56,8 +55,6 @@ defmodule CodeCorps.StripeConnectAccount do
     field :id_from_stripe, :string, null: false
 
     field :managed, :boolean, default: true
-
-    field :personal_id_number_status, :string
 
     field :support_email, :string
     field :support_phone, :string
