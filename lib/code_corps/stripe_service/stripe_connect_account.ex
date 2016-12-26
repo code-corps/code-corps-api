@@ -2,6 +2,8 @@ defmodule CodeCorps.StripeService.StripeConnectAccountService do
   alias CodeCorps.{Repo, StripeConnectAccount, StripeFileUpload}
   alias CodeCorps.StripeService.Adapters.{StripeConnectAccountAdapter, StripeFileUploadAdapter}
 
+  alias Ecto.Multi
+
   @api Application.get_env(:code_corps, :stripe)
 
   def create(%{"country" => country_code, "organization_id" => _} = attributes) do
