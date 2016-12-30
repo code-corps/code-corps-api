@@ -16,6 +16,7 @@ defmodule CodeCorps.Organization do
     field :icon, CodeCorps.OrganizationIcon.Type
     field :name, :string
     field :slug, :string
+    field :approved, :boolean
 
     has_one :slugged_route, CodeCorps.SluggedRoute
     has_one :stripe_connect_account, CodeCorps.StripeConnectAccount
