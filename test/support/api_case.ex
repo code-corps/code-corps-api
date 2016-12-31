@@ -20,6 +20,7 @@ defmodule CodeCorps.ApiCase do
   use ExUnit.CaseTemplate
   use Phoenix.ConnTest
 
+
   using(opts) do
     quote do
       # Import conveniences for testing with connections
@@ -106,7 +107,7 @@ defmodule CodeCorps.ApiCase do
 
       def request_create(conn, attrs \\ %{}) do
         path = conn |> path_for(:create)
-        payload = json_payload(factory_name, attrs)
+        payload = CodeCorps.JsonAPIHelpers.build_json_payload(attrs)
         conn |> post(path, payload)
       end
 
@@ -114,16 +115,7 @@ defmodule CodeCorps.ApiCase do
       def request_update(conn, :not_found), do: request_update(conn, -1, %{})
       def request_update(conn, attrs), do: request_update(conn, default_record, attrs)
       def request_update(conn, resource_or_id, attrs) do
-        payload = json_payload(factory_name, attrs)
-        path = conn |> path_for(:update, resource_or_id)
-        conn |> put(path, payload)
-      end
-
-      # A temporary request_update that skips building a payload
-      # using our faulty json_payload strategy
-      # Only works with attributes, not relationships
-      def request_update(conn, resource_or_id, attrs, :skip_strategy) do
-        payload = %{data: %{attributes: attrs}, type: "#{factory_name}"}
+        payload = CodeCorps.JsonAPIHelpers.build_json_payload(attrs)
         path = conn |> path_for(:update, resource_or_id)
         conn |> put(path, payload)
       end

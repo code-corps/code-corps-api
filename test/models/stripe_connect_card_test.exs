@@ -32,9 +32,9 @@ defmodule CodeCorps.StripeConnectCardTest do
 
       refute changeset.valid?
 
-      assert changeset.errors[:id_from_stripe] == {"can't be blank", []}
-      assert changeset.errors[:stripe_connect_account_id] == {"can't be blank", []}
-      assert changeset.errors[:stripe_platform_card_id] == {"can't be blank", []}
+      assert_error_message(changeset, :id_from_stripe, "can't be blank")
+      assert_error_message(changeset, :stripe_connect_account_id, "can't be blank")
+      assert_error_message(changeset, :stripe_platform_card_id, "can't be blank")
     end
 
     test "ensures associations to existing stripe_connect_account" do
@@ -54,7 +54,7 @@ defmodule CodeCorps.StripeConnectCardTest do
 
       assert result == :error
       refute changeset.valid?
-      assert changeset.errors[:stripe_connect_account] == {"does not exist", []}
+      assert_error_message(changeset, :stripe_connect_account, "does not exist")
     end
 
     test "ensures associations to existing stripe_platform_card" do
@@ -74,7 +74,7 @@ defmodule CodeCorps.StripeConnectCardTest do
 
       assert result == :error
       refute changeset.valid?
-      assert changeset.errors[:stripe_platform_card] == {"does not exist", []}
+      assert_error_message(changeset, :stripe_platform_card, "does not exist")
     end
   end
 end

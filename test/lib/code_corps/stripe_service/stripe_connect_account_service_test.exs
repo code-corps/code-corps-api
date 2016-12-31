@@ -21,12 +21,12 @@ defmodule CodeCorps.StripeService.StripeConnectAccountServiceTest do
     end
   end
 
-  describe "add_external_account/2" do
+  describe "update/2" do
     test "assigns the external_account property to the record" do
       account = insert(:stripe_connect_account)
 
       {:ok, %StripeConnectAccount{} = updated_account} =
-        StripeConnectAccountService.add_external_account(account, "ba_123")
+        StripeConnectAccountService.update(account, %{"external_account" =>"ba_123"})
       assert updated_account.external_account == "ba_123"
     end
   end

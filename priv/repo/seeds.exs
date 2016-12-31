@@ -1,13 +1,4 @@
-alias CodeCorps.Repo
-alias CodeCorps.Category
-alias CodeCorps.Organization
-alias CodeCorps.Project
-alias CodeCorps.ProjectCategory
-alias CodeCorps.ProjectSkill
-alias CodeCorps.Role
-alias CodeCorps.Skill
-alias CodeCorps.Task
-alias CodeCorps.User
+alias CodeCorps.{Category, Organization, OrganizationMembership, Project, ProjectCategory, ProjectSkill, Repo, Role, Skill, Task, User}
 
 # Users
 
@@ -323,5 +314,19 @@ cond do
       project_id: 1,
       skill_id: 1
     })
+    |> Repo.insert!
+end
+
+cond do
+  Repo.all(OrganizationMembership) != [] ->
+    IO.puts "Organization memberships detected, aborting this seed."
+  true ->
+    owner = %{
+      organization_id: 1,
+      member_id: 1
+    }
+
+    %OrganizationMembership{}
+    |> OrganizationMembership.create_owner_changeset(owner)
     |> Repo.insert!
 end

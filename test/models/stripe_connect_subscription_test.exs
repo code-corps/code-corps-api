@@ -26,11 +26,11 @@ defmodule CodeCorps.StripeConnectSubscriptionTest do
       changeset = StripeConnectSubscription.create_changeset(%StripeConnectSubscription{}, @invalid_attrs)
       refute changeset.valid?
 
-      assert changeset.errors[:application_fee_percent] == {"can't be blank", []}
-      assert changeset.errors[:id_from_stripe] == {"can't be blank", []}
-      assert changeset.errors[:plan_id_from_stripe] == {"can't be blank", []}
-      assert changeset.errors[:quantity] == {"can't be blank", []}
-      assert changeset.errors[:stripe_connect_plan_id] == {"can't be blank", []}
+      assert_error_message(changeset, :application_fee_percent, "can't be blank")
+      assert_error_message(changeset, :id_from_stripe, "can't be blank")
+      assert_error_message(changeset, :plan_id_from_stripe, "can't be blank")
+      assert_error_message(changeset, :quantity, "can't be blank")
+      assert_error_message(changeset, :stripe_connect_plan_id, "can't be blank")
     end
 
     test "ensures stripe_connect_plan_id links to existing_record" do
@@ -43,7 +43,7 @@ defmodule CodeCorps.StripeConnectSubscriptionTest do
 
       assert result == :error
       refute changeset.valid?
-      assert changeset.errors[:stripe_connect_plan] == {"does not exist", []}
+      assert_error_message(changeset, :stripe_connect_plan, "does not exist")
     end
 
     test "ensures user_id links to existing_record" do
@@ -56,7 +56,7 @@ defmodule CodeCorps.StripeConnectSubscriptionTest do
 
       assert result == :error
       refute changeset.valid?
-      assert changeset.errors[:user] == {"does not exist", []}
+      assert_error_message(changeset, :user, "does not exist")
     end
   end
 end

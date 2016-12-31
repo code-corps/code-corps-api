@@ -22,8 +22,8 @@ defmodule CodeCorps.StripePlatformCustomerTest do
       changeset = StripePlatformCustomer.create_changeset(%StripePlatformCustomer{}, @invalid_attrs)
       refute changeset.valid?
 
-      assert changeset.errors[:id_from_stripe] == {"can't be blank", []}
-      assert changeset.errors[:user_id] == {"can't be blank", []}
+      changeset |> assert_validation_triggered(:id_from_stripe, :required)
+      changeset |> assert_validation_triggered(:user_id, :required)
     end
 
     test "ensures associations link to records that exist" do
@@ -36,7 +36,7 @@ defmodule CodeCorps.StripePlatformCustomerTest do
 
       assert result == :error
       refute changeset.valid?
-      assert changeset.errors[:user] == {"does not exist", []}
+      changeset |> assert_error_message(:user, "does not exist")
     end
   end
 
@@ -54,7 +54,7 @@ defmodule CodeCorps.StripePlatformCustomerTest do
       changeset = StripePlatformCustomer.update_changeset(platform_customer, %{email: nil})
       refute changeset.valid?
 
-      assert changeset.errors[:email] == {"can't be blank", []}
+      changeset |> assert_validation_triggered(:email, :required)
     end
   end
 end

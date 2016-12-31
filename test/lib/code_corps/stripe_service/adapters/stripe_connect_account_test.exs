@@ -118,10 +118,12 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTestAdapter do
     "legal_entity_personal_address_postal_code" => nil,
     "legal_entity_personal_address_state" => nil,
 
+    "legal_entity_personal_id_number" => nil,
     "legal_entity_personal_id_number_provided" => false,
 
     "legal_entity_phone_number" => nil,
 
+    "legal_entity_ssn_last_4" => nil,
     "legal_entity_ssn_last_4_provided" => false,
 
     "legal_entity_type" => nil,

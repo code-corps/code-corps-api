@@ -22,8 +22,8 @@ defmodule CodeCorps.StripeConnectPlanTest do
       changeset = StripeConnectPlan.create_changeset(%StripeConnectPlan{}, @invalid_attrs)
       refute changeset.valid?
 
-      assert changeset.errors[:id_from_stripe] == {"can't be blank", []}
-      assert changeset.errors[:project_id] == {"can't be blank", []}
+      assert_error_message(changeset, :id_from_stripe, "can't be blank")
+      assert_error_message(changeset, :project_id, "can't be blank")
     end
 
     test "ensures associations link to records that exist" do
@@ -35,7 +35,7 @@ defmodule CodeCorps.StripeConnectPlanTest do
 
       assert result == :error
       refute changeset.valid?
-      assert changeset.errors[:project] == {"does not exist", []}
+      assert_error_message(changeset, :project, "does not exist")
     end
   end
 end

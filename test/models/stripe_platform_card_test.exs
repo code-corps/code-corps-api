@@ -30,8 +30,8 @@ defmodule CodeCorps.StripePlatformCardTest do
       changeset = StripePlatformCard.create_changeset(%StripePlatformCard{}, @invalid_attrs)
       refute changeset.valid?
 
-      assert changeset.errors[:id_from_stripe] == {"can't be blank", []}
-      assert changeset.errors[:user_id] == {"can't be blank", []}
+      assert_error_message(changeset, :id_from_stripe, "can't be blank")
+      assert_error_message(changeset, :user_id, "can't be blank")
     end
 
     test "ensures associations link to records that exist" do
@@ -43,7 +43,7 @@ defmodule CodeCorps.StripePlatformCardTest do
 
       assert result == :error
       refute changeset.valid?
-      assert changeset.errors[:user] == {"does not exist", []}
+      assert_error_message(changeset, :user, "does not exist")
     end
   end
 
@@ -65,9 +65,9 @@ defmodule CodeCorps.StripePlatformCardTest do
       changeset = StripePlatformCard.update_changeset(platform_card, @invalid_attrs)
 
       refute changeset.valid?
-      assert changeset.errors[:exp_month] == {"can't be blank", []}
-      assert changeset.errors[:exp_year] == {"can't be blank", []}
-      assert changeset.errors[:name] == {"can't be blank", []}
+      assert_error_message(changeset, :exp_month, "can't be blank")
+      assert_error_message(changeset, :exp_year, "can't be blank")
+      assert_error_message(changeset, :name, "can't be blank")
     end
   end
 end

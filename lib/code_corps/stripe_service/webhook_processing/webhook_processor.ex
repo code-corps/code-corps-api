@@ -77,7 +77,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.WebhookProcessor do
   end
 
   defp handle_event(json, event, handler) do
-    case handler.handle_event(json) |> Tuple.to_list do
+    case json |> handler.handle_event |> Tuple.to_list do
       [:ok, :unhandled_event] -> event |> set_unhandled
       [:ok | _results]        -> event |> set_processed
       [:error | _error]       -> event |> set_errored

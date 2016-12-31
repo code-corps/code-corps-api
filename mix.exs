@@ -66,15 +66,15 @@ defmodule CodeCorps.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.12"},
       {:cowboy, "~> 1.0"},
-      {:arc, git: "https://github.com/stavro/arc.git", ref: "354d4d2e1b86bcd6285db3528118fe3f5db36cf5", override: true}, # Photo uploads
-      {:arc_ecto, "~> 0.4.4"},
+      {:arc, "~> 0.6"}, # Photo uploads
+      {:arc_ecto, "~> 0.5"},
       {:benchfella, "~> 0.3.0", only: :dev},
       {:canary, "~> 1.1"}, # Authorization
       {:comeonin, "~> 2.0"},
       {:corsica, "~> 0.4"}, # CORS
       {:credo, "~> 0.5", only: [:dev, :test]}, # Code style suggestions
       {:earmark, "~> 1.0"}, # Markdown rendering
-      {:ex_aws, "~> 0.4"}, # Amazon AWS
+      {:ex_aws, "~> 1.0"}, # Amazon AWS
       {:excoveralls, "~> 0.5", only: :test}, # Test coverage
       {:ex_doc, "~> 0.14", only: [:dev, :test]},
       {:ex_machina, "~> 1.0", only: :test}, # test factories
@@ -87,9 +87,10 @@ defmodule CodeCorps.Mixfile do
       {:mix_test_watch, "~> 0.2", only: :dev}, # Test watcher
       {:poison, "~> 2.0"},
       {:scrivener_ecto, "~> 1.0"}, # DB query pagination
-      {:segment, github: "stueccles/analytics-elixir"}, # Segment analytics
+      {:segment, "~> 0.1"}, # Segment analytics
       {:sentry, "~> 2.0"}, # Sentry error tracking
       {:stripity_stripe, git: "https://github.com/code-corps/stripity_stripe.git", branch: "2.0"}, # Stripe
+      {:sweet_xml, "~> 0.5"},
       {:timber, "~> 0.4"}, # Logging
       {:timex, "~> 3.0"},
       {:timex_ecto, "~> 3.0"},

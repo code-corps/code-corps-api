@@ -1,16 +1,9 @@
 defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter do
   import CodeCorps.MapUtils, only: [keys_to_string: 1]
-  import CodeCorps.StripeService.Util, only: [transform_map: 2]
+  import CodeCorps.StripeService.Util, only: [transform_attributes: 2, transform_map: 2]
 
-  @stripe_attributes [
-    :business_name, :business_url, :charges_enabled, :country, :default_currency, :details_submitted, :email, :id, :managed,
-    :support_email, :support_phone, :support_url, :transfers_enabled
-  ]
-
-  @doc """
-  Mapping of stripe record attributes to locally stored attributes
-  Format is {:local_key, [:nesting, :of, :stripe, :keys]}
-  """
+  # Mapping of stripe record attributes to locally stored attributes
+  # Format is {:local_key, [:nesting, :of, :stripe, :keys]}
   @stripe_mapping [
     {:id_from_stripe, [:id]},
     {:business_name, [:business_name]},
@@ -45,7 +38,9 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter do
     {:legal_entity_personal_address_postal_code, [:legal_entity, :personal_address, :postal_code]},
     {:legal_entity_personal_address_state, [:legal_entity, :personal_address, :state]},
     {:legal_entity_phone_number, [:legal_entity, :phone_number]},
+    {:legal_entity_personal_id_number, [:legal_entity, :personal_id_number]},
     {:legal_entity_personal_id_number_provided, [:legal_entity, :personal_id_number_provided]},
+    {:legal_entity_ssn_last_4, [:legal_entity, :ssn_last_4]},
     {:legal_entity_ssn_last_4_provided, [:legal_entity, :ssn_last_4_provided]},
     {:legal_entity_type, [:legal_entity, :type]},
     {:legal_entity_verification_details, [:legal_entity, :verification, :details]},
@@ -61,6 +56,19 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter do
     {:verification_due_by, [:verification, :due_by]},
     {:verification_fields_needed, [:verification, :fields_needed]}
   ]
+
+  @doc """
+  Transforms a set of local attributes into a map of parameters used to
+  update a `%Stripe.Account{}`.
+  """
+  def from_params(%{} = attributes) do
+    result =
+      attributes
+      |> remove_attributes()
+      |> transform_attributes(@stripe_mapping)
+
+    {:ok, result}
+  end
 
   @doc """
   Transforms a `%Stripe.Account{}` and a set of local attributes into a
@@ -89,21 +97,23 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter do
   end
 
   defp get_non_stripe_attributes(%{} = attributes) do
-    attributes
-    |> Map.take(@non_stripe_attributes)
+    attributes |> Map.take(@non_stripe_attributes)
   end
 
   defp add_to(%{} = attributes, %{} = params) do
-    params
-    |> Map.merge(attributes)
+    params |> Map.merge(attributes)
   end
 
   defp add_nested_attributes(map, stripe_account) do
-  map
-  |> add_external_account(stripe_account)
-end
+    map |> add_external_account(stripe_account)
+  end
 
   defp add_external_account(map, %Stripe.Account{external_accounts: %{data: []}}), do: map
   defp add_external_account(map, %Stripe.Account{external_accounts: %{data: [head | _]}}), do: map |> do_add_external_account(head)
   defp do_add_external_account(map, %{"id" => id}), do: map |> Map.put(:external_account, id)
+
+  defp remove_attributes(%{"legal_entity_verification_status" => "verified"} = attributes) do
+    attributes |> Map.delete("legal_entity_verification_document")
+  end
+  defp remove_attributes(attributes), do: attributes
 end

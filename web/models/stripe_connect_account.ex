@@ -28,9 +28,9 @@ defmodule CodeCorps.StripeConnectAccount do
     field :legal_entity_business_tax_id_provided, :boolean, default: false
     field :legal_entity_business_vat_id, :string, virtual: true
     field :legal_entity_business_vat_id_provided, :boolean, default: false
-    field :legal_entity_dob_day, :string
-    field :legal_entity_dob_month, :string
-    field :legal_entity_dob_year, :string
+    field :legal_entity_dob_day, :integer
+    field :legal_entity_dob_month, :integer
+    field :legal_entity_dob_year, :integer
     field :legal_entity_first_name, :string
     field :legal_entity_last_name, :string
     field :legal_entity_gender, :string

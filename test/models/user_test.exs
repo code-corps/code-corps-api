@@ -19,20 +19,20 @@ defmodule CodeCorps.UserTest do
   test "changeset with invalid email" do
     attrs = Map.put(@valid_attrs, :email, "notanemail")
     changeset = User.changeset(%User{}, attrs)
-    assert {:email, {"has invalid format", []}} in changeset.errors
+    assert_error_message(changeset, :email, "has invalid format")
   end
 
   describe "registration_changeset" do
     test "does not accept long usernames" do
       attrs = Map.put(@valid_attrs, :username, String.duplicate("a", 40))
       changeset = User.registration_changeset(%User{}, attrs)
-      assert {:username, {"should be at most %{count} character(s)", count: 39}} in changeset.errors
+      assert {:username, {"should be at most %{count} character(s)", [count: 39, validation: :length, max: 39]}} in changeset.errors
     end
 
     test "password must be at least 6 chars long" do
       attrs = Map.put(@valid_attrs, :password, "12345")
       changeset = User.registration_changeset(%User{}, attrs)
-      assert {:password, {"should be at least %{count} character(s)", count: 6}} in changeset.errors
+      assert {:password, {"should be at least %{count} character(s)", [count: 6, validation: :length, min: 6]}} in changeset.errors
     end
 
     test "with valid attributes hashes password" do
@@ -51,7 +51,7 @@ defmodule CodeCorps.UserTest do
       changeset = User.registration_changeset(%User{}, user_2_attrs)
       {:error, changeset} = Repo.insert(changeset)
       refute changeset.valid?
-      assert changeset.errors[:email] == {"has already been taken", []}
+      assert_error_message(changeset, :email, "has already been taken")
     end
 
     test "does not allow duplicate usernames, regardless of case" do
@@ -61,7 +61,7 @@ defmodule CodeCorps.UserTest do
       changeset = User.registration_changeset(%User{}, user_2_attrs)
       {:error, changeset} = Repo.insert(changeset)
       refute changeset.valid?
-      assert changeset.errors[:username] == {"has already been taken", []}
+      assert_error_message(changeset, :username, "has already been taken")
     end
   end
 
@@ -72,7 +72,7 @@ defmodule CodeCorps.UserTest do
 
       changeset = User.update_changeset(user, attrs)
 
-      assert changeset.errors[:twitter] == {"has invalid format", []}
+      assert_error_message(changeset, :twitter, "has invalid format")
     end
 
     test "doesn't require :twitter to be part of the changes" do
@@ -90,7 +90,7 @@ defmodule CodeCorps.UserTest do
 
       changeset = User.update_changeset(user, attrs)
 
-      assert changeset.errors[:website] == {"has invalid format", []}
+      assert_error_message(changeset, :website, "has invalid format")
     end
 
     test "doesn't require :website to be part of the changes" do

@@ -34,7 +34,7 @@ defmodule CodeCorps.StripeConnectAccountControllerTest do
     test "creates and renders resource when user is authenticated and authorized", %{conn: conn, current_user: current_user} do
       organization = insert(:organization)
       insert(:organization_membership, member: current_user, organization: organization, role: "owner")
-      attrs = %{ organization: organization }
+      attrs = %{organization: organization, country: "US"}
       assert conn |> request_create(attrs) |> json_response(201)
 
       user_id = current_user.id
@@ -63,7 +63,7 @@ defmodule CodeCorps.StripeConnectAccountControllerTest do
 
       attrs = %{external_account: "ba_test123"}
 
-      assert conn |> request_update(stripe_connect_account, attrs, :skip_strategy) |> json_response(200)
+      assert conn |> request_update(stripe_connect_account, attrs) |> json_response(200)
 
       updated_account = Repo.get(StripeConnectAccount, stripe_connect_account.id)
       assert updated_account.external_account == "ba_test123"

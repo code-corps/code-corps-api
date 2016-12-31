@@ -17,7 +17,7 @@ defmodule CodeCorps.UserCategoryTest do
       changeset = UserCategory.create_changeset(%UserCategory{}, %{category_id: category_id})
 
       refute changeset.valid?
-      assert changeset.errors[:user_id] == {"can't be blank", []}
+      assert_error_message(changeset, :user_id, "can't be blank")
     end
 
     test "changeset requires category_id" do
@@ -26,7 +26,7 @@ defmodule CodeCorps.UserCategoryTest do
       changeset = UserCategory.create_changeset(%UserCategory{}, %{user_id: user_id})
 
       refute changeset.valid?
-      assert changeset.errors[:category_id] == {"can't be blank", []}
+      assert_error_message(changeset, :category_id, "can't be blank")
     end
 
     test "changeset requires id of actual user" do
@@ -39,7 +39,7 @@ defmodule CodeCorps.UserCategoryTest do
 
       assert result == :error
       refute changeset.valid?
-      assert changeset.errors[:user] == {"does not exist", []}
+      assert_error_message(changeset, :user, "does not exist")
     end
 
     test "changeset requires id of actual category" do
@@ -52,6 +52,6 @@ defmodule CodeCorps.UserCategoryTest do
 
       assert result == :error
       refute changeset.valid?
-      assert changeset.errors[:category] == {"does not exist", []}
+      assert_error_message(changeset, :category, "does not exist")
     end
 end
