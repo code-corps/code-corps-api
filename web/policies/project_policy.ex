@@ -1,6 +1,6 @@
 defmodule CodeCorps.ProjectPolicy do
   import CodeCorps.Helpers.Policy,
-    only: [get_membership: 2, get_role: 1, admin_or_higher?: 1, owner?: 1]
+    only: [get_membership: 2, get_role: 1, admin_or_higher?: 1]
 
   alias CodeCorps.Project
   alias CodeCorps.User

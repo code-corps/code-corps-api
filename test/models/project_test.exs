@@ -16,12 +16,12 @@ defmodule CodeCorps.ProjectTest do
       changeset = Project.changeset(%Project{}, @invalid_attrs)
       refute changeset.valid?
 
-      assert changeset.errors[:title] == {"can't be blank", []}
+      assert_error_message(changeset, :title, "can't be blank")
     end
 
     test "with long_description_markdown renders long_description_body" do
       changeset = Project.changeset(%Project{}, @valid_attrs |> Map.merge(%{long_description_markdown: "Something"}))
-      assert changeset |> fetch_change(:long_description_body) == { :ok, "<p>Something</p>\n" }
+      assert changeset |> fetch_change(:long_description_body) == {:ok, "<p>Something</p>\n"}
     end
 
     test "without long_description_markdown doesn't render long_description_body" do
@@ -52,11 +52,8 @@ defmodule CodeCorps.ProjectTest do
       project = insert(:project, slug: "used-slug")
       changeset = Project.changeset(%Project{organization_id: project.organization_id}, %{title: "Used Slug"})
 
-      {result, changeset} = Repo.insert(changeset)
-      {message, _} = changeset.errors[:slug]
-
-      assert result == :error
-      assert message == "has already been taken"
+      {_, changeset} = Repo.insert(changeset)
+      assert_error_message(changeset, :slug, "has already been taken")
     end
   end
 

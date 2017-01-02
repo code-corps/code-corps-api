@@ -14,7 +14,7 @@ defmodule CodeCorps.RoleTest do
 
   test "changeset with invalid attributes" do
     changeset = Role.changeset(%Role{}, @invalid_attrs)
-    assert changeset.errors == [kind: {"is invalid", []}]
+    assert_error_message(changeset, :kind, "is invalid")
     refute changeset.valid?
   end
 

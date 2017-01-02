@@ -15,9 +15,9 @@ defmodule CodeCorps.StripeEventTest do
       changeset = StripeEvent.create_changeset(%StripeEvent{}, %{})
 
       refute changeset.valid?
-      assert changeset.errors[:endpoint] == {"can't be blank", []}
-      assert changeset.errors[:id_from_stripe] == {"can't be blank", []}
-      assert changeset.errors[:type] == {"can't be blank", []}
+      assert_error_message(changeset, :endpoint, "can't be blank")
+      assert_error_message(changeset, :id_from_stripe, "can't be blank")
+      assert_error_message(changeset, :type, "can't be blank")
     end
 
     test "sets :status to 'processing'" do
@@ -36,7 +36,7 @@ defmodule CodeCorps.StripeEventTest do
       changeset = StripeEvent.create_changeset(event, attrs)
 
       refute changeset.valid?
-      assert changeset.errors[:endpoint] == {"is invalid", []}
+      assert_error_message(changeset, :endpoint, "is invalid")
     end
   end
 
@@ -56,7 +56,7 @@ defmodule CodeCorps.StripeEventTest do
       changeset = StripeEvent.update_changeset(event, %{status: nil})
 
       refute changeset.valid?
-      assert changeset.errors[:status] == {"can't be blank", []}
+      assert_error_message(changeset, :status, "can't be blank")
     end
 
     test "prevents :status from being invalid" do
@@ -65,7 +65,7 @@ defmodule CodeCorps.StripeEventTest do
       changeset = StripeEvent.update_changeset(event, %{status: "random"})
 
       refute changeset.valid?
-      assert changeset.errors[:status] == {"is invalid", []}
+      assert_error_message(changeset, :status, "is invalid")
     end
   end
 end

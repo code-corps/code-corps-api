@@ -20,7 +20,7 @@ defmodule CodeCorps.StripeFileUploadTest do
       changeset = StripeFileUpload.create_changeset(%StripeFileUpload{}, @invalid_attrs)
       refute changeset.valid?
 
-      assert changeset.errors[:id_from_stripe] == {"can't be blank", []}
+      assert_error_message(changeset, :id_from_stripe, "can't be blank")
     end
 
     test "can optionally belong to a StripeConnectAccount" do
@@ -37,7 +37,7 @@ defmodule CodeCorps.StripeFileUploadTest do
       changeset = StripeFileUpload.create_changeset(%StripeFileUpload{}, changes)
 
       refute changeset.valid?
-      assert changeset.errors[:stripe_connect_account_id] == {"is invalid", [type: :id]}
+      assert_error_message(changeset, :stripe_connect_account_id, "is invalid")
     end
   end
 end

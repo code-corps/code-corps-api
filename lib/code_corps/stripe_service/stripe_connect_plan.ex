@@ -7,7 +7,7 @@ defmodule CodeCorps.StripeService.StripeConnectPlanService do
 
   def create(%{"project_id" => project_id} = attributes) do
     with {:ok, %Project{} = project} <- get_project(project_id) |> ProjectCanEnableDonations.validate,
-         %{} = create_attributes     <- get_create_attributes(),
+         %{} = create_attributes     <- get_create_attributes(project_id),
          connect_account_id          <- project.organization.stripe_connect_account.id_from_stripe,
          {:ok, plan}                 <- @api.Plan.create(create_attributes, connect_account: connect_account_id),
          {:ok, params}               <- StripeConnectPlanAdapter.to_params(plan, attributes)
@@ -22,11 +22,12 @@ defmodule CodeCorps.StripeService.StripeConnectPlanService do
     end
   end
 
-  defp get_create_attributes do
+  @spec get_create_attributes(binary) :: map
+  defp get_create_attributes(project_id) do
     %{
       amount: 1, # in cents
       currency: "usd",
-      id: "month",
+      id: "month_project_" <> to_string(project_id),
       interval: "month",
       name: "Monthly donation",
       statement_descriptor: "CODECORPS.ORG Donation" # No more than 22 chars

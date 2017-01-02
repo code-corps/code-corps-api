@@ -99,6 +99,7 @@ defmodule Canary.Abilities do
 
     def can?(%User{} = user, :show, %StripeConnectAccount{} = stripe_connect_account), do: StripeConnectAccountPolicy.show?(user, stripe_connect_account)
     def can?(%User{} = user, :create, %Changeset{ data: %StripeConnectAccount{}} = changeset), do: StripeConnectAccountPolicy.create?(user, changeset)
+    def can?(%User{} = user, :update, %StripeConnectAccount{} = stripe_connect_account), do: StripeConnectAccountPolicy.update?(user, stripe_connect_account)
 
     def can?(%User{} = user, :show, %StripeConnectPlan{} = stripe_connect_plan), do: StripeConnectPlanPolicy.show?(user, stripe_connect_plan)
     def can?(%User{} = user, :create, %Changeset{ data: %StripeConnectPlan{}} = changeset), do: StripeConnectPlanPolicy.create?(user, changeset)

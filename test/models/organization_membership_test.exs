@@ -35,6 +35,16 @@ defmodule CodeCorps.OrganizationMembershipTest do
     end
   end
 
+  describe "create_owner_changeset" do
+    @valid_attrs %{member_id: 1, organization_id: 2}
+    @invalid_attrs %{}
+
+    test "changeset with valid attributes" do
+      changeset = OrganizationMembership.create_owner_changeset(%OrganizationMembership{}, @valid_attrs)
+      assert changeset.valid?
+    end
+  end
+
   describe "create_changeset" do
     @valid_attrs %{member_id: 1, organization_id: 2}
     @invalid_attrs %{}
@@ -48,8 +58,8 @@ defmodule CodeCorps.OrganizationMembershipTest do
       changeset = OrganizationMembership.create_changeset(%OrganizationMembership{}, @invalid_attrs)
       refute changeset.valid?
 
-      assert changeset.errors[:member_id] == {"can't be blank", []}
-      assert changeset.errors[:organization_id] == {"can't be blank", []}
+      changeset |> assert_validation_triggered(:member_id, :required)
+      changeset |> assert_validation_triggered(:organization_id, :required)
     end
 
     test "changeset ensures member and organization actually exist" do
@@ -58,7 +68,7 @@ defmodule CodeCorps.OrganizationMembershipTest do
       { result, changeset } = changeset |> Repo.insert
 
       assert result == :error
-      assert changeset.errors[:organization] == {"does not exist", []}
+      changeset |> assert_error_message(:organization, "does not exist")
 
       # assoc_constraint works through one relationship at a time
       organization = insert(:organization)
@@ -68,7 +78,7 @@ defmodule CodeCorps.OrganizationMembershipTest do
       { result, changeset } = changeset |> Repo.insert
 
       assert result == :error
-      assert changeset.errors[:member] == {"does not exist", []}
+      changeset |> assert_error_message(:member, "does not exist")
     end
   end
 end

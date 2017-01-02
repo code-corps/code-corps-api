@@ -1,4 +1,6 @@
 defmodule CodeCorps.StripeConnectAccountViewTest do
+  @moduledoc false
+
   use CodeCorps.ConnCase, async: true
 
   import Phoenix.View, only: [render: 3]
@@ -128,9 +130,21 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
 
   describe "recipient-status" do
     test "renders as 'required' by default" do
-      account = insert(:stripe_connect_account)
+      account = insert(:stripe_connect_account,  legal_entity_verification_status: "unverified")
       rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["recipient-status"] == "required"
+    end
+
+    test "renders as 'verifying' when fields_needed includes personal_id_number" do
+      account = insert(:stripe_connect_account,  legal_entity_verification_status: "unverified", verification_fields_needed: ["legal_entity.personal_id_number"])
+      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      assert rendered_json["data"]["attributes"]["recipient-status"] == "verifying"
+    end
+
+    test "renders as 'verifying' when fields_needed includes verification.document" do
+      account = insert(:stripe_connect_account,  legal_entity_verification_status: "unverified", verification_fields_needed: ["legal_entity.verification.document"])
+      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      assert rendered_json["data"]["attributes"]["recipient-status"] == "verifying"
     end
 
     test "renders as 'verifying' when appropriate" do

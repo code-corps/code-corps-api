@@ -81,6 +81,14 @@ defmodule CodeCorps.StripeConnectAccountView do
     get_recipient_status(stripe_connect_account)
   end
 
+  defp get_recipient_status(%StripeConnectAccount{legal_entity_verification_status: "unverified", verification_fields_needed: fields
+  }) do
+    cond do
+      Enum.member?(fields, "legal_entity.personal_id_number") -> "verifying"
+      Enum.member?(fields, "legal_entity.verification.document") -> "verifying"
+      true -> "required"
+    end
+  end
   defp get_recipient_status(%StripeConnectAccount{legal_entity_verification_status: "pending"}), do: "verifying"
   defp get_recipient_status(%StripeConnectAccount{legal_entity_verification_status: "verified"}), do: "verified"
   defp get_recipient_status(_), do: "required"

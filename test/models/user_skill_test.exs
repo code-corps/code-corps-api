@@ -17,7 +17,7 @@ defmodule CodeCorps.UserSkillTest do
     changeset = UserSkill.create_changeset(%UserSkill{}, %{skill_id: skill_id})
 
     refute changeset.valid?
-    assert changeset.errors[:user_id] == {"can't be blank", []}
+    assert_error_message(changeset, :user_id, "can't be blank")
   end
 
   test "changeset requires skill_id" do
@@ -26,7 +26,7 @@ defmodule CodeCorps.UserSkillTest do
     changeset = UserSkill.create_changeset(%UserSkill{}, %{user_id: user_id})
 
     refute changeset.valid?
-    assert changeset.errors[:skill_id] == {"can't be blank", []}
+    assert_error_message(changeset, :skill_id, "can't be blank")
   end
 
   test "changeset requires id of actual user" do
@@ -39,7 +39,7 @@ defmodule CodeCorps.UserSkillTest do
 
     assert result == :error
     refute changeset.valid?
-    assert changeset.errors[:user] == {"does not exist", []}
+    assert_error_message(changeset, :user, "does not exist")
   end
 
   test "changeset requires id of actual skill" do
@@ -52,6 +52,6 @@ defmodule CodeCorps.UserSkillTest do
 
     assert result == :error
     refute changeset.valid?
-    assert changeset.errors[:skill] == {"does not exist", []}
+    assert_error_message(changeset, :skill, "does not exist")
   end
 end

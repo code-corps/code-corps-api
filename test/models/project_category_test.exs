@@ -17,7 +17,7 @@ defmodule CodeCorps.ProjectCategoryTest do
     changeset = ProjectCategory.create_changeset(%ProjectCategory{}, %{category_id: category_id})
 
     refute changeset.valid?
-    assert changeset.errors[:project_id] == {"can't be blank", []}
+    changeset |> assert_validation_triggered(:project_id, :required)
   end
 
   test "changeset requires category_id" do
@@ -26,7 +26,7 @@ defmodule CodeCorps.ProjectCategoryTest do
     changeset = ProjectCategory.create_changeset(%ProjectCategory{}, %{project_id: project_id})
 
     refute changeset.valid?
-    assert changeset.errors[:category_id] == {"can't be blank", []}
+    changeset |> assert_validation_triggered(:category_id, :required)
   end
 
   test "changeset requires id of actual project" do
@@ -39,7 +39,7 @@ defmodule CodeCorps.ProjectCategoryTest do
 
     assert result == :error
     refute changeset.valid?
-    assert changeset.errors[:project] == {"does not exist", []}
+    changeset |> assert_error_message(:project, "does not exist")
   end
 
   test "changeset requires id of actual category" do
@@ -52,6 +52,6 @@ defmodule CodeCorps.ProjectCategoryTest do
 
     assert result == :error
     refute changeset.valid?
-    assert changeset.errors[:category] == {"does not exist", []}
+    changeset |> assert_error_message(:category, "does not exist")
   end
 end

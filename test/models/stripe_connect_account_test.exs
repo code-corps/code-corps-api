@@ -22,8 +22,8 @@ defmodule CodeCorps.StripeConnectAccountTest do
       changeset = StripeConnectAccount.create_changeset(%StripeConnectAccount{}, @invalid_attrs)
       refute changeset.valid?
 
-      assert changeset.errors[:id_from_stripe] == {"can't be blank", []}
-      assert changeset.errors[:organization_id] == {"can't be blank", []}
+      assert_error_message(changeset, :id_from_stripe, "can't be blank")
+      assert_error_message(changeset, :organization_id, "can't be blank")
     end
 
     test "ensures associations link to records that exist" do
@@ -34,7 +34,7 @@ defmodule CodeCorps.StripeConnectAccountTest do
         |> Repo.insert
 
       refute changeset.valid?
-      assert changeset.errors[:organization] == {"does not exist", []}
+      assert_error_message(changeset, :organization, "does not exist")
     end
 
     test "accepts list of values as verification_fields_needed" do

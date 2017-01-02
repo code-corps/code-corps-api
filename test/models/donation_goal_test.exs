@@ -8,9 +8,9 @@ defmodule CodeCorps.DonationGoalTest do
       changeset = DonationGoal.create_changeset(%DonationGoal{}, %{})
 
       refute changeset.valid?
-      assert changeset.errors[:amount] == {"can't be blank", []}
-      assert changeset.errors[:description] == {"can't be blank", []}
-      assert changeset.errors[:project_id] == {"can't be blank", []}
+      changeset |> assert_validation_triggered(:amount, :required)
+      changeset |> assert_validation_triggered(:description, :required)
+      changeset |> assert_validation_triggered(:project_id, :required)
     end
 
     test "ensures project with specified id actually exists" do
@@ -21,7 +21,7 @@ defmodule CodeCorps.DonationGoalTest do
 
       assert result == :error
       refute changeset.valid?
-      assert changeset.errors[:project] == {"does not exist", []}
+      changeset |> assert_error_message(:project, "does not exist")
     end
   end
 
@@ -32,8 +32,9 @@ defmodule CodeCorps.DonationGoalTest do
       changeset = DonationGoal.update_changeset(donation_goal, attrs)
 
       refute changeset.valid?
-      assert changeset.errors[:amount] == {"can't be blank", []}
-      assert changeset.errors[:description] == {"can't be blank", []}
+
+      changeset |> assert_validation_triggered(:amount, :required)
+      changeset |> assert_validation_triggered(:description, :required)
     end
   end
 
@@ -44,7 +45,7 @@ defmodule CodeCorps.DonationGoalTest do
       changeset = DonationGoal.set_current_changeset(donation_goal, attrs)
 
       refute changeset.valid?
-      assert changeset.errors[:current] == {"can't be blank", []}
+      changeset |> assert_validation_triggered(:current, :required)
     end
   end
 end

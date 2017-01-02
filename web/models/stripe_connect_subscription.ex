@@ -48,9 +48,10 @@ defmodule CodeCorps.StripeConnectSubscription do
   end
 
   @permitted_params [
-    :application_fee_percent, :cancelled_at, :created, :current_period_end, :current_period_start,
-    :customer_id_from_stripe, :ended_at, :id_from_stripe, :plan_id_from_stripe, :quantity,
-    :start, :status, :stripe_connect_plan_id, :user_id
+    :application_fee_percent, :cancelled_at, :created, :current_period_end,
+    :current_period_start, :customer_id_from_stripe, :ended_at,
+    :id_from_stripe, :plan_id_from_stripe, :quantity, :start, :status,
+    :stripe_connect_plan_id, :user_id
   ]
 
   @required_params [

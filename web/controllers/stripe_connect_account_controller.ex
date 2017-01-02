@@ -6,7 +6,7 @@ defmodule CodeCorps.StripeConnectAccountController do
   alias CodeCorps.StripeService.StripeConnectAccountService
 
   plug :load_and_authorize_changeset, model: StripeConnectAccount, only: [:create]
-  plug :load_and_authorize_resource, model: StripeConnectAccount, only: [:show]
+  plug :load_and_authorize_resource, model: StripeConnectAccount, only: [:show, :update]
   plug JaResource
 
   def handle_create(conn, attributes) do
@@ -20,20 +20,12 @@ defmodule CodeCorps.StripeConnectAccountController do
     result |> CodeCorps.Analytics.Segment.track(:created, conn)
   end
 
-  def handle_update(conn, record, %{"external_account" => external_account}) do
-    with {:ok, _} = result <- StripeConnectAccountService.add_external_account(record, external_account)
+  def handle_update(conn, record, attributes) do
+    with {:ok, _} = result <- StripeConnectAccountService.update(record, attributes)
     do
       CodeCorps.Analytics.Segment.track(result, :created, conn)
     else
       {:error, %Ecto.Changeset{} = changeset} -> changeset
     end
-  end
-
-  def handle_update(conn, _record, _attributes), do: conn |> unauthorized
-
-  defp unauthorized(conn) do
-    conn
-    |> Plug.Conn.assign(:authorized, false)
-    |> CodeCorps.AuthenticationHelpers.handle_unauthorized
   end
 end

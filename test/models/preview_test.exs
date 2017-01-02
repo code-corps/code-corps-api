@@ -17,7 +17,7 @@ defmodule CodeCorps.PreviewTest do
     test "requires markdown change" do
       changeset = Preview.create_changeset(%Preview{}, %{})
       refute changeset.valid?
-      assert changeset.errors[:markdown] == {"can't be blank", []}
+      changeset |> assert_validation_triggered(:markdown, :required)
     end
   end
 end
