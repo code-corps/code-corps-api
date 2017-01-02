@@ -29,16 +29,16 @@ defmodule CodeCorps.StripeConnectSubscription do
 
   schema "stripe_connect_subscriptions" do
     field :application_fee_percent, :decimal
-    field :cancelled_at, Ecto.DateTime
-    field :created, Ecto.DateTime
-    field :current_period_end, Ecto.DateTime
-    field :current_period_start, Ecto.DateTime
+    field :cancelled_at, :integer
+    field :created, :integer
+    field :current_period_end, :integer
+    field :current_period_start, :integer
     field :customer_id_from_stripe, :string
-    field :ended_at, Ecto.DateTime
+    field :ended_at, :integer
     field :id_from_stripe, :string, null: false
     field :plan_id_from_stripe, :string, null: false
     field :quantity, :integer
-    field :start, Ecto.DateTime
+    field :start, :integer
     field :status, :string
 
     belongs_to :stripe_connect_plan, CodeCorps.StripeConnectPlan

@@ -4,8 +4,9 @@ defmodule CodeCorps.StripeService.StripeConnectAccountService do
 
   @api Application.get_env(:code_corps, :stripe)
 
-  def create(%{"country" => country_code, "organization_id" => _} = attributes) do
-    with {:ok, %Stripe.Account{} = account} <- @api.Account.create(%{country: country_code, managed: true}),
+  def create(attributes) do
+    with {:ok, from_params} <- StripeConnectAccountAdapter.from_params(attributes),
+         {:ok, %Stripe.Account{} = account} <- @api.Account.create(from_params),
          {:ok, params} <- StripeConnectAccountAdapter.to_params(account, attributes)
     do
       %StripeConnectAccount{}

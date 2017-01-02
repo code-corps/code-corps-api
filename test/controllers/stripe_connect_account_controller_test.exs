@@ -34,11 +34,22 @@ defmodule CodeCorps.StripeConnectAccountControllerTest do
     test "creates and renders resource when user is authenticated and authorized", %{conn: conn, current_user: current_user} do
       organization = insert(:organization)
       insert(:organization_membership, member: current_user, organization: organization, role: "owner")
-      attrs = %{organization: organization, country: "US"}
-      assert conn |> request_create(attrs) |> json_response(201)
+
+      attrs = %{organization: organization, country: "US", tos_acceptance_date: 123456}
+
+      response = conn |> put_req_header("user-agent", "Test agent") |> request_create(attrs)
+      assert response |> json_response(201)
 
       user_id = current_user.id
       assert_received {:track, ^user_id, "Created Stripe Connect Account", %{}}
+
+      account = StripeConnectAccount |> Repo.one
+
+      assert account.tos_acceptance_date
+      request_ip = CodeCorps.ConnUtils.extract_ip(response)
+      assert account.tos_acceptance_ip == request_ip
+      request_user_agent = CodeCorps.ConnUtils.extract_user_agent(response)
+      assert account.tos_acceptance_user_agent == request_user_agent
     end
 
     test "does not create resource and renders 401 when unauthenticated", %{conn: conn} do

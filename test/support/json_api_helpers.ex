@@ -27,6 +27,7 @@ defmodule CodeCorps.JsonAPIHelpers do
     end
   end
 
+  defp is_attribute({_key, %DateTime{} = _val}), do: true
   defp is_attribute({_key, val}) when is_map(val), do: false
   defp is_attribute(_), do: true
 

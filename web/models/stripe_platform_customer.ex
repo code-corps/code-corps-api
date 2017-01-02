@@ -2,7 +2,7 @@ defmodule CodeCorps.StripePlatformCustomer do
   use CodeCorps.Web, :model
 
   schema "stripe_platform_customers" do
-    field :created, Timex.Ecto.DateTime
+    field :created, :integer
     field :currency, :string
     field :delinquent, :boolean
     field :email, :string
