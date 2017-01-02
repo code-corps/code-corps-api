@@ -1,6 +1,6 @@
 defmodule CodeCorps.StripeTesting.Account do
-  def create(_map) do
-    {:ok, create_stripe_record(%{})}
+  def create(attributes) do
+    {:ok, create_stripe_record(attributes)}
   end
 
   def retrieve(id) do
@@ -8,19 +8,18 @@ defmodule CodeCorps.StripeTesting.Account do
   end
 
   def update(id, attributes) do
-    attributes =
-      attributes
-      |> CodeCorps.MapUtils.keys_to_string
-      |> Map.merge(%{"id" => id})
-
-    {:ok, create_stripe_record(attributes)}
+    {:ok, create_stripe_record(attributes |> Map.merge(%{id: id}))}
   end
 
   defp create_stripe_record(attributes) do
-    with attributes <- account_fixture |> Map.merge(attributes) |> add_nestings
-    do
-      Stripe.Account |> Stripe.Converter.stripe_map_to_struct(attributes)
-    end
+    transformed_attributes =
+      attributes
+      |> CodeCorps.MapUtils.keys_to_string
+      |> Map.merge(account_fixture)
+      |> add_nestings
+
+
+    Stripe.Account |> Stripe.Converter.stripe_map_to_struct(transformed_attributes)
   end
 
   defp account_fixture do

@@ -2,7 +2,7 @@ defmodule CodeCorps.StripeFileUpload do
   use CodeCorps.Web, :model
 
   schema "stripe_file_uploads" do
-    field :created, Timex.Ecto.DateTime
+    field :created, :integer
     field :id_from_stripe, :string, null: false
     field :purpose, :string
     field :size, :integer

@@ -10,7 +10,11 @@ defmodule CodeCorps.StripeService.StripeConnectAccountServiceTest do
     test "creates a StripeConnectAccount" do
       organization = insert(:organization)
 
-      attributes = %{"country" => "US", "organization_id" => organization.id}
+      attributes = %{
+        "country" => "US",
+        "organization_id" => organization.id,
+        "tos_acceptance_date" => 123456
+      }
 
       {:ok, %StripeConnectAccount{} = connect_account} =
         StripeConnectAccountService.create(attributes)
@@ -18,6 +22,7 @@ defmodule CodeCorps.StripeService.StripeConnectAccountServiceTest do
       assert connect_account.country == "US"
       assert connect_account.organization_id == organization.id
       assert connect_account.managed == true
+      assert connect_account.tos_acceptance_date == 123456
     end
   end
 

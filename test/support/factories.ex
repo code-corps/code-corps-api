@@ -168,7 +168,7 @@ defmodule CodeCorps.Factories do
 
   def stripe_platform_customer_factory do
     %CodeCorps.StripePlatformCustomer{
-      created: Timex.now,
+      created: Timex.now |> Timex.to_unix,
       email: sequence(:email, &"email_#{&1}@mail.com"),
       id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
       user: build(:user)

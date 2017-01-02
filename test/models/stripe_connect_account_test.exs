@@ -4,7 +4,8 @@ defmodule CodeCorps.StripeConnectAccountTest do
   alias CodeCorps.StripeConnectAccount
 
   @valid_attrs %{
-    id_from_stripe: "abc123"
+    id_from_stripe: "abc123",
+    tos_acceptance_date: 1234567
   }
 
   @invalid_attrs %{}
@@ -22,8 +23,9 @@ defmodule CodeCorps.StripeConnectAccountTest do
       changeset = StripeConnectAccount.create_changeset(%StripeConnectAccount{}, @invalid_attrs)
       refute changeset.valid?
 
-      assert_error_message(changeset, :id_from_stripe, "can't be blank")
-      assert_error_message(changeset, :organization_id, "can't be blank")
+      assert_validation_triggered(changeset, :id_from_stripe, :required)
+      assert_validation_triggered(changeset, :organization_id, :required)
+      assert_validation_triggered(changeset, :tos_acceptance_date, :required)
     end
 
     test "ensures associations link to records that exist" do

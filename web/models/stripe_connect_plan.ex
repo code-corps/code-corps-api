@@ -13,7 +13,7 @@ defmodule CodeCorps.StripeConnectPlan do
 
   schema "stripe_connect_plans" do
     field :amount, :integer
-    field :created, Ecto.DateTime
+    field :created, :integer
     field :id_from_stripe, :string, null: false
     field :name, :string
 

@@ -2,6 +2,7 @@ defmodule CodeCorps.StripeConnectAccountController do
   use CodeCorps.Web, :controller
   use JaResource
 
+  alias CodeCorps.ConnUtils
   alias CodeCorps.StripeConnectAccount
   alias CodeCorps.StripeService.StripeConnectAccountService
 
@@ -11,6 +12,9 @@ defmodule CodeCorps.StripeConnectAccountController do
 
   def handle_create(conn, attributes) do
     attributes
+    |> Map.put("tos_acceptance_ip", conn |> ConnUtils.extract_ip)
+    |> Map.put("tos_acceptance_user_agent", conn |> ConnUtils.extract_user_agent)
+    |> Map.put("managed", true)
     |> StripeConnectAccountService.create
     |> handle_create_result(conn)
   end

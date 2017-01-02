@@ -4,12 +4,10 @@ defmodule CodeCorps.StripeTesting.Plan do
   end
 
   defp do_create(_) do
-    {:ok, created} = DateTime.from_unix(1479472835)
-
     %Stripe.Plan{
       id: "plan_9aMOFmqy1esIRE",
       amount: 5000,
-      created: created,
+      created: 1479472835,
       currency: "usd",
       interval: "month",
       interval_count: 1,

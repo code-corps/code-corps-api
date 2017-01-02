@@ -62,6 +62,11 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTestAdapter do
     support_email: nil,
     support_phone: "1234567890",
     timezone: "US/Pacific",
+    tos_acceptance: %{
+      date: 123456,
+      ip: "127.0.0.1",
+      user_agent: "Chrome"
+    },
     transfers_enabled: false,
     verification: %{
       disabled_reason: "fields_needed",
@@ -140,6 +145,10 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTestAdapter do
     "support_url" => nil,
 
     "transfers_enabled" => false,
+
+    "tos_acceptance_date" => 123456,
+    "tos_acceptance_ip" => "127.0.0.1",
+    "tos_acceptance_user_agent" => "Chrome",
 
     "verification_disabled_reason" => "fields_needed",
     "verification_due_by" => nil,

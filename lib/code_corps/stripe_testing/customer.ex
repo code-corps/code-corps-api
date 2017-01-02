@@ -12,12 +12,10 @@ defmodule CodeCorps.StripeTesting.Customer do
   end
 
   defp do_create(_) do
-    {:ok, created} = DateTime.from_unix(1479472835)
-
     %Stripe.Customer{
       id: "cus_9aMOFmqy1esIRE",
       account_balance: 0,
-      created: created,
+      created: 1479472835,
       currency: "usd",
       default_source: nil,
       delinquent: false,
@@ -29,12 +27,10 @@ defmodule CodeCorps.StripeTesting.Customer do
   end
 
   defp do_update(id, map) do
-    {:ok, created} = DateTime.from_unix(1479472835)
-
     %Stripe.Customer{
       id: id,
       account_balance: 0,
-      created: created,
+      created: 1479472835,
       currency: "usd",
       default_source: nil,
       delinquent: false,
