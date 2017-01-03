@@ -7,18 +7,18 @@ defmodule CodeCorps.MapUtils do
 
   def keys_to_string(map), do: stringify_keys(map)
 
+  # Intercept incoming %DateTime arguments; otherwise they will match %{}
+  defp stringify_keys(%DateTime{} = val), do: val
   # Goes through a list and stringifies keys of any map member
-  def stringify_keys(nil), do: nil
-  def stringify_keys(map = %{}) do
+  defp stringify_keys(map = %{}) do
     map
     |> Enum.map(fn {k, v} -> {stringify_key(k), stringify_keys(v)} end)
     |> Enum.into(%{})
   end
-  def stringify_keys([head | rest]), do: [stringify_keys(head) | stringify_keys(rest)]
+  defp stringify_keys([head | rest]), do: [stringify_keys(head) | stringify_keys(rest)]
   # Default
-  def stringify_keys(not_a_map), do: not_a_map
+  defp stringify_keys(val), do: val
 
-  def stringify_key(k) when is_atom(k), do: Atom.to_string(k)
-  def stringify_key(k), do: k
-
+  defp stringify_key(k) when is_atom(k), do: Atom.to_string(k)
+  defp stringify_key(k), do: k
 end
