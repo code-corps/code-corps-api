@@ -1,10 +1,10 @@
-defmodule CodeCorps.StripeTesting.BankAccount do
-  def retrieve(id) do
+defmodule CodeCorps.StripeTesting.ExternalAccount do
+  def retrieve(id, _) do
     {:ok, bank_account(id)}
   end
 
   defp bank_account(id) do
-    %Stripe.BankAccount{
+    %Stripe.ExternalAccount{
       id: id,
       object: "bank_account",
       account: "acct_1032D82eZvKYlo2C",

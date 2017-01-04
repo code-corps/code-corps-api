@@ -3,7 +3,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeExternalAccountTestAdapter do
 
   import CodeCorps.StripeService.Adapters.StripeExternalAccountAdapter, only: [to_params: 1]
 
-  @stripe_connect_account %Stripe.BankAccount{
+  @stripe_connect_account %Stripe.ExternalAccount{
     id: "ba_19SSZG2eZvKYlo2CXnmzYU5H",
     object: "bank_account",
     account: "acct_1032D82eZvKYlo2C",

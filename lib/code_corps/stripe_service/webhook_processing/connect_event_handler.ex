@@ -16,7 +16,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.ConnectEventHandler do
   def handle_event(%{"type" => type} = attributes), do: do_handle(type, attributes)
 
   defp do_handle("account.updated", attributes), do: Events.AccountUpdated.handle(attributes)
-  defp do_handle("account.external_account.created", attributes), do: Events.ExternalAccountCreated.handle(attributes)
+  defp do_handle("account.external_account.created", attributes), do: Events.ConnectExternalAccountCreated.handle(attributes)
   defp do_handle("customer.subscription.deleted", attributes), do: Events.CustomerSubscriptionDeleted.handle(attributes)
   defp do_handle("customer.subscription.updated", attributes), do: Events.CustomerSubscriptionUpdated.handle(attributes)
   defp do_handle(_, _), do: {:ok, :unhandled_event}
