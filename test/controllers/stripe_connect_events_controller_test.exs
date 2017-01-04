@@ -1,7 +1,7 @@
 defmodule CodeCorps.StripeConnectEventsControllerTest do
   use CodeCorps.ConnCase
 
-  alias CodeCorps.{Project, StripeConnectAccount, StripeEvent, StripeExternalAccount}
+  alias CodeCorps.{Project, StripeConnectAccount, StripeEvent, StripeExternalAccount, StripeInvoice}
 
   setup do
     conn =
@@ -17,21 +17,28 @@ defmodule CodeCorps.StripeConnectEventsControllerTest do
     "transfers_enabled" => true
   }
 
+  @bank_account %{
+    "id" => "ba_19SSZG2eZvKYlo2CXnmzYU5H",
+    "account" => "acct_1032D82eZvKYlo2C"
+  }
+
+  @invoice %{
+    "charge" => "ch_123",
+    "customer" => "cus_123",
+    "id" => "in_123",
+    "subscription" => "sub_123"
+  }
+
   @subscription %{
     "customer" => "cus_123",
     "id" => "acct_123",
     "status" => "canceled"
   }
 
-  @bank_account %{
-    "id" => "ba_19SSZG2eZvKYlo2CXnmzYU5H",
-    "account" => "acct_1032D82eZvKYlo2C"
-  }
-
   defp event_for(object, type) do
     %{
       "api_version" => "2016-07-06",
-      "created" => 1326853478,
+      "created" => 1_326_853_478,
       "data" => %{
         "object" => object
       },
@@ -50,130 +57,13 @@ defmodule CodeCorps.StripeConnectEventsControllerTest do
   # used to have the test wait for or the children of a supervisor to exit
 
   defp wait_for_children(supervisor_ref) do
-    Task.Supervisor.children(supervisor_ref)
-    |> Enum.each(&wait_for_child/1)
+    supervisor_ref |> Task.Supervisor.children |> Enum.each(&wait_for_child/1)
   end
 
   defp wait_for_child(pid) do
     # Wait until the pid is dead
     ref = Process.monitor(pid)
     assert_receive {:DOWN, ^ref, _, _, _}
-  end
-
-  describe "account.updated" do
-    test "updates account when one matches", %{conn: conn} do
-      event = event_for(@account, "account.updated")
-      stripe_id =  @account["id"]
-
-      insert(:stripe_connect_account,
-        id_from_stripe: stripe_id,
-        transfers_enabled: false
-      )
-
-      path = stripe_connect_events_path(conn, :create)
-      assert conn |> post(path, event) |> response(200)
-
-      wait_for_supervisor
-
-      updated_account = Repo.get_by(StripeConnectAccount, id_from_stripe: stripe_id)
-      assert updated_account.transfers_enabled
-    end
-  end
-
-  describe "customer.subscription.updated" do
-    test "updates subscription when one matches", %{conn: conn} do
-      event = event_for(@subscription, "customer.subscription.updated")
-      stripe_id =  @subscription["id"]
-      connect_customer_id = @subscription["customer"]
-
-      project = insert(:project, total_monthly_donated: 1000)
-      account = insert(:stripe_connect_account)
-      platform_customer = insert(:stripe_platform_customer)
-
-      insert(:stripe_connect_customer,
-        id_from_stripe: connect_customer_id,
-        stripe_connect_account: account,
-        stripe_platform_customer: platform_customer)
-
-      plan = insert(:stripe_connect_plan, project: project)
-
-      insert(:stripe_connect_subscription,
-        id_from_stripe: stripe_id,
-        stripe_connect_plan: plan)
-
-      path = stripe_connect_events_path(conn, :create)
-      assert conn |> post(path, event) |> response(200)
-
-      wait_for_supervisor
-
-      updated_project = Repo.get_by(Project, id: project.id)
-      assert updated_project.total_monthly_donated == 0
-    end
-  end
-
-  describe "customer.subscription.deleted" do
-    test "sets subscription to inactive when one matches", %{conn: conn} do
-      event = event_for(@subscription, "customer.subscription.deleted")
-      stripe_id =  @subscription["id"]
-      connect_customer_id = @subscription["customer"]
-
-      project = insert(:project, total_monthly_donated: 1000)
-      account = insert(:stripe_connect_account)
-      platform_customer = insert(:stripe_platform_customer)
-
-      insert(:stripe_connect_customer,
-        id_from_stripe: connect_customer_id,
-        stripe_connect_account: account,
-        stripe_platform_customer: platform_customer)
-
-      plan = insert(:stripe_connect_plan, project: project)
-
-      insert(:stripe_connect_subscription,
-        id_from_stripe: stripe_id,
-        stripe_connect_plan: plan)
-
-      path = stripe_connect_events_path(conn, :create)
-      assert conn |> post(path, event) |> response(200)
-
-      wait_for_supervisor
-
-      updated_project = Repo.get_by(Project, id: project.id)
-      assert updated_project.total_monthly_donated == 0
-    end
-  end
-
-  describe "account.external_account.created" do
-    test "creates an external account record, using stripe params", %{conn: conn} do
-      event = event_for(@bank_account, "account.external_account.created")
-      path = stripe_connect_events_path(conn, :create)
-
-      # we expect the event to be associated with an account, so it must be created
-      insert(:stripe_connect_account, id_from_stripe: @bank_account["account"])
-
-      assert conn |> post(path, event) |> response(200)
-
-      wait_for_supervisor
-
-      event = Repo.one(StripeEvent)
-      assert event.status == "processed"
-
-      created_account = Repo.one(StripeExternalAccount)
-      assert created_account
-    end
-
-    test "errors out event if no associated connect account", %{conn: conn} do
-      event = event_for(@bank_account, "account.external_account.created")
-      path = stripe_connect_events_path(conn, :create)
-
-      assert conn |> post(path, event) |> response(200)
-
-      wait_for_supervisor
-
-      event = Repo.one(StripeEvent)
-      assert event.status == "errored"
-
-      assert [] == Repo.all(StripeExternalAccount)
-    end
   end
 
   describe "any event" do
@@ -284,6 +174,148 @@ defmodule CodeCorps.StripeConnectEventsControllerTest do
 
       record = StripeEvent |> Repo.one
       assert record.status == "processing"
+    end
+  end
+
+  describe "account.external_account.created" do
+    test "creates an external account record, using stripe params", %{conn: conn} do
+      event = event_for(@bank_account, "account.external_account.created")
+      path = stripe_connect_events_path(conn, :create)
+
+      # we expect the event to be associated with an account, so it must be created
+      insert(:stripe_connect_account, id_from_stripe: @bank_account["account"])
+
+      assert conn |> post(path, event) |> response(200)
+
+      wait_for_supervisor
+
+      event = Repo.one(StripeEvent)
+      assert event.status == "processed"
+
+      created_account = Repo.one(StripeExternalAccount)
+      assert created_account
+    end
+
+    test "errors out event if no associated connect account", %{conn: conn} do
+      event = event_for(@bank_account, "account.external_account.created")
+      path = stripe_connect_events_path(conn, :create)
+
+      assert conn |> post(path, event) |> response(200)
+
+      wait_for_supervisor
+
+      event = Repo.one(StripeEvent)
+      assert event.status == "errored"
+
+      assert [] == Repo.all(StripeExternalAccount)
+    end
+  end
+
+  describe "account.updated" do
+    test "updates account when one matches", %{conn: conn} do
+      event = event_for(@account, "account.updated")
+      stripe_id =  @account["id"]
+
+      insert(:stripe_connect_account,
+        id_from_stripe: stripe_id,
+        transfers_enabled: false
+      )
+
+      path = stripe_connect_events_path(conn, :create)
+      assert conn |> post(path, event) |> response(200)
+
+      wait_for_supervisor
+
+      updated_account = Repo.get_by(StripeConnectAccount, id_from_stripe: stripe_id)
+      assert updated_account.transfers_enabled
+    end
+  end
+
+  describe "customer.subscription.updated" do
+    test "updates subscription when one matches", %{conn: conn} do
+      event = event_for(@subscription, "customer.subscription.updated")
+      stripe_id =  @subscription["id"]
+      connect_customer_id = @subscription["customer"]
+
+      project = insert(:project, total_monthly_donated: 1000)
+      account = insert(:stripe_connect_account)
+      platform_customer = insert(:stripe_platform_customer)
+
+      insert(:stripe_connect_customer,
+        id_from_stripe: connect_customer_id,
+        stripe_connect_account: account,
+        stripe_platform_customer: platform_customer)
+
+      plan = insert(:stripe_connect_plan, project: project)
+
+      insert(:stripe_connect_subscription,
+        id_from_stripe: stripe_id,
+        stripe_connect_plan: plan)
+
+      path = stripe_connect_events_path(conn, :create)
+      assert conn |> post(path, event) |> response(200)
+
+      wait_for_supervisor
+
+      updated_project = Repo.get_by(Project, id: project.id)
+      assert updated_project.total_monthly_donated == 0
+    end
+  end
+
+  describe "customer.subscription.deleted" do
+    test "sets subscription to inactive when one matches", %{conn: conn} do
+      event = event_for(@subscription, "customer.subscription.deleted")
+      stripe_id =  @subscription["id"]
+      connect_customer_id = @subscription["customer"]
+
+      project = insert(:project, total_monthly_donated: 1000)
+      account = insert(:stripe_connect_account)
+      platform_customer = insert(:stripe_platform_customer)
+
+      insert(:stripe_connect_customer,
+        id_from_stripe: connect_customer_id,
+        stripe_connect_account: account,
+        stripe_platform_customer: platform_customer)
+
+      plan = insert(:stripe_connect_plan, project: project)
+
+      insert(:stripe_connect_subscription,
+        id_from_stripe: stripe_id,
+        stripe_connect_plan: plan)
+
+      path = stripe_connect_events_path(conn, :create)
+      assert conn |> post(path, event) |> response(200)
+
+      wait_for_supervisor
+
+      updated_project = Repo.get_by(Project, id: project.id)
+      assert updated_project.total_monthly_donated == 0
+    end
+  end
+
+  describe "invoice.payment_succeeded" do
+    test "sets subscription to inactive when one matches", %{conn: conn} do
+      event = event_for(@invoice, "invoice.payment_succeeded")
+      stripe_id =  @invoice["id"]
+      connect_customer_id = @invoice["customer"]
+      connect_subscription_id = @invoice["subscription"]
+
+      user = insert(:user)
+      insert(:stripe_connect_subscription, id_from_stripe: connect_subscription_id)
+      stripe_platform_customer = insert(:stripe_platform_customer, user: user)
+      insert(:stripe_connect_customer,
+        id_from_stripe: connect_customer_id,
+        stripe_platform_customer: stripe_platform_customer,
+        user: user
+      )
+
+      path = stripe_connect_events_path(conn, :create)
+      assert conn |> post(path, event) |> response(200)
+
+      wait_for_supervisor
+
+      invoice = Repo.one(StripeInvoice)
+      assert invoice.id_from_stripe == stripe_id
     end
   end
 end

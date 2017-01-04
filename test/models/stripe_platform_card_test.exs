@@ -37,7 +37,7 @@ defmodule CodeCorps.StripePlatformCardTest do
     test "ensures associations link to records that exist" do
       attrs =  @valid_attrs |> Map.merge(%{user_id: -1})
 
-      { result, changeset } =
+      {result, changeset} =
         StripePlatformCard.create_changeset(%StripePlatformCard{}, attrs)
         |> Repo.insert
 

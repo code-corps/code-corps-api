@@ -77,7 +77,7 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
          platform_customer <- user.stripe_platform_customer,
          connect_account <- project.organization.stripe_connect_account,
          plan <- project.stripe_connect_plan,
-         {:ok, connect_customer} <- StripeConnectCustomerService.find_or_create(platform_customer, connect_account),
+         {:ok, connect_customer} <- StripeConnectCustomerService.find_or_create(platform_customer, connect_account, user),
          {:ok, connect_card} <- StripeConnectCardService.find_or_create(platform_card, connect_customer, platform_customer, connect_account),
          create_attributes <- to_create_attributes(connect_card, connect_customer, plan, attributes),
          {:ok, subscription} <- @api.Subscription.create(create_attributes, connect_account: connect_account.id_from_stripe),

@@ -13,7 +13,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectCustomerAdapter do
     {:ok, result}
   end
 
-  @non_stripe_attributes ["stripe_connect_account_id", "stripe_platform_customer_id"]
+  @non_stripe_attributes ["stripe_connect_account_id", "stripe_platform_customer_id", "user_id"]
 
   defp add_non_stripe_attributes(%{} = params, %{} = attributes) do
     attributes

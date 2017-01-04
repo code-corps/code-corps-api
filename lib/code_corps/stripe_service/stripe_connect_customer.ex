@@ -1,21 +1,18 @@
 defmodule CodeCorps.StripeService.StripeConnectCustomerService do
-  alias CodeCorps.Repo
   alias CodeCorps.StripeService.Adapters.StripeConnectCustomerAdapter
-  alias CodeCorps.StripeConnectAccount
-  alias CodeCorps.StripeConnectCustomer
-  alias CodeCorps.StripePlatformCustomer
+  alias CodeCorps.{Repo, StripeConnectAccount, StripeConnectCustomer, StripePlatformCustomer, User}
 
   import CodeCorps.MapUtils, only: [rename: 3, keys_to_string: 1]
   import Ecto.Query # needed for match
 
   @api Application.get_env(:code_corps, :stripe)
 
-  def find_or_create(%StripePlatformCustomer{} = platform_customer, %StripeConnectAccount{} = connect_account) do
+  def find_or_create(%StripePlatformCustomer{} = platform_customer, %StripeConnectAccount{} = connect_account, %User{} = user) do
     case get_from_db(connect_account.id, platform_customer.id) do
       %StripeConnectCustomer{} = existing_customer ->
         {:ok, existing_customer}
       nil ->
-        create(platform_customer, connect_account)
+        create(platform_customer, connect_account, user)
     end
   end
 
@@ -23,8 +20,8 @@ defmodule CodeCorps.StripeService.StripeConnectCustomerService do
     @api.Customer.update(id_from_stripe, attributes, connect_account: connect_account.id_from_stripe)
   end
 
-  defp create(%StripePlatformCustomer{} = platform_customer, %StripeConnectAccount{} = connect_account) do
-    attributes = platform_customer |> create_non_stripe_attributes(connect_account)
+  defp create(%StripePlatformCustomer{} = platform_customer, %StripeConnectAccount{} = connect_account, %User{} = user) do
+    attributes = create_non_stripe_attributes(platform_customer, connect_account, user)
     stripe_attributes = create_stripe_attributes(platform_customer)
 
     with {:ok, customer} <-
@@ -45,12 +42,13 @@ defmodule CodeCorps.StripeService.StripeConnectCustomerService do
     |> Repo.one
   end
 
-  defp create_non_stripe_attributes(platform_customer, connect_account) do
+  defp create_non_stripe_attributes(platform_customer, connect_account, user) do
     platform_customer
     |> Map.from_struct
     |> Map.take([:id])
     |> rename(:id, :stripe_platform_customer_id)
     |> Map.put(:stripe_connect_account_id, connect_account.id)
+    |> Map.put(:user_id, user.id)
     |> keys_to_string
   end
 

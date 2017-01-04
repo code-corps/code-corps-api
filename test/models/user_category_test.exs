@@ -33,7 +33,7 @@ defmodule CodeCorps.UserCategoryTest do
       user_id = -1
       category_id = insert(:category).id
 
-      { result, changeset } =
+      {result, changeset} =
         UserCategory.create_changeset(%UserCategory{}, %{user_id: user_id, category_id: category_id})
         |> Repo.insert
 
@@ -46,7 +46,7 @@ defmodule CodeCorps.UserCategoryTest do
       user_id = insert(:user).id
       category_id = -1
 
-      { result, changeset } =
+      {result, changeset} =
         UserCategory.create_changeset(%UserCategory{}, %{user_id: user_id, category_id: category_id})
         |> Repo.insert
 
