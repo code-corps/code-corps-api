@@ -71,6 +71,7 @@ defmodule CodeCorps.StripeConnectAccount do
     field :verification_fields_needed, {:array, :string}, default: []
 
     belongs_to :organization, CodeCorps.Organization
+    has_one :stripe_external_account, CodeCorps.StripeExternalAccount
 
     timestamps()
   end

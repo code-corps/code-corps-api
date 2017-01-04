@@ -147,6 +147,9 @@ defmodule CodeCorps.StripeConnectEventsControllerTest do
       event = event_for(@bank_account, "account.external_account.created")
       path = stripe_connect_events_path(conn, :create)
 
+      # we expect the event to be associated with an account, so it must be created
+      insert(:stripe_connect_account, id_from_stripe: @bank_account["account"])
+
       assert conn |> post(path, event) |> response(200)
 
       wait_for_supervisor
@@ -156,6 +159,20 @@ defmodule CodeCorps.StripeConnectEventsControllerTest do
 
       created_account = Repo.one(StripeExternalAccount)
       assert created_account
+    end
+
+    test "errors out event if no associated connect account", %{conn: conn} do
+      event = event_for(@bank_account, "account.external_account.created")
+      path = stripe_connect_events_path(conn, :create)
+
+      assert conn |> post(path, event) |> response(200)
+
+      wait_for_supervisor
+
+      event = Repo.one(StripeEvent)
+      assert event.status == "errored"
+
+      assert [] == Repo.all(StripeExternalAccount)
     end
   end
 
