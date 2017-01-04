@@ -6,9 +6,10 @@ defmodule CodeCorps.StripeConnectAccountView do
   alias CodeCorps.StripeConnectAccount
 
   attributes [
-    :bank_account_status,
+    :bank_account_bank_name,
     :bank_account_last4,
     :bank_account_routing_number,
+    :bank_account_status,
     :business_name,
     :business_url,
     :can_accept_donations,
@@ -76,6 +77,9 @@ defmodule CodeCorps.StripeConnectAccountView do
       _ -> true
     end
   end
+
+  def bank_account_bank_name(%{stripe_external_account: nil}, _conn), do: nil
+  def bank_account_bank_name(%{stripe_external_account: %{bank_name: bank_name}}, _conn), do: bank_name
 
   def bank_account_last4(%{stripe_external_account: nil}, _conn), do: nil
   def bank_account_last4(%{stripe_external_account: %{last4: last4}}, _conn), do: last4

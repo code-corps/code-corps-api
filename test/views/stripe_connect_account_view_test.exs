@@ -12,15 +12,22 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
       verification_disabled_reason: "fields_needed",
       verification_fields_needed: ["legal_entity.first_name", "legal_entity.last_name"]
     )
+    insert(:stripe_external_account,
+      stripe_connect_account: account,
+      bank_name: "Wells Fargo",
+      last4: "1234",
+      routing_number: "123456789"
+    )
 
     rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
 
     expected_json = %{
       "data" => %{
         "attributes" => %{
+          "bank-account-bank-name" => "Wells Fargo",
+          "bank-account-last4" => "1234",
+          "bank-account-routing-number" => "123456789",
           "bank-account-status" => "pending_requirement",
-          "bank-account-last4" => nil,
-          "bank-account-routing-number" => nil,
           "business-name" => account.business_name,
           "business-url" => account.business_url,
           "can-accept-donations" => true,
