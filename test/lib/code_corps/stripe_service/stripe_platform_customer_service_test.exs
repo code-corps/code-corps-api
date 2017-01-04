@@ -1,4 +1,6 @@
 defmodule CodeCorps.StripeService.StripePlatformCustomerServiceTest do
+  @moduledoc false
+  
   use CodeCorps.ModelCase
 
   alias CodeCorps.StripePlatformCustomer

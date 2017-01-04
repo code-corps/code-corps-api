@@ -1,11 +1,13 @@
 defmodule CodeCorps.StripeConnectAccountTest do
+  @moduledoc false
+
   use CodeCorps.ModelCase
 
   alias CodeCorps.StripeConnectAccount
 
   @valid_attrs %{
     id_from_stripe: "abc123",
-    tos_acceptance_date: 1234567
+    tos_acceptance_date: 1_234_567
   }
 
   @invalid_attrs %{}
@@ -31,8 +33,9 @@ defmodule CodeCorps.StripeConnectAccountTest do
     test "ensures associations link to records that exist" do
       attrs =  @valid_attrs |> Map.merge(%{organization_id: -1})
 
-      { :error, changeset } =
-        StripeConnectAccount.create_changeset(%StripeConnectAccount{}, attrs)
+      {:error, changeset} =
+        %StripeConnectAccount{}
+        |> StripeConnectAccount.create_changeset(attrs)
         |> Repo.insert
 
       refute changeset.valid?
@@ -48,8 +51,9 @@ defmodule CodeCorps.StripeConnectAccountTest do
       }
       attrs =  @valid_attrs |> Map.merge(map)
 
-      { :ok, record } =
-        StripeConnectAccount.create_changeset(%StripeConnectAccount{}, attrs)
+      {:ok, record} =
+        %StripeConnectAccount{}
+        |> StripeConnectAccount.create_changeset(attrs)
         |> Repo.insert
 
       assert record.verification_fields_needed == list

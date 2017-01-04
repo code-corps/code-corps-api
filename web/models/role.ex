@@ -1,4 +1,10 @@
 defmodule CodeCorps.Role do
+  @moduledoc """
+  This module defines a "role" on Code Corps.
+
+  Examples of roles are "Backend Developer" and "Front End Developer".
+  """
+
   use CodeCorps.Web, :model
 
   schema "roles" do
