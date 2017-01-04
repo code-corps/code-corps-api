@@ -30,7 +30,10 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTestAdapter do
         state: nil
       },
       business_name: nil,
-      business_tax_id_provided: false,
+      business_tax_id: "000000000",
+      business_tax_id_provided: true,
+      business_vat_id: "000000000",
+      business_vat_id_provided: true,
       dob: %{
         day: nil,
         month: nil,
@@ -104,8 +107,10 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTestAdapter do
     "legal_entity_address_state" => nil,
 
     "legal_entity_business_name" => nil,
-    "legal_entity_business_tax_id_provided" => false,
-    "legal_entity_business_vat_id_provided" => nil,
+    "legal_entity_business_tax_id" => "000000000",
+    "legal_entity_business_tax_id_provided" => true,
+    "legal_entity_business_vat_id" => "000000000",
+    "legal_entity_business_vat_id_provided" => true,
 
     "legal_entity_dob_day" => nil,
     "legal_entity_dob_month" => nil,
