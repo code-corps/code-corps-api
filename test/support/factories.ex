@@ -153,10 +153,17 @@ defmodule CodeCorps.Factories do
 
   def stripe_event_factory do
     %CodeCorps.StripeEvent{
-    endpoint: sequence(:endpoint, fn(_) -> Enum.random(~w{ connect platform }) end),
+      endpoint: sequence(:endpoint, fn(_) -> Enum.random(~w{ connect platform }) end),
       id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
       status: sequence(:status, fn(_) -> Enum.random(~w{ unprocessed processed errored }) end),
       type: "test.type"
+    }
+  end
+
+  def stripe_external_account_factory do
+    %CodeCorps.StripeExternalAccount{
+      account_id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}")
     }
   end
 

@@ -7,13 +7,14 @@ defmodule CodeCorps.StripeService.Adapters.StripeExternalAccountAdapter do
     :routing_number, :status
   ]
 
-  def to_params(%Stripe.ExternalAccount{} = bank_account) do
+  def to_params(%Stripe.ExternalAccount{} = bank_account, stripe_connect_account_id \\ nil) do
     params =
       bank_account
       |> Map.from_struct
       |> Map.take(@stripe_attributes)
       |> rename(:id, :id_from_stripe)
       |> rename(:account, :account_id_from_stripe)
+      |> Map.put(:stripe_connect_account_id, stripe_connect_account_id)
 
     {:ok, params}
   end

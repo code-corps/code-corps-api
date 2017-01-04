@@ -3,7 +3,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeExternalAccountTestAdapter do
 
   import CodeCorps.StripeService.Adapters.StripeExternalAccountAdapter, only: [to_params: 1]
 
-  @stripe_connect_account %Stripe.ExternalAccount{
+  @stripe_external_account %Stripe.ExternalAccount{
     id: "ba_19SSZG2eZvKYlo2CXnmzYU5H",
     object: "bank_account",
     account: "acct_1032D82eZvKYlo2C",
@@ -32,12 +32,13 @@ defmodule CodeCorps.StripeService.Adapters.StripeExternalAccountTestAdapter do
     fingerprint: "1JWtPxqbdX5Gamtc",
     last4: "6789",
     routing_number: "110000000",
-    status: "new"
+    status: "new",
+    stripe_connect_account_id: nil
   }
 
   describe "to_params/2" do
     test "converts from stripe map to local properly" do
-      {:ok, result} = to_params(@stripe_connect_account)
+      {:ok, result} = to_params(@stripe_external_account)
       assert result == @local_map
     end
   end

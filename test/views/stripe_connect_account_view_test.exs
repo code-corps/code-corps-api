@@ -12,12 +12,21 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
       verification_disabled_reason: "fields_needed",
       verification_fields_needed: ["legal_entity.first_name", "legal_entity.last_name"]
     )
+    insert(:stripe_external_account,
+      stripe_connect_account: account,
+      bank_name: "Wells Fargo",
+      last4: "1234",
+      routing_number: "123456789"
+    )
 
     rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
 
     expected_json = %{
       "data" => %{
         "attributes" => %{
+          "bank-account-bank-name" => "Wells Fargo",
+          "bank-account-last4" => "1234",
+          "bank-account-routing-number" => "123456789",
           "bank-account-status" => "pending_requirement",
           "business-name" => account.business_name,
           "business-url" => account.business_url,
@@ -306,6 +315,18 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
         verification_fields_needed: [])
       rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["bank-account-status"] == "verified"
+    end
+  end
+
+  describe "external account fields" do
+    test "render if there is an associated external account" do
+      account = insert(:stripe_connect_account)
+      insert(:stripe_external_account, last4: "ABCD", routing_number: "123456", stripe_connect_account: account)
+
+      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+
+      assert rendered_json["data"]["attributes"]["bank-account-last4"] == "ABCD"
+      assert rendered_json["data"]["attributes"]["bank-account-routing-number"] == "123456"
     end
   end
 end
