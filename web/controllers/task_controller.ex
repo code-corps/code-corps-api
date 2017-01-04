@@ -14,30 +14,17 @@ defmodule CodeCorps.TaskController do
   plug JaResource
 
   def handle_index(conn, params) do
-    page = Task
-    |> project_filter(params)
-    |> task_list_filter(params)
-    |> task_type_filter(params)
-    |> task_status_filter(params)
-    |> sort_by_order
-    |> Repo.paginate(params["page"] || %{})
-
-    # TODO: Once we are able to more easily add top-level meta
-    # from within ja_resource or ja_serializer
-    # we can split up all of this into
-    # handle_index
-    # handle_index_query
-    # serialization_opts
-
-    meta = %{
-      current_page: page.page_number,
-      page_size: page.page_size,
-      total_pages: page.total_pages,
-      total_records: page.total_entries
-    }
+    tasks =
+      Task
+      |> project_filter(params)
+      |> task_list_filter(params)
+      |> task_type_filter(params)
+      |> task_status_filter(params)
+      |> sort_by_order
+      |> Repo.all
 
     conn
-    |> render("index.json-api", data: page, opts: [meta: meta])
+    |> render("index.json-api", data: tasks)
   end
 
   def record(%Plug.Conn{params: %{"project_id" => _project_id} = params}, _number_as_id) do
