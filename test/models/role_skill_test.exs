@@ -33,7 +33,7 @@ defmodule CodeCorps.RoleSkillTest do
     role_id = -1
     skill_id = insert(:skill).id
 
-    { result, changeset } =
+    {result, changeset} =
       RoleSkill.changeset(%RoleSkill{}, %{role_id: role_id, skill_id: skill_id})
       |> Repo.insert
 
@@ -46,7 +46,7 @@ defmodule CodeCorps.RoleSkillTest do
     role_id = insert(:role).id
     skill_id = -1
 
-    { result, changeset } =
+    {result, changeset} =
       RoleSkill.changeset(%RoleSkill{}, %{role_id: role_id, skill_id: skill_id})
       |> Repo.insert
 

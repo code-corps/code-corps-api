@@ -29,7 +29,7 @@ defmodule CodeCorps.StripeConnectPlanTest do
     test "ensures associations link to records that exist" do
       attrs =  @valid_attrs |> Map.merge(%{project_id: -1})
 
-      { result, changeset } =
+      {result, changeset} =
         StripeConnectPlan.create_changeset(%StripeConnectPlan{}, attrs)
         |> Repo.insert
 

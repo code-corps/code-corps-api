@@ -33,7 +33,7 @@ defmodule CodeCorps.UserRoleTest do
     user_id = -1
     role_id = insert(:role).id
 
-    { result, changeset } =
+    {result, changeset} =
       UserRole.create_changeset(%UserRole{}, %{user_id: user_id, role_id: role_id})
       |> Repo.insert
 
@@ -46,7 +46,7 @@ defmodule CodeCorps.UserRoleTest do
     user_id = insert(:user).id
     role_id = -1
 
-    { result, changeset } =
+    {result, changeset} =
       UserRole.create_changeset(%UserRole{}, %{user_id: user_id, role_id: role_id})
       |> Repo.insert
 

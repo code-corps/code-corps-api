@@ -65,7 +65,7 @@ defmodule CodeCorps.OrganizationMembershipTest do
     test "changeset ensures member and organization actually exist" do
       changeset = OrganizationMembership.create_changeset(%OrganizationMembership{}, @valid_attrs)
 
-      { result, changeset } = changeset |> Repo.insert
+      {result, changeset} = changeset |> Repo.insert
 
       assert result == :error
       changeset |> assert_error_message(:organization, "does not exist")
@@ -75,7 +75,7 @@ defmodule CodeCorps.OrganizationMembershipTest do
       attrs = Map.merge(@valid_attrs, %{organization_id: organization.id})
       changeset = OrganizationMembership.create_changeset(%OrganizationMembership{}, attrs)
 
-      { result, changeset } = changeset |> Repo.insert
+      {result, changeset} = changeset |> Repo.insert
 
       assert result == :error
       changeset |> assert_error_message(:member, "does not exist")

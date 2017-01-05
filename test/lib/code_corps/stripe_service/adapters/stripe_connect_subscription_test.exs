@@ -1,4 +1,4 @@
-defmodule CodeCorps.StripeService.Adapters.StripeConnectSubscriptionTestAdapter do
+defmodule CodeCorps.StripeService.Adapters.StripeConnectSubscriptionTest do
   use ExUnit.Case, async: true
 
   import CodeCorps.StripeService.Adapters.StripeConnectSubscriptionAdapter, only: [to_params: 2]

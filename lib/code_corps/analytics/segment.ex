@@ -15,13 +15,7 @@ defmodule CodeCorps.Analytics.Segment do
   ```
   """
 
-  alias CodeCorps.Comment
-  alias CodeCorps.OrganizationMembership
-  alias CodeCorps.Task
-  alias CodeCorps.User
-  alias CodeCorps.UserCategory
-  alias CodeCorps.UserRole
-  alias CodeCorps.UserSkill
+  alias CodeCorps.{Comment, OrganizationMembership, StripeInvoice, Task, User, UserCategory, UserRole, UserSkill}
   alias Ecto.Changeset
 
   @api Application.get_env(:code_corps, :analytics)
@@ -37,6 +31,7 @@ defmodule CodeCorps.Analytics.Segment do
   end
   def get_event_name(:created, %OrganizationMembership{}), do: "Requested Organization Membership"
   def get_event_name(:edited, %OrganizationMembership{}), do: "Approved Organization Membership"
+  def get_event_name(:payment_succeeded, %StripeInvoice{}), do: "Processed Subscription Payment"
   def get_event_name(:created, %UserCategory{}), do: "Added User Category"
   def get_event_name(:created, %UserSkill{}), do: "Added User Skill"
   def get_event_name(:created, %UserRole{}), do: "Added User Role"
@@ -61,13 +56,16 @@ defmodule CodeCorps.Analytics.Segment do
   def track({:ok, record}, action, %Plug.Conn{} = conn) when action in @actions_without_properties do
     action_name = get_event_name(action, record)
     do_track(conn, action_name)
-
     {:ok, record}
   end
   def track({:ok, record}, action, %Plug.Conn{} = conn) do
     action_name = get_event_name(action, record)
     do_track(conn, action_name, properties(record))
-
+    {:ok, record}
+  end
+  def track({:ok, %{user_id: user_id} = record}, action, nil) do
+    action_name = get_event_name(action, record)
+    do_track(user_id, action_name, properties(record))
     {:ok, record}
   end
   def track({:error, %Changeset{} = changeset}, _action, _conn), do: {:error, changeset}
@@ -98,14 +96,13 @@ defmodule CodeCorps.Analytics.Segment do
     |> Enum.join(" ")
   end
 
-  defp do_track(conn, event_name, properties) do
+  defp do_track(conn_or_user, event_name, properties \\ %{})
+  defp do_track(%Plug.Conn{} = conn, event_name, properties) do
     @api.track(conn.assigns[:current_user].id, event_name, properties)
     conn
   end
-
-  defp do_track(conn, event_name) do
-    @api.track(conn.assigns[:current_user].id, event_name, %{})
-    conn
+  defp do_track(user_id, event_name, properties) do
+    @api.track(user_id, event_name, properties)
   end
 
   defp properties(comment = %Comment{}) do
@@ -123,6 +120,17 @@ defmodule CodeCorps.Analytics.Segment do
     %{
       organization: organization_membership.organization.name,
       organization_id: organization_membership.organization.id
+    }
+  end
+  defp properties(invoice = %StripeInvoice{}) do
+    revenue = invoice.total / 100 # TODO: this only works for some currencies
+    currency = String.capitalize(invoice.currency) # ISO 4127 format
+
+    %{
+      currency: currency,
+      invoice_id: invoice.id,
+      revenue: revenue,
+      user_id: invoice.user_id
     }
   end
   defp properties(task = %Task{}) do
@@ -154,9 +162,11 @@ defmodule CodeCorps.Analytics.Segment do
       skill_id: user_skill.skill.id
     }
   end
+
   defp properties(_struct) do
     %{}
   end
+
 
   defp traits(user) do
     %{

@@ -1,4 +1,4 @@
-defmodule CodeCorps.StripeService.Adapters.StripePlatformCardTestAdapter do
+defmodule CodeCorps.StripeService.Adapters.StripePlatformCardTest do
   use ExUnit.Case, async: true
 
   import CodeCorps.StripeService.Adapters.StripePlatformCardAdapter, only: [to_params: 2]

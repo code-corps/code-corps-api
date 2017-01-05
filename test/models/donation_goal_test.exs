@@ -15,7 +15,7 @@ defmodule CodeCorps.DonationGoalTest do
 
     test "ensures project with specified id actually exists" do
       attrs = %{amount: 100, description: "Bar", project_id: -1}
-      { result, changeset } =
+      {result, changeset} =
         DonationGoal.create_changeset(%DonationGoal{}, attrs)
         |> Repo.insert
 

@@ -33,7 +33,7 @@ defmodule CodeCorps.ProjectCategoryTest do
     project_id = -1
     category_id = insert(:category).id
 
-    { result, changeset } =
+    {result, changeset} =
       ProjectCategory.create_changeset(%ProjectCategory{}, %{project_id: project_id, category_id: category_id})
       |> Repo.insert
 
@@ -46,7 +46,7 @@ defmodule CodeCorps.ProjectCategoryTest do
     project_id = insert(:project).id
     category_id = -1
 
-    { result, changeset } =
+    {result, changeset} =
       ProjectCategory.create_changeset(%ProjectCategory{}, %{project_id: project_id, category_id: category_id})
       |> Repo.insert
 

@@ -1,4 +1,4 @@
-defmodule CodeCorps.StripeService.Adapters.StripeExternalAccountTestAdapter do
+defmodule CodeCorps.StripeService.Adapters.StripeExternalAccountTest do
   use ExUnit.Case, async: true
 
   import CodeCorps.StripeService.Adapters.StripeExternalAccountAdapter, only: [to_params: 1]

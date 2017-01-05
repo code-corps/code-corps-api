@@ -1,4 +1,4 @@
-defmodule CodeCorps.StripeService.Adapters.StripePlatformCustomerTestAdapter do
+defmodule CodeCorps.StripeService.Adapters.StripePlatformCustomerTest do
   use ExUnit.Case, async: true
 
   import CodeCorps.StripeService.Adapters.StripePlatformCustomerAdapter, only: [to_params: 2]

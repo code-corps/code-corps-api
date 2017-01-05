@@ -33,7 +33,7 @@ defmodule CodeCorps.ProjectSkillTest do
     project_id = -1
     skill_id = insert(:skill).id
 
-    { result, changeset } =
+    {result, changeset} =
       ProjectSkill.create_changeset(%ProjectSkill{}, %{project_id: project_id, skill_id: skill_id})
       |> Repo.insert
 
@@ -46,7 +46,7 @@ defmodule CodeCorps.ProjectSkillTest do
     project_id = insert(:project).id
     skill_id = -1
 
-    { result, changeset } =
+    {result, changeset} =
       ProjectSkill.create_changeset(%ProjectSkill{}, %{project_id: project_id, skill_id: skill_id})
       |> Repo.insert
 

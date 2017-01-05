@@ -37,7 +37,7 @@ defmodule CodeCorps.StripeConnectSubscriptionTest do
       user_id = insert(:user).id
       attrs =  @valid_attrs |> Map.merge(%{stripe_connect_plan_id: -1, user_id: user_id})
 
-      { result, changeset } =
+      {result, changeset} =
         StripeConnectSubscription.create_changeset(%StripeConnectSubscription{}, attrs)
         |> Repo.insert
 
@@ -50,7 +50,7 @@ defmodule CodeCorps.StripeConnectSubscriptionTest do
       stripe_connect_plan_id = insert(:stripe_connect_plan).id
       attrs =  @valid_attrs |> Map.merge(%{stripe_connect_plan_id: stripe_connect_plan_id, user_id: -1})
 
-      { result, changeset } =
+      {result, changeset} =
         StripeConnectSubscription.create_changeset(%StripeConnectSubscription{}, attrs)
         |> Repo.insert
 

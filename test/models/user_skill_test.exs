@@ -33,7 +33,7 @@ defmodule CodeCorps.UserSkillTest do
     user_id = -1
     skill_id = insert(:skill).id
 
-    { result, changeset } =
+    {result, changeset} =
       UserSkill.create_changeset(%UserSkill{}, %{user_id: user_id, skill_id: skill_id})
       |> Repo.insert
 
@@ -46,7 +46,7 @@ defmodule CodeCorps.UserSkillTest do
     user_id = insert(:user).id
     skill_id = -1
 
-    { result, changeset } =
+    {result, changeset} =
       UserSkill.create_changeset(%UserSkill{}, %{user_id: user_id, skill_id: skill_id})
       |> Repo.insert
 
