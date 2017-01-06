@@ -3,7 +3,7 @@ defmodule CodeCorps.TaskListView do
   use CodeCorps.Web, :view
   use JaSerializer.PhoenixView
 
-  attributes [:name, :order, :inserted_at, :updated_at]
+  attributes [:inbox, :name, :order, :inserted_at, :updated_at]
 
   has_one :project, serializer: CodeCorps.ProjectView
 
