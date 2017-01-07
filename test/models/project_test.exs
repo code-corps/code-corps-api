@@ -62,6 +62,21 @@ defmodule CodeCorps.ProjectTest do
       changeset = Project.create_changeset(%Project{}, %{organization_id: 1})
       assert {:ok, 1} == changeset |> fetch_change(:organization_id)
     end
+
+    test "associates the ordered default task lists to the project" do
+      organization = insert(:organization)
+      changeset = Project.create_changeset(
+        %Project{},
+        %{organization_id: organization.id, title: "Title"}
+      )
+
+      {_, project} = Repo.insert(changeset)
+
+      task_list_orders = for task_list <- project.task_lists, do: task_list.order
+
+      assert Enum.all?(task_list_orders), "some of the orders are not set (nil)"
+      assert task_list_orders == Enum.sort(task_list_orders), "task lists order does not correspond to their position"
+    end
   end
 
   describe "update_changeset/2" do
