@@ -62,6 +62,17 @@ defmodule CodeCorps.ProjectTest do
       changeset = Project.create_changeset(%Project{}, %{organization_id: 1})
       assert {:ok, 1} == changeset |> fetch_change(:organization_id)
     end
+
+    test "associates the default task lists to the project" do
+      organization = insert(:organization)
+      changeset = Project.create_changeset(%Project{}, %{organization_id: organization.id, title: "Title"})
+
+      {_, project} = Repo.insert(changeset)
+
+      orders = for task_list <- project.task_lists do; task_list.order; end
+
+      assert orders == [1, 2, 3, 4]
+    end
   end
 
   describe "update_changeset/2" do
