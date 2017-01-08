@@ -16,7 +16,7 @@ defmodule CodeCorps.TaskList do
   end
 
   def default_task_lists() do
-    task_list_data = [
+    [
       %{
         name: "Inbox",
         position: 1
@@ -30,11 +30,7 @@ defmodule CodeCorps.TaskList do
         name: "Done",
         position: 4
       }
-    ]
-
-    for task_list <- task_list_data do
-      TaskList.changeset(%TaskList{}, task_list)
-    end
+    ] |> Enum.map(fn (params) -> changeset(%TaskList{}, params) end)
   end
 
   @doc """
