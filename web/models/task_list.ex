@@ -17,16 +17,20 @@ defmodule CodeCorps.TaskList do
     [
       %{
         name: "Inbox",
-        position: 1
+        position: 1,
+        order: 1
       }, %{
         name: "Backlog",
-        position: 2
+        position: 2,
+        order: 2
       }, %{
         name: "In Progress",
-        position: 3
+        position: 3,
+        order: 3
       }, %{
         name: "Done",
-        position: 4
+        position: 4,
+        order: 4
       }
     ]
   end
