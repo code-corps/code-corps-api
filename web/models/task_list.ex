@@ -2,6 +2,8 @@ defmodule CodeCorps.TaskList do
   use CodeCorps.Web, :model
   import EctoOrdered
 
+  alias CodeCorps.TaskList
+
   schema "task_lists" do
     field :name, :string
     field :position, :integer, virtual: true
@@ -14,25 +16,25 @@ defmodule CodeCorps.TaskList do
   end
 
   def default_task_lists() do
-    [
+    task_list_data = [
       %{
         name: "Inbox",
-        position: 1,
-        order: 1
+        position: 1
       }, %{
         name: "Backlog",
-        position: 2,
-        order: 2
+        position: 2
       }, %{
         name: "In Progress",
-        position: 3,
-        order: 3
+        position: 3
       }, %{
         name: "Done",
-        position: 4,
-        order: 4
+        position: 4
       }
     ]
+
+    for task_list <- task_list_data do
+      TaskList.changeset(%TaskList{}, task_list)
+    end
   end
 
   @doc """
