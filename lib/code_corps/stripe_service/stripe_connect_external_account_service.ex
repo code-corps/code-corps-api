@@ -12,6 +12,8 @@ defmodule CodeCorps.StripeService.StripeConnectExternalAccountService do
       %StripeExternalAccount{}
       |> StripeExternalAccount.changeset(params)
       |> Repo.insert
+    else
+      failure -> failure
     end
   end
 

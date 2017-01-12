@@ -14,6 +14,8 @@ defmodule CodeCorps.StripeService.StripeConnectAccountService do
          {:ok, params} <- StripeConnectAccountAdapter.to_params(account, attributes)
     do
       %StripeConnectAccount{} |> StripeConnectAccount.create_changeset(params) |> Repo.insert
+    else
+      failure -> failure
     end
   end
 
@@ -40,8 +42,8 @@ defmodule CodeCorps.StripeService.StripeConnectAccountService do
     do
       local_account |> StripeConnectAccount.webhook_update_changeset(params) |> Repo.update
     else
-      # Not found locally
       nil -> {:error, :not_found}
+      failure -> failure
     end
   end
 end

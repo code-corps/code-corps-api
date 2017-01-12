@@ -12,6 +12,24 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
 
   @api Application.get_env(:code_corps, :stripe)
 
+  @doc """
+  Finds or creates a new `Stripe.Subscription` record on Stripe API, as well as an associated local
+  `StripeConnectSubscription` record
+
+  # Possible return values
+
+  - `{:ok, %StripeConnectSubscription{}}` - the created record.
+  - `{:error, %Ecto.Changeset{}}` - the record was not created due to validation issues.
+  - `{:error, :project_not_ready}` - the associated project does not meed the prerequisites for receiving donations.
+  - `{:error, :user_not_ready}` - the associated user does not meet the prerequisits to donate.
+  - `{:error, %Stripe.APIErrorResponse{}}` - there was a problem with the stripe request
+  - `{:error, :not_found}` - one of the associated records was not found
+
+  # Side effects
+
+  - If the subscription is created or found, associated project totals will get updated
+  - If the subscription is created or found, associated donation goal states will be updated
+  """
   def find_or_create(%{"project_id" => project_id, "quantity" => _, "user_id" => user_id} = attributes) do
     with {:ok, %Project{} = project} <- get_project(project_id) |> ProjectSubscribable.validate,
          {:ok, %User{} = user} <- get_user(user_id) |> UserCanSubscribe.validate
@@ -23,18 +41,21 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
 
       {:ok, subscription}
     else
-      # possible errors
-      # {:error, :project_not_ready} - `CodeCorps.ProjectSubscribable.validate/1` failed
-      # {:error, :user_not_ready} - `CodeCorps.UserCanSubscribe.validate/1` failed
-      # {:error, %Ecto.Changeset{}} - Record creation failed due to validation errors
-      # {:error, %Stripe.APIErrorResponse{}} - Stripe request failed
-      # {:error, :not_found} - One of the associated records was not found
-      {:error, error} -> {:error, error}
       nil -> {:error, :not_found}
-      _ -> {:error, :unexpected}
+      failure -> failure
     end
   end
 
+  @doc """
+  Updates an existing `StripeConnectSubscription` record by retrieving a `Stripe.Subscription` record and
+  using that data as update parameters
+
+  # Possible return values
+  - `{:ok, %StripeConnectSubscription{}}` - the updated record.
+  - `{:error, %Stripe.APIErrorResponse{}}` - there was a problem with the stripe request
+  - `{:error, :not_found}` - one of the associated records was not found
+
+  """
   def update_from_stripe(stripe_id, connect_customer_id) do
     with {:ok, %StripeConnectAccount{} = connect_account} <- retrieve_connect_account(connect_customer_id),
          {:ok, %Stripe.Subscription{} = stripe_subscription} <- @api.Subscription.retrieve(stripe_id, connect_account: connect_account.id),
@@ -49,13 +70,8 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
 
       {:ok, subscription}
     else
-      # possible errors
-      # {:error, %Ecto.Changeset{}} - Record creation failed due to validation errors
-      # {:error, %Stripe.APIErrorResponse{}} - Stripe request failed
-      # {:error, :not_found} - One of the associated records was not found
-      {:error, error} -> {:error, error}
       nil -> {:error, :not_found}
-      _ -> {:error, :unexpected}
+      failure -> failure
     end
   end
 

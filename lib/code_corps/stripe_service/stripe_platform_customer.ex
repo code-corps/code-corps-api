@@ -16,6 +16,8 @@ defmodule CodeCorps.StripeService.StripePlatformCustomerService do
       %StripePlatformCustomer{}
       |> StripePlatformCustomer.create_changeset(params)
       |> Repo.insert
+    else
+      failure -> failure
     end
   end
 
@@ -37,9 +39,7 @@ defmodule CodeCorps.StripeService.StripePlatformCustomerService do
     do
       {:ok, updated_customer, stripe_customer}
     else
-      {:error, %Ecto.Changeset{} = changeset} -> {:error, changeset}
-      {:error, %Stripe.APIErrorResponse{} = error} -> {:error, error}
-      _ -> {:error, :unhandled}
+      failure -> failure
     end
   end
 
@@ -56,17 +56,14 @@ defmodule CodeCorps.StripeService.StripePlatformCustomerService do
   - `{:error, :unhandled}` -if something unexpected went wrong
   """
   def update_from_stripe(id_from_stripe) do
-    with %StripePlatformCustomer{} = customer                <- Repo.get_by(StripePlatformCustomer, id_from_stripe: id_from_stripe),
-         {:ok, %Stripe.Customer{} = stripe_customer}         <- @api.Customer.retrieve(id_from_stripe),
-         {:ok, params}                                       <- StripePlatformCustomerAdapter.to_params(stripe_customer, %{}),
-         {:ok, %StripePlatformCustomer{} = platform_customer, connect_customer_updates} <- perform_update(customer, params)
+    with %StripePlatformCustomer{} = customer <- Repo.get_by(StripePlatformCustomer, id_from_stripe: id_from_stripe),
+         {:ok, %Stripe.Customer{} = stripe_customer} <- @api.Customer.retrieve(id_from_stripe),
+         {:ok, params} <- StripePlatformCustomerAdapter.to_params(stripe_customer, %{})
     do
-      {:ok, platform_customer, connect_customer_updates}
+      perform_update(customer, params)
     else
       nil -> {:error, :not_found}
-      {:error, %Ecto.Changeset{} = changeset} -> {:error, changeset}
-      {:error, %Stripe.APIErrorResponse{} = error} -> {:error, error}
-      _ -> {:error, :unhandled}
+      failure -> failure
     end
   end
 
@@ -91,8 +88,8 @@ defmodule CodeCorps.StripeService.StripePlatformCustomerService do
         {:ok, platform_customer, update_connect_customers_results}
       {:error, :update_platform_customer, %Ecto.Changeset{} = changeset, %{}} ->
         {:error, changeset}
-      {:error, _failed_operation, _failed_value, _changes_so_far} ->
-        {:error, :unhandled}
+      {:error, failed_operation, failed_value, _changes_so_far} ->
+        {:error, failed_operation, failed_value}
     end
   end
 
@@ -101,7 +98,6 @@ defmodule CodeCorps.StripeService.StripePlatformCustomerService do
       {:ok, platform_customer, nil}
     else
       {:error, changeset} -> {:error, changeset}
-      _ -> {:error, :unhandled}
     end
   end
 

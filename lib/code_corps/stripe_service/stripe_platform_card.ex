@@ -9,45 +9,27 @@ defmodule CodeCorps.StripeService.StripePlatformCardService do
   @api Application.get_env(:code_corps, :stripe)
 
   def create(%{"stripe_token" => stripe_token, "user_id" => user_id} = attributes) do
-    with %StripePlatformCustomer{} = customer <- get_customer(user_id),
-         {:ok, card}                          <- @api.Card.create(:customer, customer.id_from_stripe, stripe_token),
-         {:ok, params}                        <- StripePlatformCardAdapter.to_params(card, attributes)
+    with %StripePlatformCustomer{} = customer <- StripePlatformCustomer |> CodeCorps.Repo.get_by(user_id: user_id),
+         {:ok, %Stripe.Card{} = card} <- @api.Card.create(:customer, customer.id_from_stripe, stripe_token),
+         {:ok, params} <- StripePlatformCardAdapter.to_params(card, attributes)
     do
-      %StripePlatformCard{}
-      |> StripePlatformCard.create_changeset(params)
-      |> Repo.insert
+      %StripePlatformCard{} |> StripePlatformCard.create_changeset(params) |> Repo.insert
     else
       nil -> {:error, :not_found}
-      {:error, %Stripe.APIErrorResponse{} = error} -> {:error, error}
-      {:error, %Ecto.Changeset{} = changeset} -> {:error, changeset}
+      failure -> failure
     end
   end
 
   def update_from_stripe(card_id) do
-    with {:ok, %StripePlatformCard{} = record} <- get_card(card_id),
-         {:ok, %Stripe.Card{} = stripe_card}   <- get_card_from_stripe(record),
-         {:ok, params}                         <- StripePlatformCardAdapter.to_params(stripe_card, %{})
+    with %StripePlatformCard{} = record <- Repo.get_by(StripePlatformCard, id_from_stripe: card_id),
+         {:ok, %Stripe.Card{} = stripe_card} <- @api.Card.retrieve(:customer, record.customer_id_from_stripe, card_id),
+         {:ok, params} <- StripePlatformCardAdapter.to_params(stripe_card, %{})
     do
       perform_update(record, params)
     else
       nil -> {:error, :not_found}
-      {:error, %Stripe.APIErrorResponse{} = error} -> {:error, error}
-      {:error, %Ecto.Changeset{} = changeset} -> {:error, changeset}
+      failure -> failure
     end
-  end
-
-  defp get_customer(user_id) do
-    StripePlatformCustomer
-    |> CodeCorps.Repo.get_by(user_id: user_id)
-  end
-
-  defp get_card(card_id_from_stripe) do
-    record = Repo.get_by(StripePlatformCard, id_from_stripe: card_id_from_stripe)
-    {:ok, record}
-  end
-
-  defp get_card_from_stripe(%StripePlatformCard{id_from_stripe: stripe_id, customer_id_from_stripe: owner_id}) do
-    @api.Card.retrieve(:customer, owner_id, stripe_id)
   end
 
   defp perform_update(record, params) do
@@ -63,8 +45,8 @@ defmodule CodeCorps.StripeService.StripePlatformCardService do
         {:ok, platform_card_update, connect_card_updates}
       {:error, :update_platform_card, %Ecto.Changeset{} = changeset, %{}} ->
         {:error, changeset}
-      {:error, _failed_operation, _failed_value, _changes_so_far} ->
-        {:error, :unhandled}
+      {:error, failed_operation, failed_value, _changes_so_far} ->
+        {:error, failed_operation, failed_value}
     end
   end
 
