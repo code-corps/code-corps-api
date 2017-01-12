@@ -3,7 +3,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectSubscriptionTest do
 
   import CodeCorps.StripeService.Adapters.StripeConnectSubscriptionAdapter, only: [to_params: 2]
 
-  {:ok, date} = DateTime.from_unix(1479472835)
+  date = 1479472835
 
   @stripe_connect_subscription %Stripe.Subscription{
     application_fee_percent: 5.0,

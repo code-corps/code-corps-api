@@ -3,7 +3,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectPlanTest do
 
   import CodeCorps.StripeService.Adapters.StripeConnectPlanAdapter, only: [to_params: 2]
 
-  {:ok, timestamp} = DateTime.from_unix(1479472835)
+  timestamp = 1479472835
 
   @stripe_connect_plan %Stripe.Plan{
     id: "month",

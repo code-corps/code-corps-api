@@ -3,7 +3,7 @@ defmodule CodeCorps.StripeService.Adapters.StripePlatformCustomerTest do
 
   import CodeCorps.StripeService.Adapters.StripePlatformCustomerAdapter, only: [to_params: 2]
 
-  {:ok, timestamp} = DateTime.from_unix(1479472835)
+  timestamp = 1479472835
 
   @stripe_platform_customer %Stripe.Customer{
     id: "cus_123",

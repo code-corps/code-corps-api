@@ -42,7 +42,7 @@ defmodule CodeCorps.StripeTesting.Customer do
   end
 
   defp do_retrieve(id) do
-    {:ok, created} = DateTime.from_unix(1479472835)
+    created = 1479472835
 
     %Stripe.Customer{
       id: id,
