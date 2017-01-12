@@ -13,6 +13,7 @@ defmodule CodeCorps.TaskListViewTest do
     expected_json = %{
       "data" => %{
         "attributes" => %{
+          "inbox" => task_list.inbox,
           "name" => task_list.name,
           "order" => 1000,
           "inserted-at" => task_list.inserted_at,

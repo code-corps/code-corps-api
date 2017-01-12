@@ -3,9 +3,10 @@ defmodule CodeCorps.TaskList do
   import EctoOrdered
 
   schema "task_lists" do
+    field :inbox, :boolean, default: false
     field :name, :string
-    field :position, :integer, virtual: true
     field :order, :integer
+    field :position, :integer, virtual: true
 
     belongs_to :project, CodeCorps.Project
     has_many :tasks, CodeCorps.Task
@@ -16,15 +17,19 @@ defmodule CodeCorps.TaskList do
   def default_task_lists() do
     [
       %{
+        inbox: true,
         name: "Inbox",
         position: 1
       }, %{
+        inbox: false,
         name: "Backlog",
         position: 2
       }, %{
+        inbox: false,
         name: "In Progress",
         position: 3
       }, %{
+        inbox: false,
         name: "Done",
         position: 4
       }

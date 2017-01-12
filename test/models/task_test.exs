@@ -6,7 +6,7 @@ defmodule CodeCorps.TaskTest do
   @valid_attrs %{
     title: "Test task",
     task_type: "issue",
-    markdown: "A test task",
+    markdown: "A test task"
   }
   @invalid_attrs %{
     task_type: "nonexistent"
@@ -27,9 +27,11 @@ defmodule CodeCorps.TaskTest do
     test "renders body html from markdown" do
       user = insert(:user)
       project = insert(:project)
+      task_list = insert(:task_list)
       changes = Map.merge(@valid_attrs, %{
         markdown: "A **strong** body",
         project_id: project.id,
+        task_list_id: task_list.id,
         user_id: user.id
       })
       changeset = Task.changeset(%Task{}, changes)
@@ -118,6 +120,36 @@ defmodule CodeCorps.TaskTest do
       # Make sure that, given the same order configuration between task lists,
       # the auto-assigned order is the same, meaning the order is correctly scoped
       assert result_a.order == result_b.order
+    end
+
+    test "repositions tasks correctly" do
+      user = insert(:user)
+      project = insert(:project)
+      task_list = insert(:task_list, name: "Task List", project: project)
+
+      task_1 = insert(:task, project: project, user: user, task_list: task_list, order: 1000)
+      task_2 = insert(:task, project: project, user: user, task_list: task_list, order: 2000)
+
+      task_list_2 = insert(:task_list, name: "Task List 2", project: project)
+      task_3 = insert(:task, project: project, user: user, task_list: task_list_2)
+
+      {:ok, task_1_result} =
+        task_1
+        |> Task.update_changeset(%{position: 0})
+        |> Repo.update
+
+      {:ok, task_2_result} =
+        task_2
+        |> Task.update_changeset(%{position: 1})
+        |> Repo.update
+
+      {:ok, task_3_result} =
+        task_3
+        |> Task.update_changeset(%{position: 2, task_list_id: task_list.id})
+        |> Repo.update
+
+      assert task_1_result.order < task_2_result.order
+      assert task_2_result.order < task_3_result.order
     end
 
     test "sets state to 'published'" do

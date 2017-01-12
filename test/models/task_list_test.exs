@@ -15,4 +15,13 @@ defmodule CodeCorps.TaskListTest do
     changeset = TaskList.changeset(%TaskList{}, @invalid_attrs)
     refute changeset.valid?
   end
+
+  test "is not inbox by default" do
+    {:ok, record} =
+      %TaskList{}
+      |> TaskList.changeset(@valid_attrs)
+      |> CodeCorps.Repo.insert
+
+    refute record.inbox
+  end
 end
