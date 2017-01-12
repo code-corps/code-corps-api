@@ -10,10 +10,8 @@ defmodule CodeCorps.StripeService.StripeConnectCardService do
 
   def find_or_create(%StripePlatformCard{} = platform_card, %StripeConnectCustomer{} = connect_customer, %StripePlatformCustomer{} = platform_customer, %StripeConnectAccount{} = connect_account) do
     case get_from_db(connect_account.id, platform_card.id) do
-      %StripeConnectCard{} = existing_card ->
-        {:ok, existing_card}
-      nil ->
-        create(platform_card, connect_customer, platform_customer, connect_account)
+      %StripeConnectCard{} = existing_card -> {:ok, existing_card}
+      nil -> create(platform_card, connect_customer, platform_customer, connect_account)
     end
   end
 
@@ -22,8 +20,7 @@ defmodule CodeCorps.StripeService.StripeConnectCardService do
     do
       {:ok, updated_stripe_card}
     else
-      {:error, %Stripe.APIErrorResponse{} = error} -> {:error, error}
-      _ -> {:error, :unhandled}
+      failure -> failure
     end
   end
 

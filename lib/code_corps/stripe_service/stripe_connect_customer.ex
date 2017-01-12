@@ -32,6 +32,8 @@ defmodule CodeCorps.StripeService.StripeConnectCustomerService do
       %StripeConnectCustomer{}
       |> StripeConnectCustomer.create_changeset(params)
       |> Repo.insert
+    else
+      failure -> failure
     end
   end
 
