@@ -39,7 +39,7 @@ defmodule CodeCorps.StripeConnectPlanControllerTest do
     test "creates and renders resource when user is authenticated and authorized", %{conn: conn, current_user: current_user} do
       organization = insert(:organization)
       insert(:organization_membership, role: "owner", member: current_user, organization: organization)
-      insert(:stripe_connect_account, organization: organization, charges_enabled: true)
+      insert(:stripe_connect_account, organization: organization, charges_enabled: true, transfers_enabled: true)
       project = insert(:project, organization: organization)
       insert(:donation_goal, project: project)
 
@@ -63,10 +63,10 @@ defmodule CodeCorps.StripeConnectPlanControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders 422 when no donation goals exist", %{conn: conn, current_user: current_user} do
+    test "does not create resource and renders 422 when no donation goals exist and transfers not enabled", %{conn: conn, current_user: current_user} do
       organization = insert(:organization)
       insert(:organization_membership, role: "owner", member: current_user, organization: organization)
-      insert(:stripe_connect_account, organization: organization)
+      insert(:stripe_connect_account, organization: organization, transfers_enabled: false)
       project = insert(:project, organization: organization)
 
       assert conn |> request_create(%{project: project}) |> json_response(422)
