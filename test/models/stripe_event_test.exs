@@ -4,20 +4,29 @@ defmodule CodeCorps.StripeEventTest do
   alias CodeCorps.StripeEvent
 
   describe "create_changeset/2" do
-    @valid_attrs %{endpoint: "connect", id_from_stripe: "evt_123", type: "any.event"}
+    @valid_attrs %{
+      endpoint: "connect",
+      id_from_stripe: "evt_123",
+      object_id: "cus_123",
+      object_type: "customer",
+      type: "any.event"
+    }
 
     test "reports as valid when attributes are valid" do
       changeset = StripeEvent.create_changeset(%StripeEvent{}, @valid_attrs)
       assert changeset.valid?
     end
 
-    test "requires :id_from_stripe, :type" do
+    test "required params" do
       changeset = StripeEvent.create_changeset(%StripeEvent{}, %{})
 
       refute changeset.valid?
-      assert_error_message(changeset, :endpoint, "can't be blank")
-      assert_error_message(changeset, :id_from_stripe, "can't be blank")
-      assert_error_message(changeset, :type, "can't be blank")
+
+      assert_validation_triggered(changeset, :endpoint, :required)
+      assert_validation_triggered(changeset, :id_from_stripe, :required)
+      assert_validation_triggered(changeset, :object_id, :required)
+      assert_validation_triggered(changeset, :object_type, :required)
+      assert_validation_triggered(changeset, :type, :required)
     end
 
     test "sets :status to 'processing'" do

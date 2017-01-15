@@ -7,11 +7,15 @@ defmodule CodeCorps.StripeTesting.Event do
   end
 
   defp do_retrieve(_) do
-
     %Stripe.Event{
       api_version: "2016-07-06",
       created: 1479472835,
       id: "evt_123",
+      data: %{
+        object: %Stripe.Customer{
+          id: "cus_123"
+        }
+      },
       livemode: false,
       object: "event",
       pending_webhooks: 1,
@@ -25,6 +29,11 @@ defmodule CodeCorps.StripeTesting.Event do
       api_version: "2016-07-06",
       created: 1479472835,
       id: "evt_123",
+      data: %{
+        object: %Stripe.Customer{
+          id: "cus_123"
+        }
+      },
       livemode: false,
       object: "event",
       pending_webhooks: 1,

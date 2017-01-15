@@ -6,6 +6,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.WebhookProcessor do
   alias CodeCorps.StripeEvent
   alias CodeCorps.Repo
   alias CodeCorps.StripeService.WebhookProcessing.{ConnectEventHandler, PlatformEventHandler}
+  alias CodeCorps.StripeService.Adapters.StripeEventAdapter
 
   @api Application.get_env(:code_corps, :stripe)
 
@@ -47,9 +48,9 @@ defmodule CodeCorps.StripeService.WebhookProcessing.WebhookProcessor do
   end
 
   defp do_process(id, user_id, handler, json) do
-    with {:ok, %Stripe.Event{id: api_event_id, type: api_event_type, user_id: api_user_id}} <- retrieve_event_from_api(id, user_id),
+    with {:ok, %Stripe.Event{} = event} <- retrieve_event_from_api(id, user_id),
          {:ok, endpoint} <- infer_endpoint_from_handler(handler),
-         {:ok, %StripeEvent{} = event} <- find_or_create_event(api_event_id, api_event_type, api_user_id, endpoint)
+         {:ok, %StripeEvent{} = event} <- find_or_create_event(event, endpoint)
     do
       handle_event(json, event, handler)
     else
@@ -64,11 +65,11 @@ defmodule CodeCorps.StripeService.WebhookProcessing.WebhookProcessor do
     end
   end
 
-  defp find_or_create_event(id_from_stripe, type, user_id, endpoint) do
-    case find_event(id_from_stripe) do
+  defp find_or_create_event(%Stripe.Event{} = event, endpoint) do
+    case find_event(event.id) do
       %StripeEvent{status: "processing"} -> {:error, :already_processing}
       %StripeEvent{} = event -> {:ok, event}
-      nil -> create_event(id_from_stripe, endpoint, type, user_id)
+      nil -> create_event(event, endpoint)
     end
   end
 
@@ -86,13 +87,14 @@ defmodule CodeCorps.StripeService.WebhookProcessing.WebhookProcessor do
 
   defp infer_endpoint_from_handler(ConnectEventHandler), do: {:ok, "connect"}
   defp infer_endpoint_from_handler(PlatformEventHandler), do: {:ok, "platform"}
-  defp infer_endpoint_from_handler(_), do: {:error, :invalid_handler}
 
   defp retrieve_event_from_api(id, nil), do: @api.Event.retrieve(id)
   defp retrieve_event_from_api(id, user_id), do: @api.Event.retrieve(id, connect_account: user_id)
 
-  defp create_event(id_from_stripe, endpoint, type, user_id) do
-    %StripeEvent{} |> StripeEvent.create_changeset(%{endpoint: endpoint, id_from_stripe: id_from_stripe, type: type, user_id: user_id}) |> Repo.insert
+  defp create_event(%Stripe.Event{} = event, endpoint) do
+    with {:ok, params} <- StripeEventAdapter.to_params(event, %{"endpoint" => endpoint}) do
+      %StripeEvent{} |> StripeEvent.create_changeset(params) |> Repo.insert
+    end
   end
 
   defp set_errored(%StripeEvent{} = event) do
