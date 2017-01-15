@@ -1,12 +1,17 @@
 defmodule CodeCorps.StripeConnectEventsController do
   use CodeCorps.Web, :controller
 
-  alias CodeCorps.StripeService.WebhookProcessing.{ConnectEventHandler, WebhookProcessor}
+  alias CodeCorps.StripeService.WebhookProcessing.{
+    ConnectEventHandler, EnvironmentFilter, WebhookProcessor
+  }
 
-  def create(conn, params) do
-    case WebhookProcessor.process_async(params, ConnectEventHandler) do
-      {:ok, _pid} -> conn |> send_resp(200, "")
-      {:error, :ignored_by_environment}  -> conn |> send_resp(400, "")
+  def create(conn, event_params) do
+    case EnvironmentFilter.environment_matches?(event_params) do
+      true ->
+        {:ok, _pid} = WebhookProcessor.process_async(event_params, ConnectEventHandler)
+        conn |> send_resp(200, "")
+      false ->
+        conn |> send_resp(400, "")
     end
   end
 end
