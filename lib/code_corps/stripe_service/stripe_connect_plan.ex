@@ -48,6 +48,6 @@ defmodule CodeCorps.StripeService.StripeConnectPlanService do
   defp get_project(project_id) do
     Project
     |> Repo.get(project_id)
-    |> Repo.preload([:donation_goals, {:organization, :stripe_connect_account}])
+    |> Repo.preload([:donation_goals, {:organization, :stripe_connect_account}, :stripe_connect_plan])
   end
 end

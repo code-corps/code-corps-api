@@ -3,7 +3,7 @@ defmodule CodeCorps.StripeService.Validators.ProjectCanEnableDonations do
   Ensures a `CodeCorps.Project` is able to receive subscriptions.
   """
 
-  alias CodeCorps.{Organization, Project, StripeConnectAccount}
+  alias CodeCorps.{Organization, Project, StripeConnectAccount, StripeConnectPlan}
 
   @doc """
   Determines if the provided `CodeCorps.Project` can enable donations.
@@ -23,11 +23,10 @@ defmodule CodeCorps.StripeService.Validators.ProjectCanEnableDonations do
   """
   def validate(%Project{} = project), do: do_validate(project)
 
-  @invalid {:error, :project_not_ready}
-
+  defp do_validate(%Project{stripe_connect_plan: %StripeConnectPlan{}}), do: {:error, :project_has_plan}
   defp do_validate(%Project{
     donation_goals: [_h | _t],
     organization: %Organization{stripe_connect_account: %StripeConnectAccount{charges_enabled: true, transfers_enabled: true}}
   } = project), do: {:ok, project}
-  defp do_validate(_), do: @invalid
+  defp do_validate(_), do: {:error, :project_not_ready}
 end
