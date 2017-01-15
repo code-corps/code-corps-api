@@ -30,6 +30,28 @@ defmodule CodeCorps.TokenControllerTest do
       assert_received {:track, ^user_id, "Signed In", %{}}
     end
 
+    test "does not authenticate and renders errors when the email and password are missing", %{conn: conn} do
+      conn = post conn, token_path(conn, :create), %{"username" => ""}
+
+      response = json_response(conn, 401)
+      [error | _] = response["errors"]
+      assert error["detail"] == "Please enter your email and password."
+      assert renders_401_unauthorized?(error)
+      refute response["token"]
+      refute response["user_id"]
+    end
+
+    test "does not authenticate and renders errors when only the password is missing", %{conn: conn} do
+      conn = post conn, token_path(conn, :create), %{"username" => "test@email.com"}
+
+      response = json_response(conn, 401)
+      [error | _] = response["errors"]
+      assert error["detail"] == "Please enter your password."
+      assert renders_401_unauthorized?(error)
+      refute response["token"]
+      refute response["user_id"]
+    end
+
     test "does not authenticate and renders errors when the password is wrong", %{conn: conn} do
       user = build(:user, %{password: "password"}) |> set_password("password") |> insert
       conn = post conn, token_path(conn, :create), create_payload(user.email, "wrong password")

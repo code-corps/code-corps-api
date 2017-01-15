@@ -19,6 +19,12 @@ defmodule CodeCorps.TokenController do
       {:error, reason} -> handle_unauthenticated(conn, reason)
     end
   end
+  def create(conn, %{"username" => ""}) do
+    handle_unauthenticated(conn, "Please enter your email and password.")
+  end
+  def create(conn, %{"username" => _email}) do
+    handle_unauthenticated(conn, "Please enter your password.")
+  end
 
   def refresh(conn, %{"token" => current_token}) do
     with {:ok, claims} <- Guardian.decode_and_verify(current_token),
