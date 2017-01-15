@@ -1,7 +1,7 @@
 defmodule CodeCorps.StripeService.Events.CustomerSourceUpdated do
-  def handle(%{"data" => %{"object" => %{"id" => card_id, "object" => "card"}}}) do
+  def handle(%{data: %{object: %Stripe.Card{id: card_id}}}) do
     CodeCorps.StripeService.StripePlatformCardService.update_from_stripe(card_id)
   end
 
-  def handle(%{"data" => %{"object" => %{"id" => _, "object" => _}}}), do: {:error, :unsupported_object}
+  def handle(_data), do: {:error, :unsupported_object}
 end

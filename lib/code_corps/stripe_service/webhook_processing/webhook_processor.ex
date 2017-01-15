@@ -3,12 +3,23 @@ defmodule CodeCorps.StripeService.WebhookProcessing.WebhookProcessor do
   Used to process a Stripe webhook request.
   """
 
-  alias CodeCorps.StripeEvent
-  alias CodeCorps.Repo
-  alias CodeCorps.StripeService.WebhookProcessing.{ConnectEventHandler, PlatformEventHandler}
-  alias CodeCorps.StripeService.Adapters.StripeEventAdapter
+  alias CodeCorps.StripeService.WebhookProcessing.EventHandler
 
   @api Application.get_env(:code_corps, :stripe)
+
+  @doc """
+  Used to process a Stripe webhook event in an async manner.
+
+  Receives the event JSON as the first parameter.
+
+  Since a webhook can be a platform or a connect webhook, the function requires
+  the handler module as the second parameter.
+
+  Returns `{:ok, pid}`
+  """
+  def process_async(event_params, handler) do
+    Task.Supervisor.start_child(:webhook_processor, fn -> process(event_params, handler) end)
+  end
 
   @doc """
   Used to process a Stripe webhook event.
@@ -18,94 +29,21 @@ defmodule CodeCorps.StripeService.WebhookProcessing.WebhookProcessor do
   Since a webhook can be a platform or a connect webhook, the function requires
   the handler module as the second parameter.
 
-  ## Returns
+  # Returns
+  - `{:ok, %CodeCorps.StripeEvent{}}` if the event was processed in some way. This includes
+    the event being previously processed, or erroring out, or even just not being handled at the moment.
+  - `{:error, :already_processing}` if the event already exists locally and is in the process of
+    being handled.
 
-  - `{:ok, pid}` if the event will be handled
-  - `{:error, :ignored_by_environment}` if the event was ignored due to
-    environment mismatch
-
-  ## Note
-
-  Stripe events can have their `livemode` property set to `true` or `false`.
-  A livemode `true` event should be handled by the production environment,
-  while all other environments handle livemode `false` events.
   """
-  def process_async(%{"id" => id, "livemode" => livemode, "user_id" => user_id} = json, handler) do
-    case event_matches_environment?(livemode) do
-      true -> do_process_async(id, user_id, handler, json)
-      false -> {:error, :ignored_by_environment}
-    end
-  end
-  def process_async(%{"id" => id, "livemode" => livemode} = json, handler) do
-    case event_matches_environment?(livemode) do
-      true -> do_process_async(id, nil, handler, json)
-      false -> {:error, :ignored_by_environment}
-    end
-  end
-
-  defp do_process_async(id, user_id, handler, json) do
-    Task.Supervisor.start_child(:webhook_processor, fn -> do_process(id, user_id, handler, json) end)
-  end
-
-  defp do_process(id, user_id, handler, json) do
-    with {:ok, %Stripe.Event{} = event} <- retrieve_event_from_api(id, user_id),
-         {:ok, endpoint} <- infer_endpoint_from_handler(handler),
-         {:ok, %StripeEvent{} = event} <- find_or_create_event(event, endpoint)
+  def process(%{"id" => id} = event_params, handler) do
+    with user_id <- event_params |> Map.get("user_id"),
+         {:ok, %Stripe.Event{} = api_event} <- retrieve_event_from_api(id, user_id)
     do
-      handle_event(json, event, handler)
-    else
-      {:error, :already_processing} -> nil
+      EventHandler.handle(api_event, handler)
     end
   end
-
-  defp event_matches_environment?(livemode) do
-    case Application.get_env(:code_corps, :stripe_env) do
-      :prod -> livemode
-      _ -> !livemode
-    end
-  end
-
-  defp find_or_create_event(%Stripe.Event{} = event, endpoint) do
-    case find_event(event.id) do
-      %StripeEvent{status: "processing"} -> {:error, :already_processing}
-      %StripeEvent{} = event -> {:ok, event}
-      nil -> create_event(event, endpoint)
-    end
-  end
-
-  defp find_event(id_from_stripe) do
-    Repo.get_by(StripeEvent, id_from_stripe: id_from_stripe)
-  end
-
-  defp handle_event(json, event, handler) do
-    case json |> handler.handle_event |> Tuple.to_list do
-      [:ok, :unhandled_event] -> event |> set_unhandled
-      [:ok | _results]        -> event |> set_processed
-      [:error | _error]       -> event |> set_errored
-    end
-  end
-
-  defp infer_endpoint_from_handler(ConnectEventHandler), do: {:ok, "connect"}
-  defp infer_endpoint_from_handler(PlatformEventHandler), do: {:ok, "platform"}
 
   defp retrieve_event_from_api(id, nil), do: @api.Event.retrieve(id)
   defp retrieve_event_from_api(id, user_id), do: @api.Event.retrieve(id, connect_account: user_id)
-
-  defp create_event(%Stripe.Event{} = event, endpoint) do
-    with {:ok, params} <- StripeEventAdapter.to_params(event, %{"endpoint" => endpoint}) do
-      %StripeEvent{} |> StripeEvent.create_changeset(params) |> Repo.insert
-    end
-  end
-
-  defp set_errored(%StripeEvent{} = event) do
-    event |> StripeEvent.update_changeset(%{status: "errored"}) |> Repo.update
-  end
-
-  defp set_processed(%StripeEvent{} = event) do
-    event |> StripeEvent.update_changeset(%{status: "processed"}) |> Repo.update
-  end
-
-  defp set_unhandled(%StripeEvent{} = event) do
-    event |> StripeEvent.update_changeset(%{status: "unhandled"}) |> Repo.update
-  end
 end

@@ -24,6 +24,7 @@ defmodule CodeCorps.StripeEvent do
   schema "stripe_events" do
     field :endpoint, :string, null: false
     field :id_from_stripe, :string, null: false
+    field :ignored_reason, :string
     field :object_id, :string
     field :object_type, :string
     field :status, :string, default: "unprocessed"
@@ -54,7 +55,7 @@ defmodule CodeCorps.StripeEvent do
   """
   def update_changeset(struct, params) do
     struct
-    |> cast(params, [:status])
+    |> cast(params, [:ignored_reason, :status])
     |> validate_required([:status])
     |> validate_inclusion(:status, states)
   end
@@ -64,6 +65,6 @@ defmodule CodeCorps.StripeEvent do
   end
 
   defp states do
-    ~w{ errored processed processing unhandled unprocessed }
+    ~w{ errored ignored processed processing unhandled unprocessed }
   end
 end
