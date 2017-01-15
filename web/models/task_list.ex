@@ -2,6 +2,8 @@ defmodule CodeCorps.TaskList do
   use CodeCorps.Web, :model
   import EctoOrdered
 
+  alias CodeCorps.TaskList
+
   schema "task_lists" do
     field :inbox, :boolean, default: false
     field :name, :string
@@ -33,7 +35,7 @@ defmodule CodeCorps.TaskList do
         name: "Done",
         position: 4
       }
-    ]
+    ] |> Enum.map(fn (params) -> changeset(%TaskList{}, params) end)
   end
 
   @doc """
