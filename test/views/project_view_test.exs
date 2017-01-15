@@ -19,6 +19,7 @@ defmodule CodeCorps.ProjectViewTest do
     expected_json = %{
       "data" => %{
         "attributes" => %{
+          "can-activate-donations" => false,
           "description" => project.description,
           "donations-active" => true,
           "icon-large-url" => CodeCorps.ProjectIcon.url({project.icon, project}, :large),
@@ -92,6 +93,17 @@ defmodule CodeCorps.ProjectViewTest do
     }
 
     assert rendered_json == expected_json
+  end
+
+  test "renders can-activate-donations true when project has donations, no plan, transfers are enabled" do
+    organization = insert(:organization)
+    project = insert(:project, organization: organization)
+    insert(:donation_goal, project: project)
+    insert(:stripe_connect_account, organization: organization, charges_enabled: true, transfers_enabled: true)
+
+    conn = Phoenix.ConnTest.build_conn
+    rendered_json = render(CodeCorps.ProjectView, "show.json-api", data: project, conn: conn)
+    assert rendered_json["data"]["attributes"]["can-activate-donations"] == true
   end
 
   test "renders donations-active true when project has donations and a plan" do
