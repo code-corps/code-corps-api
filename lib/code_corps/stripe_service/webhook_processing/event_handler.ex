@@ -1,13 +1,18 @@
 defmodule CodeCorps.StripeService.WebhookProcessing.EventHandler do
   alias CodeCorps.{StripeEvent, Repo}
-  alias CodeCorps.StripeService.WebhookProcessing.{ConnectEventHandler, PlatformEventHandler}
   alias CodeCorps.StripeService.Adapters.StripeEventAdapter
+  alias CodeCorps.StripeService.WebhookProcessing.{
+    ConnectEventHandler, IgnoredEventHandler, PlatformEventHandler
+  }
 
-  def handle(%Stripe.Event{} = api_event, handler) do
+  def handle(%Stripe.Event{type: type} = api_event, handler) do
     with {:ok, endpoint} <- infer_endpoint_from_handler(handler),
          {:ok, %StripeEvent{} = local_event} <- find_or_create_event(api_event, endpoint)
     do
-      call_handler(api_event, local_event, handler)
+      case IgnoredEventHandler.should_handle?(type) do
+        true -> call_ignored_handler(local_event)
+        false -> call_handler(api_event, local_event, handler)
+      end
     else
       failure -> failure
     end
@@ -33,6 +38,8 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandler do
       %StripeEvent{} |> StripeEvent.create_changeset(params) |> Repo.insert
     end
   end
+
+  defp call_ignored_handler(local_event), do: IgnoredEventHandler.handle(local_event)
 
   defp call_handler(api_event, local_event, handler) do
     # results are multiple, so we convert the tuple to list for easier matching

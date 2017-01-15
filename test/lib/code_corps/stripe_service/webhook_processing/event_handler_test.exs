@@ -234,4 +234,14 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
       assert {:error, :already_processing} == EventHandler.handle(event, PlatformEventHandler)
     end
   end
+
+  describe "ignored events" do
+    test "properly sets as ignored" do
+      event = build_event("application_fee.created")
+      {:ok, event} = EventHandler.handle(event, PlatformEventHandler)
+
+      assert event.status == "ignored"
+      assert event.ignored_reason
+    end
+  end
 end
