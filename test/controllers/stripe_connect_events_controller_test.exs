@@ -107,7 +107,11 @@ defmodule CodeCorps.StripeConnectEventsControllerTest do
 
       wait_for_supervisor
 
-      assert StripeEvent |> Repo.aggregate(:count, :id) == 1
+      event =  StripeEvent |> Repo.one
+      {:ok, mock_api_event} = CodeCorps.StripeTesting.Event.retrieve("evt_123")
+
+      assert event.object_id == mock_api_event.data.object.id
+      assert event.object_type == "customer"
     end
 
     test "uses existing event if id exists", %{conn: conn} do

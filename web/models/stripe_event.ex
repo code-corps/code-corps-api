@@ -24,6 +24,8 @@ defmodule CodeCorps.StripeEvent do
   schema "stripe_events" do
     field :endpoint, :string, null: false
     field :id_from_stripe, :string, null: false
+    field :object_id, :string
+    field :object_type, :string
     field :status, :string, default: "unprocessed"
     field :type, :string, null: false
     field :user_id, :string
@@ -37,8 +39,8 @@ defmodule CodeCorps.StripeEvent do
   """
   def create_changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:endpoint, :id_from_stripe, :type, :user_id])
-    |> validate_required([:endpoint, :id_from_stripe, :type])
+    |> cast(params, [:endpoint, :id_from_stripe, :object_id, :object_type, :type, :user_id])
+    |> validate_required([:endpoint, :id_from_stripe, :object_id, :object_type, :type])
     |> put_change(:status, "processing")
     |> validate_inclusion(:status, states)
     |> validate_inclusion(:endpoint, endpoints)

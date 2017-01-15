@@ -156,6 +156,8 @@ defmodule CodeCorps.Factories do
     %CodeCorps.StripeEvent{
       endpoint: sequence(:endpoint, fn(_) -> Enum.random(~w{ connect platform }) end),
       id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
+      object_id: "cus_123",
+      object_type: "customer",
       status: sequence(:status, fn(_) -> Enum.random(~w{ unprocessed processed errored }) end),
       type: "test.type"
     }
