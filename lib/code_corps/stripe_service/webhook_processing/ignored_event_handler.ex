@@ -2,6 +2,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.IgnoredEventHandler do
   alias CodeCorps.{StripeEvent, Repo}
 
   @ignored_event_types [
+    "account.external_account.created",
     "application_fee.created",
     "customer.created",
     "customer.source.created",
@@ -39,6 +40,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.IgnoredEventHandler do
   end
 
   @spec get_reason(String.t) :: String.t
+  defp get_reason("account.external_account.created"), do: "External accounts are stored locally upon updating a connect account."
   defp get_reason("application_fee.created"), do: "We don't make use of the application fee object."
   defp get_reason("customer.created"), do: "Customers are only created from the client."
   defp get_reason("customer.source.created"), do: "Cards are only created from the client. No need to handle"

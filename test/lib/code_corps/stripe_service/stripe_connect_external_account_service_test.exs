@@ -1,29 +1,19 @@
 defmodule CodeCorps.StripeService.StripeConnectExternalAccountServiceTest do
-  use ExUnit.Case, async: true
-
   use CodeCorps.ModelCase
 
   alias CodeCorps.StripeService.StripeConnectExternalAccountService
 
   describe "create" do
     test "creates a StripeExternalAccount" do
-      id_from_stripe = "ba_testing123"
-      account_id_from_stripe = "acct_123"
-
-      connect_account = insert(:stripe_connect_account, id_from_stripe: account_id_from_stripe)
+      api_external_account = %Stripe.ExternalAccount{id: "bnk_123"}
+      local_connect_account = insert(:stripe_connect_account)
 
       {:ok, %CodeCorps.StripeExternalAccount{} = external_account} =
-        StripeConnectExternalAccountService.create(id_from_stripe, account_id_from_stripe)
+        StripeConnectExternalAccountService.create(api_external_account, local_connect_account)
 
-      assert external_account.id_from_stripe == id_from_stripe
-      assert external_account.stripe_connect_account_id == connect_account.id
-    end
-
-    test "returns {:error, :not_found} if there's no associated stripe connect account" do
-      id_from_stripe = "ba_testing123"
-      account_id_from_stripe = "acct_123"
-
-      assert {:error, :not_found} == StripeConnectExternalAccountService.create(id_from_stripe, account_id_from_stripe)
+      assert external_account.id_from_stripe == "bnk_123"
+      assert external_account.stripe_connect_account_id == local_connect_account.id
+      assert external_account.account_id_from_stripe == local_connect_account.id_from_stripe
     end
   end
 end

@@ -6,7 +6,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
   }
 
   alias CodeCorps.{
-    StripeEvent, StripeExternalAccount, StripeInvoice, StripePlatformCard, StripePlatformCustomer
+    StripeEvent, StripeInvoice, StripePlatformCard, StripePlatformCustomer
   }
 
   defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest.StubObject do
@@ -58,21 +58,6 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
   end
 
   describe "connect events" do
-    test "handles account.external_account.created" do
-      connect_account = insert(:stripe_connect_account)
-      event = build_event(
-        "account.external_account.created",
-        %Stripe.ExternalAccount{id: "ext_123", account: connect_account.id_from_stripe}
-      )
-
-      {:ok, event} = EventHandler.handle(event, ConnectEventHandler)
-      assert event.object_type == "external_account"
-      assert event.object_id == "ext_123"
-      assert event.status == "processed"
-
-      assert Repo.get_by(StripeExternalAccount, id_from_stripe: "ext_123")
-    end
-
     test "handles account.updated" do
       connect_account = insert(:stripe_connect_account)
       event = build_event("account.updated", %Stripe.Account{id: connect_account.id_from_stripe})
