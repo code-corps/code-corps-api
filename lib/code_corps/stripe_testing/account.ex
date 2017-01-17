@@ -1,6 +1,12 @@
 defmodule CodeCorps.StripeTesting.Account do
+  import CodeCorps.StripeTesting.Helpers
+
   def create(attributes) do
     {:ok, create_stripe_record(attributes)}
+  end
+
+  def retrieve("account_with_multiple_external_accounts") do
+    {:ok, load_fixture(Stripe.Account, "account_with_multiple_external_accounts")}
   end
 
   def retrieve(id) do
@@ -60,7 +66,7 @@ defmodule CodeCorps.StripeTesting.Account do
   defp add_external_account(%{"id" => account_id, "external_account" => external_account_id} = map) do
     external_accounts_map = %{
       "object" => "list",
-      "data" => [%{"id" => external_account_id}],
+      "data" => [%{"id" => external_account_id, "object" => "bank_account"}],
       "has_more" => false,
       "total_count" => 1,
       "url" => "/v1/accounts/#{account_id}/external_accounts"

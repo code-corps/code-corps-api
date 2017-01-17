@@ -113,9 +113,15 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter do
     map |> add_external_account(stripe_account)
   end
 
-  defp add_external_account(map, %Stripe.Account{external_accounts: %{data: []}}), do: map
-  defp add_external_account(map, %Stripe.Account{external_accounts: %{data: [head | _]}}), do: map |> do_add_external_account(head)
-  defp do_add_external_account(map, %{"id" => id}), do: map |> Map.put(:external_account, id)
+  defp add_external_account(map, %Stripe.Account{external_accounts: %Stripe.List{data: list}}) do
+    latest = list |> List.last
+    map |> do_add_external_account(latest)
+  end
+
+  defp do_add_external_account(map, nil), do: map
+  defp do_add_external_account(map, %Stripe.ExternalAccount{id: id}) do
+    map |> Map.put(:external_account, id)
+  end
 
   defp remove_attributes(%{"legal_entity_verification_status" => "verified"} = attributes) do
     attributes |> Map.delete("legal_entity_verification_document")

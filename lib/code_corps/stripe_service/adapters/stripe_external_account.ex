@@ -1,21 +1,31 @@
 defmodule CodeCorps.StripeService.Adapters.StripeExternalAccountAdapter do
-  import CodeCorps.MapUtils, only: [rename: 3]
+
+  alias CodeCorps.MapUtils
+  alias CodeCorps.StripeConnectAccount
 
   @stripe_attributes [
-    :account, :account_holder_name, :account_holder_type, :bank_name, :country,
+    :account_holder_name, :account_holder_type, :bank_name, :country,
     :currency, :default_for_currency, :fingerprint, :id, :last4,
     :routing_number, :status
   ]
 
-  def to_params(%Stripe.ExternalAccount{} = bank_account, stripe_connect_account_id \\ nil) do
+  def to_params(%Stripe.ExternalAccount{} = external_account, %StripeConnectAccount{} = connect_account) do
     params =
-      bank_account
+      external_account
       |> Map.from_struct
       |> Map.take(@stripe_attributes)
-      |> rename(:id, :id_from_stripe)
-      |> rename(:account, :account_id_from_stripe)
-      |> Map.put(:stripe_connect_account_id, stripe_connect_account_id)
+      |> MapUtils.rename(:id, :id_from_stripe)
+      |> add_association_attributes(connect_account)
 
     {:ok, params}
+  end
+
+  defp add_association_attributes(attributes, %StripeConnectAccount{} = connect_account) do
+    association_attributes = build_association_attributes(connect_account)
+    attributes |> Map.merge(association_attributes)
+  end
+
+  defp build_association_attributes(%StripeConnectAccount{id: id, id_from_stripe: id_from_stripe}) do
+    %{account_id_from_stripe: id_from_stripe, stripe_connect_account_id: id}
   end
 end

@@ -1,0 +1,128 @@
+{
+  "id": "account_with_multiple_external_accounts",
+  "object": "account",
+  "business_logo": null,
+  "business_name": "Some Company Inc.",
+  "business_url": "somecompany.org",
+  "charges_enabled": false,
+  "country": "US",
+  "debit_negative_balances": true,
+  "decline_charge_on": {
+    "avs_failure": false,
+    "cvc_failure": true
+  },
+  "default_currency": "usd",
+  "details_submitted": false,
+  "display_name": "Code Corps",
+  "email": "someone@mail.com",
+  "external_accounts": {
+    "object": "list",
+    "data": [
+      {
+        "id": "ba_111111111111111111111111",
+        "object": "bank_account",
+        "account": "account_with_multiple_external_accounts",
+        "account_holder_name": "Jane Austen",
+        "account_holder_type": "individual",
+        "bank_name": "STRIPE TEST BANK",
+        "country": "US",
+        "currency": "usd",
+        "default_for_currency": false,
+        "fingerprint": "3wib8M6m7DxSV0PP",
+        "last4": "6789",
+        "metadata": {
+        },
+        "routing_number": "110000000",
+        "status": "new"
+      },
+      {
+        "id": "ba_222222222222222222222222",
+        "object": "bank_account",
+        "account": "account_with_multiple_external_accounts",
+        "account_holder_name": "Jane Austen",
+        "account_holder_type": "individual",
+        "bank_name": "STRIPE TEST BANK",
+        "country": "US",
+        "currency": "usd",
+        "default_for_currency": false,
+        "fingerprint": "3wib8M6m7DxSV0PP",
+        "last4": "6789",
+        "metadata": {
+        },
+        "routing_number": "110000000",
+        "status": "new"
+      }
+    ],
+    "has_more": false,
+    "total_count": 0,
+    "url": "/v1/accounts/account_with_multiple_external_accounts/external_accounts"
+  },
+  "legal_entity": {
+    "additional_owners": [
+
+    ],
+    "address": {
+      "city": null,
+      "country": "US",
+      "line1": null,
+      "line2": null,
+      "postal_code": null,
+      "state": null
+    },
+    "business_name": "Some Company Inc.",
+    "business_tax_id_provided": false,
+    "business_vat_id_provided": false,
+    "dob": {
+      "day": null,
+      "month": null,
+      "year": null
+    },
+    "first_name": "John",
+    "last_name": "Doe",
+    "personal_address": {
+      "city": null,
+      "country": "US",
+      "line1": null,
+      "line2": null,
+      "postal_code": null,
+      "state": null
+    },
+    "personal_id_number_provided": false,
+    "ssn_last_4_provided": false,
+    "type": "sole_prop",
+    "verification": {
+      "details": null,
+      "details_code": "failed_other",
+      "document": "fil_12345",
+      "status": "unverified"
+    }
+  },
+  "managed": true,
+  "metadata": null,
+  "product_description": "Some product description.",
+  "statement_descriptor": null,
+  "support_email": null,
+  "support_phone": "1234567890",
+  "timezone": "Europe/Zagreb",
+  "tos_acceptance": {
+    "date": null,
+    "ip": null,
+    "user_agent": null
+  },
+  "transfer_schedule": {
+    "delay_days": 2,
+    "interval": "daily"
+  },
+  "transfer_statement_descriptor": null,
+  "transfers_enabled": false,
+  "verification": {
+    "disabled_reason": "fields_needed",
+    "due_by": null,
+    "fields_needed": [
+      "business_url",
+      "external_account",
+      "tos_acceptance.date",
+      "tos_acceptance.ip"
+    ]
+  }
+}

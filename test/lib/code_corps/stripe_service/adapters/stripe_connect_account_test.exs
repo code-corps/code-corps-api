@@ -13,9 +13,10 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTest do
     details_submitted: false,
     display_name: "Code Corps",
     email: "volunteers@codecorps.org",
-    external_accounts: %{
-      object: "list",
-      data: [%{"id" => "ba_123"}],
+    external_accounts: %Stripe.List{
+      data: [
+        %Stripe.ExternalAccount{id: "ba_123"}
+      ],
       has_more: false,
       total_count: 0,
       url: "/v1/accounts/acct_123/external_accounts"
@@ -85,19 +86,25 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTest do
     }
   }
 
-  @local_map %{
-    "id_from_stripe" => "acct_123",
+  defp test_account do
+    # If a `Stripe.Account` has multiple `Stripe.ExternalAccount` records, we want
+    # the adapter to deal with that by only taking one, so we load the appropriate fixture
+    CodeCorps.StripeTesting.Helpers.load_fixture(Stripe.Account, "account_with_multiple_external_accounts")
+  end
 
-    "business_name" => "Code Corps PBC",
-    "business_url" => "codecorps.org",
+  @local_map %{
+    "id_from_stripe" => "account_with_multiple_external_accounts",
+
+    "business_name" => "Some Company Inc.",
+    "business_url" => "somecompany.org",
     "charges_enabled" => false,
     "country" => "US",
     "default_currency" => "usd",
     "details_submitted" => false,
     "display_name" => "Code Corps",
-    "email" => "volunteers@codecorps.org",
+    "email" => "someone@mail.com",
 
-    "external_account" => "ba_123",
+    "external_account" => "ba_222222222222222222222222",
 
     "legal_entity_address_city" => nil,
     "legal_entity_address_country" => "US",
@@ -106,19 +113,19 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTest do
     "legal_entity_address_postal_code" => nil,
     "legal_entity_address_state" => nil,
 
-    "legal_entity_business_name" => nil,
-    "legal_entity_business_tax_id" => "000000000",
-    "legal_entity_business_tax_id_provided" => true,
-    "legal_entity_business_vat_id" => "000000000",
-    "legal_entity_business_vat_id_provided" => true,
+    "legal_entity_business_name" => "Some Company Inc.",
+    "legal_entity_business_tax_id" => nil,
+    "legal_entity_business_tax_id_provided" => false,
+    "legal_entity_business_vat_id" => nil,
+    "legal_entity_business_vat_id_provided" => false,
 
     "legal_entity_dob_day" => nil,
     "legal_entity_dob_month" => nil,
     "legal_entity_dob_year" => nil,
 
-    "legal_entity_first_name" => nil,
+    "legal_entity_first_name" => "John",
     "legal_entity_gender" => nil,
-    "legal_entity_last_name" => nil,
+    "legal_entity_last_name" => "Doe",
     "legal_entity_maiden_name" => nil,
 
     "legal_entity_personal_address_city" => nil,
@@ -136,14 +143,14 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTest do
     "legal_entity_ssn_last_4" => nil,
     "legal_entity_ssn_last_4_provided" => false,
 
-    "legal_entity_type" => nil,
+    "legal_entity_type" => "sole_prop",
 
     "legal_entity_verification_details" => nil,
     "legal_entity_verification_details_code" => "failed_other",
     "legal_entity_verification_document" => "fil_12345",
     "legal_entity_verification_status" => "unverified",
 
-    "managed" => false,
+    "managed" => true,
 
     "support_email" => nil,
     "support_phone" => "1234567890",
@@ -151,17 +158,15 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTest do
 
     "transfers_enabled" => false,
 
-    "tos_acceptance_date" => 123456,
-    "tos_acceptance_ip" => "127.0.0.1",
-    "tos_acceptance_user_agent" => "Chrome",
+    "tos_acceptance_date" => nil,
+    "tos_acceptance_ip" => nil,
+    "tos_acceptance_user_agent" => nil,
 
     "verification_disabled_reason" => "fields_needed",
     "verification_due_by" => nil,
     "verification_fields_needed" => [
       "business_url",
       "external_account",
-      "product_description",
-      "support_phone",
       "tos_acceptance.date",
       "tos_acceptance.ip"
     ]
@@ -169,15 +174,10 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTest do
 
   describe "to_params/2" do
     test "converts from stripe map to local properly" do
-      test_attributes = %{
-        "organization_id" => 123,
-        "foo" => "bar"
-      }
-      expected_attributes = %{
-        "organization_id" => 123,
-      }
+      test_attributes = %{"organization_id" => 123, "foo" => "bar"}
+      expected_attributes = %{"organization_id" => 123,}
 
-      {:ok, result} = to_params(@stripe_connect_account, test_attributes)
+      {:ok, result} = to_params(test_account, test_attributes)
       expected_map = Map.merge(@local_map, expected_attributes)
 
       assert result == expected_map
