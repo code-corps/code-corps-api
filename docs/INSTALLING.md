@@ -30,6 +30,12 @@ cd code-corps-api
 cp .env.example .env
 ```
 
+This file places environment variables on separate lines, prepended with `export` to make them available to your Elixir application. You can [read about environment variables you may want here](../USAGE.md#environment).
+
+> Note: Depending on your PostgreSQL configuration, you may also want to add lines for `DATABASE_POSTGRESQL_USERNAME`, `DATABASE_POSTGRESQL_PASSWORD`, `DATABASE_POSTGRESQL_HOST`.
+>
+> Your `dev.exs` has some sane defaults of `postgres`, `postgres`, and `localhost`, respectively.
+
 Now, you can source the `.env`:
 
 ```shell
