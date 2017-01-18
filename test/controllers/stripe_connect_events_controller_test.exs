@@ -27,7 +27,7 @@ defmodule CodeCorps.StripeConnectEventsControllerTest do
   end
 
   test "responds with 200 when the event will be processed", %{conn: conn} do
-    event = %{"id" => "evt_123", "livemode" => false, "type" => "any.event"}
+    event = %{"id" => "evt_123", "livemode" => false}
 
     path = conn |> stripe_connect_events_path(:create)
     assert conn |> post(path, event) |> response(200)
@@ -46,7 +46,7 @@ defmodule CodeCorps.StripeConnectEventsControllerTest do
   test "returns 400, does nothing if event is livemode and env is not :prod", %{conn: conn} do
     Application.put_env(:code_corps, :stripe_env, :other)
 
-    event = %{"id" => "evt_123", "livemode" => true, "type" => "any.event"}
+    event = %{"id" => "evt_123", "livemode" => true}
 
     path = conn |> stripe_connect_events_path(:create)
     assert conn |> post(path, event) |> response(400)
@@ -62,7 +62,7 @@ defmodule CodeCorps.StripeConnectEventsControllerTest do
   test "returns 400, does nothing if event is not livemode and env is :prod", %{conn: conn} do
     Application.put_env(:code_corps, :stripe_env, :prod)
 
-    event = %{"id" => "evt_123", "livemode" => false, "type" => "any.event"}
+    event = %{"id" => "evt_123", "livemode" => false}
 
     path = conn |> stripe_connect_events_path(:create)
     assert conn |> post(path, event) |> response(400)

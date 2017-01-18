@@ -8,7 +8,8 @@ defmodule CodeCorps.StripeService.Adapters.StripeEventTest do
     created: nil,
     data: %{
       object: %Stripe.Customer{
-        id: "cus_123"
+        id: "cus_123",
+        object: "customer"
       }
     },
     id: "evt_123",
