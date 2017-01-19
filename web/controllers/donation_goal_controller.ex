@@ -13,13 +13,15 @@ defmodule CodeCorps.DonationGoalController do
 
   def filter(_conn, query, "id", id_list), do: id_filter(query, id_list)
 
-  def handle_create(_conn, attributes) do
+  def handle_create(conn, attributes) do
     attributes
     |> DonationGoalsService.create
+    |> CodeCorps.Analytics.Segment.track(:created, conn)
   end
 
-  def handle_update(_conn, record, attributes) do
+  def handle_update(conn, record, attributes) do
     record
     |> DonationGoalsService.update(attributes)
+    |> CodeCorps.Analytics.Segment.track(:updated, conn)
   end
 end

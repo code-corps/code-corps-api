@@ -42,11 +42,17 @@ defmodule CodeCorps.DonationGoalControllerTest do
   end
 
   describe "create" do
-    @tag authenticated: :admin
-    test "creates and renders resource when data is valid", %{conn: conn} do
-      project = insert(:project)
+    @tag :authenticated
+    test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
+      organization = insert(:organization)
+      insert(:organization_membership, member: current_user, organization: organization, role: "owner")
+      project = insert(:project, organization: organization)
+
       attrs = @valid_attrs |> Map.merge(%{project: project})
       assert conn |> request_create(attrs) |> json_response(201)
+
+      user_id = current_user.id
+      assert_received {:track, ^user_id, "Created Donation Goal", %{}}
     end
 
     @tag authenticated: :admin
@@ -65,11 +71,19 @@ defmodule CodeCorps.DonationGoalControllerTest do
   end
 
   describe "update" do
-    @tag authenticated: :admin
-    test "updates and renders chosen resource when data is valid", %{conn: conn} do
-      project = insert(:project)
+    @tag :authenticated
+    test "updates and renders chosen resource when data is valid", %{conn: conn, current_user: current_user} do
+      organization = insert(:organization)
+      insert(:organization_membership, member: current_user, organization: organization, role: "owner")
+      project = insert(:project, organization: organization)
+
+      donation_goal = insert(:donation_goal, project: project)
+
       attrs = @valid_attrs |> Map.merge(%{project: project})
-      assert conn |> request_update(attrs) |> json_response(200)
+      assert conn |> request_update(donation_goal, attrs) |> json_response(200)
+
+      user_id = current_user.id
+      assert_received {:track, ^user_id, "Updated Donation Goal", %{}}
     end
 
     @tag authenticated: :admin
