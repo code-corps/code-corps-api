@@ -80,5 +80,18 @@ defmodule CodeCorps.OrganizationMembershipTest do
       assert result == :error
       changeset |> assert_error_message(:member, "does not exist")
     end
+
+    test "ensures uniqueness of organization/member combination" do
+      existing = insert(:organization_membership)
+
+      changeset = OrganizationMembership.create_changeset(
+        %OrganizationMembership{},
+        %{member_id: existing.member_id, organization_id: existing.organization_id}
+      )
+
+      {:error, changeset} = changeset |> Repo.insert
+
+      changeset |> assert_error_message(:member, "has already been taken")
+    end
   end
 end

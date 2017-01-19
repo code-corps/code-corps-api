@@ -24,6 +24,7 @@ defmodule CodeCorps.OrganizationMembership do
     |> validate_required([:member_id, :organization_id])
     |> assoc_constraint(:member)
     |> assoc_constraint(:organization)
+    |> unique_constraint(:member, name: :organization_memberships_member_id_organization_id_index)
     |> put_change(:role, "pending")
   end
 
