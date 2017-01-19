@@ -9,8 +9,8 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandler do
     with {:ok, endpoint} <- infer_endpoint_from_handler(handler),
          {:ok, %StripeEvent{} = local_event} <- find_or_create_event(api_event, endpoint)
     do
-      case IgnoredEventHandler.should_handle?(type) do
-        true -> call_ignored_handler(local_event)
+      case IgnoredEventHandler.should_handle?(type, handler) do
+        true -> call_ignored_handler(local_event, handler)
         false -> call_handler(api_event, local_event, handler)
       end
     else
@@ -39,7 +39,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandler do
     end
   end
 
-  defp call_ignored_handler(local_event), do: IgnoredEventHandler.handle(local_event)
+  defp call_ignored_handler(local_event, handler), do: IgnoredEventHandler.handle(local_event, handler)
 
   defp call_handler(api_event, local_event, handler) do
     # results are multiple, so we convert the tuple to list for easier matching
