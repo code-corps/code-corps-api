@@ -46,12 +46,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeEventAdapter do
   end
 
   defp add_object_type(params, stripe_event) do
-    object_type =
-      stripe_event.data.object.__struct__
-      |> Module.split
-      |> List.last
-      |> Inflex.underscore
-
+    object_type = stripe_event.data.object.object
     params |> Map.put(:object_type, object_type)
   end
 

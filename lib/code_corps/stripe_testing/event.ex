@@ -8,16 +8,17 @@ defmodule CodeCorps.StripeTesting.Event do
 
   defp do_retrieve(_) do
     %Stripe.Event{
+      id: "evt_123",
+      object: "event",
       api_version: "2016-07-06",
       created: 1479472835,
-      id: "evt_123",
       data: %{
         object: %Stripe.Customer{
-          id: "cus_123"
+          id: "cus_123",
+          object: "customer"
         }
       },
       livemode: false,
-      object: "event",
       pending_webhooks: 1,
       request: nil,
       type: "any.event"
@@ -26,16 +27,17 @@ defmodule CodeCorps.StripeTesting.Event do
 
   defp do_retrieve_connect(_) do
     %Stripe.Event{
+      id: "evt_123",
+      object: "event",
       api_version: "2016-07-06",
       created: 1479472835,
-      id: "evt_123",
       data: %{
         object: %Stripe.Customer{
-          id: "cus_123"
+          id: "cus_123",
+          object: "customer"
         }
       },
       livemode: false,
-      object: "event",
       pending_webhooks: 1,
       request: nil,
       type: "any.event",
