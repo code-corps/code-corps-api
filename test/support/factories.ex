@@ -127,10 +127,20 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def stripe_connect_charge_factory do
+    %CodeCorps.StripeConnectCharge{
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
+      stripe_connect_account: build(:stripe_connect_account),
+      stripe_connect_customer: build(:stripe_connect_customer),
+      user: build(:user)
+    }
+  end
+
   def stripe_connect_customer_factory do
     %CodeCorps.StripeConnectCustomer{
       id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
       stripe_connect_account: build(:stripe_connect_account),
+      stripe_platform_customer: build(:stripe_platform_customer),
       user: build(:user)
     }
   end

@@ -14,7 +14,6 @@ defmodule CodeCorps.StripeService.StripeInvoiceService do
       %StripeInvoice{}
       |> StripeInvoice.create_changeset(params)
       |> Repo.insert
-      |> CodeCorps.Analytics.Segment.track(:payment_succeeded, nil)
     else
       failure -> failure
     end
