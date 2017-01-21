@@ -613,6 +613,59 @@ ALTER SEQUENCE stripe_connect_cards_id_seq OWNED BY stripe_connect_cards.id;
 
 
 --
+-- Name: stripe_connect_charges; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE stripe_connect_charges (
+    id integer NOT NULL,
+    amount integer,
+    amount_refunded integer,
+    application_id_from_stripe character varying(255),
+    application_fee_id_from_stripe character varying(255),
+    balance_transaction_id_from_stripe character varying(255),
+    captured boolean,
+    created integer,
+    currency character varying(255),
+    customer_id_from_stripe character varying(255),
+    description character varying(255),
+    failure_code character varying(255),
+    failure_message character varying(255),
+    id_from_stripe character varying(255),
+    invoice_id_from_stripe character varying(255),
+    paid boolean,
+    refunded boolean,
+    review_id_from_stripe character varying(255),
+    source_transfer_id_from_stripe character varying(255),
+    statement_descriptor character varying(255),
+    status character varying(255),
+    stripe_connect_account_id integer,
+    stripe_connect_customer_id integer NOT NULL,
+    user_id integer NOT NULL,
+    inserted_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: stripe_connect_charges_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE stripe_connect_charges_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: stripe_connect_charges_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE stripe_connect_charges_id_seq OWNED BY stripe_connect_charges.id;
+
+
+--
 -- Name: stripe_connect_customers; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1296,6 +1349,13 @@ ALTER TABLE ONLY stripe_connect_cards ALTER COLUMN id SET DEFAULT nextval('strip
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY stripe_connect_charges ALTER COLUMN id SET DEFAULT nextval('stripe_connect_charges_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY stripe_connect_customers ALTER COLUMN id SET DEFAULT nextval('stripe_connect_customers_id_seq'::regclass);
 
 
@@ -1515,6 +1575,14 @@ ALTER TABLE ONLY slugged_routes
 
 ALTER TABLE ONLY stripe_connect_cards
     ADD CONSTRAINT stripe_connect_cards_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: stripe_connect_charges_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY stripe_connect_charges
+    ADD CONSTRAINT stripe_connect_charges_pkey PRIMARY KEY (id);
 
 
 --
@@ -1756,6 +1824,13 @@ CREATE UNIQUE INDEX stripe_connect_cards_id_from_stripe_index ON stripe_connect_
 --
 
 CREATE UNIQUE INDEX stripe_connect_cards_stripe_connect_account_id_stripe_platform_ ON stripe_connect_cards USING btree (stripe_connect_account_id, stripe_platform_card_id);
+
+
+--
+-- Name: stripe_connect_charges_id_from_stripe_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX stripe_connect_charges_id_from_stripe_index ON stripe_connect_charges USING btree (id_from_stripe);
 
 
 --
@@ -2099,6 +2174,30 @@ ALTER TABLE ONLY stripe_connect_cards
 
 
 --
+-- Name: stripe_connect_charges_stripe_connect_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY stripe_connect_charges
+    ADD CONSTRAINT stripe_connect_charges_stripe_connect_account_id_fkey FOREIGN KEY (stripe_connect_account_id) REFERENCES stripe_connect_accounts(id);
+
+
+--
+-- Name: stripe_connect_charges_stripe_connect_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY stripe_connect_charges
+    ADD CONSTRAINT stripe_connect_charges_stripe_connect_customer_id_fkey FOREIGN KEY (stripe_connect_customer_id) REFERENCES stripe_connect_customers(id);
+
+
+--
+-- Name: stripe_connect_charges_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY stripe_connect_charges
+    ADD CONSTRAINT stripe_connect_charges_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
 -- Name: stripe_connect_customers_stripe_connect_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2278,5 +2377,5 @@ ALTER TABLE ONLY user_skills
 -- PostgreSQL database dump complete
 --
 
-INSERT INTO "schema_migrations" (version) VALUES (20160723215749), (20160804000000), (20160804001111), (20160805132301), (20160805203929), (20160808143454), (20160809214736), (20160810124357), (20160815125009), (20160815143002), (20160816020347), (20160816034021), (20160817220118), (20160818000944), (20160818132546), (20160820113856), (20160820164905), (20160822002438), (20160822004056), (20160822011624), (20160822020401), (20160822044612), (20160830081224), (20160830224802), (20160911233738), (20160912002705), (20160912145957), (20160918003206), (20160928232404), (20161003185918), (20161019090945), (20161019110737), (20161020144622), (20161021131026), (20161031001615), (20161121005339), (20161121014050), (20161121043941), (20161121045709), (20161122015942), (20161123081114), (20161123150943), (20161124085742), (20161125200620), (20161126045705), (20161127054559), (20161205024856), (20161207112519), (20161209192504), (20161212005641), (20161214005935), (20161215052051), (20161216051447), (20161218005913), (20161219160401), (20161219163909), (20161220141753), (20161221085759), (20161226213600), (20161231063614), (20170102130055), (20170102181053), (20170104113708), (20170104212623), (20170104235423), (20170106013143), (20170115035159), (20170115230549);
+INSERT INTO "schema_migrations" (version) VALUES (20160723215749), (20160804000000), (20160804001111), (20160805132301), (20160805203929), (20160808143454), (20160809214736), (20160810124357), (20160815125009), (20160815143002), (20160816020347), (20160816034021), (20160817220118), (20160818000944), (20160818132546), (20160820113856), (20160820164905), (20160822002438), (20160822004056), (20160822011624), (20160822020401), (20160822044612), (20160830081224), (20160830224802), (20160911233738), (20160912002705), (20160912145957), (20160918003206), (20160928232404), (20161003185918), (20161019090945), (20161019110737), (20161020144622), (20161021131026), (20161031001615), (20161121005339), (20161121014050), (20161121043941), (20161121045709), (20161122015942), (20161123081114), (20161123150943), (20161124085742), (20161125200620), (20161126045705), (20161127054559), (20161205024856), (20161207112519), (20161209192504), (20161212005641), (20161214005935), (20161215052051), (20161216051447), (20161218005913), (20161219160401), (20161219163909), (20161220141753), (20161221085759), (20161226213600), (20161231063614), (20170102130055), (20170102181053), (20170104113708), (20170104212623), (20170104235423), (20170106013143), (20170115035159), (20170115230549), (20170121014100);
 

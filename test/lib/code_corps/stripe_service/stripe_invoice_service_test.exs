@@ -36,7 +36,6 @@ defmodule CodeCorps.StripeService.StripeInvoiceServiceTest do
 
         user_id = user.id
         assert invoice.user_id == user_id
-        assert_received {:track, ^user_id, "Processed Subscription Payment", %{}}
     end
   end
 end

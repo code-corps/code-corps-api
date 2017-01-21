@@ -40,11 +40,13 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandler do
     end
   end
 
-  defp call_ignored_handler(local_event, handler), do: IgnoredEventHandler.handle(local_event, handler)
+  defp call_ignored_handler(%StripeEvent{} = local_event, handler), do: IgnoredEventHandler.handle(local_event, handler)
 
-  defp call_handler(api_event, local_event, handler) do
+  defp call_handler(%Stripe.Event{} = api_event, %StripeEvent{} = local_event, handler) do
     # results are multiple, so we convert the tuple to list for easier matching
-    case api_event |> handler.handle_event |> Tuple.to_list do
+    user_id = Map.get(local_event, :user_id)
+    event = api_event |> Map.merge(%{user_id: user_id})
+    case event |> handler.handle_event |> Tuple.to_list do
       [:ok, :unhandled_event] -> local_event |> set_unhandled
       [:ok | _results]        -> local_event |> set_processed
       [:error | _error]       -> local_event |> set_errored

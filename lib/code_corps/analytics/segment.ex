@@ -15,7 +15,18 @@ defmodule CodeCorps.Analytics.Segment do
   ```
   """
 
-  alias CodeCorps.{Comment, OrganizationMembership, StripeInvoice, Task, User, UserCategory, UserRole, UserSkill}
+  alias CodeCorps.{
+    Comment,
+    OrganizationMembership,
+    StripeConnectCharge,
+    StripeInvoice,
+    Task,
+    User,
+    UserCategory,
+    UserRole,
+    UserSkill
+  }
+
   alias Ecto.Changeset
 
   @api Application.get_env(:code_corps, :analytics)
@@ -26,9 +37,7 @@ defmodule CodeCorps.Analytics.Segment do
   Uses the action on the record to determine the event name that should be passed in for the `track` call.
   """
   @spec get_event_name(atom, struct) :: String.t
-  def get_event_name(action, _) when action in @actions_without_properties do
-    friendly_action_name(action)
-  end
+  def get_event_name(action, _) when action in @actions_without_properties, do: friendly_action_name(action)
   def get_event_name(:created, %OrganizationMembership{}), do: "Requested Organization Membership"
   def get_event_name(:edited, %OrganizationMembership{}), do: "Approved Organization Membership"
   def get_event_name(:payment_succeeded, %StripeInvoice{}), do: "Processed Subscription Payment"
@@ -63,13 +72,15 @@ defmodule CodeCorps.Analytics.Segment do
     do_track(conn, action_name, properties(record))
     {:ok, record}
   end
-  def track({:ok, %{user_id: user_id} = record}, action, nil) do
+  def track({:error, %Changeset{} = changeset}, _action, _conn), do: {:error, changeset}
+
+  def track({:error, errors}, :deleted, _conn), do: {:error, errors}
+
+  def track({:ok, %{user_id: user_id} = record}, action) do
     action_name = get_event_name(action, record)
     do_track(user_id, action_name, properties(record))
     {:ok, record}
   end
-  def track({:error, %Changeset{} = changeset}, _action, _conn), do: {:error, changeset}
-  def track({:error, errors}, :deleted, _conn), do: {:error, errors}
 
   @doc """
   Calls `track` with the "Signed In" event in the configured API module.
@@ -122,15 +133,15 @@ defmodule CodeCorps.Analytics.Segment do
       organization_id: organization_membership.organization.id
     }
   end
-  defp properties(invoice = %StripeInvoice{}) do
-    revenue = invoice.total / 100 # TODO: this only works for some currencies
-    currency = String.capitalize(invoice.currency) # ISO 4127 format
+  defp properties(charge = %StripeConnectCharge{}) do
+    revenue = charge.amount / 100 # TODO: this only works for some currencies
+    currency = String.capitalize(charge.currency) # ISO 4127 format
 
     %{
+      charge_id: charge.id,
       currency: currency,
-      invoice_id: invoice.id,
       revenue: revenue,
-      user_id: invoice.user_id
+      user_id: charge.user_id
     }
   end
   defp properties(task = %Task{}) do
@@ -166,7 +177,6 @@ defmodule CodeCorps.Analytics.Segment do
   defp properties(_struct) do
     %{}
   end
-
 
   defp traits(user) do
     %{

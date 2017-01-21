@@ -40,7 +40,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.WebhookProcessor do
     with user_id <- event_params |> Map.get("user_id"),
          {:ok, %Stripe.Event{} = api_event} <- retrieve_event_from_api(id, user_id)
     do
-      EventHandler.handle(api_event, handler)
+      EventHandler.handle(api_event, handler, user_id)
     end
   end
 

@@ -17,19 +17,19 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
     %CodeCorps.StripeService.WebhookProcessing.EventHandlerTest.StubObject{id: "stub_id", object: "stub"}
   end
 
-  defp build_event, do: build_event("any.event", "any_object")
-  defp build_event(type, object_type), do: build_event(type, object_type,  stub_object)
-  defp build_event(type, object_type, object), do: build_event("some_id", type, object_type, object)
-  defp build_event(id, type, object_type, object) do
+  defp build_event(user_id), do: build_event("any.event", "any_object", user_id)
+  defp build_event(type, object_type, user_id), do: build_event(type, object_type, stub_object, user_id)
+  defp build_event(type, object_type, object, user_id), do: build_event("some_id", type, object_type, object, user_id)
+  defp build_event(id, type, object_type, object, user_id) do
     object = Map.merge(object, %{object: object_type})
-    %Stripe.Event{id: id, type: type, data: %{object: object}}
+    %Stripe.Event{id: id, type: type, data: %{object: object}, user_id: user_id}
   end
 
   describe "platform events" do
     test "handles customer.updated" do
       platform_customer = insert(:stripe_platform_customer)
       stripe_customer = %Stripe.Customer{id: platform_customer.id_from_stripe}
-      event = build_event("customer.updated", "customer", stripe_customer)
+      event = build_event("customer.updated", "customer", stripe_customer, nil)
 
       {:ok, event} = EventHandler.handle(event, PlatformEventHandler)
       assert event.object_type == "customer"
@@ -46,7 +46,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
       platform_customer = insert(:stripe_platform_customer)
       platform_card = insert(:stripe_platform_card, customer_id_from_stripe: platform_customer.id_from_stripe)
       stripe_card = %Stripe.Card{id: platform_card.id_from_stripe}
-      event = build_event("customer.source.updated", "card", stripe_card)
+      event = build_event("customer.source.updated", "card", stripe_card, nil)
 
       {:ok, event} = EventHandler.handle(event, PlatformEventHandler)
       assert event.object_type == "card"
@@ -63,13 +63,34 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
   describe "connect events" do
     test "handles account.updated" do
       connect_account = insert(:stripe_connect_account)
-      event = build_event("account.updated", "account", %Stripe.Account{id: connect_account.id_from_stripe})
+      event = build_event(
+        "account.updated",
+        "account",
+        %Stripe.Account{id: connect_account.id_from_stripe},
+        connect_account.id_from_stripe
+      )
 
       {:ok, event} = EventHandler.handle(event, ConnectEventHandler, "acc_123")
       assert event.object_type == "account"
       assert event.object_id == connect_account.id_from_stripe
       assert event.status == "processed"
       assert event.user_id == "acc_123"
+    end
+
+    test "handles charge.succeeded" do
+      connect_account = insert(:stripe_connect_account)
+      customer = insert(:stripe_connect_customer, id_from_stripe: "test_customer_for_charge")
+      event = build_event(
+        "charge.succeeded",
+        "charge",
+        %Stripe.Charge{id: "ch_123", customer: customer.id_from_stripe},
+        connect_account.id_from_stripe
+      )
+
+      {:ok, event} = EventHandler.handle(event, ConnectEventHandler, connect_account.id_from_stripe)
+      assert event.object_type == "charge"
+      assert event.object_id == "ch_123"
+      assert event.status == "processed"
     end
 
     test "handles customer.subscription.updated" do
@@ -91,7 +112,8 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
         %Stripe.Subscription{
           id: subscription.id_from_stripe,
           customer: connect_customer.id_from_stripe
-        }
+        },
+        account.id_from_stripe
       )
 
       {:ok, event} = EventHandler.handle(event, ConnectEventHandler, "acc_123")
@@ -120,7 +142,8 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
         %Stripe.Subscription{
           id: subscription.id_from_stripe,
           customer: connect_customer.id_from_stripe
-        }
+        },
+        account.id_from_stripe
       )
 
       {:ok, event} = EventHandler.handle(event, ConnectEventHandler, "acc_123")
@@ -150,7 +173,8 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
           id: "ivc_123",
           customer: connect_customer.id_from_stripe,
           subscription: subscription.id_from_stripe
-        }
+        },
+        nil
       )
 
       {:ok, event} = EventHandler.handle(event, ConnectEventHandler, "acc_123")
@@ -165,7 +189,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
 
   describe "any event" do
     test "sets endpoint to 'platform' when using PlatformEventHandler" do
-      event = build_event
+      event = build_event(nil)
 
       {:ok, event} = EventHandler.handle(event, PlatformEventHandler)
       assert event.endpoint == "platform"
@@ -173,7 +197,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
     end
 
     test "sets endpoint to 'connect' when using ConnectEventHandler" do
-      event = build_event
+      event = build_event(nil)
 
       {:ok, event} = EventHandler.handle(event, ConnectEventHandler, "acc_123")
       assert event.endpoint == "connect"
@@ -181,7 +205,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
     end
 
     test "creates event if id is new" do
-      event = build_event
+      event = build_event(nil)
       {:ok, event} = EventHandler.handle(event, PlatformEventHandler)
 
       assert event.id_from_stripe == "some_id"
@@ -193,7 +217,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
 
     test "uses existing event if id exists" do
       local_event = insert(:stripe_event)
-      event = build_event(local_event.id_from_stripe, "any.event", "any_object", stub_object)
+      event = build_event(local_event.id_from_stripe, "any.event", "any_object", stub_object, nil)
 
       {:ok, returned_event} = EventHandler.handle(event, PlatformEventHandler)
       assert returned_event.id == local_event.id
@@ -202,7 +226,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
     end
 
     test "sets event as unhandled if event is not handled" do
-      event = build_event("unhandled.event", "any_object")
+      event = build_event("unhandled.event", "any_object", nil)
 
       {:ok, event} = EventHandler.handle(event, PlatformEventHandler)
       assert event.status == "unhandled"
@@ -210,7 +234,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
 
     test "errors out event if handling fails" do
       # we build the event, but do not make the customer, causing it to error out
-      event = build_event("customer.updated", "customer", %Stripe.Customer{id: "some_id"})
+      event = build_event("customer.updated", "customer", %Stripe.Customer{id: "some_id"}, nil)
 
       {:ok, event} = EventHandler.handle(event, PlatformEventHandler)
       assert event.status == "errored"
@@ -218,7 +242,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
 
     test "marks event as processed if handling is done" do
       # we build the event AND create the customer, so it should process correctly
-      event = build_event("customer.updated", "customer", %Stripe.Customer{id: "some_id"})
+      event = build_event("customer.updated", "customer", %Stripe.Customer{id: "some_id"}, nil)
       insert(:stripe_platform_customer, id_from_stripe: "some_id")
 
       {:ok, event} = EventHandler.handle(event, PlatformEventHandler)
@@ -227,7 +251,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
 
     test "leaves event alone if already processing" do
       local_event = insert(:stripe_event, status: "processing")
-      event = build_event(local_event.id_from_stripe, "any.event", "any_object", %Stripe.Customer{id: "some_id"})
+      event = build_event(local_event.id_from_stripe, "any.event", "any_object", %Stripe.Customer{id: "some_id"}, nil)
 
       assert {:error, :already_processing} == EventHandler.handle(event, PlatformEventHandler)
     end
@@ -235,7 +259,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
 
   describe "ignored events" do
     test "properly sets as ignored" do
-      event = build_event("application_fee.created", "application_fee")
+      event = build_event("application_fee.created", "application_fee", nil)
       {:ok, event} = EventHandler.handle(event, PlatformEventHandler)
 
       assert event.status == "ignored"
