@@ -65,10 +65,11 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
       connect_account = insert(:stripe_connect_account)
       event = build_event("account.updated", "account", %Stripe.Account{id: connect_account.id_from_stripe})
 
-      {:ok, event} = EventHandler.handle(event, ConnectEventHandler)
+      {:ok, event} = EventHandler.handle(event, ConnectEventHandler, "acc_123")
       assert event.object_type == "account"
       assert event.object_id == connect_account.id_from_stripe
       assert event.status == "processed"
+      assert event.user_id == "acc_123"
     end
 
     test "handles customer.subscription.updated" do
@@ -93,10 +94,11 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
         }
       )
 
-      {:ok, event} = EventHandler.handle(event, ConnectEventHandler)
+      {:ok, event} = EventHandler.handle(event, ConnectEventHandler, "acc_123")
       assert event.object_type == "subscription"
       assert event.object_id == subscription.id_from_stripe
       assert event.status == "processed"
+      assert event.user_id == "acc_123"
     end
 
     test "handles customer.subscription.deleted" do
@@ -121,10 +123,11 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
         }
       )
 
-      {:ok, event} = EventHandler.handle(event, ConnectEventHandler)
+      {:ok, event} = EventHandler.handle(event, ConnectEventHandler, "acc_123")
       assert event.object_type == "subscription"
       assert event.object_id == subscription.id_from_stripe
       assert event.status == "processed"
+      assert event.user_id == "acc_123"
     end
 
     test "handles invoice.payment_succeeded" do
@@ -150,10 +153,11 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
         }
       )
 
-      {:ok, event} = EventHandler.handle(event, ConnectEventHandler)
+      {:ok, event} = EventHandler.handle(event, ConnectEventHandler, "acc_123")
       assert event.object_type == "invoice"
       assert event.object_id == "ivc_123"
       assert event.status == "processed"
+      assert event.user_id == "acc_123"
 
       assert Repo.get_by(StripeInvoice, id_from_stripe: "ivc_123")
     end
@@ -165,13 +169,15 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
 
       {:ok, event} = EventHandler.handle(event, PlatformEventHandler)
       assert event.endpoint == "platform"
+      assert event.user_id == nil
     end
 
     test "sets endpoint to 'connect' when using ConnectEventHandler" do
       event = build_event
 
-      {:ok, event} = EventHandler.handle(event, ConnectEventHandler)
+      {:ok, event} = EventHandler.handle(event, ConnectEventHandler, "acc_123")
       assert event.endpoint == "connect"
+      assert event.user_id == "acc_123"
     end
 
     test "creates event if id is new" do
@@ -182,6 +188,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
       assert event.object_id == "stub_id"
       assert event.object_type == "any_object"
       assert event.status == "unhandled"
+      assert event.user_id == nil
     end
 
     test "uses existing event if id exists" do
