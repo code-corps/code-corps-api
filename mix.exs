@@ -4,13 +4,14 @@ defmodule CodeCorps.Mixfile do
   def project do
     [app: :code_corps,
      version: "0.0.1",
-     elixir: "1.3.3",
+     elixir: "1.3.4",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      aliases: aliases(),
      deps: deps(),
+     docs: docs(),
      test_coverage: [tool: ExCoveralls]]
   end
 
@@ -21,6 +22,7 @@ defmodule CodeCorps.Mixfile do
     [
       mod: {CodeCorps, []},
       applications: [
+        :bamboo,
         :phoenix,
         :phoenix_pubsub,
         :phoenix_html,
@@ -35,10 +37,13 @@ defmodule CodeCorps.Mixfile do
         :earmark,
         :ex_aws,
         :httpoison,
+        :ja_resource,
         :scrivener_ecto,
         :segment,
         :sentry,
-        :stripity_stripe
+        :stripity_stripe,
+        :timber,
+        :timex_ecto
       ]
     ]
   end
@@ -52,36 +57,55 @@ defmodule CodeCorps.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:bamboo, "~> 0.7"}, # emails
       {:phoenix, "~> 1.2.1"},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 3.0"},
       {:postgrex, ">= 0.0.0"},
-      {:phoenix_html, "~> 2.6"},
+      {:phoenix_html, "~> 2.8"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
-      {:gettext, "~> 0.11"},
+      {:gettext, "~> 0.12"},
       {:cowboy, "~> 1.0"},
-      {:arc, git: "https://github.com/stavro/arc.git", ref: "354d4d2e1b86bcd6285db3528118fe3f5db36cf5", override: true}, # Photo uploads
-      {:arc_ecto, "~> 0.4.4"},
-      {:canary, "~> 1.0"}, # Authorization
+      {:arc, "~> 0.6"}, # Photo uploads
+      {:arc_ecto, "~> 0.5"},
+      {:benchfella, "~> 0.3.0", only: :dev},
+      {:canary, "~> 1.1"}, # Authorization
       {:comeonin, "~> 2.0"},
       {:corsica, "~> 0.4"}, # CORS
-      {:credo, "~> 0.4", only: [:dev, :test]}, # Code style suggestions
+      {:credo, "~> 0.5", only: [:dev, :test]}, # Code style suggestions
       {:earmark, "~> 1.0"}, # Markdown rendering
-      {:ex_aws, "~> 0.4"}, # Amazon AWS
+      {:ex_aws, "~> 1.0"}, # Amazon AWS
       {:excoveralls, "~> 0.5", only: :test}, # Test coverage
-      {:ex_doc, "~> 0.13", only: [:dev, :test]},
+      {:ex_doc, "~> 0.14", only: [:dev, :test]},
       {:ex_machina, "~> 1.0", only: :test}, # test factories
       {:guardian, "~> 0.13"}, # Authentication (JWT)
-      {:hackney, ">= 1.4.4", override: true},
+      {:hackney, ">= 1.4.4"},
       {:inch_ex, "~> 0.5", only: [:dev, :test]}, # Inch CI
-      {:inflex, "~> 1.7.0"},
-      {:ja_serializer, "~> 0.10.1"}, # JSON API
+      {:inflex, "~> 1.8"},
+      {:ja_resource, "~> 0.2"},
+      {:ja_serializer, "~> 0.11.0"}, # JSON API
       {:mix_test_watch, "~> 0.2", only: :dev}, # Test watcher
-      {:poison, "~> 1.2 or ~> 2.0"},
+      {:poison, "~> 2.0"},
       {:scrivener_ecto, "~> 1.0"}, # DB query pagination
-      {:segment, github: "stueccles/analytics-elixir"}, # Segment analytics
-      {:sentry, "~> 1.0"}, # Sentry error tracking
-      {:stripity_stripe, "~> 1.3.0"} # Stripe
+      {:segment, "~> 0.1"}, # Segment analytics
+      {:sentry, "~> 2.0"}, # Sentry error tracking
+      {:stripity_stripe, git: "https://github.com/code-corps/stripity_stripe.git", branch: "2.0"}, # Stripe
+      {:sweet_xml, "~> 0.5"},
+      {:timber, "~> 0.4"}, # Logging
+      {:timex, "~> 3.0"},
+      {:timex_ecto, "~> 3.0"},
+      {:ecto_ordered, "0.2.0-beta1"}
+    ]
+  end
+
+  defp docs do
+    [
+      extras: [
+        "README.md": [title: "README"],
+        "LICENSE.md": [title: "LICENSE"]
+      ],
+      main: "README",
+      source_url: "https://github.com/code-corps/code-corps-api/doc"
     ]
   end
 
@@ -94,6 +118,8 @@ defmodule CodeCorps.Mixfile do
   defp aliases do
     ["ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
      "ecto.reset": ["ecto.drop", "ecto.setup"],
+     "ecto.migrate": ["ecto.migrate", "ecto.dump"],
+     "ecto.rollback": ["ecto.rollback", "ecto.dump"],
      "test": ["ecto.create --quiet", "ecto.migrate", "test"]]
   end
 end

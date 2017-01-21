@@ -1,101 +1,82 @@
 defmodule CodeCorps.CommentControllerTest do
-  use CodeCorps.ApiCase
-
-  alias CodeCorps.Comment
-  alias CodeCorps.Repo
+  use CodeCorps.ApiCase, resource_name: :comment
 
   @valid_attrs %{markdown: "I love elixir!"}
   @invalid_attrs %{markdown: ""}
 
-  defp build_payload, do: %{ "data" => %{"type" => "comment"}}
-  defp put_id(payload, id), do: payload |> put_in(["data", "id"], id)
-  defp put_attributes(payload, attributes), do: payload |> put_in(["data", "attributes"], attributes)
-  defp put_relationships(payload, user, task) do
-    relationships = build_relationships(user, task)
-    payload |> put_in(["data", "relationships"], relationships)
-  end
-
-  defp build_relationships(user, task) do
-    %{
-      user: %{data: %{id: user.id}},
-      task: %{data: %{id: task.id}}
-    }
-  end
-
   describe "index" do
-    test "lists all entries for specified task on index", %{conn: conn} do
-      task = insert(:task)
-      path = conn |> task_comment_path(:index, task)
+    test "lists all entries on index", %{conn: conn} do
+      path = conn |> comment_path(:index)
       conn = conn |> get(path)
+
       assert json_response(conn, 200)["data"] == []
+    end
+
+    test "filters resources on index", %{conn: conn} do
+      first_comment = insert(:comment)
+      second_comment = insert(:comment)
+      insert(:comment)
+
+      path = "comments/?filter[id]=#{first_comment.id},#{second_comment.id}"
+
+      conn
+      |> get(path)
+      |> json_response(200)
+      |> assert_ids_from_response([first_comment.id, second_comment.id])
     end
   end
 
   describe "show" do
     test "shows chosen resource", %{conn: conn} do
       comment = insert(:comment)
-
-      path = conn |> comment_path(:show, comment)
-      conn = conn |> get(path)
-
-      data = json_response(conn, 200)["data"]
-
-      assert data["id"] == "#{comment.id}"
-      assert data["type"] == "comment"
-      assert data["attributes"]["body"] == comment.body
-      assert data["attributes"]["markdown"] == comment.markdown
-      assert data["relationships"]["user"]["data"]["id"] == "#{comment.user_id}"
-      assert data["relationships"]["task"]["data"]["id"] == "#{comment.task_id}"
+      conn
+      |> request_show(comment)
+      |> json_response(200)
+      |> Map.get("data")
+      |> assert_result_id(comment.id)
     end
 
-    test "does not show resource and instead throw error when id is nonexistent", %{conn: conn} do
-      assert_error_sent 404, fn ->
-        get conn, comment_path(conn, :show, -1)
-      end
+    test "renders 404 when id is nonexistent", %{conn: conn} do
+      assert conn |> request_show(:not_found) |> json_response(404)
     end
   end
 
   describe "create" do
     @tag :authenticated
-    test "creates and renders resource when data is valid", %{conn: conn} do
-      user = insert(:user)
-      task = insert(:task, user: user)
+    test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
+      task = insert(:task)
+      attrs = @valid_attrs |> Map.merge(%{task: task, user: current_user})
 
-      payload =
-        build_payload
-        |> put_attributes(@valid_attrs)
-        |> put_relationships(user, task)
+      json = conn |> request_create(attrs) |> json_response(201)
+      assert json
 
-      path = conn |> comment_path(:create)
-      conn = conn |> post(path, payload)
+      user_id = current_user.id
 
-      assert json_response(conn, 201)["data"]["id"]
-      assert Repo.get_by(Comment, @valid_attrs)
+      tracking_properties = %{
+        comment_id: String.to_integer(json["data"]["id"]),
+        task: task.title,
+        task_id: task.id,
+        task_type: task.task_type,
+        project_id: task.project_id
+      }
+
+      assert_received {:track, ^user_id, "Created Comment", ^tracking_properties}
     end
 
     @tag :authenticated
-    test "does not create resource and renders errors when data is invalid", %{conn: conn} do
-      payload = build_payload |> put_attributes(@invalid_attrs)
-
-      path = conn |> comment_path(:create)
-      conn = conn |> post(path, payload)
-
-      assert json_response(conn, 422)["errors"] != %{}
+    test "does not create resource and renders errors when data is invalid", %{conn: conn, current_user: current_user} do
+      attrs = @invalid_attrs |> Map.merge(%{user: current_user})
+      json = conn |> request_create(attrs) |> json_response(422)
+      assert json["errors"] != %{}
     end
 
     test "does not create resource and renders 401 when not authenticated", %{conn: conn} do
-      user = insert(:user)
-      task = insert(:task, user: user)
+      assert conn |> request_create(@valid_attrs) |> json_response(401)
+    end
 
-      payload =
-        build_payload
-        |> put_attributes(@valid_attrs)
-        |> put_relationships(user, task)
-
-      path = conn |> comment_path(:create)
-      conn = conn |> post(path, payload)
-
-      assert json_response(conn, 401)
+    @tag :authenticated
+    test "does not create resource and renders 403 when not authorized", %{conn: conn} do
+      assert conn |> request_create(@valid_attrs) |> json_response(403)
     end
   end
 
@@ -103,61 +84,38 @@ defmodule CodeCorps.CommentControllerTest do
     @tag :authenticated
     test "updates and renders chosen resource when data is valid", %{conn: conn, current_user: current_user} do
       comment = insert(:comment, user: current_user)
+      attrs = @valid_attrs |> Map.merge(%{user: current_user})
 
-      payload =
-        build_payload
-        |> put_id(comment.id)
-        |> put_attributes(@valid_attrs)
+      assert conn |> request_update(comment, attrs) |> json_response(200)
 
-      path = conn |> comment_path(:update, comment)
-      conn = conn |> put(path, payload)
+      user_id = current_user.id
+      task = comment.task
+      tracking_properties = %{
+        comment_id: comment.id,
+        task: task.title,
+        task_id: task.id,
+        task_type: task.task_type,
+        project_id: task.project_id
+      }
 
-      assert json_response(conn, 200)["data"]["id"]
-      assert Repo.get_by(Comment, @valid_attrs)
+      assert_received {:track, ^user_id, "Edited Comment", ^tracking_properties}
     end
 
     @tag :authenticated
     test "does not update chosen resource and renders errors when data is invalid", %{conn: conn, current_user: current_user} do
       comment = insert(:comment, user: current_user)
-
-      payload =
-        build_payload
-        |> put_id(comment.id)
-        |> put_attributes(@invalid_attrs)
-
-      path = conn |> comment_path(:update, comment)
-      conn = conn |> put(path, payload)
-
-      assert json_response(conn, 422)["errors"] != %{}
+      attrs = @invalid_attrs |> Map.merge(%{user: current_user})
+      json = conn |> request_update(comment, attrs) |> json_response(422)
+      assert json["errors"] != %{}
     end
 
     test "does not update resource and renders 401 when not authenticated", %{conn: conn} do
-      comment = insert(:comment)
-
-      payload =
-        build_payload
-        |> put_id(comment.id)
-        |> put_attributes(@valid_attrs)
-
-      path = conn |> comment_path(:update, comment)
-      conn = conn |> put(path, payload)
-
-      assert json_response(conn, 401)
+      assert conn |> request_update(@valid_attrs) |> json_response(401)
     end
 
     @tag :authenticated
-    test "does not update resource and renders 401 when not authorized", %{conn: conn} do
-      comment = insert(:comment)
-
-      payload =
-        build_payload
-        |> put_id(comment.id)
-        |> put_attributes(@valid_attrs)
-
-      path = conn |> comment_path(:update, comment)
-      conn = conn |> put(path, payload)
-
-      assert json_response(conn, 401)
+    test "does not update resource and renders 403 when not authorized", %{conn: conn} do
+      assert conn |> request_update(@valid_attrs) |> json_response(403)
     end
   end
 end

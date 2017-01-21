@@ -1,18 +1,17 @@
 defmodule CodeCorps.User do
   @moduledoc """
-  This module defines a user of the Code Corps app.
+  This module defines a user of the Code Corps app.
   """
 
   use Arc.Ecto.Schema
   use CodeCorps.Web, :model
 
+  import CodeCorps.Services.Base64ImageUploaderService
+  import CodeCorps.Validators.SlugValidator
+
   alias CodeCorps.SluggedRoute
   alias Comeonin.Bcrypt
   alias Ecto.Changeset
-
-  import CodeCorps.Base64ImageUploader
-  import CodeCorps.Validators.SlugValidator
-  import CodeCorps.ModelHelpers
 
   schema "users" do
     field :admin, :boolean
@@ -31,12 +30,16 @@ defmodule CodeCorps.User do
     field :state, :string, default: "signed_up"
     field :state_transition, :string, virtual: true
 
+    has_many :organization_memberships, CodeCorps.OrganizationMembership, foreign_key: :member_id
+    has_many :organizations, through: [:organization_memberships, :organization]
+
     has_one :slugged_route, SluggedRoute
 
-    has_many :organization_memberships,
-      CodeCorps.OrganizationMembership,
-      foreign_key: :member_id
-    has_many :organizations, through: [:organization_memberships, :organization]
+    has_many :stripe_connect_customers, CodeCorps.StripeConnectCustomer
+    has_many :stripe_connect_subscriptions, CodeCorps.StripeConnectSubscription
+
+    has_one :stripe_platform_card, CodeCorps.StripePlatformCard
+    has_one :stripe_platform_customer, CodeCorps.StripePlatformCustomer
 
     has_many :user_categories, CodeCorps.UserCategory
     has_many :categories, through: [:user_categories, :category]
@@ -109,10 +112,6 @@ defmodule CodeCorps.User do
     %{}
     |> check_username_valid(username)
     |> check_used(:username, username)
-  end
-
-  def index_filters(query, params) do
-    query |> id_filter(params)
   end
 
   defp put_pass_hash(changeset) do

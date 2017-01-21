@@ -19,6 +19,14 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def donation_goal_factory do
+    %CodeCorps.DonationGoal{
+      amount: 100,
+      description: sequence(:description, &"A description for a donation goal #{&1}"),
+      project: build(:project)
+    }
+  end
+
   def organization_factory do
     %CodeCorps.Organization{
       name: sequence(:username, &"Organization #{&1}"),
@@ -43,7 +51,16 @@ defmodule CodeCorps.Factories do
       status: "open",
       state: "published",
       project: build(:project),
-      user: build(:user)
+      user: build(:user),
+      task_list: build(:task_list)
+    }
+  end
+
+  def task_list_factory do
+    %CodeCorps.TaskList{
+      name: "Test task list",
+      position: 1,
+      project: build(:project)
     }
   end
 
@@ -92,6 +109,96 @@ defmodule CodeCorps.Factories do
   def slugged_route_factory do
     %CodeCorps.SluggedRoute{
       slug: sequence(:slug, &"slug-#{&1}")
+    }
+  end
+
+  def stripe_connect_account_factory do
+    %CodeCorps.StripeConnectAccount{
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
+      organization: build(:organization)
+    }
+  end
+
+  def stripe_connect_card_factory do
+    %CodeCorps.StripeConnectCard{
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
+      stripe_connect_account: build(:stripe_connect_account),
+      stripe_platform_card: build(:stripe_platform_card)
+    }
+  end
+
+  def stripe_connect_charge_factory do
+    %CodeCorps.StripeConnectCharge{
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
+      stripe_connect_account: build(:stripe_connect_account),
+      stripe_connect_customer: build(:stripe_connect_customer),
+      user: build(:user)
+    }
+  end
+
+  def stripe_connect_customer_factory do
+    %CodeCorps.StripeConnectCustomer{
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
+      stripe_connect_account: build(:stripe_connect_account),
+      stripe_platform_customer: build(:stripe_platform_customer),
+      user: build(:user)
+    }
+  end
+
+  def stripe_connect_plan_factory do
+    %CodeCorps.StripeConnectPlan{
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
+      project: build(:project)
+    }
+  end
+
+  def stripe_connect_subscription_factory do
+    stripe_connect_plan = build(:stripe_connect_plan)
+    %CodeCorps.StripeConnectSubscription{
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
+      plan_id_from_stripe: stripe_connect_plan.id_from_stripe,
+      stripe_connect_plan: stripe_connect_plan,
+      user: build(:user)
+    }
+  end
+
+  def stripe_event_factory do
+    %CodeCorps.StripeEvent{
+      endpoint: sequence(:endpoint, fn(_) -> Enum.random(~w{ connect platform }) end),
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
+      object_id: "cus_123",
+      object_type: "customer",
+      status: sequence(:status, fn(_) -> Enum.random(~w{ unprocessed processed errored }) end),
+      type: "test.type"
+    }
+  end
+
+  def stripe_external_account_factory do
+    %CodeCorps.StripeExternalAccount{
+      account_id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}")
+    }
+  end
+
+  def stripe_file_upload_factory do
+    %CodeCorps.StripeFileUpload{
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
+    }
+  end
+
+  def stripe_platform_customer_factory do
+    %CodeCorps.StripePlatformCustomer{
+      created: Timex.now |> Timex.to_unix,
+      email: sequence(:email, &"email_#{&1}@mail.com"),
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
+      user: build(:user)
+    }
+  end
+
+  def stripe_platform_card_factory do
+    %CodeCorps.StripePlatformCard{
+      id_from_stripe: sequence(:id_from_stripe, &"card_testDataMiscCaps#{&1}"),
+      user: build(:user)
     }
   end
 

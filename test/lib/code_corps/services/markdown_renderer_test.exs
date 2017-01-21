@@ -1,12 +1,13 @@
-defmodule CodeCorps.MarkdownRendererTest do
+defmodule CodeCorps.Services.MarkdownRendererServiceTest do
   use ExUnit.Case, async: true
 
   alias CodeCorps.Task
 
-  import CodeCorps.MarkdownRenderer
+  import CodeCorps.Services.MarkdownRendererService
 
   @valid_attrs %{
     title: "Test task",
+    task_list_id: 1,
     task_type: "issue",
     markdown: "A **strong** body",
     status: "open"

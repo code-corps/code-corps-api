@@ -1,84 +1,47 @@
 defmodule CodeCorps.UserController do
-  @analytics Application.get_env(:code_corps, :analytics)
-
   use CodeCorps.Web, :controller
+  use JaResource
+
+  import CodeCorps.Helpers.Query, only: [id_filter: 2]
 
   alias CodeCorps.User
-  alias JaSerializer.Params
+  alias CodeCorps.Services.UserService
 
   plug :load_and_authorize_resource, model: User, only: [:update]
-  plug :scrub_params, "data" when action in [:create, :update]
+  plug JaResource
 
-  def index(conn, params) do
-    users =
-      User
-      |> User.index_filters(params)
-      |> preload([:slugged_route, :organization_memberships, :user_categories, :user_roles, :user_skills])
-      |> Repo.all
-
-    render(conn, "index.json-api", data: users)
+  def filter(_conn, query, "id", id_list) do
+    query |> id_filter(id_list)
   end
 
-  def create(conn, %{"data" => data = %{"type" => "user", "attributes" => _user_params}}) do
-    changeset = User.registration_changeset(%User{}, Params.to_attributes(data))
-
-    case Repo.insert(changeset) do
-      {:ok, user} ->
-        user = Repo.preload(user, [:slugged_route, :organization_memberships, :user_categories, :user_roles, :user_skills])
-
-        conn
-        |> Plug.Conn.assign(:current_user, user)
-        |> @analytics.track(:signed_up)
-        |> put_status(:created)
-        |> put_resp_header("location", user_path(conn, :show, user))
-        |> render("show.json-api", data: user)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
+  def handle_create(conn, attributes) do
+    with {:ok, user} <- %User{} |> User.registration_changeset(attributes) |> Repo.insert,
+         conn        <- login(user, conn)
+    do
+      CodeCorps.Analytics.Segment.track({:ok, user}, :signed_up, conn)
+    else
+      {:error, changeset} -> changeset
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    user =
-      User
-      |> preload([:slugged_route, :organization_memberships, :user_categories, :user_roles, :user_skills])
-      |> Repo.get!(id)
+  defp login(user, conn), do: Plug.Conn.assign(conn, :current_user, user)
 
-    render(conn, "show.json-api", data: user)
-  end
-
-  def update(conn, %{"id" => id, "data" => data = %{"type" => "user", "attributes" => _user_params}}) do
-    user =
-      User
-      |> preload([:slugged_route, :organization_memberships, :user_categories, :user_roles, :user_skills])
-      |> Repo.get!(id)
-
-    changeset = User.update_changeset(user, Params.to_attributes(data))
-
-    case Repo.update(changeset) do
-      {:ok, user} ->
-        conn
-        |> @analytics.track(:updated_profile)
-        |> render("show.json-api", data: user)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
+  def handle_update(conn, record, attributes) do
+    with {:ok, user, _, _} <- UserService.update(record, attributes)
+    do
+      {:ok, user} |> CodeCorps.Analytics.Segment.track(:updated_profile, conn)
+    else
+      {:error, changeset} -> changeset
     end
   end
 
   def email_available(conn, %{"email" => email}) do
     hash = User.check_email_availability(email)
-
-    conn
-    |> json(hash)
+    conn |> json(hash)
   end
 
   def username_available(conn, %{"username" => username}) do
     hash = User.check_username_availability(username)
-
-    conn
-    |> json(hash)
+    conn |> json(hash)
   end
 end

@@ -8,4 +8,3 @@ ExUnit.configure exclude: [:requires_env]
 ExUnit.start
 
 Ecto.Adapters.SQL.Sandbox.mode(CodeCorps.Repo, :manual)
-

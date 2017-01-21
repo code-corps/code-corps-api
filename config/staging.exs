@@ -1,6 +1,6 @@
 use Mix.Config
 
-# For production, we configure the host to read the PORT
+# For staging, we configure the host to read the PORT
 # from the system environment. Therefore, you will need
 # to set PORT=80 before running your server.
 #
@@ -13,12 +13,14 @@ use Mix.Config
 # which you typically run after static files are built.
 config :code_corps, CodeCorps.Endpoint,
   http: [port: {:system, "PORT"}],
+  instrumenters: [Timber.PhoenixInstrumenter],
   url: [scheme: "http", host: "api.pbqrpbecf.org", port: 80],
   secret_key_base: System.get_env("SECRET_KEY_BASE")
 
 # Configure your database
 config :code_corps, CodeCorps.Repo,
   adapter: Ecto.Adapters.Postgres,
+  loggers: [{Timber.Ecto, :log, [:info]}],
   url: System.get_env("DATABASE_URL"),
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
   ssl: true
@@ -34,11 +36,24 @@ config :code_corps, allowed_origins: [
 config :guardian, Guardian,
   secret_key: System.get_env("GUARDIAN_SECRET_KEY")
 
-# Do not print debug messages in production
-config :logger, level: :info
+# Timber logging
+config :logger,
+  level: :info,
+  backends: [Timber.Logger]
+config :timber, :transport, Timber.Transports.IODevice
+
+# Configures Segment for analytics
+config :code_corps, :analytics, CodeCorps.Analytics.SegmentAPI
 
 config :sentry,
   environment_name: Mix.env || :staging
+
+# Configures stripe for staging
+config :code_corps, :stripe, Stripe
+config :code_corps, :stripe_env, :staging
+
+config :code_corps, CodeCorps.Mailer,
+  adapter: Bamboo.LocalAdapter
 
 # ## SSL Support
 #

@@ -1,41 +1,37 @@
 defmodule CodeCorps.TaskPolicy do
-  alias CodeCorps.OrganizationMembership
+  import CodeCorps.Helpers.Policy,
+    only: [get_project: 1, get_membership: 2, get_role: 1, admin_or_higher?: 1, contributor_or_higher?: 1]
+
   alias CodeCorps.Task
-  alias CodeCorps.Project
   alias CodeCorps.User
-
-  alias CodeCorps.Repo
-
-  import Ecto.Query
+  alias Ecto.Changeset
 
   # TODO: Need to be able to see what resource is being created here
   # Previously, any user could create issues and ideas, but only
   # approved members of organization could create other task types
-  def create?(%User{} = _user), do: true
-
-  def update?(%User{} = user, %Task{} = task) do
-    permitted? = cond do
-      # author can update own task
-      user.id == task.user_id -> true
+  def create?(%User{admin: true}, %Changeset{}), do: true
+  def create?(%User{} = user, %Changeset{changes: %{user_id: author_id, task_type: task_type}} = changeset) do
+    cond do
+      # can't create for some other user
+      user.id != author_id -> false
+      # any registered user can create ideas or issues
+      task_type in ["idea", "issue"] -> true
       # organization admin or higher can update other people's tasks
-      user |> is_admin_or_higher(task) -> true
+      changeset |> get_project |> get_membership(user) |> get_role |> contributor_or_higher? -> true
       # do not permit for any other case
       true -> false
     end
-
-    permitted?
   end
+  def create?(%User{}, %Changeset{}), do: false
 
-  defp is_admin_or_higher(%User{} = user, %Task{} = task) do
-    project = Project |> Repo.get(task.project_id)
-    membership =
-      OrganizationMembership
-      |> where([m], m.member_id == ^user.id and m.organization_id == ^project.organization_id)
-      |> Repo.one
-
-    membership |> is_admin_or_higher
+  def update?(%User{} = user, %Task{user_id: author_id} = task) do
+    cond do
+      # author can update own task
+      user.id == author_id -> true
+      # organization admin or higher can update other people's tasks
+      task |> get_project |> get_membership(user) |> get_role |> admin_or_higher? -> true
+      # do not permit for any other case
+      true -> false
+    end
   end
-
-  defp is_admin_or_higher(nil), do: false
-  defp is_admin_or_higher(%OrganizationMembership{} = membership), do: membership.role in ["admin", "owner"]
 end

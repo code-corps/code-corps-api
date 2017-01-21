@@ -1,9 +1,8 @@
 defmodule CodeCorps.UserControllerTest do
-  use CodeCorps.ApiCase
+  use CodeCorps.ApiCase, resource_name: :user
 
   alias CodeCorps.User
   alias CodeCorps.Repo
-  alias CodeCorps.SluggedRoute
 
   @valid_attrs %{
     email: "test@user.com",
@@ -27,47 +26,43 @@ defmodule CodeCorps.UserControllerTest do
   describe "index" do
 
     test "lists all entries on index", %{conn: conn} do
-      conn = get conn, user_path(conn, :index)
-      assert json_response(conn, 200)["data"] == []
+      [user_1, user_2] = insert_pair(:user)
+
+      conn
+      |> request_index
+      |> json_response(200)
+      |> assert_ids_from_response([user_1.id, user_2.id])
     end
 
     test "filters resources on index", %{conn: conn} do
-      [user_1, user_2] = insert_pair(:user)
-      insert(:user, username: "user_3", email: "user_3@mail.com")
-      conn = get conn, "users/?filter[id]=#{user_1.id},#{user_2.id}"
-      data = json_response(conn, 200)["data"]
-      [first_result, second_result | _] = data
-      assert length(data) == 2
-      assert first_result["id"] == "#{user_1.id}"
-      assert second_result["id"] == "#{user_2.id}"
+      [user_1, user_2 | _] = insert_list(3, :user)
+
+      path = "users/?filter[id]=#{user_1.id},#{user_2.id}"
+
+      conn
+      |> get(path)
+      |> json_response(200)
+      |> assert_ids_from_response([user_1.id, user_2.id])
     end
   end
 
-  describe "#show" do
-
+  describe "show" do
     test "shows chosen resource", %{conn: conn} do
       user = insert(:user)
-      conn = get conn, user_path(conn, :show, user)
-      data = json_response(conn, 200)["data"]
-      assert data["id"] == "#{user.id}"
-      assert data["type"] == "user"
-      assert data["attributes"]["username"] == user.username
-      assert data["attributes"]["email"] == ""
-      assert data["attributes"]["password"] == nil
+      conn
+      |> request_show(user)
+      |> json_response(200)
+      |> Map.get("data")
+      |> assert_result_id(user.id)
     end
 
-    test "renders email when authenticated", %{conn: conn} do
-      user = insert(:user)
-      path = conn |> user_path(:show, user)
-      json = conn |> authenticate(user) |> get(path) |> json_response(200)
-
-      assert json["data"]["attributes"]["email"] == user.email
+    @tag :authenticated
+    test "renders email when authenticated", %{conn: conn, current_user: current_user} do
+      assert conn |> request_show(current_user) |> json_response(200)
     end
 
-    test "does not show resource and instead throw error when id is nonexistent", %{conn: conn} do
-      assert_error_sent 404, fn ->
-        get conn, user_path(conn, :show, -1)
-      end
+    test "renders 404 when id is nonexistent", %{conn: conn} do
+      assert conn |> request_show(:not_found) |> json_response(404)
     end
   end
 
@@ -75,40 +70,62 @@ defmodule CodeCorps.UserControllerTest do
     test "creates and renders resource when data is valid", %{conn: conn} do
       attrs = Map.put(@valid_attrs, :password, "password")
       conn = post conn, user_path(conn, :create), %{
+        "data" => %{
+          "attributes" => attrs
+        }
+      }
+
+      assert conn |> json_response(201)
+    end
+
+    test "calls segment tracking after user is created", %{conn: conn} do
+      conn = post conn, user_path(conn, :create), %{
         "meta" => %{},
         "data" => %{
           "type" => "user",
+          "attributes" => Map.put(@valid_attrs, :password, "password"),
+          "relationships" => relationships
+        }
+      }
+      id = json_response(conn, 201)["data"]["id"] |> String.to_integer
+      assert_received {:track, ^id, "Signed Up", %{}}
+    end
+
+    test "does not create resource and renders errors when data is invalid", %{conn: conn} do
+      attrs = Map.put(@invalid_attrs, :password, "password")
+      conn = post conn, user_path(conn, :create), %{
+        "data" => %{
+          "attributes" => attrs
+        }
+      }
+
+      assert conn |> json_response(422)
+    end
+  end
+
+  describe "update" do
+    @tag :authenticated
+    test "updates and renders chosen resource when data is valid", %{conn: conn} do
+      user = insert(:user)
+      attrs = Map.put(@valid_attrs, :password, "password")
+
+      params = %{
+        "meta" => %{},
+        "data" => %{
+          "type" => "user",
+          "id" => user.id,
           "attributes" => attrs,
           "relationships" => relationships
         }
       }
 
-      id = json_response(conn, 201)["data"]["id"]
-      assert id
-      user = Repo.get(User, id)
-      assert user
-      slugged_route = Repo.get_by(SluggedRoute, slug: "testuser")
-      assert slugged_route
-      assert user.id == slugged_route.user_id
+      path = user_path(conn, :update, user)
+
+      assert conn |> authenticate(user) |> put(path, params) |> json_response(200)
     end
 
-    test "does not create resource and renders errors when data is invalid", %{conn: conn} do
-      conn = post conn, user_path(conn, :create), %{
-        "meta" => %{},
-        "data" => %{
-          "type" => "user",
-          "attributes" => @invalid_attrs,
-          "relationships" => relationships
-        }
-      }
-
-      assert json_response(conn, 422)["errors"] != %{}
-    end
-  end
-
-  describe "update" do
-    test "updates and renders chosen resource when data is valid", %{conn: conn} do
-      user = insert(:user)
+    test "tracks authentication & update profile events in Segment", %{conn: conn} do
+      user = insert(:user, email: "original@mail.com")
       attrs = Map.put(@valid_attrs, :password, "password")
 
       params = %{
@@ -128,19 +145,13 @@ defmodule CodeCorps.UserControllerTest do
         |> authenticate(user)
         |> put(path, params)
 
-      id = json_response(conn, 200)["data"]["id"]
-      assert id
-      user =  Repo.get(User, id)
-      assert user.email == "test@user.com"
-      assert user.first_name == "Test"
-      assert user.last_name == "User"
-      assert user.website == "http://www.example.com"
-      assert user.biography == "Just a test user"
+      id = json_response(conn, 200)["data"]["id"] |> String.to_integer
+      assert_received {:identify, ^id, %{email: "original@mail.com"}}
+      assert_received {:track, ^id, "Updated Profile", %{}}
     end
 
     test "does not update when authorized as different user", %{conn: conn} do
-      user = insert(:user)
-      another_user = insert(:user)
+      [user, another_user] = insert_pair(:user)
 
       attrs = Map.put(@valid_attrs, :password, "password")
 
@@ -161,7 +172,7 @@ defmodule CodeCorps.UserControllerTest do
         |> authenticate(another_user)
         |> put(path, params)
 
-      assert json_response(conn, 401)
+      assert json_response(conn, 403)
     end
 
     @tag :requires_env

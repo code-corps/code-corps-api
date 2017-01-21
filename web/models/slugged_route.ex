@@ -1,12 +1,12 @@
 defmodule CodeCorps.SluggedRoute do
   @moduledoc """
-  A slugged route is used for routing slugged requests like `/joshsmith` or
+  A slugged route is used for routing slugged requests like `/joshsmith` or
   `/code-corps` to their respective owner: either a user or an organization.
   """
 
   use CodeCorps.Web, :model
 
-  import CodeCorps.ModelHelpers
+  import CodeCorps.Helpers.Slug
   import CodeCorps.Validators.SlugValidator
 
   schema "slugged_routes" do

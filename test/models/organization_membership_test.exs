@@ -35,6 +35,16 @@ defmodule CodeCorps.OrganizationMembershipTest do
     end
   end
 
+  describe "create_owner_changeset" do
+    @valid_attrs %{member_id: 1, organization_id: 2}
+    @invalid_attrs %{}
+
+    test "changeset with valid attributes" do
+      changeset = OrganizationMembership.create_owner_changeset(%OrganizationMembership{}, @valid_attrs)
+      assert changeset.valid?
+    end
+  end
+
   describe "create_changeset" do
     @valid_attrs %{member_id: 1, organization_id: 2}
     @invalid_attrs %{}
@@ -48,27 +58,40 @@ defmodule CodeCorps.OrganizationMembershipTest do
       changeset = OrganizationMembership.create_changeset(%OrganizationMembership{}, @invalid_attrs)
       refute changeset.valid?
 
-      assert changeset.errors[:member_id] == {"can't be blank", []}
-      assert changeset.errors[:organization_id] == {"can't be blank", []}
+      changeset |> assert_validation_triggered(:member_id, :required)
+      changeset |> assert_validation_triggered(:organization_id, :required)
     end
 
     test "changeset ensures member and organization actually exist" do
       changeset = OrganizationMembership.create_changeset(%OrganizationMembership{}, @valid_attrs)
 
-      { result, changeset } = changeset |> Repo.insert
+      {result, changeset} = changeset |> Repo.insert
 
       assert result == :error
-      assert changeset.errors[:organization] == {"does not exist", []}
+      changeset |> assert_error_message(:organization, "does not exist")
 
       # assoc_constraint works through one relationship at a time
       organization = insert(:organization)
       attrs = Map.merge(@valid_attrs, %{organization_id: organization.id})
       changeset = OrganizationMembership.create_changeset(%OrganizationMembership{}, attrs)
 
-      { result, changeset } = changeset |> Repo.insert
+      {result, changeset} = changeset |> Repo.insert
 
       assert result == :error
-      assert changeset.errors[:member] == {"does not exist", []}
+      changeset |> assert_error_message(:member, "does not exist")
+    end
+
+    test "ensures uniqueness of organization/member combination" do
+      existing = insert(:organization_membership)
+
+      changeset = OrganizationMembership.create_changeset(
+        %OrganizationMembership{},
+        %{member_id: existing.member_id, organization_id: existing.organization_id}
+      )
+
+      {:error, changeset} = changeset |> Repo.insert
+
+      changeset |> assert_error_message(:member, "has already been taken")
     end
   end
 end

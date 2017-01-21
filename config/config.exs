@@ -52,9 +52,6 @@ config :arc,
   bucket: System.get_env("S3_BUCKET"),
   asset_host: System.get_env("CLOUDFRONT_DOMAIN")
 
-# Configures Segment for analytics
-config :code_corps, :analytics, CodeCorps.Analytics.Segment
-
 config :segment,
   write_key: System.get_env("SEGMENT_WRITE_KEY")
 
@@ -64,13 +61,17 @@ config :code_corps, :icon_color_generator, CodeCorps.RandomIconColor.Generator
 # Set Corsica logging to output a console warning when rejecting a request
 config :code_corps, :corsica_log_level, [rejected: :warn]
 
-config :stripity_stripe, secret_key: System.get_env("STRIPE_SECRET_KEY")
-config :stripity_stripe, platform_client_id: System.get_env("STRIPE_PLATFORM_CLIENT_ID")
+config :stripity_stripe,
+  api_key: System.get_env("STRIPE_SECRET_KEY"),
+  connect_client_id: System.get_env("STRIPE_PLATFORM_CLIENT_ID")
 
 config :sentry,
   dsn: System.get_env("SENTRY_DSN"),
   included_environments: ~w(prod staging)a,
   use_error_logger: true
+
+config :ja_resource,
+  repo: CodeCorps.Repo
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

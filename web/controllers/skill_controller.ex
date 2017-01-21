@@ -1,45 +1,21 @@
 defmodule CodeCorps.SkillController do
   use CodeCorps.Web, :controller
+  use JaResource
+
+  import CodeCorps.Helpers.Query, only: [id_filter: 2, title_filter: 2, limit_filter: 2]
 
   alias CodeCorps.Skill
-  alias JaSerializer.Params
 
   plug :load_and_authorize_resource, model: Skill, only: [:create]
-  plug :scrub_params, "data" when action in [:create]
+  plug JaResource
 
-  def index(conn, params) do
-    skills =
-      Skill
-      |> Skill.index_filters(params)
-      |> Repo.all
-      |> Repo.preload([:role_skills])
-
-    render(conn, "index.json-api", data: skills)
+  def filter(_conn, query, "id", id_list) do
+    query |> id_filter(id_list)
   end
 
-  def create(conn, %{"data" => data = %{"type" => "skill", "attributes" => _skill_params}}) do
-    changeset = Skill.changeset(%Skill{}, Params.to_attributes(data))
-
-    case Repo.insert(changeset) do
-      {:ok, skill} ->
-        skill = Repo.preload(skill, [:role_skills])
-
-        conn
-        |> put_status(:created)
-        |> put_resp_header("location", skill_path(conn, :show, skill))
-        |> render("show.json-api", data: skill)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
-    end
-  end
-
-  def show(conn, %{"id" => id}) do
-    skill =
-      Skill
-      |> Repo.get!(id)
-      |> Repo.preload([:role_skills])
-    render(conn, "show.json-api", data: skill)
+  def handle_index(_conn, params) do
+    Skill
+    |> title_filter(params)
+    |> limit_filter(params)
   end
 end

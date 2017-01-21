@@ -20,7 +20,6 @@ defmodule CodeCorps.Endpoint do
   end
 
   plug Plug.RequestId
-  plug Plug.Logger
 
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
@@ -40,7 +39,7 @@ defmodule CodeCorps.Endpoint do
 
   plug Corsica, [
     origins: Application.get_env(:code_corps, :allowed_origins),
-    allow_headers: ["accept", "authorization", "content-type"],
+    allow_headers: ["accept", "authorization", "content-type", "origin", "x-requested-with"],
     log: Application.get_env(:code_corps, :corsica_log_level)
   ]
   plug CodeCorps.Router

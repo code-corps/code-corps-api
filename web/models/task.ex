@@ -1,21 +1,24 @@
 defmodule CodeCorps.Task do
   use CodeCorps.Web, :model
-
-  alias CodeCorps.MarkdownRenderer
-
-  import CodeCorps.ModelHelpers
+  import EctoOrdered
+  alias CodeCorps.Services.MarkdownRendererService
 
   schema "tasks" do
     field :body, :string
     field :markdown, :string
-    field :number, :integer
-    field :task_type, :string
+    field :number, :integer, read_after_writes: true
+    field :order, :integer
     field :state, :string
     field :status, :string, default: "open"
+    field :task_type, :string
     field :title, :string
 
+    field :position, :integer, virtual: true
+
     belongs_to :project, CodeCorps.Project
+    belongs_to :task_list, CodeCorps.TaskList
     belongs_to :user, CodeCorps.User
+
     has_many :comments, CodeCorps.Comment
 
     timestamps()
@@ -23,10 +26,13 @@ defmodule CodeCorps.Task do
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:title, :markdown, :task_type])
-    |> validate_required([:title, :markdown, :task_type])
+    |> cast(params, [:title, :markdown, :task_type, :task_list_id, :position])
+    |> validate_required([:title, :markdown, :task_list_id, :task_type])
     |> validate_inclusion(:task_type, task_types)
-    |> MarkdownRenderer.render_markdown_to_html(:markdown, :body)
+    |> assoc_constraint(:task_list)
+    |> apply_position()
+    |> set_order(:position, :order, :task_list_id)
+    |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
   end
 
   def create_changeset(struct, params) do
@@ -46,7 +52,14 @@ defmodule CodeCorps.Task do
     |> cast(params, [:status])
     |> validate_inclusion(:status, statuses)
     |> put_change(:state, "edited")
+  end
 
+  def apply_position(changeset) do
+    case get_field(changeset, :position) do
+      nil ->
+        put_change(changeset, :position, 0)
+      _ -> changeset
+    end
   end
 
   defp task_types do
@@ -55,25 +68,5 @@ defmodule CodeCorps.Task do
 
   defp statuses do
     ~w{ open closed }
-  end
-
-  def index_filters(query, params) do
-    query
-    |> project_filter(params)
-    |> newest_first_filter
-  end
-
-  def task_type_filters(query, params) do
-    query |> task_type_filter(params)
-  end
-
-  def task_status_filters(query, params) do
-    query |> task_status_filter(params)
-  end
-
-  def show_project_task_filters(query, params) do
-    query
-    |> number_as_id_filter(params)
-    |> project_filter(params)
   end
 end

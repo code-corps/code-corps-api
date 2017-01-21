@@ -1,6 +1,4 @@
 defmodule CodeCorps.TokenController do
-  @analytics Application.get_env(:code_corps, :analytics)
-
   use CodeCorps.Web, :controller
   import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
   alias CodeCorps.GuardianSerializer
@@ -10,16 +8,22 @@ defmodule CodeCorps.TokenController do
   def create(conn, params = %{"username" => _, "password" => _}) do
     case login_by_email_and_pass(params) do
       {:ok, user} ->
-        {:ok, token, claims} = user |> Guardian.encode_and_sign(:token)
+        {:ok, token, _claims} = user |> Guardian.encode_and_sign(:token)
 
         conn
         |> Plug.Conn.assign(:current_user, user)
-        |> @analytics.track(:signed_in)
+        |> CodeCorps.Analytics.Segment.track_sign_in
         |> put_status(:created)
         |> render("show.json", token: token, user_id: user.id)
 
-      {:error, reason} -> handle_unauthorized(conn, reason)
+      {:error, reason} -> handle_unauthenticated(conn, reason)
     end
+  end
+  def create(conn, %{"username" => ""}) do
+    handle_unauthenticated(conn, "Please enter your email and password.")
+  end
+  def create(conn, %{"username" => _email}) do
+    handle_unauthenticated(conn, "Please enter your password.")
   end
 
   def refresh(conn, %{"token" => current_token}) do
@@ -31,14 +35,14 @@ defmodule CodeCorps.TokenController do
             |> put_status(:created)
             |> render("show.json", token: new_token, user_id: user.id)
     else
-      { :error, reason } -> handle_unauthorized(conn, reason)
+      {:error, reason} -> handle_unauthenticated(conn, reason)
     end
   end
 
-  defp handle_unauthorized(conn, reason) do
+  defp handle_unauthenticated(conn, reason) do
     conn
     |> put_status(:unauthorized)
-    |> render("error.json", message: reason)
+    |> render("401.json", message: reason)
   end
 
   defp login_by_email_and_pass(%{"username" => email, "password" => password}) do

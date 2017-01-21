@@ -1,8 +1,6 @@
 defmodule CodeCorps.RoleSkill do
   use CodeCorps.Web, :model
 
-  import CodeCorps.ModelHelpers
-
   schema "role_skills" do
     field :cat, :integer
 
@@ -25,17 +23,13 @@ defmodule CodeCorps.RoleSkill do
   end
 
   @doc """
-  Builds a changeset for importing a category.
+  Builds a changeset for importing a category.
   """
   def import_changeset(struct, params) do
     struct
     |> changeset(params)
     |> cast(params, [:cat])
     |> validate_inclusion(:cat, cats)
-  end
-
-  def index_filters(query, params) do
-    query |> id_filter(params)
   end
 
   defp cats do

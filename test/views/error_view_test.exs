@@ -5,13 +5,23 @@ defmodule CodeCorps.ErrorViewTest do
   import Phoenix.View
 
   test "renders 404.json-api" do
-    assert render(CodeCorps.ErrorView, "404.json-api", []) ==
-           %{errors: [%{status: 404, title: "404 Resource not found", id: "NOT_FOUND"}]}
+    rendered_json =  render(CodeCorps.ErrorView, "404.json-api", [])
+
+    expected_json = %{
+      "errors" => [%{status: 404,  title: "404 Resource not found", id: "NOT_FOUND"}],
+        "jsonapi" => %{"version" => "1.0"}
+    }
+    assert rendered_json == expected_json
   end
 
   test "renders 500.json-api" do
-    assert render(CodeCorps.ErrorView, "500.json-api", []) ==
-           %{errors: [%{status: 500, title: "500 Internal server error", id: "INTERNAL_SERVER_ERROR"}]}
+    rendered_json =  render(CodeCorps.ErrorView, "500.json-api", [])
+
+    expected_json = %{
+      "errors" => [%{status: 500,  title: "500 Internal server error", id: "INTERNAL_SERVER_ERROR"}],
+        "jsonapi" => %{"version" => "1.0"}
+    }
+    assert rendered_json == expected_json
   end
 
   test "render any other" do

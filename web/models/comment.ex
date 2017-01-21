@@ -1,9 +1,7 @@
 defmodule CodeCorps.Comment do
   use CodeCorps.Web, :model
 
-  alias CodeCorps.MarkdownRenderer
-
-  import CodeCorps.ModelHelpers
+  alias CodeCorps.Services.MarkdownRendererService
 
   schema "comments" do
     field :body, :string
@@ -22,7 +20,7 @@ defmodule CodeCorps.Comment do
     struct
     |> cast(params, [:markdown])
     |> validate_required([:markdown])
-    |> MarkdownRenderer.render_markdown_to_html(:markdown, :body)
+    |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
   end
 
   def create_changeset(struct, params) do
@@ -32,9 +30,5 @@ defmodule CodeCorps.Comment do
     |> validate_required([:task_id, :user_id])
     |> assoc_constraint(:task)
     |> assoc_constraint(:user)
-  end
-
-  def index_filters(query, params) do
-    query |> task_filter(params)
   end
 end

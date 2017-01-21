@@ -8,13 +8,13 @@ dependencies:
     - deps
     - _build
   pre:
-    - ./circle_pre_build.sh
+    - ./bin/circle_pre_build.sh
     - mix deps.compile
     - mix compile
 test:
   override:
     - |
-      if [ ${CIRCLE_PR_USERNAME} ]; then MIX_ENV=test mix test --cover; else MIX_ENV=test mix test --include requires_env --cover; fi
+      if [ ${CIRCLE_PR_USERNAME} ]; then MIX_ENV=test mix test; else MIX_ENV=test mix coveralls.circle --include requires_env; fi
 
   post:
     - mix inch.report
@@ -29,7 +29,7 @@ deployment:
       - heroku run "POOL_SIZE=2 mix ecto.migrate" --app code-corps-staging
       - gem install apiaryio
       - apiary publish --api-name="codecorpsapidevelop" --path ./blueprint/api.apib
-      - ./deploy_docs.sh
+      - ./bin/deploy_docs.sh
   production:
     branch: master
     commands:

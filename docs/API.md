@@ -1,40 +1,27 @@
 # How to generate API documentation locally
 
-You can generate documentation a few ways:
+You can generate documentation a couple ways:
 
-- [Apiary CLI](#apiary-cli) (recommended)
-- [`aglio`](#aglio)
+- [Apiary Client](#apiary-client) (recommended)
 - [Atom](#atom)
 
-### Apiary CLI
+### Apiary Client
 
-[Apiary CLI](https://help.apiary.io/tools/apiary-cli/) comes preloaded when you run `docker-compose up` like normal.
+[Apiary Client](https://help.apiary.io/tools/apiary-cli/) needs Ruby to run.
 
-Once Docker is running your containers, `apiary` runs an Apiary CLI server on port `8081`. You can visit the documentation by visiting `localhost:8081` in your browser. Just refresh the page any time you make changes to the documentation file at `/blueprint/api.apib`.
-
-### aglio
-
-Navigate into the `/blueprint` directory.
-
-If installing for the first time, run:
+You can install the Apiary Client by running:
 
 ```shell
-docker-compose build
+gem install apiaryio
 ```
 
-Then start the `aglio` service with:
+You can now run the server:
 
 ```shell
-docker-compose up
+apiary preview --path=blueprint/api.apib --server
 ```
 
-Now you can generate the docs with our shell script:
-
-```bash
-./generate
-```
-
-You should be able to view the docs by opening the newly generated `index.html` in your browser.
+This runs an Apiary CLI server on port `8080`. You can visit the documentation by visiting `localhost:8080` in your browser. Just refresh the page whenever you make changes to the documentation file at `/blueprint/api.apib`.
 
 ### Atom
 

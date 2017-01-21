@@ -1,16 +1,14 @@
 defmodule CodeCorps.Organization do
   @moduledoc """
-  Represents an organization on Code Corps, e.g. "Code Corps" itself.
+  Represents an organization on Code Corps, e.g. "Code Corps" itself.
   """
 
   use Arc.Ecto.Schema
   use CodeCorps.Web, :model
-
-  alias CodeCorps.SluggedRoute
-
-  import CodeCorps.Base64ImageUploader
-  import CodeCorps.ModelHelpers
+  import CodeCorps.Services.Base64ImageUploaderService
+  import CodeCorps.Helpers.Slug
   import CodeCorps.Validators.SlugValidator
+  alias CodeCorps.SluggedRoute
 
   schema "organizations" do
     field :base64_icon_data, :string, virtual: true
@@ -18,8 +16,10 @@ defmodule CodeCorps.Organization do
     field :icon, CodeCorps.OrganizationIcon.Type
     field :name, :string
     field :slug, :string
+    field :approved, :boolean
 
-    has_one :slugged_route, SluggedRoute
+    has_one :slugged_route, CodeCorps.SluggedRoute
+    has_one :stripe_connect_account, CodeCorps.StripeConnectAccount
 
     has_many :projects, CodeCorps.Project
 
@@ -40,7 +40,7 @@ defmodule CodeCorps.Organization do
   end
 
   @doc """
-  Builds a changeset for creating an organization.
+  Builds a changeset for creating an organization.
   """
   def create_changeset(struct, params) do
     struct
@@ -49,10 +49,6 @@ defmodule CodeCorps.Organization do
     |> validate_required([:slug, :description])
     |> validate_slug(:slug)
     |> put_slugged_route()
-  end
-
-  def index_filters(query, params) do
-    query |> id_filter(params)
   end
 
   defp put_slugged_route(changeset) do

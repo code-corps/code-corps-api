@@ -1,14 +1,15 @@
 defmodule CodeCorps.Plug.AnalyticsIdentify do
-  @analytics Application.get_env(:code_corps, :analytics)
+  @moduledoc """
+  Plug used to identify the current user on Segment.com using `CodeCorps.Analytics.Segment`.
+  """
 
   def init(opts), do: opts
 
-  def call(conn, _opts) do
-    if current_user = conn.assigns[:current_user] do
-      @analytics.identify(current_user)
-      conn
-    else
-      conn
-    end
+  def call(conn, _opts), do: conn |> identify
+
+  defp identify(%{assigns: %{current_user: user}} = conn) do
+    CodeCorps.Analytics.Segment.identify(user)
+    conn
   end
+  defp identify(conn), do: conn
 end

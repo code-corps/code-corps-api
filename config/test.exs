@@ -28,7 +28,11 @@ config :code_corps, allowed_origins: ["http://localhost:4200"]
 config :guardian, Guardian,
   secret_key: "e62fb6e2746f6b1bf8b5b735ba816c2eae1d5d76e64f18f3fc647e308b0c159e"
 
-config :code_corps, :analytics, CodeCorps.Analytics.InMemory
+config :code_corps, :analytics, CodeCorps.Analytics.TestAPI
+
+# Configures stripe for test mode
+config :code_corps, :stripe, CodeCorps.StripeTesting
+config :code_corps, :stripe_env, :test
 
 config :code_corps, :icon_color_generator, CodeCorps.RandomIconColor.TestGenerator
 
@@ -37,3 +41,6 @@ config :code_corps, :corsica_log_level, [rejected: :debug]
 
 config :sentry,
   environment_name: Mix.env || :test
+
+config :code_corps, CodeCorps.Mailer,
+  adapter: Bamboo.TestAdapter

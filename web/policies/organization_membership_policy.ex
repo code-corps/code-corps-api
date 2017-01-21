@@ -1,61 +1,53 @@
 defmodule CodeCorps.OrganizationMembershipPolicy do
-  alias CodeCorps.User
+  import CodeCorps.Helpers.Policy, only: [get_membership: 2, get_role: 1]
+
   alias CodeCorps.Organization
   alias CodeCorps.OrganizationMembership
-
   alias CodeCorps.Repo
+  alias CodeCorps.User
+  alias Ecto.Changeset
 
-  import Ecto.Query
+  def create?(%User{admin: true}, %Changeset{}), do: true
+  def create?(%User{id: user_id}, %Changeset{changes: %{member_id: member_id}}), do:  user_id == member_id
+  def create?(%User{}, %Changeset{}), do: false
 
-  # TODO: Make it so validation handles the fact that membership role needs to be "pending" on create
-  def create?(%User{} = _user), do: true
+  def update?(%User{admin: true}, %Changeset{}), do: true
+  def update?(%User{} = user, %Changeset{data: %OrganizationMembership{} = current_membership} = changeset) do
+    user_membership = current_membership |> get_user_membership(user)
 
-  def update?(%User{} = user, %OrganizationMembership{} = current_membership) do
-    current_organization = current_membership |> fetch_organization
-    user_membership = user |> fetch_membership(current_organization)
+    user_role = user_membership |> get_role
+    old_role = current_membership |> get_role
+    new_role = changeset |> get_role
 
-    permitted? = case user_membership do
-      # owner can update any membership
-      %OrganizationMembership{role: "owner"} -> true
-      # admin can only update lower level roles
-      %OrganizationMembership{role: "admin"} -> current_membership.role in ["pending", "contributor"]
-      # all other members, or non-members, are not permitted
-      _ -> false
+    case [user_role, old_role, new_role] do
+      # Non-member, pending and contributors can't do anything
+      [nil, _, _] -> false
+      ["pending", _, _] -> false
+      ["contributor", _, _] -> false
+      # Admins can only approve pending memberships and nothing else
+      ["admin", "pending", "contributor"] -> true
+      ["admin", _, _] -> false
+      # Owners can do everything expect changing other owners
+      ["owner", "owner", _] -> false
+      ["owner", _, _] -> true
+      # No other role change is allowed
+      [_, _, _] -> false
     end
-
-    permitted?
   end
 
-  # user can always leave the organization on their own
+  def delete?(%User{admin: true}, %OrganizationMembership{}), do: true
   def delete?(%User{} = user, %OrganizationMembership{} = current_membership) do
-    user_membership = cond do
-      user.id == current_membership.member_id ->
-        current_membership
-      true ->
-        organization = current_membership |> fetch_organization
-        user |> fetch_membership(organization)
-    end
-
-    permitted? = case user_membership do
-      # owner can delete any membership
-      %OrganizationMembership{role: "owner"} -> true
-      # admin can only delete lower level roles
-      %OrganizationMembership{role: "admin"} -> user_membership.role in ["pending", "contributor"]
-      # all other members, or non-members, are not permitted
-      _ -> false
-    end
-
-    permitted?
+    current_membership |> get_user_membership(user) |> do_delete?(current_membership)
   end
 
-  defp fetch_organization(membership) do
-    Organization
-    |> Repo.get(membership.organization_id)
-  end
-  defp fetch_membership(_user, nil), do: nil
-  defp fetch_membership(user, organization) do
-    OrganizationMembership
-    |> where([m], m.member_id == ^user.id and m.organization_id == ^organization.id)
-    |> Repo.one
-  end
+  defp do_delete?(%OrganizationMembership{} = user_m, %OrganizationMembership{} = current_m) when user_m == current_m, do: true
+  defp do_delete?(%OrganizationMembership{role: "owner"}, %OrganizationMembership{}), do: true
+  defp do_delete?(%OrganizationMembership{role: "admin"}, %OrganizationMembership{role: role}) when role in ~w(pending contributor), do: true
+  defp do_delete?(_, _), do: false
+
+  defp get_user_membership(%OrganizationMembership{member_id: nil}, %User{id: nil}), do: nil
+  defp get_user_membership(%OrganizationMembership{member_id: m_id} = membership, %User{id: u_id}) when m_id == u_id, do: membership
+  defp get_user_membership(%OrganizationMembership{} = membership, %User{} = user), do: membership |> get_organization |> get_membership(user)
+
+  defp get_organization(%OrganizationMembership{organization_id: organization_id}), do: Organization |> Repo.get(organization_id)
 end

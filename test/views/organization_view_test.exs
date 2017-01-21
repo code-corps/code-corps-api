@@ -1,27 +1,21 @@
 defmodule CodeCorps.OrganizationViewTest do
   use CodeCorps.ConnCase, async: true
 
-  alias CodeCorps.Repo
-
-  # Bring render/3 and render_to_string/3 for testing custom views
-  import Phoenix.View
+  import Phoenix.View, only: [render: 3]
 
   test "renders all attributes and relationships properly" do
     organization = insert(:organization)
     project = insert(:project, organization: organization)
     user = insert(:user)
     organization_membership = insert(:organization_membership, member: user, organization: organization)
-
-    organization =
-      CodeCorps.Organization
-      |> Repo.get(organization.id)
-      |> CodeCorps.Repo.preload([:organization_memberships, :projects, :slugged_route])
+    slugged_route = insert(:slugged_route, organization: organization)
+    stripe_connect_account = insert(:stripe_connect_account, organization: organization)
 
     rendered_json =  render(CodeCorps.OrganizationView, "show.json-api", data: organization)
 
     expected_json = %{
-      data: %{
-        attributes: %{
+      "data" => %{
+        "attributes" => %{
           "description" => organization.description,
           "icon-large-url" => CodeCorps.OrganizationIcon.url({organization.icon, organization}, :large),
           "icon-thumb-url" => CodeCorps.OrganizationIcon.url({organization.icon, organization}, :thumb),
@@ -30,26 +24,29 @@ defmodule CodeCorps.OrganizationViewTest do
           "slug" => organization.slug,
           "updated-at" => organization.updated_at,
         },
-        id: organization.id |> Integer.to_string,
-        relationships: %{
+        "id" => organization.id |> Integer.to_string,
+        "relationships" => %{
           "organization-memberships" => %{
-            data: [
-              %{id: organization_membership.id |> Integer.to_string, type: "organization-membership"}
+            "data" => [
+              %{"id" => organization_membership.id |> Integer.to_string, "type" => "organization-membership"}
             ]
           },
           "projects" => %{
-            data: [
-              %{id: project.id |> Integer.to_string, type: "project"}
+            "data" => [
+              %{"id" => project.id |> Integer.to_string, "type" => "project"}
             ]
           },
           "slugged-route" => %{
-            data: nil
+            "data" => %{"id" => slugged_route.id |> Integer.to_string, "type" => "slugged-route"}
+          },
+          "stripe-connect-account" => %{
+            "data" => %{"id" => stripe_connect_account.id |> Integer.to_string, "type" => "stripe-connect-account"}
           },
         },
-        type: "organization",
+        "type" => "organization",
       },
-      jsonapi: %{
-        version: "1.0"
+      "jsonapi" => %{
+        "version" => "1.0"
       }
     }
 

@@ -1,4 +1,4 @@
-defmodule CodeCorps.MarkdownRenderer do
+defmodule CodeCorps.Services.MarkdownRendererService do
   def render_markdown_to_html(changeset, source_field, destination_field) do
     case changeset do
       %Ecto.Changeset{valid?: false} ->

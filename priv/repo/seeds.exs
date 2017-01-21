@@ -1,29 +1,36 @@
-alias CodeCorps.Repo
-alias CodeCorps.Category
-alias CodeCorps.Organization
-alias CodeCorps.Project
-alias CodeCorps.ProjectCategory
-alias CodeCorps.ProjectSkill
-alias CodeCorps.Role
-alias CodeCorps.Skill
-alias CodeCorps.Task
-alias CodeCorps.User
+alias CodeCorps.{Category, Organization, OrganizationMembership, Project, ProjectCategory, ProjectSkill, Repo, Role, Skill, Task, User, UserCategory, UserRole, UserSkill}
 
 # Users
 
 users = [
   %{
-    username: "adminstrator",
-    email: "admin@example.org",
+    email: "owner@codecorps.org",
+    first_name: "Code Corps",
+    last_name: "Owner",
     password: "password",
-    admin: true
+    username: "codecorps-owner"
   },
   %{
-    username: "testuser",
-    email: "test@example.com",
-    password: "test123",
-    admin: false
+    email: "admin@codecorps.org",
+    first_name: "Code Corps",
+    last_name: "Admin",
+    password: "password",
+    username: "codecorps-admin"
   },
+  %{
+    email: "contributor@codecorps.org",
+    first_name: "Code Corps",
+    last_name: "Contributor",
+    password: "password",
+    username: "codecorps-contributor"
+  },
+  %{
+    email: "pending@codecorps.org",
+    first_name: "Code Corps",
+    last_name: "Pending",
+    password: "password",
+    username: "codecorps-pending"
+  }
 ]
 
 cond do
@@ -31,9 +38,14 @@ cond do
     IO.puts "Users detected, aborting user seed."
   true ->
     Enum.each(users, fn user ->
-      %User{}
-      |> User.registration_changeset(user)
-      |> Repo.insert!
+      result =
+        %User{}
+        |> User.registration_changeset(user)
+        |> Repo.insert!
+
+      result
+      |> User.update_changeset(user)
+      |> Repo.update!
     end)
 end
 
@@ -295,7 +307,8 @@ cond do
         status: "open",
         number: i,
         project_id: 1,
-        user_id: 1
+        user_id: 1,
+        task_list_id: Enum.random([1, 2, 3, 4])
       })
       |> Repo.insert!
     end
@@ -318,9 +331,138 @@ cond do
     IO.puts "Project skills detected, aborting this seed."
   true ->
     %ProjectSkill{}
-    |> ProjectSkill.changeset(%{
+    |> ProjectSkill.create_changeset(%{
       project_id: 1,
       skill_id: 1
     })
     |> Repo.insert!
+end
+
+cond do
+  Repo.all(OrganizationMembership) != [] ->
+    IO.puts "Organization memberships detected, aborting this seed."
+  true ->
+    contributors = [
+      %{
+        organization_id: 1,
+        member_id: 1,
+        role: "owner"
+      },
+      %{
+        organization_id: 1,
+        member_id: 2,
+        role: "admin"
+      },
+      %{
+        organization_id: 1,
+        member_id: 3,
+        role: "contributor"
+      },
+      %{
+        organization_id: 1,
+        member_id: 4,
+        role: "pending"
+      }
+    ]
+
+    Enum.each(contributors, fn user ->
+      membership =
+        %OrganizationMembership{}
+        |> OrganizationMembership.create_changeset(user)
+        |> Repo.insert!
+
+      membership
+      |> OrganizationMembership.update_changeset(user)
+      |> Repo.update!
+    end)
+end
+
+cond do
+  Repo.all(UserCategory) != [] ->
+    IO.puts "User categories detected, aborting this seed."
+  true ->
+    user_categories = [
+      %{
+        category_id: 1,
+        user_id: 1
+      },
+      %{
+        category_id: 1,
+        user_id: 2
+      },
+      %{
+        category_id: 1,
+        user_id: 3
+      },
+      %{
+        category_id: 1,
+        user_id: 4
+      }
+    ]
+
+    Enum.each(user_categories, fn user_category ->
+      %UserCategory{}
+      |> UserCategory.create_changeset(user_category)
+      |> Repo.insert!
+    end)
+end
+
+cond do
+  Repo.all(UserRole) != [] ->
+    IO.puts "User roles detected, aborting this seed."
+  true ->
+    user_roles = [
+      %{
+        role_id: 1,
+        user_id: 1
+      },
+      %{
+        role_id: 1,
+        user_id: 2
+      },
+      %{
+        role_id: 1,
+        user_id: 3
+      },
+      %{
+        role_id: 1,
+        user_id: 4
+      }
+    ]
+
+    Enum.each(user_roles, fn user_role ->
+      %UserRole{}
+      |> UserRole.create_changeset(user_role)
+      |> Repo.insert!
+    end)
+end
+
+cond do
+  Repo.all(UserSkill) != [] ->
+    IO.puts "User skills detected, aborting this seed."
+  true ->
+    user_skills = [
+      %{
+        skill_id: 1,
+        user_id: 1
+      },
+      %{
+        skill_id: 1,
+        user_id: 2
+      },
+      %{
+        skill_id: 1,
+        user_id: 3
+      },
+      %{
+        skill_id: 1,
+        user_id: 4
+      }
+    ]
+
+    Enum.each(user_skills, fn user_skill ->
+      %UserSkill{}
+      |> UserSkill.create_changeset(user_skill)
+      |> Repo.insert!
+    end)
 end

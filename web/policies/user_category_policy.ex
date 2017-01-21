@@ -1,12 +1,13 @@
 defmodule CodeCorps.UserCategoryPolicy do
   alias CodeCorps.UserCategory
   alias CodeCorps.User
+  alias Ecto.Changeset
 
-  def create?(%User{admin: true}, %Ecto.Changeset{}), do: true
-  def create?(%User{} = user, %Ecto.Changeset{} = changeset) do
-    user.id == changeset |> Ecto.Changeset.get_change(:user_id)
-  end
+  def create?(%User{admin: true}, %Changeset{}), do: true
+  def create?(%User{id: id}, %Changeset{changes: %{user_id: user_id}}), do: id == user_id
+  def create?(%User{}, %Changeset{}), do: false
 
   def delete?(%User{admin: true}, %UserCategory{}), do: true
-  def delete?(%User{} = user, %UserCategory{} = user_category), do: user.id == user_category.user_id
+  def delete?(%User{id: id}, %UserCategory{user_id: user_id}), do: id == user_id
+  def delete?(%User{}, %UserCategory{}), do: false
 end

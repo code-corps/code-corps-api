@@ -1,87 +1,57 @@
 defmodule CodeCorps.TaskController do
-  @analytics Application.get_env(:code_corps, :analytics)
-
   use CodeCorps.Web, :controller
+  use JaResource
+
+  import CodeCorps.Helpers.Query, only: [
+    project_filter: 2, project_id_with_number_filter: 2, task_list_id_with_number_filter: 2,
+    sort_by_order: 1, task_list_filter: 2, task_type_filter: 2, task_status_filter: 2
+  ]
 
   alias CodeCorps.Task
-  alias JaSerializer.Params
 
-  plug :load_and_authorize_resource, model: Task, only: [:create, :update]
-  plug :scrub_params, "data" when action in [:create, :update]
+  plug :load_and_authorize_changeset, model: Task, only: [:create]
+  plug :load_and_authorize_resource, model: Task, only: [:update]
+  plug JaResource
 
-  def index(conn, params) do
+  def handle_index(conn, params) do
     tasks =
       Task
-      |> preload([:comments, :project, :user])
-      |> Task.index_filters(params)
-      |> Task.task_type_filters(params)
-      |> Task.task_status_filters(params)
-      |> Repo.paginate(params["page"])
+      |> project_filter(params)
+      |> task_list_filter(params)
+      |> task_type_filter(params)
+      |> task_status_filter(params)
+      |> sort_by_order
+      |> Repo.all
 
-    meta = %{
-      current_page: tasks.page_number,
-      page_size: tasks.page_size,
-      total_pages: tasks.total_pages,
-      total_records: tasks.total_entries
-    }
-
-    render(conn, "index.json-api", data: tasks, opts: [meta: meta])
+    conn
+    |> render("index.json-api", data: tasks)
   end
 
-  def create(conn, %{"data" => data = %{"type" => "task", "attributes" => _task_params}}) do
-    changeset = Task.create_changeset(%Task{}, Params.to_attributes(data))
-
-    case Repo.insert(changeset) do
-      {:ok, task} ->
-        task =
-          Task
-          |> Repo.get(task.id) # need to reload, due to number being added on database level
-          |> Repo.preload([:comments, :project, :user])
-
-        conn
-        |> @analytics.track(:created, task)
-        |> put_status(:created)
-        |> put_resp_header("location", task_path(conn, :show, task))
-        |> render("show.json-api", data: task)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
-    end
+  def record(%Plug.Conn{params: %{"project_id" => _project_id} = params}, _number_as_id) do
+    Task
+    |> project_id_with_number_filter(params)
+    |> Repo.one
   end
 
-  def show(conn, params = %{"project_id" => _project_id, "id" => _number}) do
-    task =
-      Task
-      |> preload([:comments, :project, :user])
-      |> Task.show_project_task_filters(params)
-      |> Repo.one!
-    render(conn, "show.json-api", data: task)
-  end
-  def show(conn, %{"id" => id}) do
-    task =
-      Task
-      |> preload([:comments, :project, :user])
-      |> Repo.get!(id)
-    render(conn, "show.json-api", data: task)
+  def record(%Plug.Conn{params: %{"task_list_id" => _task_list_id} = params}, _number_as_id) do
+    Task
+    |> task_list_id_with_number_filter(params)
+    |> Repo.one
   end
 
-  def update(conn, %{"id" => id, "data" => data = %{"type" => "task", "attributes" => _task_params}}) do
-    changeset =
-      Task
-      |> preload([:comments, :project, :user])
-      |> Repo.get!(id)
-      |> Task.update_changeset(Params.to_attributes(data))
+  def record(_conn, id), do: Task |> Repo.get(id)
 
-    case Repo.update(changeset) do
-      {:ok, task} ->
-        conn
-        |> @analytics.track(:edited, task)
-        |> render("show.json-api", data: task)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
-    end
+  def handle_create(conn, attributes) do
+    %Task{}
+    |> Task.create_changeset(attributes)
+    |> Repo.insert
+    |> CodeCorps.Analytics.Segment.track(:created, conn)
+  end
+
+  def handle_update(conn, task, attributes) do
+    task
+    |> Task.update_changeset(attributes)
+    |> Repo.update
+    |> CodeCorps.Analytics.Segment.track(:edited, conn)
   end
 end
