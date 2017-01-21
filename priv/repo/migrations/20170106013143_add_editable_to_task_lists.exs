@@ -9,12 +9,6 @@ defmodule CodeCorps.Repo.Migrations.AddEditableToTaskLists do
     alter table(:task_lists) do
       add :inbox, :boolean, default: false
     end
-
-    flush
-
-    TaskList
-    |> where([task_list], task_list.name == "Inbox")
-    |> Repo.update_all(set: [inbox: true])
   end
 
   def down do
