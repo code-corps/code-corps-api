@@ -35,7 +35,7 @@ defmodule CodeCorps.TaskList do
         name: "Done",
         position: 4
       }
-    ] |> Enum.map(fn (params) -> changeset(%TaskList{}, params) end)
+    ] |> Enum.map(fn (params) -> create_changeset(%TaskList{}, params) end)
   end
 
   @doc """
@@ -46,5 +46,12 @@ defmodule CodeCorps.TaskList do
     |> cast(params, [:name, :position])
     |> validate_required([:name, :position])
     |> set_order(:position, :order, :project_id)
+  end
+
+  def create_changeset(struct, params) do
+    struct
+    |> cast(params, [:inbox])
+    |> changeset(params)
+    |> validate_required([:inbox])
   end
 end
