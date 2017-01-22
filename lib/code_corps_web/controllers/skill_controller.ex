@@ -33,6 +33,14 @@ defmodule CodeCorpsWeb.SkillController do
     end
   end
 
+  @elasticsearch_index "skills"
+  @elasticsearch_type "title"
+  @elasticsearch_url  Application.get_env(:code_corps, :elasticsearch_url)
+
+  def search(_conn, params) do
+    CodeCorps.ElasticSearchHelper.search(@elasticsearch_url, @elasticsearch_index, @elasticsearch_type, query)
+  end
+
   @spec load_skills(map) :: list(Skill.t)
   defp load_skills(%{} = params) do
     Skill

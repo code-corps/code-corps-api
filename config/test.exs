@@ -38,6 +38,9 @@ config :code_corps, :stripe_env, :test
 
 config :code_corps, :icon_color_generator, CodeCorps.RandomIconColor.TestGenerator
 
+# Configure elasticsearch
+config :code_corps, :elasticsearch_url, "http://0.0.0.0:9200"
+
 # Set Corsica logging to output no console warning when rejecting a request
 config :code_corps, :corsica_log_level, [rejected: :debug]
 
@@ -53,6 +56,10 @@ config :code_corps,
   github_app_client_id: System.get_env("GITHUB_TEST_APP_CLIENT_ID"),
   github_app_client_secret: System.get_env("GITHUB_TEST_APP_CLIENT_SECRET"),
   github_app_pem: pem
+
+# Configure elasticsearch
+config :code_corps, :elasticsearch_url, "http://0.0.0.0:9200"
+config :code_corps, :elasticsearch_index,  "skills"
 
 config :sentry,
   environment_name: Mix.env || :test

@@ -81,7 +81,8 @@ defmodule CodeCorps.Mixfile do
       {:sweet_xml, "~> 0.5"},
       {:timber, "~> 2.0"}, # Logging
       {:timex, "~> 3.0"},
-      {:timex_ecto, "~> 3.0"}
+      {:timex_ecto, "~> 3.0"},
+      {:elastix, git: "https://github.com/paulsullivanjr/elastix.git"} # for elastic search
     ]
   end
 
