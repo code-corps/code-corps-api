@@ -53,7 +53,8 @@ config :code_corps, :stripe, Stripe
 config :code_corps, :stripe_env, :staging
 
 config :code_corps, CodeCorps.Mailer,
-  adapter: Bamboo.LocalAdapter
+  adapter: Bamboo.PostmarkAdapter,
+  api_key: System.get_env("POSTMARK_API_KEY")
 
 # ## SSL Support
 #
