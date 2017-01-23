@@ -55,7 +55,8 @@ config :sentry,
 
 # TODO: Replace with actual adapter
 config :code_corps, CodeCorps.Mailer,
-  adapter: Bamboo.LocalAdapter
+  adapter: Bamboo.PostmarkAdapter,
+  api_key: System.get_env("POSTMARK_API_KEY")
 
 # ## SSL Support
 #
