@@ -32,7 +32,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectChargeTest do
         failure_code: nil,
         failure_message: nil,
         id_from_stripe: "charge",
-        invoice_id_from_stripe: nil,
+        invoice_id_from_stripe: "invoice",
         paid: true,
         refunded: false,
         review_id_from_stripe: nil,

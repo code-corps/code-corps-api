@@ -34,7 +34,7 @@ defmodule CodeCorps.StripeInvoice do
     field :total, :integer
     field :webhooks_delievered_at, :integer
 
-    belongs_to :stripe_connect_subscription, CodeCorps.StripeConnectAccount
+    belongs_to :stripe_connect_subscription, CodeCorps.StripeConnectSubscription
     belongs_to :user, CodeCorps.User
 
     timestamps()

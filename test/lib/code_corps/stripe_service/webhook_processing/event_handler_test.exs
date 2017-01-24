@@ -6,7 +6,9 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
   }
 
   alias CodeCorps.{
-    StripeEvent, StripeInvoice, StripePlatformCard, StripePlatformCustomer
+    Repo, Project,
+    StripeEvent, StripeInvoice, StripePlatformCard, StripePlatformCustomer,
+    StripeTesting
   }
 
   defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest.StubObject do
@@ -77,20 +79,49 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
       assert event.user_id == "acc_123"
     end
 
-    test "handles charge.succeeded" do
+    test "handles charge.succeeded as processed when everything is in order" do
       connect_account = insert(:stripe_connect_account)
-      customer = insert(:stripe_connect_customer, id_from_stripe: "test_customer_for_charge")
-      event = build_event(
-        "charge.succeeded",
-        "charge",
-        %Stripe.Charge{id: "ch_123", customer: customer.id_from_stripe},
-        connect_account.id_from_stripe
-      )
+
+      charge_fixture = StripeTesting.Helpers.load_fixture(Stripe.Charge, "charge")
+      insert(:stripe_connect_customer, id_from_stripe: charge_fixture.customer)
+
+      invoice_fixture = StripeTesting.Helpers.load_fixture(Stripe.Invoice, charge_fixture.invoice)
+      insert(:stripe_connect_subscription, id_from_stripe: invoice_fixture.subscription)
+
+      project = Repo.one(Project)
+      insert(:donation_goal, current: true, project: project)
+
+      event = build_event("charge.succeeded", "charge", charge_fixture, connect_account.id_from_stripe)
 
       {:ok, event} = EventHandler.handle(event, ConnectEventHandler, connect_account.id_from_stripe)
       assert event.object_type == "charge"
-      assert event.object_id == "ch_123"
+      assert event.object_id == charge_fixture.id
       assert event.status == "processed"
+    end
+
+    test "handles charge.succeeded as errored when something goes wrong with email" do
+      connect_account = insert(:stripe_connect_account)
+      charge_fixture = StripeTesting.Helpers.load_fixture(Stripe.Charge, "charge")
+
+      insert(:stripe_connect_customer, id_from_stripe: charge_fixture.customer)
+
+      event = build_event("charge.succeeded", "charge", charge_fixture, connect_account.id_from_stripe)
+      {:ok, event} = EventHandler.handle(event, ConnectEventHandler, connect_account.id_from_stripe)
+
+      assert event.object_type == "charge"
+      assert event.object_id == charge_fixture.id
+      assert event.status == "errored"
+    end
+
+    test "handles charge.succeeded as errored when something goes wrong with creating a charge" do
+      charge_fixture = StripeTesting.Helpers.load_fixture(Stripe.Charge, "charge")
+
+      event = build_event("charge.succeeded", "charge", charge_fixture, "bad_account")
+      {:ok, event} = EventHandler.handle(event, ConnectEventHandler, "bad_account")
+
+      assert event.object_type == "charge"
+      assert event.object_id == charge_fixture.id
+      assert event.status == "errored"
     end
 
     test "handles customer.subscription.updated" do
@@ -154,36 +185,29 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
     end
 
     test "handles invoice.payment_succeeded" do
+      fixture = StripeTesting.Helpers.load_fixture(Stripe.Invoice, "invoice")
+
+      insert(:stripe_connect_subscription, id_from_stripe: fixture.subscription)
+
       user = insert(:user)
-      # need to hardcode id from stripe, since this is the value StripeTesting returns
-      subscription = insert(:stripe_connect_subscription, id_from_stripe: "sub_123")
       stripe_platform_customer = insert(:stripe_platform_customer, user: user)
       # same with hardcoding customer id from stripe
-      connect_customer = insert(
+      insert(
         :stripe_connect_customer,
-        id_from_stripe: "cus_123",
+        id_from_stripe: fixture.customer,
         stripe_platform_customer: stripe_platform_customer,
         user: user
       )
 
-      event = build_event(
-        "invoice.payment_succeeded",
-        "invoice",
-        %Stripe.Invoice{
-          id: "ivc_123",
-          customer: connect_customer.id_from_stripe,
-          subscription: subscription.id_from_stripe
-        },
-        nil
-      )
+      event = build_event("invoice.payment_succeeded", "invoice", fixture, nil)
 
       {:ok, event} = EventHandler.handle(event, ConnectEventHandler, "acc_123")
       assert event.object_type == "invoice"
-      assert event.object_id == "ivc_123"
+      assert event.object_id == fixture.id
       assert event.status == "processed"
       assert event.user_id == "acc_123"
 
-      assert Repo.get_by(StripeInvoice, id_from_stripe: "ivc_123")
+      assert Repo.get_by(StripeInvoice, id_from_stripe: fixture.id)
     end
   end
 

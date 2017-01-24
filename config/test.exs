@@ -18,6 +18,8 @@ config :code_corps, CodeCorps.Repo,
   database: "code_corps_phoenix_test",
   pool: Ecto.Adapters.SQL.Sandbox
 
+config :code_corps, site_url: "http://localhost:4200"
+
 # speed up password hashing
 config :comeonin, :bcrypt_log_rounds, 4
 config :comeonin, :pbkdf2_rounds, 1
@@ -44,3 +46,6 @@ config :sentry,
 
 config :code_corps, CodeCorps.Mailer,
   adapter: Bamboo.TestAdapter
+
+config :code_corps,
+  postmark_receipt_template: "123"
