@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Your monthly donation on Code Corps</title>
+    <!--
+    Make sure you copy the styles from styles.css into the email template in Postmark before saving there.
+
+    <style type="text/css" rel="stylesheet" media="all">
+    </style>
+    -->
+    <link rel="stylesheet" type="text/css" href="styles.css" media="screen" />
+  </head>
+  <body>
+    <span class="preheader">Your receipt for your monthly donation to {{project_title}}.</span>
+    <table class="email-wrapper" width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td align="center">
+          <table class="email-content" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td class="email-masthead" width="100%" cellpadding="0" cellspacing="0">
+                <table class="email-masthead_inner" align="center" width="570" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td>
+                      <a href="https://www.codecorps.org">
+                        <img src="https://d3pgew4wbk2vb1.cloudfront.net/emails/images/logo-small@2x.png" class="email-masthead_logo" />
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <!-- Email Body -->
+            <tr>
+              <td class="email-body" width="100%" cellpadding="0" cellspacing="0">
+                <table class="email-body_inner" align="center" width="570" cellpadding="0" cellspacing="0">
+                  <!-- Body content -->
+                  <tr>
+                    <td class="content-cell">
+                      <table class="donation" width="100%" cellpadding="0" cellspacing="0">
+                        <tr>
+                          <td>
+                            <p class="donation_image center">
+                              <img src="{{high_five_image_url}}" width="100" height="100" />
+                            </p>
+                            <p class="donation_text center">
+                              <strong>{{user_first_name}}</strong>, thanks for your monthly donation to <a href="{{project_url}}">{{project_title}}</a>.
+                            </p>
+                            <tr>
+                              <td class="donation_goal">
+                                <p class="donation_goal_header">
+                                  Current Goal
+                                </p>
+                                <p class="donation_goal_footer">
+                                  {{project_current_donation_goal_description}}
+                                </p>
+                              <td>
+                            </tr>
+                          </tr>
+                        </td>
+                      </table>
+                      <table class="purchase" width="100%" cellpadding="0" cellspacing="0">
+                        <tr>
+                          <td colspan="2">
+                            <table class="charge_content" width="100%" cellpadding="0" cellspacing="0">
+                              <tr>
+                                <th class="charge_heading">
+                                  <p>Description</p>
+                                </th>
+                                <th class="charge_heading">
+                                  <p class="align-right">Amount</p>
+                                </th>
+                              </tr>
+                              <tr>
+                                <td width="80%" class="charge_item">Monthly Donation to {{project_title}}</td>
+                                <td class="align-right" width="20%" class="charge_item">{{charge_amount}}</td>
+                              </tr>
+                              <tr>
+                                <td width="80%" class="charge_footer" valign="middle">
+                                  <p class="charge_total charge_total--label">Total</p>
+                                </td>
+                                <td width="20%" class="charge_footer" valign="middle">
+                                  <p class="charge_total">{{charge_amount}}</p>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                      <table class="body-signature">
+                        <tr>
+                          <td>
+                            <p class="center small">
+                              Questions? Feedback?
+                              <br>Visit our <strong><a href="https://intercom.help/code-corps">Help Center</a></strong> or just reply to this email.</p>
+                            <p class="center">
+                              Thanks again!
+                              <br><strong>The Code Corps Team</strong>
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                      <!-- Sub copy -->
+                      <table class="body-sub">
+                        <tr>
+                          <td>
+                            <p class="sub">The charge will appear as <strong>{{charge_statement_descriptor}}</strong> on your statement.</p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <table class="email-footer" align="center" width="570" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td class="content-cell" align="center">
+                      <p class="sub align-center">
+                        Code Corps PBC
+                        <br>4166 Wilson Ave #1
+                        <br>San Diego, CA 92104
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
