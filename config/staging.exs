@@ -17,6 +17,8 @@ config :code_corps, CodeCorps.Endpoint,
   url: [scheme: "http", host: "api.pbqrpbecf.org", port: 80],
   secret_key_base: System.get_env("SECRET_KEY_BASE")
 
+config :code_corps, site_url: "http://www.pbqrpbecf.org"
+
 # Configure your database
 config :code_corps, CodeCorps.Repo,
   adapter: Ecto.Adapters.Postgres,
@@ -55,6 +57,9 @@ config :code_corps, :stripe_env, :staging
 config :code_corps, CodeCorps.Mailer,
   adapter: Bamboo.PostmarkAdapter,
   api_key: System.get_env("POSTMARK_API_KEY")
+
+config :code_corps,
+  postmark_receipt_template: "1252361"
 
 # ## SSL Support
 #

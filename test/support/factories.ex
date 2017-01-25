@@ -186,6 +186,17 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def stripe_invoice_factory do
+    %CodeCorps.StripeInvoice{
+      id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
+      charge_id_from_stripe: sequence(:id_from_stripe, &"charge_stripe_id_#{&1}"),
+      customer_id_from_stripe: sequence(:id_from_stripe, &"customer_stripe_id_#{&1}"),
+      subscription_id_from_stripe: sequence(:subscription_id_from_stripe, &"subscription_stripe_id_#{&1}"),
+      stripe_connect_subscription: build(:stripe_connect_subscription),
+      user: build(:user)
+    }
+  end
+
   def stripe_platform_customer_factory do
     %CodeCorps.StripePlatformCustomer{
       created: Timex.now |> Timex.to_unix,

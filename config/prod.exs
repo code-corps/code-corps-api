@@ -18,6 +18,8 @@ config :code_corps, CodeCorps.Endpoint,
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
   secret_key_base: System.get_env("SECRET_KEY_BASE")
 
+config :code_corps, site_url: "https://www.codecorps.org"
+
 # Configure your database
 config :code_corps, CodeCorps.Repo,
   adapter: Ecto.Adapters.Postgres,
@@ -57,6 +59,9 @@ config :sentry,
 config :code_corps, CodeCorps.Mailer,
   adapter: Bamboo.PostmarkAdapter,
   api_key: System.get_env("POSTMARK_API_KEY")
+
+config :code_corps,
+  postmark_receipt_template: "1255222"
 
 # ## SSL Support
 #
