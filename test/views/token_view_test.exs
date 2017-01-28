@@ -1,7 +1,5 @@
 defmodule CodeCorps.TokenViewTest do
-  use CodeCorps.ConnCase, async: true
-
-  import Phoenix.View, only: [render: 3]
+  use CodeCorps.ViewCase
 
   test "renders show" do
     token = "12345"

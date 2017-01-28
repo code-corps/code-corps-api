@@ -44,6 +44,8 @@ defmodule CodeCorps.StripeConnectSubscription do
     belongs_to :stripe_connect_plan, CodeCorps.StripeConnectPlan
     belongs_to :user, CodeCorps.User
 
+    has_one :project, through: [:stripe_connect_plan, :project]
+
     timestamps()
   end
 

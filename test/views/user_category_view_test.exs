@@ -1,7 +1,5 @@
 defmodule CodeCorps.UserCategoryViewTest do
-  use CodeCorps.ConnCase, async: true
-
-  import Phoenix.View, only: [render: 3]
+  use CodeCorps.ViewCase
 
   test "renders all attributes and relationships properly" do
     user_category = insert(:user_category)
