@@ -1,6 +1,4 @@
 defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
-  import Ecto.Query
-
   alias CodeCorps.{
     Project, Repo, StripeConnectCustomer, StripeConnectAccount,
     StripeConnectPlan, StripeConnectSubscription, User
@@ -20,10 +18,11 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
 
   - `{:ok, %StripeConnectSubscription{}}` - the created record.
   - `{:error, %Ecto.Changeset{}}` - the record was not created due to validation issues.
+  - `{:error, :project_not_found}`
   - `{:error, :project_not_ready}` - the associated project does not meed the prerequisites for receiving donations.
+  - `{:error, :user_not_found}`
   - `{:error, :user_not_ready}` - the associated user does not meet the prerequisits to donate.
   - `{:error, %Stripe.APIErrorResponse{}}` - there was a problem with the stripe request
-  - `{:error, :not_found}` - one of the associated records was not found
 
   # Side effects
 
@@ -31,8 +30,10 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
   - If the subscription is created or found, associated donation goal states will be updated
   """
   def find_or_create(%{"project_id" => project_id, "quantity" => _, "user_id" => user_id} = attributes) do
-    with {:ok, %Project{} = project} <- get_project(project_id) |> ProjectSubscribable.validate,
-         {:ok, %User{} = user} <- get_user(user_id) |> UserCanSubscribe.validate
+    with {:ok, %Project{} = project} <- get_project_with_preloads(project_id),
+         {:ok, %Project{}} <- ProjectSubscribable.validate(project),
+         {:ok, %User{} = user} <- get_user_with_preloads(user_id),
+         {:ok, %User{}} <- UserCanSubscribe.validate(user)
     do
       {:ok, %StripeConnectSubscription{} = subscription} = do_find_or_create(project, user, attributes)
 
@@ -41,7 +42,6 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
 
       {:ok, subscription}
     else
-      nil -> {:error, :not_found}
       failure -> failure
     end
   end
@@ -59,9 +59,8 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
   def update_from_stripe(stripe_id, connect_customer_id) do
     with {:ok, %StripeConnectAccount{} = connect_account} <- retrieve_connect_account(connect_customer_id),
          {:ok, %Stripe.Subscription{} = stripe_subscription} <- @api.Subscription.retrieve(stripe_id, connect_account: connect_account.id),
-         {:ok, %StripeConnectSubscription{} = subscription} <- load_subscription(stripe_id),
-         {:ok, params} <- stripe_subscription |> StripeConnectSubscriptionAdapter.to_params(%{}),
-         {:ok, %Project{} = project} <- get_project(subscription)
+         {:ok, %StripeConnectSubscription{stripe_connect_plan: %{project: project}} = subscription} <- load_subscription(stripe_id),
+         {:ok, params} <- stripe_subscription |> StripeConnectSubscriptionAdapter.to_params(%{})
     do
       {:ok, %StripeConnectSubscription{} = subscription} = update_subscription(subscription, params)
 
@@ -75,29 +74,30 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
     end
   end
 
-  defp do_find_or_create(%Project{} = project, %User{} = user, %{} = attributes) do
-    case find(project, user) do
+  # find_or_create
+
+  defp do_find_or_create(project, user, attributes) do
+    case find(project.stripe_connect_plan, user) do
       nil -> create(project, user, attributes)
       %StripeConnectSubscription{} = subscription -> {:ok, subscription}
     end
   end
 
-  defp find(%Project{} = project, %User{} = user) do
+  defp find(plan, user) do
     StripeConnectSubscription
-    |> where([s], s.stripe_connect_plan_id == ^project.stripe_connect_plan.id and s.user_id == ^user.id)
-    |> Repo.one
+    |> Repo.get_by(stripe_connect_plan_id: plan.id, user_id: user.id)
   end
 
-  defp create(%Project{} = project, %User{} = user, attributes) do
+  defp create(project, user, attributes) do
     with platform_card <- user.stripe_platform_card,
          platform_customer <- user.stripe_platform_customer,
          connect_account <- project.organization.stripe_connect_account,
          plan <- project.stripe_connect_plan,
          {:ok, connect_customer} <- StripeConnectCustomerService.find_or_create(platform_customer, connect_account, user),
          {:ok, connect_card} <- StripeConnectCardService.find_or_create(platform_card, connect_customer, platform_customer, connect_account),
-         create_attributes <- to_create_attributes(connect_card, connect_customer, plan, attributes),
+         create_attributes <- api_create_attributes(connect_card, connect_customer, plan, attributes),
          {:ok, subscription} <- @api.Subscription.create(create_attributes, connect_account: connect_account.id_from_stripe),
-         insert_attributes <- to_insert_attributes(attributes, plan),
+         insert_attributes <- local_insert_attributes(attributes, plan),
          {:ok, params} <- StripeConnectSubscriptionAdapter.to_params(subscription, insert_attributes),
          {:ok, %StripeConnectSubscription{} = stripe_connect_subscription} <- insert_subscription(params)
     do
@@ -108,21 +108,22 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
     end
   end
 
-  defp get_project(%StripeConnectSubscription{stripe_connect_plan_id: stripe_connect_plan_id}) do
-    %StripeConnectPlan{project_id: project_id} = Repo.get(StripeConnectPlan, stripe_connect_plan_id)
-    {:ok, get_project(project_id, [:stripe_connect_plan])}
+  defp get_project_with_preloads(id) do
+    preloads = [:stripe_connect_plan, [organization: :stripe_connect_account]]
+
+    case Repo.get(Project, id) |> Repo.preload(preloads) do
+      nil -> {:error, :project_not_found}
+      project -> {:ok, project}
+    end
   end
 
-  @default_project_preloads [:stripe_connect_plan, [{:organization, :stripe_connect_account}]]
+  defp get_user_with_preloads(user_id) do
+    preloads = [:stripe_platform_customer, [{:stripe_platform_card, :stripe_connect_cards}]]
 
-  defp get_project(project_id, preloads \\ @default_project_preloads) do
-    Repo.get(Project, project_id) |> Repo.preload(preloads)
-  end
-
-  @default_user_preloads [:stripe_platform_customer, [{:stripe_platform_card, :stripe_connect_cards}]]
-
-  defp get_user(user_id, preloads \\ @default_user_preloads) do
-    Repo.get(User, user_id) |> Repo.preload(preloads)
+    case Repo.get(User, user_id) |> Repo.preload(preloads) do
+      nil -> {:error, :user_not_found}
+      user -> {:ok, user}
+    end
   end
 
   defp insert_subscription(params) do
@@ -131,7 +132,7 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
     |> Repo.insert
   end
 
-  defp to_create_attributes(card, customer, plan, %{"quantity" => quantity}) do
+  defp api_create_attributes(card, customer, plan, %{"quantity" => quantity}) do
     %{
       application_fee_percent: 5,
       customer: customer.id_from_stripe,
@@ -141,9 +142,11 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
     }
   end
 
-  defp to_insert_attributes(attrs, %StripeConnectPlan{id: stripe_connect_plan_id}) do
+  defp local_insert_attributes(attrs, %StripeConnectPlan{id: stripe_connect_plan_id}) do
     attrs |> Map.merge(%{"stripe_connect_plan_id" => stripe_connect_plan_id})
   end
+
+  # update_from_stripe
 
   defp retrieve_connect_account(connect_customer_id) do
     customer =
@@ -155,7 +158,10 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
   end
 
   defp load_subscription(id_from_stripe) do
-    subscription = Repo.get_by(StripeConnectSubscription, id_from_stripe: id_from_stripe)
+    subscription =
+      StripeConnectSubscription
+      |> Repo.get_by(id_from_stripe: id_from_stripe)
+      |> Repo.preload([stripe_connect_plan: [project: [:stripe_connect_plan, :donation_goals]]])
 
     {:ok, subscription}
   end

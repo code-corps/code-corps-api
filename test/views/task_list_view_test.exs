@@ -1,7 +1,5 @@
 defmodule CodeCorps.TaskListViewTest do
-  use CodeCorps.ConnCase, async: true
-
-  import Phoenix.View, only: [render: 3]
+  use CodeCorps.ViewCase
 
   test "renders all attributes and relationships properly" do
     project = insert(:project)

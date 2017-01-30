@@ -1,7 +1,8 @@
 defmodule CodeCorps.UserViewTest do
-  use CodeCorps.ConnCase, async: true
+  use CodeCorps.ViewCase
 
-  import Phoenix.View, only: [render: 3]
+  alias Phoenix.ConnTest
+  alias Plug.Conn
 
   test "renders all attributes and relationships properly" do
     user = insert(:user, first_name: "First", last_name: "Last")
@@ -84,7 +85,10 @@ defmodule CodeCorps.UserViewTest do
   test "renders email when user is the authenticated user" do
     user = insert(:user)
 
-    conn = Phoenix.ConnTest.build_conn |> assign(:current_user, user)
+    conn =
+      ConnTest.build_conn
+      |> Conn.assign(:current_user, user)
+
     rendered_json = render(CodeCorps.UserView, "show.json-api", data: user, conn: conn)
     assert rendered_json["data"]["attributes"]["email"] == user.email
   end
@@ -93,14 +97,17 @@ defmodule CodeCorps.UserViewTest do
     users = insert_list(4, :user)
     auth_user = users |> List.last
 
-    conn = Phoenix.ConnTest.build_conn |> assign(:current_user, auth_user)
+    conn =
+      ConnTest.build_conn
+      |> Conn.assign(:current_user, auth_user)
+
     rendered_json = render(CodeCorps.UserView, "show.json-api", data: users, conn: conn)
 
     emails =
-    rendered_json["data"]
-    |> Enum.map(&Map.get(&1, "attributes"))
-    |> Enum.map(&Map.get(&1, "email"))
-    |> Enum.filter(fn(email) -> email != "" end)
+      rendered_json["data"]
+      |> Enum.map(&Map.get(&1, "attributes"))
+      |> Enum.map(&Map.get(&1, "email"))
+      |> Enum.filter(fn(email) -> email != "" end)
 
     assert emails == [auth_user.email]
   end
@@ -134,7 +141,10 @@ defmodule CodeCorps.UserViewTest do
   end
 
   defp render_user_json(user) do
-    conn = Phoenix.ConnTest.build_conn |> assign(:current_user, user)
+    conn =
+      ConnTest.build_conn
+      |> Conn.assign(:current_user, user)
+
     render(CodeCorps.UserView, "show.json-api", data: user, conn: conn)
   end
 end

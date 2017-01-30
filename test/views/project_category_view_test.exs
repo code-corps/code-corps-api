@@ -1,7 +1,5 @@
 defmodule CodeCorps.ProjectCategoryViewTest do
-  use CodeCorps.ConnCase, async: true
-
-  import Phoenix.View, only: [render: 3]
+  use CodeCorps.ViewCase
 
   test "renders all attributes and relationships properly" do
     project_category = insert(:project_category)

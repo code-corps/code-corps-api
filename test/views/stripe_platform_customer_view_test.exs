@@ -1,7 +1,8 @@
 defmodule CodeCorps.StripePlatformCustomerViewTest do
-  use CodeCorps.ConnCase, async: true
+  use CodeCorps.ViewCase
 
-  import Phoenix.View, only: [render: 3]
+  alias Phoenix.ConnTest
+  alias Plug.Conn
 
   test "renders all attributes and relationships properly" do
     user = insert(:user)
@@ -40,7 +41,9 @@ defmodule CodeCorps.StripePlatformCustomerViewTest do
     user = insert(:user)
     stripe_platform_customer = insert(:stripe_platform_customer, id_from_stripe: "some_id", email: "email", user: user)
 
-    conn = Phoenix.ConnTest.build_conn |> assign(:current_user, user)
+    conn =
+      ConnTest.build_conn
+      |> Conn.assign(:current_user, user)
     rendered_json = render(CodeCorps.StripePlatformCustomerView, "show.json-api", data: stripe_platform_customer, conn: conn)
     assert rendered_json["data"]["attributes"]["email"] == stripe_platform_customer.email
     assert rendered_json["data"]["attributes"]["id-from-stripe"] == stripe_platform_customer.id_from_stripe
@@ -50,7 +53,10 @@ defmodule CodeCorps.StripePlatformCustomerViewTest do
     stripe_platform_customers = insert_list(4, :stripe_platform_customer)
     auth_customer = stripe_platform_customers |> List.last
 
-    conn = Phoenix.ConnTest.build_conn |> assign(:current_user, auth_customer.user)
+    conn =
+      ConnTest.build_conn
+      |> Conn.assign(:current_user, auth_customer.user)
+
     rendered_json = render(CodeCorps.StripePlatformCustomerView, "show.json-api", data: stripe_platform_customers, conn: conn)
 
     emails =
