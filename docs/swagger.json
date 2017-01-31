@@ -1,0 +1,7014 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0",
+    "title": "API Reference",
+    "description": "TODO: Add a description",
+    "license": {
+      "name": "MIT",
+      "url": "http://github.com/gruntjs/grunt/blob/master/LICENSE-MIT"
+    }
+  },
+  "host": "api.codecorps.org",
+  "basePath": "/",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/token": {
+      "post": {
+        "description": "Exchange email and password for `token`.",
+        "tags": [
+          "Authentication"
+        ],
+        "operationId": "Exchange email and password for token",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ExchangeEmailAndPasswordForTokenRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/JsonWebTokenValidResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/token/refresh": {
+      "post": {
+        "description": "",
+        "tags": [
+          "Authentication"
+        ],
+        "operationId": "Refresh the token",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RefreshTheTokenRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/JsonWebTokenValidResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/categories": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Categories"
+        ],
+        "operationId": "List all categories",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/CategoriesResponse"
+            }
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "GET",
+              "uri": "/categories"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "List all categories1",
+            "x-testDescription": "Testcase for testing endpoint List all categories"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "post": {
+        "description": "",
+        "tags": [
+          "Categories"
+        ],
+        "operationId": "Create a category",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/CategoryResponse"
+            }
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "POST",
+              "uri": "/categories"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Create a category1",
+            "x-testDescription": "Testcase for testing endpoint Create a category"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/categories/{id}": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Categories"
+        ],
+        "operationId": "Retrieve a category",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/CategoryResponse"
+            }
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "GET",
+              "uri": "/categories/{id}"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Retrieve a category1",
+            "x-testDescription": "Testcase for testing endpoint Retrieve a category"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "patch": {
+        "description": "",
+        "tags": [
+          "Categories"
+        ],
+        "operationId": "Update a category",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/CategoryResponse"
+            }
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "PATCH",
+              "uri": "/categories/{id}"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Update a category1",
+            "x-testDescription": "Testcase for testing endpoint Update a category"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/comments": {
+      "get": {
+        "description": "You can list all comments or retrieve individual comments, as well as create and update comments.",
+        "tags": [
+          "Comments"
+        ],
+        "operationId": "Filter comments by list of ids",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "filter_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FilterCommentsByListOfIdsRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/CommentsResponse"
+            }
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "post": {
+        "description": "You can list all comments or retrieve individual comments, as well as create and update comments.",
+        "tags": [
+          "Comments"
+        ],
+        "operationId": "Create a comment",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CommentCreateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/CommentResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/comments/{id}": {
+      "patch": {
+        "description": "",
+        "tags": [
+          "Comments"
+        ],
+        "operationId": "Update a comment",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CommentUpdateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/CommentResponse"
+            }
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/donation-goals": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Donation Goals"
+        ],
+        "operationId": "Filter by id",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "filter_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FilterByIdRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/DonationGoalsResponse"
+            }
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "post": {
+        "description": "To create a donation goal the user must be a site admin or the owner of the referenced project.",
+        "tags": [
+          "Donation Goals"
+        ],
+        "operationId": "Create a donation goal",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DonationGoalCreateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/DonationGoalResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/donation-goals/{id}": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Donation Goals"
+        ],
+        "operationId": "Retrieve a donation goal",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/DonationGoalResponse"
+            }
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "delete": {
+        "description": "To delete a donation goal the user must be a site admin or the owner of the referenced project.",
+        "tags": [
+          "Donation Goals"
+        ],
+        "operationId": "Delete a donation goal",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "patch": {
+        "description": "To update a donation goal the user must be a site admin or the owner of the referenced project.",
+        "tags": [
+          "Donation Goals"
+        ],
+        "operationId": "Update a donation goal",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DonationGoalUpdateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/DonationGoalResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/organization-memberships": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Organization Memberships"
+        ],
+        "operationId": "Filter by id1",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "filter_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FilterByIdRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/OrganizationMembershipsResponse"
+            }
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "post": {
+        "description": "",
+        "tags": [
+          "Organization Memberships"
+        ],
+        "operationId": "Create an organization membership",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OrganizationMembershipCreateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/OrganizationMembershipResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/organizations/{organization_id}/memberships": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Organization Memberships"
+        ],
+        "operationId": "List all organization memberships for an organization",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "organization_id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double",
+            "description": "Organization id, uniquely identifying a organization"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/OrganizationMembershipsResponse"
+            }
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "GET",
+              "uri": "/organizations/1/memberships"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "List all organization memberships for an organization1",
+            "x-testDescription": "Testcase for testing endpoint List all organization memberships for an organization"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/organization-memberships/{id}": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Organization Memberships"
+        ],
+        "operationId": "Retrieve an organization membership",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/OrganizationMembershipResponse"
+            }
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "delete": {
+        "description": "",
+        "tags": [
+          "Organization Memberships"
+        ],
+        "operationId": "Delete an organization membership",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "patch": {
+        "description": "",
+        "tags": [
+          "Organization Memberships"
+        ],
+        "operationId": "Update an organization membership",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OrganizationMembershipUpdateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/OrganizationMembershipResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/organizations": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Organizations"
+        ],
+        "operationId": "Filter by id2",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "filter_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FilterByIdRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/OrganizationsResponse"
+            }
+          },
+          "400": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "post": {
+        "description": "",
+        "tags": [
+          "Organizations"
+        ],
+        "operationId": "Create an organization",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/OrganizationResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "POST",
+              "uri": "/organizations"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Create an organization1",
+            "x-testDescription": "Testcase for testing endpoint Create an organization"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/organizations/{id}": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Organizations"
+        ],
+        "operationId": "Retrieve an organization",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/OrganizationResponse"
+            }
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "patch": {
+        "description": "",
+        "tags": [
+          "Organizations"
+        ],
+        "operationId": "Update an organization",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OrganizationResource"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/OrganizationResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/previews": {
+      "post": {
+        "description": "",
+        "tags": [
+          "Previews"
+        ],
+        "operationId": "Create a preview",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PreviewCreateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/PreviewResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/project-categories": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Project Categories"
+        ],
+        "operationId": "List all project categories",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ProjectCategoriesResponse"
+            }
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "GET",
+              "uri": "/project-categories"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "List all project categories1",
+            "x-testDescription": "Testcase for testing endpoint List all project categories"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "post": {
+        "description": "",
+        "tags": [
+          "Project Categories"
+        ],
+        "operationId": "Create a project category",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ProjectCategoryCreateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ProjectCategoryResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/project-categories/{id}": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Project Categories"
+        ],
+        "operationId": "Retrieve a project category",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ProjectCategoryResponse"
+            }
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "delete": {
+        "description": "",
+        "tags": [
+          "Project Categories"
+        ],
+        "operationId": "Delete a project category",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/project-skills": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Project Skills"
+        ],
+        "operationId": "List all project skills",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ProjectSkillsResponse"
+            }
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "GET",
+              "uri": "/project-skills"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "List all project skills1",
+            "x-testDescription": "Testcase for testing endpoint List all project skills"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "post": {
+        "description": "",
+        "tags": [
+          "Project Skills"
+        ],
+        "operationId": "Create a project skill",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ProjectSkillCreateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ProjectSkillResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/project-skills/{id}": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Project Skills"
+        ],
+        "operationId": "Retrieve a project skill",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ProjectSkillResponse"
+            }
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "delete": {
+        "description": "",
+        "tags": [
+          "Project Skills"
+        ],
+        "operationId": "Delete a project skill",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/{slug}/projects": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Projects"
+        ],
+        "operationId": "Retrieve all projects for organization specified by slug",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ProjectsResponse"
+            }
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "GET",
+              "uri": "/{slug}/projects"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Retrieve all projects for organization specified by slug1",
+            "x-testDescription": "Testcase for testing endpoint Retrieve all projects for organization specified by slug"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/{slug}/{project_slug}": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Projects"
+        ],
+        "operationId": "Retrieve a project by slug",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "project_slug",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ProjectResponse"
+            }
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "GET",
+              "uri": "/{slug}/{project_slug}"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Retrieve a project by slug1",
+            "x-testDescription": "Testcase for testing endpoint Retrieve a project by slug"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/projects": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Projects"
+        ],
+        "operationId": "List all projects",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ProjectsResponse"
+            }
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "GET",
+              "uri": "/projects"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "List all projects1",
+            "x-testDescription": "Testcase for testing endpoint List all projects"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "post": {
+        "description": "",
+        "tags": [
+          "Projects"
+        ],
+        "operationId": "Create a project",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ProjectCreateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ProjectResponse"
+            }
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/projects/{id}": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Projects"
+        ],
+        "operationId": "Retrieve a project",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ProjectResponse"
+            }
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "patch": {
+        "description": "",
+        "tags": [
+          "Projects"
+        ],
+        "operationId": "Update a project",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ProjectUpdateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ProjectResponse"
+            }
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/roles": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Roles"
+        ],
+        "operationId": "List all roles",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/RolesResponse"
+            }
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "GET",
+              "uri": "/roles"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "List all roles1",
+            "x-testDescription": "Testcase for testing endpoint List all roles"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "post": {
+        "description": "",
+        "tags": [
+          "Roles"
+        ],
+        "operationId": "Create a role",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/RoleResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "POST",
+              "uri": "/roles"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Create a role1",
+            "x-testDescription": "Testcase for testing endpoint Create a role"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/roles/{id}": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Roles"
+        ],
+        "operationId": "Retrieve a role",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/RoleResponse"
+            }
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/role-skills": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Role Skills"
+        ],
+        "operationId": "List all role skills",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/RoleSkillsResponse"
+            }
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "GET",
+              "uri": "/role-skills"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "List all role skills1",
+            "x-testDescription": "Testcase for testing endpoint List all role skills"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "post": {
+        "description": "",
+        "tags": [
+          "Role Skills"
+        ],
+        "operationId": "Create a role skill",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/RoleSkillResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "POST",
+              "uri": "/role-skills"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Create a role skill1",
+            "x-testDescription": "Testcase for testing endpoint Create a role skill"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/role-skills/{id}": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Role Skills"
+        ],
+        "operationId": "Retrieve a role skill",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/RoleSkillResponse"
+            }
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "delete": {
+        "description": "",
+        "tags": [
+          "Role Skills"
+        ],
+        "operationId": "Delete a role skill",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/skills": {
+      "get": {
+        "description": "Skills can be queried by a substring of the name of the skill. This should be a string with one or more letters of the name of the skill requested.\nFor example, if we wanted to return skills like \"Java\" and \"JavaScript\", we may query with the substring \"jav\". A good use for this API would be a skill typeahead input.",
+        "tags": [
+          "Skills"
+        ],
+        "operationId": "Autocomplete skill with query",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "Text query to filter returned skills"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/SkillsResponse"
+            }
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "GET",
+              "uri": "/skills?query=jav"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Autocomplete skill with query1",
+            "x-testDescription": "Skills can be queried by a substring of the name of the skill. This should be a string with one or more letters of the name of the skill requested.\nFor example, if we wanted to return skills like \"Java\" and \"JavaScript\", we may query with the substring \"jav\". A good use for this API would be a skill typeahead input."
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "post": {
+        "description": "",
+        "tags": [
+          "Skills"
+        ],
+        "operationId": "Create a skill",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/SkillResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "POST",
+              "uri": "/skills"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Create a skill1",
+            "x-testDescription": "Testcase for testing endpoint Create a skill"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/skills/{id}": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Skills"
+        ],
+        "operationId": "Retrieve a skill",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/SkillResponse"
+            }
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/:slug": {
+      "get": {
+        "description": "This endpoint will return one of two possible responses, depending on if the slugged route's owner is a user or an organization. If the slugged route is owned by a user, the responses's owner relationship will have a user relationship and a nil organization relationship. If it's owned by an organization, it will have an organization relationship and a nil user relationship.",
+        "tags": [
+          "Slugged Routes"
+        ],
+        "operationId": "Retrieve a slugged route",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/SluggedRouteUserResponse"
+            }
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "GET",
+              "uri": "/:slug"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Retrieve a slugged route1",
+            "x-testDescription": "This endpoint will return one of two possible responses, depending on if the slugged route's owner is a user or an organization. If the slugged route is owned by a user, the responses's owner relationship will have a user relationship and a nil organization relationship. If it's owned by an organization, it will have an organization relationship and a nil user relationship."
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/stripe-connect-accounts": {
+      "post": {
+        "description": "",
+        "tags": [
+          "Stripe Connect Accounts"
+        ],
+        "operationId": "Create a Stripe Connect account",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/StripeConnectAccountResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "POST",
+              "uri": "/stripe-connect-accounts"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Create a Stripe Connect account1",
+            "x-testDescription": "Testcase for testing endpoint Create a Stripe Connect account"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/stripe-connect-accounts/{id}": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Stripe Connect Accounts"
+        ],
+        "operationId": "Retrieve a Stripe Connect account",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/StripeConnectAccountResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "GET",
+              "uri": "/stripe-connect-accounts/{id}"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Retrieve a Stripe Connect account1",
+            "x-testDescription": "Testcase for testing endpoint Retrieve a Stripe Connect account"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/stripe-platform-cards": {
+      "post": {
+        "description": "",
+        "tags": [
+          "Stripe Platform Card"
+        ],
+        "operationId": "Create a Stripe platform card",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/StripePlatformCardResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "POST",
+              "uri": "/stripe-platform-cards"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Create a Stripe platform card1",
+            "x-testDescription": "Testcase for testing endpoint Create a Stripe platform card"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/stripe-platform-cards/{id}": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Stripe Platform Card"
+        ],
+        "operationId": "Retrieve a Stripe platform card",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/StripePlatformCardResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/stripe-platform-customers": {
+      "post": {
+        "description": "",
+        "tags": [
+          "Stripe Platform Customers"
+        ],
+        "operationId": "Create a Stripe platform customer",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/StripePlatformCustomerResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "POST",
+              "uri": "/stripe-platform-customers"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Create a Stripe platform customer1",
+            "x-testDescription": "Testcase for testing endpoint Create a Stripe platform customer"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/stripe-platform-customers/{id}": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Stripe Platform Customers"
+        ],
+        "operationId": "Retrieve a Stripe platform customer",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/StripePlatformCustomerResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "GET",
+              "uri": "/stripe-platform-customers/{id}"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Retrieve a Stripe platform customer1",
+            "x-testDescription": "Testcase for testing endpoint Retrieve a Stripe platform customer"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/stripe-connect-plans": {
+      "post": {
+        "description": "",
+        "tags": [
+          "Stripe Connect Plans"
+        ],
+        "operationId": "Create a Stripe Connect plan",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/StripeConnectPlanResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "POST",
+              "uri": "/stripe-connect-plans"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Create a Stripe Connect plan1",
+            "x-testDescription": "Testcase for testing endpoint Create a Stripe Connect plan"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/stripe-connect-plans/{id}": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Stripe Connect Plans"
+        ],
+        "operationId": "Retrieve a Stripe Connect plan",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/StripeConnectPlanResponse"
+            }
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "GET",
+              "uri": "/stripe-connect-plans/{id}"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Retrieve a Stripe Connect plan1",
+            "x-testDescription": "Testcase for testing endpoint Retrieve a Stripe Connect plan"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/stripe-connect-subscriptions": {
+      "post": {
+        "description": "",
+        "tags": [
+          "Stripe Connect Subscriptions"
+        ],
+        "operationId": "Create a Stripe Connect subscription",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/StripeConnectSubscriptionResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "POST",
+              "uri": "/stripe-connect-subscriptions"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Create a Stripe Connect subscription1",
+            "x-testDescription": "Testcase for testing endpoint Create a Stripe Connect subscription"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/stripe-connect-subscriptions/{id}": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Stripe Connect Subscriptions"
+        ],
+        "operationId": "Retrieve a Stripe Connect subscription",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/StripeConnectSubscriptionResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/subscriptions/{id}": {
+      "patch": {
+        "description": "",
+        "tags": [
+          "Stripe Connect Subscriptions"
+        ],
+        "operationId": "Update a Stripe Connect subscription",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/StripeConnectSubscriptionResponse"
+            }
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/projects/{project_id}/tasks": {
+      "get": {
+        "description": "You can list all tasks or retrieve individual tasks for a single project.",
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "List all of a project's tasks",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double",
+            "description": "Id of a project."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/TasksResponse"
+            }
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/projects/{project_id}/tasks/{number}": {
+      "get": {
+        "description": "The `number` parameter in this endpoint is notably different from the usual `id`. Because the front-end Ember application loads a URL with the task's `number` (scoped to the project) for human readability, we don't actually know the `id`. The request is made with the `number` instead.\nThis allows us to have a logical numbering scheme for the project rather than extremely long `id`s.",
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "Retrieve a project's task",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double",
+            "description": "Id of a project."
+          },
+          {
+            "name": "number",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double",
+            "description": "The `number` of a task."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/TaskResponse"
+            }
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/tasks": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "List all tasks",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/TasksResponse"
+            }
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "GET",
+              "uri": "/tasks"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "List all tasks1",
+            "x-testDescription": "Testcase for testing endpoint List all tasks"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "post": {
+        "description": "",
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "Create a task",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/TaskResponse"
+            }
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "POST",
+              "uri": "/tasks"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Create a task1",
+            "x-testDescription": "Testcase for testing endpoint Create a task"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/tasks/{id}": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "Retrieve a task",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/TaskResponse"
+            }
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "patch": {
+        "description": "",
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "Update a task",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/TaskResponse"
+            }
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/user-categories": {
+      "get": {
+        "description": "",
+        "tags": [
+          "User Categories"
+        ],
+        "operationId": "Filter by id4",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "filter_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FilterByIdRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UserCategoriesResponse"
+            }
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "post": {
+        "description": "",
+        "tags": [
+          "User Categories"
+        ],
+        "operationId": "Create a user category",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateAUserCategoryRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UserCategoryResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/user-categories/{id}": {
+      "get": {
+        "description": "",
+        "tags": [
+          "User Categories"
+        ],
+        "operationId": "Retrieve a user category",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UserCategoryResponse"
+            }
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "delete": {
+        "description": "",
+        "tags": [
+          "User Categories"
+        ],
+        "operationId": "Delete a user category",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/user-roles": {
+      "get": {
+        "description": "",
+        "tags": [
+          "User Roles"
+        ],
+        "operationId": "List all user roles",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UserRolesResponse"
+            }
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "GET",
+              "uri": "/user-roles"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "List all user roles1",
+            "x-testDescription": "Testcase for testing endpoint List all user roles"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "post": {
+        "description": "",
+        "tags": [
+          "User Roles"
+        ],
+        "operationId": "Create a user role",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UserRoleResponse"
+            }
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "POST",
+              "uri": "/user-roles"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Create a user role1",
+            "x-testDescription": "Testcase for testing endpoint Create a user role"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/user-roles/{id}": {
+      "get": {
+        "description": "",
+        "tags": [
+          "User Roles"
+        ],
+        "operationId": "Retrieve a user role",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UserRoleResponse"
+            }
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "delete": {
+        "description": "",
+        "tags": [
+          "User Roles"
+        ],
+        "operationId": "Delete a user role",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/user-skills": {
+      "get": {
+        "description": "",
+        "tags": [
+          "User Skills"
+        ],
+        "operationId": "Filter by id5",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "filter_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FilterByIdRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UserSkillsResponse"
+            }
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "post": {
+        "description": "",
+        "tags": [
+          "User Skills"
+        ],
+        "operationId": "Create a User Skill",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UserSkillResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "POST",
+              "uri": "/user-skills"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Create a User Skill1",
+            "x-testDescription": "Testcase for testing endpoint Create a User Skill"
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/user-skills/{id}": {
+      "get": {
+        "description": "",
+        "tags": [
+          "User Skills"
+        ],
+        "operationId": "Retrieve a user skill",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UserSkillResponse"
+            }
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "delete": {
+        "description": "",
+        "tags": [
+          "User Skills"
+        ],
+        "operationId": "Delete a user skill",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Users"
+        ],
+        "operationId": "Filter by id6",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "filter_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FilterByIdRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UsersResponse"
+            }
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "post": {
+        "description": "",
+        "tags": [
+          "Users"
+        ],
+        "operationId": "Create a user",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateAUserRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UserResponse"
+            }
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/users/email_available?email={email}": {
+      "get": {
+        "description": "This endpoint allows you to check whether an email is valid (by checking simply for presence of the `@` symbol) and whether the email is not already registered.",
+        "tags": [
+          "Users"
+        ],
+        "operationId": "Check email availability",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/CheckEmailAvailabilityResponse"
+            }
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "GET",
+              "uri": "/users/email_available?email=me%40testuser.org"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Check email availability1",
+            "x-testDescription": "This endpoint allows you to check whether an email is valid (by checking simply for presence of the `@` symbol) and whether the email is not already registered."
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/users/username_available?username={username}": {
+      "get": {
+        "description": "This endpoint allows you to check whether a username is valid (by running a validation against formatting and reserved routes) and whether the username is not already registered.",
+        "tags": [
+          "Users"
+        ],
+        "operationId": "Check username availability",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/CheckUsernameAvailabilityResponse"
+            }
+          }
+        },
+        "x-unitTests": [
+          {
+            "request": {
+              "method": "GET",
+              "uri": "/users/username_available?username=testuser"
+            },
+            "expectedResponse": {
+              "x-allowExtraHeaders": true,
+              "x-bodyMatchMode": "NONE",
+              "x-arrayOrderedMatching": false,
+              "x-arrayCheckCount": false,
+              "x-matchResponseSchema": true,
+              "headers": {
+                "Content-Type": "application/vnd.api+json; charset=utf-8"
+              }
+            },
+            "x-testShouldPass": true,
+            "x-testEnabled": true,
+            "x-testName": "Check username availability1",
+            "x-testDescription": "This endpoint allows you to check whether a username is valid (by running a validation against formatting and reserved routes) and whether the username is not already registered."
+          }
+        ],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "description": "",
+        "tags": [
+          "Users"
+        ],
+        "operationId": "Retrieve a user",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UserResponse"
+            }
+          },
+          "404": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      },
+      "patch": {
+        "description": "",
+        "tags": [
+          "Users"
+        ],
+        "operationId": "Update a user",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "format": "double"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateAUserRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UserResponse"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {}
+          },
+          "403": {
+            "description": "",
+            "schema": {}
+          },
+          "422": {
+            "description": "",
+            "schema": {}
+          }
+        },
+        "x-unitTests": [],
+        "x-operation-settings": {
+          "CollectParameters": false,
+          "AllowDynamicQueryParameters": false,
+          "AllowDynamicFormParameters": false,
+          "IsMultiContentStreaming": false
+        }
+      }
+    }
+  },
+  "definitions": {
+    "CategoryAttributes": {
+      "title": "Category Attributes",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "slug"
+      ]
+    },
+    "CategoryResource": {
+      "title": "Category Resource",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/CategoryAttributes"
+        },
+        "relationships": {
+          "$ref": "#/definitions/Relationships"
+        }
+      }
+    },
+    "Relationships": {
+      "title": "relationships",
+      "type": "object",
+      "properties": {
+        "project-categories": {
+          "$ref": "#/definitions/ProjectCategories"
+        }
+      }
+    },
+    "ProjectCategories": {
+      "title": "project-categories",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProjectCategoryResourceIdentifier"
+          }
+        }
+      }
+    },
+    "ProjectCategoryResourceIdentifier": {
+      "title": "Project Category Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "CategoryResourceIdentifier": {
+      "title": "Category Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "CategoryResponse": {
+      "title": "Category Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/CategoryResource"
+        }
+      }
+    },
+    "CategoriesResponse": {
+      "title": "Categories Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CategoryResource"
+          }
+        }
+      }
+    },
+    "CommentAttributes": {
+      "title": "Comment Attributes",
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string"
+        },
+        "inserted-at": {
+          "type": "string"
+        },
+        "markdown": {
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/definitions/State"
+        },
+        "updated-at": {
+          "type": "string"
+        }
+      }
+    },
+    "State": {
+      "title": "state",
+      "type": "string",
+      "enum": [
+        "published",
+        "edited"
+      ]
+    },
+    "CommentCreateRequest": {
+      "title": "Comment Create Request",
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "attributes": {
+          "$ref": "#/definitions/Attributes"
+        },
+        "relationships": {
+          "$ref": "#/definitions/Relationships23"
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "Attributes": {
+      "title": "attributes",
+      "type": "object",
+      "properties": {
+        "markdown": {
+          "type": "string"
+        }
+      }
+    },
+    "Relationships23": {
+      "title": "relationships23",
+      "type": "object",
+      "properties": {
+        "tasks": {
+          "$ref": "#/definitions/Tasks"
+        }
+      }
+    },
+    "Tasks": {
+      "title": "tasks",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/TaskResourceIdentifier"
+        }
+      }
+    },
+    "TaskResourceIdentifier": {
+      "title": "Task Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "CommentResource": {
+      "title": "Comment Resource",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/CommentAttributes"
+        },
+        "relationships": {
+          "$ref": "#/definitions/Relationships29"
+        }
+      }
+    },
+    "Relationships29": {
+      "title": "relationships29",
+      "type": "object",
+      "properties": {
+        "task": {
+          "$ref": "#/definitions/Task"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
+        }
+      }
+    },
+    "Task": {
+      "title": "task",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/TaskResourceIdentifier"
+        }
+      }
+    },
+    "User": {
+      "title": "user",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/UserResourceIdentifier"
+        }
+      }
+    },
+    "UserResourceIdentifier": {
+      "title": "User Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "CommentResourceIdentifier": {
+      "title": "Comment Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "CommentUpdateRequest": {
+      "title": "Comment Update Request",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/Attributes"
+        }
+      }
+    },
+    "CommentResponse": {
+      "title": "Comment Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/CommentResource"
+        }
+      }
+    },
+    "CommentsResponse": {
+      "title": "Comments Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CommentResource"
+          }
+        }
+      }
+    },
+    "DonationGoalAttributes": {
+      "title": "Donation Goal Attributes",
+      "type": "object",
+      "properties": {
+        "description": {
+          "description": "Several lines describing the reasons for the goal",
+          "type": "string"
+        },
+        "amount": {
+          "description": "The amount, in cents, for the goal.",
+          "type": "number",
+          "format": "double"
+        },
+        "current": {
+          "description": "Indicates whether this is the current donation goal. This is determined by whether 1) this is the highest goal and the total monthly raised is higher than that amount or 2) the total monthly raised is between the lower goal's amount (if it exists) and this goal's amount.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "description",
+        "amount",
+        "current"
+      ]
+    },
+    "DonationGoalCreateRequest": {
+      "title": "Donation Goal Create Request",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/Data"
+        }
+      }
+    },
+    "Data": {
+      "title": "data",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/Attributes58"
+        },
+        "relationships": {
+          "$ref": "#/definitions/Relationships59"
+        }
+      }
+    },
+    "Attributes58": {
+      "title": "attributes58",
+      "type": "object",
+      "properties": {
+        "description": {
+          "description": "A short plain text description for the donation",
+          "type": "string"
+        },
+        "amount": {
+          "description": "the amount of money in cents for the goal",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "Relationships59": {
+      "title": "relationships59",
+      "type": "object",
+      "properties": {
+        "project": {
+          "$ref": "#/definitions/Project"
+        }
+      }
+    },
+    "Project": {
+      "title": "project",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/ProjectResourceIdentifier"
+        }
+      }
+    },
+    "ProjectResourceIdentifier": {
+      "title": "Project Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "DonationGoalResource": {
+      "title": "Donation Goal Resource",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/DonationGoalAttributes"
+        },
+        "relationships": {
+          "$ref": "#/definitions/Relationships59"
+        }
+      }
+    },
+    "DonationGoalResourceIdentifier": {
+      "title": "Donation Goal Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "DonationGoalResponse": {
+      "title": "Donation Goal Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/DonationGoalResource"
+        }
+      }
+    },
+    "DonationGoalsResponse": {
+      "title": "Donation Goals Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DonationGoalResource"
+          }
+        }
+      }
+    },
+    "DonationGoalUpdateRequest": {
+      "title": "Donation Goal Update Request",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/Data81"
+        }
+      }
+    },
+    "Data81": {
+      "title": "data81",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/Attributes58"
+        }
+      }
+    },
+    "FilterMissingResponse": {
+      "title": "Filter Missing Response",
+      "type": "object",
+      "properties": {
+        "errors": {
+          "$ref": "#/definitions/Errors"
+        }
+      }
+    },
+    "Errors": {
+      "title": "errors",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "detail": {
+          "description": "Details of what record was not found.",
+          "type": "string"
+        },
+        "status": {
+          "description": "HTTP status code",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "ForbiddenResponse": {
+      "title": "Forbidden Response",
+      "type": "object",
+      "properties": {
+        "errors": {
+          "$ref": "#/definitions/Errors"
+        }
+      }
+    },
+    "JsonApiVersion": {
+      "title": "JSON API Version",
+      "type": "object",
+      "properties": {
+        "jsonapi": {
+          "$ref": "#/definitions/Jsonapi"
+        }
+      }
+    },
+    "Jsonapi": {
+      "title": "jsonapi",
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "JsonWebTokenExpiredResponse": {
+      "title": "JSON Web Token Expired Response",
+      "type": "object",
+      "properties": {
+        "errors": {
+          "$ref": "#/definitions/Errors"
+        }
+      }
+    },
+    "JsonWebTokenInvalidResponse": {
+      "title": "JSON Web Token Invalid Response",
+      "type": "object",
+      "properties": {
+        "errors": {
+          "$ref": "#/definitions/Errors"
+        }
+      }
+    },
+    "JsonWebTokenInvalidPasswordResponse": {
+      "title": "JSON Web Token Invalid Password Response",
+      "type": "object",
+      "properties": {
+        "errors": {
+          "$ref": "#/definitions/Errors"
+        }
+      }
+    },
+    "JsonWebTokenNoUserWithEmailResponse": {
+      "title": "JSON Web Token No User With Email Response",
+      "type": "object",
+      "properties": {
+        "errors": {
+          "$ref": "#/definitions/Errors"
+        }
+      }
+    },
+    "JsonWebTokenValidResponse": {
+      "title": "JSON Web Token Valid Response",
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "number",
+          "format": "double"
+        }
+      },
+      "required": [
+        "token",
+        "user_id"
+      ]
+    },
+    "OrganizationAttributes": {
+      "title": "Organization Attributes",
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "icon-large-url": {
+          "type": "string"
+        },
+        "icon-thumb-url": {
+          "type": "string"
+        },
+        "inserted-at": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "updated-at": {
+          "type": "string"
+        }
+      }
+    },
+    "OrganizationResource": {
+      "title": "Organization Resource",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/OrganizationAttributes"
+        },
+        "relationships": {
+          "$ref": "#/definitions/Relationships101"
+        }
+      }
+    },
+    "Relationships101": {
+      "title": "relationships101",
+      "type": "object",
+      "properties": {
+        "organization": {
+          "description": "memberships",
+          "$ref": "#/definitions/Organization"
+        },
+        "projects": {
+          "$ref": "#/definitions/Projects"
+        },
+        "slugged": {
+          "description": "route",
+          "$ref": "#/definitions/Slugged"
+        }
+      }
+    },
+    "Organization": {
+      "title": "organization",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OrganizationMembershipResourceIdentifier"
+          }
+        }
+      }
+    },
+    "OrganizationMembershipResourceIdentifier": {
+      "title": "Organization Membership Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "Projects": {
+      "title": "projects",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProjectResourceIdentifier"
+          }
+        }
+      }
+    },
+    "Slugged": {
+      "title": "slugged",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/SluggedRouteResourceIdentifier"
+        }
+      }
+    },
+    "SluggedRouteResourceIdentifier": {
+      "title": "Slugged Route Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "OrganizationResourceIdentifier": {
+      "title": "Organization Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "OrganizationResponse": {
+      "title": "Organization Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/OrganizationResource"
+        }
+      }
+    },
+    "OrganizationsResponse": {
+      "title": "Organizations Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OrganizationResource"
+          }
+        }
+      }
+    },
+    "OrganizationMembershipAttributes": {
+      "title": "Organization Membership Attributes",
+      "type": "object",
+      "properties": {
+        "role": {
+          "$ref": "#/definitions/Role"
+        }
+      }
+    },
+    "Role": {
+      "title": "role",
+      "type": "string",
+      "enum": [
+        "pending",
+        "contributor",
+        "admin",
+        "owner"
+      ]
+    },
+    "OrganizationMembershipCreateRequest": {
+      "title": "Organization Membership Create Request",
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "attributes": {
+          "$ref": "#/definitions/OrganizationMembershipAttributes"
+        },
+        "relationships": {
+          "$ref": "#/definitions/Relationships134"
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "Relationships134": {
+      "title": "relationships134",
+      "type": "object",
+      "properties": {
+        "member": {
+          "$ref": "#/definitions/Member"
+        },
+        "organization": {
+          "$ref": "#/definitions/Organization137"
+        }
+      }
+    },
+    "Member": {
+      "title": "member",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/UserResourceIdentifier"
+        }
+      }
+    },
+    "Organization137": {
+      "title": "organization137",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/OrganizationResourceIdentifier"
+        }
+      }
+    },
+    "OrganizationMembershipResource": {
+      "title": "Organization Membership Resource",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/OrganizationMembershipAttributes"
+        },
+        "relationships": {
+          "$ref": "#/definitions/Relationships134"
+        }
+      }
+    },
+    "OrganizationMembershipResponse": {
+      "title": "Organization Membership Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/OrganizationMembershipResource"
+        }
+      }
+    },
+    "OrganizationMembershipsResponse": {
+      "title": "Organization Memberships Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OrganizationMembershipResource"
+          }
+        }
+      }
+    },
+    "OrganizationMembershipUpdateRequest": {
+      "title": "Organization Membership Update Request",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/OrganizationMembershipAttributes"
+        }
+      }
+    },
+    "PreviewAttributes": {
+      "title": "Preview Attributes",
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string"
+        },
+        "inserted-at": {
+          "type": "string"
+        },
+        "markdown": {
+          "type": "string"
+        },
+        "updated-at": {
+          "type": "string"
+        }
+      }
+    },
+    "PreviewCreateAttributes": {
+      "title": "Preview Create Attributes",
+      "type": "object",
+      "properties": {
+        "markdown": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "markdown"
+      ]
+    },
+    "PreviewCreateRequest": {
+      "title": "Preview Create Request",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/PreviewCreateAttributes"
+        }
+      }
+    },
+    "PreviewResource": {
+      "title": "Preview Resource",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/PreviewAttributes"
+        },
+        "relationships": {
+          "$ref": "#/definitions/Relationships175"
+        }
+      }
+    },
+    "Relationships175": {
+      "title": "relationships175",
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/User"
+        }
+      }
+    },
+    "PreviewResourceIdentifier": {
+      "title": "Preview Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "PreviewResponse": {
+      "title": "Preview Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/PreviewResource"
+        }
+      }
+    },
+    "ProjectAttributes": {
+      "title": "Project Attributes",
+      "type": "object",
+      "properties": {
+        "description": {
+          "description": "A short plain text description for the project",
+          "type": "string"
+        },
+        "icon-large-url": {
+          "description": "A url pointing to a large icon for the project",
+          "type": "string"
+        },
+        "icon-thumb-url": {
+          "description": "A url pointing to the project thumbnail",
+          "type": "string"
+        },
+        "inserted-at": {
+          "type": "string"
+        },
+        "long-description-body": {
+          "description": "A html string containing the rendered `long-description-markdown`",
+          "type": "string"
+        },
+        "long-description-markdown": {
+          "description": "Markdown formatted string containing the project long description",
+          "type": "string"
+        },
+        "slug": {
+          "description": "corps' (string) - Case insensitive unique string identifier for the project",
+          "type": "string"
+        },
+        "title": {
+          "description": "A title for the project",
+          "type": "string"
+        },
+        "updated-at": {
+          "type": "string"
+        }
+      }
+    },
+    "ProjectCreateRequest": {
+      "title": "Project Create Request",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/Data187"
+        }
+      }
+    },
+    "Data187": {
+      "title": "data187",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/Attributes188"
+        },
+        "relationships": {
+          "$ref": "#/definitions/Relationships189"
+        }
+      }
+    },
+    "Attributes188": {
+      "title": "attributes188",
+      "type": "object",
+      "properties": {
+        "base64-icon-data": {
+          "description": "A base64 encoded string containing the project icon",
+          "type": "string"
+        },
+        "title": {
+          "description": "A title for the project",
+          "type": "string"
+        },
+        "description": {
+          "description": "A short plain text description for the project",
+          "type": "string"
+        },
+        "slug": {
+          "description": "Case insensitive unique string identifier for the project",
+          "type": "string"
+        },
+        "long-description-markdown": {
+          "description": "Markdown formatted string containing the project long description",
+          "type": "string"
+        }
+      },
+      "required": [
+        "title"
+      ]
+    },
+    "Relationships189": {
+      "title": "relationships189",
+      "type": "object",
+      "properties": {
+        "organizations": {
+          "$ref": "#/definitions/Organizations"
+        }
+      }
+    },
+    "Organizations": {
+      "title": "organizations",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/OrganizationResourceIdentifier"
+        }
+      }
+    },
+    "ProjectResource": {
+      "title": "Project Resource",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/ProjectAttributes"
+        },
+        "relationships": {
+          "$ref": "#/definitions/Relationships194"
+        }
+      }
+    },
+    "Relationships194": {
+      "title": "relationships194",
+      "type": "object",
+      "properties": {
+        "organization": {
+          "$ref": "#/definitions/Organization137"
+        },
+        "project-categories": {
+          "$ref": "#/definitions/ProjectCategories"
+        },
+        "project-skills": {
+          "$ref": "#/definitions/ProjectSkills"
+        },
+        "tasks": {
+          "$ref": "#/definitions/Tasks201"
+        }
+      }
+    },
+    "ProjectSkills": {
+      "title": "project-skills",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProjectSkillResourceIdentifier"
+          }
+        }
+      }
+    },
+    "ProjectSkillResourceIdentifier": {
+      "title": "Project Skill Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "Tasks201": {
+      "title": "tasks201",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TaskResourceIdentifier"
+          }
+        }
+      }
+    },
+    "ProjectResponse": {
+      "title": "Project Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/ProjectResource"
+        }
+      }
+    },
+    "ProjectsResponse": {
+      "title": "Projects Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProjectResource"
+          }
+        }
+      }
+    },
+    "ProjectUpdateRequest": {
+      "title": "Project Update Request",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/Data229"
+        }
+      }
+    },
+    "Data229": {
+      "title": "data229",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/Attributes230"
+        }
+      }
+    },
+    "Attributes230": {
+      "title": "attributes230",
+      "type": "object",
+      "properties": {
+        "base64_icon_data": {
+          "description": "A base64 encoded string containing the project icon",
+          "type": "string"
+        },
+        "title": {
+          "description": "A title for the project",
+          "type": "string"
+        },
+        "description": {
+          "description": "A short plain text description for the project",
+          "type": "string"
+        },
+        "slug": {
+          "description": "Case insensitive unique string identifier for the project",
+          "type": "string"
+        },
+        "long_description_markdown": {
+          "description": "Markdown formatted string containing the project long description",
+          "type": "string"
+        }
+      }
+    },
+    "ProjectCategoryCreateRequest": {
+      "title": "Project Category Create Request",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/ProjectCategoryResource"
+        }
+      }
+    },
+    "ProjectCategoryResource": {
+      "title": "Project Category Resource",
+      "type": "object",
+      "properties": {
+        "relationships": {
+          "$ref": "#/definitions/Relationships233"
+        }
+      }
+    },
+    "Relationships233": {
+      "title": "relationships233",
+      "type": "object",
+      "properties": {
+        "category": {
+          "$ref": "#/definitions/Category"
+        },
+        "project": {
+          "$ref": "#/definitions/Project"
+        }
+      }
+    },
+    "Category": {
+      "title": "category",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/CategoryResourceIdentifier"
+        }
+      }
+    },
+    "ProjectCategoryResponse": {
+      "title": "Project Category Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/ProjectCategoryResource"
+        }
+      }
+    },
+    "ProjectCategoriesResponse": {
+      "title": "Project Categories Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProjectCategoryResource"
+          }
+        }
+      }
+    },
+    "ProjectSkillResource": {
+      "title": "Project Skill Resource",
+      "type": "object",
+      "properties": {
+        "relationships": {
+          "$ref": "#/definitions/Relationships260"
+        }
+      }
+    },
+    "Relationships260": {
+      "title": "relationships260",
+      "type": "object",
+      "properties": {
+        "project": {
+          "$ref": "#/definitions/Project"
+        },
+        "skill": {
+          "$ref": "#/definitions/Skill"
+        }
+      }
+    },
+    "Skill": {
+      "title": "skill",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/SkillResourceIdentifier"
+        }
+      }
+    },
+    "SkillResourceIdentifier": {
+      "title": "Skill Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "ProjectSkillCreateRequest": {
+      "title": "Project Skill Create Request",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/ProjectSkillResource"
+        }
+      }
+    },
+    "ProjectSkillResponse": {
+      "title": "Project Skill Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/ProjectSkillResource"
+        }
+      }
+    },
+    "ProjectSkillsResponse": {
+      "title": "Project Skills Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProjectSkillResource"
+          }
+        }
+      }
+    },
+    "RecordNotFoundResponse": {
+      "title": "Record Not Found Response",
+      "type": "object",
+      "properties": {
+        "errors": {
+          "$ref": "#/definitions/Errors288"
+        }
+      }
+    },
+    "Errors288": {
+      "title": "errors288",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "status": {
+          "description": "HTTP status code",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "RoleAttributes": {
+      "title": "Role Attributes",
+      "type": "object",
+      "properties": {
+        "ability": {
+          "type": "string"
+        },
+        "inserted-at": {
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/definitions/Kind"
+        },
+        "name": {
+          "type": "string"
+        },
+        "updated-at": {
+          "type": "string"
+        }
+      }
+    },
+    "Kind": {
+      "title": "kind",
+      "type": "string",
+      "enum": [
+        "technology",
+        "creative",
+        "support"
+      ]
+    },
+    "RoleResource": {
+      "title": "Role Resource",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/RoleAttributes"
+        },
+        "relationships": {
+          "$ref": "#/definitions/Relationships294"
+        }
+      }
+    },
+    "Relationships294": {
+      "title": "relationships294",
+      "type": "object",
+      "properties": {
+        "role-skills": {
+          "$ref": "#/definitions/RoleSkills"
+        }
+      }
+    },
+    "RoleSkills": {
+      "title": "role-skills",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RoleSkillResourceIdentifier"
+          }
+        }
+      }
+    },
+    "RoleSkillResourceIdentifier": {
+      "title": "Role Skill Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "RoleResourceIdentifier": {
+      "title": "Role Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "RoleResponse": {
+      "title": "Role Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/RoleResource"
+        }
+      }
+    },
+    "RolesResponse": {
+      "title": "Roles Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RoleResource"
+          }
+        }
+      }
+    },
+    "RoleSkillResource": {
+      "title": "Role Skill Resource",
+      "type": "object",
+      "properties": {
+        "relationships": {
+          "$ref": "#/definitions/Relationships313"
+        }
+      }
+    },
+    "Relationships313": {
+      "title": "relationships313",
+      "type": "object",
+      "properties": {
+        "role": {
+          "$ref": "#/definitions/Role314"
+        },
+        "skill": {
+          "$ref": "#/definitions/Skill"
+        }
+      }
+    },
+    "Role314": {
+      "title": "role314",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/RoleResourceIdentifier"
+        }
+      }
+    },
+    "RoleSkillResponse": {
+      "title": "Role Skill Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/RoleSkillResource"
+        }
+      }
+    },
+    "RoleSkillsResponse": {
+      "title": "Role Skills Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RoleSkillResource"
+          }
+        }
+      }
+    },
+    "SkillAttributes": {
+      "title": "Skill Attributes",
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "inserted-at": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "updated-at": {
+          "type": "string"
+        }
+      }
+    },
+    "SkillResource": {
+      "title": "Skill Resource",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/SkillAttributes"
+        },
+        "relationships": {
+          "$ref": "#/definitions/Relationships294"
+        }
+      }
+    },
+    "SkillResponse": {
+      "title": "Skill Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/SkillResource"
+        }
+      }
+    },
+    "SkillsResponse": {
+      "title": "Skills Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SkillResource"
+          }
+        }
+      }
+    },
+    "SluggedRouteOrganizationAttributes": {
+      "title": "Slugged Route Organization Attributes",
+      "type": "object",
+      "properties": {
+        "inserted-at": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "updated-at": {
+          "type": "string"
+        }
+      }
+    },
+    "SluggedRouteOrganizationResource": {
+      "title": "Slugged Route Organization Resource",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/SluggedRouteOrganizationAttributes"
+        },
+        "relationships": {
+          "$ref": "#/definitions/Relationships355"
+        }
+      }
+    },
+    "Relationships355": {
+      "title": "relationships355",
+      "type": "object",
+      "properties": {
+        "organization": {
+          "$ref": "#/definitions/Organization137"
+        },
+        "user": {
+          "$ref": "#/definitions/User358"
+        }
+      }
+    },
+    "User358": {
+      "title": "user358",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string"
+        }
+      }
+    },
+    "SluggedRouteOrganizationResponse": {
+      "title": "Slugged Route Organization Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/SluggedRouteOrganizationResource"
+        }
+      }
+    },
+    "SluggedRouteUserAttributes": {
+      "title": "Slugged Route User Attributes",
+      "type": "object",
+      "properties": {
+        "inserted-at": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "updated-at": {
+          "type": "string"
+        }
+      }
+    },
+    "SluggedRouteUserResource": {
+      "title": "Slugged Route User Resource",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/SluggedRouteUserAttributes"
+        },
+        "relationships": {
+          "$ref": "#/definitions/Relationships370"
+        }
+      }
+    },
+    "Relationships370": {
+      "title": "relationships370",
+      "type": "object",
+      "properties": {
+        "organization": {
+          "$ref": "#/definitions/Organization371"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
+        }
+      }
+    },
+    "Organization371": {
+      "title": "organization371",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string"
+        }
+      }
+    },
+    "SluggedRouteUserResponse": {
+      "title": "Slugged Route User Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/SluggedRouteUserResource"
+        }
+      }
+    },
+    "StripeConnectAccountAttributes": {
+      "title": "Stripe Connect Account Attributes",
+      "type": "object",
+      "properties": {
+        "business-name": {
+          "description": "The publicly visible name of the business",
+          "type": "string"
+        },
+        "business-url": {
+          "description": "The publicly visible website of the business",
+          "type": "string"
+        },
+        "charges-enabled": {
+          "description": "Whether or not the account can create live charges",
+          "type": "boolean"
+        },
+        "country": {
+          "type": "string"
+        },
+        "default-currency": {
+          "type": "string"
+        },
+        "details-submitted": {
+          "description": "Whether or not account details have been submitted yet. Standalone accounts cannot receive transfers before this is true.",
+          "type": "boolean"
+        },
+        "display-name": {
+          "description": "The display name for this account. This is used on the Stripe dashboard to help differentiate between accounts.",
+          "type": "string"
+        },
+        "email": {
+          "description": "The primary user’s email address",
+          "type": "string"
+        },
+        "id-from-stripe": {
+          "type": "string"
+        },
+        "inserted-at": {
+          "type": "string"
+        },
+        "managed": {
+          "description": "Whether or not the account is managed by your platform.",
+          "type": "boolean"
+        },
+        "support-email": {
+          "description": "A publicly shareable email address that can be reached for support for this account",
+          "type": "string"
+        },
+        "support-phone": {
+          "description": "The publicly visible support phone number for the business",
+          "type": "string"
+        },
+        "support-url": {
+          "description": "A publicly shareable URL that can be reached for support for this account",
+          "type": "string"
+        },
+        "transfers-enabled": {
+          "description": "Whether or not Stripe will send automatic transfers for this account. This is only false when Stripe is waiting for additional information from the account holder.",
+          "type": "boolean"
+        },
+        "updated-at": {
+          "type": "string"
+        }
+      }
+    },
+    "StripeConnectAccountResource": {
+      "title": "Stripe Connect Account Resource",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/StripeConnectAccountAttributes"
+        },
+        "relationships": {
+          "$ref": "#/definitions/Relationships384"
+        }
+      }
+    },
+    "Relationships384": {
+      "title": "relationships384",
+      "type": "object",
+      "properties": {
+        "organization": {
+          "$ref": "#/definitions/Organization137"
+        }
+      }
+    },
+    "StripeConnectAccountResourceIdentifier": {
+      "title": "Stripe Connect Account Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "StripeConnectAccountResponse": {
+      "title": "Stripe Connect Account Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/StripeConnectAccountResource"
+        }
+      }
+    },
+    "StripeConnectAccountsResponse": {
+      "title": "Stripe Connect Accounts Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StripeConnectAccountResource"
+          }
+        }
+      }
+    },
+    "StripePlatformCardAttributes": {
+      "title": "Stripe Platform Card Attributes",
+      "type": "object",
+      "properties": {
+        "brand": {
+          "description": "Card brand.",
+          "$ref": "#/definitions/Brand"
+        },
+        "cvc-check": {
+          "description": "If a CVC was provided, results of the check.",
+          "$ref": "#/definitions/CvcCheck"
+        },
+        "exp-month": {
+          "type": "number",
+          "format": "double"
+        },
+        "exp-year": {
+          "type": "number",
+          "format": "double"
+        },
+        "id-from-stripe": {
+          "type": "string"
+        },
+        "inserted-at": {
+          "type": "string"
+        },
+        "last4": {
+          "type": "string"
+        },
+        "name": {
+          "description": "Cardholder name",
+          "type": "string"
+        },
+        "updated-at": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id-from-stripe"
+      ]
+    },
+    "Brand": {
+      "title": "brand",
+      "type": "string",
+      "enum": [
+        "Visa",
+        "Enum_American Express",
+        "MasterCard",
+        "Discover",
+        "JCB",
+        "Enum_Diners Club",
+        "Unknown"
+      ]
+    },
+    "CvcCheck": {
+      "title": "cvc-check",
+      "type": "string",
+      "enum": [
+        "pass",
+        "fail",
+        "unavailable",
+        "Enum_unchecked"
+      ]
+    },
+    "StripePlatformCardResource": {
+      "title": "Stripe Platform Card Resource",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/StripePlatformCardAttributes"
+        },
+        "relationships": {
+          "$ref": "#/definitions/Relationships175"
+        }
+      }
+    },
+    "StripePlatformCardResourceIdentifier": {
+      "title": "Stripe Platform Card Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "StripePlatformCardResponse": {
+      "title": "Stripe Platform Card Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/StripePlatformCardResource"
+        }
+      }
+    },
+    "StripePlatformCardsResponse": {
+      "title": "Stripe Platform Cards Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StripePlatformCardResource"
+          }
+        }
+      }
+    },
+    "StripePlatformCustomerAttributes": {
+      "title": "Stripe Platform Customer Attributes",
+      "type": "object",
+      "properties": {
+        "created": {
+          "description": "A timestamp, indicating when the customer was created by Stripe.",
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "delinquent": {
+          "description": "Whether or not the latest charge for the customer’s latest invoice has failed.",
+          "type": "boolean"
+        },
+        "email": {
+          "description": "The email that the user used to create their Stripe Connect account.",
+          "type": "string"
+        },
+        "id-from-stripe": {
+          "description": "The ID that Stripe assigned the customer.",
+          "type": "string"
+        },
+        "inserted-at": {
+          "type": "string"
+        },
+        "updated-at": {
+          "type": "string"
+        }
+      }
+    },
+    "StripePlatformCustomerResource": {
+      "title": "Stripe Platform Customer Resource",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/StripePlatformCustomerAttributes"
+        },
+        "relationships": {
+          "$ref": "#/definitions/Relationships175"
+        }
+      }
+    },
+    "StripePlatformCustomerResourceIdentifier": {
+      "title": "Stripe Platform Customer Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "StripePlatformCustomerResponse": {
+      "title": "Stripe Platform Customer Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/StripePlatformCustomerResource"
+        }
+      }
+    },
+    "StripePlatformCustomersResponse": {
+      "title": "Stripe Platform Customers Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StripePlatformCustomerResource"
+          }
+        }
+      }
+    },
+    "StripeConnectPlanAttributes": {
+      "title": "Stripe Connect Plan Attributes",
+      "type": "object",
+      "properties": {
+        "amount": {
+          "description": "Describes the amount of a plan in cents.",
+          "type": "number",
+          "format": "double"
+        },
+        "created": {
+          "description": "A timestamp, indicating when the plan was created by Stripe",
+          "type": "string"
+        },
+        "id-from-stripe": {
+          "type": "string"
+        },
+        "inserted-at": {
+          "type": "string"
+        },
+        "name": {
+          "description": "Name of the plan, to be displayed on invoices and in the web interface.",
+          "type": "string"
+        },
+        "updated-at": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id-from-stripe"
+      ]
+    },
+    "StripeConnectPlanResource": {
+      "title": "Stripe Connect Plan Resource",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/StripeConnectPlanAttributes"
+        },
+        "relationships": {
+          "$ref": "#/definitions/Relationships59"
+        }
+      }
+    },
+    "StripeConnectPlanResourceIdentifier": {
+      "title": "Stripe Connect Plan Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "StripeConnectPlanResponse": {
+      "title": "Stripe Connect Plan Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/StripeConnectPlanResource"
+        }
+      }
+    },
+    "StripeConnectPlansResponse": {
+      "title": "Stripe Connect Plans Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StripeConnectPlanResource"
+          }
+        }
+      }
+    },
+    "StripeConnectSubscriptionAttributes": {
+      "title": "Stripe Connect Subscription Attributes",
+      "type": "object",
+      "properties": {
+        "cancelled-at": {
+          "description": "If the subscription has been canceled, the date of that cancellation.",
+          "type": "string"
+        },
+        "created": {
+          "description": "A timestamp, indicating when the plan was created by Stripe",
+          "type": "string"
+        },
+        "current-period-end": {
+          "description": "End of the current period that the subscription has been invoiced for. At the end of this period, a new invoice will be created.",
+          "type": "string"
+        },
+        "current-period-start": {
+          "description": "Start of the current period that the subscription has been invoiced for",
+          "type": "string"
+        },
+        "customer-id-from-stripe": {
+          "description": "ID of the customer who owns the subscription",
+          "type": "string"
+        },
+        "ended-at": {
+          "description": "If the subscription has ended (either because it was canceled or because the customer was switched to a subscription to a new plan), the date the subscription ended",
+          "type": "string"
+        },
+        "id-from-stripe": {
+          "type": "string"
+        },
+        "inserted-at": {
+          "type": "string"
+        },
+        "plan-id-from-stripe": {
+          "type": "string"
+        },
+        "start": {
+          "description": "Date the most recent update to this subscription started.",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/Status"
+        },
+        "updated-at": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id-from-stripe"
+      ]
+    },
+    "Status": {
+      "title": "status",
+      "type": "string",
+      "enum": [
+        "trialing",
+        "active",
+        "past_due",
+        "canceled",
+        "unpaid"
+      ]
+    },
+    "StripeConnectSubscriptionResource": {
+      "title": "Stripe Connect Subscription Resource",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/StripeConnectSubscriptionAttributes"
+        },
+        "relationships": {
+          "$ref": "#/definitions/Relationships470"
+        }
+      }
+    },
+    "Relationships470": {
+      "title": "relationships470",
+      "type": "object",
+      "properties": {
+        "stripe-platform-customer": {
+          "$ref": "#/definitions/StripePlatformCustomer"
+        },
+        "stripe-connect-plan": {
+          "$ref": "#/definitions/StripeConnectPlan"
+        }
+      }
+    },
+    "StripePlatformCustomer": {
+      "title": "stripe-platform-customer",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/StripePlatformCustomerResourceIdentifier"
+        }
+      }
+    },
+    "StripeConnectPlan": {
+      "title": "stripe-connect-plan",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/StripeConnectPlanResourceIdentifier"
+        }
+      }
+    },
+    "StripeConnectSubscriptionResourceIdentifier": {
+      "title": "Stripe Connect Subscription Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "StripeConnectSubscriptionResponse": {
+      "title": "Stripe Connect Subscription Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/StripeConnectSubscriptionResource"
+        }
+      }
+    },
+    "StripeConnectSubscriptionsResponse": {
+      "title": "Stripe Connect Subscriptions Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StripeConnectSubscriptionResource"
+          }
+        }
+      }
+    },
+    "TaskAttributes": {
+      "title": "Task Attributes",
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string"
+        },
+        "inserted-at": {
+          "type": "string"
+        },
+        "markdown": {
+          "type": "string"
+        },
+        "number": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "task-type": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "updated-at": {
+          "type": "string"
+        }
+      }
+    },
+    "TaskResource": {
+      "title": "Task Resource",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/TaskAttributes"
+        },
+        "relationships": {
+          "$ref": "#/definitions/Relationships497"
+        }
+      }
+    },
+    "Relationships497": {
+      "title": "relationships497",
+      "type": "object",
+      "properties": {
+        "comments": {
+          "$ref": "#/definitions/Comments"
+        },
+        "project": {
+          "$ref": "#/definitions/Project"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
+        }
+      }
+    },
+    "Comments": {
+      "title": "comments",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/CommentResourceIdentifier"
+        }
+      }
+    },
+    "TaskResponse": {
+      "title": "Task Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/TaskResource"
+        }
+      }
+    },
+    "TasksResponse": {
+      "title": "Tasks Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TaskResponse"
+          }
+        }
+      }
+    },
+    "UnprocessableEntityResponse": {
+      "title": "Unprocessable Entity Response",
+      "type": "object",
+      "properties": {
+        "errors": {
+          "$ref": "#/definitions/Errors527"
+        }
+      }
+    },
+    "Errors527": {
+      "title": "errors527",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "detail": {
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/definitions/Source"
+        },
+        "status": {
+          "description": "HTTP status code",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "Source": {
+      "title": "source",
+      "type": "object",
+      "properties": {
+        "pointer": {
+          "description": "The attribute in question.",
+          "type": "string"
+        }
+      }
+    },
+    "UserCategoryResource": {
+      "title": "User Category Resource",
+      "type": "object",
+      "properties": {
+        "relationships": {
+          "$ref": "#/definitions/Relationships530"
+        }
+      }
+    },
+    "Relationships530": {
+      "title": "relationships530",
+      "type": "object",
+      "properties": {
+        "category": {
+          "$ref": "#/definitions/Category"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
+        }
+      }
+    },
+    "UserCategoryResourceIdentifier": {
+      "title": "User Category Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "UserCategoryResponse": {
+      "title": "User Category Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/UserCategoryResource"
+        }
+      }
+    },
+    "UserCategoriesResponse": {
+      "title": "User Categories Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UserCategoryResource"
+          }
+        }
+      }
+    },
+    "UserAttributes": {
+      "title": "User Attributes",
+      "type": "object",
+      "properties": {
+        "biography": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "first-name": {
+          "type": "string"
+        },
+        "inserted-at": {
+          "type": "string"
+        },
+        "last-name": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "photo-large-url": {
+          "type": "string"
+        },
+        "photo-thumb-url": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "state-transition": {
+          "type": "string"
+        },
+        "theme": {
+          "type": "string"
+        },
+        "twitter": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "website": {
+          "type": "string"
+        }
+      }
+    },
+    "UserResource": {
+      "title": "User Resource",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/UserAttributes"
+        },
+        "relationships": {
+          "$ref": "#/definitions/Relationships553"
+        }
+      }
+    },
+    "Relationships553": {
+      "title": "relationships553",
+      "type": "object",
+      "properties": {
+        "organization-memberships": {
+          "$ref": "#/definitions/OrganizationMemberships"
+        },
+        "slugged-route": {
+          "$ref": "#/definitions/SluggedRoute"
+        },
+        "stripe-platform-cards": {
+          "$ref": "#/definitions/StripePlatformCards"
+        },
+        "stripe-platform-customer": {
+          "$ref": "#/definitions/StripePlatformCustomer"
+        },
+        "user-categories": {
+          "$ref": "#/definitions/UserCategories"
+        },
+        "user-roles": {
+          "$ref": "#/definitions/UserRoles"
+        },
+        "user-skills": {
+          "$ref": "#/definitions/UserSkills"
+        }
+      }
+    },
+    "OrganizationMemberships": {
+      "title": "organization-memberships",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OrganizationMembershipResourceIdentifier"
+          }
+        }
+      }
+    },
+    "SluggedRoute": {
+      "title": "slugged-route",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/SluggedRouteResourceIdentifier"
+        }
+      }
+    },
+    "StripePlatformCards": {
+      "title": "stripe-platform-cards",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StripePlatformCardResourceIdentifier"
+          }
+        }
+      }
+    },
+    "UserCategories": {
+      "title": "user-categories",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UserCategoryResourceIdentifier"
+          }
+        }
+      }
+    },
+    "UserRoles": {
+      "title": "user-roles",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UserRoleResourceIdentifier"
+          }
+        }
+      }
+    },
+    "UserRoleResourceIdentifier": {
+      "title": "User Role Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "UserSkills": {
+      "title": "user-skills",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UserSkillResourceIdentifier"
+          }
+        }
+      }
+    },
+    "UserSkillResourceIdentifier": {
+      "title": "User Skill Resource Identifier",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "UserResponse": {
+      "title": "User Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/UserResource"
+        }
+      }
+    },
+    "UsersResponse": {
+      "title": "Users Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UserResource"
+          }
+        }
+      }
+    },
+    "UserRoleResource": {
+      "title": "User Role Resource",
+      "type": "object",
+      "properties": {
+        "relationships": {
+          "$ref": "#/definitions/Relationships607"
+        }
+      }
+    },
+    "Relationships607": {
+      "title": "relationships607",
+      "type": "object",
+      "properties": {
+        "role": {
+          "$ref": "#/definitions/Role314"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
+        }
+      }
+    },
+    "UserRoleResponse": {
+      "title": "User Role Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/UserRoleResource"
+        }
+      }
+    },
+    "UserRolesResponse": {
+      "title": "User Roles Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UserRoleResource"
+          }
+        }
+      }
+    },
+    "UserSkillResource": {
+      "title": "User Skill Resource",
+      "type": "object",
+      "properties": {
+        "relationships": {
+          "$ref": "#/definitions/Relationships627"
+        }
+      }
+    },
+    "Relationships627": {
+      "title": "relationships627",
+      "type": "object",
+      "properties": {
+        "skill": {
+          "$ref": "#/definitions/Skill"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
+        }
+      }
+    },
+    "UserSkillResponse": {
+      "title": "User Skill Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/UserSkillResource"
+        }
+      }
+    },
+    "UserSkillsResponse": {
+      "title": "User Skills Response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UserSkillResource"
+          }
+        }
+      }
+    },
+    "ExchangeEmailAndPasswordForTokenRequest": {
+      "title": "Exchange email and password for token request",
+      "type": "object",
+      "properties": {
+        "username": {
+          "description": "The user's email address.",
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "username",
+        "password"
+      ]
+    },
+    "RefreshTheTokenRequest": {
+      "title": "Refresh the token request",
+      "type": "object",
+      "properties": {
+        "token": {
+          "description": "The JSON Web Token provided in the create step.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "token"
+      ]
+    },
+    "FilterCommentsByListOfIdsRequest": {
+      "title": "Filter comments by list of ids request",
+      "type": "object",
+      "properties": {
+        "filter_id": {
+          "description": "Comma separated string of `ids` to filter by.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "filter_id"
+      ]
+    },
+    "FilterByIdRequest": {
+      "title": "Filter by id request",
+      "type": "object",
+      "properties": {
+        "filter_id": {
+          "description": "Comma separated string of `ids` to filter by.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "filter_id"
+      ]
+    },
+    "CreateAUserCategoryRequest": {
+      "title": "Create a user category request",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/Data1224"
+        }
+      }
+    },
+    "Data1224": {
+      "title": "data1224",
+      "type": "object",
+      "properties": {
+        "relationships": {
+          "$ref": "#/definitions/Relationships1225"
+        }
+      }
+    },
+    "Relationships1225": {
+      "title": "relationships1225",
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string"
+        }
+      }
+    },
+    "CreateAUserRequest": {
+      "title": "Create a user request",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/Data1306"
+        }
+      }
+    },
+    "Data1306": {
+      "title": "data1306",
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "attributes": {
+          "$ref": "#/definitions/Attributes1307"
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "Attributes1307": {
+      "title": "attributes1307",
+      "type": "object",
+      "properties": {
+        "base64_photo_data": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "facebook_id": {
+          "type": "string"
+        },
+        "facebook_token": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "password",
+        "username"
+      ]
+    },
+    "CheckEmailAvailabilityResponse": {
+      "title": "Check email availability Response",
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "CheckUsernameAvailabilityResponse": {
+      "title": "Check username availability Response",
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "UpdateAUserRequest": {
+      "title": "Update a user request",
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/Data1384"
+        }
+      }
+    },
+    "Data1384": {
+      "title": "data1384",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/Attributes1385"
+        }
+      }
+    },
+    "Attributes1385": {
+      "title": "attributes1385",
+      "type": "object",
+      "properties": {
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "website": {
+          "type": "string"
+        },
+        "biography": {
+          "type": "string"
+        },
+        "twitter": {
+          "type": "string"
+        },
+        "base64_photo_data": {
+          "type": "string"
+        },
+        "state_transition": {
+          "type": "string"
+        },
+        "theme": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
