@@ -21,6 +21,7 @@ defmodule Canary.Abilities do
   alias CodeCorps.UserCategory
   alias CodeCorps.UserRole
   alias CodeCorps.UserSkill
+  alias CodeCorps.UserTask
 
   alias CodeCorps.CategoryPolicy
   alias CodeCorps.CommentPolicy
@@ -44,6 +45,7 @@ defmodule Canary.Abilities do
   alias CodeCorps.UserCategoryPolicy
   alias CodeCorps.UserRolePolicy
   alias CodeCorps.UserSkillPolicy
+  alias CodeCorps.UserTaskPolicy
 
   alias Ecto.Changeset
 
@@ -122,5 +124,8 @@ defmodule Canary.Abilities do
 
     def can?(%User{} = user, :create, %Changeset{data: %UserSkill{}} = changeset), do: UserSkillPolicy.create?(user, changeset)
     def can?(%User{} = user, :delete, %UserSkill{} = user_skill), do: UserSkillPolicy.delete?(user, user_skill)
+
+    def can?(%User{} = user, :create, %Changeset{data: %UserTask{}} = changeset), do: UserTaskPolicy.create?(user, changeset)
+    def can?(%User{} = user, :delete, %UserTask{} = user_task), do: UserTaskPolicy.delete?(user, user_task)
   end
 end

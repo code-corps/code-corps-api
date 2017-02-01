@@ -78,6 +78,7 @@ defmodule CodeCorps.Router do
     resources "/user-categories", UserCategoryController, only: [:create, :delete]
     resources "/user-roles", UserRoleController, only: [:create, :delete]
     resources "/user-skills", UserSkillController, only: [:create, :delete]
+    resources "/user-tasks", UserTaskController, only: [:create, :delete]
   end
 
   scope "/", CodeCorps, host: "api." do
@@ -110,6 +111,7 @@ defmodule CodeCorps.Router do
     resources "/user-categories", UserCategoryController, only: [:index, :show]
     resources "/user-roles", UserRoleController, only: [:index, :show]
     resources "/user-skills", UserSkillController, only: [:index, :show]
+    resources "/user-tasks", UserTaskController, only: [:index, :show]
     get "/:slug", SluggedRouteController, :show
     get "/:slug/projects", ProjectController, :index
     get "/:slug/:project_slug", ProjectController, :show
