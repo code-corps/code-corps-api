@@ -82,7 +82,7 @@ defmodule CodeCorps.Repo.Seeds.ImageMigration do
         IO.puts "No photo exists for #{user.username}, generating color only."
         color = @icon_color_generator.generate
         {:ok, user} =
-          User.changeset(user, %{default_color: color})
+          User.update_changeset(user, %{default_color: color})
           |> Repo.update
       true ->
         IO.puts "Migrating image from S3 to Cloudinary for #{user.username}."
@@ -96,7 +96,7 @@ defmodule CodeCorps.Repo.Seeds.ImageMigration do
           |> Cloudex.upload()
 
         {:ok, user} =
-          User.changeset(user, %{cloudinary_public_id: public_id, default_color: color})
+          User.update_changeset(user, %{cloudinary_public_id: public_id, default_color: color})
           |> Repo.update
     end
   end
