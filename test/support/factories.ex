@@ -241,6 +241,13 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def user_task_factory do
+    %CodeCorps.UserTask{
+      user: build(:user),
+      task: build(:task)
+    }
+  end
+
   def project_skill_factory do
     %CodeCorps.ProjectSkill{
       project: build(:project),
