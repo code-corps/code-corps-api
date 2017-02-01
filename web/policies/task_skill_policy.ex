@@ -1,8 +1,9 @@
-defmodule CodeCorps.UserTaskPolicy do
+defmodule CodeCorps.TaskSkillPolicy do
   @moduledoc """
-  Represents an authorization policy for performing actions on UserTask records.
+  Represents an authorization policy for performing actions on TaskSkill records.
   Used to authorize a controller action.
   """
+
   import CodeCorps.Helpers.Policy,
     only: [
       contributor_or_higher?: 1,
@@ -13,7 +14,7 @@ defmodule CodeCorps.UserTaskPolicy do
       task_authored_by?: 2
     ]
 
-  alias CodeCorps.{User, UserTask}
+  alias CodeCorps.{TaskSkill, User}
   alias Ecto.Changeset
 
   @spec create?(User.t, Changeset.t) :: boolean
@@ -25,11 +26,11 @@ defmodule CodeCorps.UserTaskPolicy do
     end
   end
 
-  @spec delete?(User.t, UserTask.t) :: boolean
-  def delete?(%User{} = user, %UserTask{} = user_task) do
+  @spec delete?(User.t, TaskSkill.t) :: boolean
+  def delete?(%User{} = user, %TaskSkill{} = task_skill) do
     cond do
-      user_task |> get_task |> get_project |> get_membership(user) |> get_role |> contributor_or_higher? -> true
-      user_task |> get_task |> task_authored_by?(user) -> true
+      task_skill |> get_task |> get_project |> get_membership(user) |> get_role |> contributor_or_higher? -> true
+      task_skill |> get_task |> task_authored_by?(user) -> true
       true -> false
     end
   end

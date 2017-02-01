@@ -74,6 +74,7 @@ defmodule CodeCorps.Router do
     resources "/stripe-platform-cards", StripePlatformCardController, only: [:show, :create]
     resources "/stripe-platform-customers", StripePlatformCustomerController, only: [:show, :create]
     resources "/tasks", TaskController, only: [:create, :update]
+    resources "/task-skills", TaskSkillController, only: [:create, :delete]
     resources "/users", UserController, only: [:update]
     resources "/user-categories", UserCategoryController, only: [:create, :delete]
     resources "/user-roles", UserRoleController, only: [:create, :delete]
@@ -105,6 +106,7 @@ defmodule CodeCorps.Router do
       resources "/tasks", TaskController, only: [:index, :show]
     end
     resources "/tasks", TaskController, only: [:index, :show]
+    resources "/task-skills", TaskSkillController, only: [:index, :show]
     get "/users/email_available", UserController, :email_available
     get "/users/username_available", UserController, :username_available
     resources "/users", UserController, only: [:index, :show, :create]
