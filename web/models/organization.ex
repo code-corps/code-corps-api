@@ -3,7 +3,6 @@ defmodule CodeCorps.Organization do
   Represents an organization on Code Corps, e.g. "Code Corps" itself.
   """
 
-  use Arc.Ecto.Schema
   use CodeCorps.Web, :model
   import CodeCorps.Helpers.RandomIconColor
   import CodeCorps.Helpers.Slug
@@ -14,7 +13,6 @@ defmodule CodeCorps.Organization do
     field :cloudinary_public_id
     field :default_color
     field :description, :string
-    field :icon, CodeCorps.OrganizationIcon.Type
     field :name, :string
     field :slug, :string
     field :approved, :boolean

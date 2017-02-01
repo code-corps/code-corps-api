@@ -31,7 +31,6 @@ defmodule CodeCorps.Mixfile do
         :gettext,
         :phoenix_ecto,
         :postgrex,
-        :arc_ecto,
         :cloudex,
         :comeonin,
         :corsica,
@@ -68,8 +67,6 @@ defmodule CodeCorps.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.12"},
       {:cowboy, "~> 1.0"},
-      {:arc, "~> 0.6"}, # Photo uploads
-      {:arc_ecto, "~> 0.5"},
       {:benchfella, "~> 0.3.0", only: :dev},
       {:canary, "~> 1.1"}, # Authorization
       {:cloudex, "~> 0.1.10"},
