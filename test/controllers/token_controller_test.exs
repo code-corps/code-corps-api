@@ -3,7 +3,7 @@ defmodule CodeCorps.TokenControllerTest do
 
   setup do
     conn =
-      %{build_conn | host: "api."}
+      %{build_conn() | host: "api."}
       |> put_req_header("accept", "application/vnd.api+json")
       |> put_req_header("content-type", "application/vnd.api+json")
 

@@ -15,9 +15,9 @@ defmodule CodeCorps.Services.MarkdownRendererService do
       changeset
       |> Ecto.Changeset.get_change(source_field)
 
-    html =
+    {html, _errors} =
       markdown
-      |> Earmark.to_html
+      |> Earmark.as_html()
 
     changeset
     |> Ecto.Changeset.put_change(destination_field, html)

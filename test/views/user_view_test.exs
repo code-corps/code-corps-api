@@ -5,7 +5,7 @@ defmodule CodeCorps.UserViewTest do
   alias Plug.Conn
 
   test "renders all attributes and relationships properly" do
-    user = insert(:user, first_name: "First", last_name: "Last")
+    user = insert(:user, first_name: "First", last_name: "Last", default_color: "blue")
     organization_membership = insert(:organization_membership, member: user)
     slugged_route = insert(:slugged_route, user: user)
     stripe_connect_subscription = insert(:stripe_connect_subscription, user: user)
@@ -15,6 +15,8 @@ defmodule CodeCorps.UserViewTest do
     user_role = insert(:user_role, user: user)
     user_skill = insert(:user_skill, user: user)
 
+    host = Application.get_env(:arc, :asset_host)
+
     rendered_json = render(CodeCorps.UserView, "show.json-api", data: user)
 
     expected_json = %{
@@ -23,13 +25,14 @@ defmodule CodeCorps.UserViewTest do
         "type" => "user",
         "attributes" => %{
           "biography" => user.biography,
+          "cloudinary-public-id" => nil,
           "email" => "",
           "first-name" => "First",
           "inserted-at" => user.inserted_at,
           "last-name" => "Last",
           "name" => "First Last",
-          "photo-large-url" => CodeCorps.UserPhoto.url({user.photo, user}, :large),
-          "photo-thumb-url" => CodeCorps.UserPhoto.url({user.photo, user}, :thumb),
+          "photo-large-url" => "#{host}/icons/user_default_large_blue.png",
+          "photo-thumb-url" => "#{host}/icons/user_default_thumb_blue.png",
           "state" => "signed_up",
           "state-transition" => nil,
           "twitter" => user.twitter,
@@ -86,7 +89,7 @@ defmodule CodeCorps.UserViewTest do
     user = insert(:user)
 
     conn =
-      ConnTest.build_conn
+      ConnTest.build_conn()
       |> Conn.assign(:current_user, user)
 
     rendered_json = render(CodeCorps.UserView, "show.json-api", data: user, conn: conn)
@@ -98,7 +101,7 @@ defmodule CodeCorps.UserViewTest do
     auth_user = users |> List.last
 
     conn =
-      ConnTest.build_conn
+      ConnTest.build_conn()
       |> Conn.assign(:current_user, auth_user)
 
     rendered_json = render(CodeCorps.UserView, "show.json-api", data: users, conn: conn)
@@ -142,7 +145,7 @@ defmodule CodeCorps.UserViewTest do
 
   defp render_user_json(user) do
     conn =
-      ConnTest.build_conn
+      ConnTest.build_conn()
       |> Conn.assign(:current_user, user)
 
     render(CodeCorps.UserView, "show.json-api", data: user, conn: conn)

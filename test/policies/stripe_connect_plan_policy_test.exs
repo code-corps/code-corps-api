@@ -22,7 +22,7 @@ defmodule CodeCorps.StripeConnectPlanPolicyTest do
   end
 
   defp setup_data_for_role(role) do
-    {user, organization, project} = setup_related_records
+    {user, organization, project} = setup_related_records()
     setup_membership(user, organization, role)
     plan = setup_plan(project)
 
@@ -60,7 +60,7 @@ defmodule CodeCorps.StripeConnectPlanPolicyTest do
   end
 
   defp setup_changeset_for_role(role) do
-    {user, organization, project} = setup_related_records
+    {user, organization, project} = setup_related_records()
     setup_membership(user, organization, role)
     changeset = setup_changeset(project)
 

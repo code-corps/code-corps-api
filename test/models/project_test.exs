@@ -29,20 +29,6 @@ defmodule CodeCorps.ProjectTest do
       assert changeset |> fetch_change(:long_description_body) == :error
     end
 
-    @tag :requires_env
-    test "uploads base64icon data to aws" do
-      # 1x1 black pixel gif
-      icon_data = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
-      project = insert(:project)
-      attrs = %{base64_icon_data: icon_data, title: "Test"}
-
-      changeset = Project.changeset(project, attrs)
-
-      assert changeset.valid?
-      [_, file_type] = changeset.changes.icon.file_name |> String.split(".")
-      assert file_type == "gif"
-    end
-
     test "generates slug from title" do
       changeset = Project.changeset(%Project{}, @valid_attrs)
       assert changeset |> get_change(:slug) == "a-title"

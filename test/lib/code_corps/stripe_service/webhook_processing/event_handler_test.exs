@@ -15,12 +15,12 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
     defstruct [:id, :object]
   end
 
-  defp stub_object do
+  defp stub_object() do
     %CodeCorps.StripeService.WebhookProcessing.EventHandlerTest.StubObject{id: "stub_id", object: "stub"}
   end
 
   defp build_event(user_id), do: build_event("any.event", "any_object", user_id)
-  defp build_event(type, object_type, user_id), do: build_event(type, object_type, stub_object, user_id)
+  defp build_event(type, object_type, user_id), do: build_event(type, object_type, stub_object(), user_id)
   defp build_event(type, object_type, object, user_id), do: build_event("some_id", type, object_type, object, user_id)
   defp build_event(id, type, object_type, object, user_id) do
     object = Map.merge(object, %{object: object_type})
@@ -241,7 +241,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
 
     test "uses existing event if id exists" do
       local_event = insert(:stripe_event)
-      event = build_event(local_event.id_from_stripe, "any.event", "any_object", stub_object, nil)
+      event = build_event(local_event.id_from_stripe, "any.event", "any_object", stub_object(), nil)
 
       {:ok, returned_event} = EventHandler.handle(event, PlatformEventHandler)
       assert returned_event.id == local_event.id

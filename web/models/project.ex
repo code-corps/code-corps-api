@@ -5,7 +5,7 @@ defmodule CodeCorps.Project do
 
   use Arc.Ecto.Schema
   use CodeCorps.Web, :model
-  import CodeCorps.Services.Base64ImageUploaderService
+  import CodeCorps.Helpers.RandomIconColor
   import CodeCorps.Helpers.Slug
   import CodeCorps.Validators.SlugValidator
   alias CodeCorps.Services.MarkdownRendererService
@@ -13,7 +13,8 @@ defmodule CodeCorps.Project do
 
   schema "projects" do
     field :approved, :boolean
-    field :base64_icon_data, :string, virtual: true
+    field :cloudinary_public_id
+    field :default_color
     field :description, :string
     field :icon, CodeCorps.ProjectIcon.Type
     field :long_description_body, :string
@@ -41,13 +42,12 @@ defmodule CodeCorps.Project do
 
   def changeset(struct, params) do
     struct
-    |> cast(params, [:title, :description, :long_description_markdown, :base64_icon_data])
+    |> cast(params, [:title, :description, :long_description_markdown, :cloudinary_public_id, :default_color])
     |> validate_required(:title)
     |> generate_slug(:title, :slug)
     |> validate_slug(:slug)
     |> unique_constraint(:slug, name: :index_projects_on_slug)
     |> MarkdownRendererService.render_markdown_to_html(:long_description_markdown, :long_description_body)
-    |> upload_image(:base64_icon_data, :icon)
   end
 
   @doc """
@@ -58,6 +58,7 @@ defmodule CodeCorps.Project do
     |> cast(params, [:organization_id])
     |> changeset(params)
     |> put_assoc(:task_lists, TaskList.default_task_lists())
+    |> generate_icon_color(:default_color)
   end
 
   @doc """

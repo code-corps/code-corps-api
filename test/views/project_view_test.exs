@@ -3,7 +3,7 @@ defmodule CodeCorps.ProjectViewTest do
 
   test "renders all attributes and relationships properly" do
     organization = insert(:organization)
-    project = insert(:project, organization: organization, total_monthly_donated: 5000)
+    project = insert(:project, organization: organization, total_monthly_donated: 5000, default_color: "blue")
 
     donation_goal = insert(:donation_goal, project: project)
     project_category = insert(:project_category, project: project)
@@ -12,16 +12,19 @@ defmodule CodeCorps.ProjectViewTest do
     task_list = insert(:task_list, project: project)
     task = insert(:task, project: project, task_list: task_list)
 
+    host = Application.get_env(:arc, :asset_host)
+
     rendered_json = render(CodeCorps.ProjectView, "show.json-api", data: project)
 
     expected_json = %{
       "data" => %{
         "attributes" => %{
           "can-activate-donations" => false,
+          "cloudinary-public-id" => nil,
           "description" => project.description,
           "donations-active" => true,
-          "icon-large-url" => CodeCorps.ProjectIcon.url({project.icon, project}, :large),
-          "icon-thumb-url" => CodeCorps.ProjectIcon.url({project.icon, project}, :thumb),
+          "icon-large-url" => "#{host}/icons/project_default_large_blue.png",
+          "icon-thumb-url" => "#{host}/icons/project_default_thumb_blue.png",
           "inserted-at" => project.inserted_at,
           "long-description-body" => project.long_description_body,
           "long-description-markdown" => project.long_description_markdown,
@@ -99,7 +102,7 @@ defmodule CodeCorps.ProjectViewTest do
     insert(:donation_goal, project: project)
     insert(:stripe_connect_account, organization: organization, charges_enabled: true, transfers_enabled: true)
 
-    conn = Phoenix.ConnTest.build_conn
+    conn = Phoenix.ConnTest.build_conn()
     rendered_json = render(CodeCorps.ProjectView, "show.json-api", data: project, conn: conn)
     assert rendered_json["data"]["attributes"]["can-activate-donations"] == true
   end
@@ -109,7 +112,7 @@ defmodule CodeCorps.ProjectViewTest do
     insert(:donation_goal, project: project)
     insert(:stripe_connect_plan, project: project)
 
-    conn = Phoenix.ConnTest.build_conn
+    conn = Phoenix.ConnTest.build_conn()
     rendered_json = render(CodeCorps.ProjectView, "show.json-api", data: project, conn: conn)
     assert rendered_json["data"]["attributes"]["donations-active"] == true
   end
@@ -118,7 +121,7 @@ defmodule CodeCorps.ProjectViewTest do
     project = insert(:project)
     insert(:donation_goal, project: project)
 
-    conn = Phoenix.ConnTest.build_conn
+    conn = Phoenix.ConnTest.build_conn()
     rendered_json = render(CodeCorps.ProjectView, "show.json-api", data: project, conn: conn)
     assert rendered_json["data"]["attributes"]["donations-active"] == false
   end
@@ -126,7 +129,7 @@ defmodule CodeCorps.ProjectViewTest do
   test "renders donations-active false when project has no donations and no plan" do
     project = insert(:project)
 
-    conn = Phoenix.ConnTest.build_conn
+    conn = Phoenix.ConnTest.build_conn()
     rendered_json = render(CodeCorps.ProjectView, "show.json-api", data: project, conn: conn)
     assert rendered_json["data"]["attributes"]["donations-active"] == false
   end

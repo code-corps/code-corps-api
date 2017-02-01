@@ -227,7 +227,6 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
   end
 
   describe "personal-id-number-status" do
-    @account_default %Stripe.Account{}
     test "renders as 'pending_requirement' by default" do
       account = insert(:stripe_connect_account)
       rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)

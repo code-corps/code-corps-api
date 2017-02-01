@@ -4,7 +4,7 @@ defmodule CodeCorps.Mixfile do
   def project do
     [app: :code_corps,
      version: "0.0.1",
-     elixir: "1.3.4",
+     elixir: "1.4.1",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
@@ -32,6 +32,7 @@ defmodule CodeCorps.Mixfile do
         :phoenix_ecto,
         :postgrex,
         :arc_ecto,
+        :cloudex,
         :comeonin,
         :corsica,
         :earmark,
@@ -71,6 +72,7 @@ defmodule CodeCorps.Mixfile do
       {:arc_ecto, "~> 0.5"},
       {:benchfella, "~> 0.3.0", only: :dev},
       {:canary, "~> 1.1"}, # Authorization
+      {:cloudex, "~> 0.1.10"},
       {:comeonin, "~> 2.0"},
       {:corsica, "~> 0.4"}, # CORS
       {:credo, "~> 0.5", only: [:dev, :test]}, # Code style suggestions
