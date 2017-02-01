@@ -1,3 +1,3 @@
 defmodule CodeCorps.LayoutViewTest do
-  use CodeCorps.ConnCase, async: true
+  use CodeCorps.ViewCase
 end

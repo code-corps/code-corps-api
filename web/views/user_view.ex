@@ -8,9 +8,8 @@ defmodule CodeCorps.UserView do
   use JaSerializer.PhoenixView
 
   attributes [
-    :biography, :email, :first_name, :last_name, :name,
-    :photo_large_url, :photo_thumb_url, :state, :state_transition, :twitter,
-    :username, :website, :inserted_at, :updated_at
+    :biography, :cloudinary_public_id, :email, :first_name, :last_name, :name, :photo_large_url, :photo_thumb_url, :state, :state_transition,
+    :twitter, :username, :website, :inserted_at, :updated_at
   ]
 
   has_one :slugged_route, serializer: CodeCorps.SluggedRouteView
@@ -24,11 +23,11 @@ defmodule CodeCorps.UserView do
   has_many :user_skills, serializer: CodeCorps.UserSkillView, identifiers: :always
 
   def photo_large_url(user, _conn) do
-    CodeCorps.UserPhoto.url({user.photo, user}, :large)
+    CodeCorps.Helpers.CloudinaryUrl.for(user.cloudinary_public_id, %{crop: "fill", height: 500, width: 500}, "large", user.default_color, "user")
   end
 
   def photo_thumb_url(user, _conn) do
-    CodeCorps.UserPhoto.url({user.photo, user}, :thumb)
+    CodeCorps.Helpers.CloudinaryUrl.for(user.cloudinary_public_id, %{crop: "fill", height: 100, width: 100}, "thumb", user.default_color, "user")
   end
 
   @doc """

@@ -4,7 +4,6 @@ defmodule Canary.Abilities do
   alias CodeCorps.DonationGoal
   alias CodeCorps.Organization
   alias CodeCorps.OrganizationMembership
-  alias CodeCorps.Task
   alias CodeCorps.Preview
   alias CodeCorps.Project
   alias CodeCorps.ProjectCategory
@@ -17,17 +16,19 @@ defmodule Canary.Abilities do
   alias CodeCorps.StripeConnectSubscription
   alias CodeCorps.StripePlatformCard
   alias CodeCorps.StripePlatformCustomer
+  alias CodeCorps.Task
+  alias CodeCorps.TaskSkill
   alias CodeCorps.User
   alias CodeCorps.UserCategory
   alias CodeCorps.UserRole
   alias CodeCorps.UserSkill
+  alias CodeCorps.UserTask
 
   alias CodeCorps.CategoryPolicy
   alias CodeCorps.CommentPolicy
   alias CodeCorps.DonationGoalPolicy
   alias CodeCorps.OrganizationPolicy
   alias CodeCorps.OrganizationMembershipPolicy
-  alias CodeCorps.TaskPolicy
   alias CodeCorps.PreviewPolicy
   alias CodeCorps.ProjectPolicy
   alias CodeCorps.ProjectCategoryPolicy
@@ -40,10 +41,13 @@ defmodule Canary.Abilities do
   alias CodeCorps.StripeConnectSubscriptionPolicy
   alias CodeCorps.StripePlatformCardPolicy
   alias CodeCorps.StripePlatformCustomerPolicy
+  alias CodeCorps.TaskPolicy
+  alias CodeCorps.TaskSkillPolicy
   alias CodeCorps.UserPolicy
   alias CodeCorps.UserCategoryPolicy
   alias CodeCorps.UserRolePolicy
   alias CodeCorps.UserSkillPolicy
+  alias CodeCorps.UserTaskPolicy
 
   alias Ecto.Changeset
 
@@ -75,9 +79,6 @@ defmodule Canary.Abilities do
     def can?(%User{} = user, :create, %Changeset{data: %OrganizationMembership{}} = changeset), do: OrganizationMembershipPolicy.create?(user, changeset)
     def can?(%User{} = user, :update, %Changeset{data: %OrganizationMembership{}} = changeset), do: OrganizationMembershipPolicy.update?(user, changeset)
     def can?(%User{} = user, :delete, %OrganizationMembership{} = membership), do: OrganizationMembershipPolicy.delete?(user, membership)
-
-    def can?(%User{} = user, :create, %Changeset{data: %Task{}} = changeset), do: TaskPolicy.create?(user, changeset)
-    def can?(%User{} = user, :update, %Task{} = task), do: TaskPolicy.update?(user, task)
 
     def can?(%User{} = user, :create, %Changeset{data: %Preview{}} = changeset), do: PreviewPolicy.create?(user, changeset)
 
@@ -114,6 +115,12 @@ defmodule Canary.Abilities do
     def can?(%User{} = user, :create, %Changeset{data: %StripePlatformCustomer{}} = changeset), do: StripePlatformCustomerPolicy.create?(user, changeset)
     def can?(%User{} = user, :show, %StripePlatformCustomer{} = stripe_platform_customer), do: StripePlatformCustomerPolicy.show?(user, stripe_platform_customer)
 
+    def can?(%User{} = user, :create, %Changeset{data: %Task{}} = changeset), do: TaskPolicy.create?(user, changeset)
+    def can?(%User{} = user, :update, %Task{} = task), do: TaskPolicy.update?(user, task)
+
+    def can?(%User{} = user, :create, %Changeset{data: %TaskSkill{}} = changeset), do: TaskSkillPolicy.create?(user, changeset)
+    def can?(%User{} = user, :delete, %TaskSkill{} = task_skill), do: TaskSkillPolicy.delete?(user, task_skill)
+
     def can?(%User{} = user, :create, %Changeset{data: %UserCategory{}} = changeset), do: UserCategoryPolicy.create?(user, changeset)
     def can?(%User{} = user, :delete, %UserCategory{} = user_category), do: UserCategoryPolicy.delete?(user, user_category)
 
@@ -122,5 +129,8 @@ defmodule Canary.Abilities do
 
     def can?(%User{} = user, :create, %Changeset{data: %UserSkill{}} = changeset), do: UserSkillPolicy.create?(user, changeset)
     def can?(%User{} = user, :delete, %UserSkill{} = user_skill), do: UserSkillPolicy.delete?(user, user_skill)
+
+    def can?(%User{} = user, :create, %Changeset{data: %UserTask{}} = changeset), do: UserTaskPolicy.create?(user, changeset)
+    def can?(%User{} = user, :delete, %UserTask{} = user_task), do: UserTaskPolicy.delete?(user, user_task)
   end
 end

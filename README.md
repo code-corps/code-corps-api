@@ -1,8 +1,14 @@
-# Code Corps API
-
 ![Code Corps Phoenix Logo](https://d3pgew4wbk2vb1.cloudfront.net/images/github/code-corps-api.png)
 
-[![CircleCI](https://circleci.com/gh/code-corps/code-corps-api.svg?style=shield)](https://circleci.com/gh/code-corps/code-corps-api) [![Inline docs](http://inch-ci.org/github/code-corps/code-corps-api.svg?branch=develop)](http://inch-ci.org/github/code-corps/code-corps-api) [![Coverage Status](https://coveralls.io/repos/github/code-corps/code-corps-api/badge.svg?branch=develop)](https://coveralls.io/github/code-corps/code-corps-api?branch=develop) [![Deps Status](https://beta.hexfaktor.org/badge/prod/github/code-corps/code-corps-api.svg)](https://beta.hexfaktor.org/github/code-corps/code-corps-api) [![Deps Status](https://beta.hexfaktor.org/badge/all/github/code-corps/code-corps-api.svg)](https://beta.hexfaktor.org/github/code-corps/code-corps-api) [![Slack Status](http://slack.codecorps.org/badge.svg)](http://slack.codecorps.org)
+[![CircleCI](https://circleci.com/gh/code-corps/code-corps-api.svg?style=shield)](https://circleci.com/gh/code-corps/code-corps-api)
+[![Inline docs](http://inch-ci.org/github/code-corps/code-corps-api.svg?branch=develop)](http://inch-ci.org/github/code-corps/code-corps-api)
+[![Coverage Status](https://coveralls.io/repos/github/code-corps/code-corps-api/badge.svg?branch=develop)](https://coveralls.io/github/code-corps/code-corps-api?branch=develop)
+[![Deps Status](https://beta.hexfaktor.org/badge/prod/github/code-corps/code-corps-api.svg)](https://beta.hexfaktor.org/github/code-corps/code-corps-api)
+[![Deps Status](https://beta.hexfaktor.org/badge/all/github/code-corps/code-corps-api.svg)](https://beta.hexfaktor.org/github/code-corps/code-corps-api)
+[![Slack Status](http://slack.codecorps.org/badge.svg)](http://slack.codecorps.org)
+</p>
+
+---
 
 This is the [Elixir](http://elixir-lang.org/) and [Phoenix](http://www.phoenixframework.org/) backend API for [codecorps.org](https://www.codecorps.org).
 

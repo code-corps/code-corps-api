@@ -10,8 +10,8 @@ defmodule CodeCorps.ProjectView do
   use JaSerializer.PhoenixView
 
   attributes [
-  	:slug, :title, :can_activate_donations, :description,
-    :donations_active, :icon_thumb_url,
+  	:slug, :title, :can_activate_donations, :cloudinary_public_id,
+    :description, :donations_active, :icon_thumb_url,
     :icon_large_url, :long_description_body, :long_description_markdown,
   	:inserted_at, :total_monthly_donated, :updated_at]
 
@@ -36,10 +36,10 @@ defmodule CodeCorps.ProjectView do
   end
 
   def icon_large_url(project, _conn) do
-    CodeCorps.ProjectIcon.url({project.icon, project}, :large)
+    CodeCorps.Helpers.CloudinaryUrl.for(project.cloudinary_public_id, %{crop: "fill", height: 500, width: 500}, "large", project.default_color, "project")
   end
 
   def icon_thumb_url(project, _conn) do
-    CodeCorps.ProjectIcon.url({project.icon, project}, :thumb)
+    CodeCorps.Helpers.CloudinaryUrl.for(project.cloudinary_public_id, %{crop: "fill", height: 100, width: 100}, "thumb", project.default_color, "project")
   end
 end

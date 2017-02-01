@@ -1,4 +1,6 @@
 defmodule CodeCorps.Factories do
+  @moduledoc false
+
   # with Ecto
   use ExMachina.Ecto, repo: CodeCorps.Repo
 
@@ -64,6 +66,13 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def task_skill_factory do
+    %CodeCorps.TaskSkill{
+      skill: build(:skill),
+      task: build(:task)
+    }
+  end
+
   def project_factory do
     %CodeCorps.Project{
       title: sequence(:title, &"Project #{&1}"),
@@ -94,6 +103,7 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  @spec set_password(CodeCorps.User.t, String.t) :: CodeCorps.User.t
   def set_password(user, password) do
     hashed_password = Comeonin.Bcrypt.hashpwsalt(password)
     %{user | encrypted_password: hashed_password}
@@ -238,6 +248,13 @@ defmodule CodeCorps.Factories do
     %CodeCorps.UserSkill{
       user: build(:user),
       skill: build(:skill)
+    }
+  end
+
+  def user_task_factory do
+    %CodeCorps.UserTask{
+      user: build(:user),
+      task: build(:task)
     }
   end
 

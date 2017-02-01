@@ -74,10 +74,12 @@ defmodule CodeCorps.Router do
     resources "/stripe-platform-cards", StripePlatformCardController, only: [:show, :create]
     resources "/stripe-platform-customers", StripePlatformCustomerController, only: [:show, :create]
     resources "/tasks", TaskController, only: [:create, :update]
+    resources "/task-skills", TaskSkillController, only: [:create, :delete]
     resources "/users", UserController, only: [:update]
     resources "/user-categories", UserCategoryController, only: [:create, :delete]
     resources "/user-roles", UserRoleController, only: [:create, :delete]
     resources "/user-skills", UserSkillController, only: [:create, :delete]
+    resources "/user-tasks", UserTaskController, only: [:create, :delete]
   end
 
   scope "/", CodeCorps, host: "api." do
@@ -104,12 +106,14 @@ defmodule CodeCorps.Router do
       resources "/tasks", TaskController, only: [:index, :show]
     end
     resources "/tasks", TaskController, only: [:index, :show]
+    resources "/task-skills", TaskSkillController, only: [:index, :show]
     get "/users/email_available", UserController, :email_available
     get "/users/username_available", UserController, :username_available
     resources "/users", UserController, only: [:index, :show, :create]
     resources "/user-categories", UserCategoryController, only: [:index, :show]
     resources "/user-roles", UserRoleController, only: [:index, :show]
     resources "/user-skills", UserSkillController, only: [:index, :show]
+    resources "/user-tasks", UserTaskController, only: [:index, :show]
     get "/:slug", SluggedRouteController, :show
     get "/:slug/projects", ProjectController, :index
     get "/:slug/:project_slug", ProjectController, :show

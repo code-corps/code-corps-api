@@ -1,9 +1,7 @@
 defmodule CodeCorps.ChangesetViewTest do
-  use CodeCorps.ConnCase, async: true
+  use CodeCorps.ViewCase
 
   alias CodeCorps.Preview
-
-  import Phoenix.View, only: [render: 3]
 
   test "renders all errors properly" do
     changeset = Preview.create_changeset(%Preview{}, %{})

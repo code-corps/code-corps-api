@@ -3,90 +3,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTest do
 
   import CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter, only: [to_params: 2]
 
-  @stripe_connect_account %Stripe.Account{
-    id: "acct_123",
-    business_name: "Code Corps PBC",
-    business_url: "codecorps.org",
-    charges_enabled: false,
-    country: "US",
-    default_currency: "usd",
-    details_submitted: false,
-    display_name: "Code Corps",
-    email: "volunteers@codecorps.org",
-    external_accounts: %Stripe.List{
-      data: [
-        %Stripe.ExternalAccount{id: "ba_123"}
-      ],
-      has_more: false,
-      total_count: 0,
-      url: "/v1/accounts/acct_123/external_accounts"
-    },
-    legal_entity: %{
-      address: %{
-        city: nil,
-        country: "US",
-        line1: nil,
-        line2: nil,
-        postal_code: nil,
-        state: nil
-      },
-      business_name: nil,
-      business_tax_id: "000000000",
-      business_tax_id_provided: true,
-      business_vat_id: "000000000",
-      business_vat_id_provided: true,
-      dob: %{
-        day: nil,
-        month: nil,
-        year: nil
-      },
-      first_name: nil,
-      last_name: nil,
-      personal_address: %{
-        city: nil,
-        country: "US",
-        line1: nil,
-        line2: nil,
-        postal_code: nil,
-        state: nil
-      },
-      personal_id_number_provided: false,
-      ssn_last_4_provided: false,
-      type: nil,
-      verification: %{
-        details: nil,
-        details_code: "failed_other",
-        document: "fil_12345",
-        status: "unverified"
-      }
-    },
-    id: "acct_123",
-    managed: false,
-    statement_descriptor: nil,
-    support_email: nil,
-    support_phone: "1234567890",
-    timezone: "US/Pacific",
-    tos_acceptance: %{
-      date: 123456,
-      ip: "127.0.0.1",
-      user_agent: "Chrome"
-    },
-    transfers_enabled: false,
-    verification: %{
-      disabled_reason: "fields_needed",
-      due_by: nil,
-      fields_needed: [
-        "business_url",
-        "external_account",
-        "product_description",
-        "support_phone",
-        "tos_acceptance.date",
-        "tos_acceptance.ip"
-      ]
-    }
-  }
-
-  defp test_account do
+  defp test_account() do
     # If a `Stripe.Account` has multiple `Stripe.ExternalAccount` records, we want
     # the adapter to deal with that by only taking one, so we load the appropriate fixture
     CodeCorps.StripeTesting.Helpers.load_fixture(Stripe.Account, "account_with_multiple_external_accounts")
@@ -177,7 +94,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTest do
       test_attributes = %{"organization_id" => 123, "foo" => "bar"}
       expected_attributes = %{"organization_id" => 123,}
 
-      {:ok, result} = to_params(test_account, test_attributes)
+      {:ok, result} = to_params(test_account(), test_attributes)
       expected_map = Map.merge(@local_map, expected_attributes)
 
       assert result == expected_map

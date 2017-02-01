@@ -1,14 +1,6 @@
 defmodule CodeCorps.TaskListControllerTest do
   use CodeCorps.ApiCase, resource_name: :task_list
 
-  @valid_attrs %{
-    name: "Test task"
-  }
-
-  @invalid_attrs %{
-    name: nil
-  }
-
   describe "index" do
     test "lists all entries", %{conn: conn} do
       [task_list_1, task_list_2] = insert_pair(:task_list)

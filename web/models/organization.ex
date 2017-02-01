@@ -5,13 +5,14 @@ defmodule CodeCorps.Organization do
 
   use Arc.Ecto.Schema
   use CodeCorps.Web, :model
-  import CodeCorps.Services.Base64ImageUploaderService
+  import CodeCorps.Helpers.RandomIconColor
   import CodeCorps.Helpers.Slug
   import CodeCorps.Validators.SlugValidator
   alias CodeCorps.SluggedRoute
 
   schema "organizations" do
-    field :base64_icon_data, :string, virtual: true
+    field :cloudinary_public_id
+    field :default_color
     field :description, :string
     field :icon, CodeCorps.OrganizationIcon.Type
     field :name, :string
@@ -34,9 +35,8 @@ defmodule CodeCorps.Organization do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:name, :description, :slug, :base64_icon_data])
+    |> cast(params, [:name, :description, :slug, :cloudinary_public_id, :default_color])
     |> validate_required([:name, :description])
-    |> upload_image(:base64_icon_data, :icon)
   end
 
   @doc """
@@ -49,6 +49,7 @@ defmodule CodeCorps.Organization do
     |> validate_required([:slug, :description])
     |> validate_slug(:slug)
     |> put_slugged_route()
+    |> generate_icon_color(:default_color)
   end
 
   defp put_slugged_route(changeset) do

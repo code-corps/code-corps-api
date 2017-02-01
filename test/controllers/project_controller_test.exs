@@ -107,16 +107,6 @@ defmodule CodeCorps.ProjectControllerTest do
       assert conn |> request_update(@invalid_attrs) |> json_response(422)
     end
 
-    @tag :requires_env
-    @tag authenticated: :admin
-    test "uploads a icon to S3", %{conn: conn} do
-      organization = insert(:organization)
-      icon_data = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
-      attrs = @valid_attrs |> Map.merge(%{base64_icon_data: icon_data, organization: organization})
-
-      assert conn |> request_create(attrs) |> json_response(201)
-    end
-
     test "renders 401 when unauthenticated", %{conn: conn} do
       assert conn |> request_update |> json_response(401)
     end

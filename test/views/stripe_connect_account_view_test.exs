@@ -1,9 +1,5 @@
 defmodule CodeCorps.StripeConnectAccountViewTest do
-  @moduledoc false
-
-  use CodeCorps.ConnCase, async: true
-
-  import Phoenix.View, only: [render: 3]
+  use CodeCorps.ViewCase
 
   test "renders all attributes and relationships properly" do
     organization = insert(:organization)
@@ -231,7 +227,6 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
   end
 
   describe "personal-id-number-status" do
-    @account_default %Stripe.Account{}
     test "renders as 'pending_requirement' by default" do
       account = insert(:stripe_connect_account)
       rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
