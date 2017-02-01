@@ -51,7 +51,7 @@ defmodule CodeCorps.ApiCase do
     end
 
     conn =
-      %{build_conn | host: "api."}
+      %{build_conn() | host: "api."}
       |> put_req_header("accept", "application/vnd.api+json")
       |> put_req_header("content-type", "application/vnd.api+json")
 
@@ -87,11 +87,11 @@ defmodule CodeCorps.ApiCase do
       defp default_record, do: insert(unquote(resource_name))
 
       defp path_for(conn, action, resource_or_id) do
-        apply(CodeCorps.Router.Helpers, path_helper_method, [conn, action, resource_or_id])
+        apply(CodeCorps.Router.Helpers, path_helper_method(), [conn, action, resource_or_id])
       end
 
       defp path_for(conn, action) do
-        apply(CodeCorps.Router.Helpers, path_helper_method, [conn, action])
+        apply(CodeCorps.Router.Helpers, path_helper_method(), [conn, action])
       end
 
       def request_index(conn) do
@@ -113,14 +113,14 @@ defmodule CodeCorps.ApiCase do
 
       def request_update(conn), do: request_update(conn, %{})
       def request_update(conn, :not_found), do: request_update(conn, -1, %{})
-      def request_update(conn, attrs), do: request_update(conn, default_record, attrs)
+      def request_update(conn, attrs), do: request_update(conn, default_record(), attrs)
       def request_update(conn, resource_or_id, attrs) do
         payload = CodeCorps.JsonAPIHelpers.build_json_payload(attrs)
         path = conn |> path_for(:update, resource_or_id)
         conn |> put(path, payload)
       end
 
-      def request_delete(conn), do: request_delete(conn, default_record)
+      def request_delete(conn), do: request_delete(conn, default_record())
       def request_delete(conn, :not_found), do: request_delete(conn, -1)
       def request_delete(conn, resource_or_id) do
         path = conn |> path_for(:delete, resource_or_id)

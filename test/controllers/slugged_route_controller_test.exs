@@ -1,9 +1,6 @@
 defmodule CodeCorps.SluggedRouteControllerTest do
   use CodeCorps.ApiCase, resource_name: :slugged_route
 
-  @valid_attrs %{organization_id: 42, slug: "some content", user_id: 42}
-  @invalid_attrs %{}
-
   test "shows chosen resource", %{conn: conn} do
     slug = "test-slug"
     slugged_route = insert(:slugged_route, slug: slug)

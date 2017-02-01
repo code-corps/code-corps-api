@@ -21,7 +21,7 @@ defmodule CodeCorps.UserControllerTest do
     twitter: " @ testuser"
   }
 
-  defp relationships, do: %{}
+  @relationships %{}
 
   describe "index" do
 
@@ -84,7 +84,7 @@ defmodule CodeCorps.UserControllerTest do
         "data" => %{
           "type" => "user",
           "attributes" => Map.put(@valid_attrs, :password, "password"),
-          "relationships" => relationships
+          "relationships" => @relationships
         }
       }
       id = json_response(conn, 201)["data"]["id"] |> String.to_integer
@@ -115,7 +115,7 @@ defmodule CodeCorps.UserControllerTest do
           "type" => "user",
           "id" => user.id,
           "attributes" => attrs,
-          "relationships" => relationships
+          "relationships" => @relationships
         }
       }
 
@@ -134,7 +134,7 @@ defmodule CodeCorps.UserControllerTest do
           "type" => "user",
           "id" => user.id,
           "attributes" => attrs,
-          "relationships" => relationships
+          "relationships" => @relationships
         }
       }
 
@@ -163,7 +163,7 @@ defmodule CodeCorps.UserControllerTest do
           "type" => "user",
           "id" => user.id,
           "attributes" => attrs,
-          "relationships" => relationships
+          "relationships" => @relationships
         }
       }
 
@@ -173,36 +173,6 @@ defmodule CodeCorps.UserControllerTest do
         |> put(path, params)
 
       assert json_response(conn, 403)
-    end
-
-    @tag :requires_env
-    test "uploads a photo to S3", %{conn: conn} do
-      user = insert(:user)
-      photo_data = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
-      attrs = Map.put(@valid_attrs, :base64_photo_data, photo_data)
-
-      path = user_path(conn, :update, user)
-
-      params = %{
-        "meta" => %{},
-        "data" => %{
-          "type" => "user",
-          "id" => user.id,
-          "attributes" => attrs,
-          "relationships" => relationships
-        }
-      }
-
-      conn =
-        conn
-        |> authenticate(user)
-        |> put(path, params)
-
-      data = json_response(conn, 200)["data"]
-      large_url = data["attributes"]["photo-large-url"]
-      assert String.contains? large_url, "/users/#{user.id}/large"
-      thumb_url = data["attributes"]["photo-thumb-url"]
-      assert String.contains? thumb_url, "/users/#{user.id}/thumb"
     end
 
     test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
@@ -216,7 +186,7 @@ defmodule CodeCorps.UserControllerTest do
           "type" => "user",
           "id" => user.id,
           "attributes" => @invalid_attrs,
-          "relationships" => relationships
+          "relationships" => @relationships
         }
       }
       conn =

@@ -2,21 +2,24 @@ defmodule CodeCorps.OrganizationViewTest do
   use CodeCorps.ViewCase
 
   test "renders all attributes and relationships properly" do
-    organization = insert(:organization)
+    organization = insert(:organization, default_color: "blue")
     project = insert(:project, organization: organization)
     user = insert(:user)
     organization_membership = insert(:organization_membership, member: user, organization: organization)
     slugged_route = insert(:slugged_route, organization: organization)
     stripe_connect_account = insert(:stripe_connect_account, organization: organization)
 
+    host = Application.get_env(:arc, :asset_host)
+
     rendered_json =  render(CodeCorps.OrganizationView, "show.json-api", data: organization)
 
     expected_json = %{
       "data" => %{
         "attributes" => %{
+          "cloudinary-public-id" => nil,
           "description" => organization.description,
-          "icon-large-url" => CodeCorps.OrganizationIcon.url({organization.icon, organization}, :large),
-          "icon-thumb-url" => CodeCorps.OrganizationIcon.url({organization.icon, organization}, :thumb),
+          "icon-large-url" => "#{host}/icons/organization_default_large_blue.png",
+          "icon-thumb-url" => "#{host}/icons/organization_default_thumb_blue.png",
           "inserted-at" => organization.inserted_at,
           "name" => organization.name,
           "slug" => organization.slug,

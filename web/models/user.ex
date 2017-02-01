@@ -6,7 +6,7 @@ defmodule CodeCorps.User do
   use Arc.Ecto.Schema
   use CodeCorps.Web, :model
 
-  import CodeCorps.Services.Base64ImageUploaderService
+  import CodeCorps.Helpers.RandomIconColor
   import CodeCorps.Validators.SlugValidator
 
   alias CodeCorps.SluggedRoute
@@ -15,8 +15,9 @@ defmodule CodeCorps.User do
 
   schema "users" do
     field :admin, :boolean
-    field :base64_photo_data, :string, virtual: true
     field :biography, :string
+    field :cloudinary_public_id
+    field :default_color
     field :encrypted_password, :string
     field :email, :string
     field :first_name, :string
@@ -58,7 +59,7 @@ defmodule CodeCorps.User do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:email])
+    |> cast(params, [:email, :default_color])
     |> validate_required([:email])
     |> validate_format(:email, ~r/@/)
   end
@@ -79,16 +80,16 @@ defmodule CodeCorps.User do
     |> unique_constraint(:email)
     |> put_pass_hash()
     |> put_slugged_route()
+    |> generate_icon_color(:default_color)
   end
 
   def update_changeset(struct, params) do
     struct
     |> changeset(params)
-    |> cast(params, [:first_name, :last_name, :twitter, :biography, :website, :base64_photo_data, :state_transition])
+    |> cast(params, [:biography, :cloudinary_public_id, :first_name, :last_name, :state_transition, :twitter, :website])
     |> prefix_url(:website)
     |> validate_format(:website, ~r/\A((http|https):\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,}(([0-9]{1,5})?\/.*)?#=\z/ix)
     |> validate_format(:twitter, ~r/\A[a-zA-Z0-9_]{1,15}\z/)
-    |> upload_image(:base64_photo_data, :photo)
     |> apply_state_transition(struct)
   end
 

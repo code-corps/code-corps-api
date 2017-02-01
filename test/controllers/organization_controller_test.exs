@@ -82,16 +82,5 @@ defmodule CodeCorps.OrganizationControllerTest do
     test "renders 403 when not authorized", %{conn: conn} do
       assert conn |> request_update |> json_response(403)
     end
-
-    @tag :requires_env
-    @tag authenticated: :admin
-    test "uploads an icon to S3", %{conn: conn, current_user: current_user} do
-      organization = insert(:organization)
-      insert(:organization_membership, organization: organization, member: current_user, role: "admin")
-
-      icon_data = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
-      attrs = Map.put(@valid_attrs, :base64_icon_data, icon_data)
-      assert conn |> request_create(attrs) |> json_response(201)
-    end
   end
 end

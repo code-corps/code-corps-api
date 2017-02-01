@@ -5,14 +5,14 @@ defmodule CodeCorps.StripePlatformEventsControllerTest do
 
   setup do
     conn =
-      %{build_conn | host: "api."}
+      %{build_conn() | host: "api."}
       |> put_req_header("accept", "application/json")
       |> put_req_header("content-type", "application/json")
 
     {:ok, conn: conn}
   end
 
-  defp wait_for_supervisor, do: wait_for_children(:webhook_processor)
+  defp wait_for_supervisor(), do: wait_for_children(:webhook_processor)
 
   # used to have the test wait for or the children of a supervisor to exit
 
@@ -33,7 +33,7 @@ defmodule CodeCorps.StripePlatformEventsControllerTest do
     path = conn |> stripe_platform_events_path(:create)
     assert conn |> post(path, event) |> response(200)
 
-    wait_for_supervisor
+    wait_for_supervisor()
 
     assert StripeEvent |> Repo.aggregate(:count, :id) == 1
   end
@@ -52,7 +52,7 @@ defmodule CodeCorps.StripePlatformEventsControllerTest do
     path = conn |> stripe_platform_events_path(:create)
     assert conn |> post(path, event) |> response(400)
 
-    wait_for_supervisor
+    wait_for_supervisor()
 
     assert StripeEvent |> Repo.aggregate(:count, :id) == 0
 
@@ -68,7 +68,7 @@ defmodule CodeCorps.StripePlatformEventsControllerTest do
     path = conn |> stripe_platform_events_path(:create)
     assert conn |> post(path, event) |> response(400)
 
-    wait_for_supervisor
+    wait_for_supervisor()
 
     assert StripeEvent |> Repo.aggregate(:count, :id) == 0
 
