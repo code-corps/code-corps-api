@@ -15,7 +15,7 @@ defmodule CodeCorps.UserViewTest do
     user_role = insert(:user_role, user: user)
     user_skill = insert(:user_skill, user: user)
 
-    host = Application.get_env(:arc, :asset_host)
+    host = Application.get_env(:code_corps, :asset_host)
 
     rendered_json = render(CodeCorps.UserView, "show.json-api", data: user)
 
