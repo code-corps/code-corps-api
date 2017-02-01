@@ -1,18 +1,31 @@
 defmodule CodeCorps.OrganizationIcon do
   use Arc.Definition
-
   # Include ecto support (requires package arc_ecto installed):
   use Arc.Ecto.Definition
+  alias CodeCorps.Validators.ImageValidator
+  alias CodeCorps.Validators.ImageStats
 
   @versions [:original, :large, :thumb]
-
   @acl :public_read
-
   @icon_color_generator Application.get_env(:code_corps, :icon_color_generator)
+  @max_filesize_mb 16
+  @max_height 10_000
+  @max_width 10_000
+  @max_aspect_ratio 4
+  @min_aspect_ratio 0.25
 
   # Whitelist file extensions:
   def validate({file, _}) do
-    ~w(.jpg .jpeg .gif .png) |> Enum.member?(Path.extname(file.file_name))
+    file_extension = Path.extname(file.file_name)
+    if ~w(.jpg .jpeg .gif .png) |> Enum.member?(file_extension) do
+      image = File.read!(file)
+      image_stats = ImageValidator.find_image_stats(image)
+      image_stats != nil && ImageStats.size_in(:megabytes, image_stats) > @max_filesize_mb
+      && image_stats.height <= @max_height && image_stats.width <= @max_width
+      && @max_aspect_ratio >= ImageStats.aspect_ratio(image_stats) >= @min_aspect_ratio
+    else
+      false
+    end
   end
 
   # Large transformation
