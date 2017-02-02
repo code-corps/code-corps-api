@@ -15,16 +15,8 @@ defmodule CodeCorps.UserCategoryController do
     query |> id_filter(id_list)
   end
 
-  def handle_create(conn, attributes) do
-    %UserCategory{}
-    |> UserCategory.create_changeset(attributes)
-    |> Repo.insert
-    |> CodeCorps.Analytics.Segment.track(:created, conn)
-  end
-
-  def handle_delete(conn, record) do
-    record
-    |> Repo.delete
-    |> CodeCorps.Analytics.Segment.track(:deleted, conn)
+  @spec handle_create(Plug.Conn.t, map) :: Ecto.Changeset.t
+  def handle_create(_conn, attributes) do
+    %UserCategory{} |> UserCategory.create_changeset(attributes)
   end
 end

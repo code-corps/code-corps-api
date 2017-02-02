@@ -32,7 +32,7 @@ defmodule CodeCorps.Task do
     struct
     |> cast(params, [:title, :markdown, :task_type, :task_list_id, :position])
     |> validate_required([:title, :markdown, :task_list_id, :task_type])
-    |> validate_inclusion(:task_type, task_types)
+    |> validate_inclusion(:task_type, task_types())
     |> assoc_constraint(:task_list)
     |> apply_position()
     |> set_order(:position, :order, :task_list_id)
@@ -54,7 +54,7 @@ defmodule CodeCorps.Task do
     struct
     |> changeset(params)
     |> cast(params, [:status])
-    |> validate_inclusion(:status, statuses)
+    |> validate_inclusion(:status, statuses())
     |> put_change(:state, "edited")
   end
 

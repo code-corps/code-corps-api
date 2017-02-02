@@ -50,7 +50,7 @@ defmodule CodeCorps.OrganizationMembership do
     struct
     |> cast(params, [:role])
     |> validate_required([:role])
-    |> validate_inclusion(:role, roles)
+    |> validate_inclusion(:role, roles())
   end
 
   defp roles do

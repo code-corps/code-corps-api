@@ -9,14 +9,7 @@ defmodule CodeCorps.StripePlatformCustomerController do
   plug :load_and_authorize_changeset, model: StripePlatformCustomer, only: [:create]
   plug JaResource
 
-  def handle_create(conn, attributes) do
-    attributes
-    |> StripePlatformCustomerService.create
-    |> handle_create_result(conn)
-  end
-
-  defp handle_create_result({:error, %Ecto.Changeset{} = changeset}, _conn), do: changeset
-  defp handle_create_result({:ok, %StripePlatformCustomer{}} = result, conn) do
-    result |> CodeCorps.Analytics.Segment.track(:created, conn)
+  def handle_create(_conn, attributes) do
+    attributes |> StripePlatformCustomerService.create
   end
 end

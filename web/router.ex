@@ -40,6 +40,10 @@ defmodule CodeCorps.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :tracking do
+    plug CodeCorps.Plug.Segment
+  end
+
   scope "/", CodeCorps do
     pipe_through [:logging, :browser] # Use the default browser stack
 
@@ -54,7 +58,7 @@ defmodule CodeCorps.Router do
   end
 
   scope "/", CodeCorps, host: "api." do
-    pipe_through [:logging, :api, :bearer_auth, :ensure_auth, :current_user]
+    pipe_through [:logging, :api, :bearer_auth, :ensure_auth, :current_user, :tracking]
 
     resources "/categories", CategoryController, only: [:create, :update]
     resources "/comments", CommentController, only: [:create, :update]
@@ -83,7 +87,7 @@ defmodule CodeCorps.Router do
   end
 
   scope "/", CodeCorps, host: "api." do
-    pipe_through [:logging, :api, :bearer_auth, :current_user]
+    pipe_through [:logging, :api, :bearer_auth, :current_user, :tracking]
 
     post "/token", TokenController, :create
     post "/token/refresh", TokenController, :refresh

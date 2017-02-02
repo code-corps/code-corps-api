@@ -11,21 +11,18 @@ defmodule CodeCorps.OrganizationMembershipController do
   plug :load_and_authorize_changeset, model: OrganizationMembership, only: [:create, :update], preload: [:organization, :member]
   plug JaResource
 
+  @spec filter(Plug.Conn.t, Ecto.Query.t, String.t, String.t) :: Ecto.Query.t
   def filter(_conn, query, "id", id_list) do
     query |> id_filter(id_list)
   end
 
-  def handle_create(conn, attributes) do
-    %OrganizationMembership{}
-    |> OrganizationMembership.create_changeset(attributes)
-    |> Repo.insert
-    |> CodeCorps.Analytics.Segment.track(:created, conn)
+  @spec handle_create(Plug.Conn.t, map) :: Ecto.Changeset.t
+  def handle_create(_conn, attributes) do
+    %OrganizationMembership{} |> OrganizationMembership.create_changeset(attributes)
   end
 
-  def handle_update(conn, model, attributes) do
-    model
-    |> OrganizationMembership.update_changeset(attributes)
-    |> Repo.update
-    |> CodeCorps.Analytics.Segment.track(:edited, conn)
+  @spec handle_update(Plug.Conn.t, OrganizationMembership.t, map) :: Ecto.Changeset.t
+  def handle_update(_conn, model, attributes) do
+    model |> OrganizationMembership.update_changeset(attributes)
   end
 end
