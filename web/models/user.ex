@@ -3,7 +3,6 @@ defmodule CodeCorps.User do
   This module defines a user of the Code Corps app.
   """
 
-  use Arc.Ecto.Schema
   use CodeCorps.Web, :model
 
   import CodeCorps.Helpers.RandomIconColor
@@ -23,7 +22,6 @@ defmodule CodeCorps.User do
     field :first_name, :string
     field :last_name, :string
     field :password, :string, virtual: true
-    field :photo, CodeCorps.UserPhoto.Type
     field :twitter, :string
     field :username, :string
     field :website, :string

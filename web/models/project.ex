@@ -3,7 +3,6 @@ defmodule CodeCorps.Project do
   Represents a project on Code Corps, e.g. the "Code Corps" project itself.
   """
 
-  use Arc.Ecto.Schema
   use CodeCorps.Web, :model
   import CodeCorps.Helpers.RandomIconColor
   import CodeCorps.Helpers.Slug
@@ -16,7 +15,6 @@ defmodule CodeCorps.Project do
     field :cloudinary_public_id
     field :default_color
     field :description, :string
-    field :icon, CodeCorps.ProjectIcon.Type
     field :long_description_body, :string
     field :long_description_markdown, :string
     field :slug, :string

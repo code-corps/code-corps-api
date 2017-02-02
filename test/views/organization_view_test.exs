@@ -9,7 +9,7 @@ defmodule CodeCorps.OrganizationViewTest do
     slugged_route = insert(:slugged_route, organization: organization)
     stripe_connect_account = insert(:stripe_connect_account, organization: organization)
 
-    host = Application.get_env(:arc, :asset_host)
+    host = Application.get_env(:code_corps, :asset_host)
 
     rendered_json =  render(CodeCorps.OrganizationView, "show.json-api", data: organization)
 

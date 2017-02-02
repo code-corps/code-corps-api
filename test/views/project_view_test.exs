@@ -12,7 +12,7 @@ defmodule CodeCorps.ProjectViewTest do
     task_list = insert(:task_list, project: project)
     task = insert(:task, project: project, task_list: task_list)
 
-    host = Application.get_env(:arc, :asset_host)
+    host = Application.get_env(:code_corps, :asset_host)
 
     rendered_json = render(CodeCorps.ProjectView, "show.json-api", data: project)
 
