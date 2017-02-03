@@ -1,6 +1,8 @@
 defmodule CodeCorps.StripeExternalAccount do
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "stripe_external_accounts" do
     field :id_from_stripe, :string, null: false
     field :account_id_from_stripe, :string, null: false

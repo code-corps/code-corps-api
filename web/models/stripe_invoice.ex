@@ -5,6 +5,8 @@ defmodule CodeCorps.StripeInvoice do
 
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "stripe_invoices" do
     field :amount_due, :integer
     field :application_fee, :integer

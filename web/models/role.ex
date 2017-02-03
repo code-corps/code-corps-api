@@ -7,6 +7,8 @@ defmodule CodeCorps.Role do
 
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "roles" do
     field :name, :string
     field :ability, :string
@@ -21,11 +23,12 @@ defmodule CodeCorps.Role do
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """
+  @spec changeset(CodeCorps.Role.t, map) :: Ecto.Changeset.t
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:name, :ability, :kind])
     |> validate_required([:name, :ability, :kind])
-    |> validate_inclusion(:kind, kinds)
+    |> validate_inclusion(:kind, kinds())
   end
 
   defp kinds do

@@ -10,8 +10,14 @@ defmodule CodeCorps.Services.UserService do
 
   alias CodeCorps.{Repo, StripeConnectCustomer, StripePlatformCustomer, User}
   alias CodeCorps.StripeService.{StripeConnectCustomerService, StripePlatformCustomerService}
-  alias Ecto.Changeset
-  alias Ecto.Multi
+  alias Ecto.{Changeset, Multi}
+
+  # Prevents warning for calling `Repo.transaction(multi)`.
+  # The warning was caused with how the function is internally
+  # implemented, so there's no way around it
+  # As we update Ecto, we should check if this is still necessary.
+  # Last check was Ecto 2.1.3
+  @dialyzer :no_opaque
 
   @doc """
   Updates a `CodeCorps.User` record and, if necessary, associated

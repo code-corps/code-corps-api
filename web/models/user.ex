@@ -12,6 +12,8 @@ defmodule CodeCorps.User do
   alias Comeonin.Bcrypt
   alias Ecto.Changeset
 
+  @type t :: %__MODULE__{}
+
   schema "users" do
     field :admin, :boolean
     field :biography, :string

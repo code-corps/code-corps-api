@@ -13,7 +13,7 @@ defmodule CodeCorps.Emails.ReceiptEmail do
     do
       BaseEmail.create
       |> to(charge.user.email)
-      |> template(template_id, template_model)
+      |> template(template_id(), template_model)
     else
       nil -> {:error, :project_not_found}
       other -> other
@@ -49,7 +49,7 @@ defmodule CodeCorps.Emails.ReceiptEmail do
     %{
       charge_amount: charge.amount |> format_amount(),
       charge_statement_descriptor: charge.statement_descriptor,
-      high_five_image_url: high_five_image_url,
+      high_five_image_url: high_five_image_url(),
       project_current_donation_goal_description: current_donation_goal.description,
       project_title: project.title,
       project_url: project |> url(),
@@ -62,7 +62,7 @@ defmodule CodeCorps.Emails.ReceiptEmail do
     "Your monthly donation to " <> project.title
   end
 
-  defp high_five_image_url, do: Enum.random(high_five_image_urls)
+  defp high_five_image_url, do: Enum.random(high_five_image_urls())
 
   defp high_five_image_urls, do: [
     "https://d3pgew4wbk2vb1.cloudfront.net/emails/images/emoji-1f64c-1f3fb@2x.png",

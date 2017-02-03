@@ -1,6 +1,8 @@
 defmodule CodeCorps.StripePlatformCard do
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "stripe_platform_cards" do
     field :brand, :string
     field :customer_id_from_stripe, :string

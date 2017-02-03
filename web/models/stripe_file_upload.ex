@@ -1,6 +1,8 @@
 defmodule CodeCorps.StripeFileUpload do
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "stripe_file_uploads" do
     field :created, :integer
     field :id_from_stripe, :string, null: false

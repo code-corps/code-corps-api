@@ -1,6 +1,8 @@
 defmodule CodeCorps.Skill do
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "skills" do
     field :title, :string
     field :description, :string

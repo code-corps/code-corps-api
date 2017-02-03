@@ -9,6 +9,8 @@ defmodule CodeCorps.SluggedRoute do
   import CodeCorps.Helpers.Slug
   import CodeCorps.Validators.SlugValidator
 
+  @type t :: %__MODULE__{}
+
   schema "slugged_routes" do
     belongs_to :organization, CodeCorps.Organization
     belongs_to :user, CodeCorps.User

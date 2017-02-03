@@ -11,6 +11,8 @@ defmodule CodeCorps.StripeConnectPlan do
 
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "stripe_connect_plans" do
     field :amount, :integer
     field :created, :integer

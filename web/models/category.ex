@@ -7,6 +7,8 @@ defmodule CodeCorps.Category do
 
   import CodeCorps.Helpers.Slug
 
+  @type t :: %__MODULE__{}
+
   schema "categories" do
     field :name, :string
     field :slug, :string

@@ -1,6 +1,8 @@
 defmodule CodeCorps.UserCategory do
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "user_categories" do
     belongs_to :user, CodeCorps.User
     belongs_to :category, CodeCorps.Category

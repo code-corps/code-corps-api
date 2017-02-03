@@ -4,6 +4,8 @@ defmodule CodeCorps.TaskList do
 
   alias CodeCorps.TaskList
 
+  @type t :: %__MODULE__{}
+
   schema "task_lists" do
     field :inbox, :boolean, default: false
     field :name, :string

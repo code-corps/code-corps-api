@@ -1,7 +1,11 @@
 defmodule CodeCorps.Task do
   use CodeCorps.Web, :model
+
   import EctoOrdered
+
   alias CodeCorps.Services.MarkdownRendererService
+
+  @type t :: %__MODULE__{}
 
   schema "tasks" do
     field :body, :string

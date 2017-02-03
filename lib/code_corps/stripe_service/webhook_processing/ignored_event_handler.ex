@@ -30,13 +30,13 @@ defmodule CodeCorps.StripeService.WebhookProcessing.IgnoredEventHandler do
 
   Returns true or false depending on specified type
   """
-  @spec should_handle?(String.t, Module.t) :: boolean
+  @spec should_handle?(String.t, module) :: boolean
   def should_handle?(type, handler), do: handler |> ignored_event_types |> Enum.member?(type)
 
   @doc """
   Returns a list of event types which are being explicitly ignored by the application.
   """
-  @spec ignored_event_types(Module.t) :: list
+  @spec ignored_event_types(module) :: list
   def ignored_event_types(ConnectEventHandler), do: @ignored_connect_event_types
   def ignored_event_types(PlatformEventHandler), do: @ignored_platform_event_types
 
@@ -47,14 +47,14 @@ defmodule CodeCorps.StripeService.WebhookProcessing.IgnoredEventHandler do
 
   Returns `{:ok, %CodeCorps.StripeEvent{}}
   """
-  @spec handle(StripeEvent.t, Module.t) :: {:ok, StripeEvent.t}
+  @spec handle(StripeEvent.t, module) :: {:ok, StripeEvent.t}
   def handle(%StripeEvent{type: type} = local_event, handler) do
     with ignored_reason <- get_reason(type, handler) do
       local_event |> set_ignored(ignored_reason)
     end
   end
 
-  @spec get_reason(String.t, Module.t) :: String.t
+  @spec get_reason(String.t, module) :: String.t
   defp get_reason(type, ConnectEventHandler), do: get_connect_reason(type)
   defp get_reason(type, PlatformEventHandler), do: get_platform_reason(type)
 

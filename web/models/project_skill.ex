@@ -1,6 +1,8 @@
 defmodule CodeCorps.ProjectSkill do
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "project_skills" do
     belongs_to :project, CodeCorps.Project
     belongs_to :skill, CodeCorps.Skill

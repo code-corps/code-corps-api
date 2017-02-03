@@ -1,6 +1,8 @@
 defmodule CodeCorps.StripePlatformCustomer do
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "stripe_platform_customers" do
     field :created, :integer
     field :currency, :string

@@ -1,4 +1,9 @@
 defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
+  @moduledoc """
+  Used to perform actions on `StripeConnectSubscription` records while propagating
+  to and from associated `Stripe.Subscription` records.
+  """
+
   alias CodeCorps.{
     Project, Repo, StripeConnectCustomer, StripeConnectAccount,
     StripeConnectPlan, StripeConnectSubscription, User
@@ -14,21 +19,18 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
   Finds or creates a new `Stripe.Subscription` record on Stripe API, as well as an associated local
   `StripeConnectSubscription` record
 
-  # Possible return values
-
-  - `{:ok, %StripeConnectSubscription{}}` - the created record.
-  - `{:error, %Ecto.Changeset{}}` - the record was not created due to validation issues.
-  - `{:error, :project_not_found}`
-  - `{:error, :project_not_ready}` - the associated project does not meed the prerequisites for receiving donations.
-  - `{:error, :user_not_found}`
-  - `{:error, :user_not_ready}` - the associated user does not meet the prerequisits to donate.
-  - `{:error, %Stripe.APIErrorResponse{}}` - there was a problem with the stripe request
-
   # Side effects
 
   - If the subscription is created or found, associated project totals will get updated
   - If the subscription is created or found, associated donation goal states will be updated
   """
+  @spec find_or_create(map) :: {:ok, StripeConnectSubscription.t} |
+                               {:error, Ecto.Changeset.t} |
+                               {:error, Stripe.APIErrorResponse.t} |
+                               {:error, :project_not_found} |
+                               {:error, :project_not_ready} |
+                               {:error, :user_not_found} |
+                               {:error, :user_not_ready}
   def find_or_create(%{"project_id" => project_id, "quantity" => _, "user_id" => user_id} = attributes) do
     with {:ok, %Project{} = project} <- get_project_with_preloads(project_id),
          {:ok, %Project{}} <- ProjectSubscribable.validate(project),
@@ -47,15 +49,12 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
   end
 
   @doc """
-  Updates an existing `StripeConnectSubscription` record by retrieving a `Stripe.Subscription` record and
-  using that data as update parameters
-
-  # Possible return values
-  - `{:ok, %StripeConnectSubscription{}}` - the updated record.
-  - `{:error, %Stripe.APIErrorResponse{}}` - there was a problem with the stripe request
-  - `{:error, :not_found}` - one of the associated records was not found
-
+  Updates an existing `StripeConnectSubscription` record by retrieving
+  a `Stripe.Subscription` record and using that data as update parameters
   """
+  @spec update_from_stripe(String.t, String.t) :: {:ok, StripeConnectSubscription.t} |
+                                                  {:error, Stripe.APIErrorResponse.t} |
+                                                  {:error, :not_found}
   def update_from_stripe(stripe_id, connect_customer_id) do
     with {:ok, %StripeConnectAccount{} = connect_account} <- retrieve_connect_account(connect_customer_id),
          {:ok, %Stripe.Subscription{} = stripe_subscription} <- @api.Subscription.retrieve(stripe_id, connect_account: connect_account.id),
@@ -69,7 +68,6 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
 
       {:ok, subscription}
     else
-      nil -> {:error, :not_found}
       failure -> failure
     end
   end
@@ -111,7 +109,7 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
   defp get_project_with_preloads(id) do
     preloads = [:stripe_connect_plan, [organization: :stripe_connect_account]]
 
-    case Repo.get(Project, id) |> Repo.preload(preloads) do
+    case Project |> Repo.get(id) |> Repo.preload(preloads) do
       nil -> {:error, :project_not_found}
       project -> {:ok, project}
     end
@@ -120,7 +118,7 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
   defp get_user_with_preloads(user_id) do
     preloads = [:stripe_platform_customer, [{:stripe_platform_card, :stripe_connect_cards}]]
 
-    case Repo.get(User, user_id) |> Repo.preload(preloads) do
+    case User |> Repo.get(user_id) |> Repo.preload(preloads) do
       nil -> {:error, :user_not_found}
       user -> {:ok, user}
     end

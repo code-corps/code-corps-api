@@ -1,4 +1,7 @@
 defmodule CodeCorps.OrganizationMembershipPolicy do
+  @moduledoc """
+  Handles `User` authorization of actions on `OrganizationMembership` records
+  """
   import CodeCorps.Helpers.Policy, only: [get_membership: 2, get_role: 1]
 
   alias CodeCorps.Organization
@@ -7,10 +10,12 @@ defmodule CodeCorps.OrganizationMembershipPolicy do
   alias CodeCorps.User
   alias Ecto.Changeset
 
+  @spec create?(User.t, Ecto.Changeset.t) :: boolean
   def create?(%User{admin: true}, %Changeset{}), do: true
   def create?(%User{id: user_id}, %Changeset{changes: %{member_id: member_id}}), do:  user_id == member_id
   def create?(%User{}, %Changeset{}), do: false
 
+  @spec update?(User.t, Ecto.Changeset.t) :: boolean
   def update?(%User{admin: true}, %Changeset{}), do: true
   def update?(%User{} = user, %Changeset{data: %OrganizationMembership{} = current_membership} = changeset) do
     user_membership = current_membership |> get_user_membership(user)
@@ -35,6 +40,7 @@ defmodule CodeCorps.OrganizationMembershipPolicy do
     end
   end
 
+  @spec delete?(User.t, OrganizationMembership.t) :: boolean
   def delete?(%User{admin: true}, %OrganizationMembership{}), do: true
   def delete?(%User{} = user, %OrganizationMembership{} = current_membership) do
     current_membership |> get_user_membership(user) |> do_delete?(current_membership)

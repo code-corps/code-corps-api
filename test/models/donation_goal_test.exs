@@ -1,4 +1,6 @@
 defmodule CodeCorps.DonationGoalTest do
+  @moduledoc false
+
   use CodeCorps.ModelCase
 
   alias CodeCorps.DonationGoal
@@ -16,7 +18,8 @@ defmodule CodeCorps.DonationGoalTest do
     test "ensures project with specified id actually exists" do
       attrs = %{amount: 100, description: "Bar", project_id: -1}
       {result, changeset} =
-        DonationGoal.create_changeset(%DonationGoal{}, attrs)
+        %DonationGoal{}
+        |> DonationGoal.create_changeset(attrs)
         |> Repo.insert
 
       assert result == :error
@@ -46,6 +49,21 @@ defmodule CodeCorps.DonationGoalTest do
 
       refute changeset.valid?
       changeset |> assert_validation_triggered(:current, :required)
+    end
+
+    test "ensures only one donation goal per project can be current" do
+      project = insert(:project)
+      insert(:donation_goal, current: true, project: project)
+      donation_goal = insert(:donation_goal, project: project)
+
+      attrs = %{current: true}
+      changeset = DonationGoal.set_current_changeset(donation_goal, attrs)
+
+      assert changeset.valid?
+
+      {:error, errored_changeset} = Repo.update(changeset)
+
+      assert_error_message(errored_changeset, :current, "has already been taken")
     end
   end
 end
