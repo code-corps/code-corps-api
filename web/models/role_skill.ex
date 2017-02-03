@@ -1,6 +1,8 @@
 defmodule CodeCorps.RoleSkill do
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "role_skills" do
     field :cat, :integer
 
@@ -13,6 +15,7 @@ defmodule CodeCorps.RoleSkill do
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """
+  @spec changeset(CodeCorps.RoleSkill.t, map) :: Ecto.Changeset.t
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:role_id, :skill_id])
@@ -25,11 +28,12 @@ defmodule CodeCorps.RoleSkill do
   @doc """
   Builds a changeset for importing a category.
   """
+  @spec import_changeset(CodeCorps.RoleSkill.t, map) :: Ecto.Changeset.t
   def import_changeset(struct, params) do
     struct
     |> changeset(params)
     |> cast(params, [:cat])
-    |> validate_inclusion(:cat, cats)
+    |> validate_inclusion(:cat, cats())
   end
 
   defp cats do

@@ -1,6 +1,8 @@
 defmodule CodeCorps.UserRole do
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "user_roles" do
     belongs_to :user, CodeCorps.User
     belongs_to :role, CodeCorps.Role

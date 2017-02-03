@@ -1,4 +1,8 @@
 defmodule CodeCorps.StripeService.StripePlatformCustomerService do
+  @moduledoc """
+  Used to perform actions on `StripePlatformCustomer` records while propagating
+  to and from associated `Stripe.Customer` records.
+  """
   alias CodeCorps.Repo
   alias CodeCorps.{StripeConnectCustomer, StripePlatformCustomer, User}
   alias CodeCorps.StripeService.Adapters.StripePlatformCustomerAdapter
@@ -7,6 +11,13 @@ defmodule CodeCorps.StripeService.StripePlatformCustomerService do
   alias Ecto.Multi
 
   @api Application.get_env(:code_corps, :stripe)
+
+  # Prevents warning for calling `Repo.transaction(multi)`.
+  # The warning was caused with how the function is internally
+  # implemented, so there's no way around it
+  # As we update Ecto, we should check if this is still necessary.
+  # Last check was Ecto 2.1.3
+  @dialyzer :no_opaque
 
   def create(attributes) do
     with stripe_attributes <- build_stripe_attributes(attributes),

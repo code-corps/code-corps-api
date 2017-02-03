@@ -3,6 +3,8 @@ defmodule CodeCorps.Comment do
 
   alias CodeCorps.Services.MarkdownRendererService
 
+  @type t :: %__MODULE__{}
+
   schema "comments" do
     field :body, :string
     field :markdown, :string

@@ -1,6 +1,8 @@
 defmodule CodeCorps.StripeConnectCharge do
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "stripe_connect_charges" do
     field :amount, :integer
     field :amount_refunded, :integer

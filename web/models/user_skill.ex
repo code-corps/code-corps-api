@@ -1,6 +1,8 @@
 defmodule CodeCorps.UserSkill do
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "user_skills" do
     belongs_to :user, CodeCorps.User
     belongs_to :skill, CodeCorps.Skill

@@ -27,6 +27,8 @@ defmodule CodeCorps.StripeConnectSubscription do
 
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "stripe_connect_subscriptions" do
     field :application_fee_percent, :decimal
     field :cancelled_at, :integer

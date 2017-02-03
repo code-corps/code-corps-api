@@ -1,4 +1,6 @@
 defmodule CodeCorps.Mixfile do
+  @moduledoc false
+
   use Mix.Project
 
   def project do
@@ -7,6 +9,7 @@ defmodule CodeCorps.Mixfile do
      elixir: "1.4.1",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
+     dialyzer: [plt_add_deps: :transitive],
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      aliases: aliases(),
@@ -59,6 +62,7 @@ defmodule CodeCorps.Mixfile do
     [
       {:bamboo, "~> 0.7"}, # emails
       {:bamboo_postmark, "~> 0.2.0"}, # postmark adapter for emails
+      {:dialyxir, "~> 0.4", only: [:dev, :test], runtime: false},
       {:phoenix, "~> 1.2.1"},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 3.0"},
