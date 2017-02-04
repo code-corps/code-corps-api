@@ -15,19 +15,13 @@ defmodule CodeCorps.CommentController do
     query |> id_filter(id_list)
   end
 
-  @spec handle_create(Plug.Conn.t, map) :: {:ok, Comment.t} | {:error, Ecto.Changeset.t}
-  def handle_create(conn, attributes) do
-    %Comment{}
-    |> Comment.create_changeset(attributes)
-    |> Repo.insert
-    |> CodeCorps.Analytics.Segment.track(:created, conn)
+  @spec handle_create(Plug.Conn.t, map) :: Ecto.Changeset.t
+  def handle_create(_conn, attributes) do
+    %Comment{} |> Comment.create_changeset(attributes)
   end
 
-  @spec handle_update(Plug.Conn.t, Comment.t, map) :: {:ok, Comment.t} | {:error, Ecto.Changeset.t}
-  def handle_update(conn, comment, attributes) do
-    comment
-    |> Comment.changeset(attributes)
-    |> Repo.update
-    |> CodeCorps.Analytics.Segment.track(:edited, conn)
+  @spec handle_update(Plug.Conn.t, Comment.t, map) :: Ecto.Changeset.t
+  def handle_update(_conn, comment, attributes) do
+    comment |> Comment.changeset(attributes)
   end
 end

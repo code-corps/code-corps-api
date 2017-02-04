@@ -12,7 +12,6 @@ defmodule CodeCorps.TokenController do
 
         conn
         |> Plug.Conn.assign(:current_user, user)
-        |> CodeCorps.Analytics.Segment.track_sign_in
         |> put_status(:created)
         |> render("show.json", token: token, user_id: user.id)
 

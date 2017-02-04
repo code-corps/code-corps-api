@@ -21,7 +21,7 @@ defmodule CodeCorps.StripeTesting.Account do
     transformed_attributes =
       attributes
       |> CodeCorps.MapUtils.keys_to_string
-      |> Map.merge(account_fixture)
+      |> Map.merge(account_fixture())
       |> add_nestings
 
 

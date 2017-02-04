@@ -16,20 +16,9 @@ defmodule CodeCorps.StripeConnectAccountController do
     |> Map.put("tos_acceptance_user_agent", conn |> ConnUtils.extract_user_agent)
     |> Map.put("managed", true)
     |> StripeConnectAccountService.create
-    |> handle_create_result(conn)
   end
 
-  defp handle_create_result({:error, %Ecto.Changeset{} = changeset}, _conn), do: changeset
-  defp handle_create_result({:ok, %StripeConnectAccount{}} = result, conn) do
-    result |> CodeCorps.Analytics.Segment.track(:created, conn)
-  end
-
-  def handle_update(conn, record, attributes) do
-    with {:ok, _} = result <- StripeConnectAccountService.update(record, attributes)
-    do
-      CodeCorps.Analytics.Segment.track(result, :created, conn)
-    else
-      {:error, %Ecto.Changeset{} = changeset} -> changeset
-    end
+  def handle_update(_conn, record, attributes) do
+    StripeConnectAccountService.update(record, attributes)
   end
 end

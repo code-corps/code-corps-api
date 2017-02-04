@@ -9,29 +9,22 @@ defmodule CodeCorps.UserController do
 
   plug :load_and_authorize_resource, model: User, only: [:update]
   plug JaResource
+  plug :login, only: [:create]
 
   def filter(_conn, query, "id", id_list) do
     query |> id_filter(id_list)
   end
 
-  def handle_create(conn, attributes) do
-    with {:ok, user} <- %User{} |> User.registration_changeset(attributes) |> Repo.insert,
-         conn        <- login(user, conn)
-    do
-      CodeCorps.Analytics.Segment.track({:ok, user}, :signed_up, conn)
-    else
-      {:error, changeset} -> changeset
-    end
+  def handle_create(_conn, attributes) do
+    %User{} |> User.registration_changeset(attributes)
   end
 
-  defp login(user, conn), do: Plug.Conn.assign(conn, :current_user, user)
-
-  def handle_update(conn, record, attributes) do
+  def handle_update(_conn, record, attributes) do
     with {:ok, user, _, _} <- UserService.update(record, attributes)
     do
-      {:ok, user} |> CodeCorps.Analytics.Segment.track(:updated_profile, conn)
+      {:ok, user}
     else
-      {:error, changeset} -> changeset
+      {:error, changeset} -> {:error, changeset}
     end
   end
 
@@ -44,4 +37,10 @@ defmodule CodeCorps.UserController do
     hash = User.check_username_availability(username)
     conn |> json(hash)
   end
+
+  defp login(conn, _opts) do
+    Plug.Conn.register_before_send(conn, &do_login(&1))
+  end
+
+  defp do_login(conn), do: Plug.Conn.assign(conn, :current_user, conn.assigns[:data])
 end
