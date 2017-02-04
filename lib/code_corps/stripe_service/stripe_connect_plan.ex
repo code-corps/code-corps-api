@@ -1,4 +1,10 @@
 defmodule CodeCorps.StripeService.StripeConnectPlanService do
+  @moduledoc """
+  Used to perform actions on `StripeConnectPlan` records
+  while at the same time propagating to and from associated `Stripe.Plan`
+  records.
+  """
+
   alias CodeCorps.{Project, Repo, StripeConnectPlan}
   alias CodeCorps.StripeService.Adapters.StripeConnectPlanAdapter
   alias CodeCorps.StripeService.Validators.ProjectCanEnableDonations
@@ -8,17 +14,15 @@ defmodule CodeCorps.StripeService.StripeConnectPlanService do
   @doc """
   Creates a new `Stripe.Plan` record on Stripe API, as well as an associated local
   `StripeConnectPlan` record
-
-  # Possible return values
-
-  - `{:ok, %StripeConnectPlan{}}` - the created record.
-  - `{:error, %Ecto.Changeset{}}` - the record was not created due to validation issues.
-  - `{:error, :project_not_ready}` - the associated project does not meed the prerequisites for creating a plan.
-  - `{:error, %Stripe.APIErrorResponse{}}` - there was a problem with the stripe request
-  - `{:error, :not_found}` - one of the associated records was not found
   """
+  @spec create(map) :: {:ok, StripeConnectPlan.t} |
+                       {:error, Ecto.Changeset.t} |
+                       {:error, Stripe.APIErrorResponse.t} |
+                       {:error, :project_not_ready} |
+                       {:error, :not_found}
   def create(%{"project_id" => project_id} = attributes) do
-    with {:ok, %Project{} = project} <- get_project(project_id) |> ProjectCanEnableDonations.validate,
+    with {:ok, %Project{} = project} <- get_project(project_id),
+         {:ok, %Project{}} <- ProjectCanEnableDonations.validate(project),
          %{} = create_attributes <- get_create_attributes(project_id),
          connect_account_id <- project.organization.stripe_connect_account.id_from_stripe,
          {:ok, plan} <- @api.Plan.create(create_attributes, connect_account: connect_account_id),
@@ -28,12 +32,10 @@ defmodule CodeCorps.StripeService.StripeConnectPlanService do
       |> StripeConnectPlan.create_changeset(params)
       |> Repo.insert
     else
-      nil -> {:error, :not_found}
       failure -> failure
     end
   end
 
-  @spec get_create_attributes(binary) :: map
   defp get_create_attributes(project_id) do
     %{
       amount: 1, # in cents
@@ -46,8 +48,11 @@ defmodule CodeCorps.StripeService.StripeConnectPlanService do
   end
 
   defp get_project(project_id) do
-    Project
-    |> Repo.get(project_id)
-    |> Repo.preload([:donation_goals, {:organization, :stripe_connect_account}, :stripe_connect_plan])
+    preloads = [:donation_goals, {:organization, :stripe_connect_account}, :stripe_connect_plan]
+
+    case Project |> Repo.get(project_id) |> Repo.preload(preloads) do
+      nil -> {:error, :not_found}
+      record -> {:ok, record}
+    end
   end
 end

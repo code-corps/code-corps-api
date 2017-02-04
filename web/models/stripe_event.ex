@@ -21,6 +21,8 @@ defmodule CodeCorps.StripeEvent do
 
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "stripe_events" do
     field :endpoint, :string, null: false
     field :id_from_stripe, :string, null: false

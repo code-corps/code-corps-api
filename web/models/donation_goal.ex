@@ -10,6 +10,8 @@ defmodule CodeCorps.DonationGoal do
 
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "donation_goals" do
     field :amount, :integer
     field :current, :boolean, default: false
@@ -23,6 +25,7 @@ defmodule CodeCorps.DonationGoal do
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """
+  @spec create_changeset(struct, map) :: Ecto.Changeset.t
   def create_changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:amount, :description, :project_id])
@@ -33,6 +36,7 @@ defmodule CodeCorps.DonationGoal do
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """
+  @spec update_changeset(struct, map) :: Ecto.Changeset.t
   def update_changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:amount, :description])
@@ -42,10 +46,11 @@ defmodule CodeCorps.DonationGoal do
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """
+  @spec set_current_changeset(struct, map) :: Ecto.Changeset.t
   def set_current_changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:current])
     |> validate_required([:current])
-    |> unique_constraint(:current, [:project_id])
+    |> unique_constraint(:current, name: :donation_goals_current_unique_to_project)
   end
 end

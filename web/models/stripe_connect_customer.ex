@@ -1,6 +1,8 @@
 defmodule CodeCorps.StripeConnectCustomer do
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "stripe_connect_customers" do
     field :id_from_stripe, :string, null: false
 

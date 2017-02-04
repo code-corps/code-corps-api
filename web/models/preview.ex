@@ -6,6 +6,8 @@ defmodule CodeCorps.Preview do
   use CodeCorps.Web, :model
   alias CodeCorps.Services.MarkdownRendererService
 
+  @type t :: %__MODULE__{}
+
   schema "previews" do
     field :body, :string
     field :markdown, :string

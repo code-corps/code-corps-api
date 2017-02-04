@@ -5,7 +5,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.IgnoredEventHandlerTest do
     ConnectEventHandler, IgnoredEventHandler, PlatformEventHandler
   }
 
-  @spec ignored?(String.t, Module.t) :: boolean
+  @spec ignored?(String.t, module) :: boolean
   defp ignored?(type, handler) do
     event = insert(:stripe_event, type: type)
     {:ok, event} = IgnoredEventHandler.handle(event, handler)

@@ -4,10 +4,14 @@ defmodule CodeCorps.Organization do
   """
 
   use CodeCorps.Web, :model
+
   import CodeCorps.Helpers.RandomIconColor
   import CodeCorps.Helpers.Slug
   import CodeCorps.Validators.SlugValidator
+
   alias CodeCorps.SluggedRoute
+
+  @type t :: %__MODULE__{}
 
   schema "organizations" do
     field :cloudinary_public_id

@@ -5,6 +5,8 @@ defmodule CodeCorps.ProjectCategory do
 
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "project_categories" do
     belongs_to :project, CodeCorps.Project
     belongs_to :category, CodeCorps.Category

@@ -5,6 +5,8 @@ defmodule CodeCorps.StripeConnectAccount do
 
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "stripe_connect_accounts" do
     field :business_name, :string
     field :business_url, :string

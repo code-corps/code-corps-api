@@ -14,8 +14,11 @@ dependencies:
 test:
   override:
     - |
-      if [ ${CIRCLE_PR_USERNAME} ]; then MIX_ENV=test mix test; else MIX_ENV=test mix coveralls.circle --include requires_env; fi
-
+      if [ ${CIRCLE_PR_USERNAME} ]; then
+        MIX_ENV=test mix test;
+      else
+        MIX_ENV=test mix coveralls.circle --include requires_env;
+      fi
   post:
     - mix inch.report
 

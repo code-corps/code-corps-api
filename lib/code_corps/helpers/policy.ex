@@ -46,7 +46,7 @@ defmodule CodeCorps.Helpers.Policy do
 
   Returns `:string`
   """
-  @spec get_role(nil | OrganizationMembership.t | Changeset.t) :: String.t
+  @spec get_role(nil | OrganizationMembership.t | Changeset.t) :: String.t | nil
   def get_role(nil), do: nil
   def get_role(%OrganizationMembership{role: role}), do: role
   def get_role(%Changeset{} = changeset), do: changeset |> Changeset.get_field(:role)
