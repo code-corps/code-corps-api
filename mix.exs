@@ -77,7 +77,7 @@ defmodule CodeCorps.Mixfile do
       {:comeonin, "~> 2.0"},
       {:corsica, "~> 0.4"}, # CORS
       {:credo, "~> 0.5", only: [:dev, :test]}, # Code style suggestions
-      {:earmark, "~> 1.0"}, # Markdown rendering
+      {:earmark, "~> 1.1"}, # Markdown rendering
       {:ex_aws, "~> 1.0"}, # Amazon AWS
       {:excoveralls, "~> 0.5", only: :test}, # Test coverage
       {:ex_doc, "~> 0.14", only: [:dev, :test]},
