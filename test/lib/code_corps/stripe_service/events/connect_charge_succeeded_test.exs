@@ -1,4 +1,6 @@
 defmodule CodeCorps.StripeService.Events.ConnectChargeSucceededTest do
+  @moduledoc false
+
   use CodeCorps.StripeCase
 
   use Bamboo.Test
@@ -29,9 +31,28 @@ defmodule CodeCorps.StripeService.Events.ConnectChargeSucceededTest do
 
     Bamboo.SentEmail.start_link()
 
-    assert {:ok, %StripeConnectCharge{}, %Bamboo.Email{} = email}
-      = ConnectChargeSucceeded.handle(event)
+    assert {
+      :ok,
+      %StripeConnectCharge{} = charge,
+      %Bamboo.Email{} = email
+    } = ConnectChargeSucceeded.handle(event)
+
+    # assert email was sent
 
     assert_delivered_email email
+
+    # assert event was tracked by Segment
+
+    user_id = charge.user_id
+    charge_id = charge.id
+    currency = String.capitalize(charge.currency) # Segment requires this in ISO 4127 format
+    amount = charge.amount / 100
+
+    assert_received {
+      :track,
+      ^user_id,
+      "Created Stripe Connect Charge",
+      %{charge_id: ^charge_id, currency: ^currency, revenue: ^amount, user_id: ^user_id}
+    }
   end
 end

@@ -45,8 +45,8 @@ defmodule CodeCorps.StripeEvent do
     |> cast(params, [:endpoint, :id_from_stripe, :object_id, :object_type, :type, :user_id])
     |> validate_required([:endpoint, :id_from_stripe, :object_id, :object_type, :type])
     |> put_change(:status, "processing")
-    |> validate_inclusion(:status, states)
-    |> validate_inclusion(:endpoint, endpoints)
+    |> validate_inclusion(:status, states())
+    |> validate_inclusion(:endpoint, endpoints())
     |> unique_constraint(:id_from_stripe)
   end
 
@@ -59,7 +59,7 @@ defmodule CodeCorps.StripeEvent do
     struct
     |> cast(params, [:ignored_reason, :status])
     |> validate_required([:status])
-    |> validate_inclusion(:status, states)
+    |> validate_inclusion(:status, states())
   end
 
   defp endpoints do

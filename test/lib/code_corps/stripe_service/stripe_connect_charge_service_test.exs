@@ -1,4 +1,6 @@
 defmodule CodeCorps.StripeService.StripeConnectChargeServiceTest do
+  @moduledoc false
+
   use CodeCorps.StripeCase
 
   alias CodeCorps.{StripeConnectCharge, StripeTesting}
@@ -16,12 +18,6 @@ defmodule CodeCorps.StripeService.StripeConnectChargeServiceTest do
       assert charge.id_from_stripe == "charge"
       assert charge.stripe_connect_customer_id == customer.id
       assert charge.user_id == customer.user_id
-
-      user_id = charge.user_id
-      charge_id = charge.id
-      currency = String.capitalize(charge.currency) # Segment requires this in ISO 4127 format
-      amount = charge.amount / 100
-      assert_received {:track, ^user_id, "Created Stripe Connect Charge", %{charge_id: ^charge_id, currency: ^currency, revenue: ^amount, user_id: ^user_id}}
     end
   end
 end
