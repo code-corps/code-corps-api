@@ -1,4 +1,8 @@
 defmodule CodeCorps.StripeService.Adapters.StripeEventAdapter do
+  @moduledoc """
+  Handles data transformations between the API `Stripe.Event` struct and maps of
+  attributes suitable for work with our own `StripeEvent` database objects.
+  """
   import CodeCorps.MapUtils, only: [keys_to_string: 1]
   import CodeCorps.StripeService.Util, only: [transform_map: 2]
 
@@ -14,6 +18,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeEventAdapter do
   Transforms a `%Stripe.Event{}` and a set of local attributes into a
   map of parameters used to create or update a `StripeEvent` record.
   """
+  @spec to_params(Stripe.Event.t, map) :: {:ok, map}
   def to_params(%Stripe.Event{} = stripe_event, %{} = attributes) do
     result =
       stripe_event
@@ -45,12 +50,11 @@ defmodule CodeCorps.StripeService.Adapters.StripeEventAdapter do
     params |> Map.merge(attributes)
   end
 
-  defp add_object_type(params, stripe_event) do
-    object_type = stripe_event.data.object.object
-    params |> Map.put(:object_type, object_type)
-  end
+  # NOTE: unlike object_id, object_type should never be nil
+  # Due to that, we do not have a catch-all clause for the nil case
+  # If it ever is nil, it should fail and we should know about it
+  defp add_object_type(params, %{data: %{object: %{object: object}}}), do: params |> Map.put(:object_type, object)
 
-  defp add_object_id(params, stripe_event) do
-    params |> Map.put(:object_id, stripe_event.data.object.id)
-  end
+  defp add_object_id(params, %{data: %{object: %{id: id}}}), do: params |> Map.put(:object_id, id)
+  defp add_object_id(params, _stripe_event), do: params |> Map.put(:object_id, nil)
 end
