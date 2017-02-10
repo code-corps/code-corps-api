@@ -16,8 +16,7 @@ defmodule CodeCorps.Services.MarkdownRendererService do
 
   @spec convert_into_html(String.t) :: String.t
   defp convert_into_html(markdown) do
-    # `Earmark.as_html` will return `{html, errors}`
-    markdown |> Earmark.as_html() |> Tuple.to_list() |> List.first()
+    Earmark.as_html!(markdown)
   end
 
   @spec put_into(String.t, Changeset.t, atom) :: Changeset.t
