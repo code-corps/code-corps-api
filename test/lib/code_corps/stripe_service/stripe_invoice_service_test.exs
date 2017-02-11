@@ -8,7 +8,7 @@ defmodule CodeCorps.StripeService.StripeInvoiceServiceTest do
 
   describe "create" do
     test "creates a StripeInvoice" do
-      invoice_fixture = CodeCorps.StripeTesting.Helpers.load_fixture(Stripe.Invoice, "invoice")
+      invoice_fixture = CodeCorps.StripeTesting.Helpers.load_fixture("invoice")
 
       subscription = insert(:stripe_connect_subscription, id_from_stripe: invoice_fixture.subscription)
       connect_customer = insert(:stripe_connect_customer, id_from_stripe: invoice_fixture.customer)
