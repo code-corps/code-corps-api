@@ -6,7 +6,7 @@ defmodule CodeCorps.StripeTesting.Account do
   end
 
   def retrieve("account_with_multiple_external_accounts") do
-    {:ok, load_fixture(Stripe.Account, "account_with_multiple_external_accounts")}
+    {:ok, load_fixture("account_with_multiple_external_accounts")}
   end
 
   def retrieve(id) do
@@ -25,7 +25,7 @@ defmodule CodeCorps.StripeTesting.Account do
       |> add_nestings
 
 
-    Stripe.Account |> Stripe.Converter.stripe_map_to_struct(transformed_attributes)
+    Stripe.Converter.stripe_map_to_struct(transformed_attributes)
   end
 
   defp account_fixture do
@@ -47,6 +47,7 @@ defmodule CodeCorps.StripeTesting.Account do
         "url" => "/v1/accounts/acct_123/external_accounts"
       },
       "id" => "acct_123",
+      "object" => "account",
       "managed" => true,
       "metadata" => %{},
       "statement_descriptor" => "CODECORPS.ORG",

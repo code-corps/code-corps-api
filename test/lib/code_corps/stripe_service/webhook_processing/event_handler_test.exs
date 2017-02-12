@@ -82,10 +82,10 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
     test "handles charge.succeeded as processed when everything is in order" do
       connect_account = insert(:stripe_connect_account)
 
-      charge_fixture = StripeTesting.Helpers.load_fixture(Stripe.Charge, "charge")
+      charge_fixture = StripeTesting.Helpers.load_fixture("charge")
       insert(:stripe_connect_customer, id_from_stripe: charge_fixture.customer)
 
-      invoice_fixture = StripeTesting.Helpers.load_fixture(Stripe.Invoice, charge_fixture.invoice)
+      invoice_fixture = StripeTesting.Helpers.load_fixture(charge_fixture.invoice)
       insert(:stripe_connect_subscription, id_from_stripe: invoice_fixture.subscription)
 
       project = Repo.one(Project)
@@ -101,7 +101,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
 
     test "handles charge.succeeded as errored when something goes wrong with email" do
       connect_account = insert(:stripe_connect_account)
-      charge_fixture = StripeTesting.Helpers.load_fixture(Stripe.Charge, "charge")
+      charge_fixture = StripeTesting.Helpers.load_fixture("charge")
 
       insert(:stripe_connect_customer, id_from_stripe: charge_fixture.customer)
 
@@ -114,7 +114,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
     end
 
     test "handles charge.succeeded as errored when something goes wrong with creating a charge" do
-      charge_fixture = StripeTesting.Helpers.load_fixture(Stripe.Charge, "charge")
+      charge_fixture = StripeTesting.Helpers.load_fixture("charge")
 
       event = build_event("charge.succeeded", "charge", charge_fixture, "bad_account")
       {:ok, event} = EventHandler.handle(event, ConnectEventHandler, "bad_account")
@@ -185,7 +185,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
     end
 
     test "handles invoice.payment_succeeded" do
-      fixture = StripeTesting.Helpers.load_fixture(Stripe.Invoice, "invoice")
+      fixture = StripeTesting.Helpers.load_fixture("invoice")
 
       insert(:stripe_connect_subscription, id_from_stripe: fixture.subscription)
 

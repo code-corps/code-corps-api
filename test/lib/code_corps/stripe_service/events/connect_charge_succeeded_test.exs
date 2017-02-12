@@ -14,11 +14,11 @@ defmodule CodeCorps.StripeService.Events.ConnectChargeSucceededTest do
   test "handling event creates charge and sends receipt" do
     account = insert(:stripe_connect_account)
 
-    charge_fixture = StripeTesting.Helpers.load_fixture(Stripe.Charge, "charge")
+    charge_fixture = StripeTesting.Helpers.load_fixture("charge")
 
     insert(:stripe_connect_customer, id_from_stripe: charge_fixture.customer)
 
-    invoice_fixture = StripeTesting.Helpers.load_fixture(Stripe.Invoice, charge_fixture.invoice)
+    invoice_fixture = StripeTesting.Helpers.load_fixture(charge_fixture.invoice)
     insert(:stripe_connect_subscription, id_from_stripe: invoice_fixture.subscription)
 
     project = Repo.one(Project)
