@@ -4,6 +4,7 @@ defmodule CodeCorps.TaskViewTest do
   test "renders all attributes and relationships properly" do
     task = insert(:task, order: 1000)
     comment = insert(:comment, task: task)
+    task_skill = insert(:task_skill, task: task)
 
     rendered_json =  render(CodeCorps.TaskView, "show.json-api", data: task)
 
@@ -36,6 +37,14 @@ defmodule CodeCorps.TaskViewTest do
               "id" => task.project_id |> Integer.to_string,
               "type" => "project"
             }
+          },
+          "task-skills" => %{
+            "data" => [
+              %{
+                "id" => task_skill.id |> Integer.to_string,
+                "type" => "task-skill"
+              }
+            ]
           },
           "user" => %{
             "data" => %{

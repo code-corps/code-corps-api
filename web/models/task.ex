@@ -24,6 +24,7 @@ defmodule CodeCorps.Task do
     belongs_to :user, CodeCorps.User
 
     has_many :comments, CodeCorps.Comment
+    has_many :task_skills, CodeCorps.TaskSkill
 
     timestamps()
   end
