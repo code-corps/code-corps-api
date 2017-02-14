@@ -23,6 +23,8 @@ defmodule CodeCorps.Task do
     belongs_to :task_list, CodeCorps.TaskList
     belongs_to :user, CodeCorps.User
 
+    has_one :user_task, CodeCorps.UserTask
+
     has_many :comments, CodeCorps.Comment
     has_many :task_skills, CodeCorps.TaskSkill
 
