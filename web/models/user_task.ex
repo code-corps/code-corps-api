@@ -8,8 +8,8 @@ defmodule CodeCorps.UserTask do
   @type t :: %__MODULE__{}
 
   schema "user_tasks" do
-    belongs_to :user, CodeCorps.Skill
     belongs_to :task, CodeCorps.Task
+    belongs_to :user, CodeCorps.User
 
     timestamps()
   end
