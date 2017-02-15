@@ -131,6 +131,7 @@ defmodule Canary.Abilities do
     def can?(%User{} = user, :delete, %UserSkill{} = user_skill), do: UserSkillPolicy.delete?(user, user_skill)
 
     def can?(%User{} = user, :create, %Changeset{data: %UserTask{}} = changeset), do: UserTaskPolicy.create?(user, changeset)
+    def can?(%User{} = user, :update, %UserTask{} = user_task), do: UserTaskPolicy.update?(user, user_task)
     def can?(%User{} = user, :delete, %UserTask{} = user_task), do: UserTaskPolicy.delete?(user, user_task)
   end
 end

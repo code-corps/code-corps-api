@@ -3,7 +3,7 @@ defmodule CodeCorps.UserTaskPolicyTest do
 
   use CodeCorps.PolicyCase
 
-  import CodeCorps.UserTaskPolicy, only: [create?: 2, delete?: 2]
+  import CodeCorps.UserTaskPolicy, only: [create?: 2, update?: 2, delete?: 2]
   import CodeCorps.UserTask, only: [create_changeset: 2]
 
   alias CodeCorps.UserTask
@@ -76,6 +76,56 @@ defmodule CodeCorps.UserTaskPolicyTest do
       changeset = %UserTask{} |> create_changeset(%{task_id: task.id})
 
       assert create?(user, changeset)
+    end
+  end
+
+  describe "update?" do
+    test "returns false when user is not member of organization" do
+      {user, task} = generate_data_for("non-member")
+
+      user_task = insert(:user_task, task: task)
+
+      refute update?(user, user_task)
+    end
+
+    test "returns false when user is pending member of organization" do
+      {user, task} = generate_data_for("pending")
+
+      user_task = insert(:user_task, task: task)
+
+      refute update?(user, user_task)
+    end
+
+    test "returns true when user is contributor of organization" do
+      {user, task} = generate_data_for("contributor")
+
+      user_task = insert(:user_task, task: task)
+
+      assert update?(user, user_task)
+    end
+
+    test "returns true when user is admin of organization" do
+      {user, task} = generate_data_for("admin")
+
+      user_task = insert(:user_task, task: task)
+
+      assert update?(user, user_task)
+    end
+
+    test "returns true when user is owner of organization" do
+      {user, task} = generate_data_for("owner")
+
+      user_task = insert(:user_task, task: task)
+
+      assert update?(user, user_task)
+    end
+
+    test "returns true when user is author of task" do
+      {user, task} = generate_data_for("author")
+
+      user_task = insert(:user_task, task: task)
+
+      assert update?(user, user_task)
     end
   end
 

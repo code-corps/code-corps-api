@@ -8,7 +8,7 @@ defmodule CodeCorps.UserTaskController do
 
   plug :load_resource, model: UserTask, only: [:show], preload: [:task, :user]
   plug :load_and_authorize_changeset, model: UserTask, only: [:create]
-  plug :load_and_authorize_resource, model: UserTask, only: [:delete]
+  plug :load_and_authorize_resource, model: UserTask, only: [:update, :delete]
   plug JaResource
 
   @spec filter(Plug.Conn.t, Ecto.Query.t, String.t, String.t) :: Plug.Conn.t
@@ -19,5 +19,10 @@ defmodule CodeCorps.UserTaskController do
   @spec handle_create(Plug.Conn.t, map) :: Ecto.Changeset.t
   def handle_create(_conn, attributes) do
     %UserTask{} |> UserTask.create_changeset(attributes)
+  end
+
+  @spec handle_update(Plug.Conn.t, UserTask.t, map) :: Ecto.Changeset.t
+  def handle_update(_conn, user_task, attributes) do
+    user_task |> UserTask.update_changeset(attributes)
   end
 end
