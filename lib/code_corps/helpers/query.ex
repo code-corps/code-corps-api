@@ -65,6 +65,21 @@ defmodule CodeCorps.Helpers.Query do
 
   # end comment queries
 
+  # user queries
+
+  def user_filter(query, %{"query" => query_string}) do
+    query
+    |> where(
+      [object],
+      ilike(object.first_name, ^"%#{query_string}%") or
+      ilike(object.last_name, ^"%#{query_string}%") or
+      ilike(object.username, ^"%#{query_string}%")
+    )
+  end
+  def user_filter(query, _), do: query
+
+  # end user queries
+
   # sorting
 
   def sort_by_newest_first(query), do: query |> order_by([desc: :inserted_at])
