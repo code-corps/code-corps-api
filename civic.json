@@ -1,0 +1,24 @@
+{
+  "name": "Code Corps",
+  "description": "Help build and fund software projects with massive social impact.",
+  "status": "Beta",
+  "homepage": "https://www.codecorps.org",
+  "license": "https://github.com/code-corps/code-corps-api/blob/develop/LICENSE.txt",
+  "repository": "https://github.com/code-corps/code-corps-api",
+  "geography": [],
+  "contact": {
+    "email": "josh@codecorps.org",
+    "name": "Josh Smith"
+  },
+  "type": "Elixir Phoenix Web Application",
+  "tags": [
+    "developer tools",
+    "donations",
+    "fundraising",
+    "open source",
+    "project management",
+    "software",
+    "tech for good"
+  ],
+  "thumbnailUrl": "https://d3pgew4wbk2vb1.cloudfront.net/projects/1/thumb.png?v=1474089806",
+}
