@@ -1,4 +1,4 @@
-defmodule Cloudex.CloudinaryApi.Test do
+defmodule CloudexTest do
   @moduledoc """
   Testing stub for `Cloudex`,
 

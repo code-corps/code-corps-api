@@ -50,5 +50,5 @@ config :code_corps, CodeCorps.Mailer,
 config :code_corps,
   postmark_receipt_template: "123"
 
-config :cloudex, :cloudinary_api, Cloudex.CloudinaryApi.Test
+config :code_corps, :cloudex, CloudexTest
 config :cloudex, api_key: "test_key", secret: "test_secret", cloud_name: "test_cloud_name"
