@@ -44,6 +44,32 @@ defmodule CodeCorps.UserControllerTest do
       |> json_response(200)
       |> assert_ids_from_response([user_1.id, user_2.id])
     end
+
+    test "returns search results on index", %{conn: conn} do
+      user_1 = insert(:user, first_name: "Joe")
+      user_2 = insert(:user, username: "joecoder")
+      user_3 = insert(:user, last_name: "Jacko")
+      insert(:user, first_name: "Max")
+
+      params = %{"query" => "j"}
+      path = conn |> user_path(:index, params)
+
+      conn
+      |> get(path)
+      |> json_response(200)
+      |> assert_ids_from_response([user_1.id, user_2.id, user_3.id])
+    end
+
+    test "limit filter limits results on index", %{conn: conn} do
+      insert_list(6, :user)
+
+      params = %{"limit" => 5}
+      path = conn |> user_path(:index, params)
+      json = conn |> get(path) |> json_response(200)
+
+      returned_users_length = json["data"] |> length
+      assert returned_users_length == 5
+    end
   end
 
   describe "show" do

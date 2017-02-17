@@ -2,7 +2,7 @@ defmodule CodeCorps.UserController do
   use CodeCorps.Web, :controller
   use JaResource
 
-  import CodeCorps.Helpers.Query, only: [id_filter: 2]
+  import CodeCorps.Helpers.Query, only: [id_filter: 2, user_filter: 2, limit_filter: 2]
 
   alias CodeCorps.User
   alias CodeCorps.Services.UserService
@@ -13,6 +13,12 @@ defmodule CodeCorps.UserController do
 
   def filter(_conn, query, "id", id_list) do
     query |> id_filter(id_list)
+  end
+
+  def handle_index(_conn, params) do
+    User
+    |> user_filter(params)
+    |> limit_filter(params)
   end
 
   def handle_create(_conn, attributes) do
