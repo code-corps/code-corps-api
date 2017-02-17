@@ -1,4 +1,5 @@
 defmodule CodeCorps.ProjectView do
+  alias CodeCorps.Cloudex.CloudinaryUrl
   alias CodeCorps.StripeService.Validators.ProjectCanEnableDonations
 
   use CodeCorps.PreloadHelpers,
@@ -36,10 +37,10 @@ defmodule CodeCorps.ProjectView do
   end
 
   def icon_large_url(project, _conn) do
-    CodeCorps.Helpers.CloudinaryUrl.for(project.cloudinary_public_id, %{crop: "fill", height: 500, width: 500}, "large", project.default_color, "project")
+    CloudinaryUrl.for(project.cloudinary_public_id, %{crop: "fill", height: 500, width: 500}, "large", project.default_color, "project")
   end
 
   def icon_thumb_url(project, _conn) do
-    CodeCorps.Helpers.CloudinaryUrl.for(project.cloudinary_public_id, %{crop: "fill", height: 100, width: 100}, "thumb", project.default_color, "project")
+    CloudinaryUrl.for(project.cloudinary_public_id, %{crop: "fill", height: 100, width: 100}, "thumb", project.default_color, "project")
   end
 end

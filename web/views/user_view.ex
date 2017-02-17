@@ -1,4 +1,6 @@
 defmodule CodeCorps.UserView do
+  alias CodeCorps.Cloudex.CloudinaryUrl
+
   use CodeCorps.PreloadHelpers,
       default_preloads: [
         :slugged_route, :stripe_connect_subscriptions, :stripe_platform_card, :stripe_platform_customer,
@@ -23,11 +25,11 @@ defmodule CodeCorps.UserView do
   has_many :user_skills, serializer: CodeCorps.UserSkillView, identifiers: :always
 
   def photo_large_url(user, _conn) do
-    CodeCorps.Helpers.CloudinaryUrl.for(user.cloudinary_public_id, %{crop: "fill", height: 500, width: 500}, "large", user.default_color, "user")
+    CloudinaryUrl.for(user.cloudinary_public_id, %{crop: "fill", height: 500, width: 500}, "large", user.default_color, "user")
   end
 
   def photo_thumb_url(user, _conn) do
-    CodeCorps.Helpers.CloudinaryUrl.for(user.cloudinary_public_id, %{crop: "fill", height: 100, width: 100}, "thumb", user.default_color, "user")
+    CloudinaryUrl.for(user.cloudinary_public_id, %{crop: "fill", height: 100, width: 100}, "thumb", user.default_color, "user")
   end
 
   @doc """
