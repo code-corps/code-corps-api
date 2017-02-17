@@ -40,4 +40,25 @@ defmodule CodeCorps.UserTaskTest do
       assert_error_message(response_changeset, :user, "has already been taken")
     end
   end
+
+  describe "update_changeset/2" do
+    @required_attrs ~w(user_id)
+
+    test "requires #{@required_attrs}" do
+      user_task = insert(:user_task)
+
+      changeset = UserTask.update_changeset(user_task, %{user_id: nil})
+
+      assert_validation_triggered(changeset, :user_id, :required)
+    end
+
+    test "ensures associated User record exists" do
+      user_task = insert(:user_task)
+
+      changeset = UserTask.update_changeset(user_task, %{user_id: -1})
+
+      {:error, response_changeset} = Repo.update(changeset)
+      assert_error_message(response_changeset, :user, "does not exist")
+    end
+  end
 end
