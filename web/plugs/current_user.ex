@@ -1,19 +1,18 @@
 defmodule CodeCorps.Plug.CurrentUser do
-  alias CodeCorps.GuardianSerializer
+  @moduledoc """
+  Puts authenticated Guardian user into conn.assigns[:current_user]
+  """
 
+  @spec init(Keyword.t) :: Keyword.t
   def init(opts), do: opts
 
+  @spec call(Plug.Conn.t, Keyword.t) :: Plug.Conn.t
   def call(conn, _opts) do
-    case Guardian.Plug.current_token(conn) do
+    case Guardian.Plug.current_resource(conn) do
+      user = %CodeCorps.User{} ->
+        Plug.Conn.assign(conn, :current_user, user)
       nil ->
         conn
-      current_token ->
-        with {:ok, claims} <- Guardian.decode_and_verify(current_token),
-             {:ok, user} <- GuardianSerializer.from_token(claims["sub"]) do
-                Plug.Conn.assign(conn, :current_user, user)
-        else
-          {:error, _reason} -> conn
-        end
     end
   end
 end
