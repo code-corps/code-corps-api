@@ -303,7 +303,6 @@ cond do
       |> Task.create_changeset(%{
         title: "test task #{i}",
         markdown: "test *body* #{i}",
-        task_type: Enum.random(~w{idea issue task}),
         status: "open",
         number: i,
         project_id: 1,

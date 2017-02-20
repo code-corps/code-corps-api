@@ -8,7 +8,6 @@ defmodule CodeCorps.Services.MarkdownRendererServiceTest do
   @valid_attrs %{
     title: "Test task",
     task_list_id: 1,
-    task_type: "issue",
     markdown: "A **strong** body",
     status: "open"
   }

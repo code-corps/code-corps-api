@@ -48,7 +48,6 @@ defmodule CodeCorps.Factories do
   def task_factory do
     %CodeCorps.Task{
       title: "Test task",
-      task_type: "issue",
       markdown: "A test task",
       status: "open",
       state: "published",

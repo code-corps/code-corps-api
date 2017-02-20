@@ -3,14 +3,12 @@ defmodule CodeCorps.TaskControllerTest do
 
   @valid_attrs %{
     title: "Test task",
-    task_type: "issue",
     markdown: "A test task",
     status: "open"
   }
 
   @invalid_attrs %{
     title: nil,
-    task_type: "issue",
     status: "nonexistent"
   }
 
@@ -57,30 +55,6 @@ defmodule CodeCorps.TaskControllerTest do
         |> json_response(200)
 
       assert json["data"] |> Enum.count == 2
-    end
-
-    test "lists all tasks filtered by task_type", %{conn: conn} do
-      project_1 = insert(:project)
-      user = insert(:user)
-      insert(:task, task_type: "idea", project: project_1, user: user)
-      insert(:task, task_type: "issue", project: project_1, user: user)
-      insert(:task, task_type: "task", project: project_1, user: user)
-
-      json =
-        conn
-        |> get("projects/#{project_1.id}/tasks?task_type=idea,issue")
-        |> json_response(200)
-
-      assert json["data"] |> Enum.count == 2
-
-      task_types =
-        json["data"]
-        |> Enum.map(fn(task_json) -> task_json["attributes"] end)
-        |> Enum.map(fn(task_attributes) -> task_attributes["task-type"] end)
-
-      assert task_types |> Enum.member?("issue")
-      assert task_types |> Enum.member?("idea")
-      refute task_types |> Enum.member?("task")
     end
 
     test "lists all tasks filtered by status", %{conn: conn} do
@@ -150,7 +124,6 @@ defmodule CodeCorps.TaskControllerTest do
       tracking_properties = %{
         task: @valid_attrs.title,
         task_id: String.to_integer(json["data"]["id"]),
-        task_type: @valid_attrs.task_type,
         project_id: project.id
       }
 
@@ -179,7 +152,6 @@ defmodule CodeCorps.TaskControllerTest do
       tracking_properties = %{
         task: task.title,
         task_id: task.id,
-        task_type: task.task_type,
         project_id: task.project.id
       }
 
