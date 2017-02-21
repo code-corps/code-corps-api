@@ -1,4 +1,5 @@
 defmodule CodeCorps.OrganizationView do
+  alias CodeCorps.Cloudex.CloudinaryUrl
   use CodeCorps.PreloadHelpers, default_preloads: [:slugged_route, :stripe_connect_account, :organization_memberships, :projects]
   use CodeCorps.Web, :view
   use JaSerializer.PhoenixView
@@ -15,10 +16,10 @@ defmodule CodeCorps.OrganizationView do
   has_many :projects, serializer: CodeCorps.ProjectView, identifiers: :always
 
   def icon_large_url(organization, _conn) do
-    CodeCorps.Helpers.CloudinaryUrl.for(organization.cloudinary_public_id, %{crop: "fill", height: 500, width: 500}, "large", organization.default_color, "organization")
+    CloudinaryUrl.for(organization.cloudinary_public_id, %{crop: "fill", height: 500, width: 500}, "large", organization.default_color, "organization")
   end
 
   def icon_thumb_url(organization, _conn) do
-    CodeCorps.Helpers.CloudinaryUrl.for(organization.cloudinary_public_id, %{crop: "fill", height: 100, width: 100}, "thumb", organization.default_color, "organization")
+    CloudinaryUrl.for(organization.cloudinary_public_id, %{crop: "fill", height: 100, width: 100}, "thumb", organization.default_color, "organization")
   end
 end

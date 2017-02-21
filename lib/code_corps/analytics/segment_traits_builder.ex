@@ -26,7 +26,6 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilder do
       comment_id: comment.id,
       task: comment.task.title,
       task_id: comment.task.id,
-      task_type: comment.task.task_type,
       project_id: comment.task.project_id
     }
   end
@@ -56,7 +55,6 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilder do
     %{
       task: task.title,
       task_id: task.id,
-      task_type: task.task_type,
       project_id: task.project_id
     }
   end

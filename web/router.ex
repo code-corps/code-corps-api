@@ -83,7 +83,7 @@ defmodule CodeCorps.Router do
     resources "/user-categories", UserCategoryController, only: [:create, :delete]
     resources "/user-roles", UserRoleController, only: [:create, :delete]
     resources "/user-skills", UserSkillController, only: [:create, :delete]
-    resources "/user-tasks", UserTaskController, only: [:create, :delete]
+    resources "/user-tasks", UserTaskController, only: [:create, :update, :delete]
   end
 
   scope "/", CodeCorps, host: "api." do

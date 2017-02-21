@@ -14,7 +14,6 @@ defmodule CodeCorps.Task do
     field :order, :integer
     field :state, :string
     field :status, :string, default: "open"
-    field :task_type, :string
     field :title, :string
 
     field :position, :integer, virtual: true
@@ -23,16 +22,18 @@ defmodule CodeCorps.Task do
     belongs_to :task_list, CodeCorps.TaskList
     belongs_to :user, CodeCorps.User
 
+    has_one :user_task, CodeCorps.UserTask
+
     has_many :comments, CodeCorps.Comment
+    has_many :task_skills, CodeCorps.TaskSkill
 
     timestamps()
   end
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:title, :markdown, :task_type, :task_list_id, :position])
-    |> validate_required([:title, :markdown, :task_list_id, :task_type])
-    |> validate_inclusion(:task_type, task_types())
+    |> cast(params, [:title, :markdown, :task_list_id, :position])
+    |> validate_required([:title, :markdown, :task_list_id])
     |> assoc_constraint(:task_list)
     |> apply_position()
     |> set_order(:position, :order, :task_list_id)
@@ -64,10 +65,6 @@ defmodule CodeCorps.Task do
         put_change(changeset, :position, 0)
       _ -> changeset
     end
-  end
-
-  defp task_types do
-    ~w{ idea issue task }
   end
 
   defp statuses do

@@ -5,22 +5,13 @@ defmodule CodeCorps.TaskTest do
 
   @valid_attrs %{
     title: "Test task",
-    task_type: "issue",
     markdown: "A test task"
   }
-  @invalid_attrs %{
-    task_type: "nonexistent"
-  }
+  @invalid_attrs %{}
 
   describe "create/2" do
     test "is invalid with invalid attributes" do
       changeset = Task.changeset(%Task{}, @invalid_attrs)
-      refute changeset.valid?
-    end
-
-    test "only allows specific values for task_type" do
-      changes = Map.put(@valid_attrs, :task_type, "nonexistent")
-      changeset = Task.changeset(%Task{}, changes)
       refute changeset.valid?
     end
 
@@ -47,7 +38,6 @@ defmodule CodeCorps.TaskTest do
       task_list = insert(:task_list)
       changeset = Task.create_changeset(%Task{}, %{
         markdown: "some content",
-        task_type: "issue",
         title: "some content",
         project_id: project.id,
         user_id: user.id,

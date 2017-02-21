@@ -25,6 +25,15 @@ defmodule CodeCorps.UserTaskPolicy do
     end
   end
 
+  @spec update?(User.t, UserTask.t) :: boolean
+  def update?(%User{} = user, %UserTask{} = user_task) do
+    cond do
+      user_task |> get_task |> get_project |> get_membership(user) |> get_role |> contributor_or_higher? -> true
+      user_task |> get_task |> task_authored_by?(user) -> true
+      true -> false
+    end
+  end
+
   @spec delete?(User.t, UserTask.t) :: boolean
   def delete?(%User{} = user, %UserTask{} = user_task) do
     cond do

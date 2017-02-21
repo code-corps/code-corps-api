@@ -56,7 +56,6 @@ defmodule CodeCorps.CommentControllerTest do
         comment_id: String.to_integer(json["data"]["id"]),
         task: task.title,
         task_id: task.id,
-        task_type: task.task_type,
         project_id: task.project_id
       }
 
@@ -94,7 +93,6 @@ defmodule CodeCorps.CommentControllerTest do
         comment_id: comment.id,
         task: task.title,
         task_id: task.id,
-        task_type: task.task_type,
         project_id: task.project_id
       }
 

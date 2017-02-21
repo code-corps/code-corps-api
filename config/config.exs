@@ -53,6 +53,12 @@ config :code_corps,
 config :segment,
   write_key: System.get_env("SEGMENT_WRITE_KEY")
 
+config :code_corps, :cloudex, Cloudex
+config :cloudex,
+  api_key: System.get_env("CLOUDEX_API_KEY"),
+  secret: System.get_env("CLOUDEX_SECRET"),
+  cloud_name: System.get_env("CLOUDEX_CLOUD_NAME")
+
 # Configures random icon color generator
 config :code_corps, :icon_color_generator, CodeCorps.RandomIconColor.Generator
 

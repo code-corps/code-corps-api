@@ -3,6 +3,8 @@ defmodule CodeCorps.UserTaskControllerTest do
 
   use CodeCorps.ApiCase, resource_name: :user_task
 
+  alias CodeCorps.{Repo, UserTask}
+
   describe "index" do
     test "lists all entries on index", %{conn: conn} do
       [user_task_1, user_task_2] = insert_pair(:user_task)
@@ -72,6 +74,32 @@ defmodule CodeCorps.UserTaskControllerTest do
       attrs = %{task: task, user: user}
 
       assert conn |> request_create(attrs) |> json_response(403)
+    end
+  end
+
+  describe "update" do
+    @tag :authenticated
+    test "updates chosen resource", %{conn: conn, current_user: current_user} do
+      task = insert(:task, user: current_user)
+      user_task = insert(:user_task, task: task)
+      new_user = insert(:user)
+
+      assert conn |> request_update(user_task, %{user_id: new_user.id}) |> response(200)
+
+      updated_task = Repo.get(UserTask, user_task.id)
+      assert updated_task.user_id == new_user.id
+    end
+
+    test "renders 401 when unauthenticated", %{conn: conn} do
+      user_task = insert(:user_task)
+      new_user = insert(:user)
+
+      assert conn |> request_update(user_task, %{user_id: new_user.id}) |> json_response(401)
+    end
+
+    @tag :authenticated
+    test "renders 404 when id is nonexistent", %{conn: conn} do
+      assert conn |> request_update(:not_found) |> json_response(404)
     end
   end
 

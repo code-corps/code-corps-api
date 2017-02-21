@@ -6,7 +6,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectChargeTest do
   describe "to_params/2" do
     test "adds customer and user id if those records exist" do
       # load a predefined fixture to use for adapter testing
-      fixture = CodeCorps.StripeTesting.Helpers.load_fixture(Stripe.Charge, "charge")
+      fixture = CodeCorps.StripeTesting.Helpers.load_fixture("charge")
 
       account = insert(:stripe_connect_account)
 

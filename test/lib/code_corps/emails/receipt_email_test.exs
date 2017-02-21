@@ -5,7 +5,7 @@ defmodule CodeCorps.Emails.ReceiptEmailTest do
   alias CodeCorps.Emails.ReceiptEmail
 
   test "receipt email works" do
-    invoice_fixture = CodeCorps.StripeTesting.Helpers.load_fixture(Stripe.Invoice, "invoice")
+    invoice_fixture = CodeCorps.StripeTesting.Helpers.load_fixture("invoice")
 
     user = insert(:user, email: "jimmy@mail.com", first_name: "Jimmy")
 

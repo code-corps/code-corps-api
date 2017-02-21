@@ -1,5 +1,5 @@
 defmodule CodeCorps.Helpers.Query do
-  import CodeCorps.Helpers.String, only: [coalesce_id_string: 1, coalesce_string: 1]
+  import CodeCorps.Helpers.String, only: [coalesce_id_string: 1]
   import Ecto.Query, only: [where: 3, limit: 2, order_by: 2]
 
   def id_filter(query, id_list) do
@@ -44,12 +44,6 @@ defmodule CodeCorps.Helpers.Query do
   end
   def task_list_filter(query, _), do: query
 
-  def task_type_filter(query, %{"task_type" => task_type_list}) do
-    task_types = task_type_list |> coalesce_string
-    query |> where([object], object.task_type in ^task_types)
-  end
-  def task_type_filter(query, _), do: query
-
   def task_status_filter(query, %{"status" => status}) do
     query |> where([object], object.status == ^status)
   end
@@ -64,6 +58,21 @@ defmodule CodeCorps.Helpers.Query do
   end
 
   # end comment queries
+
+  # user queries
+
+  def user_filter(query, %{"query" => query_string}) do
+    query
+    |> where(
+      [object],
+      ilike(object.first_name, ^"%#{query_string}%") or
+      ilike(object.last_name, ^"%#{query_string}%") or
+      ilike(object.username, ^"%#{query_string}%")
+    )
+  end
+  def user_filter(query, _), do: query
+
+  # end user queries
 
   # sorting
 
