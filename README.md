@@ -26,9 +26,9 @@ Our goals:
 We'd love to have you contribute to Code Corps directly!
 
 - First, read the guidelines in our [`CONTRIBUTING.md`](https://github.com/code-corps/code-corps-api/blob/develop/.github/CONTRIBUTING.md).
-- Then check out some GitHub issues to see where you can help out.
+- Then [look at our current projects](https://github.com/code-corps/code-corps-ember/projects?query=sort%3Acreated-asc) to find something that interests you.
 
-You can also always come :wave: hello [in our Slack](http://slack.codecorps.org), where there are always a ton of us around to help you learn, debug, or just shoot the breeze.
+Have questions? Need help? You can also always come :wave: hello [in our Slack](http://slack.codecorps.org), where there are always a ton of us around to help you learn, debug, or just shoot the breeze.
 
 We highlight everyone who's contributed to [the Code Corps team page](https://www.codecorps.org/team). If we've missed you for some reason, please [open an issue in the Ember app](https://github.com/code-corps/code-corps-ember/issues/new)!
 
