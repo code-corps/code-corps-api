@@ -2,9 +2,9 @@ defmodule CodeCorps.OrganizationViewTest do
   use CodeCorps.ViewCase
 
   test "renders all attributes and relationships properly" do
-    organization = insert(:organization, default_color: "blue")
-    project = insert(:project, organization: organization)
     user = insert(:user)
+    organization = insert(:organization, owner: user, default_color: "blue")
+    project = insert(:project, organization: organization)
     organization_membership = insert(:organization_membership, member: user, organization: organization)
     slugged_route = insert(:slugged_route, organization: organization)
     stripe_connect_account = insert(:stripe_connect_account, organization: organization)
@@ -27,6 +27,9 @@ defmodule CodeCorps.OrganizationViewTest do
         },
         "id" => organization.id |> Integer.to_string,
         "relationships" => %{
+          "owner" => %{
+            "data" => %{"id" => user.id |> Integer.to_string, "type" => "user"}
+          },
           "organization-memberships" => %{
             "data" => [
               %{"id" => organization_membership.id |> Integer.to_string, "type" => "organization-membership"}
