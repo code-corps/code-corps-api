@@ -3,16 +3,16 @@ defmodule CodeCorps.ProjectTest do
 
   alias CodeCorps.Project
 
-  @valid_attrs %{title: "A title"}
-  @invalid_attrs %{}
+  describe "changeset" do
+    @valid_attrs %{title: "A title"}
+    @invalid_attrs %{}
 
-  describe "changeset/2" do
-    test "with valid attributes is valid" do
+    test "with valid attributes" do
       changeset = Project.changeset(%Project{}, @valid_attrs)
       assert changeset.valid?
     end
 
-    test "with invalid attributes is invalid and has errors" do
+    test "with invalid attributes" do
       changeset = Project.changeset(%Project{}, @invalid_attrs)
       refute changeset.valid?
 
@@ -43,7 +43,20 @@ defmodule CodeCorps.ProjectTest do
     end
   end
 
-  describe "create_changeset/2" do
+  describe "create_changeset" do
+    @valid_attrs %{title: "A title", organization_id: 1, owner_id: 1}
+    @invalid_attrs %{}
+
+    test "with valid attributes" do
+      changeset = Project.create_changeset(%Project{}, @valid_attrs)
+      assert changeset.valid?
+    end
+
+    test "with invalid attributes" do
+      changeset = Project.create_changeset(%Project{}, @invalid_attrs)
+      refute changeset.valid?
+    end
+
     test "accepts setting of organization_id" do
       changeset = Project.create_changeset(%Project{}, %{organization_id: 1})
       assert {:ok, 1} == changeset |> fetch_change(:organization_id)
@@ -51,9 +64,10 @@ defmodule CodeCorps.ProjectTest do
 
     test "associates the ordered default task lists to the project" do
       organization = insert(:organization)
+      user = insert(:user)
       changeset = Project.create_changeset(
         %Project{},
-        %{organization_id: organization.id, title: "Title"}
+        %{organization_id: organization.id, title: "Title", owner_id: user.id}
       )
 
       {_, project} = Repo.insert(changeset)
@@ -63,9 +77,21 @@ defmodule CodeCorps.ProjectTest do
       assert Enum.all?(task_list_orders), "some of the orders are not set (nil)"
       assert task_list_orders == Enum.sort(task_list_orders), "task lists order does not correspond to their position"
     end
+
+    test "ensures owner (user) actually exists" do
+      organization = insert(:organization)
+      attrs = Map.merge(@valid_attrs, %{organization_id: organization.id})
+
+      changeset = Project.create_changeset(%Project{}, attrs)
+
+      {result, changeset} = changeset |> Repo.insert
+
+      assert result == :error
+      changeset |> assert_error_message(:owner, "does not exist")
+    end
   end
 
-  describe "update_changeset/2" do
+  describe "update_changeset" do
     test "rejects setting of organization id" do
       changeset = Project.update_changeset(%Project{}, %{organization_id: 1})
       assert :error == changeset |> fetch_change(:organization_id)
