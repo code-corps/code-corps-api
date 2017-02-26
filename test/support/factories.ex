@@ -76,7 +76,8 @@ defmodule CodeCorps.Factories do
     %CodeCorps.Project{
       title: sequence(:title, &"Project #{&1}"),
       slug: sequence(:slug, &"project-#{&1}"),
-      organization: build(:organization)
+      organization: build(:organization),
+      owner: build(:user)
     }
   end
 
