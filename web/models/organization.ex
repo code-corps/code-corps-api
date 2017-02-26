@@ -21,6 +21,8 @@ defmodule CodeCorps.Organization do
     field :slug, :string
     field :approved, :boolean
 
+    belongs_to :owner, CodeCorps.User
+
     has_one :slugged_route, CodeCorps.SluggedRoute
     has_one :stripe_connect_account, CodeCorps.StripeConnectAccount
 
@@ -47,8 +49,10 @@ defmodule CodeCorps.Organization do
   def create_changeset(struct, params) do
     struct
     |> changeset(params)
+    |> cast(params, [:owner_id])
     |> generate_slug(:name, :slug)
-    |> validate_required([:slug, :description])
+    |> validate_required([:description, :owner_id, :slug])
+    |> assoc_constraint(:owner)
     |> validate_slug(:slug)
     |> put_slugged_route()
     |> generate_icon_color(:default_color)
