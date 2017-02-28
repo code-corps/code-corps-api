@@ -55,6 +55,8 @@ You can also run your app inside IEx (Interactive Elixir) as:
 iex -S mix phoenix.server
 ```
 
+If you have a different version of Elixir installed than what is specified in [`mix.exs`](https://github.com/code-corps/code-corps-api/blob/develop/mix.exs), then you may want to use a version manager such as [Kiex](https://github.com/taylor/kiex) to switch between different versions.
+
 ### Seed the database
 
 You'll probably want to seed the database. You can do this with the following command:
