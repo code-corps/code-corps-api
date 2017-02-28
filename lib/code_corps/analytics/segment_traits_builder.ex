@@ -38,6 +38,14 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilder do
     }
   end
 
+  defp traits(record = %CodeCorps.ProjectUser{}) do
+    record = record |> CodeCorps.Repo.preload(:project)
+    %{
+      project: record.project.title,
+      project_id: record.project_id
+    }
+  end
+
   defp traits(charge = %CodeCorps.StripeConnectCharge{}) do
     # NOTE: this only works for some currencies
     revenue = charge.amount / 100

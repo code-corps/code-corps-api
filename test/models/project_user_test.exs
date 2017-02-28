@@ -67,19 +67,19 @@ defmodule CodeCorps.ProjectUserTest do
     end
   end
 
-  describe "create_pending_changeset/2" do
+  describe "create_changeset/2" do
     @attributes ~w(project_id user_id role)
 
     test "casts #{@attributes}, with role cast to 'pending'" do
       attrs = %{foo: "bar", project_id: 1, user_id: 2}
-      changeset = ProjectUser.create_pending_changeset(%ProjectUser{}, attrs)
+      changeset = ProjectUser.create_changeset(%ProjectUser{}, attrs)
       assert changeset.changes == %{project_id: 1, user_id: 2, role: "pending"}
     end
 
     test "ensures user record exists" do
       project = insert(:project)
       attrs = %{project_id: project.id, user_id: -1}
-      changeset = ProjectUser.create_pending_changeset(%ProjectUser{}, attrs)
+      changeset = ProjectUser.create_changeset(%ProjectUser{}, attrs)
 
       {:error, invalid_changeset} = changeset |> Repo.insert
       refute invalid_changeset.valid?
@@ -90,7 +90,7 @@ defmodule CodeCorps.ProjectUserTest do
     test "ensures project record exists" do
       user = insert(:user)
       attrs = %{project_id: -1, user_id: user.id}
-      changeset = ProjectUser.create_pending_changeset(%ProjectUser{}, attrs)
+      changeset = ProjectUser.create_changeset(%ProjectUser{}, attrs)
 
       {:error, invalid_changeset} = changeset |> Repo.insert
       refute invalid_changeset.valid?

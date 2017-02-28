@@ -69,6 +69,7 @@ defmodule CodeCorps.Router do
     resources "/projects", ProjectController, only: [:create, :update]
     resources "/project-categories", ProjectCategoryController, only: [:create, :delete]
     resources "/project-skills", ProjectSkillController, only: [:create, :delete]
+    resources "/project-users", ProjectUserController, only: [:create, :update, :delete]
     resources "/roles", RoleController, only: [:create]
     resources "/role-skills", RoleSkillController, only: [:create, :delete]
     resources "/skills", SkillController, only: [:create]
@@ -103,6 +104,7 @@ defmodule CodeCorps.Router do
     end
     resources "/project-categories", ProjectCategoryController, only: [:index, :show]
     resources "/project-skills", ProjectSkillController, only: [:index, :show]
+    resources "/project-users", ProjectUserController, only: [:index, :show]
     resources "/roles", RoleController, only: [:index, :show]
     resources "/role-skills", RoleSkillController, only: [:index, :show]
     resources "/skills", SkillController, only: [:index, :show]

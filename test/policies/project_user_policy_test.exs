@@ -2,21 +2,21 @@ defmodule CodeCorps.ProjectUserPolicyTest do
   use CodeCorps.PolicyCase
 
   import CodeCorps.ProjectUserPolicy, only: [create?: 2, update?: 2, delete?: 2]
-  import CodeCorps.ProjectUser, only: [create_pending_changeset: 2, update_changeset: 2]
+  import CodeCorps.ProjectUser, only: [create_changeset: 2, update_changeset: 2]
 
   alias CodeCorps.ProjectUser
 
   describe "create?/2" do
     test "returns true when user is creating their own membership" do
       user = insert(:user)
-      changeset = %ProjectUser{} |> create_pending_changeset(%{user_id: user.id})
+      changeset = %ProjectUser{} |> create_changeset(%{user_id: user.id})
 
       assert create?(user, changeset)
     end
 
     test "returns false for normal user, creating someone else's membership" do
       user = insert(:user)
-      changeset = %ProjectUser{} |> create_pending_changeset(%{user_id: "someone_else"})
+      changeset = %ProjectUser{} |> create_changeset(%{user_id: "someone_else"})
 
       refute create?(user, changeset)
     end

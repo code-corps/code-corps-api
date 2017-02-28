@@ -20,9 +20,9 @@ defmodule CodeCorps.ProjectUser do
   @doc """
   Builds a changeset to create a pending membership
   """
-  def create_pending_changeset(struct, params \\ %{}) do
+  def create_changeset(struct, params \\ %{}) do
     struct
-    |> create_changeset(params)
+    |> changeset(params)
     |> put_change(:role, "pending")
   end
 
@@ -31,14 +31,12 @@ defmodule CodeCorps.ProjectUser do
   """
   def create_owner_changeset(struct, params \\ %{}) do
     struct
-    |> create_changeset(params)
+    |> changeset(params)
     |> put_change(:role, "owner")
   end
 
-  @doc """
-  Builds a changeset for inserting a new record into the database
-  """
-  defp create_changeset(struct, params \\ %{}) do
+  # Builds a base changeset for inserting a new record into the database
+  defp changeset(struct, params) do
     struct
     |> cast(params, [:user_id, :project_id])
     |> validate_required([:user_id, :project_id])

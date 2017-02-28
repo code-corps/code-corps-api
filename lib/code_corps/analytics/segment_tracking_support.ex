@@ -13,6 +13,8 @@ defmodule CodeCorps.Analytics.SegmentTrackingSupport do
   def includes?(:update, %CodeCorps.DonationGoal{}), do: true
   def includes?(:create, %CodeCorps.OrganizationMembership{}), do: true
   def includes?(:update, %CodeCorps.OrganizationMembership{}), do: true
+  def includes?(:create, %CodeCorps.ProjectUser{}), do: true
+  def includes?(:update, %CodeCorps.ProjectUser{}), do: true
   def includes?(:create, %CodeCorps.StripeConnectAccount{}), do: true
   def includes?(:create, %CodeCorps.StripeConnectCharge{}), do: true
   def includes?(:create, %CodeCorps.StripeConnectPlan{}), do: true
