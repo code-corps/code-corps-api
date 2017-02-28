@@ -82,6 +82,14 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def project_user_factory do
+    %CodeCorps.ProjectUser{
+      project: build(:project),
+      user: build(:user),
+      role: "contributor"
+    }
+  end
+
   def project_category_factory do
     %CodeCorps.ProjectCategory{
       project: build(:project),

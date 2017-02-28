@@ -3,14 +3,16 @@ defmodule CodeCorps.UserView do
 
   use CodeCorps.PreloadHelpers,
       default_preloads: [
-        :slugged_route, :stripe_connect_subscriptions, :stripe_platform_card, :stripe_platform_customer,
+        :project_users, :slugged_route, :stripe_connect_subscriptions,
+        :stripe_platform_card, :stripe_platform_customer,
         :organization_memberships, :user_categories, :user_roles, :user_skills
       ]
   use CodeCorps.Web, :view
   use JaSerializer.PhoenixView
 
   attributes [
-    :biography, :cloudinary_public_id, :email, :first_name, :last_name, :name, :photo_large_url, :photo_thumb_url, :state, :state_transition,
+    :biography, :cloudinary_public_id, :email, :first_name, :last_name, :name,
+    :photo_large_url, :photo_thumb_url, :state, :state_transition,
     :twitter, :username, :website, :inserted_at, :updated_at
   ]
 
@@ -18,6 +20,7 @@ defmodule CodeCorps.UserView do
   has_one :stripe_platform_card, serializer: CodeCorps.StripePlatformCardView
   has_one :stripe_platform_customer, serializer: CodeCorps.StripePlatformCustomerView
 
+  has_many :project_users, serializer: CodeCorps.ProjectUserView, identifiers: :always
   has_many :stripe_connect_subscriptions, serializer: CodeCorps.StripeConnectSubscriptionView, identifiers: :always
   has_many :organization_memberships, serializer: CodeCorps.OrganizationMembershipView, identifiers: :always
   has_many :user_categories, serializer: CodeCorps.UserCategoryView, identifiers: :always
