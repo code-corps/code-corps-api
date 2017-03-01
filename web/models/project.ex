@@ -33,6 +33,7 @@ defmodule CodeCorps.Project do
     has_many :donation_goals, CodeCorps.DonationGoal
     has_many :project_categories, CodeCorps.ProjectCategory
     has_many :project_skills, CodeCorps.ProjectSkill
+    has_many :project_users, CodeCorps.ProjectUser
     has_many :task_lists, CodeCorps.TaskList
     has_many :tasks, CodeCorps.Task
 

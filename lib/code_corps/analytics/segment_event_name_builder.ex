@@ -20,6 +20,12 @@ defmodule CodeCorps.Analytics.SegmentEventNameBuilder do
   defp get_event_name(:update, %CodeCorps.OrganizationMembership{}) do
     "Approved Organization Membership"
   end
+  defp get_event_name(:create, %CodeCorps.ProjectUser{}) do
+    "Requested Project Membership"
+  end
+  defp get_event_name(:update, %CodeCorps.ProjectUser{}) do
+    "Approved Project Membership"
+  end
   defp get_event_name(:payment_succeeded, %CodeCorps.StripeInvoice{}) do
     "Processed Subscription Payment"
   end

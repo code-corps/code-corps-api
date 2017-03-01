@@ -8,7 +8,7 @@ defmodule CodeCorps.Helpers.Policy do
 
   alias CodeCorps.{
     Organization, OrganizationMembership,
-    Project, Repo, StripeConnectAccount,
+    Project, ProjectUser, Repo, StripeConnectAccount,
     TaskSkill, Task, User, UserTask
   }
   alias Ecto.Changeset
@@ -46,9 +46,10 @@ defmodule CodeCorps.Helpers.Policy do
 
   Returns `:string`
   """
-  @spec get_role(nil | OrganizationMembership.t | Changeset.t) :: String.t | nil
+  @spec get_role(nil | OrganizationMembership.t | ProjectUser.t | Changeset.t) :: String.t | nil
   def get_role(nil), do: nil
   def get_role(%OrganizationMembership{role: role}), do: role
+  def get_role(%ProjectUser{role: role}), do: role
   def get_role(%Changeset{} = changeset), do: changeset |> Changeset.get_field(:role)
 
   @doc """
