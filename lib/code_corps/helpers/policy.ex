@@ -32,6 +32,14 @@ defmodule CodeCorps.Helpers.Policy do
   end
 
   @doc """
+  Determines if the provided organization is owned by the provided user
+  """
+  @spec organization_owned_by?(Organization.t, User.t) :: boolean
+  def organization_owned_by?(%Organization{owner_id: owner_id}, %User{id: user_id}) do
+    owner_id == user_id
+  end
+
+  @doc """
   Retrieves a project record, from a model struct, or an `Ecto.Changeset` containing a `project_id` field
 
   Returns `CodeCorps.Project`
