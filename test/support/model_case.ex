@@ -23,16 +23,6 @@ defmodule CodeCorps.ModelCase do
       import Ecto.Query
       import CodeCorps.Factories
       import CodeCorps.ModelCase
-
-      defp assert_error_message(changeset, field, expected_message) do
-        {actual_message, _} = changeset.errors[field]
-        assert actual_message == expected_message
-      end
-
-      defp assert_validation_triggered(changeset, field, type) do
-        {_message, status} = changeset.errors[field]
-        assert status[:validation] == type
-      end
     end
   end
 
@@ -72,5 +62,73 @@ defmodule CodeCorps.ModelCase do
     struct.__struct__.changeset(struct, data)
     |> Ecto.Changeset.traverse_errors(&CodeCorps.ErrorHelpers.translate_error/1)
     |> Enum.flat_map(fn {key, errors} -> for msg <- errors, do: {key, msg} end)
+  end
+
+  @doc """
+  Asserts if a specific error message has been added to a specific field on the
+  changeset. It is more flexible to use `error_message/2` directly instead of
+  this one.
+
+  ```
+  assert_error_message(changeset, :foo, "bar")
+  ```
+
+  Compared to
+
+  ```
+  assert error_message(changeset, :foo) ==  "bar"
+  refute error_message?(changeset, :foo) ==  "baz"
+  ```
+  """
+  def assert_error_message(changeset, field, expected_message) do
+    assert error_message(changeset, field) == expected_message
+  end
+
+  @doc """
+  Asserts if a specific validation type has been triggered on a specific field
+  on the changeset. It is more flexible to use `validation_triggered/2` directly
+  instead of this one.
+
+  ```
+  assert_validation_triggered(changeset, :foo, "bar")
+  ```
+
+  Compared to
+
+  ```
+  assert validation_triggered(changeset, :foo) ==  :required
+  refute validation_triggered?(changeset, :bar) ==  :required
+  ```
+  """
+  def assert_validation_triggered(changeset, field, type) do
+    assert validation_triggered(changeset, field) == type
+  end
+
+  @doc """
+  Returns an error message on a specific field on the specified changeset
+  """
+  @spec error_message(Ecto.Changeset.t, Atom.t) :: String.t
+  def error_message(changeset, field) do
+    {message, _} = changeset.errors[field]
+    message
+  end
+
+  @doc """
+  Returns an atom indicating the type of validation that was triggered on a
+  field in a changeset.
+  """
+  @spec validation_triggered(Ecto.Changeset.t, Atom.t) :: Atom.t
+  def validation_triggered(changeset, field) do
+    {_message, status} = changeset.errors[field]
+    status[:validation]
+  end
+
+  @doc """
+  Returns true or false depending on if an assoc_constraint validation has been
+  triggered in the provided changeset on the specified field.
+  """
+  @spec assoc_constraint_triggered?(Ecto.Changeset.t, Atom.t) :: boolean
+  def assoc_constraint_triggered?(changeset, field) do
+    error_message(changeset, field) == "does not exist"
   end
 end

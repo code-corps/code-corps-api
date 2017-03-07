@@ -32,6 +32,7 @@ defmodule CodeCorps.Factories do
   def organization_factory do
     %CodeCorps.Organization{
       name: sequence(:username, &"Organization #{&1}"),
+      owner: build(:user),
       slug: sequence(:slug, &"organization-#{&1}"),
       description: sequence(:email, &"Description of organization #{&1}"),
     }
@@ -76,7 +77,16 @@ defmodule CodeCorps.Factories do
     %CodeCorps.Project{
       title: sequence(:title, &"Project #{&1}"),
       slug: sequence(:slug, &"project-#{&1}"),
-      organization: build(:organization)
+      organization: build(:organization),
+      owner: build(:user)
+    }
+  end
+
+  def project_user_factory do
+    %CodeCorps.ProjectUser{
+      project: build(:project),
+      user: build(:user),
+      role: "contributor"
     }
   end
 

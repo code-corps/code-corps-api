@@ -44,8 +44,9 @@ defmodule CodeCorps.OrganizationControllerTest do
 
   describe "create" do
     @tag authenticated: :admin
-    test "creates and renders resource when data is valid", %{conn: conn} do
-      assert conn |> request_create(@valid_attrs) |> json_response(201)
+    test "creates and renders resource when data is valid", %{conn: conn, current_user: user} do
+      attrs = Map.merge(@valid_attrs, %{owner: user})
+      assert conn |> request_create(attrs) |> json_response(201)
     end
 
     @tag authenticated: :admin

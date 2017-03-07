@@ -26,12 +26,14 @@ defmodule CodeCorps.Project do
     field :total_monthly_donated, :integer, default: 0
 
     belongs_to :organization, CodeCorps.Organization
+    belongs_to :owner, CodeCorps.User
 
     has_one :stripe_connect_plan, CodeCorps.StripeConnectPlan
 
     has_many :donation_goals, CodeCorps.DonationGoal
     has_many :project_categories, CodeCorps.ProjectCategory
     has_many :project_skills, CodeCorps.ProjectSkill
+    has_many :project_users, CodeCorps.ProjectUser
     has_many :task_lists, CodeCorps.TaskList
     has_many :tasks, CodeCorps.Task
 
@@ -57,8 +59,10 @@ defmodule CodeCorps.Project do
   """
   def create_changeset(struct, params) do
     struct
-    |> cast(params, [:organization_id])
     |> changeset(params)
+    |> cast(params, [:organization_id, :owner_id])
+    |> validate_required(:owner_id)
+    |> assoc_constraint(:owner)
     |> put_assoc(:task_lists, TaskList.default_task_lists())
     |> generate_icon_color(:default_color)
   end

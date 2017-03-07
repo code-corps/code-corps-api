@@ -14,6 +14,7 @@ defmodule CodeCorps.UserViewTest do
     user_category = insert(:user_category, user: user)
     user_role = insert(:user_role, user: user)
     user_skill = insert(:user_skill, user: user)
+    project_user = insert(:project_user, user: user)
 
     host = Application.get_env(:code_corps, :asset_host)
 
@@ -44,6 +45,11 @@ defmodule CodeCorps.UserViewTest do
           "organization-memberships" => %{
             "data" => [
               %{"id" => organization_membership.id |> Integer.to_string, "type" => "organization-membership"}
+            ]
+          },
+          "project-users" => %{
+            "data" => [
+              %{"id" => project_user.id |> Integer.to_string, "type" => "project-user"}
             ]
           },
           "slugged-route" => %{

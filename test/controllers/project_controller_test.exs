@@ -72,8 +72,9 @@ defmodule CodeCorps.ProjectControllerTest do
     @tag :authenticated
     test "creates and renders resource when attributes are valid", %{conn: conn, current_user: current_user} do
       organization = insert(:organization)
+      user = insert(:user)
       insert(:organization_membership, role: "admin", member: current_user, organization: organization)
-      attrs = @valid_attrs |> Map.merge(%{organization: organization})
+      attrs = @valid_attrs |> Map.merge(%{organization: organization, owner_id: user.id})
       response = conn |> request_create(attrs)
       assert %{assigns: %{data: %{task_lists: [_inbox, _backlog, _in_progress, _done]}}} = response
       assert response |> json_response(201)

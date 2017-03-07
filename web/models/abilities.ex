@@ -8,6 +8,7 @@ defmodule Canary.Abilities do
   alias CodeCorps.Project
   alias CodeCorps.ProjectCategory
   alias CodeCorps.ProjectSkill
+  alias CodeCorps.ProjectUser
   alias CodeCorps.Role
   alias CodeCorps.RoleSkill
   alias CodeCorps.Skill
@@ -33,6 +34,7 @@ defmodule Canary.Abilities do
   alias CodeCorps.ProjectPolicy
   alias CodeCorps.ProjectCategoryPolicy
   alias CodeCorps.ProjectSkillPolicy
+  alias CodeCorps.ProjectUserPolicy
   alias CodeCorps.RolePolicy
   alias CodeCorps.RoleSkillPolicy
   alias CodeCorps.SkillPolicy
@@ -90,6 +92,10 @@ defmodule Canary.Abilities do
 
     def can?(%User{} = user, :create, %Changeset{data: %ProjectSkill{}} = changeset), do: ProjectSkillPolicy.create?(user, changeset)
     def can?(%User{} = user, :delete, %ProjectSkill{} = project_skill), do: ProjectSkillPolicy.delete?(user, project_skill)
+
+    def can?(%User{} = user, :create, %Changeset{data: %ProjectUser{}} = changeset), do: ProjectUserPolicy.create?(user, changeset)
+    def can?(%User{} = user, :update, %Changeset{data: %ProjectUser{}} = changeset), do: ProjectUserPolicy.update?(user, changeset)
+    def can?(%User{} = user, :delete, %ProjectUser{} = record), do: ProjectUserPolicy.delete?(user, record)
 
     def can?(%User{} = user, :create, Role), do: RolePolicy.create?(user)
 
