@@ -8,70 +8,57 @@ defmodule CodeCorps.TaskSkillPolicyTest do
 
   alias CodeCorps.TaskSkill
 
-  defp generate_data_for(role) do
-    {user, project} = insert_user_and_project(role)
-
-    task = case role do
-      "author" -> insert(:task, project: project, user: user)
-      _ -> insert(:task, project: project)
-    end
-
-    {user, task}
-  end
-
-  defp insert_user_and_project(role) do
-    user = insert(:user)
-    organization = insert(:organization)
-    project = insert(:project, organization: organization)
-
-    insert_membership(user, organization, role)
-
-    {user, project}
-  end
-
-  defp insert_membership(_, _, role) when role in ~w(non-member author), do: nil
-  defp insert_membership(user, organization, role) do
-    insert(:organization_membership, organization: organization, member: user, role: role)
-  end
-
   describe "create?" do
-    test "returns false when user is not member of organization" do
-      {user, task} = generate_data_for("non-member")
+    test "returns false when user is not member of project" do
+      user = insert(:user)
+      task = insert(:task)
 
       changeset = %TaskSkill{} |> create_changeset(%{task_id: task.id})
       refute create?(user, changeset)
     end
 
-    test "returns false when user is pending member of organization" do
-      {user, task} = generate_data_for("pending")
+    test "returns false when user is pending member of project" do
+      user = insert(:user)
+      project = insert(:project)
+      insert(:project_user, user: user, project: project, role: "pending")
+      task = insert(:task, project: project)
 
       changeset = %TaskSkill{} |> create_changeset(%{task_id: task.id})
       refute create?(user, changeset)
     end
 
-    test "returns true when user is contributor of organization" do
-      {user, task} = generate_data_for("contributor")
+    test "returns true when user is contributor of project" do
+      user = insert(:user)
+      project = insert(:project)
+      insert(:project_user, user: user, project: project, role: "contributor")
+      task = insert(:task, project: project)
 
       changeset = %TaskSkill{} |> create_changeset(%{task_id: task.id})
       assert create?(user, changeset)
     end
 
-    test "returns true when user is admin of organization" do
-      {user, task} = generate_data_for("admin")
+    test "returns true when user is admin of project" do
+      user = insert(:user)
+      project = insert(:project)
+      insert(:project_user, user: user, project: project, role: "admin")
+      task = insert(:task, project: project)
 
       changeset = %TaskSkill{} |> create_changeset(%{task_id: task.id})
       assert create?(user, changeset)
     end
 
-    test "returns true when user is owner of organization" do
-      {user, task} = generate_data_for("owner")
+    test "returns true when user is owner of project" do
+      user = insert(:user)
+      project = insert(:project, owner: user)
+      task = insert(:task, project: project)
 
       changeset = %TaskSkill{} |> create_changeset(%{task_id: task.id})
       assert create?(user, changeset)
     end
 
     test "returns true when user is author of task" do
-      {user, task} = generate_data_for("author")
+      user = insert(:user)
+      task = insert(:task, user: user)
 
       changeset = %TaskSkill{} |> create_changeset(%{task_id: task.id})
 
@@ -80,40 +67,52 @@ defmodule CodeCorps.TaskSkillPolicyTest do
   end
 
   describe "delete?" do
-    test "returns false when user is not member of organization" do
-      {user, task} = generate_data_for("non-member")
+    test "returns false when user is not member of project" do
+      user = insert(:user)
+      task = insert(:task)
 
       task_skill = insert(:task_skill, task: task)
 
       refute delete?(user, task_skill)
     end
 
-    test "returns false when user is pending member of organization" do
-      {user, task} = generate_data_for("pending")
+    test "returns false when user is pending member of project" do
+      user = insert(:user)
+      project = insert(:project)
+      insert(:project_user, user: user, project: project, role: "pending")
+      task = insert(:task, project: project)
 
       task_skill = insert(:task_skill, task: task)
 
       refute delete?(user, task_skill)
     end
 
-    test "returns true when user is contributor of organization" do
-      {user, task} = generate_data_for("contributor")
+    test "returns true when user is contributor of project" do
+      user = insert(:user)
+      project = insert(:project)
+      insert(:project_user, user: user, project: project, role: "contributor")
+      task = insert(:task, project: project)
 
       task_skill = insert(:task_skill, task: task)
 
       assert delete?(user, task_skill)
     end
 
-    test "returns true when user is admin of organization" do
-      {user, task} = generate_data_for("admin")
+    test "returns true when user is admin of project" do
+      user = insert(:user)
+      project = insert(:project)
+      insert(:project_user, user: user, project: project, role: "admin")
+      task = insert(:task, project: project)
 
       task_skill = insert(:task_skill, task: task)
 
       assert delete?(user, task_skill)
     end
 
-    test "returns true when user is owner of organization" do
-      {user, task} = generate_data_for("owner")
+    test "returns true when user is owner of project" do
+      user = insert(:user)
+      project = insert(:project, owner: user)
+      task = insert(:task, project: project)
 
       task_skill = insert(:task_skill, task: task)
 
@@ -121,7 +120,8 @@ defmodule CodeCorps.TaskSkillPolicyTest do
     end
 
     test "returns true when user is author of task" do
-      {user, task} = generate_data_for("author")
+      user = insert(:user)
+      task = insert(:task, user: user)
 
       task_skill = insert(:task_skill, task: task)
 

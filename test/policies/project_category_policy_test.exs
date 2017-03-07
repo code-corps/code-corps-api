@@ -7,126 +7,84 @@ defmodule CodeCorps.ProjectCategoryPolicyTest do
   alias CodeCorps.ProjectCategory
 
   describe "create?" do
-    test "returns true when user is an admin" do
-      user = build(:user, admin: true)
-      changeset = %ProjectCategory{} |> create_changeset(%{})
-
-      assert create?(user, changeset) 
-    end
-
-    test "returns false when user is not member of organization" do
+    test "returns true when user is project owner" do
       user = insert(:user)
-      organization = insert(:organization)
-      project = insert(:project, organization: organization)
+      project = insert(:project, owner: user)
 
       changeset = %ProjectCategory{} |> create_changeset(%{project_id: project.id})
-      refute create?(user, changeset) 
+      assert create?(user, changeset)
     end
 
-    test "returns false when user is pending member of organization" do
+    test "returns false when user is not a project member" do
       user = insert(:user)
-      organization = insert(:organization)
-      project = insert(:project, organization: organization)
-
-      insert(:organization_membership, role: "pending", member: user, organization: organization)
+      project = insert(:project)
 
       changeset = %ProjectCategory{} |> create_changeset(%{project_id: project.id})
-      refute create?(user, changeset) 
+      refute create?(user, changeset)
     end
 
-    test "returns false when user is contributor of organization" do
+    test "returns false when user is a pending project member" do
       user = insert(:user)
-      organization = insert(:organization)
-      project = insert(:project, organization: organization)
-
-      insert(:organization_membership, role: "contributor", member: user, organization: organization)
+      project = insert(:project)
+      insert(:project_user, role: "pending", user: user, project: project)
 
       changeset = %ProjectCategory{} |> create_changeset(%{project_id: project.id})
-      refute create?(user, changeset) 
+      refute create?(user, changeset)
     end
 
-    test "returns true when user is admin of organization" do
+    test "returns false when user is a project contributor" do
       user = insert(:user)
-      organization = insert(:organization)
-      project = insert(:project, organization: organization)
-
-      insert(:organization_membership, role: "admin", member: user, organization: organization)
+      project = insert(:project)
+      insert(:project_user, role: "contributor", user: user, project: project)
 
       changeset = %ProjectCategory{} |> create_changeset(%{project_id: project.id})
-      assert create?(user, changeset) 
+      refute create?(user, changeset)
     end
 
-    test "returns true when user is owner of organization" do
+    test "returns true when user is a project admin" do
       user = insert(:user)
-      organization = insert(:organization)
-      project = insert(:project, organization: organization)
-
-      insert(:organization_membership, role: "owner", member: user, organization: organization)
+      project = insert(:project)
+      insert(:project_user, role: "admin", user: user, project: project)
 
       changeset = %ProjectCategory{} |> create_changeset(%{project_id: project.id})
-      assert create?(user, changeset) 
+      assert create?(user, changeset)
     end
   end
 
   describe "delete?" do
-    test "returns true when user is an admin" do
-      user = build(:user, admin: true)
-      project_category = insert(:project_category)
+    test "returns true when user is project owner" do
+      user = insert(:user)
+      project = insert(:project, owner: user)
 
-      assert delete?(user, project_category) 
+      record = insert(:project_category, project: project)
+      assert delete?(user, record)
     end
 
-    test "returns false when user is not member of organization" do
+    test "returns false when user is a pending project member" do
       user = insert(:user)
-      organization = insert(:organization)
-      project = insert(:project, organization: organization)
-      project_category = insert(:project_category, project: project)
+      project = insert(:project)
+      insert(:project_user, role: "pending", user: user, project: project)
 
-      refute delete?(user, project_category) 
+      record = insert(:project_category, project: project)
+      refute delete?(user, record)
     end
 
-    test "returns false when user is pending member of organization" do
+    test "returns false when user is a project contributor" do
       user = insert(:user)
-      organization = insert(:organization)
-      project = insert(:project, organization: organization)
-      project_category = insert(:project_category, project: project)
+      project = insert(:project)
+      insert(:project_user, role: "contributor", user: user, project: project)
 
-      insert(:organization_membership, role: "pending", member: user, organization: organization)
-
-      refute delete?(user, project_category) 
+      record = insert(:project_category, project: project)
+      refute delete?(user, record)
     end
 
-    test "returns false when user is contributor of organization" do
+    test "returns true when user is a project admin" do
       user = insert(:user)
-      organization = insert(:organization)
-      project = insert(:project, organization: organization)
-      project_category = insert(:project_category, project: project)
+      project = insert(:project)
+      insert(:project_user, role: "admin", user: user, project: project)
 
-      insert(:organization_membership, role: "contributor", member: user, organization: organization)
-
-      refute delete?(user, project_category) 
-    end
-
-    test "returns true when user is admin of organization" do
-      user = insert(:user)
-      organization = insert(:organization)
-      project = insert(:project, organization: organization)
-      project_category = insert(:project_category, project: project)
-
-      insert(:organization_membership, role: "admin", member: user, organization: organization)
-
-      assert delete?(user, project_category) 
-    end
-
-    test "returns true when user is owner of organization" do
-      user = insert(:user)
-      organization = insert(:organization)
-      project = insert(:project, organization: organization)
-      project_category = insert(:project_category, project: project)
-
-      insert(:organization_membership, role: "owner", member: user, organization: organization)
-
-      assert delete?(user, project_category) 
+      record = insert(:project_category, project: project)
+      assert delete?(user, record)
     end
   end
 end

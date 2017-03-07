@@ -71,18 +71,18 @@ defmodule CodeCorps.ProjectControllerTest do
   describe "create" do
     @tag :authenticated
     test "creates and renders resource when attributes are valid", %{conn: conn, current_user: current_user} do
-      organization = insert(:organization)
-      user = insert(:user)
-      insert(:organization_membership, role: "admin", member: current_user, organization: organization)
-      attrs = @valid_attrs |> Map.merge(%{organization: organization, owner_id: user.id})
+      organization = insert(:organization, owner: current_user)
+      attrs = @valid_attrs |> Map.merge(%{organization: organization, owner_id: current_user.id})
       response = conn |> request_create(attrs)
       assert %{assigns: %{data: %{task_lists: [_inbox, _backlog, _in_progress, _done]}}} = response
       assert response |> json_response(201)
     end
 
-    @tag authenticated: :admin
-    test "renders 422 when attributes are invalid", %{conn: conn} do
-      assert conn |> request_create(@invalid_attrs) |> json_response(422)
+    @tag :authenticated
+    test "renders 422 when attributes are invalid", %{conn: conn, current_user: current_user} do
+      organization = insert(:organization, owner: current_user)
+      attrs = @invalid_attrs |> Map.merge(%{organization: organization, owner_id: current_user.id})
+      assert conn |> request_create(attrs) |> json_response(422)
     end
 
     test "renders 401 when unauthenticated", %{conn: conn} do
@@ -98,14 +98,16 @@ defmodule CodeCorps.ProjectControllerTest do
   end
 
   describe "update" do
-    @tag authenticated: :admin
-    test "updates and renders resource when attributes are valid", %{conn: conn} do
-      assert conn |> request_update(@valid_attrs) |> json_response(200)
+    @tag :authenticated
+    test "updates and renders resource when attributes are valid", %{conn: conn, current_user: current_user} do
+      project = insert(:project, owner: current_user)
+      assert conn |> request_update(project, @valid_attrs) |> json_response(200)
     end
 
-    @tag authenticated: :admin
-    test "renders errors when attributes are invalid", %{conn: conn} do
-      assert conn |> request_update(@invalid_attrs) |> json_response(422)
+    @tag :authenticated
+    test "renders errors when attributes are invalid", %{conn: conn, current_user: current_user} do
+      project = insert(:project, owner: current_user)
+      assert conn |> request_update(project, @invalid_attrs) |> json_response(422)
     end
 
     test "renders 401 when unauthenticated", %{conn: conn} do

@@ -44,20 +44,21 @@ defmodule CodeCorps.DonationGoalControllerTest do
   describe "create" do
     @tag :authenticated
     test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
-      organization = insert(:organization)
-      insert(:organization_membership, member: current_user, organization: organization, role: "owner")
-      project = insert(:project, organization: organization)
+      project = insert(:project, owner: current_user)
 
-      attrs = @valid_attrs |> Map.merge(%{project: project})
+      attrs = @valid_attrs |> Map.merge(%{project_id: project.id})
       assert conn |> request_create(attrs) |> json_response(201)
 
       user_id = current_user.id
       assert_received {:track, ^user_id, "Created Donation Goal", %{}}
     end
 
-    @tag authenticated: :admin
-    test "does not create resource and renders errors when data is invalid", %{conn: conn} do
-      assert conn |> request_create(@invalid_attrs) |> json_response(422)
+    @tag :authenticated
+    test "does not create resource and renders errors when data is invalid", %{conn: conn, current_user: current_user} do
+      project = insert(:project, owner: current_user)
+
+      attrs = @invalid_attrs |> Map.merge(%{project_id: project.id})
+      assert conn |> request_create(attrs) |> json_response(422)
     end
 
     test "renders 401 when not authenticated", %{conn: conn} do
@@ -73,13 +74,11 @@ defmodule CodeCorps.DonationGoalControllerTest do
   describe "update" do
     @tag :authenticated
     test "updates and renders chosen resource when data is valid", %{conn: conn, current_user: current_user} do
-      organization = insert(:organization)
-      insert(:organization_membership, member: current_user, organization: organization, role: "owner")
-      project = insert(:project, organization: organization)
+      project = insert(:project, owner: current_user)
 
       donation_goal = insert(:donation_goal, project: project)
 
-      attrs = @valid_attrs |> Map.merge(%{project: project})
+      attrs = @valid_attrs |> Map.merge(%{project_id: project.id})
       assert conn |> request_update(donation_goal, attrs) |> json_response(200)
 
       user_id = current_user.id
@@ -87,8 +86,11 @@ defmodule CodeCorps.DonationGoalControllerTest do
     end
 
     @tag authenticated: :admin
-    test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
-      assert conn |> request_update(@invalid_attrs) |> json_response(422)
+    test "does not update chosen resource and renders errors when data is invalid", %{conn: conn, current_user: current_user} do
+      project = insert(:project, owner: current_user)
+      donation_goal = insert(:donation_goal, project: project)
+
+      assert conn |> request_update(donation_goal, @invalid_attrs) |> json_response(422)
     end
 
     @tag authenticated: :admin
@@ -107,9 +109,10 @@ defmodule CodeCorps.DonationGoalControllerTest do
   end
 
   describe "delete" do
-    @tag authenticated: :admin
-    test "deletes chosen resource", %{conn: conn} do
-      donation_goal = insert(:donation_goal)
+    @tag :authenticated
+    test "deletes chosen resource", %{conn: conn, current_user: current_user} do
+      project = insert(:project, owner: current_user)
+      donation_goal = insert(:donation_goal, project: project)
       assert conn |> request_delete(donation_goal) |> response(204)
     end
 

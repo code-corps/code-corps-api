@@ -6,8 +6,7 @@ defmodule CodeCorps.StripeConnectAccountControllerTest do
   describe "show" do
     @tag :authenticated
     test "shows chosen resource", %{conn: conn, current_user: current_user} do
-      organization = insert(:organization)
-      insert(:organization_membership, member: current_user, organization: organization, role: "owner")
+      organization = insert(:organization, owner: current_user)
       stripe_connect_account = insert(:stripe_connect_account, organization: organization)
 
       conn
@@ -32,8 +31,7 @@ defmodule CodeCorps.StripeConnectAccountControllerTest do
   describe "create" do
     @tag :authenticated
     test "creates and renders resource when user is authenticated and authorized", %{conn: conn, current_user: current_user} do
-      organization = insert(:organization)
-      insert(:organization_membership, member: current_user, organization: organization, role: "owner")
+      organization = insert(:organization, owner: current_user)
 
       attrs = %{organization: organization, country: "US", tos_acceptance_date: 123456}
 
@@ -67,9 +65,7 @@ defmodule CodeCorps.StripeConnectAccountControllerTest do
   describe "update" do
     @tag :authenticated
     test "updates external account on resource when user is authenticated and authorized", %{conn: conn, current_user: current_user} do
-      organization = insert(:organization)
-
-      insert(:organization_membership, member: current_user, organization: organization, role: "owner")
+      organization = insert(:organization, owner: current_user)
       stripe_connect_account = insert(:stripe_connect_account, organization: organization)
 
       attrs = %{external_account: "ba_test123"}

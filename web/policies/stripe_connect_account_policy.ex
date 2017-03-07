@@ -1,16 +1,14 @@
 defmodule CodeCorps.StripeConnectAccountPolicy do
-  import CodeCorps.Helpers.Policy,
-    only: [get_membership: 2, get_role: 1, owner?: 1]
+  import CodeCorps.Helpers.Policy, only: [get_organization: 1, owned_by?: 2]
 
-  alias CodeCorps.StripeConnectAccount
-  alias CodeCorps.User
+  alias CodeCorps.{StripeConnectAccount, User}
 
-  def show?(%User{admin: true}, %StripeConnectAccount{}), do: true
-  def show?(%User{} = user, %StripeConnectAccount{} = stripe_connect_account), do: stripe_connect_account |> get_membership(user) |> get_role |> owner?
+  def show?(%User{} = user, %StripeConnectAccount{} = stripe_connect_account),
+    do: stripe_connect_account |> get_organization() |> owned_by?(user)
 
-  def create?(%User{} = user, %Ecto.Changeset{} = changeset), do: changeset |> get_membership(user) |> get_role |> owner?
-  def create?(_, _), do: false
+  def create?(%User{} = user, %Ecto.Changeset{} = changeset),
+    do: changeset |> get_organization() |> owned_by?(user)
 
-  def update?(%User{admin: true}, %StripeConnectAccount{}), do: true
-  def update?(%User{} = user, %StripeConnectAccount{} = stripe_connect_account), do: stripe_connect_account |> get_membership(user) |> get_role |> owner?
+  def update?(%User{} = user, %StripeConnectAccount{} = stripe_connect_account),
+    do: stripe_connect_account |> get_organization() |> owned_by?(user)
 end
