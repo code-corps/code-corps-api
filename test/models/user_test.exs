@@ -132,4 +132,19 @@ defmodule CodeCorps.UserTest do
       assert message == "invalid transition yehaww from signed_up"
     end
   end
+
+  test "reset_password_changeset with valid passwords" do
+    changeset = User.reset_password_changeset(%User{}, %{password: "foobar", password_confirmation: "foobar"})
+    assert changeset.valid?
+    assert changeset.changes.encrypted_password
+  end
+
+  test "reset_password_changeset with invalid passwords generates message" do
+    changeset = User.reset_password_changeset(%User{}, %{password: "wat", password_confirmation: "foobar"})
+    refute changeset.valid?
+    [error | _] = changeset.errors
+    {attribute, {message, _}} = error
+    assert attribute == :password_confirmation
+    assert message == "passwords do not match"
+  end
 end
