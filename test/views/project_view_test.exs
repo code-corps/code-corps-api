@@ -30,10 +30,12 @@ defmodule CodeCorps.ProjectViewTest do
           "inserted-at" => project.inserted_at,
           "long-description-body" => project.long_description_body,
           "long-description-markdown" => project.long_description_markdown,
+          "should-link-externally" => project.should_link_externally,
           "slug" => project.slug,
           "title" => project.title,
           "total-monthly-donated" => project.total_monthly_donated,
           "updated-at" => project.updated_at,
+          "website" => project.website,
         },
         "id" => project.id |> Integer.to_string,
         "relationships" => %{

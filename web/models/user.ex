@@ -6,6 +6,7 @@ defmodule CodeCorps.User do
   use CodeCorps.Web, :model
 
   import CodeCorps.Helpers.RandomIconColor
+  import CodeCorps.Helpers.URL, only: [prefix_url: 2]
   import CodeCorps.Validators.SlugValidator
 
   alias CodeCorps.SluggedRoute
@@ -90,7 +91,7 @@ defmodule CodeCorps.User do
     |> changeset(params)
     |> cast(params, [:biography, :cloudinary_public_id, :first_name, :last_name, :state_transition, :twitter, :website])
     |> prefix_url(:website)
-    |> validate_format(:website, ~r/\A((http|https):\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,}(([0-9]{1,5})?\/.*)?#=\z/ix)
+    |> validate_format(:website, CodeCorps.Helpers.URL.valid_format())
     |> validate_format(:twitter, ~r/\A[a-zA-Z0-9_]{1,15}\z/)
     |> apply_state_transition(struct)
   end
@@ -135,15 +136,6 @@ defmodule CodeCorps.User do
         changeset
     end
   end
-
-  defp prefix_url(changeset, key) do
-    changeset
-    |> update_change(key, &do_prefix_url/1)
-  end
-  defp do_prefix_url(nil), do: nil
-  defp do_prefix_url("http://" <> rest), do: "http://" <> rest
-  defp do_prefix_url("https://" <> rest), do: "https://" <> rest
-  defp do_prefix_url(value), do: "http://" <> value
 
   defp check_email_valid(struct, email) do
     struct

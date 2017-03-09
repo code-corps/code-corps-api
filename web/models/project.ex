@@ -7,6 +7,7 @@ defmodule CodeCorps.Project do
 
   import CodeCorps.Helpers.RandomIconColor
   import CodeCorps.Helpers.Slug
+  import CodeCorps.Helpers.URL, only: [prefix_url: 2]
   import CodeCorps.Validators.SlugValidator
 
   alias CodeCorps.Services.MarkdownRendererService
@@ -21,9 +22,11 @@ defmodule CodeCorps.Project do
     field :description, :string
     field :long_description_body, :string
     field :long_description_markdown, :string
+    field :should_link_externally, :boolean, default: false # temporary for linking to projects off Code Corps while in alpha
     field :slug, :string
     field :title, :string
     field :total_monthly_donated, :integer, default: 0
+    field :website, :string
 
     belongs_to :organization, CodeCorps.Organization
     belongs_to :owner, CodeCorps.User
@@ -73,6 +76,9 @@ defmodule CodeCorps.Project do
   def update_changeset(struct, params) do
     struct
     |> changeset(params)
+    |> cast(params, [:website])
+    |> prefix_url(:website)
+    |> validate_format(:website, CodeCorps.Helpers.URL.valid_format())
   end
 
   def update_total_changeset(struct, params) do

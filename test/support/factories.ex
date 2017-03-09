@@ -78,7 +78,8 @@ defmodule CodeCorps.Factories do
       title: sequence(:title, &"Project #{&1}"),
       slug: sequence(:slug, &"project-#{&1}"),
       organization: build(:organization),
-      owner: build(:user)
+      owner: build(:user),
+      website: sequence(:website, &"http://test-#{&1}.com")
     }
   end
 
