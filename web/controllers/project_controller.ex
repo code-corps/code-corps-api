@@ -26,4 +26,8 @@ defmodule CodeCorps.ProjectController do
   def handle_create(_conn, attributes) do
     %Project{} |> Project.create_changeset(attributes)
   end
+
+  def handle_update(_conn, project, attributes) do
+    project |> Project.update_changeset(attributes)
+  end
 end
