@@ -64,7 +64,6 @@ defmodule CodeCorps.Router do
     resources "/comments", CommentController, only: [:create, :update]
     resources "/donation-goals", DonationGoalController, only: [:create, :update, :delete]
     resources "/organizations", OrganizationController, only: [:create, :update]
-    resources "/organization-memberships", OrganizationMembershipController, only: [:create, :update, :delete]
     resources "/previews", PreviewController, only: [:create]
     resources "/projects", ProjectController, only: [:create, :update]
     resources "/project-categories", ProjectCategoryController, only: [:create, :delete]
@@ -97,7 +96,6 @@ defmodule CodeCorps.Router do
     resources "/comments", CommentController, only: [:index, :show]
     resources "/donation-goals", DonationGoalController, only: [:index, :show]
     resources "/organizations", OrganizationController, only: [:index, :show]
-    resources "/organization-memberships", OrganizationMembershipController, only: [:index, :show]
     resources "/projects", ProjectController, only: [:index, :show] do
       resources "/task-lists", TaskListController, only: [:index, :show]
       resources "/tasks", TaskController, only: [:index, :show]

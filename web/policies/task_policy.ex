@@ -1,30 +1,17 @@
 defmodule CodeCorps.TaskPolicy do
   import CodeCorps.Helpers.Policy,
-    only: [get_project: 1, get_membership: 2, get_role: 1, admin_or_higher?: 1]
+    only: [get_project: 1, administered_by?: 2, task_authored_by?: 2]
 
-  alias CodeCorps.Task
-  alias CodeCorps.User
+  alias CodeCorps.{Task, User}
   alias Ecto.Changeset
 
-  def create?(%User{admin: true}, %Changeset{}), do: true
-  def create?(%User{} = user, %Changeset{changes: %{user_id: author_id}}) do
-    cond do
-      # can't create for some other user
-      user.id != author_id -> false
-      # permit any user to create
-      true -> true
-    end
-  end
-  def create?(%User{}, %Changeset{}), do: false
+  def create?(%User{} = user, %Changeset{changes: %{user_id: author_id}}),
+    do: user.id == author_id
 
-  def update?(%User{} = user, %Task{user_id: author_id} = task) do
-    cond do
-      # author can update own task
-      user.id == author_id -> true
-      # organization admin or higher can update other people's tasks
-      task |> get_project |> get_membership(user) |> get_role |> admin_or_higher? -> true
-      # do not permit for any other case
-      true -> false
+  def update?(%User{} = user, %Task{} = task) do
+    case task |> task_authored_by?(user) do
+      true -> true
+      false -> task |> get_project |> administered_by?(user)
     end
   end
 end

@@ -7,80 +7,120 @@ defmodule CodeCorps.DonationGoalPolicyTest do
   alias CodeCorps.DonationGoal
 
   describe "create?" do
-    test "returns true when user is an admin" do
-      user = build(:user, admin: true)
-      changeset = %DonationGoal{} |> create_changeset(%{})
+    test "returns true when user is project owner" do
+      user = insert(:user)
+      project = insert(:project, owner: user)
 
+      changeset = %DonationGoal{} |> create_changeset(%{project_id: project.id})
       assert create?(user, changeset)
     end
 
-    test "returns true when user is organization owner" do
+    test "returns false when user is not a project member" do
       user = insert(:user)
       project = insert(:project)
-      insert(:organization_membership, role: "owner", member: user, organization: project.organization)
-      changeset = %DonationGoal{} |> create_changeset(%{project_id: project.id})
 
-      assert create?(user, changeset)
+      changeset = %DonationGoal{} |> create_changeset(%{project_id: project.id})
+      refute create?(user, changeset)
     end
 
-    test "returns false when user is less than organization owner" do
+    test "returns false when user is a pending project member" do
       user = insert(:user)
       project = insert(:project)
-      insert(:organization_membership, role: "admin", member: user, organization: project.organization)
-      changeset = %DonationGoal{} |> create_changeset(%{project_id: project.id})
+      insert(:project_user, role: "pending", user: user, project: project)
 
+      changeset = %DonationGoal{} |> create_changeset(%{project_id: project.id})
+      refute create?(user, changeset)
+    end
+
+    test "returns false when user is a project contributor" do
+      user = insert(:user)
+      project = insert(:project)
+      insert(:project_user, role: "contributor", user: user, project: project)
+
+      changeset = %DonationGoal{} |> create_changeset(%{project_id: project.id})
+      refute create?(user, changeset)
+    end
+
+    test "returns false when user is a project admin" do
+      user = insert(:user)
+      project = insert(:project)
+      insert(:project_user, role: "admin", user: user, project: project)
+
+      changeset = %DonationGoal{} |> create_changeset(%{project_id: project.id})
       refute create?(user, changeset)
     end
   end
 
   describe "update?" do
-    test "returns true when user is an admin" do
-      user = build(:user, admin: true)
-      record = insert(:donation_goal)
+    test "returns true when user is project owner" do
+      user = insert(:user)
+      project = insert(:project, owner: user)
+
+      record = insert(:donation_goal, project: project)
       assert update?(user, record)
     end
 
-    test "returns true when user is organization owner" do
+    test "returns false when user is a pending project member" do
       user = insert(:user)
       project = insert(:project)
-      insert(:organization_membership, role: "owner", member: user, organization: project.organization)
-      record = insert(:donation_goal, project: project)
+      insert(:project_user, role: "pending", user: user, project: project)
 
-      assert update?(user, record)
+      record = insert(:donation_goal, project: project)
+      refute update?(user, record)
     end
 
-    test "returns false when user is less than organization owner" do
+    test "returns false when user is a project contributor" do
       user = insert(:user)
       project = insert(:project)
-      insert(:organization_membership, role: "admin", member: user, organization: project.organization)
-      record = insert(:donation_goal, project: project)
+      insert(:project_user, role: "contributor", user: user, project: project)
 
+      record = insert(:donation_goal, project: project)
+      refute update?(user, record)
+    end
+
+    test "returns false when user is a project admin" do
+      user = insert(:user)
+      project = insert(:project)
+      insert(:project_user, role: "admin", user: user, project: project)
+
+      record = insert(:donation_goal, project: project)
       refute update?(user, record)
     end
   end
 
   describe "delete?" do
-    test "returns true when user is an admin" do
-      user = build(:user, admin: true)
-      record = insert(:donation_goal)
+    test "returns true when user is project owner" do
+      user = insert(:user)
+      project = insert(:project, owner: user)
+
+      record = insert(:donation_goal, project: project)
       assert delete?(user, record)
     end
 
-    test "returns true when user is organization owner" do
+    test "returns false when user is a pending project member" do
       user = insert(:user)
       project = insert(:project)
-      insert(:organization_membership, role: "owner", member: user, organization: project.organization)
-      record = insert(:donation_goal, project: project)
+      insert(:project_user, role: "pending", user: user, project: project)
 
-      assert delete?(user, record)
+      record = insert(:donation_goal, project: project)
+      refute delete?(user, record)
     end
 
-    test "returns false when user is less than organization owner" do
+    test "returns false when user is a project contributor" do
       user = insert(:user)
       project = insert(:project)
-      insert(:organization_membership, role: "admin", member: user, organization: project.organization)
-      record = insert(:donation_goal, project: project)
+      insert(:project_user, role: "contributor", user: user, project: project)
 
+      record = insert(:donation_goal, project: project)
+      refute delete?(user, record)
+    end
+
+    test "returns false when user is a project admin" do
+      user = insert(:user)
+      project = insert(:project)
+      insert(:project_user, role: "admin", user: user, project: project)
+
+      record = insert(:donation_goal, project: project)
       refute delete?(user, record)
     end
   end
