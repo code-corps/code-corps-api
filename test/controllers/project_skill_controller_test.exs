@@ -42,19 +42,20 @@ defmodule CodeCorps.ProjectSkillControllerTest do
   end
 
   describe "create" do
-    @tag authenticated: :admin
-    test "creates and renders resource when data is valid", %{conn: conn} do
-      organization = insert(:organization)
-      project = insert(:project, organization: organization)
+    @tag :authenticated
+    test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
+      project = insert(:project, owner: current_user)
       skill = insert(:skill)
 
       attrs = %{project: project, skill: skill}
       assert conn |> request_create(attrs) |> json_response(201)
     end
 
-    @tag authenticated: :admin
-    test "renders 422 error when data is invalid", %{conn: conn} do
-      invalid_attrs = %{}
+    @tag :authenticated
+    test "renders 422 error when data is invalid", %{conn: conn, current_user: current_user} do
+      project = insert(:project, owner: current_user)
+
+      invalid_attrs = %{project: project}
       assert conn |> request_create(invalid_attrs) |> json_response(422)
     end
 
@@ -72,9 +73,11 @@ defmodule CodeCorps.ProjectSkillControllerTest do
   end
 
   describe "delete" do
-    @tag authenticated: :admin
-    test "deletes chosen resource", %{conn: conn} do
-      assert conn |> request_delete |> response(204)
+    @tag :authenticated
+    test "deletes chosen resource", %{conn: conn, current_user: current_user} do
+      project = insert(:project, owner: current_user)
+      project_skill = insert(:project_skill, project: project)
+      assert conn |> request_delete(project_skill) |> response(204)
     end
 
     test "renders 401 when unauthenticated", %{conn: conn} do

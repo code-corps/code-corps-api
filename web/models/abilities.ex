@@ -3,7 +3,6 @@ defmodule Canary.Abilities do
   alias CodeCorps.Comment
   alias CodeCorps.DonationGoal
   alias CodeCorps.Organization
-  alias CodeCorps.OrganizationMembership
   alias CodeCorps.Preview
   alias CodeCorps.Project
   alias CodeCorps.ProjectCategory
@@ -29,7 +28,6 @@ defmodule Canary.Abilities do
   alias CodeCorps.CommentPolicy
   alias CodeCorps.DonationGoalPolicy
   alias CodeCorps.OrganizationPolicy
-  alias CodeCorps.OrganizationMembershipPolicy
   alias CodeCorps.PreviewPolicy
   alias CodeCorps.ProjectPolicy
   alias CodeCorps.ProjectCategoryPolicy
@@ -77,10 +75,6 @@ defmodule Canary.Abilities do
 
     def can?(%User{} = user, :create, Organization), do: OrganizationPolicy.create?(user)
     def can?(%User{} = user, :update, %Organization{} = organization), do: OrganizationPolicy.update?(user, organization)
-
-    def can?(%User{} = user, :create, %Changeset{data: %OrganizationMembership{}} = changeset), do: OrganizationMembershipPolicy.create?(user, changeset)
-    def can?(%User{} = user, :update, %Changeset{data: %OrganizationMembership{}} = changeset), do: OrganizationMembershipPolicy.update?(user, changeset)
-    def can?(%User{} = user, :delete, %OrganizationMembership{} = membership), do: OrganizationMembershipPolicy.delete?(user, membership)
 
     def can?(%User{} = user, :create, %Changeset{data: %Preview{}} = changeset), do: PreviewPolicy.create?(user, changeset)
 

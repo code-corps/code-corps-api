@@ -12,10 +12,12 @@ defmodule CodeCorps.ProjectView do
   use JaSerializer.PhoenixView
 
   attributes [
-  	:slug, :title, :can_activate_donations, :cloudinary_public_id,
+  	:approved, :can_activate_donations, :cloudinary_public_id,
     :description, :donations_active, :icon_thumb_url,
-    :icon_large_url, :long_description_body, :long_description_markdown,
-  	:inserted_at, :total_monthly_donated, :updated_at]
+    :icon_large_url, :inserted_at, :long_description_body,
+    :long_description_markdown, :should_link_externally, :slug, :title,
+    :total_monthly_donated, :updated_at, :website
+  ]
 
   has_one :organization, serializer: CodeCorps.OrganizationView
   has_one :owner, serializer: CodeCorps.UserView

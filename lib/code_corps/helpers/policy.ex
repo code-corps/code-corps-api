@@ -4,74 +4,89 @@ defmodule CodeCorps.Helpers.Policy do
   authorization policies.
   """
 
-  import Ecto.Query
-
   alias CodeCorps.{
-    Organization, OrganizationMembership,
-    Project, ProjectUser, Repo, StripeConnectAccount,
+    Organization, ProjectUser,
+    Project, ProjectUser, Repo,
     TaskSkill, Task, User, UserTask
   }
   alias Ecto.Changeset
 
   @doc """
-  Retrieves the specified user's membership record, from a `CodeCorps.Project` struct or an `Ecto.Changeset`,
-  containing an `organization_id` field, or from a `CodeCorps.Organization` struct
-
-  Returns `CodeCorps.OrganizationMembership`
+  Determines if the provided organization or project is owned by the provided user
   """
-  @spec get_membership(nil | Changeset.t | Project.t | Organization.t | StripeConnectAccount.t, User.t) :: nil | OrganizationMembership.t
-  def get_membership(nil, %User{}), do: nil
-  def get_membership(%Changeset{changes: %{organization_id: organization_id}}, %User{id: user_id}), do: do_get_membership(organization_id, user_id)
-  def get_membership(%Project{organization_id: organization_id}, %User{id: user_id}), do: do_get_membership(organization_id, user_id)
-  def get_membership(%Organization{id: organization_id}, %User{id: user_id}), do: do_get_membership(organization_id, user_id)
-  def get_membership(%StripeConnectAccount{organization_id: organization_id}, %User{id: user_id}), do: do_get_membership(organization_id, user_id)
-  defp do_get_membership(organization_id, user_id) do
-    OrganizationMembership
-    |> where([m], m.member_id == ^user_id and m.organization_id == ^organization_id)
-    |> Repo.one
-  end
+  @spec owned_by?(nil | Organization.t | Project.t, User.t) :: boolean
+  def owned_by?(%{owner_id: owner_id}, %User{id: user_id}), do: owner_id == user_id
+  def owned_by?(nil, _), do: false
 
   @doc """
-  Retrieves a project record, from a model struct, or an `Ecto.Changeset` containing a `project_id` field
+  Determines if the provided project is being administered by the provided User
+
+  Returns `true` if
+    - the user is the owner of the project
+    - the user is an admin or higher member of the project
+  """
+  @spec administered_by?(nil | Project.t, User.t) :: boolean
+  def administered_by?(%Project{} = project, %User{} = user) do
+    case owned_by?(project, user) do
+      true -> true
+      false -> project |> get_membership(user) |> get_role |> admin_or_higher?
+    end
+  end
+  def administered_by?(nil, _), do: false
+
+  @doc """
+  Determines if the provided project is being contributed to by the provided User
+
+  Returns `true` if
+    - the user is the owner of the project
+    - the user is a contributor or higher member of the project
+  """
+  @spec contributed_by?(nil | Project.t, User.t) :: boolean
+  def contributed_by?(%Project{} = project, %User{} = user) do
+    case owned_by?(project, user) do
+      true -> true
+      false -> project |> get_membership(user) |> get_role |> contributor_or_higher?
+    end
+  end
+  def contributed_by?(nil, _), do: false
+
+  @doc """
+  Retrieves an organization record, from a model struct, or an `Ecto.Changeset`
+  containing an `organization_id` field
+
+  Returns `CodeCorps.Organization`
+  """
+  @spec get_organization(struct | Changeset.t | any) :: Organization.t
+  def get_organization(%{organization_id: id}), do: Organization |> Repo.get(id)
+  def get_organization(%Changeset{changes: %{organization_id: id}}), do: Organization |> Repo.get(id)
+  def get_organization(_), do: nil
+
+  @doc """
+  Retrieves a project record, from a model struct, or an `Ecto.Changeset`
+  containing a `project_id` field
 
   Returns `CodeCorps.Project`
   """
   @spec get_project(struct | Changeset.t | any) :: Project.t
-  def get_project(%{project_id: project_id}), do: Project |> Repo.get(project_id)
-  def get_project(%Changeset{changes: %{project_id: project_id}}), do: Project |> Repo.get(project_id)
+  def get_project(%{project_id: id}), do: Project |> Repo.get(id)
+  def get_project(%Changeset{changes: %{project_id: id}}), do: Project |> Repo.get(id)
   def get_project(_), do: nil
 
   @doc """
-  Retrieves the role field, from a `CodeCorps.OrganizationMembership` struct or an `Ecto.Changeset`
-
-  Returns `:string`
+  Retrieves the role field from a `CodeCorps.ProjectUser` struct or an `Ecto.Changeset`
   """
-  @spec get_role(nil | OrganizationMembership.t | ProjectUser.t | Changeset.t) :: String.t | nil
+  @spec get_role(nil | ProjectUser.t | Changeset.t) :: String.t | nil
   def get_role(nil), do: nil
-  def get_role(%OrganizationMembership{role: role}), do: role
   def get_role(%ProjectUser{role: role}), do: role
   def get_role(%Changeset{} = changeset), do: changeset |> Changeset.get_field(:role)
 
-  @doc """
-  Determines if provided string is equal to "owner"
-  """
-  @spec owner?(String.t) :: boolean
-  def owner?("owner"), do: true
-  def owner?(_), do: false
-
-  @doc """
-  Determines if provided string is equal to one of `["admin", "owner"]`
-  """
   @spec admin_or_higher?(String.t) :: boolean
-  def admin_or_higher?(role) when role in ["admin", "owner"], do: true
-  def admin_or_higher?(_), do: false
+  defp admin_or_higher?(role) when role in ["admin", "owner"], do: true
+  defp admin_or_higher?(_), do: false
 
-  @doc """
-  Determines if provided string is equal to one of `["contributor", "admin", "owner"]`
-  """
   @spec contributor_or_higher?(String.t) :: boolean
-  def contributor_or_higher?(role) when role in ["contributor", "admin", "owner"], do: true
-  def contributor_or_higher?(_), do: false
+  defp contributor_or_higher?(role) when role in ["contributor", "admin", "owner"], do: true
+  defp contributor_or_higher?(_), do: false
 
   @doc """
   Retrieves task from associated record
@@ -88,4 +103,9 @@ defmodule CodeCorps.Helpers.Policy do
   def task_authored_by?(%Task{user_id: author_id}, %User{id: user_id}), do: user_id == author_id
 
 
+  # Returns `CodeCorps.ProjectUser` for specified `CodeCorps.Project`
+  # and `CodeCorps.User`, or nil
+  @spec get_membership(Project.t, User.t) :: nil | ProjectUser.t
+  defp get_membership(%Project{id: project_id}, %User{id: user_id}),
+    do: ProjectUser |> Repo.get_by(project_id: project_id, user_id: user_id)
 end

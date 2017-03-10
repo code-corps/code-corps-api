@@ -2,7 +2,7 @@ defmodule CodeCorps.ProjectController do
   use CodeCorps.Web, :controller
   use JaResource
 
-  import CodeCorps.Helpers.Query, only: [slug_finder: 2]
+  import CodeCorps.Helpers.Query, only: [approved_filter: 2, slug_finder: 2]
 
   alias CodeCorps.Project
 
@@ -21,9 +21,16 @@ defmodule CodeCorps.ProjectController do
     Project
     |> Repo.all(organization_id: slugged_route.organization_id)
   end
-  def handle_index(_conn, _params), do: Project
+  def handle_index(_conn, _params) do
+    Project
+    |> approved_filter(true)
+  end
 
   def handle_create(_conn, attributes) do
     %Project{} |> Project.create_changeset(attributes)
+  end
+
+  def handle_update(_conn, project, attributes) do
+    project |> Project.update_changeset(attributes)
   end
 end
