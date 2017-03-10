@@ -5,8 +5,9 @@ defmodule CodeCorps.ProjectControllerTest do
   @invalid_attrs %{title: ""}
 
   describe "index" do
-    test "lists all entries on index", %{conn: conn} do
-      [project_1, project_2] = insert_pair(:project)
+    test "lists all approved entries on index", %{conn: conn} do
+      [project_1, project_2] = insert_pair(:project, approved: true)
+      insert(:project, approved: false)
 
       conn
       |> request_index
