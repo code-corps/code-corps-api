@@ -4,7 +4,7 @@ defmodule CodeCorps.ProjectViewTest do
   test "renders all attributes and relationships properly" do
     user = insert(:user)
     organization = insert(:organization)
-    project = insert(:project, organization: organization, owner: user, total_monthly_donated: 5000, default_color: "blue")
+    project = insert(:project, organization: organization, owner: user, total_monthly_donated: 5000, default_color: "blue", approved: true)
 
     donation_goal = insert(:donation_goal, project: project)
     project_category = insert(:project_category, project: project)
@@ -21,6 +21,7 @@ defmodule CodeCorps.ProjectViewTest do
     expected_json = %{
       "data" => %{
         "attributes" => %{
+          "approved" => true,
           "can-activate-donations" => false,
           "cloudinary-public-id" => nil,
           "description" => project.description,
