@@ -1,4 +1,7 @@
-alias CodeCorps.{Category, Organization, OrganizationMembership, Project, ProjectCategory, ProjectSkill, Repo, Role, Skill, Task, User, UserCategory, UserRole, UserSkill}
+alias CodeCorps.{
+  Category, Organization, ProjectUser, Project, ProjectCategory, ProjectSkill,
+  Repo, Role, Skill, Task, User, UserCategory, UserRole, UserSkill
+}
 
 # Users
 
@@ -88,6 +91,8 @@ cond do
       Project.create_changeset(%Project{}, project)
       |> Repo.insert!
     end)
+
+    Project |> Repo.update_all(set: [approved: true])
 end
 
 # Skills
@@ -340,40 +345,40 @@ cond do
 end
 
 cond do
-  Repo.all(OrganizationMembership) != [] ->
-    IO.puts "Organization memberships detected, aborting this seed."
+  Repo.all(ProjectUser) != [] ->
+    IO.puts "Project memberships detected, aborting this seed."
   true ->
     contributors = [
       %{
-        organization_id: 1,
-        member_id: 1,
+        project_id: 1,
+        user_id: 1,
         role: "owner"
       },
       %{
-        organization_id: 1,
-        member_id: 2,
+        project_id: 1,
+        user_id: 2,
         role: "admin"
       },
       %{
-        organization_id: 1,
-        member_id: 3,
+        project_id: 1,
+        user_id: 3,
         role: "contributor"
       },
       %{
-        organization_id: 1,
-        member_id: 4,
+        project_id: 1,
+        user_id: 4,
         role: "pending"
       }
     ]
 
     Enum.each(contributors, fn user ->
       membership =
-        %OrganizationMembership{}
-        |> OrganizationMembership.create_changeset(user)
+        %ProjectUser{}
+        |> ProjectUser.create_changeset(user)
         |> Repo.insert!
 
       membership
-      |> OrganizationMembership.update_changeset(user)
+      |> ProjectUser.update_changeset(user)
       |> Repo.update!
     end)
 end
