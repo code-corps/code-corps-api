@@ -1,7 +1,9 @@
 defmodule CodeCorps.ProjectTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.Project
+  import CodeCorps.Project
+
+  alias CodeCorps.{Project, ProjectUser, Repo}
 
   describe "changeset" do
     @valid_attrs %{title: "A title"}
@@ -43,32 +45,33 @@ defmodule CodeCorps.ProjectTest do
     end
   end
 
-  describe "create_changeset" do
-    @valid_attrs %{title: "A title", organization_id: 1, owner_id: 1}
-    @invalid_attrs %{}
-
+  describe "create_changeset/3" do
     test "with valid attributes" do
-      changeset = Project.create_changeset(%Project{}, @valid_attrs)
+      organization = insert(:organization)
+      attrs = %{title: "A title", organization_id: organization.id}
+      changeset = create_changeset(%Project{}, attrs)
       assert changeset.valid?
     end
 
     test "with invalid attributes" do
-      changeset = Project.create_changeset(%Project{}, @invalid_attrs)
+      changeset = create_changeset(%Project{}, %{})
       refute changeset.valid?
     end
 
-    test "accepts setting of organization_id" do
-      changeset = Project.create_changeset(%Project{}, %{organization_id: 1})
-      assert {:ok, 1} == changeset |> fetch_change(:organization_id)
+    test "casts :organization_id and ensures organization exists" do
+      attrs = %{title: "A title", organization_id: -1}
+      changeset = create_changeset(%Project{}, attrs)
+
+      assert {:error, failed_insert_changeset} = changeset |> Repo.insert()
+
+      refute failed_insert_changeset.valid?
+      assert error_message(failed_insert_changeset, :organization) == "does not exist"
     end
 
-    test "associates the ordered default task lists to the project" do
+    test "casts and inserts proper associated records" do
       organization = insert(:organization)
-      user = insert(:user)
-      changeset = Project.create_changeset(
-        %Project{},
-        %{organization_id: organization.id, title: "Title", owner_id: user.id}
-      )
+      attrs = %{title: "A title", organization_id: organization.id}
+      changeset = Project.create_changeset(%Project{}, attrs)
 
       {_, project} = Repo.insert(changeset)
 
@@ -76,9 +79,12 @@ defmodule CodeCorps.ProjectTest do
 
       assert Enum.all?(task_list_orders), "some of the orders are not set (nil)"
       assert task_list_orders == Enum.sort(task_list_orders), "task lists order does not correspond to their position"
-    end
 
-    test "also inserts an owner role project_user record"
+      project_user = Repo.one(ProjectUser)
+      assert project_user.project_id == project.id
+      assert project_user.user_id == organization.owner_id
+      assert project_user.role == "owner"
+    end
   end
 
   describe "update_changeset" do

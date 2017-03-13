@@ -64,7 +64,9 @@ defmodule CodeCorps.Project do
     |> changeset(params)
     |> cast(params, [:organization_id])
     |> put_assoc(:task_lists, TaskList.default_task_lists())
+    |> put_member_assoc()
     |> generate_icon_color(:default_color)
+    |> assoc_constraint(:organization)
   end
 
   @doc """
@@ -82,4 +84,19 @@ defmodule CodeCorps.Project do
     struct
     |> cast(params, [:total_monthly_donated])
   end
+
+  @spec put_member_assoc(Changeset.t) :: Changeset.t
+  defp put_member_assoc(changeset) do
+    case changeset |> get_change(:organization_id) |> get_organization do
+      nil ->
+        changeset
+      organization ->
+        changeset
+        |> put_assoc(:project_users, [%{user_id: organization.owner_id, role: "owner"}])
+    end
+  end
+
+  @spec get_organization(integer | nil) :: CodeCorps.Organization.t :: nil
+  defp get_organization(nil), do: nil
+  defp get_organization(id), do: CodeCorps.Repo.get(CodeCorps.Organization, id)
 end
