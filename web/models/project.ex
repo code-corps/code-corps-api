@@ -29,7 +29,6 @@ defmodule CodeCorps.Project do
     field :website, :string
 
     belongs_to :organization, CodeCorps.Organization
-    belongs_to :owner, CodeCorps.User
 
     has_one :stripe_connect_plan, CodeCorps.StripeConnectPlan
 
@@ -63,9 +62,7 @@ defmodule CodeCorps.Project do
   def create_changeset(struct, params) do
     struct
     |> changeset(params)
-    |> cast(params, [:organization_id, :owner_id])
-    |> validate_required(:owner_id)
-    |> assoc_constraint(:owner)
+    |> cast(params, [:organization_id])
     |> put_assoc(:task_lists, TaskList.default_task_lists())
     |> generate_icon_color(:default_color)
   end

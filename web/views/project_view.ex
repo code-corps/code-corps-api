@@ -5,7 +5,7 @@ defmodule CodeCorps.ProjectView do
   use CodeCorps.PreloadHelpers,
     default_preloads: [
       :donation_goals, [organization: :stripe_connect_account],
-      :owner, :project_categories, :project_skills, :project_users,
+      :project_categories, :project_skills, :project_users,
       :stripe_connect_plan, :task_lists, :tasks
     ]
   use CodeCorps.Web, :view
@@ -20,7 +20,6 @@ defmodule CodeCorps.ProjectView do
   ]
 
   has_one :organization, serializer: CodeCorps.OrganizationView
-  has_one :owner, serializer: CodeCorps.UserView
   has_one :stripe_connect_plan, serializer: CodeCorps.StripeConnectPlanView
 
   has_many :donation_goals, serializer: CodeCorps.DonationGoalView, identifiers: :always

@@ -4,7 +4,8 @@ defmodule CodeCorps.StripeConnectPlanControllerTest do
   describe "show" do
     @tag :authenticated
     test "shows resource when authenticated and authorized", %{conn: conn, current_user: current_user} do
-      project = insert(:project, owner: current_user)
+      project = insert(:project)
+      insert(:project_user, project: project, user: current_user, role: "owner")
       stripe_connect_plan = insert(:stripe_connect_plan, project: project)
 
       conn
@@ -37,7 +38,8 @@ defmodule CodeCorps.StripeConnectPlanControllerTest do
     test "creates and renders resource when user is authenticated and authorized", %{conn: conn, current_user: current_user} do
       organization = insert(:organization)
       insert(:stripe_connect_account, organization: organization, charges_enabled: true, transfers_enabled: true)
-      project = insert(:project, organization: organization, owner: current_user)
+      project = insert(:project, organization: organization)
+      insert(:project_user, project: project, user: current_user, role: "owner")
       insert(:donation_goal, project: project)
 
       assert conn |> request_create(%{project: project}) |> json_response(201)
@@ -51,9 +53,8 @@ defmodule CodeCorps.StripeConnectPlanControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders 403 when not authorized", %{conn: conn, current_user: current_user} do
+    test "does not create resource and renders 403 when not authorized", %{conn: conn} do
       organization = insert(:organization)
-      insert(:organization_membership, role: "admin", member: current_user, organization: organization)
       project = insert(:project, organization: organization)
 
       assert conn |> request_create(%{project: project}) |> json_response(403)
@@ -63,7 +64,8 @@ defmodule CodeCorps.StripeConnectPlanControllerTest do
     test "does not create resource and renders 422 when no donation goals exist and transfers not enabled", %{conn: conn, current_user: current_user} do
       organization = insert(:organization)
       insert(:stripe_connect_account, organization: organization, transfers_enabled: false)
-      project = insert(:project, organization: organization, owner: current_user)
+      project = insert(:project, organization: organization)
+      insert(:project_user, project: project, user: current_user, role: "owner")
 
       assert conn |> request_create(%{project: project}) |> json_response(422)
     end

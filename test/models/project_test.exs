@@ -78,17 +78,7 @@ defmodule CodeCorps.ProjectTest do
       assert task_list_orders == Enum.sort(task_list_orders), "task lists order does not correspond to their position"
     end
 
-    test "ensures owner (user) actually exists" do
-      organization = insert(:organization)
-      attrs = Map.merge(@valid_attrs, %{organization_id: organization.id})
-
-      changeset = Project.create_changeset(%Project{}, attrs)
-
-      {result, changeset} = changeset |> Repo.insert
-
-      assert result == :error
-      changeset |> assert_error_message(:owner, "does not exist")
-    end
+    test "also inserts an owner role project_user record"
   end
 
   describe "update_changeset" do

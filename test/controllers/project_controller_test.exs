@@ -73,7 +73,7 @@ defmodule CodeCorps.ProjectControllerTest do
     @tag :authenticated
     test "creates and renders resource when attributes are valid", %{conn: conn, current_user: current_user} do
       organization = insert(:organization, owner: current_user)
-      attrs = @valid_attrs |> Map.merge(%{organization: organization, owner_id: current_user.id})
+      attrs = @valid_attrs |> Map.merge(%{organization: organization})
       response = conn |> request_create(attrs)
       assert %{assigns: %{data: %{task_lists: [_inbox, _backlog, _in_progress, _done]}}} = response
       assert response |> json_response(201)
@@ -82,7 +82,7 @@ defmodule CodeCorps.ProjectControllerTest do
     @tag :authenticated
     test "renders 422 when attributes are invalid", %{conn: conn, current_user: current_user} do
       organization = insert(:organization, owner: current_user)
-      attrs = @invalid_attrs |> Map.merge(%{organization: organization, owner_id: current_user.id})
+      attrs = @invalid_attrs |> Map.merge(%{organization: organization})
       assert conn |> request_create(attrs) |> json_response(422)
     end
 
@@ -101,13 +101,15 @@ defmodule CodeCorps.ProjectControllerTest do
   describe "update" do
     @tag :authenticated
     test "updates and renders resource when attributes are valid", %{conn: conn, current_user: current_user} do
-      project = insert(:project, owner: current_user)
+      project = insert(:project)
+      insert(:project_user, project: project, user: current_user, role: "owner")
       assert conn |> request_update(project, @valid_attrs) |> json_response(200)
     end
 
     @tag :authenticated
     test "renders errors when attributes are invalid", %{conn: conn, current_user: current_user} do
-      project = insert(:project, owner: current_user)
+      project = insert(:project)
+      insert(:project_user, project: project, user: current_user, role: "owner")
       assert conn |> request_update(project, @invalid_attrs) |> json_response(422)
     end
 

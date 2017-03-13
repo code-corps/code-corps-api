@@ -7,14 +7,6 @@ defmodule CodeCorps.ProjectCategoryPolicyTest do
   alias CodeCorps.ProjectCategory
 
   describe "create?" do
-    test "returns true when user is project owner" do
-      user = insert(:user)
-      project = insert(:project, owner: user)
-
-      changeset = %ProjectCategory{} |> create_changeset(%{project_id: project.id})
-      assert create?(user, changeset)
-    end
-
     test "returns false when user is not a project member" do
       user = insert(:user)
       project = insert(:project)
@@ -24,27 +16,28 @@ defmodule CodeCorps.ProjectCategoryPolicyTest do
     end
 
     test "returns false when user is a pending project member" do
-      user = insert(:user)
-      project = insert(:project)
-      insert(:project_user, role: "pending", user: user, project: project)
+      %{project: project, user: user} = insert(:project_user, role: "pending")
 
       changeset = %ProjectCategory{} |> create_changeset(%{project_id: project.id})
       refute create?(user, changeset)
     end
 
     test "returns false when user is a project contributor" do
-      user = insert(:user)
-      project = insert(:project)
-      insert(:project_user, role: "contributor", user: user, project: project)
+      %{project: project, user: user} = insert(:project_user, role: "contributor")
 
       changeset = %ProjectCategory{} |> create_changeset(%{project_id: project.id})
       refute create?(user, changeset)
     end
 
     test "returns true when user is a project admin" do
-      user = insert(:user)
-      project = insert(:project)
-      insert(:project_user, role: "admin", user: user, project: project)
+      %{project: project, user: user} = insert(:project_user, role: "admin")
+
+      changeset = %ProjectCategory{} |> create_changeset(%{project_id: project.id})
+      assert create?(user, changeset)
+    end
+
+    test "returns true when user is project owner" do
+      %{project: project, user: user} = insert(:project_user, role: "owner")
 
       changeset = %ProjectCategory{} |> create_changeset(%{project_id: project.id})
       assert create?(user, changeset)
@@ -52,36 +45,37 @@ defmodule CodeCorps.ProjectCategoryPolicyTest do
   end
 
   describe "delete?" do
-    test "returns true when user is project owner" do
+    test "returns false when user is not a project member" do
       user = insert(:user)
-      project = insert(:project, owner: user)
+      project = insert(:project)
 
       record = insert(:project_category, project: project)
-      assert delete?(user, record)
+      refute delete?(user, record)
     end
 
     test "returns false when user is a pending project member" do
-      user = insert(:user)
-      project = insert(:project)
-      insert(:project_user, role: "pending", user: user, project: project)
+      %{project: project, user: user} = insert(:project_user, role: "pending")
 
       record = insert(:project_category, project: project)
       refute delete?(user, record)
     end
 
     test "returns false when user is a project contributor" do
-      user = insert(:user)
-      project = insert(:project)
-      insert(:project_user, role: "contributor", user: user, project: project)
+      %{project: project, user: user} = insert(:project_user, role: "contributor")
 
       record = insert(:project_category, project: project)
       refute delete?(user, record)
     end
 
     test "returns true when user is a project admin" do
-      user = insert(:user)
-      project = insert(:project)
-      insert(:project_user, role: "admin", user: user, project: project)
+      %{project: project, user: user} = insert(:project_user, role: "admin")
+
+      record = insert(:project_category, project: project)
+      assert delete?(user, record)
+    end
+
+    test "returns true when user is project owner" do
+      %{project: project, user: user} = insert(:project_user, role: "owner")
 
       record = insert(:project_category, project: project)
       assert delete?(user, record)
