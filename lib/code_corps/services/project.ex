@@ -12,8 +12,7 @@ defmodule CodeCorps.Services.ProjectService do
       StripeConnectSubscription
       |> where([s], s.status == "active" and s.stripe_connect_plan_id == ^plan_id)
       |> Repo.aggregate(:sum, :quantity)
-
-    total_monthly_donated = default_to_zero(total_monthly_donated)
+      |> default_to_zero
 
     project
     |> Project.update_total_changeset(%{total_monthly_donated: total_monthly_donated})
