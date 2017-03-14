@@ -24,36 +24,33 @@ defmodule CodeCorps.ProjectPolicyTest do
   end
 
   describe "update?" do
-    test "returns true when user is project owner" do
-      user = insert(:user)
-      project = insert(:project, owner: user)
-
-      assert update?(user, project)
-    end
-
-    test "returns false when user is pending member of project" do
+    test "returns false when user is not a project member" do
       user = insert(:user)
       project = insert(:project)
 
-      insert(:project_user, role: "pending", user: user, project: project)
+      refute update?(user, project)
+    end
+
+    test "returns false when user is pending member of project" do
+      %{project: project, user: user} = insert(:project_user, role: "pending")
 
       refute update?(user, project)
     end
 
     test "returns false when user is contributor of project" do
-      user = insert(:user)
-      project = insert(:project)
-
-      insert(:project_user, role: "contributor", user: user, project: project)
+      %{project: project, user: user} = insert(:project_user, role: "contributor")
 
       refute update?(user, project)
     end
 
     test "returns true when user is admin of project" do
-      user = insert(:user)
-      project = insert(:project)
+      %{project: project, user: user} = insert(:project_user, role: "admin")
 
-      insert(:project_user, role: "admin", user: user, project: project)
+      assert update?(user, project)
+    end
+
+    test "returns true when user is project owner" do
+      %{project: project, user: user} = insert(:project_user, role: "owner")
 
       assert update?(user, project)
     end

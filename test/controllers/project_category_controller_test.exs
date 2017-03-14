@@ -45,7 +45,8 @@ defmodule CodeCorps.ProjectCategoryControllerTest do
     @tag :authenticated
     test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
       category = insert(:category)
-      project = insert(:project, owner: current_user)
+      project = insert(:project)
+      insert(:project_user, project: project, user: current_user, role: "owner")
 
       attrs = %{category: category, project: project}
       assert conn |> request_create(attrs) |> json_response(201)
@@ -53,7 +54,8 @@ defmodule CodeCorps.ProjectCategoryControllerTest do
 
     @tag :authenticated
     test "renders 422 when data is invalid", %{conn: conn, current_user: current_user} do
-      project = insert(:project, owner: current_user)
+      project = insert(:project)
+      insert(:project_user, project: project, user: current_user, role: "owner")
       invalid_attrs = %{project: project}
       assert conn |> request_create(invalid_attrs) |> json_response(422)
     end
@@ -71,7 +73,8 @@ defmodule CodeCorps.ProjectCategoryControllerTest do
   describe "delete" do
     @tag :authenticated
     test "deletes resource", %{conn: conn, current_user: current_user} do
-      project = insert(:project, owner: current_user)
+      project = insert(:project)
+      insert(:project_user, project: project, user: current_user, role: "owner")
       project_category = insert(:project_category, project: project)
       assert conn |> request_delete(project_category) |> response(204)
     end

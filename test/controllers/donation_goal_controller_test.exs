@@ -44,7 +44,8 @@ defmodule CodeCorps.DonationGoalControllerTest do
   describe "create" do
     @tag :authenticated
     test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
-      project = insert(:project, owner: current_user)
+      project = insert(:project)
+      insert(:project_user, project: project, user: current_user, role: "owner")
 
       attrs = @valid_attrs |> Map.merge(%{project_id: project.id})
       assert conn |> request_create(attrs) |> json_response(201)
@@ -55,7 +56,8 @@ defmodule CodeCorps.DonationGoalControllerTest do
 
     @tag :authenticated
     test "does not create resource and renders errors when data is invalid", %{conn: conn, current_user: current_user} do
-      project = insert(:project, owner: current_user)
+      project = insert(:project)
+      insert(:project_user, project: project, user: current_user, role: "owner")
 
       attrs = @invalid_attrs |> Map.merge(%{project_id: project.id})
       assert conn |> request_create(attrs) |> json_response(422)
@@ -74,7 +76,8 @@ defmodule CodeCorps.DonationGoalControllerTest do
   describe "update" do
     @tag :authenticated
     test "updates and renders chosen resource when data is valid", %{conn: conn, current_user: current_user} do
-      project = insert(:project, owner: current_user)
+      project = insert(:project)
+      insert(:project_user, project: project, user: current_user, role: "owner")
 
       donation_goal = insert(:donation_goal, project: project)
 
@@ -87,7 +90,8 @@ defmodule CodeCorps.DonationGoalControllerTest do
 
     @tag authenticated: :admin
     test "does not update chosen resource and renders errors when data is invalid", %{conn: conn, current_user: current_user} do
-      project = insert(:project, owner: current_user)
+      project = insert(:project)
+      insert(:project_user, project: project, user: current_user, role: "owner")
       donation_goal = insert(:donation_goal, project: project)
 
       assert conn |> request_update(donation_goal, @invalid_attrs) |> json_response(422)
@@ -111,7 +115,8 @@ defmodule CodeCorps.DonationGoalControllerTest do
   describe "delete" do
     @tag :authenticated
     test "deletes chosen resource", %{conn: conn, current_user: current_user} do
-      project = insert(:project, owner: current_user)
+      project = insert(:project)
+      insert(:project_user, project: project, user: current_user, role: "owner")
       donation_goal = insert(:donation_goal, project: project)
       assert conn |> request_delete(donation_goal) |> response(204)
     end

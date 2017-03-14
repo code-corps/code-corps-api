@@ -80,8 +80,7 @@ defmodule CodeCorps.Factories do
       title: sequence(:title, &"Project #{&1}"),
       website: sequence(:website, &"http://test-#{&1}.com"),
 
-      organization: build(:organization),
-      owner: build(:user)
+      organization: build(:organization)
     }
   end
 
