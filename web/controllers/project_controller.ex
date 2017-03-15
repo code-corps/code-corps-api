@@ -26,7 +26,7 @@ defmodule CodeCorps.ProjectController do
     |> approved_filter(true)
   end
 
-  def handle_create(conn, attributes) do
+  def handle_create(_conn, attributes) do
     %Project{} |> Project.create_changeset(attributes)
   end
 
