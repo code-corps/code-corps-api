@@ -25,7 +25,8 @@ defmodule CodeCorps.AuthToken do
   def changeset(struct, user) do
     token = CodeCorps.Endpoint |> Phoenix.Token.sign("user", user.id)
     struct
-    |> cast(%{ value: token }, [:value])
-    |> validate_required([:value])
+    |> cast(%{ value: token, user_id: user.id }, [:value, :user_id])
+    |> validate_required([:value, :user_id])
+    |> assoc_constraint(:user)
   end
 end
