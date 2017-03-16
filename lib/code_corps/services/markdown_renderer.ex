@@ -16,7 +16,9 @@ defmodule CodeCorps.Services.MarkdownRendererService do
 
   @spec convert_into_html(String.t) :: String.t
   defp convert_into_html(markdown) do
-    Earmark.as_html!(markdown)
+    # Prism.js requires a `language-` prefix in code classes
+    # See: https://github.com/pragdave/earmark#syntax-highlightning
+    Earmark.as_html!(markdown, %Earmark.Options{code_class_prefix: "language-"})
   end
 
   @spec put_into(String.t, Changeset.t, atom) :: Changeset.t
