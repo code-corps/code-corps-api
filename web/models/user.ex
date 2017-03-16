@@ -25,6 +25,7 @@ defmodule CodeCorps.User do
     field :first_name, :string
     field :last_name, :string
     field :password, :string, virtual: true
+    field :password_confirmation, :string, virtual: true
     field :twitter, :string
     field :username, :string
     field :website, :string
@@ -94,6 +95,13 @@ defmodule CodeCorps.User do
     |> validate_format(:website, CodeCorps.Helpers.URL.valid_format())
     |> validate_format(:twitter, ~r/\A[a-zA-Z0-9_]{1,15}\z/)
     |> apply_state_transition(struct)
+  end
+
+  def reset_password_changeset(struct, params) do
+    struct
+    |> cast(params, [:password, :password_confirmation])
+    |> validate_confirmation(:password, message: "passwords do not match")
+    |> put_pass_hash
   end
 
   def apply_state_transition(changeset, %{state: current_state}) do

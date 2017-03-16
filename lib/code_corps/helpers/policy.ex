@@ -15,39 +15,30 @@ defmodule CodeCorps.Helpers.Policy do
   Determines if the provided organization or project is owned by the provided user
   """
   @spec owned_by?(nil | Organization.t | Project.t, User.t) :: boolean
-  def owned_by?(%{owner_id: owner_id}, %User{id: user_id}), do: owner_id == user_id
+  def owned_by?(%Organization{owner_id: owner_id}, %User{id: user_id}),
+    do: owner_id == user_id
+  def owned_by?(%Project{} = project, %User{} = user),
+    do: project |> get_membership(user) |> get_role |> owner?
   def owned_by?(nil, _), do: false
 
   @doc """
   Determines if the provided project is being administered by the provided User
 
-  Returns `true` if
-    - the user is the owner of the project
-    - the user is an admin or higher member of the project
+  Returns `true` if the user is an admin or higher member of the project
   """
   @spec administered_by?(nil | Project.t, User.t) :: boolean
-  def administered_by?(%Project{} = project, %User{} = user) do
-    case owned_by?(project, user) do
-      true -> true
-      false -> project |> get_membership(user) |> get_role |> admin_or_higher?
-    end
-  end
+  def administered_by?(%Project{} = project, %User{} = user),
+    do: project |> get_membership(user) |> get_role |> admin_or_higher?
   def administered_by?(nil, _), do: false
 
   @doc """
   Determines if the provided project is being contributed to by the provided User
 
-  Returns `true` if
-    - the user is the owner of the project
-    - the user is a contributor or higher member of the project
+  Returns `true` if the user is a contributor or higher member of the project
   """
   @spec contributed_by?(nil | Project.t, User.t) :: boolean
-  def contributed_by?(%Project{} = project, %User{} = user) do
-    case owned_by?(project, user) do
-      true -> true
-      false -> project |> get_membership(user) |> get_role |> contributor_or_higher?
-    end
-  end
+  def contributed_by?(%Project{} = project, %User{} = user),
+    do: project |> get_membership(user) |> get_role |> contributor_or_higher?
   def contributed_by?(nil, _), do: false
 
   @doc """
@@ -88,6 +79,10 @@ defmodule CodeCorps.Helpers.Policy do
   defp contributor_or_higher?(role) when role in ["contributor", "admin", "owner"], do: true
   defp contributor_or_higher?(_), do: false
 
+  @spec owner?(String.t) :: boolean
+  defp owner?("owner"), do: true
+  defp owner?(_), do: false
+
   @doc """
   Retrieves task from associated record
   """
@@ -101,7 +96,6 @@ defmodule CodeCorps.Helpers.Policy do
   """
   @spec task_authored_by?(Task.t, User.t) :: boolean
   def task_authored_by?(%Task{user_id: author_id}, %User{id: user_id}), do: user_id == author_id
-
 
   # Returns `CodeCorps.ProjectUser` for specified `CodeCorps.Project`
   # and `CodeCorps.User`, or nil

@@ -2,9 +2,8 @@ defmodule CodeCorps.ProjectViewTest do
   use CodeCorps.ViewCase
 
   test "renders all attributes and relationships properly" do
-    user = insert(:user)
     organization = insert(:organization)
-    project = insert(:project, organization: organization, owner: user, total_monthly_donated: 5000, default_color: "blue", approved: true)
+    project = insert(:project, organization: organization, total_monthly_donated: 5000, default_color: "blue", approved: true)
 
     donation_goal = insert(:donation_goal, project: project)
     project_category = insert(:project_category, project: project)
@@ -50,12 +49,6 @@ defmodule CodeCorps.ProjectViewTest do
             "data" => %{
               "id" => organization.id |> Integer.to_string,
               "type" => "organization"
-            }
-          },
-          "owner" => %{
-            "data" => %{
-              "id" => user.id |> Integer.to_string,
-              "type" => "user"
             }
           },
           "project-categories" => %{

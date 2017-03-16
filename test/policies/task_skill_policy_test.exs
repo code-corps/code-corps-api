@@ -18,9 +18,7 @@ defmodule CodeCorps.TaskSkillPolicyTest do
     end
 
     test "returns false when user is pending member of project" do
-      user = insert(:user)
-      project = insert(:project)
-      insert(:project_user, user: user, project: project, role: "pending")
+      %{project: project, user: user} = insert(:project_user, role: "pending")
       task = insert(:task, project: project)
 
       changeset = %TaskSkill{} |> create_changeset(%{task_id: task.id})
@@ -28,9 +26,7 @@ defmodule CodeCorps.TaskSkillPolicyTest do
     end
 
     test "returns true when user is contributor of project" do
-      user = insert(:user)
-      project = insert(:project)
-      insert(:project_user, user: user, project: project, role: "contributor")
+      %{project: project, user: user} = insert(:project_user, role: "contributor")
       task = insert(:task, project: project)
 
       changeset = %TaskSkill{} |> create_changeset(%{task_id: task.id})
@@ -38,9 +34,7 @@ defmodule CodeCorps.TaskSkillPolicyTest do
     end
 
     test "returns true when user is admin of project" do
-      user = insert(:user)
-      project = insert(:project)
-      insert(:project_user, user: user, project: project, role: "admin")
+      %{project: project, user: user} = insert(:project_user, role: "admin")
       task = insert(:task, project: project)
 
       changeset = %TaskSkill{} |> create_changeset(%{task_id: task.id})
@@ -48,8 +42,7 @@ defmodule CodeCorps.TaskSkillPolicyTest do
     end
 
     test "returns true when user is owner of project" do
-      user = insert(:user)
-      project = insert(:project, owner: user)
+      %{project: project, user: user} = insert(:project_user, role: "owner")
       task = insert(:task, project: project)
 
       changeset = %TaskSkill{} |> create_changeset(%{task_id: task.id})
@@ -77,9 +70,7 @@ defmodule CodeCorps.TaskSkillPolicyTest do
     end
 
     test "returns false when user is pending member of project" do
-      user = insert(:user)
-      project = insert(:project)
-      insert(:project_user, user: user, project: project, role: "pending")
+      %{project: project, user: user} = insert(:project_user, role: "pending")
       task = insert(:task, project: project)
 
       task_skill = insert(:task_skill, task: task)
@@ -88,9 +79,7 @@ defmodule CodeCorps.TaskSkillPolicyTest do
     end
 
     test "returns true when user is contributor of project" do
-      user = insert(:user)
-      project = insert(:project)
-      insert(:project_user, user: user, project: project, role: "contributor")
+      %{project: project, user: user} = insert(:project_user, role: "contributor")
       task = insert(:task, project: project)
 
       task_skill = insert(:task_skill, task: task)
@@ -99,9 +88,7 @@ defmodule CodeCorps.TaskSkillPolicyTest do
     end
 
     test "returns true when user is admin of project" do
-      user = insert(:user)
-      project = insert(:project)
-      insert(:project_user, user: user, project: project, role: "admin")
+      %{project: project, user: user} = insert(:project_user, role: "admin")
       task = insert(:task, project: project)
 
       task_skill = insert(:task_skill, task: task)
@@ -110,8 +97,7 @@ defmodule CodeCorps.TaskSkillPolicyTest do
     end
 
     test "returns true when user is owner of project" do
-      user = insert(:user)
-      project = insert(:project, owner: user)
+      %{project: project, user: user} = insert(:project_user, role: "owner")
       task = insert(:task, project: project)
 
       task_skill = insert(:task_skill, task: task)

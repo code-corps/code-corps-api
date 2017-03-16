@@ -38,35 +38,28 @@ defmodule CodeCorps.TaskPolicyTest do
     end
 
     test "returns false when user is a pending member of project" do
-      user = insert(:user)
-      project = insert(:project)
-      insert(:project_user, user: user, project: project, role: "pending")
+      %{project: project, user: user} = insert(:project_user, role: "pending")
       task = insert(:task, project: project)
 
       refute update?(user, task)
     end
 
     test "returns false when user is a contributing member of project" do
-      user = insert(:user)
-      project = insert(:project)
-      insert(:project_user, user: user, project: project, role: "contributor")
+      %{project: project, user: user} = insert(:project_user, role: "contributor")
       task = insert(:task, project: project)
 
       refute update?(user, task)
     end
 
     test "returns true when user is an admin member of project" do
-      user = insert(:user)
-      project = insert(:project)
-      insert(:project_user, user: user, project: project, role: "admin")
+      %{project: project, user: user} = insert(:project_user, role: "admin")
       task = insert(:task, project: project)
 
       assert update?(user, task)
     end
 
     test "returns true when user is the owner of the project" do
-      user = insert(:user)
-      project = insert(:project, owner: user)
+      %{project: project, user: user} = insert(:project_user, role: "owner")
       task = insert(:task, project: project)
 
       assert update?(user, task)

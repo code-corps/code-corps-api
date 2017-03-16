@@ -8,8 +8,8 @@ defmodule CodeCorps.StripeConnectPlanPolicyTest do
 
   describe "show?" do
     test "returns true when user is owner of project" do
-      user = insert(:user)
-      project = insert(:project, owner: user)
+      %{project: project, user: user} = insert(:project_user, role: "owner")
+
       plan = insert(:stripe_connect_plan, project: project)
 
       assert show?(user, plan)
@@ -26,8 +26,7 @@ defmodule CodeCorps.StripeConnectPlanPolicyTest do
 
   describe "create?" do
     test "returns true when user is owner of organization" do
-      user = insert(:user)
-      project = insert(:project, owner: user)
+      %{project: project, user: user} = insert(:project_user, role: "owner")
 
       changeset = create_changeset(%StripeConnectPlan{}, %{project_id: project.id})
       assert create?(user, changeset)
