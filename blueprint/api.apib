@@ -379,131 +379,6 @@ To delete a donation goal the user must be a site admin or the owner of the refe
 
     + Attributes (Record Not Found Response)
 
-# Group Organization Memberships
-
-## Organization Memberships [/organization-memberships]
-
-### Create an organization membership [POST]
-
-+ Request
-
-    + Attributes (Organization Membership Create Request)
-
-    + Headers
-
-            Accept: application/vnd.api+json
-            Authorization: Bearer {token}
-
-+ Response 201 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Organization Membership Response)
-
-+ Response 401 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (JSON Web Token Invalid Response)
-
-+ Response 403 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Forbidden Response)
-
-### List all organization memberships for an organization [GET /organizations/{organization_id}/memberships]
-
-+ Parameters
-
-    + organization_id: 1 (number, required) - Organization id, uniquely identifying a organization
-
-+ Request
-
-    + Headers
-
-            Accept: application/vnd.api+json
-
-+ Response 200 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Organization Memberships Response)
-
-### Filter by id [GET /organization-memberships{?filter[id]}]
-
-+ Request
-
-    + Attributes
-
-        + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
-
-    + Headers
-
-            Accept: application/vnd.api+json
-
-+ Response 200 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Organization Memberships Response)
-
-## Organization Membership [/organization-memberships/{id}]
-
-+ Parameters
-
-    + id (number, required)
-
-### Retrieve an organization membership [GET]
-
-+ Request
-
-    + Headers
-
-            Accept: application/vnd.api+json
-
-+ Response 200 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Organization Membership Response)
-
-### Update an organization membership [PATCH]
-
-+ Request
-
-    + Attributes (Organization Membership Update Request)
-
-    + Headers
-
-            Accept: application/vnd.api+json
-            Authorization: Bearer {token}
-
-+ Response 201 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Organization Membership Response)
-
-+ Response 401 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (JSON Web Token Invalid Response)
-
-+ Response 403 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Forbidden Response)
-
-### Delete an organization membership [DELETE]
-
-+ Request
-
-    + Headers
-
-            Accept: application/vnd.api+json
-            Authorization: Bearer {token}
-
-+ Response 204 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (No Content Response)
-
-+ Response 401 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (JSON Web Token Invalid Response)
-
-+ Response 403 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Forbidden Response)
-
-+ Response 404 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Record Not Found Response)
-
 # Group Organizations
 
 This endpoint retrieves Organizations on Code Corps. Organizations usually have one or more Projects.
@@ -807,6 +682,115 @@ This resource identifies a relationship between a Project and a Skill. For examp
 
     + Attributes (Forbidden Response)
 
+# Group Project Users
+
+## Project Users [/project-users]
+
+### Create a project user [POST]
+
++ Request
+
+    + Attributes (Project User Create Request)
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 201 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Project User Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
+### Filter by id [GET /project-users{?filter[id]}]
+
++ Request
+
+    + Attributes
+
+        + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Project Users Response)
+
+## Project User [/project-users/{id}]
+
++ Parameters
+
+    + id (number, required)
+
+### Retrieve a project user [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Project User Response)
+
+### Update a project user [PATCH]
+
++ Request
+
+    + Attributes (Project User Update Request)
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 201 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Project User Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
+### Delete a project user [DELETE]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 204 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (No Content Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
++ Response 404 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Record Not Found Response)
+
 # Group Projects
 
 ## Organization Projects [/{slug}/projects]
@@ -912,73 +896,6 @@ This resource identifies a relationship between a Project and a Skill. For examp
 
     + Attributes (Forbidden Response)
 
-# Group Roles
-
-This endpoint is for creating and returning the roles available for users.
-
-A user is able to have multiple roles through their user roles.
-
-## Roles [/roles]
-
-### Create a role [POST]
-
-+ Request
-
-    + Headers
-
-            Accept: application/vnd.api+json
-            Authorization: Bearer {token}
-
-+ Response 201 (application/vnd.api+json; charset=utf-8)
-
-  + Attributes (Role Response)
-
-+ Response 401 (application/vnd.api+json; charset=utf-8)
-
-  + Attributes (JSON Web Token Invalid Response)
-
-+ Response 403 (application/vnd.api+json; charset=utf-8)
-
-  + Attributes (Forbidden Response)
-
-+ Response 422 (application/vnd.api+json; charset=utf-8)
-
-  + Attributes (Unprocessable Entity Response)
-
-### List all roles [GET]
-
-+ Request
-
-    + Headers
-
-            Accept: application/vnd.api+json
-
-+ Response 200 (application/vnd.api+json; charset=utf-8)
-
-  + Attributes (Roles Response)
-
-## Role [/roles/{id}]
-
-+ Parameters
-
-    + id (number, required)
-
-### Retrieve a role [GET]
-
-+ Request
-
-    + Headers
-
-            Accept: application/vnd.api+json
-
-+ Response 200 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Role Response)
-
-+ Response 404 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Record Not Found Response)
-
 # Group Role Skills
 
 This resource identifies a relationship between a Role and a Skill. For example, the skill of "JavaScript" may relate to the role of "Backend Developer", "Front End Developer", and "Mobile Developer".
@@ -1066,6 +983,73 @@ We can use the many skills grouped under a role to suggest popular skills to use
 + Response 403 (application/vnd.api+json; charset=utf-8)
 
     + Attributes (Forbidden Response)
+
+# Group Roles
+
+This endpoint is for creating and returning the roles available for users.
+
+A user is able to have multiple roles through their user roles.
+
+## Roles [/roles]
+
+### Create a role [POST]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 201 (application/vnd.api+json; charset=utf-8)
+
+  + Attributes (Role Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+  + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+  + Attributes (Forbidden Response)
+
++ Response 422 (application/vnd.api+json; charset=utf-8)
+
+  + Attributes (Unprocessable Entity Response)
+
+### List all roles [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+  + Attributes (Roles Response)
+
+## Role [/roles/{id}]
+
++ Parameters
+
+    + id (number, required)
+
+### Retrieve a role [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Role Response)
+
++ Response 404 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Record Not Found Response)
 
 # Group Skills
 
@@ -1170,7 +1154,7 @@ For example, if we wanted to return skills like "Java" and "JavaScript", we may 
 
 # Group Slugged Routes
 
-A slugged route is a unique slug that resolves at the root of any request to `codecorps.org`. For the URI `codecorps.org/code-corps`, for example, `code-corps` is the slug that represents the slugged route.
+A slugged route is a unique slug that resolves at the root of any request to `codecorps.org`. For the URI `codecorps.org/code-corps`, for example, `code-corps` is the slug that represents the slugged route for the Organization `Code Corps` with the `slug` of `code-corps`.
 
 Slugged routes allow us to make API requests for a user or an organization without knowing their `id` in advance. This is particularly useful on the web when the first request may be to a user's profile or an organization's page.
 
@@ -1178,7 +1162,11 @@ Slugged routes allow us to make API requests for a user or an organization witho
 
 ### Retrieve a slugged route [GET]
 
-This endpoint will return one of two possible responses, depending on if the slugged route's owner is a user or an organization. If the slugged route is owned by a user, the responses's owner relationship will have a user relationship and a nil organization relationship. If it's owned by an organization, it will have an organization relationship and a nil user relationship.
+This endpoint will return one of two possible responses, depending on if the slugged route's owner is a user or an organization.
+
+If the slugged route is owned by a user, the responses will contain a `user` relationship and a `nil` `organization` relationship.
+
+If the slugged route is owned by an organization, the responses will contain an `organization` relationship and a `nil` `user` relationship.
 
 + Request
 
@@ -1243,128 +1231,6 @@ A Stripe Connect account belongs to an organization.
 + Response 200 (application/vnd.api+json; charset=utf-8)
 
     + Attributes (Stripe Connect Account Response)
-
-+ Response 401 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (JSON Web Token Invalid Response)
-
-+ Response 403 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Forbidden Response)
-
-+ Response 404 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Record Not Found Response)
-
-# Group Stripe Platform Card
-
-This resource identifies a card created on the [Stripe API](https://stripe.com/docs/api#cards).
-
-A Stripe platform card belongs to a user.
-
-## Stripe Platform Cards [/stripe-platform-cards]
-
-### Create a Stripe platform card [POST]
-
-+ Request
-
-    + Headers
-
-            Accept: application/vnd.api+json
-            Authorization: Bearer {token}
-
-+ Response 201 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Stripe Platform Card Response)
-
-+ Response 401 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (JSON Web Token Invalid Response)
-
-+ Response 403 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Forbidden Response)
-
-+ Response 422 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Unprocessable Entity Response)
-
-## Stripe Platform Card [/stripe-platform-cards/{id}]
-
-+ Parameters
-
-    + id (number, required)
-
-### Retrieve a Stripe platform card [GET]
-
-+ Request
-
-    + Headers
-
-            Accept: application/vnd.api+json
-            Authorization: Bearer {token}
-
-+ Response 200 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Stripe Platform Card Response)
-
-+ Response 401 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (JSON Web Token Invalid Response)
-
-+ Response 403 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Forbidden Response)
-
-+ Response 404 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Record Not Found Response)
-
-# Group Stripe Platform Customers
-
-This resource identifies a customer created on the [Stripe API](https://stripe.com/docs/api#customers) for the Code Corps platform.
-
-## Stripe Platform Customers [/stripe-platform-customers]
-
-### Create a Stripe platform customer [POST]
-
-+ Request
-
-    + Headers
-
-            Accept: application/vnd.api+json
-            Authorization: Bearer {token}
-
-+ Response 201 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Stripe Platform Customer Response)
-
-+ Response 401 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (JSON Web Token Invalid Response)
-
-+ Response 403 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Forbidden Response)
-
-+ Response 422 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Unprocessable Entity Response)
-
-## Stripe Platform Customer [/stripe-platform-customers/{id}]
-
-### Retrieve a Stripe platform customer [GET]
-
-+ Request
-
-    + Headers
-
-            Accept: application/vnd.api+json
-            Authorization: Bearer {token}
-
-+ Response 200 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Stripe Platform Customer Response)
 
 + Response 401 (application/vnd.api+json; charset=utf-8)
 
@@ -1517,6 +1383,308 @@ Stripe Connect subscriptions allow us to charge a customer's card on a recurring
 + Response 422 (application/vnd.api+json; charset=utf-8)
 
     + Attributes (Unprocessable Entity Response)
+
+# Group Stripe Platform Cards
+
+This resource identifies a card created on the [Stripe API](https://stripe.com/docs/api#cards).
+
+A Stripe platform card belongs to a user.
+
+## Stripe Platform Cards [/stripe-platform-cards]
+
+### Create a Stripe platform card [POST]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 201 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Stripe Platform Card Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
++ Response 422 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Unprocessable Entity Response)
+
+## Stripe Platform Card [/stripe-platform-cards/{id}]
+
++ Parameters
+
+    + id (number, required)
+
+### Retrieve a Stripe platform card [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Stripe Platform Card Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
++ Response 404 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Record Not Found Response)
+
+# Group Stripe Platform Customers
+
+This resource identifies a customer created on the [Stripe API](https://stripe.com/docs/api#customers) for the Code Corps platform.
+
+## Stripe Platform Customers [/stripe-platform-customers]
+
+### Create a Stripe platform customer [POST]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 201 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Stripe Platform Customer Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
++ Response 422 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Unprocessable Entity Response)
+
+## Stripe Platform Customer [/stripe-platform-customers/{id}]
+
+### Retrieve a Stripe platform customer [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Stripe Platform Customer Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
++ Response 404 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Record Not Found Response)
+
+# Group Task Lists
+
+## Project Task Lists [/projects/{project_id}/task-lists]
+
+You can list all task lists or retrieve individual task lists for a single project.
+
+### List all of a project's task lists [GET]
+
++ Parameters
+
+    + project_id (number, required) - Id of a project.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Task Lists Response)
+
+## Project Task List [/projects/{project_id}/task-lists/{id}]
+
+### Retrieve a project's task list [GET]
+
++ Parameters
+
+    + project_id (number, required) - Id of a project.
+    + id (number, required) - The `id` of a task list.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Task List Response)
+
++ Response 404 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Record Not Found Response)
+
+## Task Lists [/task-lists]
+
+### List all task lists [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Task Lists Response)
+
+## Task List [/task-lists/{id}]
+
++ Parameters
+
+    + id (number, required)
+
+### Retrieve a task list [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Task List Response)
+
++ Response 404 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Record Not Found Response)
+
+# Group Task Skills
+
+This resource identifies a relationship between a Task and a Skill. For example, the skill of "Elixir" may be given to a task to allow users to find tasks that match their skills.
+
+## Task Skills [/task-skills]
+
+### Create a task skill [POST /task-skills]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer <token>
+
++ Response 201 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Task Skill Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 422 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Unprocessable Entity Response)
+
+### List all task skills [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Task Skills Response)
+
+### Filter by id [GET /task-skills{?filter[id]}]
+
++ Request
+
+    + Attributes
+
+        + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Task Skills Response)
+
+## Task Skill [/task-skills/{id}]
+
++ Parameters
+
+    + id (number, required)
+
+### Retrieve a task skill [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Task Skill Response)
+
+
+### Delete a task skill [DELETE]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer <token>
+
++ Response 204 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (No Content Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
++ Response 404 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Record Not Found Response)
 
 # Group Tasks
 
@@ -1838,7 +2006,7 @@ This resource identifies a relationship between a User and a Skill. For example,
 
 ## User Skills [/user-skills]
 
-### Create a User Skill [POST /user-skills]
+### Create a user skill [POST /user-skills]
 
 + Request
 
@@ -1930,6 +2098,106 @@ This resource identifies a relationship between a User and a Skill. For example,
 + Response 404 (application/vnd.api+json; charset=utf-8)
 
     + Attributes (Record Not Found Response)
+
+# Group User Tasks
+
+This resource identifies the User that has been assigned to a Task.
+
+## User Tasks [/user-tasks]
+
+### Create a user task [POST /user-tasks]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer <token>
+
++ Response 201 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (User Task Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 422 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Unprocessable Entity Response)
+
+### List all user tasks [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (User Tasks Response)
+
+### Filter by id [GET /user-tasks{?filter[id]}]
+
++ Request
+
+    + Attributes
+
+        + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (User Tasks Response)
+
+## User Task [/user-tasks/{id}]
+
++ Parameters
+
+    + id (number, required)
+
+### Retrieve a user task [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (User Task Response)
+
+
+### Delete a user task [DELETE]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer <token>
+
++ Response 204 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (No Content Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
++ Response 404 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Record Not Found Response)
+
 
 # Group Users
 
@@ -2064,7 +2332,6 @@ This endpoint allows you to check whether a username is valid (by running a vali
                 + twitter: `testuser` (string, optional)
                 + base64_photo_data: `data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7` (string, optional)
                 + `state_transition`: `signed_up` (string, optional)
-                + theme: `light` (string, optional)
 
     + Headers
 
@@ -2117,10 +2384,6 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + body: `Html string rendered from markdown` (string)
 + `inserted-at`: `2014-07-07T18:01:26.000Z` (string)
 + markdown: `Markdown formatted string` (string)
-+ state: `published` (enum[string])
-    + Members
-        + `published`
-        + `edited`
 + `updated-at`: `2014-07-07T18:01:26.000Z` (string)
 
 ## Comment Create Request (object)
@@ -2158,15 +2421,16 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + include JSON API Version
 
 ## Donation Goal Attributes (object)
-+ description: `Will provide all the basic overhead costs needed to run Code Corps.` (string, required) - Several lines describing the reasons for the goal
++ achieved: `false` (required, boolean) - Indicates whether the goal `amount` has been met
 + amount: `1500000` (required, number) - The amount, in cents, for the goal.
 + current: `true` (required, boolean) - Indicates whether this is the current donation goal. This is determined by whether 1) this is the highest goal and the total monthly raised is higher than that amount or 2) the total monthly raised is between the lower goal's amount (if it exists) and this goal's amount.
++ description: `Will provide all the basic overhead costs needed to run Code Corps.` (string, required) - Several lines describing the reasons for the goal
 
 ## Donation Goal Create Request
 + data
     + attributes
-        + description (string) - A short plain text description for the donation
         + amount (number) - the amount of money in cents for the goal
+        + description (string) - A short plain text description for the donation
     + relationships
         + project
             + data(Project Resource Identifier)
@@ -2251,9 +2515,10 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + user_id: 1 (number, required)
 
 ## Organization Attributes (object)
++ `cloudinary-public-id`: `pp0md2banaw7k6oa1ew9` (string)
 + description: `Build a better future.`
-+ `icon-large-url`: `https://random_string.cloundfront.net/organizations/1/large.png`
-+ `icon-thumb-url`: `https://random_string.cloundfront.net/organizations/1/thumb.png`
++ `icon-large-url`: `//res.cloudinary.com/dlfnmtoq1/image/upload/c_fill,h_500,w_500/pp0md2banaw7k6oa1ew9`
++ `icon-thumb-url`: `//res.cloudinary.com/dlfnmtoq1/image/upload/c_fill,h_100,w_100/pp0md2banaw7k6oa1ew9`
 + `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
 + name: `Code Corps`
 + slug: `code_corps`
@@ -2263,12 +2528,14 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + include Organization Resource Identifier
 + attributes(Organization Attributes)
 + relationships
-    + organization-memberships
-        + data(array[Organization Membership Resource Identifier])
+    + owner
+        + data(User Resource Identifier)
     + projects
         + data(array[Project Resource Identifier])
     + slugged-route
         + data(Slugged Route Resource Identifier)
+    + stripe-connect-account
+        + data(Stripe Connect Account Resource Identifier)
 
 ## Organization Resource Identifier
 + id: `1` (string, required)
@@ -2282,7 +2549,7 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + data(array[Organization Resource])
 + include JSON API Version
 
-## Organization Membership Attributes (object)
+## Project User Attributes (object)
 + role: `pending` (enum[string])
     + Members
         + `pending`
@@ -2290,39 +2557,39 @@ This endpoint allows you to check whether a username is valid (by running a vali
         + `admin`
         + `owner`
 
-## Organization Membership Create Request (object)
-+ type: `organization-membership` (string, required)
-+ attributes(Organization Membership Attributes)
+## Project User Create Request (object)
++ type: `project-user` (string, required)
++ attributes(Project User Attributes)
 + relationships
-    + member
+    + project
+        + data(Project Resource Identifier)
+    + user
         + data(User Resource Identifier)
-    + organization
-        + data(Organization Resource Identifier)
 
-## Organization Membership Resource (object)
-+ include Organization Membership Resource Identifier
-+ attributes(Organization Membership Attributes)
+## Project User Resource (object)
++ include Project User Resource Identifier
++ attributes(Project User Attributes)
 + relationships
-    + member
+    + project
+        + data(Project Resource Identifier)
+    + user
         + data(User Resource Identifier)
-    + organization
-        + data(Organization Resource Identifier)
 
-## Organization Membership Resource Identifier (object)
+## Project User Resource Identifier (object)
 + id: `1` (string, required)
-+ type: `organization-membership` (string, required)
++ type: `project-user` (string, required)
 
-## Organization Membership Response (object)
-+ data(Organization Membership Resource)
+## Project User Response (object)
++ data(Project User Resource)
 + include JSON API Version
 
-## Organization Memberships Response (object)
-+ data(array[Organization Membership Resource])
+## Project Users Response (object)
++ data(array[Project User Resource])
 + include JSON API Version
 
-## Organization Membership Update Request (object)
-+ include Organization Membership Resource Identifier
-+ attributes(Organization Membership Attributes)
+## Project User Update Request (object)
++ include Project User Resource Identifier
++ attributes(Project User Attributes)
 
 ## Preview Attributes (object)
 + body: `<p>A <strong>strong</strong> preview</p>` (string)
@@ -2353,24 +2620,31 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + include JSON API Version
 
 ## Project Attributes (object)
++ approved: `true` (boolean) - Has the project been approved by Code Corps?
++ `can-activate-donations`: `true` (boolean) - Can the project turn on donations? True only if the project has at least one Donation Goal and the Organization has a Stripe Connect Account where `charges-enabled` is `true` and `transfers-enabled` is `true`.
++ `cloudinary-public-id`: `pp0md2banaw7k6oa1ew9` (string)
 + description: 'Help build and fund public software projects for social good.' (string) - A short plain text description for the project
-+ `icon-large-url`: 'example.com/icon_large.png' (string) - A url pointing to a large icon for the project
-+ `icon-thumb-url`: 'example.com/icon_thumb.png' (string) - A url pointing to the project thumbnail
++ `icon-large-url`: ``//res.cloudinary.com/dlfnmtoq1/image/upload/c_fill,h_500,w_500/pp0md2banaw7k6oa1ew9` (string) - A url pointing to a large icon for the project
++ `icon-thumb-url`: ``//res.cloudinary.com/dlfnmtoq1/image/upload/c_fill,h_100,w_100/pp0md2banaw7k6oa1ew9` (string) - A url pointing to the project thumbnail
 + `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
 + `long-description-body`: 'Example <b>html</b>' (string) - A html string containing the rendered `long-description-markdown`
 + `long-description-markdown`: 'Example **markdown**' (string) - Markdown formatted string containing the project long description
++ `should-link-externally`: `true` (boolean) - A temporary attribute while Code Corps improves project and user matching. Allows the project to link out to an external website (like GitHub) for onboarding of volunteers.
 + slug: 'code-corps' (string) - Case insensitive unique string identifier for the project
 + title: 'Code Corps' (string) - A title for the project
++ `total-monthly-donated`: `43400` - The total amount of active donations for the current month, in cents
 + `updated-at`: `2016-07-08T03:03:51.967Z` (string)
++ `website`: `https://www.codecorps.org` (string)
 
 ## Project Create Request
 + data
     + attributes
-        + `base64-icon-data` (string) - A base64 encoded string containing the project icon
-        + title (string, required) - A title for the project
+        + `cloudinary-public-id` (string) - String containing the public_id for the Cloudinary image
         + description (string) - A short plain text description for the project
-        + slug (string) - Case insensitive unique string identifier for the project
         + `long-description-markdown` (string) - Markdown formatted string containing the project long description
+        + slug (string) - Case insensitive unique string identifier for the project
+        + title (string, required) - A title for the project
+        + `website` (string) - URL for the project's website
     + relationships
         + organizations
             + data(Organization Resource Identifier) - Identifier of organization this project is being created for
@@ -2381,12 +2655,20 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + include Project Resource Identifier
 + attributes(Project Attributes)
 + relationships
+    + `donation-goals`
+        + data(array[Donation Goal Resource Identifier])
     + organization
         + data(Organization Resource Identifier)
     + `project-categories`
         + data(array[Project Category Resource Identifier])
     + `project-skills`
         + data(array[Project Skill Resource Identifier])
+    + `project-users`
+        + data(array[Project User Resource Identifier])
+    + `stripe-connect-plan`
+        + data(Stripe Connect Plan Resource Identifier)
+    + `task-lists`
+        + data(array[Task List Resource Identifier])
     + tasks
         + data(array[Task Resource Identifier])
 
@@ -2463,6 +2745,26 @@ This endpoint allows you to check whether a username is valid (by running a vali
     + title: `404 Resource not found` (string)
     + status: 404 (number) - HTTP status code
 
+## Role Skill Resource (object)
++ include Role Skill Resource Identifier
++ relationships
+    + role
+        + data(Role Resource Identifier)
+    + skill
+        + data(Skill Resource Identifier)
+
+## Role Skill Resource Identifier (object)
++ id: `1` (string, required)
++ type: `role-skill` (string, required)
+
+## Role Skill Response (object)
++ data(Role Skill Resource)
++ include JSON API Version
+
+## Role Skills Response (object)
++ data(array[Role Skill Resource])
++ include JSON API Version
+
 ## Role Attributes
 + ability: `Backend Development` (string)
 + `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
@@ -2491,26 +2793,6 @@ This endpoint allows you to check whether a username is valid (by running a vali
 
 ## Roles Response (object)
 + data(array[Role Resource])
-+ include JSON API Version
-
-## Role Skill Resource (object)
-+ include Role Skill Resource Identifier
-+ relationships
-    + role
-        + data(Role Resource Identifier)
-    + skill
-        + data(Skill Resource Identifier)
-
-## Role Skill Resource Identifier (object)
-+ id: `1` (string, required)
-+ type: `role-skill` (string, required)
-
-## Role Skill Response (object)
-+ data(Role Skill Resource)
-+ include JSON API Version
-
-## Role Skills Response (object)
-+ data(array[Role Skill Resource])
 + include JSON API Version
 
 ## Skill Attributes (object)
@@ -2615,6 +2897,74 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + data(array[Stripe Connect Account Resource])
 + include JSON API Version
 
+## Stripe Connect Plan Attributes (object)
++ amount: 999 (number) - Describes the amount of a plan in cents.
++ created: `2016-07-08T03:03:51.967Z` (string) - A timestamp, indicating when the plan was created by Stripe
++ `id-from-stripe`: `monthly-donation-1` (string, required)
++ `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
++ name: `Monthly Donation` (string) - Name of the plan, to be displayed on invoices and in the web interface.
++ `updated-at`: `2014-07-07T18:01:26.000Z` (string)
+
+## Stripe Connect Plan Resource (object)
++ include Stripe Connect Plan Resource Identifier
++ attributes(Stripe Connect Plan Attributes)
++ relationships
+    + project
+        + data(Project Resource Identifier)
+
+## Stripe Connect Plan Resource Identifier
++ id: `1` (string, required)
++ type: `stripe-connect-plan` (string, required)
+
+## Stripe Connect Plan Response
++ data(Stripe Connect Plan Resource)
++ include JSON API Version
+
+## Stripe Connect Plans Response
++ data(array[Stripe Connect Plan Resource])
++ include JSON API Version
+
+## Stripe Connect Subscription Attributes (object)
++ `cancelled-at`: null (string) - If the subscription has been canceled, the date of that cancellation.
++ created: `2016-07-08T03:03:51.967Z` (string) - A timestamp, indicating when the plan was created by Stripe
++ `current-period-end`: `2016-08-08T03:03:51.967Z` (string) - End of the current period that the subscription has been invoiced for. At the end of this period, a new invoice will be created.
++ `current-period-start`: `2016-07-08T03:03:51.967Z` (string) - Start of the current period that the subscription has been invoiced for
++ `customer-id-from-stripe`: 'cus_9RnUvtsb41mD1g'  (string) - ID of the customer who owns the subscription
++ `ended-at`: null(string) - If the subscription has ended (either because it was canceled or because the customer was switched to a subscription to a new plan), the date the subscription ended
++ `id-from-stripe`: `sub_9RnVc9Cd03wV8X` (string, required)
++ `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
++ `plan-id-from-stripe`: `monthly-donation-1` (string)
++ start: `2014-07-07T18:01:26.000Z` (string) - Date the most recent update to this subscription started.
++ status: `active` (enum[string])
+    + Members
+      + `trialing`
+      + `active`
+      + `past_due`
+      + `canceled`
+      + `unpaid`
++ `updated-at`: `2014-07-07T18:01:26.000Z` (string)
+
+## Stripe Connect Subscription Resource (object)
++ include Stripe Connect Subscription Resource Identifier
++ attributes(Stripe Connect Subscription Attributes)
++ relationships
+    + `stripe-platform-customer`
+        + data(Stripe Platform Customer Resource Identifier)
+    + `stripe-connect-plan`
+        + data(Stripe Connect Plan Resource Identifier)
+
+## Stripe Connect Subscription Resource Identifier
++ id: `1` (string, required)
++ type: `stripe-connect-subscription` (string, required)
+
+## Stripe Connect Subscription Response
++ data(Stripe Connect Subscription Resource)
++ include JSON API Version
+
+## Stripe Connect Subscriptions Response
++ data(array[Stripe Connect Subscription Resource])
++ include JSON API Version
+
 ## Stripe Platform Card Attributes (object)
 + brand: (enum[string]) - Card brand.
     + Members
@@ -2686,74 +3036,6 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + data(array[Stripe Platform Customer Resource])
 + include JSON API Version
 
-## Stripe Connect Plan Attributes (object)
-+ amount: 999 (number) - Describes the amount of a plan in cents.
-+ created: `2016-07-08T03:03:51.967Z` (string) - A timestamp, indicating when the plan was created by Stripe
-+ `id-from-stripe`: `monthly-donation-1` (string, required)
-+ `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
-+ name: `Monthly Donation` (string) - Name of the plan, to be displayed on invoices and in the web interface.
-+ `updated-at`: `2014-07-07T18:01:26.000Z` (string)
-
-## Stripe Connect Plan Resource (object)
-+ include Stripe Connect Plan Resource Identifier
-+ attributes(Stripe Connect Plan Attributes)
-+ relationships
-    + project
-        + data(Project Resource Identifier)
-
-## Stripe Connect Plan Resource Identifier
-+ id: `1` (string, required)
-+ type: `stripe-connect-plan` (string, required)
-
-## Stripe Connect Plan Response
-+ data(Stripe Connect Plan Resource)
-+ include JSON API Version
-
-## Stripe Connect Plans Response
-+ data(array[Stripe Connect Plan Resource])
-+ include JSON API Version
-
-## Stripe Connect Subscription Attributes (object)
-+ `cancelled-at`: null (string) - If the subscription has been canceled, the date of that cancellation.
-+ created: `2016-07-08T03:03:51.967Z` (string) - A timestamp, indicating when the plan was created by Stripe
-+ `current-period-end`: `2016-08-08T03:03:51.967Z` (string) - End of the current period that the subscription has been invoiced for. At the end of this period, a new invoice will be created.
-+ `current-period-start`: `2016-07-08T03:03:51.967Z` (string) - Start of the current period that the subscription has been invoiced for
-+ `customer-id-from-stripe`: 'cus_9RnUvtsb41mD1g'  (string) - ID of the customer who owns the subscription
-+ `ended-at`: null(string) - If the subscription has ended (either because it was canceled or because the customer was switched to a subscription to a new plan), the date the subscription ended
-+ `id-from-stripe`: `sub_9RnVc9Cd03wV8X` (string, required)
-+ `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
-+ `plan-id-from-stripe`: `monthly-donation-1` (string)
-+ start: `2014-07-07T18:01:26.000Z` (string) - Date the most recent update to this subscription started.
-+ status: `active` (enum[string])
-    + Members
-      + `trialing`
-      + `active`
-      + `past_due`
-      + `canceled`
-      + `unpaid`
-+ `updated-at`: `2014-07-07T18:01:26.000Z` (string)
-
-## Stripe Connect Subscription Resource (object)
-+ include Stripe Connect Subscription Resource Identifier
-+ attributes(Stripe Connect Subscription Attributes)
-+ relationships
-    + `stripe-platform-customer`
-        + data(Stripe Platform Customer Resource Identifier)
-    + `stripe-connect-plan`
-        + data(Stripe Connect Plan Resource Identifier)
-
-## Stripe Connect Subscription Resource Identifier
-+ id: `1` (string, required)
-+ type: `stripe-connect-subscription` (string, required)
-
-## Stripe Connect Subscription Response
-+ data(Stripe Connect Subscription Resource)
-+ include JSON API Version
-
-## Stripe Connect Subscriptions Response
-+ data(array[Stripe Connect Subscription Resource])
-+ include JSON API Version
-
 ## Task Attributes (object)
 + body: `<p>A <b>strong</b> body.</p>` (string)
 + `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
@@ -2787,6 +3069,54 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + data(array[Task Response])
 + include JSON API Version
 
+## Task List Attributes (object)
++ inbox: `false` (boolean)
++ `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
++ name: `In Progress` (string)
++ order: `1` (string)
++ `updated-at`: `2016-07-08T03:03:51.967Z` (string)
+
+## Task List Resource (object)
++ include Task List Resource Identifier
++ attributes(Task List Attributes)
++ relationships
+    + project (object)
+        + data(Project Resource Identifier)
+    + tasks
+        + data(array[Task Resource Identifier])
+
+## Task List Resource Identifier
++ id: `1` (string, required)
++ type: `task` (string, required)
+
+## Task List Response (object)
++ data(Task List Resource)
++ include JSON API Version
+
+## Task Lists Response (object)
++ data(array[Task List Response])
++ include JSON API Version
+
+## Task Skill Resource (object)
++ include Task Skill Resource Identifier
++ relationships
+    + skill
+        + data(Skill Resource Identifier)
+    + task
+        + data(Task Resource Identifier)
+
+## Task Skill Resource Identifier (object)
++ id: `1` (string, required)
++ type: `task-skill` (string, required)
+
+## Task Skill Response (object)
++ data(Task Skill Resource)
++ include JSON API Version
+
+## Task Skills Response (object)
++ data(array[Task Skill Resource])
++ include JSON API Version
+
 ## Unprocessable Entity Response (object)
 + errors
     + id: `VALIDATION_ERROR` (string)
@@ -2817,17 +3147,18 @@ This endpoint allows you to check whether a username is valid (by running a vali
 
 ## User Attributes (object)
 + biography: `Sample bio.` (string)
++ `cloudinary-public-id`: `pp0md2banaw7k6oa1ew9` (string)
 + email: `me@testuser.org` (string)
 + `first-name`: `Test` (string)
 + `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
 + `last-name`: `User` (string)
 + name: `Test User` (string)
-+ `photo-large-url`: `https://d3pgew4wbk2vb1.cloudfront.net/icons/user_default_large.png` (string)
-+ `photo-thumb-url`: `https://d3pgew4wbk2vb1.cloudfront.net/icons/user_default_thumb.png` (string)
++ `photo-large-url`: `//res.cloudinary.com/dlfnmtoq1/image/upload/c_fill,h_500,w_500/pp0md2banaw7k6oa1ew9` (string)
++ `photo-thumb-url`: `//res.cloudinary.com/dlfnmtoq1/image/upload/c_fill,h_100,w_100/pp0md2banaw7k6oa1ew9` (string)
 + state: `signed_up` (string)
 + `state-transition`: `edit_profile` (string)
-+ theme: `light` (string)
 + twitter: `testuser` (string)
++ `updated-at`: `2016-07-08T03:03:51.967Z` (string)
 + username: `testuser` (string)
 + website: `https://testuser.org` (string)
 
@@ -2835,10 +3166,12 @@ This endpoint allows you to check whether a username is valid (by running a vali
 + Include User Resource Identifier
 + attributes (User Attributes)
 + relationships
-  + `organization-memberships` (object)
-      + data(array[Organization Membership Resource Identifier])
+  + `project-users` (object)
+      + data(array[Project User Resource Identifier])
   + `slugged-route` (object)
       + data(Slugged Route Resource Identifier)
+  + `stripe-connect-subscriptions` (object)
+      + data(array[Stripe Connect Subscription Resource Identifier])
   + `stripe-platform-cards` (object)
       + data(array[Stripe Platform Card Resource Identifier])
   + `stripe-platform-customer` (object)
@@ -2900,4 +3233,24 @@ This endpoint allows you to check whether a username is valid (by running a vali
 
 ## User Skills Response (object)
 + data(array[User Skill Resource])
++ include JSON API Version
+
+## User Task Resource (object)
++ include User Task Resource Identifier
++ relationships
+    + task
+        + data(Task Resource Identifier)
+    + user
+        + data(User Resource Identifier)
+
+## User Task Resource Identifier (object)
++ id: `1` (string, required)
++ type: `user-task` (string, required)
+
+## User Task Response (object)
++ data(User Task Resource)
++ include JSON API Version
+
+## User Tasks Response (object)
++ data(array[User Task Resource])
 + include JSON API Version
