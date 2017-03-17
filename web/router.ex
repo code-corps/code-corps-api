@@ -66,25 +66,25 @@ defmodule CodeCorps.Router do
     resources "/organizations", OrganizationController, only: [:create, :update]
     post "/password/reset", PasswordResetController, :reset_password
     resources "/previews", PreviewController, only: [:create]
-    resources "/projects", ProjectController, only: [:create, :update]
     resources "/project-categories", ProjectCategoryController, only: [:create, :delete]
     resources "/project-skills", ProjectSkillController, only: [:create, :delete]
     resources "/project-users", ProjectUserController, only: [:create, :update, :delete]
-    resources "/roles", RoleController, only: [:create]
+    resources "/projects", ProjectController, only: [:create, :update]
     resources "/role-skills", RoleSkillController, only: [:create, :delete]
+    resources "/roles", RoleController, only: [:create]
     resources "/skills", SkillController, only: [:create]
     resources "/stripe-connect-accounts", StripeConnectAccountController, only: [:show, :create, :update]
     resources "/stripe-connect-plans", StripeConnectPlanController, only: [:show, :create]
     resources "/stripe-connect-subscriptions", StripeConnectSubscriptionController, only: [:show, :create]
     resources "/stripe-platform-cards", StripePlatformCardController, only: [:show, :create]
     resources "/stripe-platform-customers", StripePlatformCustomerController, only: [:show, :create]
-    resources "/tasks", TaskController, only: [:create, :update]
     resources "/task-skills", TaskSkillController, only: [:create, :delete]
-    resources "/users", UserController, only: [:update]
+    resources "/tasks", TaskController, only: [:create, :update]
     resources "/user-categories", UserCategoryController, only: [:create, :delete]
     resources "/user-roles", UserRoleController, only: [:create, :delete]
     resources "/user-skills", UserSkillController, only: [:create, :delete]
     resources "/user-tasks", UserTaskController, only: [:create, :update, :delete]
+    resources "/users", UserController, only: [:update]
   end
 
   scope "/", CodeCorps, host: "api." do
@@ -97,28 +97,28 @@ defmodule CodeCorps.Router do
     resources "/comments", CommentController, only: [:index, :show]
     resources "/donation-goals", DonationGoalController, only: [:index, :show]
     resources "/organizations", OrganizationController, only: [:index, :show]
+    resources "/project-categories", ProjectCategoryController, only: [:index, :show]
+    resources "/project-skills", ProjectSkillController, only: [:index, :show]
+    resources "/project-users", ProjectUserController, only: [:index, :show]
     resources "/projects", ProjectController, only: [:index, :show] do
       resources "/task-lists", TaskListController, only: [:index, :show]
       resources "/tasks", TaskController, only: [:index, :show]
     end
-    resources "/project-categories", ProjectCategoryController, only: [:index, :show]
-    resources "/project-skills", ProjectSkillController, only: [:index, :show]
-    resources "/project-users", ProjectUserController, only: [:index, :show]
-    resources "/roles", RoleController, only: [:index, :show]
     resources "/role-skills", RoleSkillController, only: [:index, :show]
+    resources "/roles", RoleController, only: [:index, :show]
     resources "/skills", SkillController, only: [:index, :show]
     resources "/task-lists", TaskListController, only: [:index, :show] do
       resources "/tasks", TaskController, only: [:index, :show]
     end
-    resources "/tasks", TaskController, only: [:index, :show]
     resources "/task-skills", TaskSkillController, only: [:index, :show]
-    get "/users/email_available", UserController, :email_available
-    get "/users/username_available", UserController, :username_available
-    resources "/users", UserController, only: [:index, :show, :create]
+    resources "/tasks", TaskController, only: [:index, :show]
     resources "/user-categories", UserCategoryController, only: [:index, :show]
     resources "/user-roles", UserRoleController, only: [:index, :show]
     resources "/user-skills", UserSkillController, only: [:index, :show]
     resources "/user-tasks", UserTaskController, only: [:index, :show]
+    get "/users/email_available", UserController, :email_available
+    get "/users/username_available", UserController, :username_available
+    resources "/users", UserController, only: [:index, :show, :create]
     get "/:slug", SluggedRouteController, :show
     get "/:slug/projects", ProjectController, :index
     get "/:slug/:project_slug", ProjectController, :show
