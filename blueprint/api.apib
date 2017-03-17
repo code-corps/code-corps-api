@@ -2354,6 +2354,56 @@ This endpoint allows you to check whether a username is valid (by running a vali
 
     + Attributes (Unprocessable Entity Response)
 
+# Group Webhooks - Stripe
+
+Code Corps responds to [Stripe webhooks](https://stripe.com/docs/webhooks).
+
+Since Code Corps is a platform, we have two separate webhook endpoints for dealing with both Stripe Connect (the managed accounts) and the platform (shared data across customers).
+
+## Stripe Connect Webhook [/webhooks/stripe/connect]
+
+Handles Stripe Connect events for managed accounts for projects on the Code Corps platform.
+
+This endpoint provides information about the actual payments and subscriptions that occur on the managed accounts.
+
+### Stripe Connect Webhook [POST]
+
++ Request
+
+    + Attributes
+
+        + object - The Stripe object.
+
+    + Headers
+
+            Content-Type: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
++ Response 400 (application/vnd.api+json; charset=utf-8)
+
+## Stripe Platform Webhook [/webhooks/stripe/platform]
+
+Handles Stripe events for the Code Corps platform itself.
+
+The platform stores Stripe customers and cards so they can be reused across different projects, and fan out updates to all the managed Stripe accounts.
+
+### Stripe Platform Webhook [POST]
+
++ Request
+
+    + Attributes
+
+        + object - The Stripe object.
+
+    + Headers
+
+            Content-Type: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
++ Response 400 (application/vnd.api+json; charset=utf-8)
+
 # Data Structures
 
 ## Category Attributes (object)
