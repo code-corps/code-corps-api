@@ -14,12 +14,6 @@ defmodule CodeCorps.Analytics.SegmentEventNameBuilder do
   defp get_event_name(:update, %CodeCorps.DonationGoal{}) do
     "Updated Donation Goal"
   end
-  defp get_event_name(:create, %CodeCorps.OrganizationMembership{}) do
-    "Requested Organization Membership"
-  end
-  defp get_event_name(:update, %CodeCorps.OrganizationMembership{}) do
-    "Approved Organization Membership"
-  end
   defp get_event_name(:create, %CodeCorps.ProjectUser{}) do
     "Requested Project Membership"
   end

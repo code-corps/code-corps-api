@@ -6,7 +6,6 @@ defmodule CodeCorps.UserViewTest do
 
   test "renders all attributes and relationships properly" do
     user = insert(:user, first_name: "First", last_name: "Last", default_color: "blue")
-    organization_membership = insert(:organization_membership, member: user)
     slugged_route = insert(:slugged_route, user: user)
     stripe_connect_subscription = insert(:stripe_connect_subscription, user: user)
     stripe_platform_card = insert(:stripe_platform_card, user: user)
@@ -42,11 +41,6 @@ defmodule CodeCorps.UserViewTest do
           "website" => user.website
         },
         "relationships" => %{
-          "organization-memberships" => %{
-            "data" => [
-              %{"id" => organization_membership.id |> Integer.to_string, "type" => "organization-membership"}
-            ]
-          },
           "project-users" => %{
             "data" => [
               %{"id" => project_user.id |> Integer.to_string, "type" => "project-user"}

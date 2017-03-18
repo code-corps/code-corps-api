@@ -30,14 +30,6 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilder do
     }
   end
 
-  defp traits(organization_membership = %CodeCorps.OrganizationMembership{}) do
-    organization_membership = organization_membership |> CodeCorps.Repo.preload(:organization)
-    %{
-      organization: organization_membership.organization.name,
-      organization_id: organization_membership.organization.id
-    }
-  end
-
   defp traits(record = %CodeCorps.ProjectUser{}) do
     record = record |> CodeCorps.Repo.preload(:project)
     %{
