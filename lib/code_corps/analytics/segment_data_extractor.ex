@@ -5,6 +5,7 @@ defmodule CodeCorps.Analytics.SegmentDataExtractor do
 
   @spec get_action(Plug.Conn.t) :: atom
   def get_action(%Plug.Conn{private: %{phoenix_action: action}}), do: action
+  def get_action(_), do: nil
 
   @spec get_resource(Plug.Conn.t) :: struct
   def get_resource(%Plug.Conn{assigns: %{data: data}}), do: data
