@@ -53,6 +53,9 @@ defmodule CodeCorps.Project do
     |> generate_slug(:title, :slug)
     |> validate_slug(:slug)
     |> unique_constraint(:slug, name: :index_projects_on_slug)
+    |> check_constraint(:long_description_markdown,
+                        message: "cannot be deleted once your project is approved",
+                        name: "set_long_description_markdown_if_approved")
     |> MarkdownRendererService.render_markdown_to_html(:long_description_markdown, :long_description_body)
   end
 

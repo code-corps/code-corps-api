@@ -76,6 +76,7 @@ defmodule CodeCorps.Factories do
   def project_factory do
     %CodeCorps.Project{
       approved: true,
+      long_description_markdown: sequence(:long_description_markdown, &"Description #{&1}"), # once approved, this MUST be set
       slug: sequence(:slug, &"project-#{&1}"),
       title: sequence(:title, &"Project #{&1}"),
       website: sequence(:website, &"http://test-#{&1}.com"),

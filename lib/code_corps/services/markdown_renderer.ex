@@ -9,6 +9,7 @@ defmodule CodeCorps.Services.MarkdownRendererService do
   def render_markdown_to_html(%Changeset{valid?: false} = changeset, _, _), do: changeset
   def render_markdown_to_html(changeset, source_field, destination_field) do
     case Changeset.get_change(changeset, source_field) do
+      "" -> Changeset.put_change(changeset, destination_field, nil)
       nil -> changeset
       markdown -> markdown |> convert_into_html() |> put_into(changeset, destination_field)
     end
@@ -23,6 +24,6 @@ defmodule CodeCorps.Services.MarkdownRendererService do
 
   @spec put_into(String.t, Changeset.t, atom) :: Changeset.t
   defp put_into(html, changeset, destination_field) do
-    Ecto.Changeset.put_change(changeset, destination_field, html)
+    Changeset.put_change(changeset, destination_field, html)
   end
 end
