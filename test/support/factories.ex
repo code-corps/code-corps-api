@@ -38,14 +38,6 @@ defmodule CodeCorps.Factories do
     }
   end
 
-  def organization_membership_factory do
-    %CodeCorps.OrganizationMembership{
-      member: build(:user),
-      organization: build(:organization),
-      role: "contributor"
-    }
-  end
-
   def task_factory do
     %CodeCorps.Task{
       title: "Test task",

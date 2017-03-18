@@ -5,7 +5,7 @@ defmodule CodeCorps.UserView do
       default_preloads: [
         :project_users, :slugged_route, :stripe_connect_subscriptions,
         :stripe_platform_card, :stripe_platform_customer,
-        :organization_memberships, :user_categories, :user_roles, :user_skills
+        :user_categories, :user_roles, :user_skills
       ]
   use CodeCorps.Web, :view
   use JaSerializer.PhoenixView
@@ -22,7 +22,6 @@ defmodule CodeCorps.UserView do
 
   has_many :project_users, serializer: CodeCorps.ProjectUserView, identifiers: :always
   has_many :stripe_connect_subscriptions, serializer: CodeCorps.StripeConnectSubscriptionView, identifiers: :always
-  has_many :organization_memberships, serializer: CodeCorps.OrganizationMembershipView, identifiers: :always
   has_many :user_categories, serializer: CodeCorps.UserCategoryView, identifiers: :always
   has_many :user_roles, serializer: CodeCorps.UserRoleView, identifiers: :always
   has_many :user_skills, serializer: CodeCorps.UserSkillView, identifiers: :always

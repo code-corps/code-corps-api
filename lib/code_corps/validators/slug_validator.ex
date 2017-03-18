@@ -34,7 +34,7 @@ defmodule CodeCorps.Validators.SlugValidator do
       images issues
       mentions
       notifications
-      oauth oauth_clients organizations organization-memberships
+      oauth oauth_clients organizations
       ping projects project-categories
       project-skills
       repositories roles
