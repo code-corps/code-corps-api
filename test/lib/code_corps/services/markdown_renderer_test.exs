@@ -12,6 +12,26 @@ defmodule CodeCorps.Services.MarkdownRendererServiceTest do
     status: "open"
   }
 
+  test "renders empty strings to nil" do
+    attrs = @valid_attrs |> Map.merge(%{markdown: ""})
+    changeset =
+      %Task{}
+      |> Task.changeset(attrs)
+      |> render_markdown_to_html(:markdown, :body)
+
+    assert changeset |> Ecto.Changeset.get_change(:body) == nil
+  end
+
+  test "returns unchanged changeset when nil" do
+    attrs = @valid_attrs |> Map.merge(%{markdown: nil})
+    changeset =
+      %Task{}
+      |> Task.changeset(attrs)
+      |> render_markdown_to_html(:markdown, :body)
+
+    assert changeset == %Task{} |> Task.changeset(attrs)
+  end
+
   test "renders markdown to html" do
     changeset =
       %Task{}
