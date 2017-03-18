@@ -1,6 +1,6 @@
 defmodule CodeCorps.OrganizationView do
   alias CodeCorps.Cloudex.CloudinaryUrl
-  use CodeCorps.PreloadHelpers, default_preloads: [:owner, :organization_memberships, :projects, :slugged_route, :stripe_connect_account]
+  use CodeCorps.PreloadHelpers, default_preloads: [:owner, :projects, :slugged_route, :stripe_connect_account]
   use CodeCorps.Web, :view
   use JaSerializer.PhoenixView
 
@@ -13,7 +13,6 @@ defmodule CodeCorps.OrganizationView do
   has_one :slugged_route, serializer: CodeCorps.SluggedRouteView
   has_one :stripe_connect_account, serializer: CodeCorps.StripeConnectAccountView
 
-  has_many :organization_memberships, serializer: CodeCorps.OrganizationMembershipView, identifiers: :always
   has_many :projects, serializer: CodeCorps.ProjectView, identifiers: :always
 
   def icon_large_url(organization, _conn) do

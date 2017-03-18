@@ -28,9 +28,6 @@ defmodule CodeCorps.Organization do
 
     has_many :projects, CodeCorps.Project
 
-    has_many :organization_memberships, CodeCorps.OrganizationMembership
-    has_many :members, through: [:organization_memberships, :member]
-
     timestamps()
   end
 
