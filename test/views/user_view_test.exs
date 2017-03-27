@@ -33,6 +33,7 @@ defmodule CodeCorps.UserViewTest do
           "name" => "First Last",
           "photo-large-url" => "#{host}/icons/user_default_large_blue.png",
           "photo-thumb-url" => "#{host}/icons/user_default_thumb_blue.png",
+          "sign-up-context" => "default",
           "state" => "signed_up",
           "state-transition" => nil,
           "twitter" => user.twitter,
