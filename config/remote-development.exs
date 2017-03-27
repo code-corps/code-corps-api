@@ -43,6 +43,7 @@ config :code_corps, CodeCorps.Mailer,
   adapter: Bamboo.LocalAdapter
 
 config :code_corps,
+  postmark_project_acceptance_template: "123",
   postmark_receipt_template: "123"
 
 # ## SSL Support

@@ -230,6 +230,37 @@ td {
   text-align: center;
 }
 
+/* Project joining -------------------------------- */
+
+.joined_images {
+  height: 70px;
+  margin: 0 0 30px 0;
+  padding: 0;
+  text-align: center;
+  width: 100%;
+}
+
+.joined_images li {
+  display: inline-block;
+}
+
+.joined_images li.icon {
+  margin: 0 5px;
+  width: 25px;
+}
+
+.joined_images li.photo {
+  width: 70px;
+}
+
+.joined_images li.photo img {
+  border-radius: 4px;
+}
+
+.joined_images li:first-child {
+  /*margin-left: 300px;*/
+}
+
 /* Data table ------------------------------ */
 
 .purchase {
