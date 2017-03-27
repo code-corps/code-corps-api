@@ -12,8 +12,8 @@ defmodule CodeCorps.UserView do
 
   attributes [
     :biography, :cloudinary_public_id, :email, :first_name, :last_name, :name,
-    :photo_large_url, :photo_thumb_url, :state, :state_transition,
-    :twitter, :username, :website, :inserted_at, :updated_at
+    :photo_large_url, :photo_thumb_url, :sign_up_context, :state,
+    :state_transition, :twitter, :username, :website, :inserted_at, :updated_at
   ]
 
   has_one :slugged_route, serializer: CodeCorps.SluggedRouteView
