@@ -1,9 +1,8 @@
 alias CodeCorps.{
   Category, Organization, ProjectUser, Project, ProjectCategory, ProjectSkill,
-  Repo, Role, Skill, Task, User, UserCategory, UserRole, UserSkill
+  Repo, Role, Skill, SluggedRoute, Task, TaskList, User, UserCategory, UserRole,
+  UserSkill
 }
-
-# Users
 
 users = [
   %{
@@ -36,275 +35,202 @@ users = [
   }
 ]
 
-cond do
-  Repo.all(User) != [] ->
-    IO.puts "Users detected, aborting user seed."
-  true ->
-    Enum.each(users, fn user ->
-      result =
-        %User{}
-        |> User.registration_changeset(user)
-        |> Repo.insert!
+case Repo.all(User) do
+  [] ->
+    users
+    |> Enum.map(fn params ->
+      registration_changeset = User.registration_changeset(%User{}, params)
+      update_changeset = User.update_changeset(%User{}, params)
 
-      result
-      |> User.update_changeset(user)
-      |> Repo.update!
+      registration_changeset
+      |> Ecto.Changeset.merge(update_changeset)
+      |> Repo.insert!()
     end)
+  _ -> IO.puts "Users detected, aborting user seed."
 end
 
-# Organizations
-
 organizations = [
-  %{
+  %Organization{
     name: "Code Corps",
     description: "Help build and fund public software projects for social good",
-    owner_id: 1
+    owner_id: 1,
+    slug: "code-corps"
   },
 ]
 
-cond do
-  Repo.all(Organization) != [] ->
-    IO.puts "Organizations detected, aborting organization seed."
-  true ->
-    Enum.each(organizations, fn organization ->
-      Organization.create_changeset(%Organization{}, organization)
-      |> Repo.insert!
+case Repo.all(Organization) do
+  [] ->
+    organizations
+    |> Enum.map(&Repo.insert!/1)
+    |> Enum.each(fn %{id: id, slug: slug} ->
+      %SluggedRoute{organization_id: id, slug: slug} |> Repo.insert!()
     end)
+  _ -> IO.puts "Organizations detected, aborting organization seed."
 end
 
-# Projects
-
 projects = [
-  %{
-    title: "Code Corps",
+  %Project{
+    approved: true,
     description: "A basic project for use in development",
-    organization_id: 1,
-    owner_id: 1
+    long_description_markdown: "A basic project for use in **development**",
+    slug: "code-corps",
+    title: "Code Corps",
+    organization_id: 1
   }
 ]
 
-cond do
-  Repo.all(Project) != [] ->
-    IO.puts "Projects detected, aborting project seed."
-  true ->
-    Enum.each(projects, fn project ->
-      Project.create_changeset(%Project{}, project)
-      |> Repo.insert!
-    end)
-
-    Project |> Repo.update_all(set: [approved: true])
+case Repo.all(Project) do
+  [] -> Enum.each(projects, &Repo.insert!/1)
+  _ -> IO.puts "Projects detected, aborting project seed."
 end
 
-# Skills
+project_users = [
+  %ProjectUser{project_id: 1, user_id: 1, role: "owner"},
+  %ProjectUser{project_id: 1, user_id: 2, role: "admin"},
+  %ProjectUser{project_id: 1, user_id: 3, role: "contributor"},
+  %ProjectUser{project_id: 1, user_id: 4, role: "pending"}
+]
+
+case Repo.all(ProjectUser) do
+  [] -> Enum.each(project_users, &Repo.insert!/1)
+  _ -> IO.puts "Project users detected, aborting this seed."
+end
+
+# task lists
+
+task_lists = [
+  %TaskList{inbox: true, name: "Inbox", position: 1, project_id: 1},
+  %TaskList{inbox: false, name: "Backlog", position: 2, project_id: 1},
+  %TaskList{inbox: false, name: "In Progress", position: 3, project_id: 1},
+  %TaskList{inbox: false, name: "Done", position: 4, project_id: 1}
+]
+
+case Repo.all(TaskList) do
+  [] -> Enum.each(task_lists, &Repo.insert!/1)
+  _ -> IO.puts "TaskLists detected, aborting this seed."
+end
 
 skills = [
-  %{
-    title: "CSS",
-    },
-  %{
-    title: "Docker",
-  },
-  %{
-    title: "Ember.js",
-  },
-  %{
-    title: "HTML",
-  },
-  %{
-    title: "Ruby",
-  },
-  %{
-    title: "Ruby on Rails",
-  },
+  %Skill{title: "CSS"},
+  %Skill{title: "Docker"},
+  %Skill{title: "Ember.js"},
+  %Skill{title: "HTML"},
+  %Skill{title: "Ruby"},
+  %Skill{title: "Ruby on Rails"}
 ]
 
-cond do
-  Repo.all(Skill) != [] ->
-    IO.puts "Skills detected, aborting skill seed."
-  true ->
-    Enum.each(skills, fn skill ->
-      Skill.changeset(%Skill{}, skill)
-      |> Repo.insert!
-    end)
+case Repo.all(Skill) do
+  [] -> Enum.each(skills, &Repo.insert!/1)
+  _ -> IO.puts "Skills detected, aborting skill seed."
 end
-
-# Roles
 
 roles = [
-  %{
-    name: "Accountant",
-    ability: "Accounting",
-    kind: "support",
-  },
-  %{
-    name: "Administrator",
-    ability: "Administrative",
-    kind: "support",
-  },
-  %{
-    name: "Donor",
-    ability: "Donations",
-    kind: "support",
-  },
-  %{
-    name: "Backend Developer",
-    ability: "Backend Development",
-    kind: "technology",
-  },
-  %{
-    name: "Data Scientist",
-    ability: "Data Science",
-    kind: "technology",
-  },
-  %{
-    name: "Designer",
-    ability: "Design",
-    kind: "creative",
-  },
-  %{
-    name: "DevOps",
-    ability: "DevOps",
-    kind: "technology",
-  },
-  %{
-    name: "Front End Developer",
-    ability: "Front End Development",
-    kind: "technology",
-  },
-  %{
-    name: "Lawyer",
-    ability: "Legal",
-    kind: "support",
-  },
-  %{
-    name: "Marketer",
-    ability: "Marketing",
-    kind: "creative",
-  },
-  %{
-    name: "Mobile Developer",
-    ability: "Mobile Development",
-    kind: "technology",
-  },
-  %{
-    name: "Product Manager",
-    ability: "Product Management",
-    kind: "technology",
-  },
-  %{
-    name: "Photographer",
-    ability: "Photography",
-    kind: "creative",
-  },
-  %{
-    name: "Researcher",
-    ability: "Research",
-    kind: "support",
-  },
-  %{
-    name: "Tester",
-    ability: "Testing",
-    kind: "technology",
-  },
-  %{
-    name: "Video Producer",
-    ability: "Video Production",
-    kind: "creative",
-  },
-  %{
-    name: "Writer",
-    ability: "Writing",
-    kind: "creative",
-  },
+  %Role{name: "Accountant", ability: "Accounting", kind: "support"},
+  %Role{name: "Administrator", ability: "Administrative", kind: "support"},
+  %Role{name: "Donor", ability: "Donations", kind: "support"},
+  %Role{name: "Backend Developer", ability: "Backend Development", kind: "technology"},
+  %Role{name: "Data Scientist", ability: "Data Science", kind: "technology"},
+  %Role{name: "Designer", ability: "Design", kind: "creative"},
+  %Role{name: "DevOps", ability: "DevOps", kind: "technology"},
+  %Role{name: "Front End Developer", ability: "Front End Development", kind: "technology"},
+  %Role{name: "Lawyer", ability: "Legal", kind: "support"},
+  %Role{name: "Marketer", ability: "Marketing", kind: "creative"},
+  %Role{name: "Mobile Developer", ability: "Mobile Development", kind: "technology"},
+  %Role{name: "Product Manager", ability: "Product Management", kind: "technology"},
+  %Role{name: "Photographer", ability: "Photography", kind: "creative"},
+  %Role{name: "Researcher", ability: "Research", kind: "support"},
+  %Role{name: "Tester", ability: "Testing", kind: "technology"},
+  %Role{name: "Video Producer", ability: "Video Production", kind: "creative"},
+  %Role{name: "Writer", ability: "Writing", kind: "creative"},
 ]
 
-cond do
-  Repo.all(Role) != [] ->
-    IO.puts "Roles detected, aborting this seed."
-  true ->
-    Enum.each(roles, fn role ->
-      Role.changeset(%Role{}, role)
-      |> Repo.insert!
-    end)
+case Repo.all(Role) do
+  [] -> Enum.each(roles, &Repo.insert!/1)
+  _ -> IO.puts "Roles detected, aborting this seed."
 end
 
-# Categories
-
 categories = [
-  %{
+  %Category{
     name: "Arts",
-    description: "You want to improve the arts."
+    description: "You want to improve the arts.",
+    slug: "arts"
   },
-  %{
+  %Category{
     name: "Economy",
-    description: "You want to improve finance and the economic climate."
+    description: "You want to improve finance and the economic climate.",
+    slug: "economy"
   },
-  %{
+  %Category{
     name: "Education",
-    description: "You want to improve literacy, schools, and training."
+    description: "You want to improve literacy, schools, and training.",
+    slug: "education"
   },
-  %{
+  %Category{
     name: "Environment",
-    description: "You want to improve your environment."
+    description: "You want to improve your environment.",
+    slug: "environment"
   },
-  %{
+  %Category{
     name: "Government",
-    description: "You want to improve government responsiveness."
+    description: "You want to improve government responsiveness.",
+    slug: "government"
   },
-  %{
+  %Category{
     name: "Health",
-    description: "You want to improve prevention and treatment."
+    description: "You want to improve prevention and treatment.",
+    slug: "health"
   },
-  %{
+  %Category{
     name: "Justice",
-    description: "You want to improve your judicial system."
+    description: "You want to improve your judicial system.",
+    slug: "justice"
   },
-  %{
+  %Category{
     name: "Politics",
-    description: "You want to improve elections and voting."
+    description: "You want to improve elections and voting.",
+    slug: "politics"
   },
-  %{
+  %Category{
     name: "Public Safety",
-    description: "You want to improve crime prevention and safety."
+    description: "You want to improve crime prevention and safety.",
+    slug: "public-safety"
   },
-  %{
+  %Category{
     name: "Science",
-    description: "You want to improve tools for advancing science."
+    description: "You want to improve tools for advancing science.",
+    slug: "science"
   },
-  %{
+  %Category{
     name: "Security",
-    description: "You want to improve tools like encryption."
+    description: "You want to improve tools like encryption.",
+    slug: "security"
   },
-  %{
+  %Category{
     name: "Society",
-    description: "You want to improve our communities."
+    description: "You want to improve our communities.",
+    slug: "society"
   },
-  %{
+  %Category{
     name: "Technology",
-    description: "You want to improve software tools and infrastructure."
+    description: "You want to improve software tools and infrastructure.",
+    slug: "technology"
   },
-  %{
+  %Category{
     name: "Transportation",
-    description: "You want to improve how people travel."
+    description: "You want to improve how people travel.",
+    slug: "transportation"
   },
 ]
 
-cond do
-  Repo.all(Category) != [] ->
-    IO.puts "Categories detected, aborting category seed."
-  true ->
-    Enum.each(categories, fn category ->
-      Category.create_changeset(%Category{}, category)
-      |> Repo.insert!
-    end)
+case Repo.all(Category) do
+  [] -> Enum.each(categories, &Repo.insert!/1)
+  _ -> IO.puts "Categories detected, aborting category seed."
 end
 
 # Tasks
 
-cond do
-  Repo.all(Task) != [] ->
-    IO.puts "Tasks detected, aborting this seed."
-  true ->
+case Repo.all(Task) do
+  [] ->
     for i <- 1..50 do
       %Task{}
       |> Task.create_changeset(%{
@@ -318,157 +244,60 @@ cond do
       })
       |> Repo.insert!
     end
+  _ -> IO.puts "Tasks detected, aborting this seed."
 end
 
-cond do
-  Repo.all(ProjectCategory) != [] ->
-    IO.puts "Project categories detected, aborting this seed."
-  true ->
-    %ProjectCategory{}
-    |> ProjectCategory.create_changeset(%{
-      project_id: 1,
-      category_id: 12
-    })
-    |> Repo.insert!
+project_categories = [
+  %ProjectCategory{project_id: 1, category_id: 12}
+]
+
+case Repo.all(ProjectCategory) do
+  [] -> Enum.each(project_categories, &Repo.insert!/1)
+  _ -> IO.puts "Project categories detected, aborting this seed."
 end
 
-cond do
-  Repo.all(ProjectSkill) != [] ->
-    IO.puts "Project skills detected, aborting this seed."
-  true ->
-    %ProjectSkill{}
-    |> ProjectSkill.create_changeset(%{
-      project_id: 1,
-      skill_id: 1
-    })
-    |> Repo.insert!
+project_skills = [
+  %ProjectSkill{project_id: 1, skill_id: 1}
+]
+
+case Repo.all(ProjectSkill) do
+  [] -> Enum.each(project_skills, &Repo.insert!/1)
+  _ -> IO.puts "Project skills detected, aborting this seed."
 end
 
-cond do
-  Repo.all(ProjectUser) != [] ->
-    IO.puts "Project memberships detected, aborting this seed."
-  true ->
-    contributors = [
-      %{
-        project_id: 1,
-        user_id: 1,
-        role: "owner"
-      },
-      %{
-        project_id: 1,
-        user_id: 2,
-        role: "admin"
-      },
-      %{
-        project_id: 1,
-        user_id: 3,
-        role: "contributor"
-      },
-      %{
-        project_id: 1,
-        user_id: 4,
-        role: "pending"
-      }
-    ]
+user_categories = [
+  %UserCategory{category_id: 1, user_id: 1},
+  %UserCategory{category_id: 1, user_id: 2},
+  %UserCategory{category_id: 1, user_id: 3},
+  %UserCategory{category_id: 1, user_id: 4}
+]
 
-    Enum.each(contributors, fn user ->
-      membership =
-        %ProjectUser{}
-        |> ProjectUser.create_changeset(user)
-        |> Repo.insert!
-
-      membership
-      |> ProjectUser.update_changeset(user)
-      |> Repo.update!
-    end)
+case Repo.all(UserCategory) do
+  [] -> Enum.each(user_categories, &Repo.insert!/1)
+  _ -> IO.puts "User categories detected, aborting this seed."
 end
 
-cond do
-  Repo.all(UserCategory) != [] ->
-    IO.puts "User categories detected, aborting this seed."
-  true ->
-    user_categories = [
-      %{
-        category_id: 1,
-        user_id: 1
-      },
-      %{
-        category_id: 1,
-        user_id: 2
-      },
-      %{
-        category_id: 1,
-        user_id: 3
-      },
-      %{
-        category_id: 1,
-        user_id: 4
-      }
-    ]
+user_roles = [
+  %UserRole{role_id: 1, user_id: 1},
+  %UserRole{role_id: 1, user_id: 2},
+  %UserRole{role_id: 1, user_id: 3},
+  %UserRole{role_id: 1, user_id: 4}
+]
 
-    Enum.each(user_categories, fn user_category ->
-      %UserCategory{}
-      |> UserCategory.create_changeset(user_category)
-      |> Repo.insert!
-    end)
+case Repo.all(UserRole) do
+  [] -> Enum.each(user_roles, &Repo.insert!/1)
+  _ -> IO.puts "User roles detected, aborting this seed."
 end
 
-cond do
-  Repo.all(UserRole) != [] ->
-    IO.puts "User roles detected, aborting this seed."
-  true ->
-    user_roles = [
-      %{
-        role_id: 1,
-        user_id: 1
-      },
-      %{
-        role_id: 1,
-        user_id: 2
-      },
-      %{
-        role_id: 1,
-        user_id: 3
-      },
-      %{
-        role_id: 1,
-        user_id: 4
-      }
-    ]
+user_skills = [
+  %UserSkill{skill_id: 1, user_id: 1},
+  %UserSkill{skill_id: 1, user_id: 2},
+  %UserSkill{skill_id: 1, user_id: 3},
+  %UserSkill{skill_id: 1, user_id: 4}
+]
 
-    Enum.each(user_roles, fn user_role ->
-      %UserRole{}
-      |> UserRole.create_changeset(user_role)
-      |> Repo.insert!
-    end)
+case Repo.all(UserSkill) do
+  [] -> Enum.each(user_skills, &Repo.insert!/1)
+  _ -> IO.puts "User skills detected, aborting this seed."
 end
 
-cond do
-  Repo.all(UserSkill) != [] ->
-    IO.puts "User skills detected, aborting this seed."
-  true ->
-    user_skills = [
-      %{
-        skill_id: 1,
-        user_id: 1
-      },
-      %{
-        skill_id: 1,
-        user_id: 2
-      },
-      %{
-        skill_id: 1,
-        user_id: 3
-      },
-      %{
-        skill_id: 1,
-        user_id: 4
-      }
-    ]
-
-    Enum.each(user_skills, fn user_skill ->
-      %UserSkill{}
-      |> UserSkill.create_changeset(user_skill)
-      |> Repo.insert!
-    end)
-end

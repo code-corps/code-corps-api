@@ -1,5 +1,5 @@
 defmodule CodeCorps.UserView do
-  alias CodeCorps.Cloudex.CloudinaryUrl
+  alias CodeCorps.Presenters.ImagePresenter
 
   use CodeCorps.PreloadHelpers,
       default_preloads: [
@@ -12,8 +12,8 @@ defmodule CodeCorps.UserView do
 
   attributes [
     :biography, :cloudinary_public_id, :email, :first_name, :last_name, :name,
-    :photo_large_url, :photo_thumb_url, :state, :state_transition,
-    :twitter, :username, :website, :inserted_at, :updated_at
+    :photo_large_url, :photo_thumb_url, :sign_up_context, :state,
+    :state_transition, :twitter, :username, :website, :inserted_at, :updated_at
   ]
 
   has_one :slugged_route, serializer: CodeCorps.SluggedRouteView
@@ -26,13 +26,9 @@ defmodule CodeCorps.UserView do
   has_many :user_roles, serializer: CodeCorps.UserRoleView, identifiers: :always
   has_many :user_skills, serializer: CodeCorps.UserSkillView, identifiers: :always
 
-  def photo_large_url(user, _conn) do
-    CloudinaryUrl.for(user.cloudinary_public_id, %{crop: "fill", height: 500, width: 500}, "large", user.default_color, "user")
-  end
+  def photo_large_url(user, _conn), do: ImagePresenter.large(user)
 
-  def photo_thumb_url(user, _conn) do
-    CloudinaryUrl.for(user.cloudinary_public_id, %{crop: "fill", height: 100, width: 100}, "thumb", user.default_color, "user")
-  end
+  def photo_thumb_url(user, _conn), do: ImagePresenter.thumbnail(user)
 
   @doc """
   Returns the user email or an empty string, depending on the user

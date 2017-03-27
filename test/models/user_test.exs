@@ -63,6 +63,13 @@ defmodule CodeCorps.UserTest do
       refute changeset.valid?
       assert_error_message(changeset, :username, "has already been taken")
     end
+
+    test "allows setting sign_up_context to 'donation'" do
+      attrs = @valid_attrs |> Map.put(:sign_up_context, "donation")
+      changeset = User.registration_changeset(%User{}, attrs)
+      assert changeset.valid?
+      assert changeset |> Ecto.Changeset.get_change(:sign_up_context) == "donation"
+    end
   end
 
   describe "update_changeset" do

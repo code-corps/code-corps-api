@@ -17,7 +17,7 @@ test:
       if [ ${CIRCLE_PR_USERNAME} ]; then
         MIX_ENV=test mix test;
       else
-        MIX_ENV=test mix coveralls.circle --include requires_env;
+        MIX_ENV=test mix coveralls.circle;
       fi
   post:
     - mix inch.report

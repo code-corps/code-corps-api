@@ -26,6 +26,7 @@ defmodule CodeCorps.User do
     field :last_name, :string
     field :password, :string, virtual: true
     field :password_confirmation, :string, virtual: true
+    field :sign_up_context, :string, default: "default"
     field :twitter, :string
     field :username, :string
     field :website, :string
@@ -71,11 +72,11 @@ defmodule CodeCorps.User do
   def registration_changeset(struct, params) do
     struct
     |> changeset(params)
-    |> cast(params, [:password, :username])
-    |> validate_required(:password)
-    |> validate_required(:username)
+    |> cast(params, [:password, :sign_up_context, :username])
+    |> validate_required([:password, :username])
     |> validate_length(:password, min: 6)
     |> validate_length(:username, min: 1, max: 39)
+    |> validate_inclusion(:sign_up_context, ["default", "donation"])
     |> validate_slug(:username)
     |> unique_constraint(:username, name: :users_lower_username_index)
     |> unique_constraint(:email)
