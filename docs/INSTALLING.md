@@ -46,6 +46,19 @@ You can now fetch your dependencies, compile, and run the server:
 
 ```shell
 mix deps.get
+```
+
+You'll likely need to create the database, using [Ecto's `create` mix task](https://hexdocs.pm/ecto/Mix.Tasks.Ecto.Create.html):
+
+```shell
+mix ecto.create
+```
+
+> Note: If you're seeing error output like `psql: FATAL: role "postgres" does not exist`, you'll need to create the `"postgres"` role by running `psql` in your CLI, followed by `CREATE USER postgres SUPERUSER;`. Please post an issue if you're having other issues.
+
+You can now compile and run the server:
+
+```shell
 mix phoenix.server
 ```
 
