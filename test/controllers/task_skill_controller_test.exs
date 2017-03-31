@@ -34,8 +34,7 @@ defmodule CodeCorps.TaskSkillControllerTest do
       conn
       |> request_show(task_skill)
       |> json_response(200)
-      |> Map.get("data")
-      |> assert_result_id(task_skill.id)
+      |> assert_id_from_response(task_skill.id)
     end
 
     test "renders 404 error when id is nonexistent", %{conn: conn} do

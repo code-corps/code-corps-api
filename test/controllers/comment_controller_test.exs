@@ -32,8 +32,7 @@ defmodule CodeCorps.CommentControllerTest do
       conn
       |> request_show(comment)
       |> json_response(200)
-      |> Map.get("data")
-      |> assert_result_id(comment.id)
+      |> assert_id_from_response(comment.id)
     end
 
     test "renders 404 when id is nonexistent", %{conn: conn} do

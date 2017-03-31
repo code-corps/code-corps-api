@@ -78,8 +78,7 @@ defmodule CodeCorps.UserControllerTest do
       conn
       |> request_show(user)
       |> json_response(200)
-      |> Map.get("data")
-      |> assert_result_id(user.id)
+      |> assert_id_from_response(user.id)
     end
 
     @tag :authenticated

@@ -50,18 +50,17 @@ defmodule CodeCorps.TaskListControllerTest do
       conn
       |> request_show(task_list)
       |> json_response(200)
-      |> Map.get("data")
-      |> assert_result_id(task_list.id)
+      |> assert_id_from_response(task_list.id)
     end
 
     test "shows task list by id for project", %{conn: conn} do
       task_list = insert(:task_list)
 
       path = conn |> project_task_list_path(:show, task_list.project_id, task_list.id)
-      data = conn |> get(path) |> json_response(200) |> Map.get("data")
+      data = conn |> get(path) |> json_response(200)
 
-      assert data["id"] == "#{task_list.id}"
-      assert data["type"] == "task-list"
+      assert data["data"]["id"] == "#{task_list.id}"
+      assert data["data"]["type"] == "task-list"
     end
 
     test "renders 404 when id is nonexistent", %{conn: conn} do

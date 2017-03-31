@@ -32,8 +32,7 @@ defmodule CodeCorps.DonationGoalControllerTest do
       conn
       |> request_show(donation_goal)
       |> json_response(200)
-      |> Map.get("data")
-      |> assert_result_id(donation_goal.id)
+      |> assert_id_from_response(donation_goal.id)
     end
 
     test "renders 404 when id is nonexistent", %{conn: conn} do

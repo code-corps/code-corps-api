@@ -8,6 +8,11 @@ defmodule CodeCorps.TestHelpers do
     end
   end
 
+  def assert_id_from_response(response, id) do
+    assert String.to_integer(response["data"]["id"]) == id
+    response
+  end
+
   def assert_ids_from_response(response, ids) do
     assert ids_from_response(response) == ids
     response
@@ -26,11 +31,6 @@ defmodule CodeCorps.TestHelpers do
   def assert_jsonapi_relationship(json, relationship_name, id) do
     assert json["data"]["relationships"][relationship_name]["data"]["id"] == Integer.to_string(id)
     json
-  end
-
-  def assert_result_id(result, id) do
-    assert String.to_integer(result["id"]) == id
-    result
   end
 
   def put_id(payload, id), do: put_in(payload, ["data", "id"], id)
