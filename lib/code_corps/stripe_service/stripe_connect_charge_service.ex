@@ -1,8 +1,7 @@
 defmodule CodeCorps.StripeService.StripeConnectChargeService do
-  alias CodeCorps.{
-    Repo, StripeConnectAccount, StripeConnectCharge
-  }
+  alias CodeCorps.Repo
   alias CodeCorps.StripeService.Adapters.StripeConnectChargeAdapter
+  alias CodeCorps.Web.{StripeConnectAccount, StripeConnectCharge}
 
   @api Application.get_env(:code_corps, :stripe)
 

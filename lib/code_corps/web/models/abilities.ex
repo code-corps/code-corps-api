@@ -1,14 +1,14 @@
 defmodule Canary.Abilities do
   alias CodeCorps.Web.{
-    Category, Comment, CodeCorps.Web.DonationGoal, Organization, Preview, Project,
-    ProjectCategory, ProjectSkill, ProjectUser, Role, RoleSkill, Skill,
-    StripeConnectAccount, StripeConnectPlan, StripeConnectSubscription,
-    StripePlatformCard, StripePlatformCustomer, Task, TaskSkill, User,
-    UserCategory, UserRole, UserSkill, UserTask
+    Category, Comment, CodeCorps.DonationGoal, Organization, Preview,
+    Project, ProjectCategory, ProjectSkill, ProjectUser, Role, RoleSkill,
+    Skill, StripeConnectAccount, StripeConnectPlan,
+    StripeConnectSubscription, StripePlatformCard, StripePlatformCustomer,
+    Task, TaskSkill, User, UserCategory, UserRole, UserSkill, UserTask
   }
 
   alias CodeCorps.Web.{
-    CategoryPolicy, CommentPolicy, CodeCorps.Web.DonationGoalPolicy, OrganizationPolicy,
+    CategoryPolicy, CommentPolicy, DonationGoalPolicy, OrganizationPolicy,
     PreviewPolicy, ProjectPolicy, ProjectCategoryPolicy,
     ProjectSkillPolicy, ProjectUserPolicy, RolePolicy, RoleSkillPolicy,
     SkillPolicy, StripeConnectAccountPolicy, StripeConnectPlanPolicy,

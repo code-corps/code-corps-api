@@ -2,14 +2,15 @@ defmodule CodeCorps.Services.UserService do
   @moduledoc """
   Handles CRUD operations for users.
 
-  When operations happen on `CodeCorps.Web.User`, we need to make sure changes
-  are propagated to related records, ex., `CodeCorps.Web.StripePlatformCustomer` and
+  When operations happen on `CodeCorps.Web.User`, we need to make sure
+  change are propagated to related records, ex.,
+  `CodeCorps.Web.StripePlatformCustomer` and
   `CodeCorps.Web.StripeConnectCustomer`
-
   """
 
-  alias CodeCorps.{Repo, StripeConnectCustomer, StripePlatformCustomer, User}
+  alias CodeCorps.Repo
   alias CodeCorps.StripeService.{StripeConnectCustomerService, StripePlatformCustomerService}
+  alias CodeCorps.Web{StripeConnectCustomer, StripePlatformCustomer, User}
   alias Ecto.{Changeset, Multi}
 
   # Prevents warning for calling `Repo.transaction(multi)`.
