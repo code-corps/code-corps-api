@@ -44,8 +44,7 @@ defmodule CodeCorps.ProjectControllerTest do
       conn
       |> request_show(project)
       |> json_response(200)
-      |> Map.get("data")
-      |> assert_result_id(project.id)
+      |> assert_id_from_response(project.id)
     end
 
     test "shows chosen resource retrieved by slug", %{conn: conn} do
@@ -57,8 +56,7 @@ defmodule CodeCorps.ProjectControllerTest do
       conn
       |> get(path)
       |> json_response(200)
-      |> Map.get("data")
-      |> assert_result_id(project.id)
+      |> assert_id_from_response(project.id)
     end
 
     test "retrieval by slug is case insensitive", %{conn: conn} do

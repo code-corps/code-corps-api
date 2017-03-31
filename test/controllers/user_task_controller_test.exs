@@ -36,8 +36,7 @@ defmodule CodeCorps.UserTaskControllerTest do
       conn
       |> request_show(user_task)
       |> json_response(200)
-      |> Map.get("data")
-      |> assert_result_id(user_task.id)
+      |> assert_id_from_response(user_task.id)
     end
 
     test "renders 404 error when id is nonexistent", %{conn: conn} do

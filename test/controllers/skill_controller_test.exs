@@ -61,8 +61,7 @@ defmodule CodeCorps.SkillControllerTest do
       conn
       |> request_show(skill)
       |> json_response(200)
-      |> Map.get("data")
-      |> assert_result_id(skill.id)
+      |> assert_id_from_response(skill.id)
     end
 
     test "renders 404 when id is nonexistent", %{conn: conn} do

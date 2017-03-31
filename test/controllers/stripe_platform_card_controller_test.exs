@@ -8,8 +8,7 @@ defmodule CodeCorps.StripePlatformCardControllerTest do
       conn
       |> request_show(stripe_platform_card)
       |> json_response(200)
-      |> Map.get("data")
-      |> assert_result_id(stripe_platform_card.id)
+      |> assert_id_from_response(stripe_platform_card.id)
     end
 
     test "renders 401 when unauthenticated", %{conn: conn} do

@@ -7,8 +7,7 @@ defmodule CodeCorps.SluggedRouteControllerTest do
     conn
     |> get("/#{slug}")
     |> json_response(200)
-    |> Map.get("data")
-    |> assert_result_id(slugged_route.id)
+    |> assert_id_from_response(slugged_route.id)
   end
 
   test "is case insensitive", %{conn: conn} do

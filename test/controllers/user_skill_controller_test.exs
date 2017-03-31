@@ -30,8 +30,7 @@ defmodule CodeCorps.UserSkillControllerTest do
       conn
       |> request_show(user_skill)
       |> json_response(200)
-      |> Map.get("data")
-      |> assert_result_id(user_skill.id)
+      |> assert_id_from_response(user_skill.id)
     end
 
     test "renders 404 error when id is nonexistent", %{conn: conn} do
