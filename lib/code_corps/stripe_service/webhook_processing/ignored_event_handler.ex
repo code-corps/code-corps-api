@@ -1,8 +1,9 @@
 defmodule CodeCorps.StripeService.WebhookProcessing.IgnoredEventHandler do
-  alias CodeCorps.{StripeEvent, Repo}
+  alias CodeCorps.Repo
   alias CodeCorps.StripeService.WebhookProcessing.{
     ConnectEventHandler, PlatformEventHandler
   }
+  alias CodeCorps.Web.StripeEvent
 
   @ignored_platform_event_types [
     "account.external_account.created",

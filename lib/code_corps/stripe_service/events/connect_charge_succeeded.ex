@@ -4,7 +4,7 @@ defmodule CodeCorps.StripeService.Events.ConnectChargeSucceeded do
   on Stripe Connect
   """
   alias CodeCorps.StripeService.StripeConnectChargeService
-  alias CodeCorps.{Emails, Mailer, StripeConnectCharge}
+  alias CodeCorps.Web.{Emails, Mailer, StripeConnectCharge}
 
   @api Application.get_env(:code_corps, :stripe)
 

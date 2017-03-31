@@ -1,13 +1,12 @@
-defmodule CodeCorps.Web.Helpers.Policy do
+defmodule CodeCorps.Helpers.Policy do
   @moduledoc """
   Holds helpers for extracting record relationships and determining roles for
   authorization policies.
   """
 
-  alias CodeCorps.{
-    Organization, ProjectUser,
-    Project, ProjectUser, Repo,
-    TaskSkill, Task, User, UserTask
+  alias CodeCorps.Web.{
+    Organization, ProjectUser, Project, ProjectUser, Repo, TaskSkill,
+    Task, User, UserTask
   }
   alias Ecto.Changeset
 

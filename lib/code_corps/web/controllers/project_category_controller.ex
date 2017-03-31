@@ -4,7 +4,7 @@ defmodule CodeCorps.Web.ProjectCategoryController do
 
   alias CodeCorps.Web.ProjectCategory
 
-  import CodeCorps.Web.Helpers.Query, only: [id_filter: 2]
+  import CodeCorps.Helpers.Query, only: [id_filter: 2]
 
   plug :load_resource, model: ProjectCategory, only: [:show], preload: [:project, :category]
   plug :load_and_authorize_changeset, model: ProjectCategory, only: [:create]

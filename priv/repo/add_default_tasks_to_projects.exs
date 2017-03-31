@@ -31,7 +31,7 @@ defmodule CodeCorps.Repo.Seeds.AddDefaultTasksToProjects do
 
   defp add_existing_tasks_to_inbox(project, task_list) do
     Task
-    |> CodeCorps.Web.Helpers.Query.project_filter(%{ project_id: project.id })
+    |> CodeCorps.Helpers.Query.project_filter(%{ project_id: project.id })
     |> Repo.all()
     |> Enum.each(&assign_task_to_inbox(&1, task_list))
   end

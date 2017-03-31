@@ -5,8 +5,8 @@ defmodule CodeCorps.Web.Organization do
 
   use CodeCorps.Web, :model
 
-  import CodeCorps.Web.Helpers.RandomIconColor
-  import CodeCorps.Web.Helpers.Slug
+  import CodeCorps.Helpers.RandomIconColor
+  import CodeCorps.Helpers.Slug
   import CodeCorps.Validators.SlugValidator
 
   alias CodeCorps.Web.SluggedRoute

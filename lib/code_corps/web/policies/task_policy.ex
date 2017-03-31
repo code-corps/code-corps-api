@@ -1,5 +1,5 @@
 defmodule CodeCorps.Web.TaskPolicy do
-  import CodeCorps.Web.Helpers.Policy,
+  import CodeCorps.Helpers.Policy,
     only: [get_project: 1, administered_by?: 2, task_authored_by?: 2]
 
   alias CodeCorps.{Task, User}

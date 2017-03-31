@@ -1,5 +1,5 @@
 defmodule CodeCorps.Web.OrganizationPolicy do
-  import CodeCorps.Web.Helpers.Policy,
+  import CodeCorps.Helpers.Policy,
     only: [owned_by?: 2]
 
   alias CodeCorps.Web.User

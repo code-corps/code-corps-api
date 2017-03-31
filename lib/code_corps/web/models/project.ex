@@ -5,9 +5,9 @@ defmodule CodeCorps.Web.Project do
 
   use CodeCorps.Web, :model
 
-  import CodeCorps.Web.Helpers.RandomIconColor
-  import CodeCorps.Web.Helpers.Slug
-  import CodeCorps.Web.Helpers.URL, only: [prefix_url: 2]
+  import CodeCorps.Helpers.RandomIconColor
+  import CodeCorps.Helpers.Slug
+  import CodeCorps.Helpers.URL, only: [prefix_url: 2]
   import CodeCorps.Validators.SlugValidator
 
   alias CodeCorps.Services.MarkdownRendererService
@@ -80,7 +80,7 @@ defmodule CodeCorps.Web.Project do
     |> changeset(params)
     |> cast(params, [:website])
     |> prefix_url(:website)
-    |> validate_format(:website, CodeCorps.Web.Helpers.URL.valid_format())
+    |> validate_format(:website, CodeCorps.Helpers.URL.valid_format())
   end
 
   def update_total_changeset(struct, params) do

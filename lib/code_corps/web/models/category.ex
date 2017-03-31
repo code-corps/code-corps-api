@@ -5,7 +5,7 @@ defmodule CodeCorps.Web.Category do
 
   use CodeCorps.Web, :model
 
-  import CodeCorps.Web.Helpers.Slug
+  import CodeCorps.Helpers.Slug
 
   @type t :: %__MODULE__{}
 

@@ -1,5 +1,6 @@
 defmodule CodeCorps.StripeService.StripeConnectCardService do
-  alias CodeCorps.{Repo, StripeConnectAccount, StripeConnectCard,
+  alias CodeCorps.Repo
+  alias CodeCorps.Web.{StripeConnectAccount, StripeConnectCard,
   StripeConnectCustomer, StripePlatformCard, StripePlatformCustomer}
   alias CodeCorps.StripeService.Adapters.StripeConnectCardAdapter
 

@@ -2,7 +2,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectChargeAdapter do
 
   alias CodeCorps.Repo
   alias CodeCorps.StripeService.Util
-  alias CodeCorps.Web{StripeConnectAccount, StripeConnectCustomer}
+  alias CodeCorps.Web.{StripeConnectAccount, StripeConnectCustomer}
 
   # Mapping of stripe record attributes to locally stored attributes
   # Format is {:local_key, [:nesting, :of, :stripe, :keys]}

@@ -2,7 +2,7 @@ defmodule CodeCorps.Web.ProjectUserPolicy do
   @moduledoc """
   Handles `User` authorization of actions on `ProjectUser` records
   """
-  import CodeCorps.Web.Helpers.Policy, only: [get_role: 1]
+  import CodeCorps.Helpers.Policy, only: [get_role: 1]
 
   alias CodeCorps.{ProjectUser, Repo, User}
   alias Ecto.Changeset

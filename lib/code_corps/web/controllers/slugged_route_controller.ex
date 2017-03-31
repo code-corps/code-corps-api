@@ -2,7 +2,7 @@ defmodule CodeCorps.Web.SluggedRouteController do
   use CodeCorps.Web, :controller
   use JaResource
 
-  import CodeCorps.Web.Helpers.Query, only: [slug_finder: 2]
+  import CodeCorps.Helpers.Query, only: [slug_finder: 2]
 
   alias CodeCorps.Web.SluggedRoute
 

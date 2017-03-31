@@ -1,6 +1,7 @@
 defmodule CodeCorps.StripeService.StripeConnectCustomerService do
+  alias CodeCorps.Repo
   alias CodeCorps.StripeService.Adapters.StripeConnectCustomerAdapter
-  alias CodeCorps.{Repo, StripeConnectAccount, StripeConnectCustomer, StripePlatformCustomer, User}
+  alias CodeCorps.Web.{StripeConnectAccount, StripeConnectCustomer, StripePlatformCustomer, User}
 
   import CodeCorps.MapUtils, only: [rename: 3, keys_to_string: 1]
   import Ecto.Query # needed for match

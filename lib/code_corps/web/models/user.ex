@@ -5,8 +5,8 @@ defmodule CodeCorps.Web.User do
 
   use CodeCorps.Web, :model
 
-  import CodeCorps.Web.Helpers.RandomIconColor
-  import CodeCorps.Web.Helpers.URL, only: [prefix_url: 2]
+  import CodeCorps.Helpers.RandomIconColor
+  import CodeCorps.Helpers.URL, only: [prefix_url: 2]
   import CodeCorps.Validators.SlugValidator
 
   alias CodeCorps.Web.SluggedRoute
@@ -90,7 +90,7 @@ defmodule CodeCorps.Web.User do
     |> changeset(params)
     |> cast(params, [:biography, :cloudinary_public_id, :first_name, :last_name, :state_transition, :twitter, :website])
     |> prefix_url(:website)
-    |> validate_format(:website, CodeCorps.Web.Helpers.URL.valid_format())
+    |> validate_format(:website, CodeCorps.Helpers.URL.valid_format())
     |> validate_format(:twitter, ~r/\A[a-zA-Z0-9_]{1,15}\z/)
     |> apply_state_transition(struct)
   end

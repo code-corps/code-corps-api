@@ -1,5 +1,6 @@
 defmodule CodeCorps.StripeService.Adapters.StripeInvoiceAdapter do
-  alias CodeCorps.{Repo, StripeConnectCustomer, StripeConnectSubscription}
+  alias CodeCorps.Repo
+  alias CodeCorps.Web.{StripeConnectCustomer, StripeConnectSubscription}
 
   import CodeCorps.MapUtils, only: [keys_to_string: 1]
   import CodeCorps.StripeService.Util, only: [transform_map: 2]

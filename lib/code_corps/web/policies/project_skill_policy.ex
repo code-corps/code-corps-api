@@ -1,5 +1,5 @@
 defmodule CodeCorps.Web.ProjectSkillPolicy do
-  import CodeCorps.Web.Helpers.Policy, only: [get_project: 1, administered_by?: 2]
+  import CodeCorps.Helpers.Policy, only: [get_project: 1, administered_by?: 2]
 
   alias CodeCorps.{ProjectSkill, User}
   alias Ecto.Changeset

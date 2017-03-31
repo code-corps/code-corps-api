@@ -2,7 +2,7 @@ defmodule CodeCorps.Web.TaskListController do
   use CodeCorps.Web, :controller
   use JaResource
 
-  import CodeCorps.Web.Helpers.Query, only: [
+  import CodeCorps.Helpers.Query, only: [
     project_filter: 2, sort_by_order: 1,
   ]
 

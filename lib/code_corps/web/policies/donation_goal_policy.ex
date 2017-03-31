@@ -1,6 +1,6 @@
 defmodule CodeCorps.Web.DonationGoalPolicy do
 
-  import CodeCorps.Web.Helpers.Policy, only: [get_project: 1, owned_by?: 2]
+  import CodeCorps.Helpers.Policy, only: [get_project: 1, owned_by?: 2]
 
   alias CodeCorps.{CodeCorps.Web.DonationGoal, User}
   alias Ecto.Changeset

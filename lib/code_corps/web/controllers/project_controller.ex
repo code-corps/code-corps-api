@@ -2,7 +2,7 @@ defmodule CodeCorps.Web.ProjectController do
   use CodeCorps.Web, :controller
   use JaResource
 
-  import CodeCorps.Web.Helpers.Query, only: [approved_filter: 2, slug_finder: 2]
+  import CodeCorps.Helpers.Query, only: [approved_filter: 2, slug_finder: 2]
 
   alias CodeCorps.Web.Project
 

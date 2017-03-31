@@ -3,12 +3,13 @@ defmodule CodeCorps.Emails.ReceiptEmail do
   import Bamboo.PostmarkHelper
 
   alias CodeCorps.Emails.BaseEmail
-  alias CodeCorps.{CodeCorps.Web.DonationGoal, Project, Repo, StripeConnectCharge, StripeConnectSubscription}
+  alias CodeCorps.Repo
+  alias CodeCorps.Web.{DonationGoal, Project, StripeConnectCharge, StripeConnectSubscription}
 
   def create(%StripeConnectCharge{} = charge, %Stripe.Invoice{} = invoice) do
     with %StripeConnectCharge{} = charge <- preload(charge),
          %Project{} = project <- get_project(invoice.subscription),
-         {:ok, %CodeCorps.Web.DonationGoal{} = current_donation_goal} <- get_current_donation_goal(project),
+         {:ok, %DonationGoal{} = current_donation_goal} <- get_current_donation_goal(project),
          template_model <- build_model(charge, project, current_donation_goal)
     do
       BaseEmail.create
@@ -39,7 +40,7 @@ defmodule CodeCorps.Emails.ReceiptEmail do
   end
 
   defp get_current_donation_goal(project) do
-    case  Repo.get_by(CodeCorps.Web.DonationGoal, current: true, project_id: project.id) do
+    case  Repo.get_by(DonationGoal, current: true, project_id: project.id) do
       nil -> {:error, :donation_goal_not_found}
       donation_goal -> {:ok, donation_goal}
     end

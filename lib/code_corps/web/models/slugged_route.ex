@@ -6,7 +6,7 @@ defmodule CodeCorps.Web.SluggedRoute do
 
   use CodeCorps.Web, :model
 
-  import CodeCorps.Web.Helpers.Slug
+  import CodeCorps.Helpers.Slug
   import CodeCorps.Validators.SlugValidator
 
   @type t :: %__MODULE__{}

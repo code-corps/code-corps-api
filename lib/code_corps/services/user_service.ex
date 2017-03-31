@@ -10,7 +10,7 @@ defmodule CodeCorps.Services.UserService do
 
   alias CodeCorps.Repo
   alias CodeCorps.StripeService.{StripeConnectCustomerService, StripePlatformCustomerService}
-  alias CodeCorps.Web{StripeConnectCustomer, StripePlatformCustomer, User}
+  alias CodeCorps.Web.{StripeConnectCustomer, StripePlatformCustomer, User}
   alias Ecto.{Changeset, Multi}
 
   # Prevents warning for calling `Repo.transaction(multi)`.

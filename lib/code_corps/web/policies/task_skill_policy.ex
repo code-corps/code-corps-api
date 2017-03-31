@@ -4,7 +4,7 @@ defmodule CodeCorps.Web.TaskSkillPolicy do
   Used to authorize a controller action.
   """
 
-  import CodeCorps.Web.Helpers.Policy,
+  import CodeCorps.Helpers.Policy,
     only: [
       contributed_by?: 2,
       get_project: 1,
