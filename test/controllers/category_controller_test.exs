@@ -1,4 +1,4 @@
-defmodule CodeCorps.CategoryControllerTest do
+defmodule CodeCorps.Web.CategoryControllerTest do
   use CodeCorps.ApiCase, resource_name: :category
 
   @valid_attrs %{name: "Technology"}

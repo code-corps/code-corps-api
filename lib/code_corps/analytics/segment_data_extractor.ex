@@ -19,8 +19,8 @@ defmodule CodeCorps.Analytics.SegmentDataExtractor do
   end
   def get_resource(_), do: nil
 
-  @spec get_user_id(Plug.Conn.t, CodeCorps.User.t | struct | map) :: String.t
-  def get_user_id(%Plug.Conn{assigns: %{current_user: %CodeCorps.User{id: id}}}, _), do: id
-  def get_user_id(_, %CodeCorps.User{id: id}), do: id
+  @spec get_user_id(Plug.Conn.t, CodeCorps.Web.User.t | struct | map) :: String.t
+  def get_user_id(%Plug.Conn{assigns: %{current_user: %CodeCorps.Web.User{id: id}}}, _), do: id
+  def get_user_id(_, %CodeCorps.Web.User{id: id}), do: id
   def get_user_id(_, %{user_id: user_id}), do: user_id
 end

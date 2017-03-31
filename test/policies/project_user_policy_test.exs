@@ -1,10 +1,10 @@
-defmodule CodeCorps.ProjectUserPolicyTest do
+defmodule CodeCorps.Web.ProjectUserPolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.ProjectUserPolicy, only: [create?: 2, update?: 2, delete?: 2]
-  import CodeCorps.ProjectUser, only: [create_changeset: 2, update_changeset: 2]
+  import CodeCorps.Web.ProjectUserPolicy, only: [create?: 2, update?: 2, delete?: 2]
+  import CodeCorps.Web.ProjectUser, only: [create_changeset: 2, update_changeset: 2]
 
-  alias CodeCorps.ProjectUser
+  alias CodeCorps.Web.ProjectUser
 
   describe "create?/2" do
     test "returns true when user is creating their own membership" do

@@ -1,5 +1,5 @@
-defmodule CodeCorps.OrganizationViewTest do
-  use CodeCorps.ViewCase
+defmodule CodeCorps.Web.OrganizationViewTest do
+  use CodeCorps.Web.ViewCase
 
   test "renders all attributes and relationships properly" do
     user = insert(:user)
@@ -10,7 +10,7 @@ defmodule CodeCorps.OrganizationViewTest do
 
     host = Application.get_env(:code_corps, :asset_host)
 
-    rendered_json =  render(CodeCorps.OrganizationView, "show.json-api", data: organization)
+    rendered_json =  render(CodeCorps.Web.OrganizationView, "show.json-api", data: organization)
 
     expected_json = %{
       "data" => %{

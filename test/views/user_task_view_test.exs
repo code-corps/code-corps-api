@@ -1,12 +1,12 @@
-defmodule CodeCorps.UserTaskViewTest do
+defmodule CodeCorps.Web.UserTaskViewTest do
   @moduledoc false
 
-  use CodeCorps.ViewCase
+  use CodeCorps.Web.ViewCase
 
   test "renders all attributes and relationships properly" do
     user_task = insert(:user_task)
 
-    rendered_json = render(CodeCorps.UserTaskView, "show.json-api", data: user_task)
+    rendered_json = render(CodeCorps.Web.UserTaskView, "show.json-api", data: user_task)
 
     expected_json = %{
       "data" => %{

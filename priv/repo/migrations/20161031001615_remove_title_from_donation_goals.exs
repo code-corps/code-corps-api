@@ -1,4 +1,4 @@
-defmodule CodeCorps.Repo.Migrations.RemoveTitleFromDonationGoals do
+defmodule CodeCorps.Repo.Migrations.RemoveTitleFromCodeCorps.Web.DonationGoals do
   use Ecto.Migration
 
   def up do

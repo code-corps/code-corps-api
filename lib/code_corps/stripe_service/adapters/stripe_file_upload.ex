@@ -10,7 +10,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeFileUploadAdapter do
 
   @doc """
   Converts a struct received from the Stripe API into a map that can be used
-  to create a `CodeCorps.StripeFileUpload` record
+  to create a `CodeCorps.Web.StripeFileUpload` record
   """
   def to_params(%Stripe.FileUpload{} = stripe_file_upload, %{} = attributes) do
     result =

@@ -1,10 +1,10 @@
-defmodule CodeCorps.StripeConnectPlanPolicyTest do
+defmodule CodeCorps.Web.StripeConnectPlanPolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.StripeConnectPlanPolicy, only: [show?: 2, create?: 2]
-  import CodeCorps.StripeConnectPlan, only: [create_changeset: 2]
+  import CodeCorps.Web.StripeConnectPlanPolicy, only: [show?: 2, create?: 2]
+  import CodeCorps.Web.StripeConnectPlan, only: [create_changeset: 2]
 
-  alias CodeCorps.StripeConnectPlan
+  alias CodeCorps.Web.StripeConnectPlan
 
   describe "show?" do
     test "returns true when user is owner of project" do

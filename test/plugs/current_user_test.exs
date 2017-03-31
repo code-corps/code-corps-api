@@ -1,4 +1,4 @@
-defmodule CodeCorps.Plug.CurrentUserTest do
+defmodule CodeCorps.Web.Plug.CurrentUserTest do
 
   use CodeCorps.ConnCase
 
@@ -8,13 +8,13 @@ defmodule CodeCorps.Plug.CurrentUserTest do
       build_conn(),
       user
     )
-    result_conn = CodeCorps.Plug.CurrentUser.call(conn, [])
+    result_conn = CodeCorps.Web.Plug.CurrentUser.call(conn, [])
     assert result_conn.assigns[:current_user] == user
   end
 
   test "simply returns conn if user is not authenticated" do
     conn = build_conn()
-    result_conn = CodeCorps.Plug.CurrentUser.call(conn, [])
+    result_conn = CodeCorps.Web.Plug.CurrentUser.call(conn, [])
     assert result_conn == conn
   end
 end

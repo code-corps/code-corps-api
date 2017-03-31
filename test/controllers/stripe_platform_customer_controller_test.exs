@@ -1,4 +1,4 @@
-defmodule CodeCorps.StripePlatformCustomerControllerTest do
+defmodule CodeCorps.Web.StripePlatformCustomerControllerTest do
   use CodeCorps.ApiCase, resource_name: :stripe_platform_customer
 
   describe "show" do

@@ -1,4 +1,4 @@
-defmodule CodeCorps.UserTaskControllerTest do
+defmodule CodeCorps.Web.UserTaskControllerTest do
   @moduledoc false
 
   use CodeCorps.ApiCase, resource_name: :user_task

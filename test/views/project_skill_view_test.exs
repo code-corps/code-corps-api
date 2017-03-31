@@ -1,10 +1,10 @@
-defmodule CodeCorps.ProjectSkillViewTest do
-  use CodeCorps.ViewCase
+defmodule CodeCorps.Web.ProjectSkillViewTest do
+  use CodeCorps.Web.ViewCase
 
   test "renders all attributes and relationships properly" do
     project_skill = insert(:project_skill)
 
-    rendered_json = render(CodeCorps.ProjectSkillView, "show.json-api", data: project_skill)
+    rendered_json = render(CodeCorps.Web.ProjectSkillView, "show.json-api", data: project_skill)
 
     expected_json = %{
       "data" => %{

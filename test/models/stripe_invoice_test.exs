@@ -1,7 +1,7 @@
-defmodule CodeCorps.StripeInvoiceTest do
+defmodule CodeCorps.Web.StripeInvoiceTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.StripeInvoice
+  alias CodeCorps.Web.StripeInvoice
 
   @valid_attrs %{
     charge_id_from_stripe: "ch_123",

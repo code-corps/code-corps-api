@@ -1,7 +1,7 @@
-defmodule CodeCorps.OrganizationPolicyTest do
+defmodule CodeCorps.Web.OrganizationPolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.OrganizationPolicy, only: [create?: 1, update?: 2]
+  import CodeCorps.Web.OrganizationPolicy, only: [create?: 1, update?: 2]
 
   describe "create" do
     test "returns true when user is an admin" do

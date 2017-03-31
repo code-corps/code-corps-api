@@ -10,7 +10,7 @@ config :code_corps,
   ecto_repos: [CodeCorps.Repo]
 
 # Configures the endpoint
-config :code_corps, CodeCorps.Endpoint,
+config :code_corps, CodeCorps.Web.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "eMl0+Byu0Zv7q48thBu23ChBVFO1+sdLqoMI8yZoxEviF1K3C5uIohbDfvM9felL",
   render_errors: [view: CodeCorps.ErrorView, accepts: ~w(html json json-api)],

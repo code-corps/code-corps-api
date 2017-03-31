@@ -1,11 +1,11 @@
-defmodule CodeCorps.PreviewViewTest do
-  use CodeCorps.ViewCase
+defmodule CodeCorps.Web.PreviewViewTest do
+  use CodeCorps.Web.ViewCase
 
   test "renders all attributes and relationships properly" do
     user = insert(:user)
     preview = insert(:preview, user: user)
 
-    rendered_json = render(CodeCorps.PreviewView, "show.json-api", data: preview)
+    rendered_json = render(CodeCorps.Web.PreviewView, "show.json-api", data: preview)
 
     expected_json = %{
       "data" => %{

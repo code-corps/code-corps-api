@@ -1,5 +1,5 @@
-defmodule CodeCorps.StripePlatformCustomerViewTest do
-  use CodeCorps.ViewCase
+defmodule CodeCorps.Web.StripePlatformCustomerViewTest do
+  use CodeCorps.Web.ViewCase
 
   alias Phoenix.ConnTest
   alias Plug.Conn
@@ -8,7 +8,7 @@ defmodule CodeCorps.StripePlatformCustomerViewTest do
     user = insert(:user)
     stripe_platform_customer = insert(:stripe_platform_customer, id_from_stripe: "some_id", email: "email", user: user)
 
-    rendered_json =  render(CodeCorps.StripePlatformCustomerView, "show.json-api", data: stripe_platform_customer)
+    rendered_json =  render(CodeCorps.Web.StripePlatformCustomerView, "show.json-api", data: stripe_platform_customer)
 
     expected_json = %{
       "data" => %{
@@ -44,7 +44,7 @@ defmodule CodeCorps.StripePlatformCustomerViewTest do
     conn =
       ConnTest.build_conn
       |> Conn.assign(:current_user, user)
-    rendered_json = render(CodeCorps.StripePlatformCustomerView, "show.json-api", data: stripe_platform_customer, conn: conn)
+    rendered_json = render(CodeCorps.Web.StripePlatformCustomerView, "show.json-api", data: stripe_platform_customer, conn: conn)
     assert rendered_json["data"]["attributes"]["email"] == stripe_platform_customer.email
     assert rendered_json["data"]["attributes"]["id-from-stripe"] == stripe_platform_customer.id_from_stripe
   end
@@ -57,7 +57,7 @@ defmodule CodeCorps.StripePlatformCustomerViewTest do
       ConnTest.build_conn
       |> Conn.assign(:current_user, auth_customer.user)
 
-    rendered_json = render(CodeCorps.StripePlatformCustomerView, "show.json-api", data: stripe_platform_customers, conn: conn)
+    rendered_json = render(CodeCorps.Web.StripePlatformCustomerView, "show.json-api", data: stripe_platform_customers, conn: conn)
 
     emails =
       rendered_json["data"]

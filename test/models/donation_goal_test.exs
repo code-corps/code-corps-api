@@ -1,13 +1,13 @@
-defmodule CodeCorps.DonationGoalTest do
+defmodule CodeCorps.Web.DonationGoalTest do
   @moduledoc false
 
   use CodeCorps.ModelCase
 
-  alias CodeCorps.DonationGoal
+  alias CodeCorps.Web.DonationGoal
 
   describe "%create_changeset/2" do
     test "requires amount, description and project_id" do
-      changeset = DonationGoal.create_changeset(%DonationGoal{}, %{})
+      changeset = CodeCorps.Web.DonationGoal.create_changeset(%CodeCorps.Web.DonationGoal{}, %{})
 
       refute changeset.valid?
       changeset |> assert_validation_triggered(:amount, :required)
@@ -18,8 +18,8 @@ defmodule CodeCorps.DonationGoalTest do
     test "ensures project with specified id actually exists" do
       attrs = %{amount: 100, description: "Bar", project_id: -1}
       {result, changeset} =
-        %DonationGoal{}
-        |> DonationGoal.create_changeset(attrs)
+        %CodeCorps.Web.DonationGoal{}
+        |> CodeCorps.Web.DonationGoal.create_changeset(attrs)
         |> Repo.insert
 
       assert result == :error
@@ -32,7 +32,7 @@ defmodule CodeCorps.DonationGoalTest do
     test "requires amount, description" do
       attrs = %{amount: nil, description: nil}
       donation_goal = insert(:donation_goal)
-      changeset = DonationGoal.update_changeset(donation_goal, attrs)
+      changeset = CodeCorps.Web.DonationGoal.update_changeset(donation_goal, attrs)
 
       refute changeset.valid?
 
@@ -45,7 +45,7 @@ defmodule CodeCorps.DonationGoalTest do
     test "requires current" do
       attrs = %{current: nil}
       donation_goal = insert(:donation_goal)
-      changeset = DonationGoal.set_current_changeset(donation_goal, attrs)
+      changeset = CodeCorps.Web.DonationGoal.set_current_changeset(donation_goal, attrs)
 
       refute changeset.valid?
       changeset |> assert_validation_triggered(:current, :required)
@@ -57,7 +57,7 @@ defmodule CodeCorps.DonationGoalTest do
       donation_goal = insert(:donation_goal, project: project)
 
       attrs = %{current: true}
-      changeset = DonationGoal.set_current_changeset(donation_goal, attrs)
+      changeset = CodeCorps.Web.DonationGoal.set_current_changeset(donation_goal, attrs)
 
       assert changeset.valid?
 

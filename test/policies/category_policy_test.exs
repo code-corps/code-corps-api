@@ -1,7 +1,7 @@
-defmodule CodeCorps.CategoryPolicyTest do
+defmodule CodeCorps.Web.CategoryPolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.CategoryPolicy, only: [create?: 1, update?: 1]
+  import CodeCorps.Web.CategoryPolicy, only: [create?: 1, update?: 1]
 
   describe "create?" do
     test "returns true when user is an admin" do

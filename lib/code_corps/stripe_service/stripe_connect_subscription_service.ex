@@ -8,7 +8,7 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
     Project, Repo, StripeConnectCustomer, StripeConnectAccount,
     StripeConnectPlan, StripeConnectSubscription, User
   }
-  alias CodeCorps.Services.{DonationGoalsService, ProjectService}
+  alias CodeCorps.Services.{CodeCorps.Web.DonationGoalsService, ProjectService}
   alias CodeCorps.StripeService.{StripeConnectCardService, StripeConnectCustomerService}
   alias CodeCorps.StripeService.Adapters.StripeConnectSubscriptionAdapter
   alias CodeCorps.StripeService.Validators.{ProjectSubscribable, UserCanSubscribe}
@@ -40,7 +40,7 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
       {:ok, %StripeConnectSubscription{} = subscription} = do_find_or_create(project, user, attributes)
 
       ProjectService.update_project_totals(project)
-      DonationGoalsService.update_project_goals(project)
+      CodeCorps.Web.DonationGoalsService.update_project_goals(project)
 
       {:ok, subscription}
     else
@@ -64,7 +64,7 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
       {:ok, %StripeConnectSubscription{} = subscription} = update_subscription(subscription, params)
 
       ProjectService.update_project_totals(project)
-      DonationGoalsService.update_project_goals(project)
+      CodeCorps.Web.DonationGoalsService.update_project_goals(project)
 
       {:ok, subscription}
     else

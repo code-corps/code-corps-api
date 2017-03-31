@@ -1,4 +1,4 @@
-defmodule CodeCorps.CommentControllerTest do
+defmodule CodeCorps.Web.CommentControllerTest do
   use CodeCorps.ApiCase, resource_name: :comment
 
   @valid_attrs %{markdown: "I love elixir!"}

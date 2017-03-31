@@ -1,7 +1,7 @@
-defmodule CodeCorps.TaskTest do
+defmodule CodeCorps.Web.TaskTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.Task
+  alias CodeCorps.Web.Task
 
   @valid_attrs %{
     title: "Test task",

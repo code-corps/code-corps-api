@@ -3,7 +3,7 @@ defmodule CodeCorps.Services.UserServiceTest do
 
   use CodeCorps.ModelCase
 
-  alias CodeCorps.StripePlatformCustomer
+  alias CodeCorps.Web.StripePlatformCustomer
   alias CodeCorps.Services.UserService
 
   describe "update/1" do

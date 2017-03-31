@@ -1,7 +1,7 @@
 defmodule CodeCorps.Services.MarkdownRendererServiceTest do
   use ExUnit.Case, async: true
 
-  alias CodeCorps.Task
+  alias CodeCorps.Web.Task
 
   import CodeCorps.Services.MarkdownRendererService
 

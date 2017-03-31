@@ -1,4 +1,4 @@
-defmodule CodeCorps.SkillControllerTest do
+defmodule CodeCorps.Web.SkillControllerTest do
   use CodeCorps.ApiCase, resource_name: :skill
 
   @valid_attrs %{

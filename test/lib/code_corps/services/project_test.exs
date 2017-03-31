@@ -1,7 +1,7 @@
 defmodule CodeCorps.Services.ProjectServiceTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.Project
+  alias CodeCorps.Web.Project
   alias CodeCorps.Repo
   alias CodeCorps.Services.ProjectService
 

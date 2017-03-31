@@ -1,12 +1,12 @@
-defmodule CodeCorps.UserTaskPolicyTest do
+defmodule CodeCorps.Web.UserTaskPolicyTest do
   @moduledoc false
 
   use CodeCorps.PolicyCase
 
-  import CodeCorps.UserTaskPolicy, only: [create?: 2, update?: 2, delete?: 2]
-  import CodeCorps.UserTask, only: [create_changeset: 2]
+  import CodeCorps.Web.UserTaskPolicy, only: [create?: 2, update?: 2, delete?: 2]
+  import CodeCorps.Web.UserTask, only: [create_changeset: 2]
 
-  alias CodeCorps.UserTask
+  alias CodeCorps.Web.UserTask
 
   describe "create?" do
     test "returns false when user is not member of project" do

@@ -1,4 +1,4 @@
-defmodule CodeCorps.Helpers.Slug do
+defmodule CodeCorps.Web.Helpers.Slug do
   alias Ecto.Changeset
 
   def generate_slug(changeset, value_key, slug_key) do

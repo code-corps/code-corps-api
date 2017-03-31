@@ -1,5 +1,5 @@
-defmodule CodeCorps.StripeConnectSubscriptionViewTest do
-  use CodeCorps.ViewCase
+defmodule CodeCorps.Web.StripeConnectSubscriptionViewTest do
+  use CodeCorps.Web.ViewCase
 
   test "renders all attributes and relationships properly" do
     project = insert(:project)
@@ -7,7 +7,7 @@ defmodule CodeCorps.StripeConnectSubscriptionViewTest do
     user = insert(:user)
     subscription = insert(:stripe_connect_subscription, stripe_connect_plan: plan, user: user)
 
-    rendered_json =  render(CodeCorps.StripeConnectSubscriptionView, "show.json-api", data: subscription)
+    rendered_json =  render(CodeCorps.Web.StripeConnectSubscriptionView, "show.json-api", data: subscription)
 
     expected_json = %{
       "data" => %{

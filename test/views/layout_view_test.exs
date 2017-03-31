@@ -1,3 +1,3 @@
 defmodule CodeCorps.LayoutViewTest do
-  use CodeCorps.ViewCase
+  use CodeCorps.Web.ViewCase
 end

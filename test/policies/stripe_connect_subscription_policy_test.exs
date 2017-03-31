@@ -1,10 +1,10 @@
-defmodule CodeCorps.StripeConnectSubscriptionPolicyTest do
+defmodule CodeCorps.Web.StripeConnectSubscriptionPolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.StripeConnectSubscriptionPolicy, only: [create?: 2, show?: 2]
-  import CodeCorps.StripeConnectSubscription, only: [create_changeset: 2]
+  import CodeCorps.Web.StripeConnectSubscriptionPolicy, only: [create?: 2, show?: 2]
+  import CodeCorps.Web.StripeConnectSubscription, only: [create_changeset: 2]
 
-  alias CodeCorps.StripeConnectSubscription
+  alias CodeCorps.Web.StripeConnectSubscription
 
   describe "create?" do
     test "returns true if user is creating their own record" do

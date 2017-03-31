@@ -1,12 +1,12 @@
-defmodule CodeCorps.TaskSkillPolicyTest do
+defmodule CodeCorps.Web.TaskSkillPolicyTest do
   @moduledoc false
 
   use CodeCorps.PolicyCase
 
-  import CodeCorps.TaskSkillPolicy, only: [create?: 2, delete?: 2]
-  import CodeCorps.TaskSkill, only: [create_changeset: 2]
+  import CodeCorps.Web.TaskSkillPolicy, only: [create?: 2, delete?: 2]
+  import CodeCorps.Web.TaskSkill, only: [create_changeset: 2]
 
-  alias CodeCorps.TaskSkill
+  alias CodeCorps.Web.TaskSkill
 
   describe "create?" do
     test "returns false when user is not member of project" do

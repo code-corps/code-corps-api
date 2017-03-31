@@ -1,7 +1,7 @@
-defmodule CodeCorps.OrganizationTest do
+defmodule CodeCorps.Web.OrganizationTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.Organization
+  alias CodeCorps.Web.Organization
 
 
   describe "changeset" do

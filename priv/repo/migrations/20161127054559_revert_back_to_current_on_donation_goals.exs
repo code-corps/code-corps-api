@@ -1,4 +1,4 @@
-defmodule CodeCorps.Repo.Migrations.RevertBackToCurrentOnDonationGoals do
+defmodule CodeCorps.Repo.Migrations.RevertBackToCurrentOnCodeCorps.Web.DonationGoals do
   use Ecto.Migration
 
   def up do

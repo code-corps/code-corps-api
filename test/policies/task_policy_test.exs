@@ -1,10 +1,10 @@
-defmodule CodeCorps.TaskPolicyTest do
+defmodule CodeCorps.Web.TaskPolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.TaskPolicy, only: [create?: 2, update?: 2]
-  import CodeCorps.Task, only: [create_changeset: 2]
+  import CodeCorps.Web.TaskPolicy, only: [create?: 2, update?: 2]
+  import CodeCorps.Web.Task, only: [create_changeset: 2]
 
-  alias CodeCorps.Task
+  alias CodeCorps.Web.Task
 
   describe "create?" do
     test "returns true when user is task author" do

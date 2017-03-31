@@ -1,7 +1,7 @@
-defmodule CodeCorps.UserSkillTest do
+defmodule CodeCorps.Web.UserSkillTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.UserSkill
+  alias CodeCorps.Web.UserSkill
 
   test "valid_changeset_is_valid" do
     user_id = insert(:user).id

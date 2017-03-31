@@ -1,4 +1,4 @@
-defmodule CodeCorps.OrganizationControllerTest do
+defmodule CodeCorps.Web.OrganizationControllerTest do
   use CodeCorps.ApiCase, resource_name: :organization
 
   @valid_attrs %{description: "Build a better future.", name: "Code Corps"}

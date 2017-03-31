@@ -1,6 +1,6 @@
 defmodule CodeCorps.Services.ProjectService do
   @moduledoc """
-  Handles special CRUD operations for `CodeCorps.Project`.
+  Handles special CRUD operations for `CodeCorps.Web.Project`.
   """
 
   import Ecto.Query

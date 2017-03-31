@@ -1,7 +1,7 @@
-defmodule CodeCorps.UserControllerTest do
+defmodule CodeCorps.Web.UserControllerTest do
   use CodeCorps.ApiCase, resource_name: :user
 
-  alias CodeCorps.User
+  alias CodeCorps.Web.User
   alias CodeCorps.Repo
 
   @valid_attrs %{

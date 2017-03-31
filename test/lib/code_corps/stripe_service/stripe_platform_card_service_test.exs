@@ -3,7 +3,7 @@ defmodule CodeCorps.StripeService.StripePlatformCardServiceTest do
 
   use CodeCorps.ModelCase
 
-  alias CodeCorps.StripePlatformCard
+  alias CodeCorps.Web.StripePlatformCard
   alias CodeCorps.StripeService.StripePlatformCardService
 
   describe "update_from_stripe/1" do

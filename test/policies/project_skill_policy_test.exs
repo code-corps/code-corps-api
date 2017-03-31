@@ -1,10 +1,10 @@
-defmodule CodeCorps.ProjectSkillPolicyTest do
+defmodule CodeCorps.Web.ProjectSkillPolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.ProjectSkillPolicy, only: [create?: 2, delete?: 2]
-  import CodeCorps.ProjectSkill, only: [create_changeset: 2]
+  import CodeCorps.Web.ProjectSkillPolicy, only: [create?: 2, delete?: 2]
+  import CodeCorps.Web.ProjectSkill, only: [create_changeset: 2]
 
-  alias CodeCorps.ProjectSkill
+  alias CodeCorps.Web.ProjectSkill
 
   describe "create?" do
     test "returns false when user is not a project member" do

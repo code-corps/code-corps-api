@@ -1,7 +1,7 @@
-defmodule CodeCorps.UserRoleTest do
+defmodule CodeCorps.Web.UserRoleTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.UserRole
+  alias CodeCorps.Web.UserRole
 
   test "valid_changeset_is_valid" do
     user_id = insert(:user).id

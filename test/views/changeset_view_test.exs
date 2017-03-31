@@ -1,7 +1,7 @@
 defmodule CodeCorps.ChangesetViewTest do
-  use CodeCorps.ViewCase
+  use CodeCorps.Web.ViewCase
 
-  alias CodeCorps.Preview
+  alias CodeCorps.Web.Preview
 
   test "renders all errors properly" do
     changeset = Preview.create_changeset(%Preview{}, %{})

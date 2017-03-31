@@ -1,5 +1,5 @@
 defmodule CodeCorps.ErrorViewTest do
-  use CodeCorps.ViewCase
+  use CodeCorps.Web.ViewCase
 
   # Bring render/3 and render_to_string/3 for testing custom views
   import Phoenix.View

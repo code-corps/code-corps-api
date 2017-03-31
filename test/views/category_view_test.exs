@@ -1,11 +1,11 @@
-defmodule CodeCorps.CategoryViewTest do
-  use CodeCorps.ViewCase
+defmodule CodeCorps.Web.CategoryViewTest do
+  use CodeCorps.Web.ViewCase
 
   test "renders all attributes and relationships properly" do
     category = insert(:category)
     project_category = insert(:project_category, category: category)
 
-    rendered_json =  render(CodeCorps.CategoryView, "show.json-api", data: category)
+    rendered_json =  render(CodeCorps.Web.CategoryView, "show.json-api", data: category)
 
     expected_json = %{
       "data" => %{

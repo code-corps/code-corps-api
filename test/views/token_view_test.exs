@@ -1,5 +1,5 @@
 defmodule CodeCorps.TokenViewTest do
-  use CodeCorps.ViewCase
+  use CodeCorps.Web.ViewCase
 
   test "renders show" do
     token = "12345"

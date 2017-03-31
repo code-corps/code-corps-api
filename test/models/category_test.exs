@@ -1,7 +1,7 @@
-defmodule CodeCorps.CategoryTest do
+defmodule CodeCorps.Web.CategoryTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.Category
+  alias CodeCorps.Web.Category
 
   @valid_attrs %{description: "You want to improve software tools and infrastructure.", name: "Technology", slug: "technology"}
   @invalid_attrs %{}

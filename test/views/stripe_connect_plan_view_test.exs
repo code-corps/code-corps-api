@@ -1,11 +1,11 @@
-defmodule CodeCorps.StripeConnectPlanViewTest do
-  use CodeCorps.ViewCase
+defmodule CodeCorps.Web.StripeConnectPlanViewTest do
+  use CodeCorps.Web.ViewCase
 
   test "renders all attributes and relationships properly" do
     project = insert(:project)
     plan = insert(:stripe_connect_plan, project: project)
 
-    rendered_json =  render(CodeCorps.StripeConnectPlanView, "show.json-api", data: plan)
+    rendered_json =  render(CodeCorps.Web.StripeConnectPlanView, "show.json-api", data: plan)
 
     expected_json = %{
       "data" => %{

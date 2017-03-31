@@ -1,4 +1,4 @@
-defmodule CodeCorps.ProjectUserTest do
+defmodule CodeCorps.Web.ProjectUserTest do
   use CodeCorps.ModelCase
 
   alias CodeCorps.{ProjectUser, Repo}

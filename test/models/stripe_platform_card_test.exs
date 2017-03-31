@@ -1,7 +1,7 @@
-defmodule CodeCorps.StripePlatformCardTest do
+defmodule CodeCorps.Web.StripePlatformCardTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.StripePlatformCard
+  alias CodeCorps.Web.StripePlatformCard
 
   @valid_attrs %{
     brand: "Visa",

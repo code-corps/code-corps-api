@@ -2,7 +2,7 @@ defmodule CodeCorps.Repo.Migrations.FixMixedCaseSlugs do
   use Ecto.Migration
 
   alias CodeCorps.Repo
-  alias CodeCorps.SluggedRoute
+  alias CodeCorps.Web.SluggedRoute
 
   def up do
     SluggedRoute

@@ -25,11 +25,11 @@ defmodule CodeCorps.ConnCase do
       import Ecto.Changeset
       import Ecto.Query
 
-      import CodeCorps.Router.Helpers
+      import CodeCorps.Web.Router.Helpers
       import CodeCorps.Factories
 
       # The default endpoint for testing
-      @endpoint CodeCorps.Endpoint
+      @endpoint CodeCorps.Web.Endpoint
     end
   end
 

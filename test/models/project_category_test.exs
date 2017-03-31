@@ -1,7 +1,7 @@
-defmodule CodeCorps.ProjectCategoryTest do
+defmodule CodeCorps.Web.ProjectCategoryTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.ProjectCategory
+  alias CodeCorps.Web.ProjectCategory
 
   test "valid_changeset_is_valid" do
     project_id = insert(:project).id

@@ -1,11 +1,11 @@
-defmodule CodeCorps.SluggedRouteViewTest do
-  use CodeCorps.ViewCase
+defmodule CodeCorps.Web.SluggedRouteViewTest do
+  use CodeCorps.Web.ViewCase
 
   test "renders all attributes and relationships properly for organization" do
     organization = insert(:organization)
     slugged_route = insert(:slugged_route, organization: organization)
 
-    rendered_json = render(CodeCorps.SluggedRouteView, "show.json-api", data: slugged_route)
+    rendered_json = render(CodeCorps.Web.SluggedRouteView, "show.json-api", data: slugged_route)
 
     expected_json = %{
       "data" => %{
@@ -37,7 +37,7 @@ defmodule CodeCorps.SluggedRouteViewTest do
     user = insert(:user)
     slugged_route = insert(:slugged_route, user: user)
 
-    rendered_json = render(CodeCorps.SluggedRouteView, "show.json-api", data: slugged_route)
+    rendered_json = render(CodeCorps.Web.SluggedRouteView, "show.json-api", data: slugged_route)
 
     expected_json = %{
       "data" => %{

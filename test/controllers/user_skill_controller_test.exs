@@ -1,4 +1,4 @@
-defmodule CodeCorps.UserSkillControllerTest do
+defmodule CodeCorps.Web.UserSkillControllerTest do
   use CodeCorps.ApiCase, resource_name: :user_skill
 
   describe "index" do

@@ -1,7 +1,7 @@
-defmodule CodeCorps.RolePolicyTest do
+defmodule CodeCorps.Web.RolePolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.RolePolicy, only: [create?: 1]
+  import CodeCorps.Web.RolePolicy, only: [create?: 1]
 
   describe "create?" do
     test "returns true when user is an admin" do

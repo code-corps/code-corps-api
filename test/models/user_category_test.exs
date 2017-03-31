@@ -1,7 +1,7 @@
-defmodule CodeCorps.UserCategoryTest do
+defmodule CodeCorps.Web.UserCategoryTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.UserCategory
+  alias CodeCorps.Web.UserCategory
 
   test "valid_changeset_is_valid" do
       user_id = insert(:user).id

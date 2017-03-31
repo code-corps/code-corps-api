@@ -1,7 +1,7 @@
-defmodule CodeCorps.StripePlatformCustomerPolicyTest do
+defmodule CodeCorps.Web.StripePlatformCustomerPolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.StripePlatformCustomerPolicy, only: [show?: 2]
+  import CodeCorps.Web.StripePlatformCustomerPolicy, only: [show?: 2]
 
   describe "show?" do
     test "returns true when user is an admin" do

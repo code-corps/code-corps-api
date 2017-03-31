@@ -1,6 +1,6 @@
 defmodule CodeCorps.RandomIconColor.RandomIconColorTest do
   use ExUnit.Case, async: true
-  import CodeCorps.Helpers.RandomIconColor
+  import CodeCorps.Web.Helpers.RandomIconColor
   import Ecto.Changeset
 
   test "inserts color into changeset" do

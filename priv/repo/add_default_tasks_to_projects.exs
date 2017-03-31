@@ -2,10 +2,10 @@ defmodule CodeCorps.Repo.Seeds.AddDefaultTasksToProjects do
   import Ecto.Changeset
   import Ecto.Query
 
-  alias CodeCorps.Project
+  alias CodeCorps.Web.Project
   alias CodeCorps.Repo
-  alias CodeCorps.Task
-  alias CodeCorps.TaskList
+  alias CodeCorps.Web.Task
+  alias CodeCorps.Web.TaskList
 
   def migrate_existing() do
     Project
@@ -31,7 +31,7 @@ defmodule CodeCorps.Repo.Seeds.AddDefaultTasksToProjects do
 
   defp add_existing_tasks_to_inbox(project, task_list) do
     Task
-    |> CodeCorps.Helpers.Query.project_filter(%{ project_id: project.id })
+    |> CodeCorps.Web.Helpers.Query.project_filter(%{ project_id: project.id })
     |> Repo.all()
     |> Enum.each(&assign_task_to_inbox(&1, task_list))
   end

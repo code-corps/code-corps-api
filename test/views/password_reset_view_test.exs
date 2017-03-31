@@ -1,5 +1,5 @@
 defmodule CodeCorps.PasswordResetViewTest do
-  use CodeCorps.ViewCase
+  use CodeCorps.Web.ViewCase
 
   test "renders show" do
     email = "wat@codecorps.org"

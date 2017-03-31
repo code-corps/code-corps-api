@@ -1,5 +1,5 @@
-defmodule CodeCorps.StripeConnectAccountViewTest do
-  use CodeCorps.ViewCase
+defmodule CodeCorps.Web.StripeConnectAccountViewTest do
+  use CodeCorps.Web.ViewCase
 
   test "renders all attributes and relationships properly" do
     organization = insert(:organization)
@@ -15,7 +15,7 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
       routing_number: "123456789"
     )
 
-    rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+    rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
 
     expected_json = %{
       "data" => %{
@@ -104,7 +104,7 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
     organization = insert(:organization)
     account = insert(:stripe_connect_account, organization: organization, charges_enabled: true)
 
-    rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+    rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
     assert rendered_json["data"]["attributes"]["can-accept-donations"] == true
     assert rendered_json["data"]["attributes"]["charges-enabled"] == true
 
@@ -117,7 +117,7 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
     organization = insert(:organization)
     account = insert(:stripe_connect_account, organization: organization, charges_enabled: false)
 
-    rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+    rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
     assert rendered_json["data"]["attributes"]["can-accept-donations"] == false
     assert rendered_json["data"]["attributes"]["charges-enabled"] == false
 
@@ -128,7 +128,7 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
     organization = insert(:organization)
     account = insert(:stripe_connect_account, organization: organization, charges_enabled: false)
 
-    rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+    rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
     assert rendered_json["data"]["attributes"]["can-accept-donations"] == true
     assert rendered_json["data"]["attributes"]["charges-enabled"] == false
   end
@@ -136,31 +136,31 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
   describe "recipient-status" do
     test "renders as 'required' by default" do
       account = insert(:stripe_connect_account,  legal_entity_verification_status: "unverified")
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["recipient-status"] == "required"
     end
 
     test "renders as 'verifying' when fields_needed includes personal_id_number" do
       account = insert(:stripe_connect_account,  legal_entity_verification_status: "unverified", verification_fields_needed: ["legal_entity.personal_id_number"])
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["recipient-status"] == "verifying"
     end
 
     test "renders as 'verifying' when fields_needed includes verification.document" do
       account = insert(:stripe_connect_account,  legal_entity_verification_status: "unverified", verification_fields_needed: ["legal_entity.verification.document"])
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["recipient-status"] == "verifying"
     end
 
     test "renders as 'verifying' when appropriate" do
       account = insert(:stripe_connect_account, legal_entity_verification_status: "pending")
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["recipient-status"] == "verifying"
     end
 
     test "renders as 'verified' when appropriate" do
       account = insert(:stripe_connect_account, legal_entity_verification_status: "verified")
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["recipient-status"] == "verified"
     end
   end
@@ -168,7 +168,7 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
   describe "verification-document-status" do
     test "renders as 'pending_requirement' by default" do
       account = insert(:stripe_connect_account)
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["verification-document-status"] == "pending_requirement"
     end
 
@@ -177,7 +177,7 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
         :stripe_connect_account,
         legal_entity_verification_document: nil,
         verification_fields_needed: ["legal_entity.type"])
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["verification-document-status"] == "pending_requirement"
     end
 
@@ -186,7 +186,7 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
         :stripe_connect_account,
         legal_entity_verification_document: nil,
         verification_fields_needed: ["legal_entity.verification.document"])
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["verification-document-status"] == "required"
     end
 
@@ -195,7 +195,7 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
         :stripe_connect_account,
         legal_entity_verification_document: "file_123",
         legal_entity_verification_status: "pending")
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["verification-document-status"] == "verifying"
     end
 
@@ -203,7 +203,7 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
       account = insert(
         :stripe_connect_account,
         verification_fields_needed: nil)
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["verification-document-status"] == "verified"
     end
 
@@ -212,7 +212,7 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
         :stripe_connect_account,
         legal_entity_verification_document: "file_123",
         verification_fields_needed: ["legal_entity.personal_id_number"])
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["verification-document-status"] == "verified"
     end
 
@@ -221,7 +221,7 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
         :stripe_connect_account,
         legal_entity_verification_document: "file_123",
         verification_fields_needed: ["legal_entity.verification.document"])
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["verification-document-status"] == "errored"
     end
   end
@@ -229,7 +229,7 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
   describe "personal-id-number-status" do
     test "renders as 'pending_requirement' by default" do
       account = insert(:stripe_connect_account)
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["personal-id-number-status"] == "pending_requirement"
     end
 
@@ -238,7 +238,7 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
         :stripe_connect_account,
         legal_entity_personal_id_number_provided: false,
         verification_fields_needed: ["legal_entity.type"])
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["personal-id-number-status"] == "pending_requirement"
     end
 
@@ -247,7 +247,7 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
         :stripe_connect_account,
         legal_entity_personal_id_number_provided: false,
         verification_fields_needed: ["legal_entity.personal_id_number"])
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["personal-id-number-status"] == "required"
     end
 
@@ -256,7 +256,7 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
         :stripe_connect_account,
         legal_entity_personal_id_number_provided: true,
         legal_entity_verification_status: "pending")
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["personal-id-number-status"] == "verifying"
     end
 
@@ -264,7 +264,7 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
       account = insert(
         :stripe_connect_account,
         verification_fields_needed: nil)
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["personal-id-number-status"] == "verified"
     end
 
@@ -273,7 +273,7 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
         :stripe_connect_account,
         legal_entity_personal_id_number_provided: true,
         verification_fields_needed: ["external_account"])
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["personal-id-number-status"] == "verified"
     end
   end
@@ -281,7 +281,7 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
   describe "bank-account-status" do
     test "renders as 'pending_requirement' by default" do
       account = insert(:stripe_connect_account)
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["bank-account-status"] == "pending_requirement"
     end
 
@@ -290,7 +290,7 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
         :stripe_connect_account,
         legal_entity_verification_status: "pending",
         verification_fields_needed: ["external_account"])
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["bank-account-status"] == "pending_requirement"
     end
 
@@ -299,7 +299,7 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
         :stripe_connect_account,
         legal_entity_verification_status: "verified",
         verification_fields_needed: ["external_account"])
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["bank-account-status"] == "required"
     end
 
@@ -308,7 +308,7 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
         :stripe_connect_account,
         legal_entity_verification_status: "verified",
         verification_fields_needed: [])
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
       assert rendered_json["data"]["attributes"]["bank-account-status"] == "verified"
     end
   end
@@ -318,7 +318,7 @@ defmodule CodeCorps.StripeConnectAccountViewTest do
       account = insert(:stripe_connect_account)
       insert(:stripe_external_account, last4: "ABCD", routing_number: "123456", stripe_connect_account: account)
 
-      rendered_json = render(CodeCorps.StripeConnectAccountView, "show.json-api", data: account)
+      rendered_json = render(CodeCorps.Web.StripeConnectAccountView, "show.json-api", data: account)
 
       assert rendered_json["data"]["attributes"]["bank-account-last4"] == "ABCD"
       assert rendered_json["data"]["attributes"]["bank-account-routing-number"] == "123456"

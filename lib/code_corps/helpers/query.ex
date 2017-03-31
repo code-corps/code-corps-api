@@ -1,5 +1,5 @@
-defmodule CodeCorps.Helpers.Query do
-  import CodeCorps.Helpers.String, only: [coalesce_id_string: 1]
+defmodule CodeCorps.Web.Helpers.Query do
+  import CodeCorps.Web.Helpers.String, only: [coalesce_id_string: 1]
   import Ecto.Query, only: [where: 3, limit: 2, order_by: 2]
 
   def id_filter(query, id_list) do

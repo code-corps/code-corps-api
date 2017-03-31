@@ -1,12 +1,12 @@
-defmodule CodeCorps.CommentViewTest do
-  use CodeCorps.ViewCase
+defmodule CodeCorps.Web.CommentViewTest do
+  use CodeCorps.Web.ViewCase
 
   test "renders all attributes and relationships properly" do
     task = insert(:task)
     user = insert(:user)
     comment = insert(:comment, user: user, task: task)
 
-    rendered_json = render(CodeCorps.CommentView, "show.json-api", data: comment)
+    rendered_json = render(CodeCorps.Web.CommentView, "show.json-api", data: comment)
 
     expected_json = %{
       "data" => %{

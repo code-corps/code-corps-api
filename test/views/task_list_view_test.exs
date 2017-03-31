@@ -1,12 +1,12 @@
-defmodule CodeCorps.TaskListViewTest do
-  use CodeCorps.ViewCase
+defmodule CodeCorps.Web.TaskListViewTest do
+  use CodeCorps.Web.ViewCase
 
   test "renders all attributes and relationships properly" do
     project = insert(:project)
     task_list = insert(:task_list, order: 1000, project: project)
     task = insert(:task, order: 1000, task_list: task_list)
 
-    rendered_json =  render(CodeCorps.TaskListView, "show.json-api", data: task_list)
+    rendered_json =  render(CodeCorps.Web.TaskListView, "show.json-api", data: task_list)
 
     expected_json = %{
       "data" => %{

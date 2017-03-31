@@ -1,7 +1,7 @@
-defmodule CodeCorps.StripePlatformCustomerTest do
+defmodule CodeCorps.Web.StripePlatformCustomerTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.StripePlatformCustomer
+  alias CodeCorps.Web.StripePlatformCustomer
 
   @valid_attrs %{
     id_from_stripe: "abc123"

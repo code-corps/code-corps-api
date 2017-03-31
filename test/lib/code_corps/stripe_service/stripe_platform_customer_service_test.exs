@@ -3,7 +3,7 @@ defmodule CodeCorps.StripeService.StripePlatformCustomerServiceTest do
   
   use CodeCorps.ModelCase
 
-  alias CodeCorps.StripePlatformCustomer
+  alias CodeCorps.Web.StripePlatformCustomer
   alias CodeCorps.StripeService.StripePlatformCustomerService
 
   describe "update/2" do

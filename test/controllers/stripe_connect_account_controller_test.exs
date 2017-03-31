@@ -1,7 +1,7 @@
-defmodule CodeCorps.StripeConnectAccountControllerTest do
+defmodule CodeCorps.Web.StripeConnectAccountControllerTest do
   use CodeCorps.ApiCase, resource_name: :stripe_connect_account
 
-  alias CodeCorps.StripeConnectAccount
+  alias CodeCorps.Web.StripeConnectAccount
 
   describe "show" do
     @tag :authenticated

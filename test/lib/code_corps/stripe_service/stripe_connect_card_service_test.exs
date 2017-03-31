@@ -3,7 +3,7 @@ defmodule CodeCorps.StripeService.StripeConnectCardServiceTest do
 
   use CodeCorps.ModelCase
 
-  alias CodeCorps.StripeConnectCard
+  alias CodeCorps.Web.StripeConnectCard
   alias CodeCorps.StripeService.StripeConnectCardService
 
   describe "update/1" do

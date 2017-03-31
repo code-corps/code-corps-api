@@ -1,12 +1,12 @@
-defmodule CodeCorps.TaskSkillViewTest do
+defmodule CodeCorps.Web.TaskSkillViewTest do
   @moduledoc false
 
-  use CodeCorps.ViewCase
+  use CodeCorps.Web.ViewCase
 
   test "renders all attributes and relationships properly" do
     task_skill = insert(:task_skill)
 
-    rendered_json = render(CodeCorps.TaskSkillView, "show.json-api", data: task_skill)
+    rendered_json = render(CodeCorps.Web.TaskSkillView, "show.json-api", data: task_skill)
 
     expected_json = %{
       "data" => %{

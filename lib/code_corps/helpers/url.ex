@@ -1,4 +1,4 @@
-defmodule CodeCorps.Helpers.URL do
+defmodule CodeCorps.Web.Helpers.URL do
   @moduledoc """
   Provides some helpers for assembling and validating URLs.
   """

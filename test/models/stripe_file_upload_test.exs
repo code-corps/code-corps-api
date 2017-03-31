@@ -1,7 +1,7 @@
-defmodule CodeCorps.StripeFileUploadTest do
+defmodule CodeCorps.Web.StripeFileUploadTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.StripeFileUpload
+  alias CodeCorps.Web.StripeFileUpload
 
   @valid_attrs %{
     id_from_stripe: "abc123"

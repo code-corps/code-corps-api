@@ -2,9 +2,9 @@ defmodule CodeCorps.Services.UserService do
   @moduledoc """
   Handles CRUD operations for users.
 
-  When operations happen on `CodeCorps.User`, we need to make sure changes
-  are propagated to related records, ex., `CodeCorps.StripePlatformCustomer` and
-  `CodeCorps.StripeConnectCustomer`
+  When operations happen on `CodeCorps.Web.User`, we need to make sure changes
+  are propagated to related records, ex., `CodeCorps.Web.StripePlatformCustomer` and
+  `CodeCorps.Web.StripeConnectCustomer`
 
   """
 
@@ -20,16 +20,16 @@ defmodule CodeCorps.Services.UserService do
   @dialyzer :no_opaque
 
   @doc """
-  Updates a `CodeCorps.User` record and, if necessary, associated
-  `CodeCorps.StripePlatformCustomer` and `CodeCorps.StripeConnectCustomer` records.
+  Updates a `CodeCorps.Web.User` record and, if necessary, associated
+  `CodeCorps.Web.StripePlatformCustomer` and `CodeCorps.Web.StripeConnectCustomer` records.
 
   These related records inherit the email field from the user,
   so they need to be kept in sync, both locally, and on the Stripe platform.
 
   Returns one of
-  * `{:ok, %CodeCorps.User{}, nil, nil}`
-  * `{:ok, %CodeCorps.User{}, %CodeCorps.StripePlatformCustomer{}, nil}`
-  * `{:ok, %CodeCorps.User{}, %CodeCorps.StripePlatformCustomer{}, %CodeCorps.StripeConnectCustomer{}}`
+  * `{:ok, %CodeCorps.Web.User{}, nil, nil}`
+  * `{:ok, %CodeCorps.Web.User{}, %CodeCorps.Web.StripePlatformCustomer{}, nil}`
+  * `{:ok, %CodeCorps.Web.User{}, %CodeCorps.Web.StripePlatformCustomer{}, %CodeCorps.Web.StripeConnectCustomer{}}`
   * `{:error, %Ecto.Changeset{}}`
   * `{:error, :unhandled}`
 

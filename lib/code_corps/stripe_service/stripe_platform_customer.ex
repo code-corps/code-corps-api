@@ -33,7 +33,7 @@ defmodule CodeCorps.StripeService.StripePlatformCustomerService do
   end
 
   @doc """
-  Updates a `CodeCorps.StripePlatformCustomer` local and associated `%Stripe.Customer{} API record
+  Updates a `CodeCorps.Web.StripePlatformCustomer` local and associated `%Stripe.Customer{} API record
   with provided attributes
 
   Returns
@@ -55,12 +55,12 @@ defmodule CodeCorps.StripeService.StripePlatformCustomerService do
   end
 
   @doc """
-  Updates a `CodeCorps.StripePlatformCustomer` local record using `%Stripe.Customer{} API record
+  Updates a `CodeCorps.Web.StripePlatformCustomer` local record using `%Stripe.Customer{} API record
   retrieved from API using the provided Stripe ID
 
   Returns
 
-  - `{:ok, %CodeCorps.StripePlatformCustomer{}}` if the local record was updated
+  - `{:ok, %CodeCorps.Web.StripePlatformCustomer{}}` if the local record was updated
   - `{:error, :not_found}` - If there was no record witht he specified Stripe ID
   - `{:error, %Ecto.Changeset{}}` -if there was a validation issue while updating the local record
   - `{:error, %Stripe.APIErrorResposne{}}` - if there was a problem with retrieving the API record

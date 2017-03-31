@@ -1,4 +1,4 @@
-defmodule CodeCorps.DonationGoalControllerTest do
+defmodule CodeCorps.Web.DonationGoalControllerTest do
   use CodeCorps.ApiCase, resource_name: :donation_goal
 
   @valid_attrs %{amount: 200, description: "A description"}

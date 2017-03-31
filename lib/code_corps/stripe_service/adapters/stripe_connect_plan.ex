@@ -8,7 +8,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectPlanAdapter do
 
   @doc """
   Converts a map received from the Stripe API into a map that can be used
-  to create a `CodeCorps.StripeConnectPlan` record
+  to create a `CodeCorps.Web.StripeConnectPlan` record
   """
   @stripe_attributes [:amount, :created, :id, :name]
 

@@ -1,9 +1,9 @@
-defmodule CodeCorps.Services.DonationGoalsService do
+defmodule CodeCorps.Services.CodeCorps.Web.DonationGoalsService do
   @moduledoc """
   Handles CRUD operations for donation goals.
 
-  When operations happen on `CodeCorps.DonationGoal`, we need to set
-  the current donation goal on `CodeCorps.Project`.
+  When operations happen on `CodeCorps.Web.DonationGoal`, we need to set
+  the current donation goal on `CodeCorps.Web.Project`.
 
   The current donation goal should be the smallest value that is
   greater than the project's current total donations, _or_ falls back to
@@ -12,7 +12,7 @@ defmodule CodeCorps.Services.DonationGoalsService do
 
   import Ecto.Query
 
-  alias CodeCorps.{DonationGoal, Project, Repo}
+  alias CodeCorps.{CodeCorps.Web.DonationGoal, Project, Repo}
   alias Ecto.Multi
 
   # Prevents warning for calling `Repo.transaction(multi)`.
@@ -23,7 +23,7 @@ defmodule CodeCorps.Services.DonationGoalsService do
   @dialyzer :no_opaque
 
   @doc """
-  Creates the `CodeCorps.DonationGoal` by wrapping the following in a
+  Creates the `CodeCorps.Web.DonationGoal` by wrapping the following in a
   transaction:
 
   - Inserting the donation goal
@@ -32,8 +32,8 @@ defmodule CodeCorps.Services.DonationGoalsService do
   @spec create(map) :: tuple
   def create(attributes) do
     changeset =
-      %DonationGoal{}
-      |> DonationGoal.create_changeset(attributes)
+      %CodeCorps.Web.DonationGoal{}
+      |> CodeCorps.Web.DonationGoal.create_changeset(attributes)
 
     multi = Multi.new
     |> Multi.insert(:donation_goal, changeset)
@@ -41,7 +41,7 @@ defmodule CodeCorps.Services.DonationGoalsService do
 
     case Repo.transaction(multi) do
       {:ok, %{donation_goal: donation_goal, update_related_goals: _}} ->
-        {:ok, Repo.get(DonationGoal, donation_goal.id)}
+        {:ok, Repo.get(CodeCorps.Web.DonationGoal, donation_goal.id)}
       {:error, :donation_goal, %Ecto.Changeset{} = changeset, %{}} ->
         {:error, changeset}
       {:error, _failed_operation, _failed_value, _changes_so_far} ->
@@ -50,16 +50,16 @@ defmodule CodeCorps.Services.DonationGoalsService do
   end
 
   @doc """
-  Updates the `CodeCorps.DonationGoal` by wrapping the following in a
+  Updates the `CodeCorps.Web.DonationGoal` by wrapping the following in a
   transaction:
 
   - Updating the donation goal
   - Updating the sibling goals with `update_related_goals/1`
   """
-  def update(%DonationGoal{} = donation_goal, attributes) do
+  def update(%CodeCorps.Web.DonationGoal{} = donation_goal, attributes) do
     changeset =
       donation_goal
-      |> DonationGoal.create_changeset(attributes)
+      |> CodeCorps.Web.DonationGoal.create_changeset(attributes)
 
     multi = Multi.new
     |> Multi.update(:donation_goal, changeset)
@@ -67,7 +67,7 @@ defmodule CodeCorps.Services.DonationGoalsService do
 
     case Repo.transaction(multi) do
       {:ok, %{donation_goal: donation_goal, update_related_goals: _}} ->
-        {:ok, Repo.get(DonationGoal, donation_goal.id)}
+        {:ok, Repo.get(CodeCorps.Web.DonationGoal, donation_goal.id)}
       {:error, :donation_goal, %Ecto.Changeset{} = changeset, %{}} ->
         {:error, changeset}
       {:error, _failed_operation, _failed_value, _changes_so_far} ->
@@ -76,7 +76,7 @@ defmodule CodeCorps.Services.DonationGoalsService do
   end
 
   @doc """
-  Updates sibling goals for a `CodeCorps.DonationGoal` by:
+  Updates sibling goals for a `CodeCorps.Web.DonationGoal` by:
 
   - Finding this goal's project
   - Finding the current goal for that project
@@ -96,8 +96,8 @@ defmodule CodeCorps.Services.DonationGoalsService do
   one. It is therefore possible for a goal to have both `current` and `achieved`
   be true.
   """
-  def update_related_goals(%{donation_goal: %DonationGoal{} = donation_goal}), do: update_related_goals(donation_goal)
-  def update_related_goals(%DonationGoal{project_id: project_id}) do
+  def update_related_goals(%{donation_goal: %CodeCorps.Web.DonationGoal{} = donation_goal}), do: update_related_goals(donation_goal)
+  def update_related_goals(%CodeCorps.Web.DonationGoal{project_id: project_id}) do
     with project      <- Repo.get(Project, project_id),
          current_goal <- find_current_goal(project)
     do
@@ -106,7 +106,7 @@ defmodule CodeCorps.Services.DonationGoalsService do
   end
 
   @doc """
-  Updates all `CodeCorpes.DonationGoal` records for a project.
+  Updates all `CodeCorps.CodeCorps.Web.DonationGoal` records for a project.
 
   To be used when something related to the project's donation goals changes,
   but not any of the donation goals directly.
@@ -130,13 +130,13 @@ defmodule CodeCorps.Services.DonationGoalsService do
     case find_lowest_not_yet_reached(project) do
       nil ->
         find_largest_goal(project)
-      %DonationGoal{} = donation_goal ->
+      %CodeCorps.Web.DonationGoal{} = donation_goal ->
         donation_goal
     end
   end
 
   defp find_largest_goal(%Project{id: project_id, total_monthly_donated: total_monthly_donated}) do
-    DonationGoal
+    CodeCorps.Web.DonationGoal
     |> where([d], d.project_id == ^project_id and d.amount <= ^total_monthly_donated)
     |> order_by(desc: :amount)
     |> limit(1)
@@ -144,21 +144,21 @@ defmodule CodeCorps.Services.DonationGoalsService do
   end
 
   defp find_lowest_not_yet_reached(%Project{id: project_id, total_monthly_donated: total_monthly_donated}) do
-    DonationGoal
+    CodeCorps.Web.DonationGoal
     |> where([d], d.project_id == ^project_id and d.amount > ^total_monthly_donated)
     |> order_by(asc: :amount)
     |> limit(1)
     |> Repo.one
   end
 
-  defp update_goals(%Project{id: project_id}, %DonationGoal{} = donation_goal) do
-    DonationGoal
+  defp update_goals(%Project{id: project_id}, %CodeCorps.Web.DonationGoal{} = donation_goal) do
+    CodeCorps.Web.DonationGoal
     |> where([d], d.project_id == ^project_id)
     |> where([d], d.id != ^donation_goal.id)
     |> Repo.update_all(set: [current: false])
 
     donation_goal
-    |> DonationGoal.set_current_changeset(%{current: true})
+    |> CodeCorps.Web.DonationGoal.set_current_changeset(%{current: true})
     |> Repo.update()
   end
   # if there is no candidate for a current goal,

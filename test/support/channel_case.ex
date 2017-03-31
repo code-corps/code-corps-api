@@ -27,7 +27,7 @@ defmodule CodeCorps.ChannelCase do
 
 
       # The default endpoint for testing
-      @endpoint CodeCorps.Endpoint
+      @endpoint CodeCorps.Web.Endpoint
     end
   end
 

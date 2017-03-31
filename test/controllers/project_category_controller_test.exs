@@ -1,4 +1,4 @@
-defmodule CodeCorps.ProjectCategoryControllerTest do
+defmodule CodeCorps.Web.ProjectCategoryControllerTest do
   use CodeCorps.ApiCase, resource_name: :project_category
 
   describe "index" do

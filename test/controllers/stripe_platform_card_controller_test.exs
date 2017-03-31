@@ -1,4 +1,4 @@
-defmodule CodeCorps.StripePlatformCardControllerTest do
+defmodule CodeCorps.Web.StripePlatformCardControllerTest do
   use CodeCorps.ApiCase, resource_name: :stripe_platform_card
 
   describe "show" do

@@ -13,8 +13,8 @@ defmodule CodeCorps.Analytics.SegmentTracker do
   @doc """
   Calls `identify` in the configured API module.
   """
-  @spec identify(CodeCorps.User.t) :: any
-  def identify(%CodeCorps.User{} = user) do
+  @spec identify(CodeCorps.Web.User.t) :: any
+  def identify(%CodeCorps.Web.User{} = user) do
     @api.identify(user.id, SegmentTraitsBuilder.build(user))
   end
 

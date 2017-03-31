@@ -1,4 +1,4 @@
-defmodule CodeCorps.Helpers.Policy do
+defmodule CodeCorps.Web.Helpers.Policy do
   @moduledoc """
   Holds helpers for extracting record relationships and determining roles for
   authorization policies.
@@ -45,7 +45,7 @@ defmodule CodeCorps.Helpers.Policy do
   Retrieves an organization record, from a model struct, or an `Ecto.Changeset`
   containing an `organization_id` field
 
-  Returns `CodeCorps.Organization`
+  Returns `CodeCorps.Web.Organization`
   """
   @spec get_organization(struct | Changeset.t | any) :: Organization.t
   def get_organization(%{organization_id: id}), do: Organization |> Repo.get(id)
@@ -56,7 +56,7 @@ defmodule CodeCorps.Helpers.Policy do
   Retrieves a project record, from a model struct, or an `Ecto.Changeset`
   containing a `project_id` field
 
-  Returns `CodeCorps.Project`
+  Returns `CodeCorps.Web.Project`
   """
   @spec get_project(struct | Changeset.t | any) :: Project.t
   def get_project(%{project_id: id}), do: Project |> Repo.get(id)
@@ -64,7 +64,7 @@ defmodule CodeCorps.Helpers.Policy do
   def get_project(_), do: nil
 
   @doc """
-  Retrieves the role field from a `CodeCorps.ProjectUser` struct or an `Ecto.Changeset`
+  Retrieves the role field from a `CodeCorps.Web.ProjectUser` struct or an `Ecto.Changeset`
   """
   @spec get_role(nil | ProjectUser.t | Changeset.t) :: String.t | nil
   def get_role(nil), do: nil
@@ -97,8 +97,8 @@ defmodule CodeCorps.Helpers.Policy do
   @spec task_authored_by?(Task.t, User.t) :: boolean
   def task_authored_by?(%Task{user_id: author_id}, %User{id: user_id}), do: user_id == author_id
 
-  # Returns `CodeCorps.ProjectUser` for specified `CodeCorps.Project`
-  # and `CodeCorps.User`, or nil
+  # Returns `CodeCorps.Web.ProjectUser` for specified `CodeCorps.Web.Project`
+  # and `CodeCorps.Web.User`, or nil
   @spec get_membership(Project.t, User.t) :: nil | ProjectUser.t
   defp get_membership(%Project{id: project_id}, %User{id: user_id}),
     do: ProjectUser |> Repo.get_by(project_id: project_id, user_id: user_id)
