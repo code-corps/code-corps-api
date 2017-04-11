@@ -4,8 +4,9 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
   to and from associated `Stripe.Subscription` records.
   """
 
-  alias CodeCorps.{
-    Project, Repo, StripeConnectCustomer, StripeConnectAccount,
+  alias CodeCorps.Repo
+  alias CodeCorps.Web.{
+    Project, StripeConnectCustomer, StripeConnectAccount,
     StripeConnectPlan, StripeConnectSubscription, User
   }
   alias CodeCorps.Services.{DonationGoalsService, ProjectService}

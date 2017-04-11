@@ -1,4 +1,4 @@
-defmodule CodeCorps.Repo.Migrations.CreateDonationGoal do
+defmodule CodeCorps.Repo.Migrations.CreateCodeCorps.Web.DonationGoal do
   use Ecto.Migration
 
   def change do

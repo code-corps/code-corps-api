@@ -2,9 +2,10 @@ defmodule CodeCorps.Emails.ProjectUserAcceptanceEmail do
   import Bamboo.Email
   import Bamboo.PostmarkHelper
 
-  alias CodeCorps.{Project, ProjectUser, Repo, User}
   alias CodeCorps.Emails.BaseEmail
   alias CodeCorps.Presenters.ImagePresenter
+  alias CodeCorps.Repo
+  alias CodeCorps.Web.{Project, ProjectUser, User}
 
   def create(%ProjectUser{project: project, user: user}) do
     BaseEmail.create

@@ -30,7 +30,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.WebhookProcessor do
   the handler module as the second parameter.
 
   # Returns
-  - `{:ok, %CodeCorps.StripeEvent{}}` if the event was processed in some way. This includes
+  - `{:ok, %CodeCorps.Web.StripeEvent{}}` if the event was processed in some way. This includes
     the event being previously processed, or erroring out, or even just not being handled at the moment.
   - `{:error, :already_processing}` if the event already exists locally and is in the process of
     being handled.

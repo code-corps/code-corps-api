@@ -1,5 +1,5 @@
-defmodule CodeCorps.ProjectViewTest do
-  use CodeCorps.ViewCase
+defmodule CodeCorps.Web.ProjectViewTest do
+  use CodeCorps.Web.ViewCase
 
   test "renders all attributes and relationships properly" do
     organization = insert(:organization)
@@ -15,7 +15,7 @@ defmodule CodeCorps.ProjectViewTest do
 
     host = Application.get_env(:code_corps, :asset_host)
 
-    rendered_json = render(CodeCorps.ProjectView, "show.json-api", data: project)
+    rendered_json = render(CodeCorps.Web.ProjectView, "show.json-api", data: project)
 
     expected_json = %{
       "data" => %{
@@ -112,7 +112,7 @@ defmodule CodeCorps.ProjectViewTest do
     insert(:stripe_connect_account, organization: organization, charges_enabled: true, transfers_enabled: true)
 
     conn = Phoenix.ConnTest.build_conn()
-    rendered_json = render(CodeCorps.ProjectView, "show.json-api", data: project, conn: conn)
+    rendered_json = render(CodeCorps.Web.ProjectView, "show.json-api", data: project, conn: conn)
     assert rendered_json["data"]["attributes"]["can-activate-donations"] == true
   end
 
@@ -122,7 +122,7 @@ defmodule CodeCorps.ProjectViewTest do
     insert(:stripe_connect_plan, project: project)
 
     conn = Phoenix.ConnTest.build_conn()
-    rendered_json = render(CodeCorps.ProjectView, "show.json-api", data: project, conn: conn)
+    rendered_json = render(CodeCorps.Web.ProjectView, "show.json-api", data: project, conn: conn)
     assert rendered_json["data"]["attributes"]["donations-active"] == true
   end
 
@@ -131,7 +131,7 @@ defmodule CodeCorps.ProjectViewTest do
     insert(:donation_goal, project: project)
 
     conn = Phoenix.ConnTest.build_conn()
-    rendered_json = render(CodeCorps.ProjectView, "show.json-api", data: project, conn: conn)
+    rendered_json = render(CodeCorps.Web.ProjectView, "show.json-api", data: project, conn: conn)
     assert rendered_json["data"]["attributes"]["donations-active"] == false
   end
 
@@ -139,7 +139,7 @@ defmodule CodeCorps.ProjectViewTest do
     project = insert(:project)
 
     conn = Phoenix.ConnTest.build_conn()
-    rendered_json = render(CodeCorps.ProjectView, "show.json-api", data: project, conn: conn)
+    rendered_json = render(CodeCorps.Web.ProjectView, "show.json-api", data: project, conn: conn)
     assert rendered_json["data"]["attributes"]["donations-active"] == false
   end
 end

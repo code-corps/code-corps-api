@@ -1,7 +1,7 @@
-defmodule CodeCorps.StripeConnectCustomerTest do
+defmodule CodeCorps.Web.StripeConnectCustomerTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.StripeConnectCustomer
+  alias CodeCorps.Web.StripeConnectCustomer
 
   @valid_attrs %{
     id_from_stripe: "abc123"

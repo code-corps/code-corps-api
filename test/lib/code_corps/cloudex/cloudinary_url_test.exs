@@ -1,6 +1,7 @@
 defmodule CodeCorps.Cloudex.CloudinaryUrlTest do
-  alias CodeCorps.Cloudex.CloudinaryUrl
   use ExUnit.Case, async: true
+
+  alias CodeCorps.Cloudex.CloudinaryUrl
 
   test "calls Cloudex.Url.for with correct arguments" do
     expected_args = {:test_public_id, %{test_option: nil}}

@@ -1,4 +1,4 @@
-defmodule CodeCorps.ProjectSkillControllerTest do
+defmodule CodeCorps.Web.ProjectSkillControllerTest do
   use CodeCorps.ApiCase, resource_name: :project_skill
 
   describe "index" do

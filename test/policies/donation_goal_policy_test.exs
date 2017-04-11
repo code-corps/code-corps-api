@@ -1,10 +1,10 @@
-defmodule CodeCorps.DonationGoalPolicyTest do
+defmodule CodeCorps.Web.DonationGoalPolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.DonationGoalPolicy, only: [create?: 2, update?: 2, delete?: 2]
-  import CodeCorps.DonationGoal, only: [create_changeset: 2]
+  import CodeCorps.Web.DonationGoalPolicy, only: [create?: 2, update?: 2, delete?: 2]
+  import CodeCorps.Web.DonationGoal, only: [create_changeset: 2]
 
-  alias CodeCorps.DonationGoal
+  alias CodeCorps.Web.DonationGoal
 
   describe "create?" do
     test "returns false when user is not a project member" do

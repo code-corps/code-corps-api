@@ -1,10 +1,10 @@
-defmodule CodeCorps.ProjectCategoryPolicyTest do
+defmodule CodeCorps.Web.ProjectCategoryPolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.ProjectCategoryPolicy, only: [create?: 2, delete?: 2]
-  import CodeCorps.ProjectCategory, only: [create_changeset: 2]
+  import CodeCorps.Web.ProjectCategoryPolicy, only: [create?: 2, delete?: 2]
+  import CodeCorps.Web.ProjectCategory, only: [create_changeset: 2]
 
-  alias CodeCorps.ProjectCategory
+  alias CodeCorps.Web.ProjectCategory
 
   describe "create?" do
     test "returns false when user is not a project member" do

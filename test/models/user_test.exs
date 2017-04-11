@@ -1,7 +1,7 @@
-defmodule CodeCorps.UserTest do
+defmodule CodeCorps.Web.UserTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.User
+  alias CodeCorps.Web.User
 
   @valid_attrs %{email: "test@user.com", password: "somepassword", username: "testuser"}
   @invalid_attrs %{}

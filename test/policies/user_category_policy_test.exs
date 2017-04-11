@@ -1,10 +1,10 @@
-defmodule CodeCorps.UserCategoryPolicyTest do
+defmodule CodeCorps.Web.UserCategoryPolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.UserCategoryPolicy, only: [create?: 2, delete?: 2]
-  import CodeCorps.UserCategory, only: [create_changeset: 2]
+  import CodeCorps.Web.UserCategoryPolicy, only: [create?: 2, delete?: 2]
+  import CodeCorps.Web.UserCategory, only: [create_changeset: 2]
 
-  alias CodeCorps.UserCategory
+  alias CodeCorps.Web.UserCategory
 
   describe "create?" do
     test "returns true when user is an admin" do

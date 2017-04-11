@@ -1,7 +1,7 @@
-defmodule CodeCorps.ProjectUserTest do
+defmodule CodeCorps.Web.ProjectUserTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.{ProjectUser, Repo}
+  alias CodeCorps.Web.ProjectUser
 
   describe "update_changeset role validation" do
     test "includes pending" do

@@ -1,7 +1,7 @@
-defmodule CodeCorps.RoleTest do
+defmodule CodeCorps.Web.RoleTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.Role
+  alias CodeCorps.Web.Role
 
   @valid_attrs %{ability: "Backend Development", kind: "technology", name: "Backend Developer"}
   @invalid_attrs %{ability: "Juggling", kind: "circus", name: "Juggler"}

@@ -3,6 +3,11 @@ defmodule CodeCorps.Analytics.SegmentEventNameBuilder do
   Used for building friendly event names for use in Segment tracking
   """
 
+  alias CodeCorps.Web.{
+    DonationGoal, ProjectUser, StripeInvoice,
+    User, UserCategory, UserRole, UserSkill
+  }
+
   @spec build(atom, struct) :: String.t
   def build(action, record), do: get_event_name(action, record)
 
@@ -11,23 +16,23 @@ defmodule CodeCorps.Analytics.SegmentEventNameBuilder do
   defp get_event_name(action, _) when action in @actions_without_properties do
     friendly_action_name(action)
   end
-  defp get_event_name(:update, %CodeCorps.DonationGoal{}) do
+  defp get_event_name(:update, %DonationGoal{}) do
     "Updated Donation Goal"
   end
-  defp get_event_name(:create, %CodeCorps.ProjectUser{}) do
+  defp get_event_name(:create, %ProjectUser{}) do
     "Requested Project Membership"
   end
-  defp get_event_name(:update, %CodeCorps.ProjectUser{}) do
+  defp get_event_name(:update, %ProjectUser{}) do
     "Approved Project Membership"
   end
-  defp get_event_name(:payment_succeeded, %CodeCorps.StripeInvoice{}) do
+  defp get_event_name(:payment_succeeded, %StripeInvoice{}) do
     "Processed Subscription Payment"
   end
-  defp get_event_name(:create, %CodeCorps.User{}), do: "Signed Up"
-  defp get_event_name(:update, %CodeCorps.User{}), do: "Updated Profile"
-  defp get_event_name(:create, %CodeCorps.UserCategory{}), do: "Added User Category"
-  defp get_event_name(:create, %CodeCorps.UserSkill{}), do: "Added User Skill"
-  defp get_event_name(:create, %CodeCorps.UserRole{}), do: "Added User Role"
+  defp get_event_name(:create, %User{}), do: "Signed Up"
+  defp get_event_name(:update, %User{}), do: "Updated Profile"
+  defp get_event_name(:create, %UserCategory{}), do: "Added User Category"
+  defp get_event_name(:create, %UserRole{}), do: "Added User Role"
+  defp get_event_name(:create, %UserSkill{}), do: "Added User Skill"
   defp get_event_name(:create, %{token: _, user_id: _}), do: "Signed In"
   defp get_event_name(action, model) do
     [friendly_action_name(action), friendly_model_name(model)] |> Enum.join(" ")

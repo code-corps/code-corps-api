@@ -3,8 +3,9 @@ defmodule CodeCorps.StripeService.StripeConnectChargeServiceTest do
 
   use CodeCorps.StripeCase
 
-  alias CodeCorps.{StripeConnectCharge, StripeTesting}
   alias CodeCorps.StripeService.StripeConnectChargeService
+  alias CodeCorps.StripeTesting
+  alias CodeCorps.Web.{StripeConnectCharge}
 
   describe "create" do
     test "creates a StripeConnectCharge, with proper associations" do

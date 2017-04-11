@@ -1,11 +1,12 @@
 defmodule CodeCorps.Services.ProjectService do
   @moduledoc """
-  Handles special CRUD operations for `CodeCorps.Project`.
+  Handles special CRUD operations for `CodeCorps.Web.Project`.
   """
 
   import Ecto.Query
 
-  alias CodeCorps.{Project, Repo, StripeConnectPlan, StripeConnectSubscription}
+  alias CodeCorps.Repo
+  alias CodeCorps.Web.{Project, StripeConnectPlan, StripeConnectSubscription}
 
   def update_project_totals(%Project{stripe_connect_plan: %StripeConnectPlan{id: plan_id}} = project) do
     total_monthly_donated =

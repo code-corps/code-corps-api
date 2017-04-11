@@ -1,7 +1,7 @@
-defmodule CodeCorps.PreviewTest do
+defmodule CodeCorps.Web.PreviewTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.Preview
+  alias CodeCorps.Web.Preview
 
   describe "create_changeset/2" do
     test "renders body html from markdown" do

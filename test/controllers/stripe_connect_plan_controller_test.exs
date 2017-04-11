@@ -1,4 +1,4 @@
-defmodule CodeCorps.StripeConnectPlanControllerTest do
+defmodule CodeCorps.Web.StripeConnectPlanControllerTest do
   use CodeCorps.ApiCase, resource_name: :stripe_connect_plan
 
   describe "show" do

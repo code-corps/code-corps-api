@@ -1,7 +1,8 @@
 defmodule CodeCorps.StripeService.StripeConnectAccountService do
-  alias CodeCorps.{Repo, StripeConnectAccount, StripeExternalAccount}
+  alias CodeCorps.Repo
   alias CodeCorps.StripeService.Adapters.{StripeConnectAccountAdapter}
   alias CodeCorps.StripeService.StripeConnectExternalAccountService
+  alias CodeCorps.Web.{StripeConnectAccount, StripeExternalAccount}
   alias Ecto.Multi
 
   import Ecto.Query, only: [where: 3]

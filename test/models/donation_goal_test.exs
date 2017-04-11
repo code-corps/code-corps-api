@@ -1,9 +1,9 @@
-defmodule CodeCorps.DonationGoalTest do
+defmodule CodeCorps.Web.DonationGoalTest do
   @moduledoc false
 
   use CodeCorps.ModelCase
 
-  alias CodeCorps.DonationGoal
+  alias CodeCorps.Web.DonationGoal
 
   describe "%create_changeset/2" do
     test "requires amount, description and project_id" do

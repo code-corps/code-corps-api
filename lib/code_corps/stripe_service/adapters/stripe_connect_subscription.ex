@@ -13,7 +13,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectSubscriptionAdapter do
 
   @doc """
   Converts a map received from the Stripe API into a map that can be used
-  to create a `CodeCorps.StripeConnectSubscription` record
+  to create a `CodeCorps.Web.StripeConnectSubscription` record
   """
   def to_params(%Stripe.Subscription{plan: stripe_plan} = stripe_subscription, %{} = attributes) do
     result =

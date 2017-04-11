@@ -1,6 +1,8 @@
 defmodule CodeCorps.Helpers.URLTest do
   use ExUnit.Case, async: true
+
   import CodeCorps.Helpers.URL
+
   alias Ecto.Changeset
 
   test "returns nil when nil" do

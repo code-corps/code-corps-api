@@ -1,9 +1,9 @@
-defmodule CodeCorps.UserTaskTest do
+defmodule CodeCorps.Web.UserTaskTest do
   @moduledoc false
 
   use CodeCorps.ModelCase
 
-  alias CodeCorps.UserTask
+  alias CodeCorps.Web.UserTask
 
   describe "create_changeset/2" do
     @required_attrs ~w(task_id user_id)

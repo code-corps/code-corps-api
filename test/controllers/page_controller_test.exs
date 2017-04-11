@@ -1,4 +1,4 @@
-defmodule CodeCorps.PageControllerTest do
+defmodule CodeCorps.Web.PageControllerTest do
   use CodeCorps.ConnCase
 
   test "GET /", %{conn: conn} do

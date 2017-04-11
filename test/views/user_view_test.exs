@@ -1,5 +1,5 @@
-defmodule CodeCorps.UserViewTest do
-  use CodeCorps.ViewCase
+defmodule CodeCorps.Web.UserViewTest do
+  use CodeCorps.Web.ViewCase
 
   alias Phoenix.ConnTest
   alias Plug.Conn
@@ -17,7 +17,7 @@ defmodule CodeCorps.UserViewTest do
 
     host = Application.get_env(:code_corps, :asset_host)
 
-    rendered_json = render(CodeCorps.UserView, "show.json-api", data: user)
+    rendered_json = render(CodeCorps.Web.UserView, "show.json-api", data: user)
 
     expected_json = %{
       "data" => %{
@@ -93,7 +93,7 @@ defmodule CodeCorps.UserViewTest do
       ConnTest.build_conn()
       |> Conn.assign(:current_user, user)
 
-    rendered_json = render(CodeCorps.UserView, "show.json-api", data: user, conn: conn)
+    rendered_json = render(CodeCorps.Web.UserView, "show.json-api", data: user, conn: conn)
     assert rendered_json["data"]["attributes"]["email"] == user.email
   end
 
@@ -105,7 +105,7 @@ defmodule CodeCorps.UserViewTest do
       ConnTest.build_conn()
       |> Conn.assign(:current_user, auth_user)
 
-    rendered_json = render(CodeCorps.UserView, "show.json-api", data: users, conn: conn)
+    rendered_json = render(CodeCorps.Web.UserView, "show.json-api", data: users, conn: conn)
 
     emails =
       rendered_json["data"]
@@ -149,6 +149,6 @@ defmodule CodeCorps.UserViewTest do
       ConnTest.build_conn()
       |> Conn.assign(:current_user, user)
 
-    render(CodeCorps.UserView, "show.json-api", data: user, conn: conn)
+    render(CodeCorps.Web.UserView, "show.json-api", data: user, conn: conn)
   end
 end

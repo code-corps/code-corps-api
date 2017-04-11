@@ -1,4 +1,4 @@
-defmodule CodeCorps.StripeConnectSubscriptionControllerTest do
+defmodule CodeCorps.Web.StripeConnectSubscriptionControllerTest do
   use CodeCorps.ApiCase, resource_name: :stripe_connect_subscription
 
   defp build_payload(user, project, quantity) do

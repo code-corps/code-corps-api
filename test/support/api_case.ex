@@ -20,7 +20,6 @@ defmodule CodeCorps.ApiCase do
   use ExUnit.CaseTemplate
   use Phoenix.ConnTest
 
-
   using(opts) do
     quote do
       # Import conveniences for testing with connections
@@ -32,12 +31,12 @@ defmodule CodeCorps.ApiCase do
       import Ecto.Query
 
       import CodeCorps.AuthenticationTestHelpers
-      import CodeCorps.Router.Helpers
+      import CodeCorps.Web.Router.Helpers
       import CodeCorps.Factories
       import CodeCorps.TestHelpers
 
       # The default endpoint for testing
-      @endpoint CodeCorps.Endpoint
+      @endpoint CodeCorps.Web.Endpoint
 
       CodeCorps.ApiCase.define_request_helper_methods(unquote(opts))
     end
@@ -87,11 +86,11 @@ defmodule CodeCorps.ApiCase do
       defp default_record, do: insert(unquote(resource_name))
 
       defp path_for(conn, action, resource_or_id) do
-        apply(CodeCorps.Router.Helpers, path_helper_method(), [conn, action, resource_or_id])
+        apply(CodeCorps.Web.Router.Helpers, path_helper_method(), [conn, action, resource_or_id])
       end
 
       defp path_for(conn, action) do
-        apply(CodeCorps.Router.Helpers, path_helper_method(), [conn, action])
+        apply(CodeCorps.Web.Router.Helpers, path_helper_method(), [conn, action])
       end
 
       def request_index(conn) do

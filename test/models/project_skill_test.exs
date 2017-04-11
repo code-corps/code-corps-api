@@ -1,7 +1,7 @@
-defmodule CodeCorps.ProjectSkillTest do
+defmodule CodeCorps.Web.ProjectSkillTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.ProjectSkill
+  alias CodeCorps.Web.ProjectSkill
 
   test "changeset with valid attributes" do
     project_id = insert(:project).id

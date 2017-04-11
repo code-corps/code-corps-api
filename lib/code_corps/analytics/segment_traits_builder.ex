@@ -6,7 +6,7 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilder do
   @spec build(struct) :: map
   def build(record), do: traits(record)
 
-  defp traits(%CodeCorps.User{} = user) do
+  defp traits(%CodeCorps.Web.User{} = user) do
     %{
       admin: user.admin,
       biography: user.biography,
@@ -20,7 +20,7 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilder do
     }
   end
 
-  defp traits(comment = %CodeCorps.Comment{}) do
+  defp traits(comment = %CodeCorps.Web.Comment{}) do
     comment = comment |> CodeCorps.Repo.preload(:task)
     %{
       comment_id: comment.id,
@@ -30,7 +30,7 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilder do
     }
   end
 
-  defp traits(record = %CodeCorps.ProjectUser{}) do
+  defp traits(record = %CodeCorps.Web.ProjectUser{}) do
     record = record |> CodeCorps.Repo.preload(:project)
     %{
       project: record.project.title,
@@ -38,7 +38,7 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilder do
     }
   end
 
-  defp traits(charge = %CodeCorps.StripeConnectCharge{}) do
+  defp traits(charge = %CodeCorps.Web.StripeConnectCharge{}) do
     # NOTE: this only works for some currencies
     revenue = charge.amount / 100
     currency = String.capitalize(charge.currency) # ISO 4127 format
@@ -51,7 +51,7 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilder do
     }
   end
 
-  defp traits(task = %CodeCorps.Task{}) do
+  defp traits(task = %CodeCorps.Web.Task{}) do
     %{
       task: task.title,
       task_id: task.id,
@@ -59,7 +59,7 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilder do
     }
   end
 
-  defp traits(user_category = %CodeCorps.UserCategory{}) do
+  defp traits(user_category = %CodeCorps.Web.UserCategory{}) do
     user_category = user_category |> CodeCorps.Repo.preload(:category)
     %{
       category: user_category.category.name,
@@ -67,7 +67,7 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilder do
     }
   end
 
-  defp traits(user_role = %CodeCorps.UserRole{}) do
+  defp traits(user_role = %CodeCorps.Web.UserRole{}) do
     user_role = user_role |> CodeCorps.Repo.preload(:role)
     %{
       role: user_role.role.name,
@@ -75,7 +75,7 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilder do
     }
   end
 
-  defp traits(user_skill = %CodeCorps.UserSkill{}) do
+  defp traits(user_skill = %CodeCorps.Web.UserSkill{}) do
     user_skill = user_skill |> CodeCorps.Repo.preload(:skill)
     %{
       skill: user_skill.skill.title,

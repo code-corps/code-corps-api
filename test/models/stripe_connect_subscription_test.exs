@@ -1,7 +1,7 @@
-defmodule CodeCorps.StripeConnectSubscriptionTest do
+defmodule CodeCorps.Web.StripeConnectSubscriptionTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.StripeConnectSubscription
+  alias CodeCorps.Web.StripeConnectSubscription
 
   @valid_attrs %{
     application_fee_percent: 5,

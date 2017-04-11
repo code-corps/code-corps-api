@@ -1,7 +1,7 @@
-defmodule CodeCorps.TaskListTest do
+defmodule CodeCorps.Web.TaskListTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.TaskList
+  alias CodeCorps.Web.TaskList
 
   @valid_attrs %{name: "some content", position: 42}
   @invalid_attrs %{}

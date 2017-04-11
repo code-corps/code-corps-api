@@ -1,9 +1,9 @@
 defmodule CodeCorps.Services.MarkdownRendererServiceTest do
   use ExUnit.Case, async: true
 
-  alias CodeCorps.Task
-
   import CodeCorps.Services.MarkdownRendererService
+
+  alias CodeCorps.Web.Task
 
   @valid_attrs %{
     title: "Test task",

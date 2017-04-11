@@ -3,8 +3,8 @@ defmodule CodeCorps.Services.UserServiceTest do
 
   use CodeCorps.ModelCase
 
-  alias CodeCorps.StripePlatformCustomer
   alias CodeCorps.Services.UserService
+  alias CodeCorps.Web.StripePlatformCustomer
 
   describe "update/1" do
     test "it just updates the user if there is nothing associated to update" do

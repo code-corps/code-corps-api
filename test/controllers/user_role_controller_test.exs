@@ -1,4 +1,4 @@
-defmodule CodeCorps.UserRoleControllerTest do
+defmodule CodeCorps.Web.UserRoleControllerTest do
   use CodeCorps.ApiCase, resource_name: :user_role
 
   describe "index" do

@@ -1,10 +1,9 @@
 defmodule CodeCorps.StripeService.StripeInvoiceServiceTest do
   use ExUnit.Case, async: true
-
   use CodeCorps.ModelCase
 
-  alias CodeCorps.{StripeInvoice}
   alias CodeCorps.StripeService.StripeInvoiceService
+  alias CodeCorps.Web.StripeInvoice
 
   describe "create" do
     test "creates a StripeInvoice" do

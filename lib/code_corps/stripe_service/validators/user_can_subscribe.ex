@@ -1,13 +1,13 @@
 defmodule CodeCorps.StripeService.Validators.UserCanSubscribe do
   @moduledoc """
-  Ensures a `CodeCorps.User` is able to subscribe to a `CodeCorps.Project`.
+  Ensures a `CodeCorps.Web.User` is able to subscribe to a `CodeCorps.Web.Project`.
   """
 
-  alias CodeCorps.{User, StripePlatformCard, StripePlatformCustomer}
+  alias CodeCorps.Web.{User, StripePlatformCard, StripePlatformCustomer}
 
   @doc """
-  Determines if the provided `CodeCorps.User` is able to
-  subscribe to a `CodeCorps.Project`
+  Determines if the provided `CodeCorps.Web.User` is able to
+  subscribe to a `CodeCorps.Web.Project`
 
   For a user to be able to create subscriptions, they need to have
   their associated records properly set up

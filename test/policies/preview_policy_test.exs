@@ -1,10 +1,10 @@
-defmodule CodeCorps.PreviewPolicyTest do
+defmodule CodeCorps.Web.PreviewPolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.PreviewPolicy, only: [create?: 2]
-  import CodeCorps.Preview, only: [create_changeset: 2]
+  import CodeCorps.Web.PreviewPolicy, only: [create?: 2]
+  import CodeCorps.Web.Preview, only: [create_changeset: 2]
 
-  alias CodeCorps.Preview
+  alias CodeCorps.Web.Preview
 
   describe "create?" do
     test "returns true if user is creating their own record" do

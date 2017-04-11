@@ -1,7 +1,7 @@
 defmodule CodeCorps.StripeService.StripeConnectAccountServiceTest do
   use CodeCorps.StripeCase
 
-  alias CodeCorps.{StripeConnectAccount, StripeExternalAccount}
+  alias CodeCorps.Web.{StripeConnectAccount, StripeExternalAccount}
   alias CodeCorps.StripeService.StripeConnectAccountService
 
   describe "create" do

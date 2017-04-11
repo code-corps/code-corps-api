@@ -1,7 +1,7 @@
-defmodule CodeCorps.StripeEventTest do
+defmodule CodeCorps.Web.StripeEventTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.StripeEvent
+  alias CodeCorps.Web.StripeEvent
 
   describe "create_changeset/2" do
     @valid_attrs %{

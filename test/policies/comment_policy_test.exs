@@ -1,10 +1,10 @@
-defmodule CodeCorps.CommentPolicyTest do
+defmodule CodeCorps.Web.CommentPolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.CommentPolicy, only: [create?: 2, update?: 2]
-  import CodeCorps.Comment, only: [create_changeset: 2]
+  import CodeCorps.Web.CommentPolicy, only: [create?: 2, update?: 2]
+  import CodeCorps.Web.Comment, only: [create_changeset: 2]
 
-  alias CodeCorps.Comment
+  alias CodeCorps.Web.Comment
 
   describe "create?" do
     test "returns true if own record" do

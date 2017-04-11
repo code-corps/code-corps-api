@@ -1,10 +1,10 @@
-defmodule CodeCorps.StripePlatformCardPolicyTest do
+defmodule CodeCorps.Web.StripePlatformCardPolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.StripePlatformCardPolicy, only: [create?: 2, delete?: 2, show?: 2]
-  import CodeCorps.StripePlatformCard, only: [create_changeset: 2]
+  import CodeCorps.Web.StripePlatformCardPolicy, only: [create?: 2, delete?: 2, show?: 2]
+  import CodeCorps.Web.StripePlatformCard, only: [create_changeset: 2]
 
-  alias CodeCorps.StripePlatformCard
+  alias CodeCorps.Web.StripePlatformCard
 
   describe "create?" do
     test "returns true if user is creating their own record" do

@@ -1,15 +1,13 @@
 defmodule CodeCorps.Services.DonationGoalsServiceTest do
   use CodeCorps.ModelCase
 
-  import CodeCorps.Project, only: [update_total_changeset: 2]
+  import CodeCorps.Web.Project, only: [update_total_changeset: 2]
 
-  alias CodeCorps.DonationGoal
+  alias CodeCorps.Web.DonationGoal
   alias CodeCorps.Services.DonationGoalsService
 
   defp assert_current_goal_id(goal_id) do
-    current_goal =
-      DonationGoal
-      |> Repo.get_by(current: true)
+    current_goal = DonationGoal |> Repo.get_by(current: true)
 
     assert current_goal.id == goal_id
   end
@@ -23,7 +21,8 @@ defmodule CodeCorps.Services.DonationGoalsServiceTest do
       project = insert(:project)
       insert(:stripe_connect_plan, project: project)
 
-      {:ok, %DonationGoal{} = donation_goal} = DonationGoalsService.create(%{amount: 10, description: "Test", project_id: project.id})
+      {:ok, %DonationGoal{} = donation_goal} =
+        DonationGoalsService.create(%{amount: 10, description: "Test", project_id: project.id})
       assert_current_goal_id(donation_goal.id)
     end
 
@@ -137,8 +136,6 @@ defmodule CodeCorps.Services.DonationGoalsServiceTest do
       assert_current_goal_id(goal_1.id)
     end
   end
-
-
 
   describe "set_current_goal_for_project/1" do
     test "sets current goal correctly" do

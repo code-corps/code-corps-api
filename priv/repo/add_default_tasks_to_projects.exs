@@ -2,10 +2,10 @@ defmodule CodeCorps.Repo.Seeds.AddDefaultTasksToProjects do
   import Ecto.Changeset
   import Ecto.Query
 
-  alias CodeCorps.Project
+  alias CodeCorps.Web.Project
   alias CodeCorps.Repo
-  alias CodeCorps.Task
-  alias CodeCorps.TaskList
+  alias CodeCorps.Web.Task
+  alias CodeCorps.Web.TaskList
 
   def migrate_existing() do
     Project

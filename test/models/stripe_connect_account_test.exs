@@ -1,9 +1,9 @@
-defmodule CodeCorps.StripeConnectAccountTest do
+defmodule CodeCorps.Web.StripeConnectAccountTest do
   @moduledoc false
 
   use CodeCorps.ModelCase
 
-  alias CodeCorps.StripeConnectAccount
+  alias CodeCorps.Web.StripeConnectAccount
 
   @valid_attrs %{
     id_from_stripe: "abc123",

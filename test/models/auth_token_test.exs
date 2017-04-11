@@ -1,7 +1,7 @@
-defmodule CodeCorps.AuthTokenTest do
+defmodule CodeCorps.Web.AuthTokenTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.AuthToken
+  alias CodeCorps.Web.AuthToken
 
   test "changeset with valid attributes" do
     user = insert(:user)

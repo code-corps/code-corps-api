@@ -1,6 +1,9 @@
 defmodule CodeCorps.StripeService.StripeConnectCardService do
-  alias CodeCorps.{Repo, StripeConnectAccount, StripeConnectCard,
-  StripeConnectCustomer, StripePlatformCard, StripePlatformCustomer}
+  alias CodeCorps.Repo
+  alias CodeCorps.Web.{
+    StripeConnectAccount, StripeConnectCard, StripeConnectCustomer,
+    StripePlatformCard, StripePlatformCustomer
+  }
   alias CodeCorps.StripeService.Adapters.StripeConnectCardAdapter
 
   import CodeCorps.MapUtils, only: [rename: 3, keys_to_string: 1]

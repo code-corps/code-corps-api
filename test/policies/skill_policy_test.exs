@@ -1,7 +1,7 @@
-defmodule CodeCorps.SkillPolicyTest do
+defmodule CodeCorps.Web.SkillPolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.SkillPolicy, only: [create?: 1]
+  import CodeCorps.Web.SkillPolicy, only: [create?: 1]
 
   describe "create?" do
     test "returns true when user is an admin" do

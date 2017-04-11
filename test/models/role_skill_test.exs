@@ -1,7 +1,7 @@
-defmodule CodeCorps.RoleSkillTest do
+defmodule CodeCorps.Web.RoleSkillTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.RoleSkill
+  alias CodeCorps.Web.RoleSkill
 
   test "changeset with valid attributes" do
     role_id = insert(:role).id

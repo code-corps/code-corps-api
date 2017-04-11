@@ -1,7 +1,7 @@
-defmodule CodeCorps.StripeConnectEventsControllerTest do
+defmodule CodeCorps.Web.StripeConnectEventsControllerTest do
   use CodeCorps.ConnCase
 
-  alias CodeCorps.StripeEvent
+  alias CodeCorps.Web.StripeEvent
 
   setup do
     conn =

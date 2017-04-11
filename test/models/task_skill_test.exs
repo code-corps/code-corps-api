@@ -1,9 +1,9 @@
-defmodule CodeCorps.TaskSkillTest do
+defmodule CodeCorps.Web.TaskSkillTest do
   @moduledoc false
 
   use CodeCorps.ModelCase
 
-  alias CodeCorps.TaskSkill
+  alias CodeCorps.Web.TaskSkill
 
   describe "create_changeset/2" do
     @required_attrs ~w(task_id skill_id)

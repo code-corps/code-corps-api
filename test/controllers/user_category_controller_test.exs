@@ -1,4 +1,4 @@
-defmodule CodeCorps.UserCategoryControllerTest do
+defmodule CodeCorps.Web.UserCategoryControllerTest do
   use CodeCorps.ApiCase, resource_name: :user_category
 
   describe "index" do

@@ -1,9 +1,9 @@
-defmodule CodeCorps.ProjectTest do
+defmodule CodeCorps.Web.ProjectTest do
   use CodeCorps.ModelCase
 
-  import CodeCorps.Project
+  import CodeCorps.Web.Project
 
-  alias CodeCorps.{Project, ProjectUser, Repo}
+  alias CodeCorps.Web.{Project, ProjectUser}
 
   describe "changeset" do
     @valid_attrs %{title: "A title"}

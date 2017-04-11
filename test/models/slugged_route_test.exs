@@ -1,7 +1,7 @@
-defmodule CodeCorps.SluggedRouteTest do
+defmodule CodeCorps.Web.SluggedRouteTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.SluggedRoute
+  alias CodeCorps.Web.SluggedRoute
 
   @valid_organization_attrs %{slug: "organization-slug", organization_id: 1}
   @valid_user_attrs %{slug: "user-slug", user_id: 1}

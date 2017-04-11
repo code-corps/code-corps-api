@@ -1,5 +1,5 @@
 defmodule CodeCorps.Presenters.ImagePresenter do
-  alias CodeCorps.{Project, User}
+  alias CodeCorps.Web.{Project, User}
   alias CodeCorps.Cloudex.CloudinaryUrl
 
   @logo_options %{crop: "fill", height: 500, width: 500}

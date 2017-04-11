@@ -1,4 +1,4 @@
-defmodule CodeCorps.ProjectUserControllerTest do
+defmodule CodeCorps.Web.ProjectUserControllerTest do
   use CodeCorps.ApiCase, resource_name: :project_user
   use Bamboo.Test
 
@@ -94,7 +94,7 @@ defmodule CodeCorps.ProjectUserControllerTest do
       assert_received {:track, ^user_id, "Approved Project Membership", ^tracking_properties}
 
       email =
-        CodeCorps.ProjectUser
+        CodeCorps.Web.ProjectUser
         |> CodeCorps.Repo.get_by(role: "contributor")
         |> CodeCorps.Repo.preload([:project, :user])
         |> CodeCorps.Emails.ProjectUserAcceptanceEmail.create()

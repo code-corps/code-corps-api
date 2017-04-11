@@ -1,10 +1,10 @@
-defmodule CodeCorps.ProjectPolicyTest do
+defmodule CodeCorps.Web.ProjectPolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.ProjectPolicy, only: [create?: 2, update?: 2]
-  import CodeCorps.Project, only: [create_changeset: 2]
+  import CodeCorps.Web.ProjectPolicy, only: [create?: 2, update?: 2]
+  import CodeCorps.Web.Project, only: [create_changeset: 2]
 
-  alias CodeCorps.Project
+  alias CodeCorps.Web.Project
 
   describe "create?" do
     test "returns true when user is owner of organization" do

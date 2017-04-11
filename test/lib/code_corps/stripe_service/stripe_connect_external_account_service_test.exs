@@ -8,7 +8,7 @@ defmodule CodeCorps.StripeService.StripeConnectExternalAccountServiceTest do
       api_external_account = %Stripe.ExternalAccount{id: "bnk_123"}
       local_connect_account = insert(:stripe_connect_account)
 
-      {:ok, %CodeCorps.StripeExternalAccount{} = external_account} =
+      {:ok, %CodeCorps.Web.StripeExternalAccount{} = external_account} =
         StripeConnectExternalAccountService.create(api_external_account, local_connect_account)
 
       assert external_account.id_from_stripe == "bnk_123"

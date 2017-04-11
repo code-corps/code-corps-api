@@ -1,7 +1,7 @@
-defmodule CodeCorps.UserPolicyTest do
+defmodule CodeCorps.Web.UserPolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.UserPolicy, only: [update?: 2]
+  import CodeCorps.Web.UserPolicy, only: [update?: 2]
 
   describe "update?" do
     test "returns true if user is updating their own record" do

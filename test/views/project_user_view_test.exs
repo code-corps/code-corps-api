@@ -1,12 +1,12 @@
-defmodule CodeCorps.ProjectUserViewTest do
-  use CodeCorps.ViewCase
+defmodule CodeCorps.Web.ProjectUserViewTest do
+  use CodeCorps.Web.ViewCase
 
   test "renders all attributes and relationships properly" do
     project = insert(:project)
     user = insert(:user)
     project_user = insert(:project_user, project: project, user: user)
 
-    rendered_json = render(CodeCorps.ProjectUserView, "show.json-api", data: project_user)
+    rendered_json = render(CodeCorps.Web.ProjectUserView, "show.json-api", data: project_user)
 
     expected_json = %{
       "data" => %{

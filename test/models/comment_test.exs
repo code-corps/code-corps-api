@@ -1,7 +1,7 @@
-defmodule CodeCorps.CommentTest do
+defmodule CodeCorps.Web.CommentTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.Comment
+  alias CodeCorps.Web.Comment
 
   @valid_attrs %{markdown: "I love elixir!", state: "published"}
   @invalid_attrs %{}

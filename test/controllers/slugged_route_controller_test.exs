@@ -1,4 +1,4 @@
-defmodule CodeCorps.SluggedRouteControllerTest do
+defmodule CodeCorps.Web.SluggedRouteControllerTest do
   use CodeCorps.ApiCase, resource_name: :slugged_route
 
   test "shows chosen resource", %{conn: conn} do

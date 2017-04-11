@@ -1,4 +1,4 @@
-defmodule CodeCorps.TaskSkillControllerTest do
+defmodule CodeCorps.Web.TaskSkillControllerTest do
   @moduledoc false
 
   use CodeCorps.ApiCase, resource_name: :task_skill

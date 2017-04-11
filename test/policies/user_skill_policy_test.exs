@@ -1,10 +1,10 @@
-defmodule CodeCorps.UserSkillPolicyTest do
+defmodule CodeCorps.Web.UserSkillPolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.UserSkillPolicy, only: [create?: 2, delete?: 2]
-  import CodeCorps.UserSkill, only: [create_changeset: 2]
+  import CodeCorps.Web.UserSkillPolicy, only: [create?: 2, delete?: 2]
+  import CodeCorps.Web.UserSkill, only: [create_changeset: 2]
 
-  alias CodeCorps.UserSkill
+  alias CodeCorps.Web.UserSkill
 
   describe "create?" do
     test "returns true when user is an admin" do

@@ -1,4 +1,4 @@
-defmodule CodeCorps.RoleControllerTest do
+defmodule CodeCorps.Web.RoleControllerTest do
   use CodeCorps.ApiCase, resource_name: :role
 
   @valid_attrs %{ability: "Backend Development", kind: "technology", name: "Backend Developer"}

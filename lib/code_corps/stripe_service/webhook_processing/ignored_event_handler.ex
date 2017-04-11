@@ -1,8 +1,9 @@
 defmodule CodeCorps.StripeService.WebhookProcessing.IgnoredEventHandler do
-  alias CodeCorps.{StripeEvent, Repo}
+  alias CodeCorps.Repo
   alias CodeCorps.StripeService.WebhookProcessing.{
     ConnectEventHandler, PlatformEventHandler
   }
+  alias CodeCorps.Web.StripeEvent
 
   @ignored_platform_event_types [
     "account.external_account.created",
@@ -41,11 +42,11 @@ defmodule CodeCorps.StripeService.WebhookProcessing.IgnoredEventHandler do
   def ignored_event_types(PlatformEventHandler), do: @ignored_platform_event_types
 
   @doc """
-  Takes in a `CodeCorps.StripeEvent` to be processed as "ignored".
+  Takes in a `CodeCorps.Web.StripeEvent` to be processed as "ignored".
   Determines the reason for ignoring the event, then updates the record to
   `status: "ignored"` and `ignored_reason: inferred_message`
 
-  Returns `{:ok, %CodeCorps.StripeEvent{}}
+  Returns `{:ok, %CodeCorps.Web.StripeEvent{}}
   """
   @spec handle(StripeEvent.t, module) :: {:ok, StripeEvent.t}
   def handle(%StripeEvent{type: type} = local_event, handler) do

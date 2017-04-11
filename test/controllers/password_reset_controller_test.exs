@@ -1,8 +1,9 @@
-defmodule CodeCorps.PasswordResetControllerTest do
+defmodule CodeCorps.Web.PasswordResetControllerTest do
   @moduledoc false
 
   use CodeCorps.ApiCase, resource_name: :password_reset
-  alias CodeCorps.AuthToken
+
+  alias CodeCorps.Web.AuthToken
 
   @tag :authenticated
   test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do

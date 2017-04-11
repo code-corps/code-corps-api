@@ -4,11 +4,11 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest do
   alias CodeCorps.StripeService.WebhookProcessing.{
     ConnectEventHandler, EventHandler, PlatformEventHandler
   }
-
-  alias CodeCorps.{
-    Repo, Project,
-    StripeEvent, StripeInvoice, StripePlatformCard, StripePlatformCustomer,
-    StripeTesting
+  alias CodeCorps.StripeTesting
+  alias CodeCorps.Repo
+  alias CodeCorps.Web.{
+    Project, StripeEvent, StripeInvoice,
+    StripePlatformCard, StripePlatformCustomer
   }
 
   defmodule CodeCorps.StripeService.WebhookProcessing.EventHandlerTest.StubObject do

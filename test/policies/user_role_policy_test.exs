@@ -1,10 +1,10 @@
-defmodule CodeCorps.UserRolePolicyTest do
+defmodule CodeCorps.Web.UserRolePolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.UserRolePolicy, only: [create?: 2, delete?: 2]
-  import CodeCorps.UserRole, only: [create_changeset: 2]
+  import CodeCorps.Web.UserRolePolicy, only: [create?: 2, delete?: 2]
+  import CodeCorps.Web.UserRole, only: [create_changeset: 2]
 
-  alias CodeCorps.UserRole
+  alias CodeCorps.Web.UserRole
 
   describe "create?" do
     test "returns true when user is an admin" do

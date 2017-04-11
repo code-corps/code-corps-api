@@ -1,7 +1,7 @@
-defmodule CodeCorps.SkillTest do
+defmodule CodeCorps.Web.SkillTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.Skill
+  alias CodeCorps.Web.Skill
 
   @valid_attrs %{
     description: "Elixir is a functional, concurrent, general-purpose programming language that runs on the Erlang virtual machine (BEAM).",

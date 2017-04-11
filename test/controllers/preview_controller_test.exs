@@ -1,4 +1,4 @@
-defmodule CodeCorps.PreviewControllerTest do
+defmodule CodeCorps.Web.PreviewControllerTest do
   use CodeCorps.ApiCase, resource_name: :preview
 
   @valid_attrs %{markdown: "A **strong** element"}

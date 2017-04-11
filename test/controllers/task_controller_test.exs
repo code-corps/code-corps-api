@@ -1,4 +1,4 @@
-defmodule CodeCorps.TaskControllerTest do
+defmodule CodeCorps.Web.TaskControllerTest do
   use CodeCorps.ApiCase, resource_name: :task
 
   @valid_attrs %{

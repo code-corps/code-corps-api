@@ -2,8 +2,8 @@ defmodule CodeCorps.Services.DonationGoalsService do
   @moduledoc """
   Handles CRUD operations for donation goals.
 
-  When operations happen on `CodeCorps.DonationGoal`, we need to set
-  the current donation goal on `CodeCorps.Project`.
+  When operations happen on `CodeCorps.Web.DonationGoal`, we need to set
+  the current donation goal on `CodeCorps.Web.Project`.
 
   The current donation goal should be the smallest value that is
   greater than the project's current total donations, _or_ falls back to
@@ -12,7 +12,8 @@ defmodule CodeCorps.Services.DonationGoalsService do
 
   import Ecto.Query
 
-  alias CodeCorps.{DonationGoal, Project, Repo}
+  alias CodeCorps.Repo
+  alias CodeCorps.Web.{DonationGoal, Project}
   alias Ecto.Multi
 
   # Prevents warning for calling `Repo.transaction(multi)`.
@@ -23,7 +24,7 @@ defmodule CodeCorps.Services.DonationGoalsService do
   @dialyzer :no_opaque
 
   @doc """
-  Creates the `CodeCorps.DonationGoal` by wrapping the following in a
+  Creates the `CodeCorps.Web.DonationGoal` by wrapping the following in a
   transaction:
 
   - Inserting the donation goal
@@ -50,7 +51,7 @@ defmodule CodeCorps.Services.DonationGoalsService do
   end
 
   @doc """
-  Updates the `CodeCorps.DonationGoal` by wrapping the following in a
+  Updates the `CodeCorps.Web.DonationGoal` by wrapping the following in a
   transaction:
 
   - Updating the donation goal
@@ -76,7 +77,7 @@ defmodule CodeCorps.Services.DonationGoalsService do
   end
 
   @doc """
-  Updates sibling goals for a `CodeCorps.DonationGoal` by:
+  Updates sibling goals for a `CodeCorps.Web.DonationGoal` by:
 
   - Finding this goal's project
   - Finding the current goal for that project
@@ -106,7 +107,7 @@ defmodule CodeCorps.Services.DonationGoalsService do
   end
 
   @doc """
-  Updates all `CodeCorpes.DonationGoal` records for a project.
+  Updates all `CodeCorps.CodeCorps.Web.DonationGoal` records for a project.
 
   To be used when something related to the project's donation goals changes,
   but not any of the donation goals directly.

@@ -1,7 +1,7 @@
-defmodule CodeCorps.StripeConnectChargeTest do
+defmodule CodeCorps.Web.StripeConnectChargeTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.StripeConnectCharge
+  alias CodeCorps.Web.StripeConnectCharge
 
   test "requires :id_from_stripe, :stripe_connect_customer_id, :user_id" do
     changeset = %StripeConnectCharge{} |> StripeConnectCharge.create_changeset(%{})

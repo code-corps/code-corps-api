@@ -1,4 +1,4 @@
-defmodule CodeCorps.TaskListControllerTest do
+defmodule CodeCorps.Web.TaskListControllerTest do
   use CodeCorps.ApiCase, resource_name: :task_list
 
   describe "index" do

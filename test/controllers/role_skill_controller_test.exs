@@ -1,4 +1,4 @@
-defmodule CodeCorps.RoleSkillControllerTest do
+defmodule CodeCorps.Web.RoleSkillControllerTest do
   use CodeCorps.ApiCase, resource_name: :role_skill
 
   describe "index" do

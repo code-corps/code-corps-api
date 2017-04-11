@@ -3,7 +3,10 @@ defmodule CodeCorps.Emails.ReceiptEmail do
   import Bamboo.PostmarkHelper
 
   alias CodeCorps.Emails.BaseEmail
-  alias CodeCorps.{DonationGoal, Project, Repo, StripeConnectCharge, StripeConnectSubscription}
+  alias CodeCorps.Repo
+  alias CodeCorps.Web.{
+    DonationGoal, Project, StripeConnectCharge, StripeConnectSubscription
+  }
 
   def create(%StripeConnectCharge{} = charge, %Stripe.Invoice{} = invoice) do
     with %StripeConnectCharge{} = charge <- preload(charge),

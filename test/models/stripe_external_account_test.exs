@@ -1,7 +1,7 @@
-defmodule CodeCorps.StripeExternalAccountTest do
+defmodule CodeCorps.Web.StripeExternalAccountTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.StripeExternalAccount
+  alias CodeCorps.Web.StripeExternalAccount
 
   @valid_attrs %{account_id_from_stripe: "some content", id_from_stripe: "some content"}
   @invalid_attrs %{}

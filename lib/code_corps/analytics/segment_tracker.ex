@@ -7,14 +7,15 @@ defmodule CodeCorps.Analytics.SegmentTracker do
     SegmentEventNameBuilder,
     SegmentTraitsBuilder
   }
+  alias CodeCorps.Web.User
 
   @api Application.get_env(:code_corps, :analytics)
 
   @doc """
   Calls `identify` in the configured API module.
   """
-  @spec identify(CodeCorps.User.t) :: any
-  def identify(%CodeCorps.User{} = user) do
+  @spec identify(User.t) :: any
+  def identify(%User{} = user) do
     @api.identify(user.id, SegmentTraitsBuilder.build(user))
   end
 

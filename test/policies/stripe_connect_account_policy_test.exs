@@ -1,12 +1,12 @@
-defmodule CodeCorps.StripeConnectAccountPolicyTest do
+defmodule CodeCorps.Web.StripeConnectAccountPolicyTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.StripeConnectAccountPolicy,
+  import CodeCorps.Web.StripeConnectAccountPolicy,
     only: [show?: 2, create?: 2, update?: 2]
 
-  import CodeCorps.StripeConnectAccount, only: [create_changeset: 2]
+  import CodeCorps.Web.StripeConnectAccount, only: [create_changeset: 2]
 
-  alias CodeCorps.StripeConnectAccount
+  alias CodeCorps.Web.StripeConnectAccount
 
   describe "show?" do
     test "returns true when user is owner of organization" do

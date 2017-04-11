@@ -1,5 +1,5 @@
-defmodule CodeCorps.DonationGoalViewTest do
-  use CodeCorps.ViewCase
+defmodule CodeCorps.Web.DonationGoalViewTest do
+  use CodeCorps.Web.ViewCase
 
   test "renders all attributes and relationships properly" do
     project = insert(:project)
@@ -8,7 +8,7 @@ defmodule CodeCorps.DonationGoalViewTest do
     donation_goal = insert(:donation_goal, project: project, amount: 500)
     CodeCorps.Services.DonationGoalsService.update_related_goals(donation_goal)
 
-    rendered_json = render(CodeCorps.DonationGoalView, "show.json-api", data: donation_goal)
+    rendered_json = render(CodeCorps.Web.DonationGoalView, "show.json-api", data: donation_goal)
 
     expected_json = %{
       "data" => %{

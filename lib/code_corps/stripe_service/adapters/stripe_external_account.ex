@@ -1,7 +1,7 @@
 defmodule CodeCorps.StripeService.Adapters.StripeExternalAccountAdapter do
 
   alias CodeCorps.MapUtils
-  alias CodeCorps.StripeConnectAccount
+  alias CodeCorps.Web.StripeConnectAccount
 
   @stripe_attributes [
     :account_holder_name, :account_holder_type, :bank_name, :country,

@@ -1,3 +1,3 @@
-defmodule CodeCorps.PageViewTest do
-  use CodeCorps.ViewCase
+defmodule CodeCorps.Web.PageViewTest do
+  use CodeCorps.Web.ViewCase
 end

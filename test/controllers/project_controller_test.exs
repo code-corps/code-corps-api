@@ -1,4 +1,4 @@
-defmodule CodeCorps.ProjectControllerTest do
+defmodule CodeCorps.Web.ProjectControllerTest do
   use CodeCorps.ApiCase, resource_name: :project
 
   @valid_attrs %{title: "Valid project"}

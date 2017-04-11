@@ -1,10 +1,10 @@
-defmodule CodeCorps.UserRoleViewTest do
-  use CodeCorps.ViewCase
+defmodule CodeCorps.Web.UserRoleViewTest do
+  use CodeCorps.Web.ViewCase
 
   test "renders all attributes and relationships properly" do
     user_role = insert(:user_role)
 
-    rendered_json = render(CodeCorps.UserRoleView, "show.json-api", data: user_role)
+    rendered_json = render(CodeCorps.Web.UserRoleView, "show.json-api", data: user_role)
 
     expected_json = %{
       "data" => %{

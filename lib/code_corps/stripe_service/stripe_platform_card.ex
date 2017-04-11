@@ -6,7 +6,9 @@ defmodule CodeCorps.StripeService.StripePlatformCardService do
   alias CodeCorps.Repo
   alias CodeCorps.StripeService.Adapters.StripePlatformCardAdapter
   alias CodeCorps.StripeService.StripeConnectCardService
-  alias CodeCorps.{StripeConnectCard, StripePlatformCard, StripePlatformCustomer}
+  alias CodeCorps.Web.{
+    StripeConnectCard, StripePlatformCard, StripePlatformCustomer
+  }
 
   alias Ecto.Multi
 

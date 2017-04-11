@@ -1,11 +1,11 @@
-defmodule CodeCorps.SkillViewTest do
-  use CodeCorps.ViewCase
+defmodule CodeCorps.Web.SkillViewTest do
+  use CodeCorps.Web.ViewCase
 
   test "renders all attributes and relationships properly" do
     skill = insert(:skill)
     role_skill = insert(:role_skill, skill: skill)
 
-    rendered_json =  render(CodeCorps.SkillView, "show.json-api", data: skill)
+    rendered_json =  render(CodeCorps.Web.SkillView, "show.json-api", data: skill)
 
     expected_json = %{
       "data" => %{

@@ -3,8 +3,9 @@ defmodule CodeCorps.StripeService.StripeConnectExternalAccountService do
   Used to perform actions on a `StripeConnectExternalAccount` record while
   propagating to and from the associated `Stripe.ExternalAccount` record.
   """
-  alias CodeCorps.{Repo, StripeConnectAccount, StripeExternalAccount}
+  alias CodeCorps.Repo
   alias CodeCorps.StripeService.Adapters.StripeExternalAccountAdapter
+  alias CodeCorps.Web.{StripeConnectAccount, StripeExternalAccount}
 
   @spec create(Stripe.ExternalAccount.t, StripeConnectAccount.t) :: {:ok, StripeExternalAccount.t}
   def create(%Stripe.ExternalAccount{} = external_account, %StripeConnectAccount{} = connect_account) do
