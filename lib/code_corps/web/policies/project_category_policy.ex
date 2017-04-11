@@ -1,7 +1,7 @@
 defmodule CodeCorps.Web.ProjectCategoryPolicy do
   import CodeCorps.Helpers.Policy, only: [get_project: 1, administered_by?: 2]
 
-  alias CodeCorps.{ProjectCategory, User}
+  alias CodeCorps.Web.{ProjectCategory, User}
   alias Ecto.Changeset
 
   def create?(%User{} = user, %Changeset{} = changeset) do

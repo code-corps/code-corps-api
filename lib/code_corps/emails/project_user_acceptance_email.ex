@@ -4,7 +4,8 @@ defmodule CodeCorps.Emails.ProjectUserAcceptanceEmail do
 
   alias CodeCorps.Emails.BaseEmail
   alias CodeCorps.Presenters.ImagePresenter
-  alias CodeCorps.Web.{Project, ProjectUser, Repo, User}
+  alias CodeCorps.Repo
+  alias CodeCorps.Web.{Project, ProjectUser, User}
 
   def create(%ProjectUser{project: project, user: user}) do
     BaseEmail.create

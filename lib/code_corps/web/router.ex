@@ -44,25 +44,25 @@ defmodule CodeCorps.Web.Router do
     plug CodeCorps.Web.Plug.Segment
   end
 
-  scope "/", CodeCorps do
+  scope "/", CodeCorps.Web do
     pipe_through [:logging, :browser] # Use the default browser stack
 
     get "/", PageController, :index
   end
 
-  scope "/", CodeCorps, host: "api." do
+  scope "/", CodeCorps.Web, host: "api." do
     pipe_through [:logging, :stripe_webhooks]
 
     post "/webhooks/stripe/connect", StripeConnectEventsController, :create
     post "/webhooks/stripe/platform", StripePlatformEventsController, :create
   end
 
-  scope "/", CodeCorps, host: "api." do
+  scope "/", CodeCorps.Web, host: "api." do
     pipe_through [:logging, :api, :bearer_auth, :ensure_auth, :current_user, :tracking]
 
     resources "/categories", CategoryController, only: [:create, :update]
     resources "/comments", CommentController, only: [:create, :update]
-    resources "/donation-goals", CodeCorps.Web.DonationGoalController, only: [:create, :update, :delete]
+    resources "/donation-goals", DonationGoalController, only: [:create, :update, :delete]
     resources "/organizations", OrganizationController, only: [:create, :update]
     post "/password/reset", PasswordResetController, :reset_password
     resources "/previews", PreviewController, only: [:create]
@@ -87,7 +87,7 @@ defmodule CodeCorps.Web.Router do
     resources "/users", UserController, only: [:update]
   end
 
-  scope "/", CodeCorps, host: "api." do
+  scope "/", CodeCorps.Web, host: "api." do
     pipe_through [:logging, :api, :bearer_auth, :current_user, :tracking]
 
     post "/token", TokenController, :create
@@ -95,7 +95,7 @@ defmodule CodeCorps.Web.Router do
 
     resources "/categories", CategoryController, only: [:index, :show]
     resources "/comments", CommentController, only: [:index, :show]
-    resources "/donation-goals", CodeCorps.Web.DonationGoalController, only: [:index, :show]
+    resources "/donation-goals", DonationGoalController, only: [:index, :show]
     resources "/organizations", OrganizationController, only: [:index, :show]
     resources "/project-categories", ProjectCategoryController, only: [:index, :show]
     resources "/project-skills", ProjectSkillController, only: [:index, :show]

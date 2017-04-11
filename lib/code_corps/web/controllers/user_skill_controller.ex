@@ -11,6 +11,8 @@ defmodule CodeCorps.Web.UserSkillController do
   plug :load_and_authorize_resource, model: UserSkill, only: [:delete]
   plug JaResource
 
+  def model(), do: UserSkill
+
   @spec filter(Plug.Conn.t, Ecto.Query.t, String.t, String.t) :: Ecto.Query.t
   def filter(_conn, query, "id", id_list) do
     query |> id_filter(id_list)

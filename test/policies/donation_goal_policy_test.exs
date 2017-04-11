@@ -11,35 +11,35 @@ defmodule CodeCorps.Web.DonationGoalPolicyTest do
       user = insert(:user)
       project = insert(:project)
 
-      changeset = %CodeCorps.Web.DonationGoal{} |> create_changeset(%{project_id: project.id})
+      changeset = %DonationGoal{} |> create_changeset(%{project_id: project.id})
       refute create?(user, changeset)
     end
 
     test "returns false when user is a pending project member" do
       %{project: project, user: user} = insert(:project_user, role: "pending")
 
-      changeset = %CodeCorps.Web.DonationGoal{} |> create_changeset(%{project_id: project.id})
+      changeset = %DonationGoal{} |> create_changeset(%{project_id: project.id})
       refute create?(user, changeset)
     end
 
     test "returns false when user is a project contributor" do
       %{project: project, user: user} = insert(:project_user, role: "contributor")
 
-      changeset = %CodeCorps.Web.DonationGoal{} |> create_changeset(%{project_id: project.id})
+      changeset = %DonationGoal{} |> create_changeset(%{project_id: project.id})
       refute create?(user, changeset)
     end
 
     test "returns false when user is a project admin" do
       %{project: project, user: user} = insert(:project_user, role: "admin")
 
-      changeset = %CodeCorps.Web.DonationGoal{} |> create_changeset(%{project_id: project.id})
+      changeset = %DonationGoal{} |> create_changeset(%{project_id: project.id})
       refute create?(user, changeset)
     end
 
     test "returns true when user is project owner" do
       %{project: project, user: user} = insert(:project_user, role: "owner")
 
-      changeset = %CodeCorps.Web.DonationGoal{} |> create_changeset(%{project_id: project.id})
+      changeset = %DonationGoal{} |> create_changeset(%{project_id: project.id})
       assert create?(user, changeset)
     end
   end

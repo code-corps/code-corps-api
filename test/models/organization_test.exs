@@ -3,7 +3,6 @@ defmodule CodeCorps.Web.OrganizationTest do
 
   alias CodeCorps.Web.Organization
 
-
   describe "changeset" do
     @valid_attrs %{description: "Building a better future.", name: "Code Corps"}
     @invalid_attrs %{}

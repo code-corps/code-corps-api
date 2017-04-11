@@ -5,20 +5,21 @@ defmodule CodeCorps.AuthenticationHelpers do
   import Canada.Can, only: [can?: 3]
   import Plug.Conn, only: [halt: 1, put_status: 2, assign: 3]
 
+  alias CodeCorps.Web.{ErrorView, TokenView}
   alias JaSerializer.Params
 
   def handle_unauthorized(conn = %{assigns: %{authorized: true}}), do: conn
   def handle_unauthorized(conn = %{assigns: %{authorized: false}}) do
     conn
     |> put_status(403)
-    |> render(CodeCorps.TokenView, "403.json", message: "You are not authorized to perform this action.")
+    |> render(TokenView, "403.json", message: "You are not authorized to perform this action.")
     |> halt
   end
 
   def handle_not_found(conn) do
     conn
     |> put_status(:not_found)
-    |> render(CodeCorps.ErrorView, "404.json")
+    |> render(ErrorView, "404.json")
     |> halt
   end
 

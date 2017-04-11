@@ -1,10 +1,10 @@
 defmodule CodeCorps.StripeService.StripePlatformCustomerServiceTest do
   @moduledoc false
-  
+
   use CodeCorps.ModelCase
 
-  alias CodeCorps.Web.StripePlatformCustomer
   alias CodeCorps.StripeService.StripePlatformCustomerService
+  alias CodeCorps.Web.StripePlatformCustomer
 
   describe "update/2" do
     test "performs update" do

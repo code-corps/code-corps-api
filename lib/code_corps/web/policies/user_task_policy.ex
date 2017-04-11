@@ -11,7 +11,7 @@ defmodule CodeCorps.Web.UserTaskPolicy do
       task_authored_by?: 2
     ]
 
-  alias CodeCorps.{UserTask, User}
+  alias CodeCorps.Web.{UserTask, User}
   alias Ecto.Changeset
 
   @spec create?(User.t, Changeset.t) :: boolean

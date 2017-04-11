@@ -1,15 +1,13 @@
-defmodule CodeCorps.Services.CodeCorps.Web.DonationGoalsServiceTest do
+defmodule CodeCorps.Services.DonationGoalsServiceTest do
   use CodeCorps.ModelCase
 
   import CodeCorps.Web.Project, only: [update_total_changeset: 2]
 
   alias CodeCorps.Web.DonationGoal
-  alias CodeCorps.Services.CodeCorps.Web.DonationGoalsService
+  alias CodeCorps.Services.DonationGoalsService
 
   defp assert_current_goal_id(goal_id) do
-    current_goal =
-      CodeCorps.Web.DonationGoal
-      |> Repo.get_by(current: true)
+    current_goal = DonationGoal |> Repo.get_by(current: true)
 
     assert current_goal.id == goal_id
   end
@@ -23,23 +21,24 @@ defmodule CodeCorps.Services.CodeCorps.Web.DonationGoalsServiceTest do
       project = insert(:project)
       insert(:stripe_connect_plan, project: project)
 
-      {:ok, %CodeCorps.Web.DonationGoal{} = donation_goal} = CodeCorps.Web.DonationGoalsService.create(%{amount: 10, description: "Test", project_id: project.id})
+      {:ok, %DonationGoal{} = donation_goal} =
+        DonationGoalsService.create(%{amount: 10, description: "Test", project_id: project.id})
       assert_current_goal_id(donation_goal.id)
     end
 
     test "returns {:error, changeset} if there are validation errors" do
-      {:error, %Ecto.Changeset{} = changeset} = CodeCorps.Web.DonationGoalsService.create(%{amount: 10})
+      {:error, %Ecto.Changeset{} = changeset} = DonationGoalsService.create(%{amount: 10})
       refute changeset.valid?
     end
 
     test "sets current goal correctly when amount exists already" do
       project = insert(:project, total_monthly_donated: 10)
 
-      {:ok, first_goal} = CodeCorps.Web.DonationGoalsService.create(%{amount: 20, description: "Test", project_id: project.id})
+      {:ok, first_goal} = DonationGoalsService.create(%{amount: 20, description: "Test", project_id: project.id})
 
       assert_current_goal_id(first_goal.id)
 
-      {:ok, second_goal} = CodeCorps.Web.DonationGoalsService.create(%{amount: 15, description: "Test", project_id: project.id})
+      {:ok, second_goal} = DonationGoalsService.create(%{amount: 15, description: "Test", project_id: project.id})
 
       assert_current_goal_id(second_goal.id)
     end
@@ -47,17 +46,17 @@ defmodule CodeCorps.Services.CodeCorps.Web.DonationGoalsServiceTest do
     test "sets current goal correctly" do
       project = insert(:project, total_monthly_donated: 5)
 
-      {:ok, first_goal} = CodeCorps.Web.DonationGoalsService.create(%{amount: 10, description: "Test", project_id: project.id})
+      {:ok, first_goal} = DonationGoalsService.create(%{amount: 10, description: "Test", project_id: project.id})
 
       # total donated is 5,
       # only goal inserted is the first goal
       assert_current_goal_id(first_goal.id)
 
-      {:ok, second_goal} = CodeCorps.Web.DonationGoalsService.create(%{amount: 7, description: "Test", project_id: project.id})
+      {:ok, second_goal} = DonationGoalsService.create(%{amount: 7, description: "Test", project_id: project.id})
 
       assert_current_goal_id(second_goal.id)
 
-      {:ok, _} = CodeCorps.Web.DonationGoalsService.create(%{amount: 20, description: "Test", project_id: project.id})
+      {:ok, _} = DonationGoalsService.create(%{amount: 20, description: "Test", project_id: project.id})
 
       # total donated is still 5
       # first goal larger than 5 is the second goal
@@ -65,7 +64,7 @@ defmodule CodeCorps.Services.CodeCorps.Web.DonationGoalsServiceTest do
 
       project |> set_donated(20)
 
-      {:ok, fourth_goal} = CodeCorps.Web.DonationGoalsService.create(%{amount: 30, description: "Test", project_id: project.id})
+      {:ok, fourth_goal} = DonationGoalsService.create(%{amount: 30, description: "Test", project_id: project.id})
 
       # total donated is 20.
       # first applicable goal is fourth goal, with an amount of 30
@@ -73,7 +72,7 @@ defmodule CodeCorps.Services.CodeCorps.Web.DonationGoalsServiceTest do
 
       project |> set_donated(45)
 
-      {:ok, fourth_goal} = CodeCorps.Web.DonationGoalsService.create(%{amount: 40, description: "Test", project_id: project.id})
+      {:ok, fourth_goal} = DonationGoalsService.create(%{amount: 40, description: "Test", project_id: project.id})
 
       # total donated is 45, which is more than any defined goal
       # largest goal inserted after change the fourth goal, with an amount of 40
@@ -86,7 +85,7 @@ defmodule CodeCorps.Services.CodeCorps.Web.DonationGoalsServiceTest do
       project = insert(:project)
       donation_goal = insert(:donation_goal, amount: 10, project: project)
 
-      {:ok, %CodeCorps.Web.DonationGoal{} = updated_goal} = CodeCorps.Web.DonationGoalsService.update(donation_goal, %{amount: 15})
+      {:ok, %DonationGoal{} = updated_goal} = DonationGoalsService.update(donation_goal, %{amount: 15})
       assert_current_goal_id(updated_goal.id)
       assert updated_goal.id == donation_goal.id
     end
@@ -94,7 +93,7 @@ defmodule CodeCorps.Services.CodeCorps.Web.DonationGoalsServiceTest do
       project = insert(:project)
       donation_goal = insert(:donation_goal, amount: 10, project: project)
 
-      {:error, %Ecto.Changeset{} = changeset} = CodeCorps.Web.DonationGoalsService.update(donation_goal, %{amount: nil})
+      {:error, %Ecto.Changeset{} = changeset} = DonationGoalsService.update(donation_goal, %{amount: nil})
       refute changeset.valid?
     end
 
@@ -104,41 +103,39 @@ defmodule CodeCorps.Services.CodeCorps.Web.DonationGoalsServiceTest do
       goal_2 = insert(:donation_goal, amount: 15, project: project)
       insert(:donation_goal, amount: 20, project: project)
 
-      CodeCorps.Web.DonationGoalsService.update(goal_1, %{amount: 11})
+      DonationGoalsService.update(goal_1, %{amount: 11})
 
       # amount donated is 0, first goal above that is still goal 1
       assert_current_goal_id(goal_1.id)
 
-      CodeCorps.Web.DonationGoalsService.update(goal_1, %{amount: 21})
+      DonationGoalsService.update(goal_1, %{amount: 21})
 
       # amount donated is still 0, first goal above that is now goal 2
       assert_current_goal_id(goal_2.id)
 
       project |> set_donated(25)
 
-      CodeCorps.Web.DonationGoalsService.update(goal_1, %{amount: 21})
+      DonationGoalsService.update(goal_1, %{amount: 21})
 
       # amount donated is now 25
       # this is more than any current goal
       # largest goal is goal 1, with 21
       assert_current_goal_id(goal_1.id)
 
-      CodeCorps.Web.DonationGoalsService.update(goal_2, %{amount: 22})
+      DonationGoalsService.update(goal_2, %{amount: 22})
 
       # amount donated is now 25
       # this is more than any current goal
       # largest goal is goal 2, with 22
       assert_current_goal_id(goal_2.id)
 
-      CodeCorps.Web.DonationGoalsService.update(goal_1, %{amount: 27})
+      DonationGoalsService.update(goal_1, %{amount: 27})
 
       # amount donated is still 25
       # first goal higher than that is goal 1, with 27
       assert_current_goal_id(goal_1.id)
     end
   end
-
-
 
   describe "set_current_goal_for_project/1" do
     test "sets current goal correctly" do
@@ -149,27 +146,27 @@ defmodule CodeCorps.Services.CodeCorps.Web.DonationGoalsServiceTest do
       goal_3 = insert(:donation_goal, amount: 20, project: project)
 
       project |> set_donated(5)
-      CodeCorps.Web.DonationGoalsService.update_related_goals(goal_1)
+      DonationGoalsService.update_related_goals(goal_1)
       assert_current_goal_id(goal_1.id)
 
       project |> set_donated(10) # total is now 10
-      CodeCorps.Web.DonationGoalsService.update_related_goals(goal_2)
+      DonationGoalsService.update_related_goals(goal_2)
       assert_current_goal_id(goal_2.id)
 
       project |> set_donated(15) # total is now 15
-      CodeCorps.Web.DonationGoalsService.update_related_goals(goal_3)
+      DonationGoalsService.update_related_goals(goal_3)
       assert_current_goal_id(goal_3.id)
 
       project |> set_donated(20) # total is now 20
-      CodeCorps.Web.DonationGoalsService.update_related_goals(goal_3)
+      DonationGoalsService.update_related_goals(goal_3)
       assert_current_goal_id(goal_3.id)
 
       project |> set_donated(25) # total is now 25
-      CodeCorps.Web.DonationGoalsService.update_related_goals(goal_3)
+      DonationGoalsService.update_related_goals(goal_3)
       assert_current_goal_id(goal_3.id)
 
       goal_4 = insert(:donation_goal, amount: 30, project: project) # 30 is more than the current 25 total
-      CodeCorps.Web.DonationGoalsService.update_related_goals(goal_4)
+      DonationGoalsService.update_related_goals(goal_4)
       assert_current_goal_id(goal_4.id)
     end
   end

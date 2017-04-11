@@ -2,7 +2,7 @@ defmodule CodeCorps.Web.TaskPolicy do
   import CodeCorps.Helpers.Policy,
     only: [get_project: 1, administered_by?: 2, task_authored_by?: 2]
 
-  alias CodeCorps.{Task, User}
+  alias CodeCorps.Web.{Task, User}
   alias Ecto.Changeset
 
   def create?(%User{} = user, %Changeset{changes: %{user_id: author_id}}),

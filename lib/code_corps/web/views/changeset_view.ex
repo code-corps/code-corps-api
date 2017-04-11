@@ -1,4 +1,4 @@
-defmodule CodeCorps.ChangesetView do
+defmodule CodeCorps.Web.ChangesetView do
   use CodeCorps.Web, :view
 
   alias Ecto.Changeset
@@ -7,7 +7,7 @@ defmodule CodeCorps.ChangesetView do
   Traverses and translates changeset errors.
 
   See `Ecto.Changeset.traverse_errors/2` and
-  `CodeCorps.ErrorHelpers.translate_error/1` for more details.
+  `CodeCorps.Web.ErrorHelpers.translate_error/1` for more details.
   """
   def translate_errors(changeset) do
     errors =

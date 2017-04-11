@@ -11,6 +11,8 @@ defmodule CodeCorps.Web.TaskListController do
   plug :load_resource, model: TaskList, only: [:show]
   plug JaResource
 
+  def model(), do: TaskList
+
   def handle_index(conn, params) do
     tasks = TaskList
     |> project_filter(params)

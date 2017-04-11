@@ -11,6 +11,8 @@ defmodule CodeCorps.Web.ProjectCategoryController do
   plug :load_and_authorize_resource, model: ProjectCategory, only: [:delete]
   plug JaResource
 
+  def model(), do: ProjectCategory
+
   def filter(_conn, query, "id", id_list) do
     query |> id_filter(id_list)
   end

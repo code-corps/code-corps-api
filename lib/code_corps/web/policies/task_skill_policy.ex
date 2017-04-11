@@ -12,7 +12,7 @@ defmodule CodeCorps.Web.TaskSkillPolicy do
       task_authored_by?: 2
     ]
 
-  alias CodeCorps.{TaskSkill, User}
+  alias CodeCorps.Web.{TaskSkill, User}
   alias Ecto.Changeset
 
   @spec create?(User.t, Changeset.t) :: boolean

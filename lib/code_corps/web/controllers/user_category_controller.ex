@@ -11,6 +11,8 @@ defmodule CodeCorps.Web.UserCategoryController do
   plug :load_and_authorize_resource, model: UserCategory, only: [:delete]
   plug JaResource
 
+  def model(), do: UserCategory
+
   def filter(_conn, query, "id", id_list) do
     query |> id_filter(id_list)
   end

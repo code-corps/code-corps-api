@@ -9,6 +9,8 @@ defmodule CodeCorps.Web.OrganizationController do
   plug :load_and_authorize_resource, model: Organization, only: [:create, :update]
   plug JaResource
 
+  def model(), do: Organization
+
   def filter(_conn, query, "id", id_list) do
     query |> id_filter(id_list)
   end

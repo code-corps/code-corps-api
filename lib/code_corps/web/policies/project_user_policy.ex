@@ -4,7 +4,8 @@ defmodule CodeCorps.Web.ProjectUserPolicy do
   """
   import CodeCorps.Helpers.Policy, only: [get_role: 1]
 
-  alias CodeCorps.{ProjectUser, Repo, User}
+  alias CodeCorps.Repo
+  alias CodeCorps.Web.{ProjectUser, User}
   alias Ecto.Changeset
 
   @spec create?(User.t, Ecto.Changeset.t) :: boolean

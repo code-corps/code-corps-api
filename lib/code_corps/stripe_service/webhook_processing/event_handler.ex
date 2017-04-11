@@ -4,7 +4,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.EventHandler do
   alias CodeCorps.StripeService.WebhookProcessing.{
     ConnectEventHandler, IgnoredEventHandler, PlatformEventHandler
   }
-  alias CodeCorps.Web.{StripeEvent}
+  alias CodeCorps.Web.StripeEvent
 
   def handle(%Stripe.Event{type: type} = api_event, handler, user_id \\ nil) do
     with {:ok, endpoint} <- infer_endpoint_from_handler(handler),

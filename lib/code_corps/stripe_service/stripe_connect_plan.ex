@@ -5,9 +5,10 @@ defmodule CodeCorps.StripeService.StripeConnectPlanService do
   records.
   """
 
-  alias CodeCorps.{Project, Repo, StripeConnectPlan}
+  alias CodeCorps.Repo
   alias CodeCorps.StripeService.Adapters.StripeConnectPlanAdapter
   alias CodeCorps.StripeService.Validators.ProjectCanEnableDonations
+  alias CodeCorps.Web.{Project, StripeConnectPlan}
 
   @api Application.get_env(:code_corps, :stripe)
 

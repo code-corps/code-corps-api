@@ -1,9 +1,9 @@
 defmodule CodeCorps.Services.ProjectServiceTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.Web.Project
   alias CodeCorps.Repo
   alias CodeCorps.Services.ProjectService
+  alias CodeCorps.Web.Project
 
   describe "update_project_totals/1" do
     test "updates the project totals when has active subscriptions" do

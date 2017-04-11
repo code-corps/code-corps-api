@@ -1,6 +1,5 @@
 defmodule CodeCorps.Web.StripePlatformCardPolicy do
-  alias CodeCorps.Web.StripePlatformCard
-  alias CodeCorps.Web.User
+  alias CodeCorps.Web.{StripePlatformCard, User}
   alias Ecto.Changeset
 
   def create?(user, card), do: user |> owns?(card)

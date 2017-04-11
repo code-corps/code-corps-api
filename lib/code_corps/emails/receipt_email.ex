@@ -4,7 +4,9 @@ defmodule CodeCorps.Emails.ReceiptEmail do
 
   alias CodeCorps.Emails.BaseEmail
   alias CodeCorps.Repo
-  alias CodeCorps.Web.{DonationGoal, Project, StripeConnectCharge, StripeConnectSubscription}
+  alias CodeCorps.Web.{
+    DonationGoal, Project, StripeConnectCharge, StripeConnectSubscription
+  }
 
   def create(%StripeConnectCharge{} = charge, %Stripe.Invoice{} = invoice) do
     with %StripeConnectCharge{} = charge <- preload(charge),

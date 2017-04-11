@@ -10,6 +10,8 @@ defmodule CodeCorps.Web.ProjectController do
   plug :load_and_authorize_resource, model: Project, only: [:update]
   plug JaResource
 
+  def model(), do: Project
+
   def record(%Plug.Conn{params: %{"project_slug" => project_slug}}, nil) do
     Project |> slug_finder(project_slug)
   end

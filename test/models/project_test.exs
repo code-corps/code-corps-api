@@ -3,7 +3,7 @@ defmodule CodeCorps.Web.ProjectTest do
 
   import CodeCorps.Web.Project
 
-  alias CodeCorps.{Project, ProjectUser, Repo}
+  alias CodeCorps.Web.{Project, ProjectUser}
 
   describe "changeset" do
     @valid_attrs %{title: "A title"}

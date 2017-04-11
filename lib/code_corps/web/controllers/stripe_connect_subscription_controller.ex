@@ -10,6 +10,8 @@ defmodule CodeCorps.Web.StripeConnectSubscriptionController do
 
   plug JaResource
 
+  def model(), do: StripeConnectSubscription
+
   def handle_create(_conn, attributes) do
     attributes |> StripeConnectSubscriptionService.find_or_create
   end

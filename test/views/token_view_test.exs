@@ -1,11 +1,13 @@
-defmodule CodeCorps.TokenViewTest do
+defmodule CodeCorps.Web.TokenViewTest do
   use CodeCorps.Web.ViewCase
+
+  alias CodeCorps.Web.TokenView
 
   test "renders show" do
     token = "12345"
     user_id = 1
 
-    rendered_json = render(CodeCorps.TokenView, "show.json", %{token: token, user_id: user_id})
+    rendered_json = render(TokenView, "show.json", %{token: token, user_id: user_id})
 
     expected_json = %{
       token: token,
@@ -18,7 +20,7 @@ defmodule CodeCorps.TokenViewTest do
   test "renders 401" do
     message = "Silly wabbit, Trix are for kids!"
 
-    rendered_json = render(CodeCorps.TokenView, "401.json", %{message: message})
+    rendered_json = render(TokenView, "401.json", %{message: message})
 
     expected_json = %{
       errors: [
@@ -37,7 +39,7 @@ defmodule CodeCorps.TokenViewTest do
   test "renders 403" do
     message = "Silly wabbit, Trix are for kids!"
 
-    rendered_json = render(CodeCorps.TokenView, "403.json", %{message: message})
+    rendered_json = render(TokenView, "403.json", %{message: message})
 
     expected_json = %{
       errors: [
@@ -54,7 +56,7 @@ defmodule CodeCorps.TokenViewTest do
   end
 
   test "renders delete" do
-    rendered_json = render(CodeCorps.TokenView, "delete.json", %{})
+    rendered_json = render(TokenView, "delete.json", %{})
 
     expected_json = %{
       ok: true

@@ -1,6 +1,5 @@
 defmodule CodeCorps.StripeService.StripeConnectCardServiceTest do
   use ExUnit.Case, async: true
-
   use CodeCorps.ModelCase
 
   alias CodeCorps.Web.StripeConnectCard

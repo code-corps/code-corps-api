@@ -9,6 +9,8 @@ defmodule CodeCorps.Web.SkillController do
   plug :load_and_authorize_resource, model: Skill, only: [:create]
   plug JaResource
 
+  def model(), do: Skill
+
   def filter(_conn, query, "id", id_list) do
     query |> id_filter(id_list)
   end

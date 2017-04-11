@@ -13,7 +13,7 @@ config :code_corps,
 config :code_corps, CodeCorps.Web.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "eMl0+Byu0Zv7q48thBu23ChBVFO1+sdLqoMI8yZoxEviF1K3C5uIohbDfvM9felL",
-  render_errors: [view: CodeCorps.ErrorView, accepts: ~w(html json json-api)],
+  render_errors: [view: CodeCorps.Web.ErrorView, accepts: ~w(html json json-api)],
   pubsub: [name: CodeCorps.PubSub,
            adapter: Phoenix.PubSub.PG2]
 

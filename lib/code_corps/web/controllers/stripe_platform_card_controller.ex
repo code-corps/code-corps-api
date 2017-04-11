@@ -10,6 +10,8 @@ defmodule CodeCorps.Web.StripePlatformCardController do
 
   plug JaResource
 
+  def model(), do: StripePlatformCard
+
   def handle_create(_conn, attributes) do
     attributes |> StripePlatformCardService.create
   end

@@ -3,7 +3,9 @@ defmodule CodeCorps.StripeService.Validators.ProjectCanEnableDonations do
   Ensures a `CodeCorps.Web.Project` is able to receive subscriptions.
   """
 
-  alias CodeCorps.{Organization, Project, StripeConnectAccount, StripeConnectPlan}
+  alias CodeCorps.Web.{
+    Organization, Project, StripeConnectAccount, StripeConnectPlan
+  }
 
   @doc """
   Determines if the provided `CodeCorps.Web.Project` can enable donations.
@@ -13,7 +15,7 @@ defmodule CodeCorps.StripeService.Validators.ProjectCanEnableDonations do
 
   These are:
 
-  - At least one `CodeCorps.Web.DonationGoal`
+  - At least one `DonationGoal`
   - `Organization` with a `StripeConnectAccount` which
     has `charges_enabled: true` and `transfers_enabled: true`
 

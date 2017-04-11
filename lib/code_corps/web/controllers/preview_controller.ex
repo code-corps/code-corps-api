@@ -7,6 +7,8 @@ defmodule CodeCorps.Web.PreviewController do
   plug :load_and_authorize_changeset, model: Preview, only: [:create]
   plug JaResource
 
+  def model(), do: Preview
+
   def handle_create(_conn, attributes) do
     Preview.create_changeset(%Preview{}, attributes)
   end

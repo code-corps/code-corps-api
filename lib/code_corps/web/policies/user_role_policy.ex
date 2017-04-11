@@ -1,6 +1,5 @@
 defmodule CodeCorps.Web.UserRolePolicy do
-  alias CodeCorps.Web.UserRole
-  alias CodeCorps.Web.User
+  alias CodeCorps.Web.{User, UserRole}
   alias Ecto.Changeset
 
   def create?(%User{admin: true}, %Changeset{}), do: true

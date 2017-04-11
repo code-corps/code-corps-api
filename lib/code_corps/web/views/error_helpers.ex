@@ -1,4 +1,4 @@
-defmodule CodeCorps.ErrorHelpers do
+defmodule CodeCorps.Web.ErrorHelpers do
   @moduledoc """
   Conveniences for translating and building error messages.
   """

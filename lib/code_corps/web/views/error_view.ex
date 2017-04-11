@@ -1,4 +1,4 @@
-defmodule CodeCorps.ErrorView do
+defmodule CodeCorps.Web.ErrorView do
   use CodeCorps.Web, :view
   use JaSerializer.PhoenixView
 

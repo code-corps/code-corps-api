@@ -9,6 +9,8 @@ defmodule CodeCorps.Web.StripeConnectPlanController do
   plug :load_and_authorize_resource, model: StripeConnectPlan, only: [:show]
   plug JaResource
 
+  def model(), do: StripeConnectPlan
+
   def handle_create(conn, attributes) do
     attributes
     |> StripeConnectPlanService.create
@@ -18,7 +20,7 @@ defmodule CodeCorps.Web.StripeConnectPlanController do
   defp handle_create_result({:error, :project_not_ready}, conn) do
     conn
     |> put_status(422)
-    |> render(CodeCorps.ErrorView, "422.json-api")
+    |> render(CodeCorps.Web.ErrorView, "422.json-api")
   end
   defp handle_create_result(other, _conn), do: other
 end

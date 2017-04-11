@@ -2,7 +2,7 @@ defmodule CodeCorps.Web.ProjectPolicy do
   import CodeCorps.Helpers.Policy,
     only: [get_organization: 1, owned_by?: 2, administered_by?: 2]
 
-  alias CodeCorps.{Project, User}
+  alias CodeCorps.Web.{Project, User}
   alias Ecto.Changeset
 
   @spec create?(User.t, Changeset.t) :: boolean

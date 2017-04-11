@@ -9,6 +9,8 @@ defmodule CodeCorps.Web.RoleSkillController do
   plug :load_and_authorize_resource, model: RoleSkill, only: [:create, :delete]
   plug JaResource
 
+  def model(), do: RoleSkill
+
   def filter(_conn, query, "id", id_list) do
     query |> id_filter(id_list)
   end

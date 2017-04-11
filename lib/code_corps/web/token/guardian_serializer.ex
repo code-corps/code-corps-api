@@ -1,6 +1,6 @@
 defmodule CodeCorps.GuardianSerializer do
   alias CodeCorps.Repo
-  alias CodeCorps.Web.{Project,User}
+  alias CodeCorps.Web.{Project, User}
 
   @behaviour Guardian.Serializer
 

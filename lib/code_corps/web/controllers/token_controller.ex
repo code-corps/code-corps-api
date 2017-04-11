@@ -1,6 +1,8 @@
-defmodule CodeCorps.TokenController do
+defmodule CodeCorps.Web.TokenController do
   use CodeCorps.Web, :controller
+
   import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
+
   alias CodeCorps.GuardianSerializer
   alias CodeCorps.Repo
   alias CodeCorps.Web.User

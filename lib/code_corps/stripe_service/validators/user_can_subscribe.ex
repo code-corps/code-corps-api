@@ -3,7 +3,7 @@ defmodule CodeCorps.StripeService.Validators.UserCanSubscribe do
   Ensures a `CodeCorps.Web.User` is able to subscribe to a `CodeCorps.Web.Project`.
   """
 
-  alias CodeCorps.{User, StripePlatformCard, StripePlatformCustomer}
+  alias CodeCorps.Web.{User, StripePlatformCard, StripePlatformCustomer}
 
   @doc """
   Determines if the provided `CodeCorps.Web.User` is able to

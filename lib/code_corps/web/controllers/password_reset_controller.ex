@@ -1,7 +1,7 @@
-defmodule CodeCorps.PasswordResetController do
+defmodule CodeCorps.Web.PasswordResetController do
   use CodeCorps.Web, :controller
 
-  alias CodeCorps.{User,AuthToken}
+  alias CodeCorps.Web.{User, AuthToken, ErrorView}
   alias Ecto.Changeset
 
   @doc"""
@@ -12,15 +12,15 @@ defmodule CodeCorps.PasswordResetController do
   """
   def reset_password(conn, %{"token" => token, "password" => password, "password_confirmation" => password_confirmation}) do
     user = conn.assigns.current_user
-    with %AuthToken{value: auth_token} <- Repo.get_by(CodeCorps.Web.AuthToken, %{ value: token, user_id: user.id }),
+    with %AuthToken{value: auth_token} <- Repo.get_by(AuthToken, %{ value: token, user_id: user.id }),
       {:ok, _} <- Phoenix.Token.verify(CodeCorps.Web.Endpoint, "user", auth_token, max_age: 1209600) do
-        with %Changeset{valid?: true} <- User.reset_password_changeset(user, 
+        with %Changeset{valid?: true} <- User.reset_password_changeset(user,
                                                                        %{password: password, password_confirmation: password_confirmation}) do
           conn
           |> put_status(:created)
           |> render("show.json", email: user.email)
         else
-          %Changeset{valid?: false} -> 
+          %Changeset{valid?: false} ->
             handle_reset_pswd_result(conn)
         end
     else
@@ -32,7 +32,7 @@ defmodule CodeCorps.PasswordResetController do
   defp handle_reset_pswd_result(conn) do
     conn
     |> put_status(422)
-    |> render(CodeCorps.ErrorView, "422.json-api")
+    |> render(ErrorView, "422.json-api")
   end
 
 end

@@ -8,6 +8,8 @@ defmodule CodeCorps.Web.SluggedRouteController do
 
   plug JaResource
 
+  def model(), do: SluggedRoute
+
   def record(%Plug.Conn{params: %{"slug" => slug}}, _id) do
     SluggedRoute |> slug_finder(slug)
   end

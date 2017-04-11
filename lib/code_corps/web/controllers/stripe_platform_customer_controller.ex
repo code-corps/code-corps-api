@@ -9,6 +9,8 @@ defmodule CodeCorps.Web.StripePlatformCustomerController do
   plug :load_and_authorize_changeset, model: StripePlatformCustomer, only: [:create]
   plug JaResource
 
+  def model(), do: StripePlatformCustomer
+
   def handle_create(_conn, attributes) do
     attributes |> StripePlatformCustomerService.create
   end

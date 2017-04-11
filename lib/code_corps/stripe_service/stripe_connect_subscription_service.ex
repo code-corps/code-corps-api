@@ -4,11 +4,12 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
   to and from associated `Stripe.Subscription` records.
   """
 
-  alias CodeCorps.{
-    Project, Repo, StripeConnectCustomer, StripeConnectAccount,
+  alias CodeCorps.Repo
+  alias CodeCorps.Web.{
+    Project, StripeConnectCustomer, StripeConnectAccount,
     StripeConnectPlan, StripeConnectSubscription, User
   }
-  alias CodeCorps.Services.{CodeCorps.Web.DonationGoalsService, ProjectService}
+  alias CodeCorps.Services.{DonationGoalsService, ProjectService}
   alias CodeCorps.StripeService.{StripeConnectCardService, StripeConnectCustomerService}
   alias CodeCorps.StripeService.Adapters.StripeConnectSubscriptionAdapter
   alias CodeCorps.StripeService.Validators.{ProjectSubscribable, UserCanSubscribe}
@@ -40,7 +41,7 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
       {:ok, %StripeConnectSubscription{} = subscription} = do_find_or_create(project, user, attributes)
 
       ProjectService.update_project_totals(project)
-      CodeCorps.Web.DonationGoalsService.update_project_goals(project)
+      DonationGoalsService.update_project_goals(project)
 
       {:ok, subscription}
     else
@@ -64,7 +65,7 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
       {:ok, %StripeConnectSubscription{} = subscription} = update_subscription(subscription, params)
 
       ProjectService.update_project_totals(project)
-      CodeCorps.Web.DonationGoalsService.update_project_goals(project)
+      DonationGoalsService.update_project_goals(project)
 
       {:ok, subscription}
     else

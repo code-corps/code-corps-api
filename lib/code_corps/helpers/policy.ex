@@ -4,8 +4,9 @@ defmodule CodeCorps.Helpers.Policy do
   authorization policies.
   """
 
+  alias CodeCorps.Repo
   alias CodeCorps.Web.{
-    Organization, ProjectUser, Project, ProjectUser, Repo, TaskSkill,
+    Organization, ProjectUser, Project, ProjectUser, TaskSkill,
     Task, User, UserTask
   }
   alias Ecto.Changeset

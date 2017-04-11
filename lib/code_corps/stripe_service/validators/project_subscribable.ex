@@ -3,7 +3,7 @@ defmodule CodeCorps.StripeService.Validators.ProjectSubscribable do
   Ensures a `CodeCorps.Web.Project` is able to receive subscriptions.
   """
 
-  alias CodeCorps.{Organization, Project, StripeConnectAccount, StripeConnectPlan}
+  alias CodeCorps.Web.{Organization, Project, StripeConnectAccount, StripeConnectPlan}
 
   @doc """
   Determines if the provided `CodeCorps.Web.Project` is able to

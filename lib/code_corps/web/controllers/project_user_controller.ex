@@ -4,7 +4,7 @@ defmodule CodeCorps.Web.ProjectUserController do
 
   import CodeCorps.Helpers.Query, only: [id_filter: 2]
 
-  alias CodeCorps.{Emails, Mailer, ProjectUser}
+  alias CodeCorps.{Emails, Mailer, Web.ProjectUser}
 
   @preloads [:project, :user]
 
@@ -13,6 +13,8 @@ defmodule CodeCorps.Web.ProjectUserController do
   plug :load_and_authorize_changeset, model: ProjectUser, only: [:create, :update], preload: @preloads
   plug :schedule_email when action in [:update]
   plug JaResource
+
+  def model(), do: ProjectUser
 
 
   @spec filter(Plug.Conn.t, Ecto.Query.t, String.t, String.t) :: Ecto.Query.t

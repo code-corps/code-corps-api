@@ -3,7 +3,7 @@ defmodule CodeCorps.StripeService.Validators.ProjectCanEnableDonationsTest do
 
   use CodeCorps.ModelCase
 
-  alias CodeCorps.{Project}
+  alias CodeCorps.Web.Project
   alias CodeCorps.StripeService.Validators.ProjectCanEnableDonations
 
   describe "validate" do

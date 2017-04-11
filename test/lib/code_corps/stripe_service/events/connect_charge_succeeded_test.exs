@@ -2,11 +2,12 @@ defmodule CodeCorps.StripeService.Events.ConnectChargeSucceededTest do
   @moduledoc false
 
   use CodeCorps.StripeCase
-
   use Bamboo.Test
 
-  alias CodeCorps.{
-    Project, Repo, StripeConnectCharge, StripeTesting
+  alias CodeCorps.Repo
+  alias CodeCorps.StripeTesting
+  alias CodeCorps.Web.{
+    Project, StripeConnectCharge
   }
 
   alias CodeCorps.StripeService.Events.ConnectChargeSucceeded

@@ -10,6 +10,8 @@ defmodule CodeCorps.Web.StripeConnectAccountController do
   plug :load_and_authorize_resource, model: StripeConnectAccount, only: [:show, :update]
   plug JaResource
 
+  def model(), do: StripeConnectAccount
+
   def handle_create(conn, attributes) do
     attributes
     |> Map.put("tos_acceptance_ip", conn |> ConnUtils.extract_ip)

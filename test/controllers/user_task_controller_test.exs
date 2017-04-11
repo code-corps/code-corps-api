@@ -3,7 +3,7 @@ defmodule CodeCorps.Web.UserTaskControllerTest do
 
   use CodeCorps.ApiCase, resource_name: :user_task
 
-  alias CodeCorps.{Repo, UserTask}
+  alias CodeCorps.{Repo, Web.UserTask}
 
   describe "index" do
     test "lists all entries on index", %{conn: conn} do

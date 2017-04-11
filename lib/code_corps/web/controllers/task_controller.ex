@@ -13,6 +13,8 @@ defmodule CodeCorps.Web.TaskController do
   plug :load_and_authorize_resource, model: Task, only: [:update]
   plug JaResource
 
+  def model(), do: Task
+
   def handle_index(conn, params) do
     tasks =
       Task

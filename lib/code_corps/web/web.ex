@@ -36,8 +36,8 @@ defmodule CodeCorps.Web do
       import Ecto
       import Ecto.Query
 
+      import CodeCorps.Gettext
       import CodeCorps.Web.Router.Helpers
-      import CodeCorps.Web.Gettext
 
       import Canary.Plugs
       import CodeCorps.AuthenticationHelpers, only: [load_and_authorize_changeset: 2]
@@ -55,9 +55,9 @@ defmodule CodeCorps.Web do
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
 
+      import CodeCorps.Gettext
       import CodeCorps.Web.Router.Helpers
       import CodeCorps.Web.ErrorHelpers
-      import CodeCorps.Web.Gettext
     end
   end
 
@@ -71,10 +71,12 @@ defmodule CodeCorps.Web do
     quote do
       use Phoenix.Channel
 
-      alias CodeCorps.Repo
+      import CodeCorps.Gettext
+
       import Ecto
       import Ecto.Query
-      import CodeCorps.Web.Gettext
+
+      alias CodeCorps.Repo
     end
   end
 

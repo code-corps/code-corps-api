@@ -1,4 +1,4 @@
-defmodule CodeCorps.ChangesetViewTest do
+defmodule CodeCorps.Web.ChangesetViewTest do
   use CodeCorps.Web.ViewCase
 
   alias CodeCorps.Web.Preview
@@ -6,7 +6,7 @@ defmodule CodeCorps.ChangesetViewTest do
   test "renders all errors properly" do
     changeset = Preview.create_changeset(%Preview{}, %{})
 
-    rendered_json = render(CodeCorps.ChangesetView, "error.json-api", %{changeset: changeset})
+    rendered_json = render(CodeCorps.Web.ChangesetView, "error.json-api", %{changeset: changeset})
 
     expected_json = %{
       errors: [

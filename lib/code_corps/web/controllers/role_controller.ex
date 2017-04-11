@@ -6,4 +6,6 @@ defmodule CodeCorps.Web.RoleController do
 
   plug :load_and_authorize_resource, model: Role, only: [:create]
   plug JaResource
+
+  def model(), do: Role
 end

@@ -4,7 +4,7 @@ defmodule CodeCorps.StripeService.StripePlatformCustomerService do
   to and from associated `Stripe.Customer` records.
   """
   alias CodeCorps.Repo
-  alias CodeCorps.{StripeConnectCustomer, StripePlatformCustomer, User}
+  alias CodeCorps.Web.{StripeConnectCustomer, StripePlatformCustomer, User}
   alias CodeCorps.StripeService.Adapters.StripePlatformCustomerAdapter
   alias CodeCorps.StripeService.StripeConnectCustomerService
 

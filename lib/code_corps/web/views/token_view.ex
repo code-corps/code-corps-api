@@ -1,4 +1,4 @@
-defmodule CodeCorps.TokenView do
+defmodule CodeCorps.Web.TokenView do
   use CodeCorps.Web, :view
 
   def render("show.json", %{token: token, user_id: user_id}) do

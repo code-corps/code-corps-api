@@ -1,10 +1,9 @@
 defmodule CodeCorps.StripeService.StripePlatformCardServiceTest do
   use ExUnit.Case, async: true
-
   use CodeCorps.ModelCase
 
-  alias CodeCorps.Web.StripePlatformCard
   alias CodeCorps.StripeService.StripePlatformCardService
+  alias CodeCorps.Web.StripePlatformCard
 
   describe "update_from_stripe/1" do
     test "it just updates the platform card if there is nothing associated to update" do
