@@ -30,7 +30,7 @@ defmodule CodeCorps.User do
     field :twitter, :string
     field :username, :string
     field :website, :string
-
+    field :github_id, :string
     field :state, :string, default: "signed_up"
     field :state_transition, :string, virtual: true
 
@@ -93,6 +93,12 @@ defmodule CodeCorps.User do
     |> validate_format(:website, CodeCorps.Helpers.URL.valid_format())
     |> validate_format(:twitter, ~r/\A[a-zA-Z0-9_]{1,15}\z/)
     |> apply_state_transition(struct)
+  end
+
+  def github_associate_changeset(struct, params) do
+    struct
+    |> cast(params, [:github_id])
+    |> validate_required([:github_id])
   end
 
   def reset_password_changeset(struct, params) do
