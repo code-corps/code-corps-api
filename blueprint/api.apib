@@ -2265,6 +2265,32 @@ This endpoint handles the User resources for Code Corps.
 
     + Attributes (Record Not Found Response)
 
+### Connect user to GitHub [POST /github_connect]
+
+This endpoint allows a user to connect their CodeCorps account to their respective GitHub account.
+
++ Request
+
+    + Attributes
+
+      + code (string) - Client generated code for authenication when sending request to GitHub.
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 201 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (User Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 422 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Unprocessable Entity Response)
+
 ### Check email availability [GET /users/email_available?email={email}]
 
 This endpoint allows you to check whether an email is valid (by checking simply for presence of the `@` symbol) and whether the email is not already registered.
