@@ -59,6 +59,8 @@ defmodule CodeCorpsWeb.Router do
 
     post "/webhooks/stripe/connect", StripeConnectEventsController, :create
     post "/webhooks/stripe/platform", StripePlatformEventsController, :create
+    post "/webhooks/github_issues", GithubIssueController, :create
+    post "/webhooks/github_issue_comments", GithubIssueCommentController, :create
   end
 
   scope "/", CodeCorpsWeb, host: "api." do
