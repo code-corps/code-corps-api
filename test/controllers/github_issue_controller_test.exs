@@ -10,13 +10,13 @@ defmodule CodeCorps.GithubIssueControllerTest do
   end
 
   test "creates and renders resource when data is valid", %{conn: conn} do
-    conn = post conn, github_issue_path(conn, :create), github_issue: @valid_attrs
+    conn = post conn, github_issue_path(conn, :handle), github_issue: @valid_attrs
     assert json_response(conn, 201)["data"]["id"]
     assert Repo.get_by(GithubIssue, @valid_attrs)
   end
 
   test "does not create resource and renders errors when data is invalid", %{conn: conn} do
-    conn = post conn, github_issue_path(conn, :create), github_issue: @invalid_attrs
+    conn = post conn, github_issue_path(conn, :handle), github_issue: @invalid_attrs
     assert json_response(conn, 422)["errors"] != %{}
   end
 end

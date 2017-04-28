@@ -3,7 +3,7 @@ defmodule CodeCorps.GithubIssueController do
 
   alias CodeCorps.Task
 
-  def create(conn, payload) do
+  def handle(conn, payload) do
     attributes = convert_task_attributes(payload)
     task = lookup_task(payload)
 
