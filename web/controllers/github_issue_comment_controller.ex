@@ -7,7 +7,7 @@ defmodule CodeCorps.GithubIssueCommentController do
     case payload["action"] do
       "created" ->
         # create comment
-        attributes = convert_comment_attributes(payload)
+        attributes = comment_attributes(payload)
         changeset = %Comment{} |> Comment.create_changeset(attributes)
         case Repo.insert(changeset) do
           {:ok, _comment} ->
@@ -19,7 +19,7 @@ defmodule CodeCorps.GithubIssueCommentController do
       "edited" ->
         # update comment
         comment = lookup_comment(payload)
-        attributes = convert_comment_attributes(payload)
+        attributes = comment_attributes(payload)
         changeset = comment |> Comment.changeset(attributes)
         case Repo.update(changeset) do
           {:ok, _comment} ->
@@ -44,7 +44,7 @@ defmodule CodeCorps.GithubIssueCommentController do
     Comment |> Repo.get_by(github_id: comment_id)
   end
 
-  defp convert_comment_attributes(payload) do
+  defp comment_attributes(payload) do
     comment = payload["comment"]
     %{
       "github_id" => comment["id"],
