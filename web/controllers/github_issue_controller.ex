@@ -11,10 +11,10 @@ defmodule CodeCorps.GithubIssueController do
         changeset = %Task{} |> Task.github_create_changeset(attributes)
         case Repo.insert(changeset) do
           {:ok, _task} ->
-            conn
+            conn |> put_status(:ok)
           {:error, changeset}
             # log error
-            conn
+            conn |> put_status(:internal_server_error)
         end
       "edited" ->
         # update task
@@ -23,19 +23,19 @@ defmodule CodeCorps.GithubIssueController do
         changeset = task |> Task.github_update_changeset(attributes)
         case Repo.update(changeset) do
           {:ok, _task} ->
-            conn
+            conn |> put_status(:ok)
           {:error, changeset}
             # log error
-            conn
+            conn |> put_status(:internal_server_error)
         end
       "deleted" ->
         # delete task
         task = lookup_task(payload)
         Repo.delete(task)
-        conn
+        conn |> put_status(:ok)
       _ ->
         # log error or do nothing
-        conn
+        conn |> put_status(:internal_server_error)
     end
   end
 
@@ -47,7 +47,7 @@ defmodule CodeCorps.GithubIssueController do
   defp task_attributes(payload) do
     issue = payload["issue"]
     %{
-      "id" => issue["id"],
+      "github_id" => issue["id"],
       "title" => issue["title"],
       "markdown" => issue["body"],
       "task_list_id" => CodeCorps.TaskList |> Repo.get_by(name: "Inbox"), # Default to Inbox
