@@ -500,6 +500,28 @@ This endpoint is a parent route for reset and forgot password endpoints
 
 + Response 200 (application/vnd.api+json; charset=utf-8)
 
+## Reset [/password/reset]
+
+Reset Password resource allow a user to reset their password
+
+### Reset Password [POST]
+
++ Request
+
+    + Attributes (Reset Password Request)
+
++ Response 201 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Valid Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token No User With Email Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Password Response)
+
 # Group Previews
 
 Preview resources allow a user to create a temporary HTML preview for any kind of markdown.
@@ -2849,6 +2871,15 @@ The platform stores Stripe customers and cards so they can be reused across diff
     + id: `NOT_FOUND` (string)
     + title: `404 Resource not found` (string)
     + status: 404 (number) - HTTP status code
+
+## Reset Password Resource (object)
++ token: `zzz123` (string, required)
++ password: `mypwd` (string, required)
++ password-confirmation: `mypwd` (string, required)
+
+## Reset Password Request (object)
++ data(Reset Password Resource)
++ include JSON API Version
 
 ## Role Skill Resource (object)
 + include Role Skill Resource Identifier

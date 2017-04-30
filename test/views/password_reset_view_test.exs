@@ -2,12 +2,12 @@ defmodule CodeCorps.PasswordResetViewTest do
   use CodeCorps.ViewCase
 
   test "renders show" do
-    email = "wat@codecorps.org"
+    token = "zzz123"
 
-    rendered_json = render(CodeCorps.PasswordResetView, "show.json", %{email: email})
+    rendered_json = render(CodeCorps.PasswordResetView, "show.json", %{token: token})
 
     expected_json = %{
-      email: email
+      token: token
     }
 
     assert expected_json == rendered_json

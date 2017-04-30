@@ -1,9 +1,9 @@
 defmodule CodeCorps.PasswordResetView do
   use CodeCorps.Web, :view
 
-  def render("show.json", %{email: email}) do
+  def render("show.json", %{token: token}) do
     %{
-      email: email
+      token: token
     }
   end
 
