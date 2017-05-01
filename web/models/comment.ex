@@ -8,6 +8,7 @@ defmodule CodeCorps.Comment do
   schema "comments" do
     field :body, :string
     field :markdown, :string
+    field :github_id, :integer
 
     belongs_to :user, CodeCorps.User
     belongs_to :task, CodeCorps.Task

@@ -15,6 +15,7 @@ defmodule CodeCorps.Task do
     field :state, :string
     field :status, :string, default: "open"
     field :title, :string
+    field :github_id, :integer
 
     field :position, :integer, virtual: true
 
