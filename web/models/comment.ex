@@ -34,4 +34,13 @@ defmodule CodeCorps.Comment do
     |> assoc_constraint(:task)
     |> assoc_constraint(:user)
   end
+
+  @doc """
+  Builds a changeset for creating a comment that has a connected GitHub comment.
+  """
+  def github_create_changeset(struct, params) do
+    struct
+    |> create_changeset(params)
+    |> cast(params, [:github_id])
+  end
 end
