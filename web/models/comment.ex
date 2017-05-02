@@ -42,5 +42,6 @@ defmodule CodeCorps.Comment do
     struct
     |> create_changeset(params)
     |> cast(params, [:github_id])
+    |> validate_required([:github_id])
   end
 end
