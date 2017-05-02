@@ -242,13 +242,34 @@ defmodule CodeCorps.UserControllerTest do
     end
   end
 
+  describe "github_connect" do
+    test "return the user when current user connects successfully", %{conn: conn} do
+      user = insert(:user)
+
+      code = %{"code" => "client generated code"}
+
+      path = user_path(conn, :github_connect, code)
+
+      json = conn |> authenticate(user) |> post(path) |> json_response(200)
+
+      assert json["data"]["id"] |> String.to_integer == user.id
+    end
+
+    test "return unauthenticated error code when no current user", %{conn: conn} do
+      code = %{"code" => "client generated code"}
+
+      path = user_path(conn, :github_connect, code)
+
+      conn |> post(path) |> json_response(401)
+    end
+  end
+
   describe "email_available" do
     test "returns valid and available when email is valid and available", %{conn: conn} do
       resp = get conn, user_path(conn, :email_available, %{email: "available@mail.com"})
       json = json_response(resp, 200)
       assert json["available"]
       assert json["valid"]
-
     end
 
     test "returns valid but inavailable when email is valid but taken", %{conn: conn} do
