@@ -15,6 +15,7 @@ defmodule CodeCorps.Task do
     field :state, :string
     field :status, :string, default: "open"
     field :title, :string
+    field :github_id, :integer
 
     field :position, :integer, virtual: true
 
@@ -49,6 +50,16 @@ defmodule CodeCorps.Task do
     |> assoc_constraint(:user)
     |> put_change(:state, "published")
     |> put_change(:status, "open")
+  end
+
+  @doc """
+  Builds a changeset for creating a task that has a connected GitHub issue.
+  """
+  def github_create_changeset(struct, params) do
+    struct
+    |> create_changeset(params)
+    |> cast(params, [:github_id])
+    |> validate_required([:github_id])
   end
 
   def update_changeset(struct, params) do

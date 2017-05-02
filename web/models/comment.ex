@@ -8,6 +8,7 @@ defmodule CodeCorps.Comment do
   schema "comments" do
     field :body, :string
     field :markdown, :string
+    field :github_id, :integer
 
     belongs_to :user, CodeCorps.User
     belongs_to :task, CodeCorps.Task
@@ -32,5 +33,15 @@ defmodule CodeCorps.Comment do
     |> validate_required([:task_id, :user_id])
     |> assoc_constraint(:task)
     |> assoc_constraint(:user)
+  end
+
+  @doc """
+  Builds a changeset for creating a comment that has a connected GitHub comment.
+  """
+  def github_create_changeset(struct, params) do
+    struct
+    |> create_changeset(params)
+    |> cast(params, [:github_id])
+    |> validate_required([:github_id])
   end
 end

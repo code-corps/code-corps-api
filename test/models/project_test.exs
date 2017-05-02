@@ -87,6 +87,18 @@ defmodule CodeCorps.ProjectTest do
     end
   end
 
+  describe "github_create_changeset/2" do
+    test "github create changeset with valid attributes" do
+      attrs = Map.merge(@valid_attrs, %{
+        github_id: 1,
+        organization_id: 1
+      })
+
+      changeset = Project.github_create_changeset(%Project{}, attrs)
+      assert changeset.valid?
+    end
+  end
+
   describe "update_changeset" do
     test "rejects setting of organization id" do
       changeset = Project.update_changeset(%Project{}, %{organization_id: 1})
