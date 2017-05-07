@@ -85,7 +85,8 @@ defmodule CodeCorps.GitHub.Event.InstallationTest do
       insert(
         :github_app_installation,
         user: user,
-        access_token_expires_at: Timex.now |> Timex.shift(days: 1)
+        access_token_expires_at: Timex.now |> Timex.shift(days: 1),
+        github_id: nil
       )
 
       {:ok, %GithubAppInstallation{} = installation, %Task{} = task}

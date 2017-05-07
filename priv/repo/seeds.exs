@@ -232,17 +232,22 @@ end
 case Repo.all(Task) do
   [] ->
     for i <- 1..50 do
-      %Task{}
-      |> Task.create_changeset(%{
+      markdown = "test *body* #{i}"
+      options = %Earmark.Options{code_class_prefix: "language-"}
+      html = Earmark.as_html!(markdown, options)
+
+      task = %Task{
         title: "test task #{i}",
-        markdown: "test *body* #{i}",
+        markdown: markdown,
+        body: html,
         status: "open",
         number: i,
         project_id: 1,
         user_id: 1,
         task_list_id: Enum.random([1, 2, 3, 4])
-      })
-      |> Repo.insert!
+      }
+
+      task |> Repo.insert!
     end
   _ -> IO.puts "Tasks detected, aborting this seed."
 end
@@ -300,4 +305,3 @@ case Repo.all(UserSkill) do
   [] -> Enum.each(user_skills, &Repo.insert!/1)
   _ -> IO.puts "User skills detected, aborting this seed."
 end
-

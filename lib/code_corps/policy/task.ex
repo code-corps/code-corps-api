@@ -1,12 +1,16 @@
 defmodule CodeCorps.Policy.Task do
+  @moduledoc ~S"""
+  Authorization policy in charge of dermining if a `User` is authorized to
+  perform an action on a `Task`.
+  """
   import CodeCorps.Policy.Helpers,
     only: [get_project: 1, administered_by?: 2, task_authored_by?: 2]
 
   alias CodeCorps.{Task, User}
-  alias Ecto.Changeset
 
-  def create?(%User{} = user, %Changeset{changes: %{user_id: author_id}}),
-    do: user.id == author_id
+  def create?(%User{id: user_id}, %{"user_id" => author_id})
+    when user_id == author_id and not is_nil(user_id), do: true
+  def create?(%User{}, %{}), do: false
 
   def update?(%User{} = user, %Task{} = task) do
     case task |> task_authored_by?(user) do

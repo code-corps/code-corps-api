@@ -1,54 +1,41 @@
 defmodule CodeCorpsWeb.TaskController do
   use CodeCorpsWeb, :controller
-  use JaResource
 
-  import CodeCorps.Helpers.Query, only: [
-    project_filter: 2, project_id_with_number_filter: 2, task_list_id_with_number_filter: 2,
-    sort_by_order: 1, task_list_filter: 2, task_status_filter: 2
-  ]
+  alias CodeCorps.{Task, Policy, User}
 
-  alias CodeCorps.Task
+  action_fallback CodeCorpsWeb.FallbackController
+  plug CodeCorpsWeb.Plug.DataToAttributes
 
-  plug :load_and_authorize_changeset, model: Task, only: [:create]
-  plug :load_and_authorize_resource, model: Task, only: [:update]
-  plug JaResource
-
-  @spec model :: module
-  def model, do: CodeCorps.Task
-
-  def handle_index(conn, params) do
-    tasks =
-      Task
-      |> project_filter(params)
-      |> task_list_filter(params)
-      |> task_status_filter(params)
-      |> sort_by_order
-      |> Repo.all
-
-    conn
-    |> render("index.json-api", data: tasks)
+  @spec index(Conn.t, map) :: Conn.t
+  def index(%Conn{} = conn, %{} = params) do
+    with tasks <- Task |> Task.Query.filter(params) |> Ecto.Query.order_by([asc: :order]) |> Repo.all do
+      conn |> render("index.json-api", data: tasks)
+    end
   end
 
-  @spec record(Plug.Conn.t, String.t) :: Task.t | nil
-  def record(%Plug.Conn{params: %{"project_id" => _project_id} = params}, _number_as_id) do
-    Task
-    |> project_id_with_number_filter(params)
-    |> Repo.one
-  end
-  def record(%Plug.Conn{params: %{"task_list_id" => _task_list_id} = params}, _number_as_id) do
-    Task
-    |> task_list_id_with_number_filter(params)
-    |> Repo.one
-  end
-  def record(_conn, id), do: Task |> Repo.get(id)
-
-  @spec handle_create(Plug.Conn.t, map) :: Ecto.Changeset.t
-  def handle_create(_conn, attributes) do
-    %Task{} |> Task.create_changeset(attributes)
+  @spec show(Conn.t, map) :: Conn.t
+  def show(%Conn{} = conn, %{} = params) do
+    with %Task{} = task <- Task |> Task.Query.query(params) |> Repo.one do
+      conn |> render("show.json-api", data: task)
+    end
   end
 
-  @spec handle_update(Plug.Conn.t, Task.t, map) :: Ecto.Changeset.t
-  def handle_update(_conn, task, attributes) do
-    task |> Task.update_changeset(attributes)
+  @spec create(Conn.t, map) :: Conn.t
+  def create(%Conn{} = conn, %{} = params) do
+    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+         {:ok, :authorized} <- current_user |> Policy.authorize(:create, %Task{}, params),
+         {:ok, %Task{} = task} <- params |> Task.Service.create do
+      conn |> put_status(:created) |> render("show.json-api", data: task)
+    end
+  end
+
+  @spec update(Conn.t, map) :: Conn.t
+  def update(%Conn{} = conn, %{} = params) do
+    with %Task{} = task <- Task |> Task.Query.query(params) |> Repo.one,
+         %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+         {:ok, :authorized} <- current_user |> Policy.authorize(:update, task),
+         {:ok, %Task{} = task} <- task |> Task.Service.update(params) do
+      conn |> render("show.json-api", data: task)
+    end
   end
 end

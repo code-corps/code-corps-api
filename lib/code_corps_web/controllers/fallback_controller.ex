@@ -8,9 +8,8 @@ defmodule CodeCorpsWeb.FallbackController do
                                nil
 
   @doc ~S"""
-  Default fallback for validation errors.
-
-  Renders validation errors for the provided changeset using `JaSerializer`
+  Default fallback for different `with` clause errors in controllers across the
+  application.
   """
   @spec call(Conn.t, supported_fallbacks) :: Conn.t
   def call(%Conn{} = conn, {:error, %Changeset{} = changeset}) do

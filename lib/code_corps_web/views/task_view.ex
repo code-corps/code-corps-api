@@ -1,11 +1,12 @@
 defmodule CodeCorpsWeb.TaskView do
   use CodeCorpsWeb.PreloadHelpers,
-      default_preloads: [:project, :user, :task_list, :task_skills, :comments, :user_task]
+      default_preloads: ~w(github_repo project user task_list task_skills comments user_task)a
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
 
-  attributes [:body, :markdown, :number, :status, :title, :order, :inserted_at, :updated_at]
+  attributes ~w(body markdown number status title order inserted_at updated_at)a
 
+  has_one :github_repo, serializer: CodeCorpsWeb.GithubRepoView
   has_one :project, serializer: CodeCorpsWeb.ProjectView
   has_one :task_list, serializer: CodeCorpsWeb.TaskListView
   has_one :user, serializer: CodeCorpsWeb.UserView

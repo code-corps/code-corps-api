@@ -21,7 +21,7 @@ defmodule CodeCorps.GitHub.API do
       {:ok, json} ->
         {:ok, json}
       {:error, _value} ->
-        marshall_response({:error, :body_decoding_error})
+        {:error, HTTPClientError.new(reason: :body_decoding_error)}
     end
   end
   defp marshall_response({:ok, 404, _headers, body}) do
@@ -32,7 +32,7 @@ defmodule CodeCorps.GitHub.API do
       {:ok, json} ->
         {:error, APIError.new({status, json})}
       {:error, _value} ->
-        marshall_response({:error, :body_decoding_error})
+        {:error, HTTPClientError.new(reason: :body_decoding_error)}
     end
   end
   defp marshall_response({:error, reason}) do
