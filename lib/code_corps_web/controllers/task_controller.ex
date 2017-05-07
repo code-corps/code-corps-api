@@ -50,10 +50,8 @@ defmodule CodeCorpsWeb.TaskController do
       current_user = Guardian.Plug.current_resource(conn)
       github_id = github_module().create_issue(attributes, project, current_user)
       attributes = Map.merge(attributes, %{"github_id" => github_id})
-      %Task{} |> Task.github_create_changeset(attributes)
-    else
-      %Task{} |> Task.create_changeset(attributes)
     end
+    %Task{} |> Task.create_changeset(attributes)
   end
 
   @spec handle_update(Plug.Conn.t, Task.t, map) :: Ecto.Changeset.t

@@ -32,7 +32,7 @@ defmodule CodeCorps.Task do
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:title, :markdown, :task_list_id, :position])
+    |> cast(params, [:title, :markdown, :task_list_id, :position, :github_id])
     |> validate_required([:title, :markdown, :task_list_id])
     |> assoc_constraint(:task_list)
     |> apply_position()
@@ -48,15 +48,6 @@ defmodule CodeCorps.Task do
     |> assoc_constraint(:project)
     |> assoc_constraint(:user)
     |> put_change(:status, "open")
-  end
-
-  @doc """
-  Builds a changeset for creating a task that has a connected GitHub issue.
-  """
-  def github_create_changeset(struct, params) do
-    struct
-    |> create_changeset(params)
-    |> cast(params, [:github_id])
   end
 
   def update_changeset(struct, params) do
