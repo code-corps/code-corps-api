@@ -135,9 +135,8 @@ defmodule CodeCorpsWeb.TaskControllerTest do
       task_list = insert(:task_list, project: project)
       attrs = @valid_attrs |> Map.merge(%{project: project, user: current_user, task_list: task_list})
       json = conn |> request_create(attrs) |> json_response(201)
-      IO.inspect json
       # check that task has a github id
-      assert json["data"]["attributes"]["github_id"] == "1"
+      assert json["data"]["attributes"]["github-id"] == 1
     end
 
     @tag :authenticated
@@ -147,7 +146,7 @@ defmodule CodeCorpsWeb.TaskControllerTest do
       attrs = @valid_attrs |> Map.merge(%{project: project, user: current_user, task_list: task_list, error_testing: true})
       json = conn |> request_create(attrs) |> json_response(201)
 
-      assert json["data"]["attributes"]["github_id"] == nil
+      assert json["data"]["attributes"]["github-id"] == nil
     end
 
     @tag :authenticated
@@ -157,7 +156,7 @@ defmodule CodeCorpsWeb.TaskControllerTest do
       attrs = @valid_attrs |> Map.merge(%{project: project, user: current_user, task_list: task_list})
       json = conn |> request_create(attrs) |> json_response(201)
 
-      assert json["data"]["attributes"]["github_id"] == nil
+      assert json["data"]["attributes"]["github-id"] == nil
     end
 
     @tag :authenticated
