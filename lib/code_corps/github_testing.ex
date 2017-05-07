@@ -18,7 +18,7 @@ defmodule CodeCorps.GithubTesting do
       true ->
         nil
       _ ->
-        "1" # Return github id
+        1 # Return github id
     end
   end
 end
