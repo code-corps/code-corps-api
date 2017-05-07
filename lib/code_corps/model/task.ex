@@ -57,7 +57,6 @@ defmodule CodeCorps.Task do
     struct
     |> create_changeset(params)
     |> cast(params, [:github_id])
-    |> validate_required([:github_id])
   end
 
   def update_changeset(struct, params) do

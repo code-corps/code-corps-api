@@ -41,6 +41,9 @@ config :code_corps, :icon_color_generator, CodeCorps.RandomIconColor.TestGenerat
 # Set Corsica logging to output no console warning when rejecting a request
 config :code_corps, :corsica_log_level, [rejected: :debug]
 
+# Set the Github module
+config :code_corps, github: CodeCorps.GithubTesting
+
 config :sentry,
   environment_name: Mix.env || :test
 

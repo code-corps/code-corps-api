@@ -8,6 +8,7 @@ defmodule CodeCorpsWeb.TaskController do
   ]
 
   alias CodeCorps.Task
+  alias CodeCorps.Project
 
   plug :load_and_authorize_changeset, model: Task, only: [:create]
   plug :load_and_authorize_resource, model: Task, only: [:update]
@@ -43,12 +44,24 @@ defmodule CodeCorpsWeb.TaskController do
   def record(_conn, id), do: Task |> Repo.get(id)
 
   @spec handle_create(Plug.Conn.t, map) :: Ecto.Changeset.t
-  def handle_create(_conn, attributes) do
-    %Task{} |> Task.create_changeset(attributes)
+  def handle_create(conn, attributes) do
+    project = Project |> Repo.get(attributes["project_id"])
+    if project.github_id do
+      current_user = Guardian.Plug.current_resource(conn)
+      github_id = github_module().create_issue(attributes, project, current_user)
+      attributes = Map.merge(attributes, %{"github_id" => github_id})
+      %Task{} |> Task.github_create_changeset(attributes)
+    else
+      %Task{} |> Task.create_changeset(attributes)
+    end
   end
 
   @spec handle_update(Plug.Conn.t, Task.t, map) :: Ecto.Changeset.t
   def handle_update(_conn, task, attributes) do
     task |> Task.update_changeset(attributes)
+  end
+
+  defp github_module do
+    Application.get_env(:code_corps, :github)
   end
 end

@@ -130,6 +130,37 @@ defmodule CodeCorpsWeb.TaskControllerTest do
     end
 
     @tag :authenticated
+    test "creates github issue when project is connected to github", %{conn: conn, current_user: current_user} do
+      project = insert(:project, github_id: 1)
+      task_list = insert(:task_list, project: project)
+      attrs = @valid_attrs |> Map.merge(%{project: project, user: current_user, task_list: task_list})
+      json = conn |> request_create(attrs) |> json_response(201)
+      IO.inspect json
+      # check that task has a github id
+      assert json["data"]["attributes"]["github_id"] == "1"
+    end
+
+    @tag :authenticated
+    test "doesnt create github issue when error in Github API call", %{conn: conn, current_user: current_user} do
+      project = insert(:project, github_id: 1)
+      task_list = insert(:task_list, project: project)
+      attrs = @valid_attrs |> Map.merge(%{project: project, user: current_user, task_list: task_list, error_testing: true})
+      json = conn |> request_create(attrs) |> json_response(201)
+
+      assert json["data"]["attributes"]["github_id"] == nil
+    end
+
+    @tag :authenticated
+    test "doesnt create github issue when project is not connected to github", %{conn: conn, current_user: current_user} do
+      project = insert(:project)
+      task_list = insert(:task_list, project: project)
+      attrs = @valid_attrs |> Map.merge(%{project: project, user: current_user, task_list: task_list})
+      json = conn |> request_create(attrs) |> json_response(201)
+
+      assert json["data"]["attributes"]["github_id"] == nil
+    end
+
+    @tag :authenticated
     test "renders 422 when data is invalid", %{conn: conn, current_user: current_user} do
       project = insert(:project)
       attrs = @invalid_attrs |> Map.merge(%{project: project, user: current_user})

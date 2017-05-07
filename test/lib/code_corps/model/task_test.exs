@@ -150,7 +150,7 @@ defmodule CodeCorps.TaskTest do
   end
 
   describe "github_create_changeset/2" do
-    test "github create changeset with valid attributes" do
+    test "github create changeset casts a github_id" do
       attrs = Map.merge(@valid_attrs, %{
         github_id: 1,
         project_id: 1,
@@ -159,7 +159,7 @@ defmodule CodeCorps.TaskTest do
       })
 
       changeset = Task.github_create_changeset(%Task{}, attrs)
-      assert changeset.valid?
+      assert changeset.changes |> Map.has_key?(:github_id)
     end
   end
 
