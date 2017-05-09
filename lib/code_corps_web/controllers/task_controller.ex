@@ -48,7 +48,7 @@ defmodule CodeCorpsWeb.TaskController do
     project = Project |> Repo.get(attributes["project_id"])
     if project.github_id do
       current_user = Guardian.Plug.current_resource(conn)
-      github_id = github_module().create_issue(attributes, project, current_user)
+      github_id = github().create_issue(attributes, project, current_user)
       attributes = Map.merge(attributes, %{"github_id" => github_id})
     end
     %Task{} |> Task.create_changeset(attributes)
@@ -59,7 +59,8 @@ defmodule CodeCorpsWeb.TaskController do
     task |> Task.update_changeset(attributes)
   end
 
-  defp github_module do
+  @spec github() :: CodeCorps.Github || CodeCorps.GithubTesting
+  defp github do
     Application.get_env(:code_corps, :github)
   end
 end
