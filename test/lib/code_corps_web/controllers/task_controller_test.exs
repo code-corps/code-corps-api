@@ -1,6 +1,8 @@
 defmodule CodeCorpsWeb.TaskControllerTest do
   use CodeCorpsWeb.ApiCase, resource_name: :task
 
+  import ExUnit.CaptureLog
+
   @valid_attrs %{
     title: "Test task",
     markdown: "A test task",
