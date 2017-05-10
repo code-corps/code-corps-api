@@ -59,7 +59,7 @@ defmodule CodeCorpsWeb.TaskController do
     task |> Task.update_changeset(attributes)
   end
 
-  @spec github() :: CodeCorps.Github || CodeCorps.GithubTesting
+  @spec github() :: CodeCorps.Github # Test mode: CodeCorps.GithubTesting
   defp github do
     Application.get_env(:code_corps, :github)
   end
