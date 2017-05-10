@@ -245,6 +245,21 @@ defmodule CodeCorps.GitHub do
     end
   end
 
+  def update_issue(attributes, task, current_user) do
+    access_token = current_user.github_access_token || default_user_token() # need to create the Github user for this token
+    client = Tentacat.Client.new(%{access_token: access_token})
+    response = Tentacat.Issues.update(
+      task.project.github_owner,
+      task.project.github_repo,
+      task.github_id,
+      attributes,
+      client
+    )
+    unless response.status == 200 do
+      # log error
+    end
+  end
+
   defp default_user_token do
     System.get_env("GITHUB_DEFAULT_USER_TOKEN")
   end

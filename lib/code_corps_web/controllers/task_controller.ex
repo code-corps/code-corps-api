@@ -56,6 +56,10 @@ defmodule CodeCorpsWeb.TaskController do
 
   @spec handle_update(Plug.Conn.t, Task.t, map) :: Ecto.Changeset.t
   def handle_update(_conn, task, attributes) do
+    if task.github_id do
+      current_user = Guardian.Plug.current_resource(conn)
+      github().update_issue(attributes, task, current_user)
+    end
     task |> Task.update_changeset(attributes)
   end
 
