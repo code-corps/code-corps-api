@@ -49,6 +49,8 @@ config :guardian, Guardian,
 
 config :code_corps, :analytics, CodeCorps.Analytics.InMemoryAPI
 
+config :code_corps, :github_api, CodeCorps.Github.API
+
 # Configures stripe for dev mode
 config :code_corps, :stripe, Stripe
 config :code_corps, :stripe_env, :dev
@@ -71,3 +73,7 @@ if System.get_env("CLOUDEX_API_KEY") == nil do
   config :code_corps, :cloudex, CloudexTest
   config :cloudex, api_key: "test_key", secret: "test_secret", cloud_name: "test_cloud_name"
 end
+
+config :code_corps,
+  github_client_id: System.get_env("GITHUB_CLIENT_ID"),
+  github_client_secret: System.get_env("GITHUB_CLIENT_SECRET")
