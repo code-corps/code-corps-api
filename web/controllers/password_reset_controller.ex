@@ -11,8 +11,7 @@ defmodule CodeCorps.PasswordResetController do
   and return email. 422 if pwd do not match or auth token does not exist
   """
   def reset_password(conn, %{"token" => token, "password" => password, "password_confirmation" => password_confirmation}) do
-    user = conn.assigns.current_user
-    with %AuthToken{value: auth_token} <- Repo.get_by(CodeCorps.AuthToken, %{ value: token, user_id: user.id }),
+    with %AuthToken{value: auth_token, user: user} <- Repo.get_by(AuthToken, %{ value: token }) |> Repo.preload(:user),
       {:ok, _} <- Phoenix.Token.verify(CodeCorps.Endpoint, "user", auth_token, max_age: 1209600) do
         with %Changeset{valid?: true} <- User.reset_password_changeset(user, 
                                                                        %{password: password, password_confirmation: password_confirmation}) do

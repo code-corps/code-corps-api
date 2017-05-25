@@ -98,6 +98,7 @@ defmodule CodeCorps.Router do
     resources "/comments", CommentController, only: [:index, :show]
     resources "/donation-goals", DonationGoalController, only: [:index, :show]
     resources "/organizations", OrganizationController, only: [:index, :show]
+    post "/password/forgot", PasswordController, :forgot_password
     resources "/project-categories", ProjectCategoryController, only: [:index, :show]
     resources "/project-skills", ProjectSkillController, only: [:index, :show]
     resources "/project-users", ProjectUserController, only: [:index, :show]
