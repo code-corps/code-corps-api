@@ -3,7 +3,7 @@ defmodule CodeCorps.Services.ForgotPasswordService do
   alias CodeCorps.{AuthToken, Emails, Mailer, Repo, User}
 
   @doc"""
-  forgot_password should take an email and generate an AuthToken model and send an email
+  Generates an AuthToken model and sends to the provided email.
   """
   def forgot_password(email) do
     with %User{} = user <- Repo.get_by(User, email: email),
@@ -14,5 +14,4 @@ defmodule CodeCorps.Services.ForgotPasswordService do
       nil -> nil
     end
   end
-
 end

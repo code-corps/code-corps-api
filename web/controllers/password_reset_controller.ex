@@ -5,14 +5,20 @@ defmodule CodeCorps.PasswordResetController do
   alias Ecto.Changeset
 
   @doc"""
-  reset_password should take a token, password, and password_confirmation and check
-  1. the token exists in AuthToken model & verifies it with Phoenix.Token.verify
-  2. password & password_confirmation match
-  and return email. 422 if pwd do not match or auth token does not exist
+  Requires a `token`, `password`, and `password_confirmation` and checks:
+
+  1. The token exists in an `AuthToken` record, verified with
+  `Phoenix.Token.verify`
+
+  2. The `password` and `password_confirmation` match, and the auth token
+  exists:
+
+    - If yes, a `200` response will return the email.
+    - If no, a `422` response will return the error.
   """
   def reset_password(conn, %{"token" => reset_token, "password" => _password, "password_confirmation" => _password_confirmation} = params) do
     with %AuthToken{user: user} <- AuthToken |> Repo.get_by(%{ value: reset_token }) |> Repo.preload(:user),
-         {:ok, _} <- Phoenix.Token.verify(CodeCorps.Endpoint, "user", reset_token, max_age: 1209600),
+         {:ok, _} <- Phoenix.Token.verify(CodeCorps.Endpoint, "user", reset_token, max_age: 3600),
          {:ok, updated_user} <- user |> User.reset_password_changeset(params) |> Repo.update,
          {:ok, auth_token, _claims} = updated_user |> Guardian.encode_and_sign(:token)
     do

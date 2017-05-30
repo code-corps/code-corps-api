@@ -6,8 +6,11 @@ defmodule CloudexTest do
   """
 
   defmodule Url do
-    def for(public_id, options) do
-      {public_id, options}
+    def for(_public_id, %{height: height, width: width}) do
+      "https://placehold.it/#{width}x#{height}"
+    end
+    def for(_public_id, _options) do
+      "https://placehold.it/500x500"
     end
   end
 end
