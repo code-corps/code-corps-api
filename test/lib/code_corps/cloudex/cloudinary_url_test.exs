@@ -3,9 +3,9 @@ defmodule CodeCorps.Cloudex.CloudinaryUrlTest do
   use ExUnit.Case, async: true
 
   test "calls Cloudex.Url.for with correct arguments" do
-    expected_args = {:test_public_id, %{test_option: nil}}
-    args = CloudinaryUrl.for(:test_public_id, %{test_option: nil}, nil, nil, nil)
-    assert expected_args == args
+    expected_url = "https://placehold.it/100x100"
+    url = CloudinaryUrl.for(:test_public_id, %{height: 100, width: 100}, nil, nil, nil)
+    assert expected_url == url
   end
 
   test "returns correct url if called without public_id" do
