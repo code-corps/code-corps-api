@@ -17,10 +17,11 @@ defmodule CodeCorps.Helpers.Query do
 
   # skill queries
 
-  def limit_filter(query, %{"limit" => count}) do
-    query |> limit(^count)
-  end
+  def limit_filter(query, %{"limit" => count}), do: query |> add_limit(count |> Integer.parse)
   def limit_filter(query, _), do: query
+
+  defp add_limit(query, {count, _rem}), do: query |> limit(^count)
+  defp add_limit(query, _other), do: query
 
   def title_filter(query, %{"query" => title}) do
     query |> where([object], ilike(object.title, ^"%#{title}%"))
