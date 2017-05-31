@@ -7,7 +7,7 @@ defmodule CodeCorps.Emails.ForgotPasswordEmail do
   def create(user, token) do
     BaseEmail.create
     |> to(user.email)
-    |> template(template_id(), [link: link(token)])
+    |> template(template_id(), %{link: link(token)})
   end
 
   defp template_id, do: Application.get_env(:code_corps, :postmark_forgot_password_template)
