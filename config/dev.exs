@@ -49,7 +49,7 @@ config :guardian, Guardian,
 
 config :code_corps, :analytics, CodeCorps.Analytics.InMemoryAPI
 
-config :code_corps, :github_api, CodeCorps.Github.API
+config :code_corps, :github_api, CodeCorps.GitHub.API
 
 # Configures stripe for dev mode
 config :code_corps, :stripe, Stripe
@@ -75,5 +75,5 @@ if System.get_env("CLOUDEX_API_KEY") == nil do
 end
 
 config :code_corps,
-  github_client_id: System.get_env("GITHUB_CLIENT_ID"),
-  github_client_secret: System.get_env("GITHUB_CLIENT_SECRET")
+  github_oauth_client_id: System.get_env("GITHUB_OAUTH_CLIENT_ID"),
+  github_oauth_client_secret: System.get_env("GITHUB_OAUTH_CLIENT_SECRET")

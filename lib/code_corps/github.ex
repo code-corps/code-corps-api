@@ -1,20 +1,20 @@
-defmodule CodeCorps.Github do
+defmodule CodeCorps.GitHub do
   alias CodeCorps.{User, Repo}
 
   @api Application.get_env(:code_corps, :github_api)
 
   @doc """
-  Posts code to github to receive an auth token, associates user with that
-  auth token.
+  POSTs `code` to GitHub to receive an OAuth token, then associates the user
+  with that OAuth token.
 
-  Accepts a third parameter, which is a custom API module, for the purposes of
+  Accepts a third parameter – a custom API module – for the purposes of
   explicit dependency injection during testing.
 
   Returns one of the following:
 
-  - {:ok, %CodeCorps.User{}}
-  - {:error, %Ecto.Changeset{}}
-  - {:error, "some_github_error"}
+  - `{:ok, %CodeCorps.User{}}`
+  - `{:error, %Ecto.Changeset{}}`
+  - `{:error, "some_github_error"}`
   """
   @spec connect(User.t, String.t, module) :: {:ok, User.t} | {:error, String.t}
   def connect(%User{} = user, code, api \\ @api) do
@@ -25,7 +25,7 @@ defmodule CodeCorps.Github do
   end
 
   @doc """
-  Associates user with an auth token
+  Associates user with the GitHub OAuth token.
 
   Returns one of the following:
 

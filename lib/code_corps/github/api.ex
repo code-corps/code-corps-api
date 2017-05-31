@@ -1,12 +1,12 @@
-defmodule CodeCorps.Github.API do
+defmodule CodeCorps.GitHub.API do
   @moduledoc """
-  The boundary module which communicates with the Github API using either
-  direct requests, or through Tentacat
+  The boundary module which communicates with the GitHub API using either
+  direct requests, or through Tentacat.
   """
-  @behaviour CodeCorps.Github.APIContract
+  @behaviour CodeCorps.GitHub.APIContract
 
-  @client_secret Application.get_env(:code_corps, :github_client_secret)
-  @client_id Application.get_env(:code_corps, :github_client_id)
+  @client_secret Application.get_env(:code_corps, :github_oauth_client_secret)
+  @client_id Application.get_env(:code_corps, :github_oauth_client_id)
 
   @base_connect_params %{
     client_id: @client_id,
@@ -14,8 +14,8 @@ defmodule CodeCorps.Github.API do
   }
 
   @doc """
-  Receives a code generated through the client-side github connect process and
-  posts it to github.
+  Receives a code generated through the client-side GitHub connect process
+  and posts it to GitHub.
 
   Returns either an {:ok, access_token}, or an {:error, error_message}.
   """
@@ -34,7 +34,7 @@ defmodule CodeCorps.Github.API do
 
   @spec do_connect(map) :: {:ok, HTTPoison.Response.t | HTTPoison.AsyncResponse.t} | {:error, HTTPoison.Error.t}
   defp do_connect(params) do
-    HTTPoison.post(@connect_url, "", [{"Accept", "application/json"}], [params: params])
+    HTTPoison.post(@connect_url, "", [{"Accept", "application/json"}, {"Content-Type", "application/json"}], [params: params])
   end
 
   @spec build_connect_params(String.t) :: map

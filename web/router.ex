@@ -63,7 +63,7 @@ defmodule CodeCorps.Router do
     resources "/categories", CategoryController, only: [:create, :update]
     resources "/comments", CommentController, only: [:create, :update]
     resources "/donation-goals", DonationGoalController, only: [:create, :update, :delete]
-    post "/github-connect", UserController, :github_connect
+    post "/oauth/github", UserController, :github_oauth
     resources "/organizations", OrganizationController, only: [:create, :update]
     resources "/previews", PreviewController, only: [:create]
     resources "/project-categories", ProjectCategoryController, only: [:create, :delete]
