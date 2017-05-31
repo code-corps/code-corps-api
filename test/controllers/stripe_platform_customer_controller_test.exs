@@ -9,8 +9,7 @@ defmodule CodeCorps.StripePlatformCustomerControllerTest do
       conn
       |> request_show(stripe_platform_customer)
       |> json_response(200)
-      |> Map.get("data")
-      |> assert_result_id(stripe_platform_customer.id)
+      |> assert_id_from_response(stripe_platform_customer.id)
     end
 
     test "renders 401 when unauthenticated", %{conn: conn} do

@@ -30,8 +30,7 @@ defmodule CodeCorps.RoleSkillControllerTest do
       conn
       |> request_show(role_skill)
       |> json_response(200)
-      |> Map.get("data")
-      |> assert_result_id(role_skill.id)
+      |> assert_id_from_response(role_skill.id)
     end
 
     test "renders 404", %{conn: conn} do

@@ -6,6 +6,7 @@ defmodule CodeCorps.UserController do
 
   alias CodeCorps.User
   alias CodeCorps.Services.UserService
+  alias CodeCorps.Github
 
   plug :load_and_authorize_resource, model: User, only: [:update]
   plug JaResource
@@ -31,6 +32,23 @@ defmodule CodeCorps.UserController do
       {:ok, user}
     else
       {:error, changeset} -> {:error, changeset}
+    end
+  end
+
+  def github_connect(conn, code) do
+    current_user = Guardian.Plug.current_resource(conn)
+    with {:ok, user} <- Github.connect(current_user, code)
+    do
+      conn |> render(:show, data: user)
+    else
+      {:error, %Ecto.Changeset{} = changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
+      {:error, _error} ->
+        conn
+        |> put_status(:internal_server_error)
+        |> render(CodeCorps.ErrorView, "500.json-api")
     end
   end
 

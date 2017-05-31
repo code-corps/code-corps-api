@@ -61,6 +61,7 @@ config :code_corps, CodeCorps.Mailer,
   api_key: System.get_env("POSTMARK_API_KEY")
 
 config :code_corps,
+  postmark_forgot_password_template: "1989483",
   postmark_project_acceptance_template: "1447041",
   postmark_receipt_template: "1255222"
 

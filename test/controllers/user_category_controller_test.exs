@@ -29,8 +29,7 @@ defmodule CodeCorps.UserCategoryControllerTest do
       conn
       |> request_show(user_category)
       |> json_response(200)
-      |> Map.get("data")
-      |> assert_result_id(user_category.id)
+      |> assert_id_from_response(user_category.id)
     end
 
     test "renders 404 when id is nonexistent", %{conn: conn} do

@@ -481,6 +481,47 @@ Until the Code Corps platform is open to new organizations, only admin users can
 
     + Attributes (Unprocessable Entity Response)
 
+# Group Password
+
+This endpoint is a parent route for reset and forgot password endpoints
+
+## Forgot [/forgot]
+
+### Forgot Password [POST]
+
++ Request
+
+    + Attributes (Forgot Password Request)
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer <token>
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+## Reset [/password/reset]
+
+Reset Password resource allow a user to reset their password
+
+### Reset Password [POST]
+
++ Request
+
+    + Attributes (Reset Password Request)
+
++ Response 201 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Valid Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token No User With Email Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Password Response)
+
 # Group Previews
 
 Preview resources allow a user to create a temporary HTML preview for any kind of markdown.
@@ -2265,6 +2306,32 @@ This endpoint handles the User resources for Code Corps.
 
     + Attributes (Record Not Found Response)
 
+### Connect user to GitHub [POST /github_connect]
+
+This endpoint allows a user to connect their CodeCorps account to their respective GitHub account.
+
++ Request
+
+    + Attributes
+
+      + code (string) - Client generated code for authenication when sending request to GitHub.
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 201 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (User Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 422 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Unprocessable Entity Response)
+
 ### Check email availability [GET /users/email_available?email={email}]
 
 This endpoint allows you to check whether an email is valid (by checking simply for presence of the `@` symbol) and whether the email is not already registered.
@@ -2599,6 +2666,16 @@ The platform stores Stripe customers and cards so they can be reused across diff
 + data(array[Organization Resource])
 + include JSON API Version
 
+## Forgot Password Resource (object)
++ include Forgot Password Resource Identifier
+
+## Forgot Password Resource Identifier
++ email: `myemail@gmail.com` (string, required)
+
+## Forgot Password Request (object)
++ data(Forgot Password Resource)
++ include JSON API Version
+
 ## Project User Attributes (object)
 + role: `pending` (enum[string])
     + Members
@@ -2794,6 +2871,15 @@ The platform stores Stripe customers and cards so they can be reused across diff
     + id: `NOT_FOUND` (string)
     + title: `404 Resource not found` (string)
     + status: 404 (number) - HTTP status code
+
+## Reset Password Resource (object)
++ token: `zzz123` (string, required)
++ password: `mypwd` (string, required)
++ password-confirmation: `mypwd` (string, required)
+
+## Reset Password Request (object)
++ data(Reset Password Resource)
++ include JSON API Version
 
 ## Role Skill Resource (object)
 + include Role Skill Resource Identifier

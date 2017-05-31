@@ -32,8 +32,7 @@ defmodule CodeCorps.ProjectUserControllerTest do
       conn
       |> request_show(record)
       |> json_response(200)
-      |> Map.get("data")
-      |> assert_result_id(record.id)
+      |> assert_id_from_response(record.id)
     end
 
     test "renders 404 when id is nonexistent", %{conn: conn} do

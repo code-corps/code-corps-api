@@ -1,12 +1,13 @@
 defmodule CodeCorps.AuthToken do
   @moduledoc """
-  Represent's one of the user's many possible authentication tokens, created
+  Represents one of the user's many possible authentication tokens, created
   using `Phoenix.Token.sign/4`.
 
-  Many can coexist and be valid at the same time. They can be used for password
-  resets or passwordless logins.
+  Many can coexist and be valid at the same time. They can be used for
+  password resets or passwordless logins.
 
-  These tokens expire.
+  These tokens do expire based on the `max_age` value passed to
+  `Phoenix.Token.verify/4`.
   """
 
   use CodeCorps.Web, :model

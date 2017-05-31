@@ -63,8 +63,8 @@ defmodule CodeCorps.Router do
     resources "/categories", CategoryController, only: [:create, :update]
     resources "/comments", CommentController, only: [:create, :update]
     resources "/donation-goals", DonationGoalController, only: [:create, :update, :delete]
+    post "/github-connect", UserController, :github_connect
     resources "/organizations", OrganizationController, only: [:create, :update]
-    post "/password/reset", PasswordResetController, :reset_password
     resources "/previews", PreviewController, only: [:create]
     resources "/project-categories", ProjectCategoryController, only: [:create, :delete]
     resources "/project-skills", ProjectSkillController, only: [:create, :delete]
@@ -92,11 +92,13 @@ defmodule CodeCorps.Router do
 
     post "/token", TokenController, :create
     post "/token/refresh", TokenController, :refresh
+    post "/password/reset", PasswordResetController, :reset_password
 
     resources "/categories", CategoryController, only: [:index, :show]
     resources "/comments", CommentController, only: [:index, :show]
     resources "/donation-goals", DonationGoalController, only: [:index, :show]
     resources "/organizations", OrganizationController, only: [:index, :show]
+    post "/password/forgot", PasswordController, :forgot_password
     resources "/project-categories", ProjectCategoryController, only: [:index, :show]
     resources "/project-skills", ProjectSkillController, only: [:index, :show]
     resources "/project-users", ProjectUserController, only: [:index, :show]

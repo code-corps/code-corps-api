@@ -29,4 +29,15 @@ defmodule CodeCorps.CommentTest do
     changeset = Comment.create_changeset(%Comment{}, @invalid_attrs)
     refute changeset.valid?
   end
+
+  test "github create changeset with valid attributes" do
+    attrs = Map.merge(@valid_attrs, %{
+      task_id: 1,
+      user_id: 1,
+      github_id: 1
+    })
+
+    changeset = Comment.github_create_changeset(%Comment{}, attrs)
+    assert changeset.valid?
+  end
 end

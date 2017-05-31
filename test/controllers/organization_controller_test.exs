@@ -33,8 +33,7 @@ defmodule CodeCorps.OrganizationControllerTest do
       conn
       |> request_show(organization)
       |> json_response(200)
-      |> Map.get("data")
-      |> assert_result_id(organization.id)
+      |> assert_id_from_response(organization.id)
     end
 
     test "renders 404 when id is nonexistent", %{conn: conn} do

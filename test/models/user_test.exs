@@ -140,6 +140,20 @@ defmodule CodeCorps.UserTest do
     end
   end
 
+  describe "github_associate_changeset" do
+    test "should cast github_id" do
+      user = insert(:user)
+      changeset = user |> User.github_associate_changeset(%{github_id: "foobar"})
+      assert changeset.valid?
+      assert changeset.changes.github_id == "foobar"
+    end
+    test "github_id should be required" do
+      user = insert(:user)
+      changeset = user |> User.github_associate_changeset(%{})
+      refute changeset.valid?
+    end
+  end
+
   test "reset_password_changeset with valid passwords" do
     changeset = User.reset_password_changeset(%User{}, %{password: "foobar", password_confirmation: "foobar"})
     assert changeset.valid?

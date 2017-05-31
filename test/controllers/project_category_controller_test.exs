@@ -32,8 +32,7 @@ defmodule CodeCorps.ProjectCategoryControllerTest do
       conn
       |> request_show(project_category)
       |> json_response(200)
-      |> Map.get("data")
-      |> assert_result_id(project_category.id)
+      |> assert_id_from_response(project_category.id)
     end
 
     test "renders 404 when id is nonexistent", %{conn: conn} do
