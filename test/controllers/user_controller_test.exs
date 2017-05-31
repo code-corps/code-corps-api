@@ -246,7 +246,7 @@ defmodule CodeCorps.UserControllerTest do
     test "return the user when current user connects successfully", %{conn: conn} do
       user = insert(:user)
 
-      code = %{"code" => "client generated code"}
+      code = %{"code" => "valid_code"}
 
       path = user_path(conn, :github_connect, code)
 

@@ -35,7 +35,7 @@ defmodule CodeCorps.UserController do
     end
   end
 
-  def github_connect(conn, code) do
+  def github_connect(conn, %{"code" => code}) do
     current_user = Guardian.Plug.current_resource(conn)
     with {:ok, user} <- Github.connect(current_user, code)
     do
