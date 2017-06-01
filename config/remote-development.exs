@@ -48,8 +48,8 @@ config :code_corps,
   postmark_receipt_template: "123"
 
 config :code_corps,
-  github_client_id: System.get_env("GITHUB_CLIENT_ID"),
-  github_client_secret: System.get_env("GITHUB_CLIENT_SECRET")
+  github_oauth_client_id: System.get_env("GITHUB_OAUTH_CLIENT_ID"),
+  github_oauth_client_secret: System.get_env("GITHUB_OAUTH_CLIENT_SECRET")
 
 # ## SSL Support
 #

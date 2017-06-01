@@ -6,7 +6,7 @@ defmodule CodeCorps.UserController do
 
   alias CodeCorps.User
   alias CodeCorps.Services.UserService
-  alias CodeCorps.Github
+  alias CodeCorps.GitHub
 
   plug :load_and_authorize_resource, model: User, only: [:update]
   plug JaResource
@@ -35,11 +35,14 @@ defmodule CodeCorps.UserController do
     end
   end
 
-  def github_connect(conn, %{"code" => code}) do
+  @doc """
+  Differs from other resources by path: `/oauth/github`
+  """
+  def github_oauth(conn, %{"code" => code}) do
     current_user = Guardian.Plug.current_resource(conn)
-    with {:ok, user} <- Github.connect(current_user, code)
+    with {:ok, user} <- GitHub.connect(current_user, code)
     do
-      conn |> render(:show, data: user)
+      conn |> render("show.json-api", data: user)
     else
       {:error, %Ecto.Changeset{} = changeset} ->
         conn
