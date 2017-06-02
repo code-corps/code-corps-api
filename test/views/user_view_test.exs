@@ -5,7 +5,7 @@ defmodule CodeCorps.UserViewTest do
   alias Plug.Conn
 
   test "renders all attributes and relationships properly" do
-    user = insert(:user, first_name: "First", last_name: "Last", default_color: "blue")
+    user = insert(:user, first_name: "First", github_avatar_url: "foo", github_id: 123, github_username: "githubuser", last_name: "Last", default_color: "blue")
     slugged_route = insert(:slugged_route, user: user)
     stripe_connect_subscription = insert(:stripe_connect_subscription, user: user)
     stripe_platform_card = insert(:stripe_platform_card, user: user)
@@ -28,6 +28,9 @@ defmodule CodeCorps.UserViewTest do
           "cloudinary-public-id" => nil,
           "email" => "",
           "first-name" => "First",
+          "github-avatar-url" => "foo",
+          "github-id" => 123,
+          "github-username" => "githubuser",
           "inserted-at" => user.inserted_at,
           "last-name" => "Last",
           "name" => "First Last",

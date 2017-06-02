@@ -11,9 +11,11 @@ defmodule CodeCorps.UserView do
   use JaSerializer.PhoenixView
 
   attributes [
-    :biography, :cloudinary_public_id, :email, :first_name, :last_name, :name,
-    :photo_large_url, :photo_thumb_url, :sign_up_context, :state,
-    :state_transition, :twitter, :username, :website, :inserted_at, :updated_at
+    :biography, :cloudinary_public_id, :email, :first_name,
+    :github_avatar_url, :github_id, :github_username, :inserted_at,
+    :last_name, :name, :photo_large_url, :photo_thumb_url,
+    :sign_up_context, :state, :state_transition, :twitter, :username,
+    :website, :updated_at
   ]
 
   has_one :slugged_route, serializer: CodeCorps.SluggedRouteView

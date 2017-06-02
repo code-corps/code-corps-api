@@ -73,6 +73,7 @@ defmodule CodeCorps.Mixfile do
       {:gettext, "~> 0.12"},
       {:cowboy, "~> 1.0"},
       {:benchfella, "~> 0.3.0", only: :dev},
+      {:bypass, "~> 0.6", only: :test},
       {:canary, "~> 1.1"}, # Authorization
       {:cloudex, "~> 0.1.10"},
       {:comeonin, "~> 2.0"},
@@ -89,6 +90,7 @@ defmodule CodeCorps.Mixfile do
       {:inflex, "~> 1.8"},
       {:ja_resource, "~> 0.2"},
       {:ja_serializer, "~> 0.11.0"}, # JSON API
+      {:joken, "~> 1.1"}, # JWT encoding
       {:mix_test_watch, "~> 0.2", only: :dev}, # Test watcher
       {:money, "~> 1.2.1"},
       {:poison, "~> 2.0"},

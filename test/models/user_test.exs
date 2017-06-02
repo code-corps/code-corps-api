@@ -143,9 +143,9 @@ defmodule CodeCorps.UserTest do
   describe "github_association_changeset" do
     test "should cast github_auth_token" do
       user = insert(:user)
-      changeset = user |> User.github_association_changeset(%{github_auth_token: "foobar"})
+      changeset = user |> User.github_association_changeset(%{github_auth_token: "foo_token", github_avatar_url: "foo_url", github_id: 123, github_username: "foo_username"})
       assert changeset.valid?
-      assert changeset.changes.github_auth_token == "foobar"
+      assert changeset.changes.github_auth_token == "foo_token"
     end
     test "github_auth_token should be required" do
       user = insert(:user)

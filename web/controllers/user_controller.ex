@@ -4,9 +4,9 @@ defmodule CodeCorps.UserController do
 
   import CodeCorps.Helpers.Query, only: [id_filter: 2, user_filter: 2, limit_filter: 2]
 
-  alias CodeCorps.User
-  alias CodeCorps.Services.UserService
   alias CodeCorps.GitHub
+  alias CodeCorps.Services.UserService
+  alias CodeCorps.User
 
   plug :load_and_authorize_resource, model: User, only: [:update]
   plug JaResource
@@ -38,9 +38,9 @@ defmodule CodeCorps.UserController do
   @doc """
   Differs from other resources by path: `/oauth/github`
   """
-  def github_oauth(conn, %{"code" => code}) do
+  def github_oauth(conn, %{"code" => code, "state" => state}) do
     current_user = Guardian.Plug.current_resource(conn)
-    with {:ok, user} <- GitHub.connect(current_user, code)
+    with {:ok, user} <- GitHub.OAuth.connect(current_user, code, state)
     do
       conn |> render("show.json-api", data: user)
     else
@@ -48,7 +48,7 @@ defmodule CodeCorps.UserController do
         conn
         |> put_status(:unprocessable_entity)
         |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
-      {:error, _error} ->
+      {:error, error} ->
         conn
         |> put_status(:internal_server_error)
         |> render(CodeCorps.ErrorView, "500.json-api")

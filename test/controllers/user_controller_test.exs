@@ -1,5 +1,8 @@
 defmodule CodeCorps.UserControllerTest do
+  @moduledoc false
+
   use CodeCorps.ApiCase, resource_name: :user
+  use CodeCorps.GitHubCase
 
   alias CodeCorps.User
   alias CodeCorps.Repo
@@ -242,13 +245,27 @@ defmodule CodeCorps.UserControllerTest do
     end
   end
 
+
   describe "github_oauth" do
+    @github_user_data %{
+      "avatar_url" => "foo_url",
+      "email" => "foo_email",
+      "id" => 123,
+      "login" => "foo_login"
+    }
+
+    @github_token_data %{"access_token" => "foo_auth_token"}
+
+    @tag bypass: %{
+      "/" => {200, @github_token_data},
+      "/user" => {200, @github_user_data}
+    }
     test "return the user when current user connects successfully", %{conn: conn} do
       user = insert(:user)
 
-      code = %{"code" => "valid_code"}
+      json = %{"code" => "valid_code", "state" => "valid_state"}
 
-      path = user_path(conn, :github_oauth, code)
+      path = user_path(conn, :github_oauth, json)
 
       json = conn |> authenticate(user) |> post(path) |> json_response(200)
 
@@ -256,9 +273,9 @@ defmodule CodeCorps.UserControllerTest do
     end
 
     test "return unauthenticated error code when no current user", %{conn: conn} do
-      code = %{"code" => "client generated code"}
+      json = %{"code" => "client generated code", "state" => "state"}
 
-      path = user_path(conn, :github_oauth, code)
+      path = user_path(conn, :github_oauth, json)
 
       conn |> post(path) |> json_response(401)
     end
