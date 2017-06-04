@@ -13,6 +13,8 @@ defmodule CodeCorps.Project do
   alias CodeCorps.Services.MarkdownRendererService
   alias CodeCorps.TaskList
 
+  alias Ecto.Changeset
+
   @type t :: %__MODULE__{}
 
   schema "projects" do

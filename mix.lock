@@ -59,6 +59,7 @@
   "ssl_verify_fun": {:hex, :ssl_verify_fun, "1.1.1", "28a4d65b7f59893bc2c7de786dec1e1555bd742d336043fe644ae956c3497fbe", [:make, :rebar], []},
   "stripity_stripe": {:git, "https://github.com/code-corps/stripity_stripe.git", "1e9b87d73710ef901dd6d735d6f2d0a2cef75d1c", [branch: "2.0"]},
   "sweet_xml": {:hex, :sweet_xml, "0.6.5", "dd9cde443212b505d1b5f9758feb2000e66a14d3c449f04c572f3048c66e6697", [:mix], []},
+  "tentacat": {:hex, :tentacat, "0.6.2", "e5e5ad95d577dd441e4dcfcab259c9d92b0049f0481a4be6453769d61a956a3b", [:mix], [{:exjsx, "~> 3.2", [hex: :exjsx, optional: false]}, {:httpoison, "~> 0.8", [hex: :httpoison, optional: false]}]},
   "timber": {:hex, :timber, "0.4.7", "df3fcd79bcb4eb4b53874d906ef5f3a212937b4bc7b7c5b244745202cc389443", [:mix], [{:ecto, "~> 2.0", [hex: :ecto, optional: true]}, {:phoenix, "~> 1.2", [hex: :phoenix, optional: true]}, {:plug, "~> 1.2", [hex: :plug, optional: true]}, {:poison, "~> 2.0 or ~> 3.0", [hex: :poison, optional: false]}]},
   "timex": {:hex, :timex, "3.0.8", "71d5ebafcdc557c6c866cdc196c5054f587e7cd1118ad8937e2293d51fc85608", [:mix], [{:combine, "~> 0.7", [hex: :combine, optional: false]}, {:gettext, "~> 0.10", [hex: :gettext, optional: false]}, {:tzdata, "~> 0.1.8 or ~> 0.5", [hex: :tzdata, optional: false]}]},
   "timex_ecto": {:hex, :timex_ecto, "3.1.1", "37d54f6879d96a6789bb497296531cfb853631de78e152969d95cff03c1368dd", [:mix], [{:ecto, "~> 2.1.0", [hex: :ecto, optional: false]}, {:timex, "~> 3.0", [hex: :timex, optional: false]}]},

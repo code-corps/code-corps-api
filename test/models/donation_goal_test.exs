@@ -26,6 +26,15 @@ defmodule CodeCorps.DonationGoalTest do
       refute changeset.valid?
       changeset |> assert_error_message(:project, "does not exist")
     end
+
+    test "amount must not be negative" do
+      attrs = %{amount: -100, description: "Cashback for donators", project_id: 2}
+      donation_goal = insert(:donation_goal)
+      changeset = DonationGoal.create_changeset(donation_goal, attrs)
+
+      refute changeset.valid?
+      changeset |> assert_error_message(:amount, "must be greater than %{number}")
+    end
   end
 
   describe "&update_changeset/2" do
