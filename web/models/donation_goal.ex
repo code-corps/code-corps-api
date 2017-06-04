@@ -30,6 +30,7 @@ defmodule CodeCorps.DonationGoal do
     struct
     |> cast(params, [:amount, :description, :project_id])
     |> validate_required([:amount, :description, :project_id])
+    |> validate_number(:amount, greater_than: 0)
     |> assoc_constraint(:project)
   end
 
