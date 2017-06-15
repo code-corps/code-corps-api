@@ -65,6 +65,14 @@ config :code_corps, :icon_color_generator, CodeCorps.RandomIconColor.Generator
 # Set Corsica logging to output a console warning when rejecting a request
 config :code_corps, :corsica_log_level, [rejected: :warn]
 
+{:ok, pem} = System.get_env("GITHUB_APP_PEM") |> Base.decode64()
+
+config :code_corps,
+  github_app_id: System.get_env("GITHUB_APP_ID"),
+  github_app_client_id: System.get_env("GITHUB_APP_CLIENT_ID"),
+  github_app_client_secret: System.get_env("GITHUB_APP_CLIENT_SECRET"),
+  github_app_pem: pem
+
 config :stripity_stripe,
   api_key: System.get_env("STRIPE_SECRET_KEY"),
   connect_client_id: System.get_env("STRIPE_PLATFORM_CLIENT_ID")

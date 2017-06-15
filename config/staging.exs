@@ -63,10 +63,6 @@ config :code_corps,
   postmark_project_acceptance_template: "1447022",
   postmark_receipt_template: "1252361"
 
-config :code_corps,
-  github_oauth_client_id: System.get_env("GITHUB_OAUTH_CLIENT_ID"),
-  github_oauth_client_secret: System.get_env("GITHUB_OAUTH_CLIENT_SECRET")
-
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key

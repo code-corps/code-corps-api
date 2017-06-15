@@ -1,52 +1,50 @@
 defmodule CodeCorps.GitHubTest do
+  @moduledoc false
+
   use CodeCorps.ModelCase
+  use CodeCorps.GitHubCase
 
-  alias CodeCorps.{
-    GitHub, User
-  }
+  alias CodeCorps.GitHub
 
-  alias Ecto.Changeset
-
-  describe "associate/2" do
-    test "updates the user, returns :ok tuple with user" do
-      user = insert(:user)
-      params = %{github_auth_token: "foobar"}
-      {:ok, %User{} = returned_user} = GitHub.associate(user, params)
-      assert user.id == returned_user.id
-      assert returned_user.github_auth_token == "foobar"
+  describe "request/5" do
+    @tag bypass: %{"/foo" => {200, %{"bar" => "baz"}}}
+    test "handles a successful response" do
+      {:ok, response} = GitHub.request(%{}, :get, "foo", %{}, [])
+      assert response == %{"bar" => "baz"}
     end
 
-    test "returns :error tupple with changeset if there are validation errors" do
-      user = insert(:user)
-      params = %{}
-      {:error, %Changeset{} = changeset} = GitHub.associate(user, params)
-      refute changeset.valid?
+    @tag bypass: %{"/foo" => {404, %{"bar" => "baz"}}}
+    test "handles an error response" do
+      {:error, response} = GitHub.request(%{}, :get, "foo", %{}, [])
+      assert response == CodeCorps.GitHub.APIError.new({404, %{"message" => %{"bar" => "baz"} |> Poison.encode!}})
     end
   end
 
-  defmodule SuccessAPI do
-    @behaviour CodeCorps.GitHub.APIContract
-    def connect(_code), do: {:ok, "foo_auth_token"}
-  end
-
-  defmodule ErrorAPI do
-    @behaviour CodeCorps.GitHub.APIContract
-    def connect(_code), do: {:error, "foo_error"}
-  end
-
-  describe "connect/2" do
-    test "posts to github, updates user if reply is ok, returns updated user" do
-      user = insert(:user)
-
-      {:ok, %User{} = returned_user} = GitHub.connect(user, "foo", SuccessAPI)
-
-      assert returned_user.id == user.id
-      assert returned_user.github_auth_token == "foo_auth_token"
+  describe "user_access_token_request/2" do
+    @tag bypass: %{"/" => {200, %{"bar" => "baz"}}}
+    test "handles a successful response" do
+      {:ok, response} = GitHub.user_access_token_request("foo_code", "foo_state")
+      assert response == %{"bar" => "baz"}
     end
 
-    test "posts to github, returns error if reply is not ok" do
-      user = insert(:user)
-      assert {:error, "foo_error"} == GitHub.connect(user, "foo", ErrorAPI)
+    @tag bypass: %{"/" => {404, %{"bar" => "baz"}}}
+    test "handles an error response" do
+      {:error, response} = GitHub.user_access_token_request("foo_code", "foo_state")
+      assert response == CodeCorps.GitHub.APIError.new({404, %{"message" => %{"bar" => "baz"} |> Poison.encode!}})
+    end
+  end
+
+  describe "authenticated_integration_request/5" do
+    @tag bypass: %{"/foo" => {200, %{"bar" => "baz"}}}
+    test "handles a successful response" do
+      {:ok, response} = GitHub.authenticated_integration_request(%{}, :get, "foo", %{}, [])
+      assert response == %{"bar" => "baz"}
+    end
+
+    @tag bypass: %{"/foo" => {404, %{"bar" => "baz"}}}
+    test "handles an error response" do
+      {:error, response} = GitHub.authenticated_integration_request(%{}, :get, "foo", %{}, [])
+      assert response == CodeCorps.GitHub.APIError.new({404, %{"message" => %{"bar" => "baz"} |> Poison.encode!}})
     end
   end
 end

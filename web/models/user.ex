@@ -23,6 +23,11 @@ defmodule CodeCorps.User do
     field :encrypted_password, :string
     field :email, :string
     field :first_name, :string
+    field :github_auth_token, :string
+    field :github_avatar_url, :string
+    field :github_email, :string
+    field :github_id, :integer
+    field :github_username, :string
     field :last_name, :string
     field :password, :string, virtual: true
     field :password_confirmation, :string, virtual: true
@@ -32,9 +37,6 @@ defmodule CodeCorps.User do
     field :website, :string
     field :state, :string, default: "signed_up"
     field :state_transition, :string, virtual: true
-
-    field :github_id, :string
-    field :github_auth_token, :string
 
     has_one :slugged_route, SluggedRoute
 
@@ -99,8 +101,8 @@ defmodule CodeCorps.User do
 
   def github_association_changeset(struct, params) do
     struct
-    |> cast(params, [:github_auth_token])
-    |> validate_required([:github_auth_token])
+    |> cast(params, [:github_auth_token, :github_avatar_url, :github_email, :github_id, :github_username])
+    |> validate_required([:github_auth_token, :github_avatar_url, :github_id, :github_username])
   end
 
   def reset_password_changeset(struct, params) do

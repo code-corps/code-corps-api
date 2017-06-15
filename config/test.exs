@@ -32,8 +32,6 @@ config :guardian, Guardian,
 
 config :code_corps, :analytics, CodeCorps.Analytics.TestAPI
 
-config :code_corps, :github_api, CodeCorps.GitHub.TestAPI
-
 # Configures stripe for test mode
 config :code_corps, :stripe, CodeCorps.StripeTesting
 config :code_corps, :stripe_env, :test
