@@ -379,6 +379,111 @@ To delete a donation goal the user must be a site admin or the owner of the refe
 
     + Attributes (Record Not Found Response)
 
+# Group Github App Installations
+
+This endpoint is used for creating, updating, and retrieving information about a GitHub App installation. See the GitHub API documentation for more details about [the installation process of GitHub Apps](https://developer.github.com/apps/building-integrations/setting-up-a-new-integration/about-choosing-an-integration-type/#installation-processes-for-integrations).
+
+To simplify, Code Corps has a GitHub App which is installed to a GitHub user's or GitHub organization's account _on GitHub_. This grants Code Corps read and write access to the GitHub API on behalf of that user or organization.
+
+You'll notice project and user relationships, which are only useful when setting up an installation for the first time. When GitHub redirects the user back to Code Corps after installing the GitHub App, our client only has access to the installation's `installation_id` in a query parameter. Because of this, before we direct the user to GitHub to install our App, we need to create a GithubAppInstallation record that keeps track of the user who requested it, the project it was requested on, and mark the installation as `initiated_on_code_corps`.
+
+Note that this does not mean there's actually an installation yet! The user hasn't been to GitHub. We're just keeping track of that installation for later.
+
+Once the user installs the App on GitHub, GitHub will send an `installation` webhook to our API. The payload includes a `sender` key containing the GitHub account (along with its `id`) that performed the installation. The user is then automatically redirected back to Code Corps.
+
+Once the user is back on Code Corps, we want to redirect the user back to the target project. Luckily, the `installation_id` GitHub provided in the query parameter yields enough information to match it to our authenticated user's GithubAppInstallation record created in the previous step.
+
+We match:
+  - the `installation_id` in the query parameter
+  - the `installation` webhook's `installation_id` and `sender`'s account `id`
+  - our user's GitHub account `id`
+
+These pieces of information are enough to tell us who installed the application. And because we stored the target project for this first installation, we can redirect our user. The API may need to do some processing work to complete the setup, but once the `state` has moved to `processed`, the client can redirect to the project's integrations page using the project relationship.
+
+Keep in mind that an installation could be used across multiple projects. And because an installation can be installed at the _organization_ level on GitHub, that means the user who requested the installation is likely not be the only user with permissions on GitHub to modify or even uninstall the GitHub App. The user relationship specified here is _only_ useful for the first installation of a user on a project, due solely to the complicated redirection flow detailed above.
+
+## Github App Installations [/github-app-installations]
+
+### Create a Github app installation [POST]
+
++ Request
+
+    + Attributes (Github App Installation Create Request)
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 201 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Github App Installation Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
+### Filter by id [GET /github-app-installations{?filter[id]}]
+
++ Request
+
+    + Attributes
+
+        + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Github App Installations Response)
+
+## Github App Installation [/github-app-installations/{id}]
+
++ Parameters
+
+    + id (number, required)
+
+### Retrieve a Github app installation [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Github App Installation Response)
+
+### Update a Github app installation [PATCH]
+
++ Request
+
+    + Attributes (Github App Installation Update Request)
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 201 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Github App Installation Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
 # Group Organizations
 
 This endpoint retrieves Organizations on Code Corps. Organizations usually have one or more Projects.
@@ -2590,6 +2695,53 @@ The platform stores Stripe customers and cards so they can be reused across diff
     + id: `FORBIDDEN` (string)
     + status: 403 (number) - HTTP status code
     + title: `403 Forbidden` (string)
+
+## Github App Installation Attributes (object)
++ `github-id`: 12345 (number) - The id of the application installation on GitHub
++ `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
++ installed: true (boolean) - Whether the installation is currently installed. The user can potentially uninstall from GitHub, for example.
++ state: `processed` (enum[string])
+    + Members
+        + `initiated_on_code_corps`
+        + `initiated_on_github`
+        + `processing`
+        + `processed`
+        + `unmatched_user`
++ `updated-at`: `2016-07-08T03:03:51.967Z` (string)
+
+## Github App Installation Create Request (object)
++ type: `github-app-installation` (string, required)
++ attributes(Github App Installation Attributes)
++ relationships
+    + project
+        + data(Project Resource Identifier)
+    + user
+        + data(User Resource Identifier)
+
+## Github App Installation Resource (object)
++ include Github App Installation Resource Identifier
++ attributes(Github App Installation Attributes)
++ relationships
+    + project
+        + data(Project Resource Identifier)
+    + user
+        + data(User Resource Identifier)
+
+## Github App Installation Resource Identifier (object)
++ id: `1` (string, required)
++ type: `github-app-installation` (string, required)
+
+## Github App Installation Response (object)
++ data(Github App Installation Resource)
++ include JSON API Version
+
+## Github App Installations Response (object)
++ data(array[Github App Installation Resource])
++ include JSON API Version
+
+## Github App Installation Update Request (object)
++ include Project User Resource Identifier
++ attributes(Project User Attributes)
 
 ## No Content Response (object)
 

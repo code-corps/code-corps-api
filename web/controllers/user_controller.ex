@@ -48,7 +48,7 @@ defmodule CodeCorps.UserController do
         conn
         |> put_status(:unprocessable_entity)
         |> render(CodeCorps.ChangesetView, "error.json-api", changeset: changeset)
-      {:error, error} ->
+      {:error, _error} ->
         conn
         |> put_status(:internal_server_error)
         |> render(CodeCorps.ErrorView, "500.json-api")

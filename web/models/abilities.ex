@@ -1,53 +1,7 @@
 defmodule Canary.Abilities do
-  alias CodeCorps.Category
-  alias CodeCorps.Comment
-  alias CodeCorps.DonationGoal
-  alias CodeCorps.Organization
-  alias CodeCorps.Preview
-  alias CodeCorps.Project
-  alias CodeCorps.ProjectCategory
-  alias CodeCorps.ProjectSkill
-  alias CodeCorps.ProjectUser
-  alias CodeCorps.Role
-  alias CodeCorps.RoleSkill
-  alias CodeCorps.Skill
-  alias CodeCorps.StripeConnectAccount
-  alias CodeCorps.StripeConnectPlan
-  alias CodeCorps.StripeConnectSubscription
-  alias CodeCorps.StripePlatformCard
-  alias CodeCorps.StripePlatformCustomer
-  alias CodeCorps.Task
-  alias CodeCorps.TaskSkill
-  alias CodeCorps.User
-  alias CodeCorps.UserCategory
-  alias CodeCorps.UserRole
-  alias CodeCorps.UserSkill
-  alias CodeCorps.UserTask
+  alias CodeCorps.{Category, Comment, DonationGoal, GithubAppInstallation, Organization, Preview, Project, ProjectCategory, ProjectSkill, ProjectUser, Role, RoleSkill, Skill, StripeConnectAccount, StripeConnectPlan, StripeConnectSubscription, StripePlatformCard, StripePlatformCustomer, Task, TaskSkill, User, UserCategory, UserRole, UserSkill, UserTask}
 
-  alias CodeCorps.CategoryPolicy
-  alias CodeCorps.CommentPolicy
-  alias CodeCorps.DonationGoalPolicy
-  alias CodeCorps.OrganizationPolicy
-  alias CodeCorps.PreviewPolicy
-  alias CodeCorps.ProjectPolicy
-  alias CodeCorps.ProjectCategoryPolicy
-  alias CodeCorps.ProjectSkillPolicy
-  alias CodeCorps.ProjectUserPolicy
-  alias CodeCorps.RolePolicy
-  alias CodeCorps.RoleSkillPolicy
-  alias CodeCorps.SkillPolicy
-  alias CodeCorps.StripeConnectAccountPolicy
-  alias CodeCorps.StripeConnectPlanPolicy
-  alias CodeCorps.StripeConnectSubscriptionPolicy
-  alias CodeCorps.StripePlatformCardPolicy
-  alias CodeCorps.StripePlatformCustomerPolicy
-  alias CodeCorps.TaskPolicy
-  alias CodeCorps.TaskSkillPolicy
-  alias CodeCorps.UserPolicy
-  alias CodeCorps.UserCategoryPolicy
-  alias CodeCorps.UserRolePolicy
-  alias CodeCorps.UserSkillPolicy
-  alias CodeCorps.UserTaskPolicy
+  alias CodeCorps.{CategoryPolicy, CommentPolicy, DonationGoalPolicy, GithubAppInstallationPolicy, OrganizationPolicy, PreviewPolicy, ProjectPolicy, ProjectCategoryPolicy, ProjectSkillPolicy, ProjectUserPolicy, RolePolicy, RoleSkillPolicy, SkillPolicy, StripeConnectAccountPolicy, StripeConnectPlanPolicy, StripeConnectSubscriptionPolicy, StripePlatformCardPolicy, StripePlatformCustomerPolicy, TaskPolicy, TaskSkillPolicy, UserPolicy, UserCategoryPolicy, UserRolePolicy, UserSkillPolicy, UserTaskPolicy}
 
   alias Ecto.Changeset
 
@@ -72,6 +26,9 @@ defmodule Canary.Abilities do
     def can?(%User{} = user, :create, %Changeset{data: %DonationGoal{}} = changeset), do: DonationGoalPolicy.create?(user, changeset)
     def can?(%User{} = user, :update, %DonationGoal{} = comment), do: DonationGoalPolicy.update?(user, comment)
     def can?(%User{} = user, :delete, %DonationGoal{} = comment), do: DonationGoalPolicy.delete?(user, comment)
+
+    def can?(%User{} = user, :create, %Changeset{data: %GithubAppInstallation{}} = changeset), do: GithubAppInstallationPolicy.create?(user, changeset)
+    def can?(%User{} = user, :update, %GithubAppInstallation{} = github_app_installation), do: GithubAppInstallationPolicy.update?(user, github_app_installation)
 
     def can?(%User{} = user, :create, Organization), do: OrganizationPolicy.create?(user)
     def can?(%User{} = user, :update, %Organization{} = organization), do: OrganizationPolicy.update?(user, organization)

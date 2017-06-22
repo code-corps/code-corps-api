@@ -52,8 +52,8 @@ defmodule CodeCorps.StripeEvent do
 
   @doc """
   Builds a changeset for updating the status of an existing event reference.
-  Accepts `:status` only and ensures it's one of "unprocessed", "processed" or
-  "errored".
+  Accepts `:status` only and ensures it's one of "unprocessed", "processed"
+  or "errored".
   """
   def update_changeset(struct, params) do
     struct
