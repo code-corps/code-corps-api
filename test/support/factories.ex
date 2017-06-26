@@ -29,6 +29,13 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def github_app_installation_factory do
+    %CodeCorps.GithubAppInstallation{
+      project: build(:project),
+      user: build(:user)
+    }
+  end
+
   def organization_factory do
     %CodeCorps.Organization{
       name: sequence(:username, &"Organization #{&1}"),

@@ -40,6 +40,8 @@ defmodule CodeCorps.User do
 
     has_one :slugged_route, SluggedRoute
 
+    has_many :github_app_installations, CodeCorps.GithubAppInstallation
+
     has_many :project_users, CodeCorps.ProjectUser
 
     has_many :stripe_connect_customers, CodeCorps.StripeConnectCustomer
