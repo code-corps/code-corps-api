@@ -139,7 +139,7 @@ defmodule CodeCorps.GitHub do
 
     %{}
     |> Joken.token
-    |> Joken.with_exp(Timex.now |> Timex.shift(minutes: 10) |> Timex.to_unix)
+    |> Joken.with_exp(Timex.now |> Timex.shift(minutes: 5) |> Timex.to_unix)
     |> Joken.with_iss(@app_id |> String.to_integer())
     |> Joken.with_iat(Timex.now |> Timex.to_unix)
     |> Joken.with_signer(signer)

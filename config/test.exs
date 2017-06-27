@@ -32,6 +32,13 @@ config :guardian, Guardian,
 
 config :code_corps, :analytics, CodeCorps.Analytics.TestAPI
 
+config :code_corps,
+  # GitHub webhook API uses cased header names in their requests
+  # However, in the test environment, Plug.Conn enforces headers to be
+  # lowercased and errors out otherwise.
+  github_event_type_header: ("x-github-event"),
+  github_event_id_header: ("x-github-delivery")
+
 # Configures stripe for test mode
 config :code_corps, :stripe, CodeCorps.StripeTesting
 config :code_corps, :stripe_env, :test
