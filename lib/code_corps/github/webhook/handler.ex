@@ -28,17 +28,10 @@ defmodule CodeCorps.GitHub.Webhook.Handler do
     %{
       action: action,
       github_delivery_id: id,
-      type: type,
+      source: sender |> get_source(),
       status: type |> get_status(),
-      source: sender |> get_source()
+      type: type
     }
-  end
-
-  defp get_status(type) do
-    case EventSupport.status(type) do
-      :unsupported -> "unhandled"
-      :supported -> "unprocessed"
-    end
   end
 
   defp create_event(params) do
@@ -47,8 +40,19 @@ defmodule CodeCorps.GitHub.Webhook.Handler do
 
   defp get_source(_), do: "not implemented"
 
-  def process_payload(%GithubEvent{type: "installation"} = event, payload), do: Installation.handle(event, payload)
-  def process_payload(%GithubEvent{type: "installation_repositories"} = event, payload), do: InstallationRepositories.handle(event, payload)
-  def process_payload(%GithubEvent{type: "issue_comment"} = event, payload), do: IssueComment.handle(event, payload)
-  def process_payload(%GithubEvent{type: "issues"} = event, payload), do: Issues.handle(event, payload)
+  defp get_status(type) do
+    case EventSupport.status(type) do
+      :unsupported -> "unhandled"
+      :supported -> "unprocessed"
+    end
+  end
+
+  defp process_payload(%GithubEvent{type: "installation"} = event, payload),
+    do: Installation.handle(event, payload)
+  defp process_payload(%GithubEvent{type: "installation_repositories"} = event, payload),
+    do: InstallationRepositories.handle(event, payload)
+  defp process_payload(%GithubEvent{type: "issue_comment"} = event, payload),
+    do: IssueComment.handle(event, payload)
+  defp process_payload(%GithubEvent{type: "issues"} = event, payload),
+    do: Issues.handle(event, payload)
 end

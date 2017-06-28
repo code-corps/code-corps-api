@@ -12,7 +12,7 @@ defmodule CodeCorps.GitHub.Events.InstallationRepositoriesTest do
 
   describe "handle/2" do
     test "is not implemented" do
-      payload = load_fixture("installation_repositories_removed")
+      payload = load_event_fixture("installation_repositories_removed")
       assert InstallationRepositories.handle(%GithubEvent{}, payload) == :not_fully_implemented
     end
   end

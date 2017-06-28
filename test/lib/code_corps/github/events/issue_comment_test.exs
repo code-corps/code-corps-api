@@ -12,7 +12,7 @@ defmodule CodeCorps.GitHub.Events.IssueCommentTest do
 
   describe "handle/2" do
     test "is not implemented" do
-      payload = load_fixture("issue_comment_created")
+      payload = load_event_fixture("issue_comment_created")
       assert IssueComment.handle(%GithubEvent{}, payload) == :not_fully_implemented
     end
   end

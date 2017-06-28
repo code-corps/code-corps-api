@@ -103,7 +103,6 @@ defmodule CodeCorps.GitHub do
     Application.get_env(:code_corps, :github_base_url) || "https://api.github.com/"
   end
 
-  #
   @spec get_token_url() :: String.t
   defp get_token_url() do
     Application.get_env(:code_corps, :github_oauth_url) || "https://github.com/login/oauth/access_token"
@@ -132,7 +131,7 @@ defmodule CodeCorps.GitHub do
   Used to exchange the JWT for an access token for a given integration, or
   for the GitHub App itself.
 
-  Expires in 10 minutes.
+  Expires in 5 minutes.
   """
   def generate_jwt do
     signer = rsa_key() |> Joken.rs256()
@@ -163,6 +162,13 @@ defmodule CodeCorps.GitHub do
     [:with_body | opts]
   end
 
+  @spec build_access_token_params(String.t, String.t) :: map
+  defp build_access_token_params(code, state) do
+    @base_access_token_params
+    |> Map.put(:code, code)
+    |> Map.put(:state, state)
+  end
+
   @doc """
   A low level utility function to make a direct request to the GitHub API.
   """
@@ -186,13 +192,6 @@ defmodule CodeCorps.GitHub do
     method
     |> :hackney.request(req_url, req_headers, req_body, req_opts)
     |> handle_response()
-  end
-
-  @spec build_access_token_params(String.t, String.t) :: map
-  defp build_access_token_params(code, state) do
-    @base_access_token_params
-    |> Map.put(:code, code)
-    |> Map.put(:state, state)
   end
 
   @doc """

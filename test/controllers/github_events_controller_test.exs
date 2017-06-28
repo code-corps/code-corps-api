@@ -38,7 +38,7 @@ defmodule CodeCorps.GitHubEventsControllerTest do
   test "responds with 200 for a supported event", %{conn: conn} do
     path = conn |> github_events_path(:create)
 
-    payload = load_fixture("installation_created")
+    payload = load_event_fixture("installation_created")
     assert conn |> for_event("installation", "foo") |> post(path, payload) |> response(200)
 
     wait_for_supervisor()
