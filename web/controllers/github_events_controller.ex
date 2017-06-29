@@ -18,12 +18,10 @@ defmodule CodeCorps.GitHubEventsController do
   end
 
   defp get_event_type(conn) do
-    header = Application.get_env(:code_corps, :github_event_type_header)
-    conn |> get_req_header(header) |> List.first
+    conn |> get_req_header("x-github-event") |> List.first
   end
 
   defp get_delivery_id(conn) do
-    header = Application.get_env(:code_corps, :github_event_id_header)
-    conn |> get_req_header(header) |> List.first
+    conn |> get_req_header("x-github-delivery") |> List.first
   end
 end

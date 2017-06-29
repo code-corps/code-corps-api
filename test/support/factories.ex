@@ -36,6 +36,10 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def github_event_factory do
+    %CodeCorps.GithubEvent{}
+  end
+
   def organization_factory do
     %CodeCorps.Organization{
       name: sequence(:username, &"Organization #{&1}"),

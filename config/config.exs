@@ -68,11 +68,6 @@ config :code_corps, :corsica_log_level, [rejected: :warn]
 {:ok, pem} = (System.get_env("GITHUB_APP_PEM") || "") |> Base.decode64()
 
 config :code_corps,
-  # GitHub webhook API uses cased header names in their requests
-  # However, in the test environment, Plug.Conn enforces headers to be
-  # lowercased and errors out otherwise.
-  github_event_type_header: ("X-GitHub-Event"),
-  github_event_id_header: ("X-GitHub-Delivery"),
   github_app_id: System.get_env("GITHUB_APP_ID"),
   github_app_client_id: System.get_env("GITHUB_APP_CLIENT_ID"),
   github_app_client_secret: System.get_env("GITHUB_APP_CLIENT_SECRET"),

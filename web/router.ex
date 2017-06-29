@@ -40,6 +40,10 @@ defmodule CodeCorps.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :github_webhooks do
+    plug :accepts, ["json"]
+  end
+
   pipeline :tracking do
     plug CodeCorps.Plug.Segment
   end
@@ -55,6 +59,11 @@ defmodule CodeCorps.Router do
 
     post "/webhooks/stripe/connect", StripeConnectEventsController, :create
     post "/webhooks/stripe/platform", StripePlatformEventsController, :create
+  end
+
+  scope "/", CodeCorps, host: "api." do
+    pipe_through [:logging, :github_webhooks]
+
     post "/webhooks/github", GitHubEventsController, :create, as: :github_events
   end
 
