@@ -1,6 +1,8 @@
 defmodule CodeCorps.GithubEvent do
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "github_events" do
     field :action, :string
     field :github_delivery_id, :string

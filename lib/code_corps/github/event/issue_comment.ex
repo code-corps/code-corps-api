@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Events.IssueComment do
+defmodule CodeCorps.GitHub.Event.IssueComment do
   @moduledoc """
   In charge of dealing with "IssueComment" GitHub Webhook events
   """

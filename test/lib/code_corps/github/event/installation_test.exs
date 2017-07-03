@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Events.InstallationTest do
+defmodule CodeCorps.GitHub.Event.InstallationTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
@@ -11,7 +11,7 @@ defmodule CodeCorps.GitHub.Events.InstallationTest do
     GithubAppInstallation,
     GithubEvent,
     GithubRepo,
-    GitHub.Events.Installation,
+    GitHub.Event.Installation,
     Repo
   }
 

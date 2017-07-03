@@ -40,6 +40,10 @@ defmodule CodeCorps.Factories do
     %CodeCorps.GithubEvent{}
   end
 
+  def github_repo_factory do
+    %CodeCorps.GithubRepo{}
+  end
+
   def organization_factory do
     %CodeCorps.Organization{
       name: sequence(:username, &"Organization #{&1}"),
@@ -100,6 +104,13 @@ defmodule CodeCorps.Factories do
     %CodeCorps.ProjectCategory{
       project: build(:project),
       category: build(:category)
+    }
+  end
+
+  def project_github_repo_factory do
+    %CodeCorps.ProjectGithubRepo{
+      project: build(:project),
+      github_repo: build(:github_repo)
     }
   end
 

@@ -1,5 +1,5 @@
 {
-  "action": "removed",
+  "action": "added",
   "installation": {
     "id": 2,
     "account": {
@@ -28,9 +28,6 @@
   },
   "repository_selection": "selected",
   "repositories_added": [
-
-  ],
-  "repositories_removed": [
     {
       "id": 1296269,
       "name": "Hello-World",
@@ -41,6 +38,9 @@
       "name": "Hello-Code-Corps",
       "full_name": "octocat/Hello-Code-Corps"
     }
+  ],
+  "repositories_removed": [
+
   ],
   "sender": {
     "login": "octocat",

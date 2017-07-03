@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Events.IssuesTest do
+defmodule CodeCorps.GitHub.Event.IssuesTest do
   @moduledoc false
 
   use ExUnit.Case, aysnc: true
@@ -7,7 +7,7 @@ defmodule CodeCorps.GitHub.Events.IssuesTest do
 
   alias CodeCorps.{
     GithubEvent,
-    GitHub.Events.Issues
+    GitHub.Event.Issues
   }
 
   describe "handle/2" do

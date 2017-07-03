@@ -1,12 +1,12 @@
-defmodule CodeCorps.GitHub.Events.InstallationRepositories do
+defmodule CodeCorps.GitHub.Event.Issues do
   @moduledoc """
-  In charge of dealing with "InstallationRepositories" GitHub Webhook events
+  In charge of dealing with "Issues" GitHub Webhook events
   """
 
   alias CodeCorps.GithubEvent
 
   @doc """
-  Handles an "InstallationRepositories" GitHub Webhook event
+  Handles an "Issues" GitHub Webhook event
 
   The general idea is
   - marked the passed in event as "processing"

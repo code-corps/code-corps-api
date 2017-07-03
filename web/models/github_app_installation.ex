@@ -52,7 +52,6 @@ defmodule CodeCorps.GithubAppInstallation do
       current_state
       |> CodeCorps.Transition.GithubAppInstallationState.next(changed_state)
     case next_state do
-      nil -> changeset
       {:ok, next_state} -> cast(changeset, %{state: next_state}, [:state])
       {:error, reason} -> add_error(changeset, :state, reason)
     end
