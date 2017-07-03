@@ -59,6 +59,8 @@ defmodule CodeCorps.User do
     has_many :user_skills, CodeCorps.UserSkill
     has_many :skills, through: [:user_skills, :skill]
 
+    has_one :github_app_installation, CodeCorps.GithubAppInstallation
+
     timestamps()
   end
 

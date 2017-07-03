@@ -1,20 +1,22 @@
 defmodule CodeCorps.GitHub.Adapters.GithubRepo do
-  def from_api(%{"owner" => owner} = payload) do
-    %{}
-    |> Map.merge(payload |> adapt_base())
-    |> Map.merge(owner |> adapt_owner())
-  end
-
-  defp adapt_base(%{"id" => id, "name" => name}) do
-    %{github_id: id, name: name}
-  end
-
-  defp adapt_owner(%{"id" => id, "avatar_url" => avatar_url, "login" => login, "type" => type }) do
+  def from_api(%{
+    "id" => github_id,
+    "name" => name,
+    "owner" => %{
+      "id" => github_account_id,
+      "avatar_url" => github_account_avatar_url,
+      "login" => github_account_login,
+      "type" => github_account_type
+    }
+  }) do
     %{
-      github_account_id: id,
-      github_account_avatar_url: avatar_url,
-      github_account_login: login,
-      github_account_type: type
+      github_id: github_id,
+      name: name,
+      github_account_id: github_account_id,
+      github_account_avatar_url: github_account_avatar_url,
+      github_account_login: github_account_login,
+      github_account_type: github_account_type
     }
   end
+  def from_api(_), do: {:error, :invalid_repo_payload}
 end

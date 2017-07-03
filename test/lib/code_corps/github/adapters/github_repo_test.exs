@@ -20,5 +20,9 @@ defmodule CodeCorps.GitHub.Adapters.GithubRepoTest do
         github_account_type: repo |> get_in(["owner", "type"]),
       }
     end
+
+    test "returns error if payload structure is unexpected" do
+      assert GithubRepo.from_api("foo") == {:error, :invalid_repo_payload}
+    end
   end
 end

@@ -1,11 +1,14 @@
 defmodule CodeCorps.GithubAppInstallation do
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "github_app_installations" do
     field :access_token, :string
     field :access_token_expires_at, :utc_datetime
     field :github_id, :integer
     field :installed, :boolean
+    field :sender_github_id, :integer
     field :state, :string
 
     belongs_to :project, CodeCorps.Project # The originating project
@@ -52,7 +55,6 @@ defmodule CodeCorps.GithubAppInstallation do
       current_state
       |> CodeCorps.Transition.GithubAppInstallationState.next(changed_state)
     case next_state do
-      nil -> changeset
       {:ok, next_state} -> cast(changeset, %{state: next_state}, [:state])
       {:error, reason} -> add_error(changeset, :state, reason)
     end

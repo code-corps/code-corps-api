@@ -21,6 +21,8 @@ defmodule CodeCorps.GitHub do
     [GitHub API documentation](https://developer.github.com/v3/#client-errors).
     """
 
+    @type t :: %__MODULE__{}
+
     defstruct [:code, :field, :resource]
 
     def new(opts) do
@@ -40,7 +42,7 @@ defmodule CodeCorps.GitHub do
 
     @type t :: %__MODULE__{
       documentation_url: String.t | nil,
-      errors: List.t | nil,
+      errors: list | nil,
       message: String.t | nil,
       status_code: pos_integer | nil
     }
@@ -55,8 +57,6 @@ defmodule CodeCorps.GitHub do
         status_code: status_code
       }
     end
-
-    @spec new({integer, map}) :: t
     def new({status_code, %{"message" => message, "documentation_url" => documentation_url}}) do
       %__MODULE__{
         documentation_url: documentation_url,
@@ -64,8 +64,6 @@ defmodule CodeCorps.GitHub do
         status_code: status_code
       }
     end
-
-    @spec new({integer, map}) :: t
     def new({status_code, %{"message" => message}}) do
       %__MODULE__{
         message: message,
@@ -73,6 +71,7 @@ defmodule CodeCorps.GitHub do
       }
     end
 
+    @spec convert_error(map) :: APIErrorObject.t
     defp convert_error(%{"code" => code, "field" => field, "resource" => resource}) do
       APIErrorObject.new([code: code, field: field, resource: resource])
     end
@@ -83,6 +82,8 @@ defmodule CodeCorps.GitHub do
     The GitHub HTTP client encountered an error while communicating with
     the GitHub API.
     """]
+
+    @type t :: %__MODULE__{}
 
     def new(opts) do
       struct(__MODULE__, opts)
@@ -95,9 +96,7 @@ defmodule CodeCorps.GitHub do
   @typep http_success :: {:ok, integer, [{String.t, String.t}], String.t}
   @typep http_failure :: {:error, term}
 
-  @type api_error_struct ::
-    %APIError{}            |
-    %HTTPClientError{}
+  @type api_error_struct :: APIError.t | HTTPClientError.t | Poison.DecodeError.t
 
   @spec get_base_url() :: String.t
   defp get_base_url() do
@@ -212,23 +211,18 @@ defmodule CodeCorps.GitHub do
 
   @spec handle_response(http_success | http_failure) :: {:ok, map} | {:error, api_error_struct}
   defp handle_response({:ok, status, _headers, body}) when status in 200..299 do
-    decoded_body = body |> Poison.decode!
-    {:ok, decoded_body}
+    body |> Poison.decode
   end
-
   defp handle_response({:ok, 404, _headers, body}) do
-    error = APIError.new({404, %{"message" => body}})
-    {:error, error}
+    {:error, APIError.new({404, %{"message" => body}})}
   end
-
   defp handle_response({:ok, status, _headers, body}) when status in 400..599 do
-    json = body |> Poison.decode!
-    error = APIError.new({status, json})
-    {:error, error}
+    case body |> Poison.decode do
+      {:ok, json} -> {:error, APIError.new({status, json})}
+      {:error, error} -> {:error, error}
+    end
   end
-
   defp handle_response({:error, reason}) do
-    error = HTTPClientError.new(reason: reason)
-    {:error, error}
+    {:error, HTTPClientError.new(reason: reason)}
   end
 end
