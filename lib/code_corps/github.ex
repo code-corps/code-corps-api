@@ -1,6 +1,7 @@
 defmodule CodeCorps.GitHub do
 
-  @app_id Application.get_env(:code_corps, :github_app_id)
+  alias CodeCorps.Github.JWT
+
   @client_id Application.get_env(:code_corps, :github_app_client_id)
   @client_secret Application.get_env(:code_corps, :github_app_client_secret)
 
@@ -124,37 +125,9 @@ defmodule CodeCorps.GitHub do
     Map.put(existing_headers, "Authorization", "token #{access_token}")
   end
 
-  @doc """
-  Generates a JWT from the GitHub App's generated RSA private key using the
-  RS256 algo, where the issuer is the GitHub App's ID.
-
-  Used to exchange the JWT for an access token for a given integration, or
-  for the GitHub App itself.
-
-  Expires in 5 minutes.
-  """
-  def generate_jwt do
-    signer = rsa_key() |> Joken.rs256()
-
-    %{}
-    |> Joken.token
-    |> Joken.with_exp(Timex.now |> Timex.shift(minutes: 5) |> Timex.to_unix)
-    |> Joken.with_iss(@app_id |> String.to_integer())
-    |> Joken.with_iat(Timex.now |> Timex.to_unix)
-    |> Joken.with_signer(signer)
-    |> Joken.sign
-    |> Joken.get_compact
-  end
-
-  defp rsa_key do
-    Application.get_env(:code_corps, :github_app_pem)
-    |> JOSE.JWK.from_pem()
-  end
-
   @spec add_jwt_header(headers) :: headers
   defp add_jwt_header(existing_headers) do
-    jwt = generate_jwt()
-    Map.put(existing_headers, "Authorization", "Bearer #{jwt}")
+    Map.put(existing_headers, "Authorization", "Bearer #{JWT.generate}")
   end
 
   @spec add_default_options(list) :: list
