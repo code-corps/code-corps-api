@@ -1,6 +1,8 @@
 defmodule CodeCorps.GithubAppInstallation do
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "github_app_installations" do
     field :access_token, :string
     field :access_token_expires_at, :utc_datetime
