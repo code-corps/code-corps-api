@@ -1,6 +1,8 @@
 defmodule CodeCorps.GithubRepo do
   use CodeCorps.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "github_repos" do
     field :github_id, :integer
 

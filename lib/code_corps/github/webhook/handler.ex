@@ -5,10 +5,10 @@ defmodule CodeCorps.GitHub.Webhook.Handler do
 
   alias CodeCorps.{
     GithubEvent,
-    GitHub.Events.Installation,
-    GitHub.Events.InstallationRepositories,
-    GitHub.Events.IssueComment,
-    GitHub.Events.Issues,
+    GitHub.Event.Installation,
+    GitHub.Event.InstallationRepositories,
+    GitHub.Event.IssueComment,
+    GitHub.Event.Issues,
     GitHub.Webhook.EventSupport,
     Repo
   }

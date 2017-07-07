@@ -5,23 +5,24 @@ defmodule CodeCorps.GitHub.Installation do
 
   alias CodeCorps.{
     GitHub,
-    GitHub.APIError,
     GitHub.Request,
     GithubAppInstallation,
     Repo
   }
+
+  alias Ecto.Changeset
 
   @doc """
   List repositories that are accessible to the authenticated installation.
 
   https://developer.github.com/v3/apps/installations/#list-repositories
   """
-  @spec repositories(GithubAppInstallation.t) :: {:ok, list} | {:error, APIError.t}
+  @spec repositories(GithubAppInstallation.t) :: {:ok, list(map)} | {:error, GitHub.api_error_struct}
   def repositories(%GithubAppInstallation{} = installation) do
     endpoint = "installation/repositories"
     {:ok, access_token} = installation |> get_access_token()
     case Request.retrieve(endpoint, [access_token: access_token]) do
-      {:error, %APIError{} = error} -> {:error, error}
+      {:error, error} -> {:error, error}
       {:ok, %{"total_count" => _, "repositories" => repositories}} -> {:ok, repositories}
     end
   end
@@ -35,7 +36,7 @@ defmodule CodeCorps.GitHub.Installation do
 
   https://developer.github.com/apps/building-integrations/setting-up-and-registering-github-apps/about-authentication-options-for-github-apps/#authenticating-as-an-installation
   """
-  @spec get_access_token(GithubAppInstallation.t) :: {:ok, String.t} | {:error, APIError.t} | {:error, Ecto.Changeset.t}
+  @spec get_access_token(GithubAppInstallation.t) :: {:ok, String.t} | {:error, GitHub.api_error_struct} | {:error, Changeset.t}
   def get_access_token(%GithubAppInstallation{access_token: token, access_token_expires_at: expires_at} = installation) do
     case token_expired?(expires_at) do
       true ->  installation |> refresh_token()
@@ -51,7 +52,7 @@ defmodule CodeCorps.GitHub.Installation do
 
   https://developer.github.com/apps/building-integrations/setting-up-and-registering-github-apps/about-authentication-options-for-github-apps/#authenticating-as-an-installation
   """
-  @spec refresh_token(GithubAppInstallation.t) :: {:ok, String.t} | {:error, APIError.t} | {:error, Ecto.Changeset.t}
+  @spec refresh_token(GithubAppInstallation.t) :: {:ok, String.t} | {:error, GitHub.api_error_struct} | {:error, Changeset.t}
   def refresh_token(%GithubAppInstallation{github_id: installation_id} = installation) do
     endpoint = "installations/#{installation_id}/access_tokens"
     with {:ok, %{"token" => token, "expires_at" => expires_at}} <-
@@ -65,7 +66,7 @@ defmodule CodeCorps.GitHub.Installation do
     end
   end
 
-  @spec update_token(GithubAppInstallation.t, String.t, String.t) :: {:ok, GithubAppInstallation.t} | {:error, Ecto.Changeset.t}
+  @spec update_token(GithubAppInstallation.t, String.t, String.t) :: {:ok, GithubAppInstallation.t} | {:error, Changeset.t}
   defp update_token(%GithubAppInstallation{} = installation, token, expires_at) do
     installation
     |> GithubAppInstallation.access_token_changeset(%{access_token: token, access_token_expires_at: expires_at})

@@ -58,7 +58,7 @@ config :cloudex, api_key: "test_key", secret: "test_secret", cloud_name: "test_c
 # fall back to sample pem if none is available as an ENV variable
 pem = case System.get_env("GITHUB_APP_PEM") do
   nil -> "./test/fixtures/github/app.pem" |> File.read!
-  encoded_pem -> encoded_pem |> Base.decode64! |> IO.inspect
+  encoded_pem -> encoded_pem |> Base.decode64!
 end
 
 config :code_corps, github_app_pem: pem
