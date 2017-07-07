@@ -80,6 +80,13 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def organization_github_app_installation_factory do
+    %CodeCorps.OrganizationGithubAppInstallation{
+      github_app_installation: build(:github_app_installation),
+      organization: build(:organization)
+    }
+  end
+
   def project_factory do
     %CodeCorps.Project{
       approved: true,

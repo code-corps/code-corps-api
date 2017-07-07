@@ -75,6 +75,7 @@ defmodule CodeCorps.Router do
     resources "/donation-goals", DonationGoalController, only: [:create, :update, :delete]
     post "/oauth/github", UserController, :github_oauth
     resources "/github-app-installations", GithubAppInstallationController, only: [:create, :update]
+    resources "/organization-github-app-installations", OrganizationGithubAppInstallationController, only: [:create, :delete]
     resources "/organizations", OrganizationController, only: [:create, :update]
     resources "/previews", PreviewController, only: [:create]
     resources "/project-categories", ProjectCategoryController, only: [:create, :delete]
@@ -109,6 +110,7 @@ defmodule CodeCorps.Router do
     resources "/comments", CommentController, only: [:index, :show]
     resources "/donation-goals", DonationGoalController, only: [:index, :show]
     resources "/github-app-installations", GithubAppInstallationController, only: [:index, :show]
+    resources "/organization-github-app-installations", OrganizationGithubAppInstallationController, only: [:index, :show]
     resources "/organizations", OrganizationController, only: [:index, :show]
     post "/password/forgot", PasswordController, :forgot_password
     resources "/project-categories", ProjectCategoryController, only: [:index, :show]

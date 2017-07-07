@@ -4,6 +4,8 @@ defmodule CodeCorps.OrganizationViewTest do
   test "renders all attributes and relationships properly" do
     user = insert(:user)
     organization = insert(:organization, owner: user, default_color: "blue")
+    github_app_installation = insert(:github_app_installation)
+    organization_github_app_installation = insert(:organization_github_app_installation, github_app_installation: github_app_installation, organization: organization)
     project = insert(:project, organization: organization)
     slugged_route = insert(:slugged_route, organization: organization)
     stripe_connect_account = insert(:stripe_connect_account, organization: organization)
@@ -26,6 +28,11 @@ defmodule CodeCorps.OrganizationViewTest do
         },
         "id" => organization.id |> Integer.to_string,
         "relationships" => %{
+          "organization-github-app-installations" => %{
+            "data" => [
+              %{"id" => organization_github_app_installation.id |> Integer.to_string, "type" => "organization-github-app-installation"}
+            ]
+          },
           "owner" => %{
             "data" => %{"id" => user.id |> Integer.to_string, "type" => "user"}
           },

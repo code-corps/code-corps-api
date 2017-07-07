@@ -26,6 +26,7 @@ defmodule CodeCorps.Organization do
     has_one :slugged_route, CodeCorps.SluggedRoute
     has_one :stripe_connect_account, CodeCorps.StripeConnectAccount
 
+    has_many :organization_github_app_installations, CodeCorps.OrganizationGithubAppInstallation
     has_many :projects, CodeCorps.Project
 
     timestamps()
