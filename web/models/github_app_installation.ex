@@ -8,6 +8,7 @@ defmodule CodeCorps.GithubAppInstallation do
     field :access_token_expires_at, :utc_datetime
     field :github_id, :integer
     field :installed, :boolean
+    field :sender_github_id, :integer
     field :state, :string
 
     belongs_to :project, CodeCorps.Project # The originating project

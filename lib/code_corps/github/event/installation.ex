@@ -3,12 +3,16 @@ defmodule CodeCorps.GitHub.Event.Installation do
   In charge of dealing with "Installation" GitHub Webhook events
   """
 
+  import Ecto.Query
+
   alias CodeCorps.{
     GitHub,
     GithubAppInstallation,
     GithubEvent,
     GithubRepo,
     GitHub.Event,
+    GitHub.Event.Installation.UnmatchedUser,
+    GitHub.Event.Installation.MatchedUser,
     Repo,
     User
   }
@@ -17,12 +21,34 @@ defmodule CodeCorps.GitHub.Event.Installation do
   alias Ecto.{Changeset, Multi}
 
   @doc """
-  Handles an "Installation" GitHub Webhook event
+  Handles an "Installation" GitHub Webhook event. The event could be
+  of subtype "created" or "deleted". Only the "created" variant is handled at
+  the moment.
 
-  The general idea is
-  - marked the passed in event as "processing"
-  - do the work
-  - marked the passed in event as "processed" or "errored"
+  `InstallationCrreated::added` will first try to find the `User` and the
+  `GithubAppInstallation`, using information from the payload.
+    - if neither are found, it will
+      - create a fresh `GithubAppInstallation`, with status "unmatched_user"
+    - if only the `User` is found, it will
+      - create `GithubAppInstallation` with status "initiated_on_github",
+        associated with the `User`
+    - if both are found, it will
+      - fetch repositories for the installation, create `GithubRepo` records
+      - mark installation as processed
+    - find `GithubAppInstallation`
+      - marks event as errored if not found
+      - marks event as errored if payload does not have keys it needs, meaning
+        there's something wrong with our code and we need to updated
+    - find or create `GithubRepo` records affected
+
+    At the end of the process, the associated event will me marked as
+    "processed". If any failure occurs, the event will be marked as "errored".
+
+    Potential points of failure:
+    - the installation is found, but the user is not
+    - problem communicating with the API
+    - the payload received is not of the expected structure
+    - the action type is not one of the supported types ("created")
   """
   @spec handle(GithubEvent.t, map) :: {:ok, GithubEvent.t}
   def handle(%GithubEvent{action: action} = event, payload) do
@@ -35,98 +61,17 @@ defmodule CodeCorps.GitHub.Event.Installation do
   @typep outcome :: {:ok, GithubAppInstallation.t} | {:error, any}
 
   @spec do_handle({:ok, GithubEvent.t}, String.t, map) :: outcome
-  defp do_handle({:ok, %GithubEvent{}}, "created", %{"installation" => installation_attrs, "sender" => sender_attrs}) do
-    case {sender_attrs |> find_user, installation_attrs |> find_installation} do
-      {nil, nil} -> create_unmatched_user_installation(installation_attrs)
-      {%User{} = user, nil} -> create_installation_initiated_on_github(user, installation_attrs)
-      {%User{}, %GithubAppInstallation{} = installation} -> update_matched_installation(installation)
-      {nil, %GithubAppInstallation{}} -> {:error, :unhandled_installation_case}
+  defp do_handle({:ok, %GithubEvent{}}, "created", %{"installation" => %{"id" => _} = installation_attrs, "sender" => %{"id" => _} = sender_attrs}) do
+    case sender_attrs |> find_user() do
+      # No user was found with the specified github_id
+      nil -> UnmatchedUser.handle(installation_attrs, sender_attrs)
+      # A user was found, matching the sspecified github_id
+      %User{} = user -> MatchedUser.handle(user, installation_attrs)
     end
   end
+  defp do_handle({:ok, %GithubEvent{}}, _action, _payload), do: {:error, :unexpected_action_or_payload}
 
-  @spec create_unmatched_user_installation(map) :: {:ok, GithubAppInstallation.t}
-  defp create_unmatched_user_installation(%{"id" => github_id}) do
-    %GithubAppInstallation{}
-    |> Changeset.change(%{github_id: github_id, installed: true, state: "unmatched_user"})
-    |> Repo.insert()
-  end
-
-  @spec create_installation_initiated_on_github(User.t, map) :: {:ok, GithubAppInstallation.t}
-  defp create_installation_initiated_on_github(%User{} = user, %{"id" => github_id}) do
-    %GithubAppInstallation{}
-    |> Changeset.change(%{github_id: github_id, installed: true, state: "initiated_on_github"})
-    |> Changeset.put_assoc(:user, user)
-    |> Repo.insert()
-  end
-
-  @spec update_matched_installation(GithubAppInstallation.t) :: outcome
-  defp update_matched_installation(%GithubAppInstallation{} = installation) do
-    processing_changeset =
-      installation
-      |> Changeset.change(%{installed: true, state: "processing"})
-
-    multi =
-      Multi.new
-      |> Multi.update(:processing_installation, processing_changeset)
-      |> Multi.run(:process_repos, &process_repos/1)
-      |> Multi.run(:stop_processing, &stop_processing/1)
-
-    case Repo.transaction(multi) do
-      {:ok, %{processing_installation: _, process_repos: github_repos, stop_processing: processed_installation}} ->
-        {:ok, processed_installation |> Map.put(:github_repos, github_repos)}
-      {:error, :api_error} -> {:error, :api_error}
-      {:error, :invalid_repo_payload} -> {:error, :invalid_repo_payload}
-    end
-  end
-
-  @spec find_installation(map) :: GithubAppInstallation.t | nil
-  defp find_installation(%{"id" => github_id}), do: GithubAppInstallation |> Repo.get_by(github_id: github_id)
-
-  @spec find_user(map) :: User.t | nil
+  @spec find_user(any) :: User.t | nil
   defp find_user(%{"id" => github_id}), do: User |> Repo.get_by(github_id: github_id)
-
-  @typep repo_processing_outcome :: {:ok, list(GithubRepo.t)} | {:error, any}
-
-  @spec process_repos(%{processing_installation: GithubAppInstallation.t}) :: repo_processing_outcome
-  defp process_repos(%{processing_installation: %GithubAppInstallation{} = installation}) do
-    case installation |> GitHub.Installation.repositories() do
-      {:error, reason} -> {:error, reason}
-      {:ok, response} ->
-        adapter_results = response |> Enum.map(&GithubRepoAdapter.from_api/1)
-        case adapter_results |>  Enum.all?(&valid?/1) do
-          true -> installation |> create_all_repositories(adapter_results)
-          false -> {:error, :invalid_repo_payload}
-        end
-    end
-  end
-
-  @spec valid?(any) :: boolean
-  defp valid?({:error, _}), do: false
-  defp valid?(_), do: true
-
-  @spec create_all_repositories(GithubAppInstallation.t, list(map)) :: {:ok, list(GithubRepo.t)}
-  defp create_all_repositories(%GithubAppInstallation{} = installation, attrs_list) when is_list(attrs_list) do
-    github_repos =
-      attrs_list
-      |> Enum.map(fn attrs -> create_repository(installation, attrs) end)
-      |> Enum.map(&Tuple.to_list/1) # {:ok, repo} -> [:ok, repo]
-      |> Enum.map(&List.last/1) # [:ok, repo] -> repo
-
-    {:ok, github_repos}
-  end
-
-  @spec create_repository(GithubAppInstallation.t, map) :: {:ok, GithubRepo.t}
-  defp create_repository(%GithubAppInstallation{} = installation, repo_attributes) do
-    %GithubRepo{}
-    |> Changeset.change(repo_attributes)
-    |> Changeset.put_assoc(:github_app_installation, installation)
-    |> Repo.insert()
-  end
-
-  @spec stop_processing(%{processing_installation: GithubAppInstallation.t}) :: {:ok, GithubAppInstallation.t}
-  defp stop_processing(%{processing_installation: %GithubAppInstallation{} = installation}) do
-    installation
-    |> Changeset.change(%{state: "processed"})
-    |> Repo.update()
-  end
+  defp find_user(_), do: :unexpected_user_payload
 end
