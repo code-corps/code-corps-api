@@ -1,4 +1,6 @@
 defmodule CodeCorps.GitHubEventsControllerTest do
+  @moduledoc false
+
   use CodeCorps.ConnCase
 
   import CodeCorps.TestHelpers.GitHub
@@ -19,7 +21,8 @@ defmodule CodeCorps.GitHubEventsControllerTest do
   # used to have the test wait for or the children of a supervisor to exit
 
   defp wait_for_children(supervisor_ref) do
-    Task.Supervisor.children(supervisor_ref)
+    supervisor_ref
+    |> Task.Supervisor.children()
     |> Enum.each(&wait_for_child/1)
   end
 

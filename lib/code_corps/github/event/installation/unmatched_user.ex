@@ -5,10 +5,18 @@ defmodule CodeCorps.GitHub.Event.Installation.UnmatchedUser do
 
   alias CodeCorps.{
     GithubAppInstallation,
-    Repo
+    Repo,
+    GitHub.Event.Installation.Repos
   }
 
   alias Ecto.Changeset
+
+  @typep process_outcome :: {:ok, GithubAppInstallation.t} |
+                            {:error, Changeset.t} |
+                            {:error, CodeCorps.GitHub.api_error_struct} |
+                            {:error, :invalid_repo_payload}
+
+  @typep outcome :: process_outcome |  {:error, :unexpected_installation_payload}
 
   @doc """
   Handles the installation event in the case of an unmatched user.
@@ -24,35 +32,46 @@ defmodule CodeCorps.GitHub.Event.Installation.UnmatchedUser do
   it should not happen, but the process continues gracefuly and simply updates
   the record (making no actual changes in most cases).
   """
-  @spec handle(any, map) :: {:ok, GithubAppInstallation.t} | {:error, :unexpected_installation_payload}
+  @spec handle(any, map) :: outcome
   def handle(%{} = installation_attrs, %{} = sender_attrs) do
     case installation_attrs |> find_installation() do
       # There is no installation or user, we create an unmatched installation,
       # and store the sender_github_id on it, to match with a user which might
       # connect with github later
       nil -> create_installation(installation_attrs, sender_attrs)
+      :unexpected_installation_payload -> {:error, :unexpected_installation_payload}
       # We found an existing app installation matching the specified `github_id`.
       # This should really not happen, but we did, so we update, just in case.
       %GithubAppInstallation{} = installation -> update_installation(installation, installation_attrs, sender_attrs)
     end
   end
 
-  @spec find_installation(any) :: GithubAppInstallation.t | nil
+  @spec find_installation(any) :: GithubAppInstallation.t | nil | :unexpected_installation_payload
   defp find_installation(%{"id" => github_id}), do: GithubAppInstallation |> Repo.get_by(github_id: github_id)
   defp find_installation(_), do: :unexpected_installation_payload
 
   @spec create_installation(map, map) :: {:ok, GithubAppInstallation.t} | {:error, Changeset.t}
   defp create_installation(%{} = installation_attrs, %{} = sender_attrs) do
-    %GithubAppInstallation{}
-    |> changeset(installation_attrs, sender_attrs)
-    |> Repo.insert()
+    changeset =
+      %GithubAppInstallation{}
+      |> changeset(installation_attrs, sender_attrs)
+
+    case changeset |> Repo.insert() do
+      {:ok, %GithubAppInstallation{} = installation} -> installation |> Repo.preload(:github_repos) |> Repos.process
+      {:error, %Changeset{} = changeset} -> {:error, changeset}
+    end
   end
 
   @spec update_installation(GithubAppInstallation.t, map, map) :: {:ok, GithubAppInstallation.t} | {:error, Changeset.t}
   defp update_installation(%GithubAppInstallation{} = installation, %{} = installation_attrs, %{} = sender_attrs) do
-    installation
-    |> changeset(installation_attrs, sender_attrs)
-    |> Repo.update
+    changeset =
+      installation
+      |> changeset(installation_attrs, sender_attrs)
+
+    case changeset |> Repo.update() do
+      {:ok, %GithubAppInstallation{} = installation} -> installation |> Repo.preload(:github_repos) |> Repos.process
+      {:error, %Changeset{} = changeset} -> {:error, changeset}
+    end
   end
 
   @spec changeset(GithubAppInstallation.t, map, map) :: Changeset.t

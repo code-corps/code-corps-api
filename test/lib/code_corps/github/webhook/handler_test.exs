@@ -2,6 +2,7 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
+  use CodeCorps.GitHubCase
 
   import CodeCorps.TestHelpers.GitHub
   import CodeCorps.Factories
@@ -81,10 +82,22 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
       assert event.type == "installation_repositories"
     end
 
-    test "handles installation 'created' event" do
-      payload = load_event_fixture("installation_created")
+    @access_token "v1.1f699f1069f60xxx"
 
-      assert Handler.handle("installation", "abc-123", payload)
+    @installation_created_payload load_event_fixture("installation_created")
+    @installation_github_id @installation_created_payload["installation"]["id"]
+
+    @expires_at Timex.now() |> Timex.shift(hours: 1) |> DateTime.to_iso8601()
+    @access_token_create_response %{"token" => @access_token, "expires_at" => @expires_at}
+
+    @installation_repositories load_endpoint_fixture("installation_repositories")
+
+    @tag bypass: %{
+      "/installation/repositories" => {200, @installation_repositories},
+      "/installations/#{@installation_github_id}/access_tokens" => {200, @access_token_create_response}
+    }
+    test "handles installation 'created' event" do
+      assert Handler.handle("installation", "abc-123", @installation_created_payload)
 
       event = Repo.one(GithubEvent)
 

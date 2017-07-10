@@ -14,12 +14,12 @@ defmodule CodeCorps.GitHub.Event.Installation.MatchedUser do
 
   alias Ecto.Changeset
 
-  @typep update_outcome :: {:ok, GithubAppInstallation.t} |
-                           {:error, Changeset.t} |
-                           {:error, CodeCorps.GitHub.api_error_struct} |
-                           {:error, :invalid_repo_payload}
+  @typep process_outcome :: {:ok, GithubAppInstallation.t} |
+                            {:error, Changeset.t} |
+                            {:error, CodeCorps.GitHub.api_error_struct} |
+                            {:error, :invalid_repo_payload}
 
-  @typep outcome :: update_outcome | {:error, :too_many_unprocessed_installations}
+  @typep outcome :: process_outcome | {:error, :too_many_unprocessed_installations}
 
   @doc """
   Handles the installation event in the case of a matched user.
@@ -50,19 +50,25 @@ defmodule CodeCorps.GitHub.Event.Installation.MatchedUser do
   defp find_unprocessed_installations(%User{id: user_id}) do
     GithubAppInstallation
     |> where([i], is_nil(i.github_id) and i.user_id == ^user_id)
+    |> preload(:github_repos)
     |> Repo.all
   end
 
-  @spec create_installation_initiated_on_github(User.t, map) :: {:ok, GithubAppInstallation.t} | {:error, Changeset.t}
+  @spec create_installation_initiated_on_github(User.t, map) :: process_outcome
   defp create_installation_initiated_on_github(%User{github_id: sender_github_id} = user, %{"id" => github_id}) do
-    %GithubAppInstallation{}
-    |> Changeset.change(%{github_id: github_id, sender_github_id: sender_github_id, installed: true, state: "initiated_on_github"})
-    |> Changeset.put_assoc(:user, user)
-    |> Changeset.unique_constraint(:github_id, name: :github_app_installations_github_id_index)
-    |> Repo.insert()
+    changeset =
+      %GithubAppInstallation{}
+      |> Changeset.change(%{github_id: github_id, sender_github_id: sender_github_id, installed: true, state: "initiated_on_github"})
+      |> Changeset.put_assoc(:user, user)
+      |> Changeset.unique_constraint(:github_id, name: :github_app_installations_github_id_index)
+
+    case changeset |> Repo.insert() do
+      {:ok, %GithubAppInstallation{} = installation} -> installation |> Repo.preload(:github_repos) |> Repos.process
+      {:error, %Changeset{} = changeset} -> {:error, changeset}
+    end
   end
 
-  @spec update_installation(GithubAppInstallation.t, map) :: update_outcome
+  @spec update_installation(GithubAppInstallation.t, map) :: process_outcome
   defp update_installation(%GithubAppInstallation{} = installation, %{"id" => github_id}) do
     changeset =
       installation
@@ -70,7 +76,7 @@ defmodule CodeCorps.GitHub.Event.Installation.MatchedUser do
       |> Changeset.unique_constraint(:github_id, name: :github_app_installations_github_id_index)
 
     case changeset |> Repo.update() do
-      {:ok, %GithubAppInstallation{} = installation} -> installation |> Repos.process
+      {:ok, %GithubAppInstallation{} = installation} -> installation |> Repo.preload(:github_repos) |> Repos.process
       {:error, %Changeset{} = changeset} -> {:error, changeset}
     end
   end
