@@ -3,22 +3,15 @@ defmodule CodeCorps.GitHub.Event.Installation do
   In charge of dealing with "Installation" GitHub Webhook events
   """
 
-  import Ecto.Query
-
   alias CodeCorps.{
-    GitHub,
     GithubAppInstallation,
     GithubEvent,
-    GithubRepo,
     GitHub.Event,
     GitHub.Event.Installation.UnmatchedUser,
     GitHub.Event.Installation.MatchedUser,
     Repo,
     User
   }
-
-  alias CodeCorps.GitHub.Adapters.GithubRepo, as: GithubRepoAdapter
-  alias Ecto.{Changeset, Multi}
 
   @doc """
   Handles an "Installation" GitHub Webhook event. The event could be

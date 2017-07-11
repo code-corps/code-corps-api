@@ -1,7 +1,7 @@
 defmodule Canary.Abilities do
-  alias CodeCorps.{Category, Comment, DonationGoal, GithubAppInstallation, Organization, Preview, Project, ProjectCategory, ProjectSkill, ProjectUser, Role, RoleSkill, Skill, StripeConnectAccount, StripeConnectPlan, StripeConnectSubscription, StripePlatformCard, StripePlatformCustomer, Task, TaskSkill, User, UserCategory, UserRole, UserSkill, UserTask}
+  alias CodeCorps.{Category, Comment, DonationGoal, GithubAppInstallation, Organization, OrganizationGithubAppInstallation, Preview, Project, ProjectCategory, ProjectSkill, ProjectUser, Role, RoleSkill, Skill, StripeConnectAccount, StripeConnectPlan, StripeConnectSubscription, StripePlatformCard, StripePlatformCustomer, Task, TaskSkill, User, UserCategory, UserRole, UserSkill, UserTask}
 
-  alias CodeCorps.{CategoryPolicy, CommentPolicy, DonationGoalPolicy, GithubAppInstallationPolicy, OrganizationPolicy, PreviewPolicy, ProjectPolicy, ProjectCategoryPolicy, ProjectSkillPolicy, ProjectUserPolicy, RolePolicy, RoleSkillPolicy, SkillPolicy, StripeConnectAccountPolicy, StripeConnectPlanPolicy, StripeConnectSubscriptionPolicy, StripePlatformCardPolicy, StripePlatformCustomerPolicy, TaskPolicy, TaskSkillPolicy, UserPolicy, UserCategoryPolicy, UserRolePolicy, UserSkillPolicy, UserTaskPolicy}
+  alias CodeCorps.{CategoryPolicy, CommentPolicy, DonationGoalPolicy, GithubAppInstallationPolicy, OrganizationPolicy, OrganizationGithubAppInstallationPolicy, PreviewPolicy, ProjectPolicy, ProjectCategoryPolicy, ProjectSkillPolicy, ProjectUserPolicy, RolePolicy, RoleSkillPolicy, SkillPolicy, StripeConnectAccountPolicy, StripeConnectPlanPolicy, StripeConnectSubscriptionPolicy, StripePlatformCardPolicy, StripePlatformCustomerPolicy, TaskPolicy, TaskSkillPolicy, UserPolicy, UserCategoryPolicy, UserRolePolicy, UserSkillPolicy, UserTaskPolicy}
 
   alias Ecto.Changeset
 
@@ -32,6 +32,9 @@ defmodule Canary.Abilities do
 
     def can?(%User{} = user, :create, Organization), do: OrganizationPolicy.create?(user)
     def can?(%User{} = user, :update, %Organization{} = organization), do: OrganizationPolicy.update?(user, organization)
+
+    def can?(%User{} = user, :create, %Changeset{data: %OrganizationGithubAppInstallation{}} = changeset), do: OrganizationGithubAppInstallationPolicy.create?(user, changeset)
+    def can?(%User{} = user, :delete, %OrganizationGithubAppInstallation{} = github_app_installation), do: OrganizationGithubAppInstallationPolicy.delete?(user, github_app_installation)
 
     def can?(%User{} = user, :create, %Changeset{data: %Preview{}} = changeset), do: PreviewPolicy.create?(user, changeset)
 

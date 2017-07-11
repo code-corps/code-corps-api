@@ -15,6 +15,7 @@ defmodule CodeCorps.GithubAppInstallation do
     belongs_to :user, CodeCorps.User
 
     has_many :github_repos, CodeCorps.GithubRepo
+    has_many :organization_github_app_installations, CodeCorps.OrganizationGithubAppInstallation
 
     timestamps()
   end

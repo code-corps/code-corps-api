@@ -1,5 +1,5 @@
 defmodule CodeCorps.GithubAppInstallationView do
-  use CodeCorps.PreloadHelpers, default_preloads: [:project, :user]
+  use CodeCorps.PreloadHelpers, default_preloads: [:organization_github_app_installations, :project, :user]
   use CodeCorps.Web, :view
   use JaSerializer.PhoenixView
 
@@ -7,4 +7,6 @@ defmodule CodeCorps.GithubAppInstallationView do
 
   has_one :project, serializer: CodeCorps.ProjectView
   has_one :user, serializer: CodeCorps.UserView
+
+  has_many :organization_github_app_installations, serializer: CodeCorps.OrganizationGithubAppInstallationView, identifiers: :always
 end
