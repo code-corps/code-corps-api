@@ -484,6 +484,48 @@ Keep in mind that an installation could be used across multiple projects. And be
 
     + Attributes (Forbidden Response)
 
+# Group Github Repos
+
+This endpoint is used for retrieving information about a Github Repo for display only.
+
+Note that a Github Repo relates 1:1 to a Github App Installation, since only a single installation of the Code Corps GitHub App will happen on a GitHub account. A Github Repo will never be duplicated and does not need to have a many-to-many relationship.
+
+## Github Repos [/github-repos]
+
+### Filter by id [GET /github-repos{?filter[id]}]
+
++ Request
+
+    + Attributes
+
+        + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Github Repos Response)
+
+## Github Repo [/github-repos/{id}]
+
++ Parameters
+
+    + id (number, required)
+
+### Retrieve a Github repo [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Github Repo Response)
+
 # Group Organizations
 
 This endpoint retrieves Organizations on Code Corps. Organizations usually have one or more Projects.
@@ -724,6 +766,94 @@ This resource identifies a relationship between a Project and a Category. For ex
     + Attributes (Record Not Found Response)
 
 ### Delete a project category [DELETE]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 204 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (No Content Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
+# Group Project Github Repos
+
+This resource identifies a relationship between a Project and a GitHub repository. This relationship indicates whether the project is connected to a particular repository on GitHub and listening for events on that repository (like an issue being created). This is essential for the operation of the GitHub integration for syncing new issues and comments from GitHub to Code Corps.
+
+For example, the project "Code Corps" may have the GitHub repositories of "code-corps-api" and "code-corps-ember" syncing with the project's tasks _on Code Corps itself_.
+
+The organization owner can update their projects by connecting or disconnecting GitHub repositories that are available under their GitHub App installation. This will create or delete the Project Github Repo records, respectively.
+
+## Project Github Repos [/project-github-repos]
+
+### Create a project GitHub repo [POST]
+
++ Request
+
+    + Attributes (Project Github Repo Create Request)
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 201 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Project Github Repo Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 422 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Unprocessable Entity Response)
+
+### List all project GitHub repos [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Project Github Repos Response)
+
+## Project Github Repo [/project-github-repos/{id}]
+
++ Parameters
+
+    + id (number, required)
+
+### Retrieve a project GitHub repo [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Project Github Repo Response)
+
++ Response 404 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Record Not Found Response)
+
+### Delete a project GitHub repo [DELETE]
 
 + Request
 
@@ -2740,8 +2870,40 @@ The platform stores Stripe customers and cards so they can be reused across diff
 + include JSON API Version
 
 ## Github App Installation Update Request (object)
-+ include Project User Resource Identifier
-+ attributes(Project User Attributes)
++ include Github App Installation Resource Identifier
++ attributes(Github App Installation Attributes)
+
+## Github Repo Attributes (object)
++ `github-account-avatar-url`: `https://avatars3.githubusercontent.com/u/12991115?v=3` (string) - The GitHub URL for the avatar of the account that owns the GitHub repository
++ `github-account-id`: 12991115 (number) - The account id on GitHub that owns the GitHub repository
++ `github-account-login`: `code-corps` (string) - The account for the GitHub repository
++ `github-account-type`: `Organization` (enum[string]) - The type of GitHub account that owns the GitHub repository
+  + Members
+      + `Organization`
+      + `User`
++ `github-id`: 63497734 (number) - The id of the repository on GitHub
++ `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
++ name: `code-corps-api` (string) - The name of the GitHub repo.
++ `updated-at`: `2016-07-08T03:03:51.967Z` (string)
+
+## Github Repo Resource (object)
++ include Github Repo Resource Identifier
++ attributes(Github Repo Attributes)
++ relationships
+  + github-app-installation
+      + data(Github App Installation Resource Identifier)
+
+## Github Repo Resource Identifier (object)
++ id: `1` (string, required)
++ type: `github-repo` (string, required)
+
+## Github Repo Response (object)
++ data(Github Repo Resource)
++ include JSON API Version
+
+## Github Repos Response (object)
++ data(array[Github Repo Resource])
++ include JSON API Version
 
 ## No Content Response (object)
 
@@ -2940,6 +3102,8 @@ The platform stores Stripe customers and cards so they can be reused across diff
         + data(Organization Resource Identifier)
     + `project-categories`
         + data(array[Project Category Resource Identifier])
+    + `project-github-repos`
+        + data(array[Project Github Repo Resource Identifier])
     + `project-skills`
         + data(array[Project Skill Resource Identifier])
     + `project-users`
@@ -2993,6 +3157,29 @@ The platform stores Stripe customers and cards so they can be reused across diff
 
 ## Project Categories Response (object)
 + data(array[Project Category Resource])
++ include JSON API Version
+
+## Project Github Repo Resource (object)
++ include Project Github Repo Resource Identifier
++ relationships
+    + github-repo
+        + data(Github Repo Resource Identifier)
+    + project
+        + data(Project Resource Identifier)
+
+## Project Github Repo Resource Identifier (object)
++ id: `1` (string, required)
++ type: `project-github-repo` (string, required)
+
+## Project Github Repo Create Request (object)
++ data(Project Github Repo Resource)
+
+## Project Github Repo Response (object)
++ data(Project Github Repo Resource)
++ include JSON API Version
+
+## Project Github Repos Response (object)
++ data(array[Project Github Repo Resource])
 + include JSON API Version
 
 ## Project Skill Resource (object)

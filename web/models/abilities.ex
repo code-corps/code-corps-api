@@ -1,7 +1,7 @@
 defmodule Canary.Abilities do
-  alias CodeCorps.{Category, Comment, DonationGoal, GithubAppInstallation, Organization, OrganizationGithubAppInstallation, Preview, Project, ProjectCategory, ProjectSkill, ProjectUser, Role, RoleSkill, Skill, StripeConnectAccount, StripeConnectPlan, StripeConnectSubscription, StripePlatformCard, StripePlatformCustomer, Task, TaskSkill, User, UserCategory, UserRole, UserSkill, UserTask}
+  alias CodeCorps.{Category, Comment, DonationGoal, GithubAppInstallation, Organization, OrganizationGithubAppInstallation, Preview, Project, ProjectCategory, ProjectGithubRepo, ProjectSkill, ProjectUser, Role, RoleSkill, Skill, StripeConnectAccount, StripeConnectPlan, StripeConnectSubscription, StripePlatformCard, StripePlatformCustomer, Task, TaskSkill, User, UserCategory, UserRole, UserSkill, UserTask}
 
-  alias CodeCorps.{CategoryPolicy, CommentPolicy, DonationGoalPolicy, GithubAppInstallationPolicy, OrganizationPolicy, OrganizationGithubAppInstallationPolicy, PreviewPolicy, ProjectPolicy, ProjectCategoryPolicy, ProjectSkillPolicy, ProjectUserPolicy, RolePolicy, RoleSkillPolicy, SkillPolicy, StripeConnectAccountPolicy, StripeConnectPlanPolicy, StripeConnectSubscriptionPolicy, StripePlatformCardPolicy, StripePlatformCustomerPolicy, TaskPolicy, TaskSkillPolicy, UserPolicy, UserCategoryPolicy, UserRolePolicy, UserSkillPolicy, UserTaskPolicy}
+  alias CodeCorps.{CategoryPolicy, CommentPolicy, DonationGoalPolicy, GithubAppInstallationPolicy, OrganizationPolicy, OrganizationGithubAppInstallationPolicy, PreviewPolicy, ProjectPolicy, ProjectCategoryPolicy, ProjectGithubRepoPolicy, ProjectSkillPolicy, ProjectUserPolicy, RolePolicy, RoleSkillPolicy, SkillPolicy, StripeConnectAccountPolicy, StripeConnectPlanPolicy, StripeConnectSubscriptionPolicy, StripePlatformCardPolicy, StripePlatformCustomerPolicy, TaskPolicy, TaskSkillPolicy, UserPolicy, UserCategoryPolicy, UserRolePolicy, UserSkillPolicy, UserTaskPolicy}
 
   alias Ecto.Changeset
 
@@ -43,6 +43,9 @@ defmodule Canary.Abilities do
 
     def can?(%User{} = user, :create, %Changeset{data: %ProjectCategory{}} = changeset), do: ProjectCategoryPolicy.create?(user, changeset)
     def can?(%User{} = user, :delete, %ProjectCategory{} = project_category), do: ProjectCategoryPolicy.delete?(user, project_category)
+
+    def can?(%User{} = user, :create, %Changeset{data: %ProjectGithubRepo{}} = changeset), do: ProjectGithubRepoPolicy.create?(user, changeset)
+    def can?(%User{} = user, :delete, %ProjectGithubRepo{} = project_github_repo), do: ProjectGithubRepoPolicy.delete?(user, project_github_repo)
 
     def can?(%User{} = user, :create, %Changeset{data: %ProjectSkill{}} = changeset), do: ProjectSkillPolicy.create?(user, changeset)
     def can?(%User{} = user, :delete, %ProjectSkill{} = project_skill), do: ProjectSkillPolicy.delete?(user, project_skill)

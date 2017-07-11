@@ -3,6 +3,6 @@ defmodule CodeCorps.ProjectGithubRepoView do
   use CodeCorps.Web, :view
   use JaSerializer.PhoenixView
 
-  has_one :project, serializer: CodeCorps.ProjectView
   has_one :github_repo, serializer: CodeCorps.GithubRepoView
+  has_one :project, serializer: CodeCorps.ProjectView
 end
