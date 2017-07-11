@@ -37,12 +37,14 @@ defmodule CodeCorps.Project do
 
     has_many :donation_goals, CodeCorps.DonationGoal
     has_many :project_categories, CodeCorps.ProjectCategory
+    has_many :project_github_repos, CodeCorps.ProjectGithubRepo
     has_many :project_skills, CodeCorps.ProjectSkill
     has_many :project_users, CodeCorps.ProjectUser
     has_many :task_lists, CodeCorps.TaskList
     has_many :tasks, CodeCorps.Task
 
     has_many :categories, through: [:project_categories, :category]
+    has_many :github_repos, through: [:project_github_repos, :github_repo]
     has_many :skills, through: [:project_skills, :skill]
     has_many :stripe_connect_subscriptions, through: [:stripe_connect_plan, :stripe_connect_subscriptions]
 

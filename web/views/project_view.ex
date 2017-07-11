@@ -5,8 +5,8 @@ defmodule CodeCorps.ProjectView do
   use CodeCorps.PreloadHelpers,
     default_preloads: [
       :donation_goals, [organization: :stripe_connect_account],
-      :project_categories, :project_skills, :project_users,
-      :stripe_connect_plan, :task_lists, :tasks
+      :project_categories, :project_github_repos, :project_skills,
+      :project_users, :stripe_connect_plan, :task_lists, :tasks
     ]
   use CodeCorps.Web, :view
   use JaSerializer.PhoenixView
@@ -24,6 +24,7 @@ defmodule CodeCorps.ProjectView do
 
   has_many :donation_goals, serializer: CodeCorps.DonationGoalView, identifiers: :always
   has_many :project_categories, serializer: CodeCorps.ProjectCategoryView, identifiers: :always
+  has_many :project_github_repos, serializer: CodeCorps.ProjectGithubRepoView, identifiers: :always
   has_many :project_skills, serializer: CodeCorps.ProjectSkillView, identifiers: :always
   has_many :project_users, serializer: CodeCorps.ProjectUserView, identifiers: :always
   has_many :task_lists, serializer: CodeCorps.TaskListView, identifiers: :always
