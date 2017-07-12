@@ -18,20 +18,22 @@ defmodule CodeCorps.GitHub.EventTest do
     end
   end
 
-  @ok_tuple {:ok, "foo"}
-  @error_tuple {:error, "bar"}
+  defp get_resulting_status(tuple) do
+    event = insert(:github_event, status: "processing")
+    {:ok, %GithubEvent{} = updated_event} = Event.stop_processing(tuple, event)
+    updated_event.status
+  end
 
   describe "stop_processing/2" do
-    test "sets event status to 'processed' if ok tuple is the first argument" do
-      event = insert(:github_event, status: "processing")
-      {:ok, %GithubEvent{} = updated_event} = Event.stop_processing(@ok_tuple, event)
-      assert updated_event.status == "processed"
-    end
-
-    test "sets event status to 'errored' if error tuple is the first argument" do
-      event = insert(:github_event, status: "processing")
-      {:ok, %GithubEvent{} = updated_event} = Event.stop_processing(@error_tuple, event)
-      assert updated_event.status == "errored"
+    test "sets proper status for event, based on first argument" do
+      assert {:ok} |> get_resulting_status() == "processed"
+      assert {:ok, "foo"} |> get_resulting_status() == "processed"
+      assert {:ok, "foo", "bar"} |> get_resulting_status() == "processed"
+      assert {:ok, "foo", "bar", "baz"} |> get_resulting_status() == "processed"
+      assert {:error} |> get_resulting_status() == "errored"
+      assert {:error, "foo"} |> get_resulting_status() == "errored"
+      assert {:error, "foo", "bar"} |> get_resulting_status() == "errored"
+      assert {:error, "foo", "bar", "baz"} |> get_resulting_status() == "errored"
     end
   end
 end

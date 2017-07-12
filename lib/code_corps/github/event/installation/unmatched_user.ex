@@ -3,19 +3,10 @@ defmodule CodeCorps.GitHub.Event.Installation.UnmatchedUser do
   In charge of handling the unmatched user case of an installation event
   """
 
-  alias CodeCorps.{
-    GithubAppInstallation,
-    Repo,
-    GitHub.Event.Installation.Repos
-  }
-
+  alias CodeCorps.{GithubAppInstallation, Repo}
   alias Ecto.Changeset
 
-  @typep process_outcome :: {:ok, GithubAppInstallation.t} |
-                            {:error, Changeset.t} |
-                            {:error, CodeCorps.GitHub.api_error_struct} |
-                            {:error, :invalid_repo_payload}
-
+  @typep process_outcome :: {:ok, GithubAppInstallation.t} | {:error, Changeset.t}
   @typep outcome :: process_outcome |  {:error, :unexpected_installation_payload}
 
   @doc """
@@ -52,32 +43,23 @@ defmodule CodeCorps.GitHub.Event.Installation.UnmatchedUser do
 
   @spec create_installation(map, map) :: {:ok, GithubAppInstallation.t} | {:error, Changeset.t}
   defp create_installation(%{} = installation_attrs, %{} = sender_attrs) do
-    changeset =
-      %GithubAppInstallation{}
-      |> changeset(installation_attrs, sender_attrs)
-
-    case changeset |> Repo.insert() do
-      {:ok, %GithubAppInstallation{} = installation} -> installation |> Repo.preload(:github_repos) |> Repos.process
-      {:error, %Changeset{} = changeset} -> {:error, changeset}
-    end
+    %GithubAppInstallation{}
+    |> changeset(installation_attrs, sender_attrs)
+    |> Changeset.put_change(:origin, "github")
+    |> Repo.insert()
   end
 
   @spec update_installation(GithubAppInstallation.t, map, map) :: {:ok, GithubAppInstallation.t} | {:error, Changeset.t}
   defp update_installation(%GithubAppInstallation{} = installation, %{} = installation_attrs, %{} = sender_attrs) do
-    changeset =
-      installation
-      |> changeset(installation_attrs, sender_attrs)
-
-    case changeset |> Repo.update() do
-      {:ok, %GithubAppInstallation{} = installation} -> installation |> Repo.preload(:github_repos) |> Repos.process
-      {:error, %Changeset{} = changeset} -> {:error, changeset}
-    end
+    installation
+    |> changeset(installation_attrs, sender_attrs)
+    |> Repo.update()
   end
 
   @spec changeset(GithubAppInstallation.t, map, map) :: Changeset.t
   defp changeset(%GithubAppInstallation{} = installation, %{"id" => github_id}, %{"id" => sender_github_id}) do
     installation
-    |> Changeset.change(%{github_id: github_id, sender_github_id: sender_github_id, installed: true, state: "unmatched_user"})
+    |> Changeset.change(%{github_id: github_id, sender_github_id: sender_github_id, installed: true})
     |> Changeset.unique_constraint(:github_id, name: :github_app_installations_github_id_index)
   end
 end

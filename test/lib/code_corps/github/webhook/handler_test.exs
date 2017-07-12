@@ -17,13 +17,11 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
     test "issues 'opened' event is supported but not implemented" do
       payload = load_event_fixture("issues_opened")
 
-      assert Handler.handle("issues", "abc-123", payload) == :not_fully_implemented
-
-      event = Repo.one(GithubEvent)
+      {:ok, %GithubEvent{} = event} = Handler.handle("issues", "abc-123", payload)
 
       assert event.action == "opened"
       assert event.github_delivery_id == "abc-123"
-      assert event.status == "unprocessed"
+      assert event.status == "errored"
       assert event.source == "not implemented"
       assert event.type == "issues"
     end
@@ -31,13 +29,11 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
     test "issue_comment 'created' event is supported, but not implemented" do
       payload = load_event_fixture("issue_comment_created")
 
-      assert Handler.handle("issue_comment", "abc-123", payload) == :not_fully_implemented
-
-      event = Repo.one(GithubEvent)
+      {:ok, %GithubEvent{} = event} = Handler.handle("issue_comment", "abc-123", payload)
 
       assert event.action == "created"
       assert event.github_delivery_id == "abc-123"
-      assert event.status == "unprocessed"
+      assert event.status == "errored"
       assert event.source == "not implemented"
       assert event.type == "issue_comment"
     end

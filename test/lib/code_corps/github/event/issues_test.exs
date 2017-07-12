@@ -13,7 +13,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
   describe "handle/2" do
     test "is not implemented" do
       payload = load_event_fixture("issues_opened")
-      assert Issues.handle(%GithubEvent{}, payload) == :not_fully_implemented
+      assert Issues.handle(%GithubEvent{}, payload) == {:error, :not_fully_implemented}
     end
   end
 end

@@ -12,7 +12,7 @@ defmodule CodeCorps.StripeConnectEventsControllerTest do
     {:ok, conn: conn}
   end
 
-  defp wait_for_supervisor(), do: wait_for_children(:webhook_processor)
+  defp wait_for_supervisor(), do: wait_for_children(:background_processor)
 
   # used to have the test wait for or the children of a supervisor to exit
 

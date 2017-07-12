@@ -1,7 +1,11 @@
 defmodule CodeCorps.GitHubEventsControllerTest do
   @moduledoc false
 
-  use CodeCorps.ConnCase
+  use CodeCorps.{
+    ConnCase,
+    BackgroundProcessingCase,
+    GitHubCase
+  }
 
   import CodeCorps.TestHelpers.GitHub
 
@@ -16,28 +20,23 @@ defmodule CodeCorps.GitHubEventsControllerTest do
     {:ok, conn: conn}
   end
 
-  defp wait_for_supervisor(), do: wait_for_children(:webhook_processor)
-
-  # used to have the test wait for or the children of a supervisor to exit
-
-  defp wait_for_children(supervisor_ref) do
-    supervisor_ref
-    |> Task.Supervisor.children()
-    |> Enum.each(&wait_for_child/1)
-  end
-
-  defp wait_for_child(pid) do
-    # Wait until the pid is dead
-    ref = Process.monitor(pid)
-    assert_receive {:DOWN, ^ref, _, _, _}
-  end
-
   defp for_event(conn, type, id) do
     conn
     |> put_req_header("x-github-event", type)
     |> put_req_header("x-github-delivery", id)
   end
 
+  @access_token "v1.1f699f1069f60xxx"
+  @expires_at Timex.now() |> Timex.shift(hours: 1) |> DateTime.to_iso8601()
+  @access_token_create_response %{"token" => @access_token, "expires_at" => @expires_at}
+
+  @installation_created load_event_fixture("installation_created")
+  @installation_repositories load_endpoint_fixture("installation_repositories")
+
+  @tag bypass: %{
+    "/installation/repositories" => {200, @installation_repositories},
+    "/installations/#{@installation_created["installation"]["id"]}/access_tokens" => {200, @access_token_create_response}
+  }
   test "responds with 200 for a supported event", %{conn: conn} do
     path = conn |> github_events_path(:create)
 
@@ -54,6 +53,8 @@ defmodule CodeCorps.GitHubEventsControllerTest do
     assert conn |> for_event("gollum", "foo") |> post(path, %{}) |> response(202)
 
     wait_for_supervisor()
+
+    refute Repo.get_by(GithubEvent, github_delivery_id: "foo")
   end
 
   test "responds with 202 for an unknown event", %{conn: conn} do
@@ -61,5 +62,7 @@ defmodule CodeCorps.GitHubEventsControllerTest do
     assert conn |> for_event("unknown", "foo") |> post(path, %{}) |> response(202)
 
     wait_for_supervisor()
+
+    refute Repo.get_by(GithubEvent, github_delivery_id: "foo")
   end
 end

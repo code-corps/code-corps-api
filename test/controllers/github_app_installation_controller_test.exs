@@ -51,7 +51,7 @@ defmodule CodeCorps.GithubAppInstallationControllerTest do
     test "does not create resource and renders 422 when data is invalid", %{conn: conn, current_user: user} do
       project = insert(:project)
       insert(:project_user, project: project, user: user, role: "owner")
-      attrs = %{project: project, user: user, state: "invalid"}
+      attrs = %{project: project, user: nil}
       assert conn |> request_create(attrs) |> json_response(422)
     end
 

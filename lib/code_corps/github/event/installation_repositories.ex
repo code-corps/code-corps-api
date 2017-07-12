@@ -7,11 +7,16 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositories do
     GithubAppInstallation,
     GithubEvent,
     GithubRepo,
-    GitHub.Event,
     Repo
   }
 
   alias Ecto.Changeset
+
+  @typep outcome :: {:ok, [GithubRepo.t]} |
+                    {:error, :no_installation} |
+                    {:error, :unexpected_action_or_payload} |
+                    {:error, :unexpected_installation_payload} |
+                    {:error, :unexpected_repo_payload}
 
   @doc """
   Handles an "InstallationRepositories" GitHub Webhook event. The event could be
@@ -34,22 +39,11 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositories do
       - `ProjectGithubRepo` are deleted automatically, since they are set to
         `on_delete: :delete_all`
   """
-  @spec handle(GithubEvent.t, map) :: {:ok, GithubEvent.t}
-  def handle(%GithubEvent{action: action} = event, payload) do
-    event
-    |> Event.start_processing()
-    |> do_handle(action, payload)
-    |> Event.stop_processing(event)
-  end
+  @spec handle(GithubEvent.t, map) :: outcome
+  def handle(%GithubEvent{action: action}, payload), do: do_handle(action, payload)
 
-  @typep outcome :: {:ok, [GithubRepo.t]} |
-                    {:error, :no_installation} |
-                    {:error, :unexpected_action_or_payload} |
-                    {:error, :unexpected_installation_payload} |
-                    {:error, :unexpected_repo_payload}
-
-  @spec do_handle({:ok, GithubEvent.t}, String.t, map) :: outcome
-  defp do_handle({:ok, %GithubEvent{}}, "added", %{"installation" => installation_attrs, "repositories_added" => repositories_attr_list}) do
+  @spec do_handle(String.t, map) :: outcome
+  defp do_handle("added", %{"installation" => installation_attrs, "repositories_added" => repositories_attr_list}) do
     case installation_attrs |> find_installation() do
       nil -> {:error, :no_installation}
       :unexpected_installation_payload -> {:error, :unexpected_installation_payload}
@@ -60,7 +54,7 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositories do
         end
     end
   end
-  defp do_handle({:ok, %GithubEvent{}}, "removed", %{"installation" => installation_attrs, "repositories_removed" => repositories_attr_list}) do
+  defp do_handle("removed", %{"installation" => installation_attrs, "repositories_removed" => repositories_attr_list}) do
     case installation_attrs |> find_installation() do
       nil -> {:error, :no_installation}
       :unexpected_installation_payload -> {:error, :unexpected_installation_payload}
@@ -71,7 +65,7 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositories do
         end
     end
   end
-  defp do_handle({:ok, %GithubEvent{}}, _action, _payload), do: {:error, :unexpected_action_or_payload}
+  defp do_handle(_action, _payload), do: {:error, :unexpected_action_or_payload}
 
   @spec find_installation(any) :: GithubAppInstallation.t | nil | :unexpected_installation_payload
   defp find_installation(%{"id" => github_id}), do: GithubAppInstallation |> Repo.get_by(github_id: github_id)
