@@ -1,4 +1,8 @@
 defmodule Canary.Abilities do
+  @moduledoc ~S"""
+  Handles authorization for various API actions performed on objects in the database.
+  """
+
   alias CodeCorps.{Category, Comment, DonationGoal, GithubAppInstallation, Organization, OrganizationGithubAppInstallation, Preview, Project, ProjectCategory, ProjectGithubRepo, ProjectSkill, ProjectUser, Role, RoleSkill, Skill, StripeConnectAccount, StripeConnectPlan, StripeConnectSubscription, StripePlatformCard, StripePlatformCustomer, Task, TaskSkill, User, UserCategory, UserRole, UserSkill, UserTask}
 
   alias CodeCorps.{CategoryPolicy, CommentPolicy, DonationGoalPolicy, GithubAppInstallationPolicy, OrganizationPolicy, OrganizationGithubAppInstallationPolicy, PreviewPolicy, ProjectPolicy, ProjectCategoryPolicy, ProjectGithubRepoPolicy, ProjectSkillPolicy, ProjectUserPolicy, RolePolicy, RoleSkillPolicy, SkillPolicy, StripeConnectAccountPolicy, StripeConnectPlanPolicy, StripeConnectSubscriptionPolicy, StripePlatformCardPolicy, StripePlatformCustomerPolicy, TaskPolicy, TaskSkillPolicy, UserPolicy, UserCategoryPolicy, UserRolePolicy, UserSkillPolicy, UserTaskPolicy}
@@ -28,7 +32,6 @@ defmodule Canary.Abilities do
     def can?(%User{} = user, :delete, %DonationGoal{} = comment), do: DonationGoalPolicy.delete?(user, comment)
 
     def can?(%User{} = user, :create, %Changeset{data: %GithubAppInstallation{}} = changeset), do: GithubAppInstallationPolicy.create?(user, changeset)
-    def can?(%User{} = user, :update, %GithubAppInstallation{} = github_app_installation), do: GithubAppInstallationPolicy.update?(user, github_app_installation)
 
     def can?(%User{} = user, :create, Organization), do: OrganizationPolicy.create?(user)
     def can?(%User{} = user, :update, %Organization{} = organization), do: OrganizationPolicy.update?(user, organization)

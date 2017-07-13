@@ -1,4 +1,6 @@
 defmodule CodeCorps.GithubAppInstallationControllerTest do
+  @moduledoc false
+
   use CodeCorps.ApiCase, resource_name: :github_app_installation
 
   describe "index" do
@@ -62,32 +64,6 @@ defmodule CodeCorps.GithubAppInstallationControllerTest do
     @tag :authenticated
     test "does not create resource and renders 403 when not authorized", %{conn: conn} do
       assert conn |> request_create |> json_response(403)
-    end
-  end
-
-  describe "update" do
-    @tag :authenticated
-    test "updates and renders resource when data is valid", %{conn: conn, current_user: user} do
-      project = insert(:project)
-      insert(:project_user, project: project, user: user, role: "owner")
-      record = insert(:github_app_installation, project: project, user: user, state: "initiated_on_code_corps")
-      attrs = %{state: "processing"}
-
-      assert conn |> request_update(record, attrs) |> json_response(200)
-    end
-
-    test "doesn't update and renders 401 when unauthenticated", %{conn: conn} do
-      assert conn |> request_update |> json_response(401)
-    end
-
-    @tag :authenticated
-    test "doesn't update and renders 403 when not authorized", %{conn: conn} do
-      assert conn |> request_update |> json_response(403)
-    end
-
-    @tag :authenticated
-    test "renders 404 when id is nonexistent on update", %{conn: conn} do
-      assert conn |> request_update(:not_found) |> json_response(404)
     end
   end
 end

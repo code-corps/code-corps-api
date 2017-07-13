@@ -1,4 +1,7 @@
 defmodule CodeCorps.GithubAppInstallation do
+  @moduledoc ~S"""
+  Represents an installation of the CodeCorps app to a user or an organization on GitHub.
+  """
   use CodeCorps.Web, :model
 
   @type t :: %__MODULE__{}
@@ -23,7 +26,7 @@ defmodule CodeCorps.GithubAppInstallation do
     timestamps()
   end
 
-  @doc """
+  @doc ~S"""
   Changeset used to create a GithubAppInstallation record from CodeCorps
   """
   def create_changeset(struct, params \\ %{}) do
@@ -36,16 +39,9 @@ defmodule CodeCorps.GithubAppInstallation do
     |> assoc_constraint(:user)
   end
 
-  @doc """
-  Changeset used to update a GithubAppInstallation record from CodeCorps
+  @doc ~S"""
+  Changeset used to refresh an access token for a GithubAppInstallation
   """
-  def update_changeset(struct, params \\ %{}) do
-    struct
-    |> cast(params, [:project_id])
-    |> validate_required([:project_id])
-    |> assoc_constraint(:project)
-  end
-
   def access_token_changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:access_token, :access_token_expires_at])
