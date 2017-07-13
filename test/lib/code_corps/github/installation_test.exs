@@ -19,8 +19,10 @@ defmodule CodeCorps.GitHub.InstallationTest do
   @installation_repositories load_endpoint_fixture("installation_repositories")
   @installations_access_tokens load_endpoint_fixture("installations_access_tokens")
 
-  @tag bypass: %{"/installation/repositories" => {200, @installation_repositories},
-  "/installations/#{@installation_github_id}/access_tokens" => {200, @access_token_create_response}}
+  @tag bypass: %{
+    "/installation/repositories" => {200, @installation_repositories},
+    "/installations/#{@installation_github_id}/access_tokens" => {200, @access_token_create_response}
+  }
   describe "repositories/1" do
     test "makes a request to get the repositories for the authenticated installation" do
       installation = %GithubAppInstallation{github_id: @installation_github_id, access_token: @access_token, access_token_expires_at: @expires_at}

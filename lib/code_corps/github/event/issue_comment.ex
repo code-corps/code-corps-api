@@ -13,5 +13,5 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
   - do the work
   - marked the passed in event as "processed" or "errored"
   """
-  def handle(%GithubEvent{}, %{}), do: :not_fully_implemented
+  def handle(%GithubEvent{}, %{}), do: {:error, :not_fully_implemented}
 end

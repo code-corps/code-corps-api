@@ -1,21 +1,25 @@
 defmodule CodeCorps.GithubAppInstallationTest do
+  @moduledoc false
+
   use CodeCorps.ModelCase
 
   alias CodeCorps.{GithubAppInstallation, Repo}
 
   describe "create_changeset/2" do
     test "casts the changes appropriately" do
-      attrs = %{foo: "bar", project_id: 1, user_id: 2, state: "initiated_on_code_corps"}
+      attrs = %{foo: "bar", project_id: 1, user_id: 2}
       changeset =
         %GithubAppInstallation{}
         |> GithubAppInstallation.create_changeset(attrs)
       assert changeset.valid?
-      assert changeset.changes == %{project_id: 1, user_id: 2, state: "initiated_on_code_corps"}
+      assert changeset.changes == %{project_id: 1, user_id: 2}
+      assert changeset |> Ecto.Changeset.get_field(:origin) == "codecorps"
+      assert changeset |> Ecto.Changeset.get_field(:state) == "unprocessed"
     end
 
     test "ensures user record exists" do
       project = insert(:project)
-      attrs = %{project_id: project.id, user_id: -1, state: "initiated_on_code_corps"}
+      attrs = %{project_id: project.id, user_id: -1, state: "processed"}
       changeset =
         %GithubAppInstallation{}
         |> GithubAppInstallation.create_changeset(attrs)
@@ -28,7 +32,7 @@ defmodule CodeCorps.GithubAppInstallationTest do
 
     test "ensures project record exists" do
       user = insert(:user)
-      attrs = %{project_id: -1, user_id: user.id, state: "initiated_on_code_corps"}
+      attrs = %{project_id: -1, user_id: user.id, state: "processed"}
       changeset =
         %GithubAppInstallation{}
         |> GithubAppInstallation.create_changeset(attrs)
@@ -37,73 +41,6 @@ defmodule CodeCorps.GithubAppInstallationTest do
       refute invalid_changeset.valid?
 
       assert assoc_constraint_triggered?(invalid_changeset, :project)
-    end
-
-    test "ensures uniqueness of :github_id" do
-      insert(:github_app_installation, github_id: 1)
-      project = insert(:project)
-      user = insert(:user)
-
-      attrs = %{
-        github_id: 1,
-        state: "initiated_on_code_corps",
-        project_id: project.id,
-        user_id: user.id
-      }
-
-      changeset =
-        %GithubAppInstallation{}
-        |> GithubAppInstallation.create_changeset(attrs)
-
-      {:error, changeset} = changeset |> Repo.insert
-
-      assert_error_message(changeset, :github_id, "has already been taken")
-    end
-
-    test "does not count null values as unique for :github_id" do
-      insert(:github_app_installation, github_id: nil)
-      project = insert(:project)
-      user = insert(:user)
-
-      attrs = %{
-        github_id: nil,
-        state: "initiated_on_code_corps",
-        project_id: project.id,
-        user_id: user.id
-      }
-
-      changeset =
-        %GithubAppInstallation{}
-        |> GithubAppInstallation.create_changeset(attrs)
-
-      assert changeset |> Repo.insert
-    end
-  end
-
-  describe "update_changeset/2" do
-    test "transitions correctly" do
-      github_app_installation = insert(:github_app_installation, state: "initiated_on_code_corps")
-
-      changeset =
-        github_app_installation
-        |> GithubAppInstallation.update_changeset(%{state: "processed"})
-
-      assert changeset.valid?
-      assert get_field(changeset, :state) == "processed"
-    end
-
-    test "prevents an invalid transition" do
-      github_app_installation = insert(:github_app_installation, state: "initiated_on_code_corps")
-
-      changeset =
-        github_app_installation
-        |> GithubAppInstallation.update_changeset(%{state: "unknown"})
-
-      refute changeset.valid?
-      [error | _] = changeset.errors
-      {attribute, {message, _}} = error
-      assert attribute == :state
-      assert message == "invalid transition to unknown from initiated_on_code_corps"
     end
   end
 

@@ -10,10 +10,8 @@ defmodule CodeCorps.GithubAppInstallationController do
 
   plug :load_resource, model: GithubAppInstallation, only: [:show], preload: @preloads
   plug :load_and_authorize_changeset, model: GithubAppInstallation, only: [:create], preload: @preloads
-  plug :load_and_authorize_resource, model: GithubAppInstallation, only: [:update], preload: @preloads
 
   plug JaResource
-
 
   @spec filter(Plug.Conn.t, Ecto.Query.t, String.t, String.t) :: Ecto.Query.t
   def filter(_conn, query, "id", id_list) do
@@ -24,10 +22,5 @@ defmodule CodeCorps.GithubAppInstallationController do
   def handle_create(_conn, attributes) do
     %GithubAppInstallation{}
     |> GithubAppInstallation.create_changeset(attributes)
-  end
-
-  @spec handle_update(Plug.Conn.t, GithubAppInstallation.t, map) :: Ecto.Changeset.t
-  def handle_update(_conn, model, attributes) do
-    model |> GithubAppInstallation.update_changeset(attributes)
   end
 end

@@ -385,7 +385,7 @@ This endpoint is used for creating, updating, and retrieving information about a
 
 To simplify, Code Corps has a GitHub App which is installed to a GitHub user's or GitHub organization's account _on GitHub_. This grants Code Corps read and write access to the GitHub API on behalf of that user or organization.
 
-You'll notice project and user relationships, which are only useful when setting up an installation for the first time. When GitHub redirects the user back to Code Corps after installing the GitHub App, our client only has access to the installation's `installation_id` in a query parameter. Because of this, before we direct the user to GitHub to install our App, we need to create a GithubAppInstallation record that keeps track of the user who requested it, the project it was requested on, and mark the installation as `initiated_on_code_corps`.
+You'll notice project and user relationships, which are only useful when setting up an installation for the first time. When GitHub redirects the user back to Code Corps after installing the GitHub App, our client only has access to the installation's `installation_id` in a query parameter. Because of this, before we direct the user to GitHub to install our App, we need to create a GithubAppInstallation record that keeps track of the user who requested it, the project it was requested on. This installation will be automatically marked with the `state` set to `"unprocessed"` and the `origin` set to `"codecorps"`.
 
 Note that this does not mean there's actually an installation yet! The user hasn't been to GitHub. We're just keeping track of that installation for later.
 
@@ -460,29 +460,6 @@ Keep in mind that an installation could be used across multiple projects. And be
 + Response 200 (application/vnd.api+json; charset=utf-8)
 
     + Attributes (Github App Installation Response)
-
-### Update a Github app installation [PATCH]
-
-+ Request
-
-    + Attributes (Github App Installation Update Request)
-
-    + Headers
-
-            Accept: application/vnd.api+json
-            Authorization: Bearer {token}
-
-+ Response 201 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Github App Installation Response)
-
-+ Response 401 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (JSON Web Token Invalid Response)
-
-+ Response 403 (application/vnd.api+json; charset=utf-8)
-
-    + Attributes (Forbidden Response)
 
 # Group Github Repos
 

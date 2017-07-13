@@ -2,6 +2,7 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
+  use CodeCorps.GitHubCase
 
   import CodeCorps.TestHelpers.GitHub
   import CodeCorps.Factories
@@ -16,13 +17,11 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
     test "issues 'opened' event is supported but not implemented" do
       payload = load_event_fixture("issues_opened")
 
-      assert Handler.handle("issues", "abc-123", payload) == :not_fully_implemented
-
-      event = Repo.one(GithubEvent)
+      {:ok, %GithubEvent{} = event} = Handler.handle("issues", "abc-123", payload)
 
       assert event.action == "opened"
       assert event.github_delivery_id == "abc-123"
-      assert event.status == "unprocessed"
+      assert event.status == "errored"
       assert event.source == "not implemented"
       assert event.type == "issues"
     end
@@ -30,13 +29,11 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
     test "issue_comment 'created' event is supported, but not implemented" do
       payload = load_event_fixture("issue_comment_created")
 
-      assert Handler.handle("issue_comment", "abc-123", payload) == :not_fully_implemented
-
-      event = Repo.one(GithubEvent)
+      {:ok, %GithubEvent{} = event} = Handler.handle("issue_comment", "abc-123", payload)
 
       assert event.action == "created"
       assert event.github_delivery_id == "abc-123"
-      assert event.status == "unprocessed"
+      assert event.status == "errored"
       assert event.source == "not implemented"
       assert event.type == "issue_comment"
     end
@@ -81,10 +78,22 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
       assert event.type == "installation_repositories"
     end
 
-    test "handles installation 'created' event" do
-      payload = load_event_fixture("installation_created")
+    @access_token "v1.1f699f1069f60xxx"
 
-      assert Handler.handle("installation", "abc-123", payload)
+    @installation_created_payload load_event_fixture("installation_created")
+    @installation_github_id @installation_created_payload["installation"]["id"]
+
+    @expires_at Timex.now() |> Timex.shift(hours: 1) |> DateTime.to_iso8601()
+    @access_token_create_response %{"token" => @access_token, "expires_at" => @expires_at}
+
+    @installation_repositories load_endpoint_fixture("installation_repositories")
+
+    @tag bypass: %{
+      "/installation/repositories" => {200, @installation_repositories},
+      "/installations/#{@installation_github_id}/access_tokens" => {200, @access_token_create_response}
+    }
+    test "handles installation 'created' event" do
+      assert Handler.handle("installation", "abc-123", @installation_created_payload)
 
       event = Repo.one(GithubEvent)
 

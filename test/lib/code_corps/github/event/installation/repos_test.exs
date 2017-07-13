@@ -9,6 +9,7 @@ defmodule CodeCorps.GitHub.Event.Installation.ReposTest do
 
   alias CodeCorps.{
     GithubAppInstallation,
+    GithubRepo,
     GitHub.Event.Installation.Repos,
     Repo
   }
@@ -24,46 +25,92 @@ defmodule CodeCorps.GitHub.Event.Installation.ReposTest do
 
   @app_github_id 2
 
-  @tag bypass: %{
-    "/installation/repositories" => {200, @installation_repositories},
-    "/installations/#{@app_github_id}/access_tokens" => {200, @access_token_create_response}
-  }
-  describe "process/1" do
-    test "creates repos, returns installation with repos and state set to processed" do
+  describe "process_async/1" do
+    @tag bypass: %{
+      "/installation/repositories" => {200, @installation_repositories},
+      "/installations/#{@app_github_id}/access_tokens" => {200, @access_token_create_response}
+    }
+    test "syncs repos by performing a diff using payload as master list, asynchronously" do
       installation = insert(:github_app_installation, github_id: @app_github_id, state: "initiated_on_code_corps")
 
-      {:ok, %GithubAppInstallation{} = updated_installation} = Repos.process(installation)
+      %{"repositories" => [matched_repo_payload, new_repo_payload]} = @installation_repositories
+      matched_repo_attrs = matched_repo_payload |> GithubRepoAdapter.from_api
+      new_repo_attrs = new_repo_payload |> GithubRepoAdapter.from_api
 
-      assert updated_installation.state == "processed"
-      assert updated_installation.github_repos |> Enum.count == 2
+      unmatched_repo = insert(:github_repo, github_app_installation: installation)
+      _matched_repo = insert(:github_repo, matched_repo_attrs |> Map.put(:github_app_installation, installation))
 
-      [repo_1, repo_2] = updated_installation.github_repos
-      %{"repositories" => [repo_1_payload, repo_2_payload]} = @installation_repositories
+      {:ok, %GithubAppInstallation{state: intermediate_state}, task} =
+        installation
+        |> Repo.preload(:github_repos)
+        |> Repos.process_async()
 
-      attributes = [:github_id, :name, :github_account_id, :github_account_avatar_url, :github_account_login, :github_account_type]
+      assert intermediate_state == "processing"
 
-      assert repo_1 |> Map.take(attributes) == repo_1_payload |> GithubRepoAdapter.from_api
-      assert repo_2 |> Map.take(attributes) == repo_2_payload |> GithubRepoAdapter.from_api
+      task |> Task.await
+
+      %GithubAppInstallation{state: end_state} = Repo.one(GithubAppInstallation)
+
+      assert end_state == "processed"
+
+      # unmatched repo was on record, but not in the payload, so it got deleted
+      refute Repo.get(GithubRepo, unmatched_repo.id)
+      # matched repo was both on record and in the payload, so it got updated
+      assert Repo.get_by(GithubRepo, matched_repo_attrs)
+      # new_repo was not on record, but was in the payload, so it got created
+      assert Repo.get_by(GithubRepo, new_repo_attrs)
+
+      # ensure no other repos have been created
+      assert GithubRepo |> Repo.aggregate(:count, :id) == 2
+    end
+  end
+
+  describe "process/1" do
+    @tag bypass: %{
+      "/installation/repositories" => {200, @installation_repositories},
+      "/installations/#{@app_github_id}/access_tokens" => {200, @access_token_create_response}
+    }
+    test "syncs repos by performing a diff using payload as master list" do
+      installation = insert(:github_app_installation, github_id: @app_github_id, state: "initiated_on_code_corps")
+
+      %{"repositories" => [matched_repo_payload, new_repo_payload]} = @installation_repositories
+      matched_repo_attrs = matched_repo_payload |> GithubRepoAdapter.from_api
+      new_repo_attrs = new_repo_payload |> GithubRepoAdapter.from_api
+
+      unmatched_repo = insert(:github_repo, github_app_installation: installation)
+      _matched_repo = insert(:github_repo, matched_repo_attrs |> Map.put(:github_app_installation, installation))
+
+      installation |> Repo.preload(:github_repos) |> Repos.process()
+
+      # unmatched repo was on record, but not in the payload, so it got deleted
+      refute Repo.get(GithubRepo, unmatched_repo.id)
+      # matched repo was both on record and in the payload, so it got updated
+      assert Repo.get_by(GithubRepo, matched_repo_attrs)
+      # new_repo was not on record, but was in the payload, so it got created
+      assert Repo.get_by(GithubRepo, new_repo_attrs)
+
+      # ensure no other repos have been created
+      assert GithubRepo |> Repo.aggregate(:count, :id) == 2
     end
 
     @tag bypass: %{
       "/installation/repositories" => {403, @forbidden},
       "/installations/#{@app_github_id}/access_tokens" => {200, @access_token_create_response}
     }
-    test "returns installation untouched if api error" do
+    test "returns installation as errored if api error" do
       installation = insert(:github_app_installation, github_id: @app_github_id, state: "initiated_on_code_corps")
-      {:error, %CodeCorps.GitHub.APIError{}} = Repos.process(installation)
-      assert Repo.one(GithubAppInstallation).state == "initiated_on_code_corps"
+      {:error, %GithubAppInstallation{state: state}, %CodeCorps.GitHub.APIError{}} = Repos.process(installation)
+      assert state == "errored"
     end
 
     @tag bypass: %{
       "/installation/repositories" => {200, @installation_repositories |> Map.put("repositories", ["foo"])},
       "/installations/#{@app_github_id}/access_tokens" => {200, @access_token_create_response}
     }
-    test "returns installation untouched if payload incorrect" do
+    test "returns installation as errored if payload incorrect" do
       installation = insert(:github_app_installation, github_id: @app_github_id, state: "initiated_on_code_corps")
-      {:error, :invalid_repo_payload} = Repos.process(installation)
-      assert Repo.one(GithubAppInstallation).state == "initiated_on_code_corps"
+      {:error, %GithubAppInstallation{state: state}, :invalid_repo_payload} = Repos.process(installation)
+      assert state == "errored"
     end
   end
 end

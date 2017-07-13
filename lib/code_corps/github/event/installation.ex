@@ -6,55 +6,52 @@ defmodule CodeCorps.GitHub.Event.Installation do
   alias CodeCorps.{
     GithubAppInstallation,
     GithubEvent,
-    GitHub.Event,
     GitHub.Event.Installation.UnmatchedUser,
     GitHub.Event.Installation.MatchedUser,
+    GitHub.Event.Installation.Repos,
     Repo,
     User
   }
+
+  @typep outcome :: {:ok, GithubAppInstallation.t, Task.t} | {:error, any}
 
   @doc """
   Handles an "Installation" GitHub Webhook event. The event could be
   of subtype "created" or "deleted". Only the "created" variant is handled at
   the moment.
 
-  `InstallationCrreated::added` will first try to find the `User` and the
-  `GithubAppInstallation`, using information from the payload.
-    - if neither are found, it will
-      - create a fresh `GithubAppInstallation`, with status "unmatched_user"
-    - if only the `User` is found, it will
-      - create `GithubAppInstallation` with status "initiated_on_github",
-        associated with the `User`
-    - if both are found, it will
-      - fetch repositories for the installation, create `GithubRepo` records
-      - mark installation as processed
-    - find `GithubAppInstallation`
-      - marks event as errored if not found
-      - marks event as errored if payload does not have keys it needs, meaning
-        there's something wrong with our code and we need to updated
-    - find or create `GithubRepo` records affected
+  `Installation::created` will first try to find the `User` using information
+  from the payload.
 
-    At the end of the process, the associated event will me marked as
-    "processed". If any failure occurs, the event will be marked as "errored".
+  Depending on the outcame of that operation, it will either call one of
 
-    Potential points of failure:
-    - the installation is found, but the user is not
-    - problem communicating with the API
-    - the payload received is not of the expected structure
-    - the action type is not one of the supported types ("created")
+  - `CodeCorps.GitHub.Event.Installation.UnmatchedUser.handle/2`
+  - `CodeCorps.GitHub.Event.Installation.MatchedUser.handle/2`
+
+  These helper modules will create or update the `GithubAppInstallation` with
+  proper data.
+
+  Once that is done, the outcome will be returned.
+
+  Additionally, a background task will launch
+  `CodeCorps.GitHub.Event.Installation.Repos.process_async` to asynchronously
+  fetch and process repositories for the installation.
+
+  The installation will initially be returned with the state "processing", but
+  in the background, it will eventually switch to either "processed" or
+  "errored".
   """
-  @spec handle(GithubEvent.t, map) :: {:ok, GithubEvent.t}
-  def handle(%GithubEvent{action: action} = event, payload) do
-    event
-    |> Event.start_processing()
-    |> do_handle(action, payload)
-    |> Event.stop_processing(event)
-  end
+  @spec handle(GithubEvent.t, map) :: outcome
+  def handle(%GithubEvent{action: action}, payload),
+    do: action |> do_handle(payload) |> postprocess()
 
-  @typep outcome :: {:ok, GithubAppInstallation.t} | {:error, any}
+  @spec do_handle(String.t, map) :: outcome
+  defp do_handle(
+      "created",
+      %{"installation" => %{"id" => _} = installation_attrs,
+      "sender" => %{"id" => _} = sender_attrs}
+    ) do
 
-  @spec do_handle({:ok, GithubEvent.t}, String.t, map) :: outcome
-  defp do_handle({:ok, %GithubEvent{}}, "created", %{"installation" => %{"id" => _} = installation_attrs, "sender" => %{"id" => _} = sender_attrs}) do
     case sender_attrs |> find_user() do
       # No user was found with the specified github_id
       nil -> UnmatchedUser.handle(installation_attrs, sender_attrs)
@@ -62,7 +59,15 @@ defmodule CodeCorps.GitHub.Event.Installation do
       %User{} = user -> MatchedUser.handle(user, installation_attrs)
     end
   end
-  defp do_handle({:ok, %GithubEvent{}}, _action, _payload), do: {:error, :unexpected_action_or_payload}
+  defp do_handle(_action, _payload), do: {:error, :unexpected_action_or_payload}
+
+  @spec postprocess({:ok, GithubAppInstallation.t} | {:error, any}) :: {:ok, GithubAppInstallation.t} | {:error, any}
+  defp postprocess({:ok, %GithubAppInstallation{} = installation}) do
+    installation
+    |> Repo.preload(:github_repos)
+    |> Repos.process_async
+  end
+  defp postprocess({:error, error}), do: {:error, error}
 
   @spec find_user(any) :: User.t | nil
   defp find_user(%{"id" => github_id}), do: User |> Repo.get_by(github_id: github_id)

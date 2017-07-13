@@ -18,7 +18,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.WebhookProcessor do
   Returns `{:ok, pid}`
   """
   def process_async(event_params, handler) do
-    Task.Supervisor.start_child(:webhook_processor, fn -> process(event_params, handler) end)
+    Task.Supervisor.start_child(:background_processor, fn -> process(event_params, handler) end)
   end
 
   @doc """

@@ -74,7 +74,7 @@ defmodule CodeCorps.Router do
     resources "/comments", CommentController, only: [:create, :update]
     resources "/donation-goals", DonationGoalController, only: [:create, :update, :delete]
     post "/oauth/github", UserController, :github_oauth
-    resources "/github-app-installations", GithubAppInstallationController, only: [:create, :update]
+    resources "/github-app-installations", GithubAppInstallationController, only: [:create]
     resources "/organization-github-app-installations", OrganizationGithubAppInstallationController, only: [:create, :delete]
     resources "/organizations", OrganizationController, only: [:create, :update]
     resources "/previews", PreviewController, only: [:create]

@@ -15,7 +15,7 @@ defmodule CodeCorps.GitHub.Webhook.Processor do
   Returns `{:ok, pid}`
   """
   def process_async(type, id, payload) do
-    Task.Supervisor.start_child(:webhook_processor, fn -> process(type, id, payload) end)
+    Task.Supervisor.start_child(:background_processor, fn -> process(type, id, payload) end)
   end
 
   defdelegate process(type, id, payload), to: Handler, as: :handle
