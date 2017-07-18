@@ -14,14 +14,62 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
   }
 
   describe "handle" do
-    test "issues 'opened' event is supported but not implemented" do
-      payload = load_event_fixture("issues_opened")
+    test "handles issues 'opened' event" do
+      %{"repository" => %{"id" => github_repo_id}}
+        = payload = load_event_fixture("issues_opened")
+
+      insert(:github_repo, github_id: github_repo_id)
 
       {:ok, %GithubEvent{} = event} = Handler.handle("issues", "abc-123", payload)
 
       assert event.action == "opened"
       assert event.github_delivery_id == "abc-123"
-      assert event.status == "errored"
+      assert event.status == "processed"
+      assert event.source == "not implemented"
+      assert event.type == "issues"
+    end
+
+    test "handles issues 'closed' event" do
+      %{"repository" => %{"id" => github_repo_id}}
+        = payload = load_event_fixture("issues_closed")
+
+      insert(:github_repo, github_id: github_repo_id)
+
+      {:ok, %GithubEvent{} = event} = Handler.handle("issues", "abc-123", payload)
+
+      assert event.action == "closed"
+      assert event.github_delivery_id == "abc-123"
+      assert event.status == "processed"
+      assert event.source == "not implemented"
+      assert event.type == "issues"
+    end
+
+    test "handles issues 'edited' event" do
+      %{"repository" => %{"id" => github_repo_id}}
+        = payload = load_event_fixture("issues_edited")
+
+      insert(:github_repo, github_id: github_repo_id)
+
+      {:ok, %GithubEvent{} = event} = Handler.handle("issues", "abc-123", payload)
+
+      assert event.action == "edited"
+      assert event.github_delivery_id == "abc-123"
+      assert event.status == "processed"
+      assert event.source == "not implemented"
+      assert event.type == "issues"
+    end
+
+    test "handles issues 'reopened' event" do
+      %{"repository" => %{"id" => github_repo_id}}
+        = payload = load_event_fixture("issues_reopened")
+
+      insert(:github_repo, github_id: github_repo_id)
+
+      {:ok, %GithubEvent{} = event} = Handler.handle("issues", "abc-123", payload)
+
+      assert event.action == "reopened"
+      assert event.github_delivery_id == "abc-123"
+      assert event.status == "processed"
       assert event.source == "not implemented"
       assert event.type == "issues"
     end

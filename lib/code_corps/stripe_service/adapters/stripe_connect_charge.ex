@@ -1,10 +1,9 @@
 defmodule CodeCorps.StripeService.Adapters.StripeConnectChargeAdapter do
 
   alias CodeCorps.{
+    Adapter.MapTransformer,
     StripeConnectAccount, StripeConnectCustomer, Repo
   }
-
-  alias CodeCorps.StripeService.Util
 
   # Mapping of stripe record attributes to locally stored attributes
   # Format is {:local_key, [:nesting, :of, :stripe, :keys]}
@@ -46,7 +45,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectChargeAdapter do
     result =
       stripe_charge
       |> Map.from_struct
-      |> Util.transform_map(@stripe_mapping)
+      |> MapTransformer.transform(@stripe_mapping)
       |> Map.put(:stripe_connect_account_id, connect_account_id)
       |> add_other_associations()
 

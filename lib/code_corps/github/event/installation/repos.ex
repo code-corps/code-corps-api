@@ -71,18 +71,11 @@ defmodule CodeCorps.GitHub.Event.Installation.Repos do
   end
 
   # transaction step 2
-  @spec adapt_api_repo_list(%{api_response: any}) :: list(map) | {:error, :invalid_repo_payload}
+  @spec adapt_api_repo_list(%{api_response: any}) :: {:ok, list(map)}
   defp adapt_api_repo_list(%{api_response: repositories}) do
     adapter_results = repositories |> Enum.map(&GithubRepoAdapter.from_api/1)
-    case adapter_results |>  Enum.all?(&valid?/1) do
-      true -> {:ok, adapter_results}
-      false -> {:error, :invalid_repo_payload}
-    end
+    {:ok, adapter_results}
   end
-
-  @spec valid?(any) :: boolean
-  defp valid?({:error, _}), do: false
-  defp valid?(_), do: true
 
   # transaction step 3
   @spec delete_repos(%{processing_installation: GithubAppInstallation.t, repo_attrs_list: list(map)}) :: aggregated_result
@@ -141,7 +134,7 @@ defmodule CodeCorps.GitHub.Event.Installation.Repos do
   @spec create(GithubAppInstallation.t, map) :: {:ok, GithubRepo.t}
   defp create(%GithubAppInstallation{} = installation, %{} = repo_attributes) do
     %GithubRepo{}
-    |> Changeset.change(repo_attributes)
+    |> changeset(repo_attributes)
     |> Changeset.put_assoc(:github_app_installation, installation)
     |> Repo.insert()
   end
@@ -149,8 +142,18 @@ defmodule CodeCorps.GitHub.Event.Installation.Repos do
   @spec update(GithubRepo.t, map) :: {:ok, GithubRepo.t}
   defp update(%GithubRepo{} = github_repo, %{} = repo_attributes) do
     github_repo
-    |> Changeset.change(repo_attributes)
+    |> changeset(repo_attributes)
     |> Repo.update()
+  end
+
+  @spec changeset(GithubRepo.t, map) :: Changeset.t
+  defp changeset(%GithubRepo{} = github_repo, %{} = repo_attributes) do
+    github_repo
+    |> Changeset.change(repo_attributes)
+    |> Changeset.validate_required([
+      :github_id, :name, :github_account_id,
+      :github_account_avatar_url, :github_account_login, :github_account_type
+    ])
   end
 
   # transaction step 5
