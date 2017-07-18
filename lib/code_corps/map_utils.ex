@@ -7,6 +7,8 @@ defmodule CodeCorps.MapUtils do
 
   def keys_to_string(map), do: stringify_keys(map)
 
+  def keys_to_atom(map), do: atomize_keys(map)
+
   # Intercept incoming %DateTime arguments; otherwise they will match %{}
   defp stringify_keys(%DateTime{} = val), do: val
   # Goes through a list and stringifies keys of any map member
@@ -21,4 +23,8 @@ defmodule CodeCorps.MapUtils do
 
   defp stringify_key(k) when is_atom(k), do: Atom.to_string(k)
   defp stringify_key(k), do: k
+
+  defp atomize_keys(map), do: map |> Enum.map(&atomize_key/1) |> Enum.into(%{})
+  defp atomize_key({k, v}) when is_binary(k), do: {k |> String.to_existing_atom, v}
+  defp atomize_key(any), do: any
 end

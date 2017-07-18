@@ -20,22 +20,22 @@ defmodule CodeCorps.GitHub.Event.InstallationTest do
   @installation_repositories load_endpoint_fixture("installation_repositories")
 
   describe "handle/2" do
-    test "marks event as errored if payload is wrong" do
+    test "returns error if payload is wrong" do
       event = build(:github_event, action: "created", type: "installation")
       assert {:error, :unexpected_action_or_payload} == Installation.handle(event, %{})
     end
 
-    test "marks event as errored if action of the event is wrong" do
+    test "returns error if action of the event is wrong" do
       event = build(:github_event, action: "foo", type: "installation")
       assert {:error, :unexpected_action_or_payload} == Installation.handle(event, @installation_created)
     end
 
-    test "marks event as errored if user payload is wrong" do
+    test "returns error if user payload is wrong" do
       event = build(:github_event, action: "created", type: "installation")
       assert {:error, :unexpected_action_or_payload} == Installation.handle(event, @installation_created |> Map.put("sender", "foo"))
     end
 
-    test "marks event as errored if installation payload is wrong" do
+    test "returns error if installation payload is wrong" do
       event = build(:github_event, action: "created", type: "installation")
       assert {:error, :unexpected_action_or_payload} == Installation.handle(event, @installation_created |> Map.put("installation", "foo"))
     end

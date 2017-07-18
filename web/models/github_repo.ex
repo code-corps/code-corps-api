@@ -12,6 +12,7 @@ defmodule CodeCorps.GithubRepo do
     field :name, :string
 
     belongs_to :github_app_installation, CodeCorps.GithubAppInstallation
+    has_many :project_github_repos, CodeCorps.ProjectGithubRepo
 
     timestamps()
   end

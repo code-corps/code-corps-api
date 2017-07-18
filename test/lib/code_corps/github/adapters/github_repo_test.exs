@@ -3,9 +3,9 @@ defmodule CodeCorps.GitHub.Adapters.GithubRepoTest do
 
   use ExUnit.Case, async: true
 
-  alias CodeCorps.GitHub.Adapters.GithubRepo
-
   import CodeCorps.TestHelpers.GitHub
+
+  alias CodeCorps.GitHub.Adapters.GithubRepo
 
   describe "from_api/1" do
     test "maps api payload correctly" do
@@ -19,10 +19,6 @@ defmodule CodeCorps.GitHub.Adapters.GithubRepoTest do
         github_account_avatar_url: repo |> get_in(["owner", "avatar_url"]),
         github_account_type: repo |> get_in(["owner", "type"]),
       }
-    end
-
-    test "returns error if payload structure is unexpected" do
-      assert GithubRepo.from_api("foo") == {:error, :invalid_repo_payload}
     end
   end
 end

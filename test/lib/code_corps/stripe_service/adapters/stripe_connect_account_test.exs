@@ -1,7 +1,7 @@
 defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTest do
   use ExUnit.Case, async: true
 
-  import CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter, only: [to_params: 2]
+  alias CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter
 
   defp test_account() do
     # If a `Stripe.Account` has multiple `Stripe.ExternalAccount` records, we want
@@ -92,12 +92,54 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTest do
   describe "to_params/2" do
     test "converts from stripe map to local properly" do
       test_attributes = %{"organization_id" => 123, "foo" => "bar"}
-      expected_attributes = %{"organization_id" => 123,}
+      expected_attributes = %{"organization_id" => 123}
 
-      {:ok, result} = to_params(test_account(), test_attributes)
+      {:ok, result} = StripeConnectAccountAdapter.to_params(test_account(), test_attributes)
       expected_map = Map.merge(@local_map, expected_attributes)
 
       assert result == expected_map
+    end
+  end
+
+  describe "from_params/1" do
+    test "converts from local to stripe map properly" do
+      # add some junk data to ensure that gets removed
+      test_input = Map.merge(@local_map, %{"organization_id" => 123, "foo" => "bar"})
+
+      {:ok, result} = StripeConnectAccountAdapter.from_params(test_input)
+
+      assert result == %{
+        business_name: "Some Company Inc.",
+        business_url: "somecompany.org",
+        charges_enabled: false,
+        country: "US",
+        default_currency: "usd",
+        details_submitted: false,
+        display_name: "Code Corps",
+        email: "someone@mail.com",
+        id: "account_with_multiple_external_accounts",
+        managed: true,
+        support_phone: "1234567890",
+        transfers_enabled: false,
+        legal_entity: %{
+          business_name: "Some Company Inc.",
+          business_tax_id_provided: false,
+          business_vat_id_provided: false,
+          first_name: "John",
+          last_name: "Doe",
+          personal_id_number_provided: false,
+          ssn_last_4_provided: false,
+          type: "sole_prop",
+          address: %{country: "US"},
+          personal_address: %{country: "US"},
+          verification: %{details_code: "failed_other", document: "fil_12345", status: "unverified"}
+        },
+        verification: %{
+          disabled_reason: "fields_needed",
+          fields_needed: ["business_url", "external_account", "tos_acceptance.date", "tos_acceptance.ip"]
+        },
+        external_account: "ba_222222222222222222222222"
+      }
     end
   end
 end

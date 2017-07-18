@@ -104,12 +104,15 @@ defmodule CodeCorps.GitHub.Event.Installation.ReposTest do
     end
 
     @tag bypass: %{
-      "/installation/repositories" => {200, @installation_repositories |> Map.put("repositories", ["foo"])},
+      "/installation/repositories" => {200, @installation_repositories |> Map.put("repositories", [%{}])},
       "/installations/#{@app_github_id}/access_tokens" => {200, @access_token_create_response}
     }
-    test "returns installation as errored if payload incorrect" do
+    test "returns installation as errored if error creating repos" do
       installation = insert(:github_app_installation, github_id: @app_github_id, state: "initiated_on_code_corps")
-      {:error, %GithubAppInstallation{state: state}, :invalid_repo_payload} = Repos.process(installation)
+
+      {:error, %GithubAppInstallation{state: state}, _changesets}
+        = installation |> Repo.preload(:github_repos) |> Repos.process()
+
       assert state == "errored"
     end
   end
