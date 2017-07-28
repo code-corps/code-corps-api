@@ -4,8 +4,6 @@ defmodule CodeCorps.Github.JWT do
   it.
   """
 
-  @app_id Application.get_env(:code_corps, :github_app_id)
-
   @doc """
   Generates a JWT from the GitHub App's generated RSA private key using the
   RS256 algo, where the issuer is the GitHub App's ID.
@@ -21,7 +19,7 @@ defmodule CodeCorps.Github.JWT do
     %{}
     |> Joken.token
     |> Joken.with_exp(Timex.now |> Timex.shift(minutes: 5) |> Timex.to_unix)
-    |> Joken.with_iss(@app_id |> String.to_integer())
+    |> Joken.with_iss(app_id())
     |> Joken.with_iat(Timex.now |> Timex.to_unix)
     |> Joken.with_signer(signer)
     |> Joken.sign
@@ -32,4 +30,6 @@ defmodule CodeCorps.Github.JWT do
     Application.get_env(:code_corps, :github_app_pem)
     |> JOSE.JWK.from_pem()
   end
+
+  defp app_id(), do: Application.get_env(:code_corps, :github_app_id)
 end
