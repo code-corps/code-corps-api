@@ -19,12 +19,17 @@ defmodule CodeCorps.GitHub.Installation do
   """
   @spec repositories(GithubAppInstallation.t) :: {:ok, list(map)} | {:error, GitHub.api_error_struct}
   def repositories(%GithubAppInstallation{} = installation) do
-    endpoint = "installation/repositories"
-    {:ok, access_token} = installation |> get_access_token()
-    case Request.retrieve(endpoint, [access_token: access_token]) do
+    with {:ok, access_token} <- installation |> get_access_token(),
+         {:ok, %{"repositories" => repositories}} <- fetch_repositories(access_token) do
+
+      {:ok, repositories}
+    else
       {:error, error} -> {:error, error}
-      {:ok, %{"total_count" => _, "repositories" => repositories}} -> {:ok, repositories}
     end
+  end
+
+  defp fetch_repositories(access_token) do
+    Request.retrieve("installation/repositories", [access_token: access_token])
   end
 
   @doc """
