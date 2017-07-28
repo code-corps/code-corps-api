@@ -103,12 +103,6 @@ defmodule CodeCorps.User do
     |> apply_state_transition(struct)
   end
 
-  def github_association_changeset(struct, params) do
-    struct
-    |> cast(params, [:github_auth_token, :github_avatar_url, :github_email, :github_id, :github_username])
-    |> validate_required([:github_auth_token, :github_avatar_url, :github_id, :github_username])
-  end
-
   def reset_password_changeset(struct, params) do
     struct
     |> cast(params, [:password, :password_confirmation])
