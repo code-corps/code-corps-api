@@ -10,10 +10,18 @@ defmodule CodeCorps.GithubAppInstallation do
     field :access_token, :string
     field :access_token_expires_at, :utc_datetime
     field :github_id, :integer
+
+    field :github_account_avatar_url, :string
+    field :github_account_id, :integer
+    field :github_account_login, :string
+    field :github_account_type, :string
+
     field :installed, :boolean
     field :sender_github_id, :integer
+
     # "unprocessed", "processing", "processed" or "errored"
     field :state, :string, default: "unprocessed"
+
     # "codecorps" or "github"
     field :origin, :string, default: "codecorps"
 

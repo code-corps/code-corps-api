@@ -5,8 +5,12 @@ defmodule CodeCorps.GitHub.Event.Installation.MatchedUser do
 
   import Ecto.Query
 
-  alias CodeCorps.{GithubAppInstallation, Repo, User}
-  alias Ecto.Changeset
+  alias CodeCorps.{
+    GitHub.Event.Installation.ChangesetBuilder,
+    GithubAppInstallation,
+    Repo,
+    User
+  }
 
   @typep process_outcome :: {:ok, GithubAppInstallation.t} | {:error, Changeset.t}
   @typep outcome :: process_outcome | {:error, :too_many_unprocessed_installations}
@@ -28,10 +32,10 @@ defmodule CodeCorps.GitHub.Event.Installation.MatchedUser do
   in an error tuple being returned.
   """
   @spec handle(map, User.t) :: outcome
-  def handle(%User{} = user, %{} = installation_attrs) do
+  def handle(%User{} = user, %{} = payload) do
     case user |> find_unprocessed_installations() do
-      [] -> user |> create_installation(installation_attrs)
-      [%GithubAppInstallation{} = installation] -> update_installation(installation, installation_attrs)
+      [] -> user |> create_installation(payload)
+      [%GithubAppInstallation{} = installation] -> update_installation(installation, payload)
       [_|_] -> {:error, :too_many_unprocessed_installations}
     end
   end
@@ -45,29 +49,16 @@ defmodule CodeCorps.GitHub.Event.Installation.MatchedUser do
   end
 
   @spec create_installation(User.t, map) :: process_outcome
-  defp create_installation(%User{github_id: sender_github_id} = user, %{"id" => github_id}) do
-    attrs = %{
-      github_id: github_id,
-      sender_github_id: sender_github_id,
-      installed: true,
-      origin: "github"
-    }
-
+  defp create_installation(%User{} = user, %{} = payload) do
     %GithubAppInstallation{}
-    |> changeset(attrs)
-    |> Changeset.put_assoc(:user, user)
+    |> ChangesetBuilder.build_changeset(payload, user)
     |> Repo.insert()
   end
 
   @spec update_installation(GithubAppInstallation.t, map) :: process_outcome
-  defp update_installation(%GithubAppInstallation{} = installation, %{"id" => github_id}) do
-    attrs = %{github_id: github_id, installed: true}
-    installation |> changeset(attrs) |> Repo.update()
-  end
-
-  defp changeset(%GithubAppInstallation{} = installation, %{} = attrs) do
+  defp update_installation(%GithubAppInstallation{} = installation, %{} = payload) do
     installation
-    |> Changeset.change(attrs)
-    |> Changeset.unique_constraint(:github_id, name: :github_app_installations_github_id_index)
+    |> ChangesetBuilder.build_changeset(payload)
+    |> Repo.update()
   end
 end

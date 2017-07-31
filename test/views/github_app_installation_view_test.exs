@@ -17,6 +17,10 @@ defmodule CodeCorps.GithubAppInstallationViewTest do
         "type" => "github-app-installation",
         "attributes" => %{
           "github-id" => github_app_installation.github_id,
+          "github-account-avatar-url" => github_app_installation.github_account_avatar_url,
+          "github-account-id" => github_app_installation.github_account_id,
+          "github-account-login" => github_app_installation.github_account_login,
+          "github-account-type" => github_app_installation.github_account_type,
           "inserted-at" => github_app_installation.inserted_at,
           "installed" => github_app_installation.installed,
           "state" => github_app_installation.state,

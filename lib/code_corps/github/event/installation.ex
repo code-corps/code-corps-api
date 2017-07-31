@@ -9,6 +9,7 @@ defmodule CodeCorps.GitHub.Event.Installation do
     GitHub.Event.Installation.UnmatchedUser,
     GitHub.Event.Installation.MatchedUser,
     GitHub.Event.Installation.Repos,
+    GitHub.Event.Installation.Validator,
     Repo,
     User
   }
@@ -42,24 +43,28 @@ defmodule CodeCorps.GitHub.Event.Installation do
   "errored".
   """
   @spec handle(GithubEvent.t, map) :: outcome
-  def handle(%GithubEvent{action: action}, payload),
-    do: action |> do_handle(payload) |> postprocess()
-
-  @spec do_handle(String.t, map) :: outcome
-  defp do_handle(
-      "created",
-      %{"installation" => %{"id" => _} = installation_attrs,
-      "sender" => %{"id" => _} = sender_attrs}
-    ) do
-
-    case sender_attrs |> find_user() do
-      # No user was found with the specified github_id
-      nil -> UnmatchedUser.handle(installation_attrs, sender_attrs)
-      # A user was found, matching the sspecified github_id
-      %User{} = user -> MatchedUser.handle(user, installation_attrs)
+  def handle(%GithubEvent{action: "created"}, payload) do
+    case payload |> Validator.valid? do
+      true -> payload |> do_handle() |> postprocess()
+      false -> {:error, :unexpected_payload}
     end
   end
-  defp do_handle(_action, _payload), do: {:error, :unexpected_action_or_payload}
+  def handle(%GithubEvent{action: "deleted"}, _) do
+    {:error, :not_fully_implemented}
+  end
+  def handle(%GithubEvent{action: _action}, _payload) do
+    {:error, :unexpected_action}
+  end
+
+  @spec do_handle(map) :: outcome
+  defp do_handle(%{"sender" => sender_attrs} = payload) do
+    case sender_attrs |> find_user() do
+      # No user was found with the specified github_id
+      nil -> UnmatchedUser.handle(payload)
+      # A user was found, matching the sspecified github_id
+      %User{} = user -> MatchedUser.handle(user, payload)
+    end
+  end
 
   @spec postprocess({:ok, GithubAppInstallation.t} | {:error, any}) :: {:ok, GithubAppInstallation.t} | {:error, any}
   defp postprocess({:ok, %GithubAppInstallation{} = installation}) do
