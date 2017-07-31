@@ -14,6 +14,7 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
   }
 
   describe "handle" do
+
     test "handles issues 'opened' event" do
       %{"repository" => %{"id" => github_repo_id}}
         = payload = load_event_fixture("issues_opened")
@@ -74,14 +75,47 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
       assert event.type == "issues"
     end
 
-    test "issue_comment 'created' event is supported, but not implemented" do
-      payload = load_event_fixture("issue_comment_created")
+    test "handles issue_comment 'created' event" do
+      %{"repository" => %{"id" => github_repo_id}}
+        = payload = load_event_fixture("issue_comment_created")
+
+      insert(:github_repo, github_id: github_repo_id)
 
       {:ok, %GithubEvent{} = event} = Handler.handle("issue_comment", "abc-123", payload)
 
       assert event.action == "created"
       assert event.github_delivery_id == "abc-123"
-      assert event.status == "errored"
+      assert event.status == "processed"
+      assert event.source == "not implemented"
+      assert event.type == "issue_comment"
+    end
+
+    test "handles issue_comment 'edited' event" do
+      %{"repository" => %{"id" => github_repo_id}}
+        = payload = load_event_fixture("issue_comment_edited")
+
+      insert(:github_repo, github_id: github_repo_id)
+
+      {:ok, %GithubEvent{} = event} = Handler.handle("issue_comment", "abc-123", payload)
+
+      assert event.action == "edited"
+      assert event.github_delivery_id == "abc-123"
+      assert event.status == "processed"
+      assert event.source == "not implemented"
+      assert event.type == "issue_comment"
+    end
+
+    test "handles issue_comment 'deleted' event" do
+      %{"repository" => %{"id" => github_repo_id}}
+        = payload = load_event_fixture("issue_comment_deleted")
+
+      insert(:github_repo, github_id: github_repo_id)
+
+      {:ok, %GithubEvent{} = event} = Handler.handle("issue_comment", "abc-123", payload)
+
+      assert event.action == "deleted"
+      assert event.github_delivery_id == "abc-123"
+      assert event.status == "processed"
       assert event.source == "not implemented"
       assert event.type == "issue_comment"
     end

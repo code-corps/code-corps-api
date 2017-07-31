@@ -12,7 +12,6 @@ defmodule CodeCorps.Task do
     field :markdown, :string
     field :number, :integer, read_after_writes: true
     field :order, :integer
-    field :state, :string
     field :status, :string, default: "open"
     field :title, :string
     field :github_id, :integer
@@ -48,7 +47,6 @@ defmodule CodeCorps.Task do
     |> validate_required([:project_id, :user_id])
     |> assoc_constraint(:project)
     |> assoc_constraint(:user)
-    |> put_change(:state, "published")
     |> put_change(:status, "open")
   end
 
@@ -67,7 +65,6 @@ defmodule CodeCorps.Task do
     |> changeset(params)
     |> cast(params, [:status])
     |> validate_inclusion(:status, statuses())
-    |> put_change(:state, "edited")
   end
 
   def apply_position(changeset) do

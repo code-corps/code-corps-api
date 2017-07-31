@@ -5,7 +5,6 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilder do
   """
 
   alias CodeCorps.{
-    GitHub.Event.Issues.StateMapper,
     Services.MarkdownRendererService,
     ProjectGithubRepo,
     Task,
@@ -20,13 +19,12 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilder do
   @spec build_changeset(Task.t, map, ProjectGithubRepo.t, User.t) :: Changeset.t
   def build_changeset(
     %Task{} = task,
-    %{"issue" => issue_attrs} = payload,
+    %{"issue" => issue_attrs},
     %ProjectGithubRepo{project_id: project_id},
     %User{id: user_id}) do
 
     task
     |> Changeset.change(issue_attrs |> TaskAdapter.from_issue())
-    |> Changeset.put_change(:state, payload |> StateMapper.get_state())
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
     |> Changeset.put_change(:project_id, project_id)
     |> Changeset.put_change(:user_id, user_id)

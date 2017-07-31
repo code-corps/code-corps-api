@@ -7,16 +7,14 @@ defmodule CodeCorps.GitHub.Event.Issues do
 
   alias CodeCorps.{
     GithubEvent,
-    GithubRepo,
-    GitHub.Event.Issues.ChangesetBuilder,
-    GitHub.Event.Issues.Validator,
+    GitHub.Event.Common.RepoFinder,
+    GitHub.Event.Issues.TaskSyncer,
     GitHub.Event.Issues.UserLinker,
-    ProjectGithubRepo,
+    GitHub.Event.Issues.Validator,
     Repo,
-    Task,
-    User
+    Task
   }
-  alias Ecto.{Changeset, Multi}
+  alias Ecto.Multi
 
   @typep outcome :: {:ok, list(Task.t)} |
                     {:error, :not_fully_implemented} |
@@ -64,69 +62,17 @@ defmodule CodeCorps.GitHub.Event.Issues do
   def handle(%GithubEvent{action: _action}, _payload), do: {:error, :unexpected_action}
 
   @spec do_handle(map) :: {:ok, list(Task.t)} | {:error, :unmatched_repository}
-  defp do_handle(%{} = payload) do
+  defp do_handle(%{"issue" => issue_payload} = payload) do
     multi =
       Multi.new
-      |> Multi.run(:repo, fn _ -> find_repo(payload) end)
+      |> Multi.run(:repo, fn _ -> RepoFinder.find_repo(payload) end)
       |> Multi.run(:user, fn _ -> UserLinker.find_or_create_user(payload) end)
-      |> Multi.run(:tasks, &sync_all(&1, payload))
+      |> Multi.run(:tasks, fn %{repo: github_repo, user: user} -> TaskSyncer.sync_all(github_repo, user, payload) end)
 
     case Repo.transaction(multi) do
       {:ok, %{tasks: tasks}} -> {:ok, tasks}
       {:error, :repo, :unmatched_project, _steps} -> {:ok, []}
       {:error, _errored_step, error_response, _steps} -> {:error, error_response}
     end
-  end
-
-  @spec find_repo(map) :: {:ok, GithubRepo.t} | {:error, :unmatched_repository} | {:error, :unmatched_project}
-  defp find_repo(%{"repository" => %{"id" => github_id}}) do
-    case GithubRepo |> Repo.get_by(github_id: github_id) |> Repo.preload(:project_github_repos) do
-      # a GithubRepo with at least some ProjectGithubRepo children
-      %GithubRepo{project_github_repos: [_ | _]} = github_repo -> {:ok, github_repo}
-      # a GithubRepo with no ProjectGithubRepo children
-      %GithubRepo{project_github_repos: []} -> {:error, :unmatched_project}
-      nil -> {:error, :unmatched_repository}
-    end
-  end
-
-  @spec sync_all(map, map) :: {:ok, list(Task.t)}
-  defp sync_all(
-    %{
-      repo: %GithubRepo{project_github_repos: project_github_repos},
-      user: %User{} = user
-    },
-    %{} = payload) do
-
-    project_github_repos
-    |> Enum.map(&sync(&1, user, payload))
-    |> aggregate()
-  end
-
-  @spec sync(ProjectGithubRepo.t, User.t, map) :: {:ok, ProjectGithubRepo.t} | {:error, Changeset.t}
-  defp sync(%ProjectGithubRepo{} = project_github_repo, %User{} = user, %{} = payload) do
-    project_github_repo
-    |> find_or_init_task(payload)
-    |> ChangesetBuilder.build_changeset(payload, project_github_repo, user)
-    |> commit()
-  end
-
-  @spec find_or_init_task(ProjectGithubRepo.t, map) :: Task.t
-  defp find_or_init_task(%ProjectGithubRepo{project_id: project_id}, %{"issue" => %{"id" => github_id}}) do
-    case Task |> Repo.get_by(github_id: github_id, project_id: project_id) do
-      nil -> %Task{}
-      %Task{} = task -> task
-    end
-  end
-
-  @spec commit(Changeset.t) :: {:ok, Task.t} | {:error, Changeset.t}
-  defp commit(%Changeset{data: %Task{id: nil}} = changeset), do: changeset |> Repo.insert
-  defp commit(%Changeset{} = changeset), do: changeset |> Repo.update
-
-  @spec aggregate(list({:ok, Task.t})) :: {:ok, list(Task.t)}
-  defp aggregate(results) do
-    results
-    |> Enum.map(&Tuple.to_list/1)
-    |> Enum.map(&List.last/1)
-    |> (fn tasks -> {:ok, tasks} end).()
   end
 end

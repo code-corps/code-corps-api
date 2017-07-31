@@ -142,11 +142,6 @@ defmodule CodeCorps.TaskTest do
       assert task_2_result.order < task_3_result.order
     end
 
-    test "sets state to 'published'" do
-      changeset = Task.create_changeset(%Task{}, %{})
-      assert changeset |> get_change(:state) == "published"
-    end
-
     test "sets status to 'open'" do
       changeset = Task.create_changeset(%Task{}, %{})
       # open is default, so we `get_field` instead of `get_change`
@@ -169,11 +164,6 @@ defmodule CodeCorps.TaskTest do
   end
 
   describe "update_changeset/2" do
-    test "sets state to 'edited'" do
-      changeset = Task.update_changeset(%Task{}, %{})
-      assert changeset |> get_change(:state) == "edited"
-    end
-
     test "only allows specific values for status" do
       changes = Map.put(@valid_attrs, :status, "nonexistent")
       changeset = Task.update_changeset(%Task{}, changes)
