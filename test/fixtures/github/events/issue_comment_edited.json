@@ -1,5 +1,5 @@
 {
-  "action": "created",
+  "action": "edited",
   "issue": {
     "url": "https://api.github.com/repos/baxterthehacker/public-repo/issues/2",
     "labels_url": "https://api.github.com/repos/baxterthehacker/public-repo/issues/2/labels{/name}",

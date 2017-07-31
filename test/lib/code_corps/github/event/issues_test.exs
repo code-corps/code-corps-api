@@ -66,7 +66,6 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         assert task.markdown == markdown
         assert task.title == title
         assert task.github_id == github_id
-        assert task.state == "published"
         assert task.status == "open"
       end)
     end
@@ -114,7 +113,6 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         assert task.markdown == markdown
         assert task.title == title
         assert task.github_id == github_id
-        assert task.state == "published"
         assert task.status == "open"
       end)
 
@@ -186,7 +184,6 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         assert task.markdown == markdown
         assert task.title == title
         assert task.github_id == github_id
-        assert task.state == "edited"
         assert task.status == "closed"
       end)
     end
@@ -234,7 +231,6 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         assert task.markdown == markdown
         assert task.title == title
         assert task.github_id == github_id
-        assert task.state == "edited"
         assert task.status == "closed"
       end)
 
@@ -306,7 +302,6 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         assert task.markdown == markdown
         assert task.title == title
         assert task.github_id == github_id
-        assert task.state == "edited"
         assert task.status == "open"
       end)
     end
@@ -354,7 +349,6 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         assert task.markdown == markdown
         assert task.title == title
         assert task.github_id == github_id
-        assert task.state == "edited"
         assert task.status == "open"
       end)
 
@@ -426,7 +420,6 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         assert task.markdown == markdown
         assert task.title == title
         assert task.github_id == github_id
-        assert task.state == "edited"
         assert task.status == "open"
       end)
     end
@@ -474,7 +467,6 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         assert task.markdown == markdown
         assert task.title == title
         assert task.github_id == github_id
-        assert task.state == "edited"
         assert task.status == "open"
       end)
 

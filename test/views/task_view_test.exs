@@ -18,7 +18,6 @@ defmodule CodeCorps.TaskViewTest do
           "number" => task.number,
           "order" => task.order,
           "status" => task.status,
-          "state" => task.state,
           "title" => task.title,
           "updated-at" => task.updated_at
         },

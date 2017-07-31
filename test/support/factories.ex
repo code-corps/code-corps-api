@@ -58,7 +58,6 @@ defmodule CodeCorps.Factories do
       title: "Test task",
       markdown: "A test task",
       status: "open",
-      state: "published",
       project: build(:project),
       user: build(:user),
       task_list: build(:task_list)

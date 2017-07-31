@@ -8,7 +8,6 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilderTest do
 
   alias CodeCorps.{
     GitHub.Event.Issues.ChangesetBuilder,
-    GitHub.Event.Issues.StateMapper,
     Task
   }
 
@@ -36,9 +35,6 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilderTest do
       # relationships are proper
       assert get_change(changeset, :project_id) == project_github_repo.project_id
       assert get_change(changeset, :user_id) == user.id
-
-      # state was computed
-      assert get_change(changeset, :state) == StateMapper.get_state(payload)
 
       assert changeset.valid?
     end
