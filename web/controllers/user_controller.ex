@@ -40,7 +40,7 @@ defmodule CodeCorps.UserController do
   """
   def github_oauth(conn, %{"code" => code, "state" => state}) do
     current_user = Guardian.Plug.current_resource(conn)
-    with {:ok, user} <- GitHub.OAuth.connect(current_user, code, state)
+    with {:ok, user} <- GitHub.User.connect(current_user, code, state)
     do
       conn |> render("show.json-api", data: user)
     else
