@@ -3,6 +3,7 @@ defmodule CodeCorps.UserView do
 
   use CodeCorps.PreloadHelpers,
       default_preloads: [
+        :github_app_installations,
         :project_users, :slugged_route, :stripe_connect_subscriptions,
         :stripe_platform_card, :stripe_platform_customer,
         :user_categories, :user_roles, :user_skills
@@ -23,6 +24,7 @@ defmodule CodeCorps.UserView do
   has_one :stripe_platform_customer, serializer: CodeCorps.StripePlatformCustomerView
 
   has_many :project_users, serializer: CodeCorps.ProjectUserView, identifiers: :always
+  has_many :github_app_installations, serializer: CodeCorps.GithubAppInstallationView, identifiers: :always
   has_many :stripe_connect_subscriptions, serializer: CodeCorps.StripeConnectSubscriptionView, identifiers: :always
   has_many :user_categories, serializer: CodeCorps.UserCategoryView, identifiers: :always
   has_many :user_roles, serializer: CodeCorps.UserRoleView, identifiers: :always
