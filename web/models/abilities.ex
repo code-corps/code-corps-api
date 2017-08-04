@@ -3,9 +3,9 @@ defmodule Canary.Abilities do
   Handles authorization for various API actions performed on objects in the database.
   """
 
-  alias CodeCorps.{Category, Comment, DonationGoal, GithubAppInstallation, Organization, OrganizationGithubAppInstallation, Preview, Project, ProjectCategory, ProjectGithubRepo, ProjectSkill, ProjectUser, Role, RoleSkill, Skill, StripeConnectAccount, StripeConnectPlan, StripeConnectSubscription, StripePlatformCard, StripePlatformCustomer, Task, TaskSkill, User, UserCategory, UserRole, UserSkill, UserTask}
+  alias CodeCorps.{Category, Comment, DonationGoal, GithubAppInstallation, Organization, OrganizationInvite, OrganizationGithubAppInstallation, Preview, Project, ProjectCategory, ProjectGithubRepo, ProjectSkill, ProjectUser, Role, RoleSkill, Skill, StripeConnectAccount, StripeConnectPlan, StripeConnectSubscription, StripePlatformCard, StripePlatformCustomer, Task, TaskSkill, User, UserCategory, UserRole, UserSkill, UserTask}
 
-  alias CodeCorps.{CategoryPolicy, CommentPolicy, DonationGoalPolicy, GithubAppInstallationPolicy, OrganizationPolicy, OrganizationGithubAppInstallationPolicy, PreviewPolicy, ProjectPolicy, ProjectCategoryPolicy, ProjectGithubRepoPolicy, ProjectSkillPolicy, ProjectUserPolicy, RolePolicy, RoleSkillPolicy, SkillPolicy, StripeConnectAccountPolicy, StripeConnectPlanPolicy, StripeConnectSubscriptionPolicy, StripePlatformCardPolicy, StripePlatformCustomerPolicy, TaskPolicy, TaskSkillPolicy, UserPolicy, UserCategoryPolicy, UserRolePolicy, UserSkillPolicy, UserTaskPolicy}
+  alias CodeCorps.{CategoryPolicy, CommentPolicy, DonationGoalPolicy, GithubAppInstallationPolicy, OrganizationPolicy, OrganizationInvitePolicy, OrganizationGithubAppInstallationPolicy, PreviewPolicy, ProjectPolicy, ProjectCategoryPolicy, ProjectGithubRepoPolicy, ProjectSkillPolicy, ProjectUserPolicy, RolePolicy, RoleSkillPolicy, SkillPolicy, StripeConnectAccountPolicy, StripeConnectPlanPolicy, StripeConnectSubscriptionPolicy, StripePlatformCardPolicy, StripePlatformCustomerPolicy, TaskPolicy, TaskSkillPolicy, UserPolicy, UserCategoryPolicy, UserRolePolicy, UserSkillPolicy, UserTaskPolicy}
 
   alias Ecto.Changeset
 
@@ -35,6 +35,9 @@ defmodule Canary.Abilities do
 
     def can?(%User{} = user, :create, Organization), do: OrganizationPolicy.create?(user)
     def can?(%User{} = user, :update, %Organization{} = organization), do: OrganizationPolicy.update?(user, organization)
+
+    def can?(%User{} = user, :create, OrganizationInvite), do: OrganizationInvitePolicy.create?(user)
+    def can?(%User{} = user, :update, %OrganizationInvite{}), do: OrganizationInvitePolicy.update?(user)
 
     def can?(%User{} = user, :create, %Changeset{data: %OrganizationGithubAppInstallation{}} = changeset), do: OrganizationGithubAppInstallationPolicy.create?(user, changeset)
     def can?(%User{} = user, :delete, %OrganizationGithubAppInstallation{} = github_app_installation), do: OrganizationGithubAppInstallationPolicy.delete?(user, github_app_installation)

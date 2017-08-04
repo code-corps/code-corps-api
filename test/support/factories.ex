@@ -53,6 +53,15 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def organization_invite_factory do
+    %CodeCorps.OrganizationInvite{
+      email: sequence(:email, &"email_#{&1}@mail.com"),
+      title: sequence(:title, &"organization-#{&1}"),
+      code: sequence(:code, &"n43crhiqR-#{&1}"),
+      fulfilled: false
+    }
+  end
+
   def task_factory do
     %CodeCorps.Task{
       title: "Test task",
