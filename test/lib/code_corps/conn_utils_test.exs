@@ -1,5 +1,5 @@
 defmodule CodeCorps.ConnUtilsTest do
-  use CodeCorps.ConnCase
+  use CodeCorpsWeb.ConnCase
 
   alias CodeCorps.ConnUtils
 

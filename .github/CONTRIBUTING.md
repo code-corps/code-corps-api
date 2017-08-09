@@ -190,6 +190,6 @@ Here's [a guide on Elixir School for writing tests](https://elixirschool.com/les
 
 We've written some convenience helper modules and functions to help with API testing. The helpers are found in `test/support` as:
 
-- `CodeCorps.ApiCase` - used to simplify testing JSON API endpoints
+- `CodeCorpsWeb.ApiCase` - used to simplify testing JSON API endpoints
 - `CodeCorps.AuthenticationTestHelpers` - provides authentication helpers for authenticating a `conn`
 - `CodeCorps.Factories` - provides factories using [`ex_machina`](https://github.com/thoughtbot/ex_machina), which makes it easy to create test data and associations with Ecto

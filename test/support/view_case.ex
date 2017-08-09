@@ -1,4 +1,4 @@
-defmodule CodeCorps.ViewCase do
+defmodule CodeCorpsWeb.ViewCase do
   @moduledoc """
   This module defines the test case to be used by
   tests for views defined in the application.

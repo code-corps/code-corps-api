@@ -10,10 +10,10 @@ config :code_corps,
   ecto_repos: [CodeCorps.Repo]
 
 # Configures the endpoint
-config :code_corps, CodeCorps.Endpoint,
+config :code_corps, CodeCorpsWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "eMl0+Byu0Zv7q48thBu23ChBVFO1+sdLqoMI8yZoxEviF1K3C5uIohbDfvM9felL",
-  render_errors: [view: CodeCorps.ErrorView, accepts: ~w(html json json-api)],
+  render_errors: [view: CodeCorpsWeb.ErrorView, accepts: ~w(html json json-api)],
   pubsub: [name: CodeCorps.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
@@ -36,11 +36,11 @@ config :guardian, Guardian,
   ttl: { 30, :days },
   verify_issuer: true, # optional
   secret_key: System.get_env("GUARDIAN_SECRET_KEY"),
-  serializer: CodeCorps.GuardianSerializer
+  serializer: CodeCorpsWeb.GuardianSerializer
 
 config :canary, repo: CodeCorps.Repo
-config :canary, unauthorized_handler: {CodeCorps.AuthenticationHelpers, :handle_unauthorized}
-config :canary, not_found_handler: {CodeCorps.AuthenticationHelpers, :handle_not_found}
+config :canary, unauthorized_handler: {CodeCorpsWeb.AuthenticationHelpers, :handle_unauthorized}
+config :canary, not_found_handler: {CodeCorpsWeb.AuthenticationHelpers, :handle_not_found}
 
 # Configures ex_aws with credentials
 config :ex_aws, :code_corps,

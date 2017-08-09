@@ -62,7 +62,7 @@ defmodule CodeCorps.GitHub.Event.Issues do
   def handle(%GithubEvent{action: _action}, _payload), do: {:error, :unexpected_action}
 
   @spec do_handle(map) :: {:ok, list(Task.t)} | {:error, :unmatched_repository}
-  defp do_handle(%{"issue" => issue_payload} = payload) do
+  defp do_handle(%{} = payload) do
     multi =
       Multi.new
       |> Multi.run(:repo, fn _ -> RepoFinder.find_repo(payload) end)

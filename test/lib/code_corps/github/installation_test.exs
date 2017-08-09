@@ -1,7 +1,7 @@
 defmodule CodeCorps.GitHub.InstallationTest do
   @moduledoc false
 
-  use CodeCorps.ApiCase
+  use CodeCorpsWeb.ApiCase
   use CodeCorps.GitHubCase
 
   import CodeCorps.TestHelpers.GitHub
