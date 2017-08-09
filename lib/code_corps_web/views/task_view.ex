@@ -4,7 +4,7 @@ defmodule CodeCorpsWeb.TaskView do
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
 
-  attributes [:body, :markdown, :number, :status, :title, :order, :inserted_at, :updated_at]
+  attributes [:body, :markdown, :number, :status, :title, :order, :inserted_at, :updated_at, :github_id]
 
   has_one :project, serializer: CodeCorpsWeb.ProjectView
   has_one :task_list, serializer: CodeCorpsWeb.TaskListView

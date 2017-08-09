@@ -67,6 +67,7 @@ defmodule CodeCorps.Factories do
       title: "Test task",
       markdown: "A test task",
       status: "open",
+      github_id: 1,
       project: build(:project),
       user: build(:user),
       task_list: build(:task_list)
@@ -102,6 +103,7 @@ defmodule CodeCorps.Factories do
       slug: sequence(:slug, &"project-#{&1}"),
       title: sequence(:title, &"Project #{&1}"),
       website: sequence(:website, &"http://test-#{&1}.com"),
+      github_id: nil,
 
       organization: build(:organization)
     }

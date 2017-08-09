@@ -1,6 +1,8 @@
 defmodule CodeCorpsWeb.TaskControllerTest do
   use CodeCorpsWeb.ApiCase, resource_name: :task
 
+  import ExUnit.CaptureLog
+
   @valid_attrs %{
     title: "Test task",
     markdown: "A test task",
@@ -127,6 +129,36 @@ defmodule CodeCorpsWeb.TaskControllerTest do
       }
 
       assert_received {:track, ^user_id, "Created Task", ^tracking_properties}
+    end
+
+    @tag :authenticated
+    test "creates github issue when project is connected to github", %{conn: conn, current_user: current_user} do
+      project = insert(:project, github_id: 1)
+      task_list = insert(:task_list, project: project)
+      attrs = @valid_attrs |> Map.merge(%{project: project, user: current_user, task_list: task_list})
+      json = conn |> request_create(attrs) |> json_response(201)
+      # check that task has a github id
+      assert json["data"]["attributes"]["github-id"] == 1
+    end
+
+    @tag :authenticated
+    test "doesnt create github issue when error in Github API call", %{conn: conn, current_user: current_user} do
+      project = insert(:project, github_id: 1)
+      task_list = insert(:task_list, project: project)
+      attrs = @valid_attrs |> Map.merge(%{project: project, user: current_user, task_list: task_list, error_testing: true})
+      json = conn |> request_create(attrs) |> json_response(201)
+
+      assert json["data"]["attributes"]["github-id"] == nil
+    end
+
+    @tag :authenticated
+    test "doesnt create github issue when project is not connected to github", %{conn: conn, current_user: current_user} do
+      project = insert(:project)
+      task_list = insert(:task_list, project: project)
+      attrs = @valid_attrs |> Map.merge(%{project: project, user: current_user, task_list: task_list})
+      json = conn |> request_create(attrs) |> json_response(201)
+
+      assert json["data"]["attributes"]["github-id"] == nil
     end
 
     @tag :authenticated

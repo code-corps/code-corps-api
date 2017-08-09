@@ -149,20 +149,6 @@ defmodule CodeCorps.TaskTest do
     end
   end
 
-  describe "github_create_changeset/2" do
-    test "github create changeset with valid attributes" do
-      attrs = Map.merge(@valid_attrs, %{
-        github_id: 1,
-        project_id: 1,
-        task_list_id: 1,
-        user_id: 1
-      })
-
-      changeset = Task.github_create_changeset(%Task{}, attrs)
-      assert changeset.valid?
-    end
-  end
-
   describe "update_changeset/2" do
     test "only allows specific values for status" do
       changes = Map.put(@valid_attrs, :status, "nonexistent")

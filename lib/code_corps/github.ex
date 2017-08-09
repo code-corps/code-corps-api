@@ -141,6 +141,8 @@ defmodule CodeCorps.GitHub do
     |> Map.put(:state, state)
   end
 
+  require Logger
+
   @doc """
   A low level utility function to make a direct request to the GitHub API.
   """

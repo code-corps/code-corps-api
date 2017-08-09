@@ -2,12 +2,11 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.6.3
--- Dumped by pg_dump version 9.6.3
+-- Dumped from database version 9.5.1
+-- Dumped by pg_dump version 9.5.1
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
@@ -586,6 +585,8 @@ CREATE TABLE projects (
     website character varying(255),
     should_link_externally boolean DEFAULT false,
     github_id integer,
+    github_repo character varying(255),
+    github_owner character varying(255),
     CONSTRAINT set_long_description_markdown_if_approved CHECK (((long_description_markdown IS NOT NULL) OR (approved = false)))
 );
 
@@ -1565,287 +1566,287 @@ ALTER SEQUENCE users_id_seq OWNED BY users.id;
 
 
 --
--- Name: auth_token id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY auth_token ALTER COLUMN id SET DEFAULT nextval('auth_token_id_seq'::regclass);
 
 
 --
--- Name: categories id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY categories ALTER COLUMN id SET DEFAULT nextval('categories_id_seq'::regclass);
 
 
 --
--- Name: comments id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY comments ALTER COLUMN id SET DEFAULT nextval('comments_id_seq'::regclass);
 
 
 --
--- Name: donation_goals id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY donation_goals ALTER COLUMN id SET DEFAULT nextval('donation_goals_id_seq'::regclass);
 
 
 --
--- Name: github_app_installations id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY github_app_installations ALTER COLUMN id SET DEFAULT nextval('github_app_installations_id_seq'::regclass);
 
 
 --
--- Name: github_events id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY github_events ALTER COLUMN id SET DEFAULT nextval('github_events_id_seq'::regclass);
 
 
 --
--- Name: github_repos id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY github_repos ALTER COLUMN id SET DEFAULT nextval('github_repos_id_seq'::regclass);
 
 
 --
--- Name: organization_github_app_installations id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organization_github_app_installations ALTER COLUMN id SET DEFAULT nextval('organization_github_app_installations_id_seq'::regclass);
 
 
 --
--- Name: organization_invites id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organization_invites ALTER COLUMN id SET DEFAULT nextval('organization_invites_id_seq'::regclass);
 
 
 --
--- Name: organizations id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organizations ALTER COLUMN id SET DEFAULT nextval('organizations_id_seq'::regclass);
 
 
 --
--- Name: previews id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY previews ALTER COLUMN id SET DEFAULT nextval('previews_id_seq'::regclass);
 
 
 --
--- Name: project_categories id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_categories ALTER COLUMN id SET DEFAULT nextval('project_categories_id_seq'::regclass);
 
 
 --
--- Name: project_github_repos id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_github_repos ALTER COLUMN id SET DEFAULT nextval('project_github_repos_id_seq'::regclass);
 
 
 --
--- Name: project_skills id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_skills ALTER COLUMN id SET DEFAULT nextval('project_skills_id_seq'::regclass);
 
 
 --
--- Name: project_users id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_users ALTER COLUMN id SET DEFAULT nextval('project_users_id_seq'::regclass);
 
 
 --
--- Name: projects id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY projects ALTER COLUMN id SET DEFAULT nextval('projects_id_seq'::regclass);
 
 
 --
--- Name: role_skills id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY role_skills ALTER COLUMN id SET DEFAULT nextval('role_skills_id_seq'::regclass);
 
 
 --
--- Name: roles id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY roles ALTER COLUMN id SET DEFAULT nextval('roles_id_seq'::regclass);
 
 
 --
--- Name: skills id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY skills ALTER COLUMN id SET DEFAULT nextval('skills_id_seq'::regclass);
 
 
 --
--- Name: slugged_routes id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY slugged_routes ALTER COLUMN id SET DEFAULT nextval('slugged_routes_id_seq'::regclass);
 
 
 --
--- Name: stripe_connect_accounts id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_accounts ALTER COLUMN id SET DEFAULT nextval('stripe_connect_accounts_id_seq'::regclass);
 
 
 --
--- Name: stripe_connect_cards id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_cards ALTER COLUMN id SET DEFAULT nextval('stripe_connect_cards_id_seq'::regclass);
 
 
 --
--- Name: stripe_connect_charges id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_charges ALTER COLUMN id SET DEFAULT nextval('stripe_connect_charges_id_seq'::regclass);
 
 
 --
--- Name: stripe_connect_customers id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_customers ALTER COLUMN id SET DEFAULT nextval('stripe_connect_customers_id_seq'::regclass);
 
 
 --
--- Name: stripe_connect_plans id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_plans ALTER COLUMN id SET DEFAULT nextval('stripe_connect_plans_id_seq'::regclass);
 
 
 --
--- Name: stripe_connect_subscriptions id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_subscriptions ALTER COLUMN id SET DEFAULT nextval('stripe_connect_subscriptions_id_seq'::regclass);
 
 
 --
--- Name: stripe_events id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_events ALTER COLUMN id SET DEFAULT nextval('stripe_events_id_seq'::regclass);
 
 
 --
--- Name: stripe_external_accounts id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_external_accounts ALTER COLUMN id SET DEFAULT nextval('stripe_external_accounts_id_seq'::regclass);
 
 
 --
--- Name: stripe_file_upload id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_file_upload ALTER COLUMN id SET DEFAULT nextval('stripe_file_upload_id_seq'::regclass);
 
 
 --
--- Name: stripe_invoices id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_invoices ALTER COLUMN id SET DEFAULT nextval('stripe_invoices_id_seq'::regclass);
 
 
 --
--- Name: stripe_platform_cards id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_platform_cards ALTER COLUMN id SET DEFAULT nextval('stripe_platform_cards_id_seq'::regclass);
 
 
 --
--- Name: stripe_platform_customers id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_platform_customers ALTER COLUMN id SET DEFAULT nextval('stripe_platform_customers_id_seq'::regclass);
 
 
 --
--- Name: task_lists id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY task_lists ALTER COLUMN id SET DEFAULT nextval('task_lists_id_seq'::regclass);
 
 
 --
--- Name: task_skills id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY task_skills ALTER COLUMN id SET DEFAULT nextval('task_skills_id_seq'::regclass);
 
 
 --
--- Name: tasks id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY tasks ALTER COLUMN id SET DEFAULT nextval('tasks_id_seq'::regclass);
 
 
 --
--- Name: user_categories id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_categories ALTER COLUMN id SET DEFAULT nextval('user_categories_id_seq'::regclass);
 
 
 --
--- Name: user_roles id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_roles ALTER COLUMN id SET DEFAULT nextval('user_roles_id_seq'::regclass);
 
 
 --
--- Name: user_skills id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_skills ALTER COLUMN id SET DEFAULT nextval('user_skills_id_seq'::regclass);
 
 
 --
--- Name: user_tasks id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_tasks ALTER COLUMN id SET DEFAULT nextval('user_tasks_id_seq'::regclass);
 
 
 --
--- Name: users id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
 
 
 --
--- Name: auth_token auth_token_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: auth_token_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY auth_token
@@ -1853,7 +1854,7 @@ ALTER TABLE ONLY auth_token
 
 
 --
--- Name: categories categories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: categories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY categories
@@ -1861,7 +1862,7 @@ ALTER TABLE ONLY categories
 
 
 --
--- Name: comments comments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: comments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY comments
@@ -1869,7 +1870,7 @@ ALTER TABLE ONLY comments
 
 
 --
--- Name: donation_goals donation_goals_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: donation_goals_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY donation_goals
@@ -1877,7 +1878,7 @@ ALTER TABLE ONLY donation_goals
 
 
 --
--- Name: github_app_installations github_app_installations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: github_app_installations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY github_app_installations
@@ -1885,7 +1886,7 @@ ALTER TABLE ONLY github_app_installations
 
 
 --
--- Name: github_events github_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: github_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY github_events
@@ -1893,7 +1894,7 @@ ALTER TABLE ONLY github_events
 
 
 --
--- Name: github_repos github_repos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: github_repos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY github_repos
@@ -1901,7 +1902,7 @@ ALTER TABLE ONLY github_repos
 
 
 --
--- Name: organization_github_app_installations organization_github_app_installations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: organization_github_app_installations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organization_github_app_installations
@@ -1909,7 +1910,7 @@ ALTER TABLE ONLY organization_github_app_installations
 
 
 --
--- Name: organization_invites organization_invites_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: organization_invites_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organization_invites
@@ -1917,7 +1918,7 @@ ALTER TABLE ONLY organization_invites
 
 
 --
--- Name: organizations organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organizations
@@ -1925,7 +1926,7 @@ ALTER TABLE ONLY organizations
 
 
 --
--- Name: previews previews_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: previews_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY previews
@@ -1933,7 +1934,7 @@ ALTER TABLE ONLY previews
 
 
 --
--- Name: project_categories project_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: project_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_categories
@@ -1941,7 +1942,7 @@ ALTER TABLE ONLY project_categories
 
 
 --
--- Name: project_github_repos project_github_repos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: project_github_repos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_github_repos
@@ -1949,7 +1950,7 @@ ALTER TABLE ONLY project_github_repos
 
 
 --
--- Name: project_skills project_skills_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: project_skills_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_skills
@@ -1957,7 +1958,7 @@ ALTER TABLE ONLY project_skills
 
 
 --
--- Name: project_users project_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: project_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_users
@@ -1965,7 +1966,7 @@ ALTER TABLE ONLY project_users
 
 
 --
--- Name: projects projects_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: projects_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY projects
@@ -1973,7 +1974,7 @@ ALTER TABLE ONLY projects
 
 
 --
--- Name: role_skills role_skills_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: role_skills_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY role_skills
@@ -1981,7 +1982,7 @@ ALTER TABLE ONLY role_skills
 
 
 --
--- Name: roles roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY roles
@@ -1989,7 +1990,7 @@ ALTER TABLE ONLY roles
 
 
 --
--- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY schema_migrations
@@ -1997,7 +1998,7 @@ ALTER TABLE ONLY schema_migrations
 
 
 --
--- Name: skills skills_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: skills_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY skills
@@ -2005,7 +2006,7 @@ ALTER TABLE ONLY skills
 
 
 --
--- Name: slugged_routes slugged_routes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: slugged_routes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY slugged_routes
@@ -2013,7 +2014,7 @@ ALTER TABLE ONLY slugged_routes
 
 
 --
--- Name: stripe_connect_cards stripe_connect_cards_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_cards_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_cards
@@ -2021,7 +2022,7 @@ ALTER TABLE ONLY stripe_connect_cards
 
 
 --
--- Name: stripe_connect_charges stripe_connect_charges_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_charges_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_charges
@@ -2029,7 +2030,7 @@ ALTER TABLE ONLY stripe_connect_charges
 
 
 --
--- Name: stripe_connect_customers stripe_connect_customers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_customers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_customers
@@ -2037,7 +2038,7 @@ ALTER TABLE ONLY stripe_connect_customers
 
 
 --
--- Name: stripe_events stripe_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_events
@@ -2045,7 +2046,7 @@ ALTER TABLE ONLY stripe_events
 
 
 --
--- Name: stripe_external_accounts stripe_external_accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_external_accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_external_accounts
@@ -2053,7 +2054,7 @@ ALTER TABLE ONLY stripe_external_accounts
 
 
 --
--- Name: stripe_file_upload stripe_file_upload_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_file_upload_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_file_upload
@@ -2061,7 +2062,7 @@ ALTER TABLE ONLY stripe_file_upload
 
 
 --
--- Name: stripe_invoices stripe_invoices_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_invoices_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_invoices
@@ -2069,7 +2070,7 @@ ALTER TABLE ONLY stripe_invoices
 
 
 --
--- Name: task_lists task_lists_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: task_lists_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY task_lists
@@ -2077,7 +2078,7 @@ ALTER TABLE ONLY task_lists
 
 
 --
--- Name: task_skills task_skills_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: task_skills_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY task_skills
@@ -2085,7 +2086,7 @@ ALTER TABLE ONLY task_skills
 
 
 --
--- Name: user_categories user_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: user_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_categories
@@ -2093,7 +2094,7 @@ ALTER TABLE ONLY user_categories
 
 
 --
--- Name: user_roles user_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: user_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_roles
@@ -2101,7 +2102,7 @@ ALTER TABLE ONLY user_roles
 
 
 --
--- Name: user_skills user_skills_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: user_skills_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_skills
@@ -2109,7 +2110,7 @@ ALTER TABLE ONLY user_skills
 
 
 --
--- Name: user_tasks user_tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: user_tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_tasks
@@ -2117,7 +2118,7 @@ ALTER TABLE ONLY user_tasks
 
 
 --
--- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY users
@@ -2566,14 +2567,14 @@ CREATE UNIQUE INDEX users_lower_username_index ON users USING btree (lower((user
 
 
 --
--- Name: tasks task_created; Type: TRIGGER; Schema: public; Owner: -
+-- Name: task_created; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER task_created BEFORE INSERT ON tasks FOR EACH ROW EXECUTE PROCEDURE assign_number();
 
 
 --
--- Name: auth_token auth_token_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: auth_token_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY auth_token
@@ -2581,7 +2582,7 @@ ALTER TABLE ONLY auth_token
 
 
 --
--- Name: comments comments_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: comments_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY comments
@@ -2589,7 +2590,7 @@ ALTER TABLE ONLY comments
 
 
 --
--- Name: comments comments_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: comments_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY comments
@@ -2597,7 +2598,7 @@ ALTER TABLE ONLY comments
 
 
 --
--- Name: donation_goals donation_goals_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: donation_goals_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY donation_goals
@@ -2605,7 +2606,7 @@ ALTER TABLE ONLY donation_goals
 
 
 --
--- Name: github_app_installations github_app_installations_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: github_app_installations_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY github_app_installations
@@ -2613,7 +2614,7 @@ ALTER TABLE ONLY github_app_installations
 
 
 --
--- Name: github_app_installations github_app_installations_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: github_app_installations_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY github_app_installations
@@ -2621,7 +2622,7 @@ ALTER TABLE ONLY github_app_installations
 
 
 --
--- Name: github_repos github_repos_github_app_installation_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: github_repos_github_app_installation_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY github_repos
@@ -2629,7 +2630,7 @@ ALTER TABLE ONLY github_repos
 
 
 --
--- Name: organization_github_app_installations organization_github_app_installations_github_app_installation_i; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: organization_github_app_installations_github_app_installation_i; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organization_github_app_installations
@@ -2637,7 +2638,7 @@ ALTER TABLE ONLY organization_github_app_installations
 
 
 --
--- Name: organization_github_app_installations organization_github_app_installations_organization_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: organization_github_app_installations_organization_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organization_github_app_installations
@@ -2645,7 +2646,7 @@ ALTER TABLE ONLY organization_github_app_installations
 
 
 --
--- Name: organizations organizations_owner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: organizations_owner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organizations
@@ -2653,7 +2654,7 @@ ALTER TABLE ONLY organizations
 
 
 --
--- Name: previews previews_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: previews_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY previews
@@ -2661,7 +2662,7 @@ ALTER TABLE ONLY previews
 
 
 --
--- Name: project_categories project_categories_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: project_categories_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_categories
@@ -2669,7 +2670,7 @@ ALTER TABLE ONLY project_categories
 
 
 --
--- Name: project_categories project_categories_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: project_categories_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_categories
@@ -2677,7 +2678,7 @@ ALTER TABLE ONLY project_categories
 
 
 --
--- Name: project_github_repos project_github_repos_github_repo_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: project_github_repos_github_repo_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_github_repos
@@ -2685,7 +2686,7 @@ ALTER TABLE ONLY project_github_repos
 
 
 --
--- Name: project_github_repos project_github_repos_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: project_github_repos_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_github_repos
@@ -2693,7 +2694,7 @@ ALTER TABLE ONLY project_github_repos
 
 
 --
--- Name: project_skills project_skills_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: project_skills_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_skills
@@ -2701,7 +2702,7 @@ ALTER TABLE ONLY project_skills
 
 
 --
--- Name: project_skills project_skills_skill_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: project_skills_skill_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_skills
@@ -2709,7 +2710,7 @@ ALTER TABLE ONLY project_skills
 
 
 --
--- Name: project_users project_users_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: project_users_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_users
@@ -2717,7 +2718,7 @@ ALTER TABLE ONLY project_users
 
 
 --
--- Name: project_users project_users_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: project_users_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_users
@@ -2725,7 +2726,7 @@ ALTER TABLE ONLY project_users
 
 
 --
--- Name: projects projects_organization_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: projects_organization_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY projects
@@ -2733,7 +2734,7 @@ ALTER TABLE ONLY projects
 
 
 --
--- Name: role_skills role_skills_role_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: role_skills_role_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY role_skills
@@ -2741,7 +2742,7 @@ ALTER TABLE ONLY role_skills
 
 
 --
--- Name: role_skills role_skills_skill_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: role_skills_skill_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY role_skills
@@ -2749,7 +2750,7 @@ ALTER TABLE ONLY role_skills
 
 
 --
--- Name: slugged_routes slugged_routes_organization_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: slugged_routes_organization_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY slugged_routes
@@ -2757,7 +2758,7 @@ ALTER TABLE ONLY slugged_routes
 
 
 --
--- Name: slugged_routes slugged_routes_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: slugged_routes_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY slugged_routes
@@ -2765,7 +2766,7 @@ ALTER TABLE ONLY slugged_routes
 
 
 --
--- Name: stripe_connect_accounts stripe_connect_accounts_organization_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_accounts_organization_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_accounts
@@ -2773,7 +2774,7 @@ ALTER TABLE ONLY stripe_connect_accounts
 
 
 --
--- Name: stripe_connect_cards stripe_connect_cards_stripe_connect_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_cards_stripe_connect_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_cards
@@ -2781,7 +2782,7 @@ ALTER TABLE ONLY stripe_connect_cards
 
 
 --
--- Name: stripe_connect_cards stripe_connect_cards_stripe_platform_card_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_cards_stripe_platform_card_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_cards
@@ -2789,7 +2790,7 @@ ALTER TABLE ONLY stripe_connect_cards
 
 
 --
--- Name: stripe_connect_charges stripe_connect_charges_stripe_connect_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_charges_stripe_connect_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_charges
@@ -2797,7 +2798,7 @@ ALTER TABLE ONLY stripe_connect_charges
 
 
 --
--- Name: stripe_connect_charges stripe_connect_charges_stripe_connect_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_charges_stripe_connect_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_charges
@@ -2805,7 +2806,7 @@ ALTER TABLE ONLY stripe_connect_charges
 
 
 --
--- Name: stripe_connect_charges stripe_connect_charges_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_charges_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_charges
@@ -2813,7 +2814,7 @@ ALTER TABLE ONLY stripe_connect_charges
 
 
 --
--- Name: stripe_connect_customers stripe_connect_customers_stripe_connect_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_customers_stripe_connect_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_customers
@@ -2821,7 +2822,7 @@ ALTER TABLE ONLY stripe_connect_customers
 
 
 --
--- Name: stripe_connect_customers stripe_connect_customers_stripe_platform_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_customers_stripe_platform_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_customers
@@ -2829,7 +2830,7 @@ ALTER TABLE ONLY stripe_connect_customers
 
 
 --
--- Name: stripe_connect_customers stripe_connect_customers_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_customers_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_customers
@@ -2837,7 +2838,7 @@ ALTER TABLE ONLY stripe_connect_customers
 
 
 --
--- Name: stripe_connect_plans stripe_connect_plans_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_plans_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_plans
@@ -2845,7 +2846,7 @@ ALTER TABLE ONLY stripe_connect_plans
 
 
 --
--- Name: stripe_connect_subscriptions stripe_connect_subscriptions_stripe_connect_plan_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_subscriptions_stripe_connect_plan_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_subscriptions
@@ -2853,7 +2854,7 @@ ALTER TABLE ONLY stripe_connect_subscriptions
 
 
 --
--- Name: stripe_connect_subscriptions stripe_connect_subscriptions_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_subscriptions_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_subscriptions
@@ -2861,7 +2862,7 @@ ALTER TABLE ONLY stripe_connect_subscriptions
 
 
 --
--- Name: stripe_external_accounts stripe_external_accounts_stripe_connect_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_external_accounts_stripe_connect_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_external_accounts
@@ -2869,7 +2870,7 @@ ALTER TABLE ONLY stripe_external_accounts
 
 
 --
--- Name: stripe_file_upload stripe_file_upload_stripe_connect_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_file_upload_stripe_connect_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_file_upload
@@ -2877,7 +2878,7 @@ ALTER TABLE ONLY stripe_file_upload
 
 
 --
--- Name: stripe_invoices stripe_invoices_stripe_connect_subscription_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_invoices_stripe_connect_subscription_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_invoices
@@ -2885,7 +2886,7 @@ ALTER TABLE ONLY stripe_invoices
 
 
 --
--- Name: stripe_invoices stripe_invoices_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_invoices_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_invoices
@@ -2893,7 +2894,7 @@ ALTER TABLE ONLY stripe_invoices
 
 
 --
--- Name: stripe_platform_cards stripe_platform_cards_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_platform_cards_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_platform_cards
@@ -2901,7 +2902,7 @@ ALTER TABLE ONLY stripe_platform_cards
 
 
 --
--- Name: stripe_platform_customers stripe_platform_customers_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_platform_customers_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_platform_customers
@@ -2909,7 +2910,7 @@ ALTER TABLE ONLY stripe_platform_customers
 
 
 --
--- Name: task_lists task_lists_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: task_lists_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY task_lists
@@ -2917,7 +2918,7 @@ ALTER TABLE ONLY task_lists
 
 
 --
--- Name: task_skills task_skills_skill_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: task_skills_skill_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY task_skills
@@ -2925,7 +2926,7 @@ ALTER TABLE ONLY task_skills
 
 
 --
--- Name: task_skills task_skills_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: task_skills_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY task_skills
@@ -2933,7 +2934,7 @@ ALTER TABLE ONLY task_skills
 
 
 --
--- Name: tasks tasks_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: tasks_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY tasks
@@ -2941,7 +2942,7 @@ ALTER TABLE ONLY tasks
 
 
 --
--- Name: tasks tasks_task_list_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: tasks_task_list_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY tasks
@@ -2949,7 +2950,7 @@ ALTER TABLE ONLY tasks
 
 
 --
--- Name: tasks tasks_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: tasks_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY tasks
@@ -2957,7 +2958,7 @@ ALTER TABLE ONLY tasks
 
 
 --
--- Name: user_categories user_categories_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_categories_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_categories
@@ -2965,7 +2966,7 @@ ALTER TABLE ONLY user_categories
 
 
 --
--- Name: user_categories user_categories_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_categories_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_categories
@@ -2973,7 +2974,7 @@ ALTER TABLE ONLY user_categories
 
 
 --
--- Name: user_roles user_roles_role_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_roles_role_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_roles
@@ -2981,7 +2982,7 @@ ALTER TABLE ONLY user_roles
 
 
 --
--- Name: user_roles user_roles_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_roles_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_roles
@@ -2989,7 +2990,7 @@ ALTER TABLE ONLY user_roles
 
 
 --
--- Name: user_skills user_skills_skill_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_skills_skill_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_skills
@@ -2997,7 +2998,7 @@ ALTER TABLE ONLY user_skills
 
 
 --
--- Name: user_skills user_skills_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_skills_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_skills
@@ -3005,7 +3006,7 @@ ALTER TABLE ONLY user_skills
 
 
 --
--- Name: user_tasks user_tasks_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_tasks_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_tasks
@@ -3013,7 +3014,7 @@ ALTER TABLE ONLY user_tasks
 
 
 --
--- Name: user_tasks user_tasks_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_tasks_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_tasks
@@ -3024,4 +3025,5 @@ ALTER TABLE ONLY user_tasks
 -- PostgreSQL database dump complete
 --
 
-INSERT INTO "schema_migrations" (version) VALUES (20160723215749), (20160804000000), (20160804001111), (20160805132301), (20160805203929), (20160808143454), (20160809214736), (20160810124357), (20160815125009), (20160815143002), (20160816020347), (20160816034021), (20160817220118), (20160818000944), (20160818132546), (20160820113856), (20160820164905), (20160822002438), (20160822004056), (20160822011624), (20160822020401), (20160822044612), (20160830081224), (20160830224802), (20160911233738), (20160912002705), (20160912145957), (20160918003206), (20160928232404), (20161003185918), (20161019090945), (20161019110737), (20161020144622), (20161021131026), (20161031001615), (20161121005339), (20161121014050), (20161121043941), (20161121045709), (20161122015942), (20161123081114), (20161123150943), (20161124085742), (20161125200620), (20161126045705), (20161127054559), (20161205024856), (20161207112519), (20161209192504), (20161212005641), (20161214005935), (20161215052051), (20161216051447), (20161218005913), (20161219160401), (20161219163909), (20161220141753), (20161221085759), (20161226213600), (20161231063614), (20170102130055), (20170102181053), (20170104113708), (20170104212623), (20170104235423), (20170106013143), (20170115035159), (20170115230549), (20170121014100), (20170131234029), (20170201014901), (20170201025454), (20170201035458), (20170201183258), (20170220032224), (20170224233516), (20170226050552), (20170228085250), (20170308214128), (20170308220713), (20170308222552), (20170313130611), (20170318032449), (20170318082740), (20170324194827), (20170424215355), (20170501225441), (20170526095401), (20170602000208), (20170622205732), (20170626231059), (20170628092119), (20170628213609), (20170629183404), (20170630140136), (20170706132431), (20170707213648), (20170711122252), (20170717092127), (20170727052644);
+INSERT INTO "schema_migrations" (version) VALUES (20160723215749), (20160804000000), (20160804001111), (20160805132301), (20160805203929), (20160808143454), (20160809214736), (20160810124357), (20160815125009), (20160815143002), (20160816020347), (20160816034021), (20160817220118), (20160818000944), (20160818132546), (20160820113856), (20160820164905), (20160822002438), (20160822004056), (20160822011624), (20160822020401), (20160822044612), (20160830081224), (20160830224802), (20160911233738), (20160912002705), (20160912145957), (20160918003206), (20160928232404), (20161003185918), (20161019090945), (20161019110737), (20161020144622), (20161021131026), (20161031001615), (20161121005339), (20161121014050), (20161121043941), (20161121045709), (20161122015942), (20161123081114), (20161123150943), (20161124085742), (20161125200620), (20161126045705), (20161127054559), (20161205024856), (20161207112519), (20161209192504), (20161212005641), (20161214005935), (20161215052051), (20161216051447), (20161218005913), (20161219160401), (20161219163909), (20161220141753), (20161221085759), (20161226213600), (20161231063614), (20170102130055), (20170102181053), (20170104113708), (20170104212623), (20170104235423), (20170106013143), (20170115035159), (20170115230549), (20170121014100), (20170131234029), (20170201014901), (20170201025454), (20170201035458), (20170201183258), (20170220032224), (20170224233516), (20170226050552), (20170228085250), (20170308214128), (20170308220713), (20170308222552), (20170313130611), (20170318032449), (20170318082740), (20170324194827), (20170424215355), (20170501225441), (20170505224222), (20170526095401), (20170602000208), (20170622205732), (20170626231059), (20170628092119), (20170628213609), (20170629183404), (20170630140136), (20170706132431), (20170707213648), (20170711122252), (20170717092127), (20170725060612), (20170727052644), (20170731130121);
+
