@@ -1,10 +1,8 @@
-defmodule CodeCorps.Github.Issue do
-  alias CodeCorps.{User, Repo}
-
+defmodule CodeCorps.GitHub.Issue do
   require Logger
 
   def create(project, attributes, current_user) do
-    access_token = current_user.github_access_token || default_user_token() # need to create the Github user for this token
+    access_token = current_user.github_auth_token || default_user_token() # need to create the Github user for this token
     client = Tentacat.Client.new(%{access_token: access_token})
     response = Tentacat.Issues.create(
       project.github_owner,
@@ -21,7 +19,7 @@ defmodule CodeCorps.Github.Issue do
   end
 
   def update(task, attributes, current_user) do
-    access_token = current_user.github_access_token || default_user_token() # need to create the Github user for this token
+    access_token = current_user.github_auth_token || default_user_token() # need to create the Github user for this token
     client = Tentacat.Client.new(%{access_token: access_token})
     response = Tentacat.Issues.update(
       task.project.github_owner,
