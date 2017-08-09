@@ -503,6 +503,111 @@ Note that a Github Repo relates 1:1 to a Github App Installation, since only a s
 
     + Attributes (Github Repo Response)
 
+#Group Organization Invites
+
+This endpoint is for Creating, Updating, returning Organization Invites on Code Corps.
+
+`fulfilled` field may only change from false to true.
+
+##Organization Invites [/organization-invites]
+
+### Create an organization invite [POST]
+
+Admin creates new organization invites which contains `email` and `title`. A `code` is automatically generated on creation and `fulfilled` is set to false.
+
++ Request
+
+  + Headers
+
+          Accept: application/vnd.api+json
+          Authorization: Bearer <token>
+
++ Response 201 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Organization Invite Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
++ Response 422 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Unprocessable Entity Response)
+
+### Filter by id [GET /organization-invites{?filter[id]}]
+
++ Request
+
+    + Attributes
+
+        + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Organization Invites Response)
+
++ Response 400 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Filter Missing Response)
+
+## Organization Invite [/organization-invites/{id}]
+
++ Parameters
+
+    + id (number, required)
+
+### Retrieve an organization invite [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Organization Invite Response)
+
++ Response 404 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Record Not Found Response)
+
+### Update an organization invite [PATCH]
+
++ Request (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Organization Invite Resource)
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 201 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Organization Invite Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
++ Response 422 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Unprocessable Entity Response)
+
+
 # Group Organizations
 
 This endpoint retrieves Organizations on Code Corps. Organizations usually have one or more Projects.
@@ -2955,6 +3060,29 @@ The platform stores Stripe customers and cards so they can be reused across diff
 
 ## Organizations Response (object)
 + data(array[Organization Resource])
++ include JSON API Version
+
+## Organization Invite Attributes (object)
++ title: `Code Corps` (string)
++ email: `head@corecorps.com` (string)
++ `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
++ `updated-at`: `2016-07-08T03:03:51.967Z` (string)
++ fulfilled: `false` (boolean)
+
+## Organization Invite Resource (object)
++ include Organization Invite Resource Identifier
++ attributes(Organization Invite Attributes)
+
+## Organization Invite Resource Identifier
++ id: `1` (string, required)
++ type: `organization-invite` (string, required)
+
+## Organization Invite Response (object)
++ data(Organization Invite Resource)
++ include JSON API Version
+
+## Organization Invites Response (object)
++ data(array[Organization Invite Resource])
 + include JSON API Version
 
 ## Forgot Password Resource (object)

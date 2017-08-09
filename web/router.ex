@@ -77,6 +77,7 @@ defmodule CodeCorps.Router do
     resources "/github-app-installations", GithubAppInstallationController, only: [:create]
     resources "/organization-github-app-installations", OrganizationGithubAppInstallationController, only: [:create, :delete]
     resources "/organizations", OrganizationController, only: [:create, :update]
+    resources "/organization-invites", OrganizationInviteController, only: [:create, :update]
     resources "/previews", PreviewController, only: [:create]
     resources "/project-categories", ProjectCategoryController, only: [:create, :delete]
     resources "/project-github-repos", ProjectGithubRepoController, only: [:create, :delete]
@@ -114,6 +115,7 @@ defmodule CodeCorps.Router do
     resources "/github-repos", GithubRepoController, only: [:index, :show]
     resources "/organization-github-app-installations", OrganizationGithubAppInstallationController, only: [:index, :show]
     resources "/organizations", OrganizationController, only: [:index, :show]
+    resources "/organization-invites", OrganizationInviteController, only: [:index, :show]
     post "/password/forgot", PasswordController, :forgot_password
     resources "/project-categories", ProjectCategoryController, only: [:index, :show]
     resources "/project-github-repos", ProjectGithubRepoController, only: [:index, :show]
