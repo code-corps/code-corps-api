@@ -1,10 +1,10 @@
-defmodule CodeCorps.ApiCase do
+defmodule CodeCorpsWeb.ApiCase do
   @moduledoc """
   This module defines the test case to be used by
   tests that require setting up a connection, specificaly,
   those working with the API endpoints.
 
-  It's basically a clone of CodeCorps.ConnCase, with some extras,
+  It's basically a clone of CodeCorpsWeb.ConnCase, with some extras,
   mainly authentication and proper headers, added.
 
   If provided with a :resource_name option, it dynamically
@@ -32,14 +32,14 @@ defmodule CodeCorps.ApiCase do
       import Ecto.Query
 
       import CodeCorps.AuthenticationTestHelpers
-      import CodeCorps.Router.Helpers
+      import CodeCorpsWeb.Router.Helpers
       import CodeCorps.Factories
       import CodeCorps.TestHelpers
 
       # The default endpoint for testing
-      @endpoint CodeCorps.Endpoint
+      @endpoint CodeCorpsWeb.Endpoint
 
-      CodeCorps.ApiCase.define_request_helper_methods(unquote(opts))
+      CodeCorpsWeb.ApiCase.define_request_helper_methods(unquote(opts))
     end
   end
 
@@ -87,11 +87,11 @@ defmodule CodeCorps.ApiCase do
       defp default_record, do: insert(unquote(resource_name))
 
       defp path_for(conn, action, resource_or_id) do
-        apply(CodeCorps.Router.Helpers, path_helper_method(), [conn, action, resource_or_id])
+        apply(CodeCorpsWeb.Router.Helpers, path_helper_method(), [conn, action, resource_or_id])
       end
 
       defp path_for(conn, action) do
-        apply(CodeCorps.Router.Helpers, path_helper_method(), [conn, action])
+        apply(CodeCorpsWeb.Router.Helpers, path_helper_method(), [conn, action])
       end
 
       def request_index(conn) do

@@ -24,37 +24,12 @@ defmodule CodeCorps.Mixfile do
   def application do
     [
       mod: {CodeCorps, []},
-      applications: [
-        :bamboo,
-        :phoenix,
-        :phoenix_pubsub,
-        :phoenix_html,
-        :cowboy,
-        :logger,
-        :gettext,
-        :phoenix_ecto,
-        :postgrex,
-        :cloudex,
-        :comeonin,
-        :corsica,
-        :earmark,
-        :ex_aws,
-        :httpoison,
-        :ja_resource,
-        :scrivener_ecto,
-        :segment,
-        :sentry,
-        :stripity_stripe,
-        :tentacat,
-        :timber,
-        :timex_ecto
-      ]
     ]
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "web", "test/support"]
-  defp elixirc_paths(_),     do: ["lib", "web"]
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_),     do: ["lib"]
 
   # Specifies your project dependencies.
   #
@@ -64,12 +39,12 @@ defmodule CodeCorps.Mixfile do
       {:bamboo, "~> 0.7"}, # emails
       {:bamboo_postmark, "~> 0.2.0"}, # postmark adapter for emails
       {:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false},
-      {:phoenix, "~> 1.2.1"},
-      {:phoenix_pubsub, "~> 1.0"},
-      {:phoenix_ecto, "~> 3.0"},
+      {:phoenix, "~> 1.3"},
+      {:phoenix_pubsub, "~> 1.0.2"},
+      {:phoenix_ecto, "~> 3.2.3"},
       {:postgrex, ">= 0.0.0"},
-      {:phoenix_html, "~> 2.8"},
-      {:phoenix_live_reload, "~> 1.0", only: :dev},
+      {:phoenix_html, "~> 2.10.3"},
+      {:phoenix_live_reload, "~> 1.0.8", only: :dev},
       {:gettext, "~> 0.12"},
       {:cowboy, "~> 1.0"},
       {:benchfella, "~> 0.3.0", only: :dev},
@@ -84,7 +59,7 @@ defmodule CodeCorps.Mixfile do
       {:excoveralls, "~> 0.5", only: :test}, # Test coverage
       {:ex_doc, "~> 0.14", only: [:dev, :test]},
       {:ex_machina, "~> 1.0", only: :test}, # test factories
-      {:guardian, "~> 0.13"}, # Authentication (JWT)
+      {:guardian, "~> 0.14.5"}, # Authentication (JWT)
       {:hackney, ">= 1.4.4"},
       {:inch_ex, "~> 0.5", only: [:dev, :test]}, # Inch CI
       {:inflex, "~> 1.8"},
