@@ -1,5 +1,6 @@
 defmodule CodeCorpsWeb.OrganizationInviteControllerTest do
   use CodeCorpsWeb.ApiCase, resource_name: :organization_invite
+  use Bamboo.Test
 
   @valid_attrs %{email: "code@corps.com", title: "Code Corps"}
   @invalid_attrs %{email: "code", title: ""}
@@ -32,8 +33,16 @@ defmodule CodeCorpsWeb.OrganizationInviteControllerTest do
 
   describe "create" do
     @tag authenticated: :admin
-    test "creates and renders resource when data is valid", %{conn: conn} do
+    test "creates and renders resource when data is valid, sends valid email", %{conn: conn} do
       assert conn |> request_create(@valid_attrs) |> json_response(201)
+
+      organization_invite_email = 
+        CodeCorps.OrganizationInvite
+        |> first()
+        |> Repo.one()
+        |> CodeCorps.Emails.OrganizationInviteEmail.create()
+
+      assert_delivered_email organization_invite_email  
     end
 
     @tag authenticated: :admin

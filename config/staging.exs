@@ -61,7 +61,8 @@ config :code_corps, CodeCorps.Mailer,
 config :code_corps,
   postmark_forgot_password_template: "1989481",
   postmark_project_acceptance_template: "1447022",
-  postmark_receipt_template: "1252361"
+  postmark_receipt_template: "1252361",
+  postmark_organization_invite_email_template: "3442401"
 
 # ## SSL Support
 #
