@@ -32,7 +32,6 @@ defmodule CodeCorpsWeb do
     quote do
       use Phoenix.Controller, namespace: CodeCorpsWeb
 
-      alias CodeCorps.Repo
       import Ecto
       import Ecto.Query
 
@@ -41,6 +40,9 @@ defmodule CodeCorpsWeb do
 
       import Canary.Plugs
       import CodeCorpsWeb.AuthenticationHelpers, only: [load_and_authorize_changeset: 2]
+
+      alias CodeCorps.{Repo, Policy}
+      alias Plug.Conn
     end
   end
 

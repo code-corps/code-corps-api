@@ -1,28 +1,23 @@
 defmodule CodeCorps.Policy.CommentTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.Policy.Comment, only: [create?: 2, update?: 2]
-  import CodeCorps.Comment, only: [create_changeset: 2]
-
-  alias CodeCorps.Comment
+  alias CodeCorps.{Comment, Policy, User}
 
   describe "create?" do
     test "returns true if own record" do
       user = insert(:user)
-      changeset = %Comment{} |> create_changeset(%{user_id: user.id})
-      assert create?(user, changeset)
+      params = %{"user_id" => user.id}
+      assert Policy.Comment.create?(user, params)
     end
 
     test "returns false if someone else's record" do
       [user, another_user] = insert_pair(:user)
-      changeset = %Comment{} |> create_changeset(%{user_id: another_user.id})
-      refute create?(user, changeset)
+      params = %{"user_id" => another_user.id}
+      refute Policy.Comment.create?(user, params)
     end
 
-    test "returns false if changeset is empty" do
-      user = insert(:user)
-      changeset = %Comment{} |> create_changeset(%{})
-      refute create?(user, changeset)
+    test "returns false by default" do
+      refute Policy.Comment.create?(%User{}, %{})
     end
   end
 
@@ -30,13 +25,17 @@ defmodule CodeCorps.Policy.CommentTest do
     test "returns true if own record" do
       user = insert(:user)
       comment = insert(:comment, user: user)
-      assert update?(user, comment)
+      assert Policy.Comment.update?(user, comment)
     end
 
     test "returns false if someone else's record" do
       [user, another_user] = insert_pair(:user)
       comment = insert(:comment, user: user)
-      refute update?(another_user, comment)
+      refute Policy.Comment.update?(another_user, comment)
+    end
+
+    test "returns false by default" do
+      refute Policy.Comment.update?(%User{}, %Comment{})
     end
   end
 end

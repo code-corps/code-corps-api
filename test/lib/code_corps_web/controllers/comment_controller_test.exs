@@ -114,5 +114,10 @@ defmodule CodeCorpsWeb.CommentControllerTest do
     test "does not update resource and renders 403 when not authorized", %{conn: conn} do
       assert conn |> request_update(@valid_attrs) |> json_response(403)
     end
+
+    @tag :authenticated
+    test "renders 404 when id is nonexistent", %{conn: conn} do
+      assert conn |> request_update(:not_found) |> json_response(404)
+    end
   end
 end
