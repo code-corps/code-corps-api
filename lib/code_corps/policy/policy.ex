@@ -8,6 +8,25 @@ defmodule CodeCorps.Policy do
   alias CodeCorps.Policy
   alias Ecto.Changeset
 
+  @doc ~S"""
+  Determines if the specified user can perform the specified action on the
+  specified resource.
+
+  The resource can be a record, when performing an action on an existing record,
+  or it can be a map of parameters, when creating a new record.
+  """
+  @spec authorize(User.t, atom, map | struct) :: {:ok, :authorized} | {:error, :not_authorized}
+  def authorize(%User{} = user, action, resource) do
+    case user |> can?(action, resource) do
+      true -> {:ok, :authorized}
+      false -> {:error, :not_authorized}
+    end
+  end
+
+  @spec can?(User.t, atom, map | struct) :: boolean
+  defp can?(%User{} = user, :update, %Comment{} = comment), do: Policy.Comment.update?(user, comment)
+  defp can?(%User{} = user, :create, %{} = params), do: Policy.Comment.create?(user, params)
+
   defimpl Canada.Can, for: User do
     # NOTE: Canary sets an :unauthorized and a :not_found handler on a config level
     # The problem is, it will still go through the authorization process first and only call the
@@ -22,9 +41,6 @@ defmodule CodeCorps.Policy do
 
     def can?(%User{} = user, :create, Category), do: Policy.Category.create?(user)
     def can?(%User{} = user, :update, %Category{}), do: Policy.Category.update?(user)
-
-    def can?(%User{} = user, :create, %Changeset{data: %Comment{}} = changeset), do: Policy.Comment.create?(user, changeset)
-    def can?(%User{} = user, :update, %Comment{} = comment), do: Policy.Comment.update?(user, comment)
 
     def can?(%User{} = user, :create, %Changeset{data: %DonationGoal{}} = changeset), do: Policy.DonationGoal.create?(user, changeset)
     def can?(%User{} = user, :update, %DonationGoal{} = comment), do: Policy.DonationGoal.update?(user, comment)

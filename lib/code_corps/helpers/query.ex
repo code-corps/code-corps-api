@@ -2,7 +2,12 @@ defmodule CodeCorps.Helpers.Query do
   import CodeCorps.Helpers.String, only: [coalesce_id_string: 1]
   import Ecto.Query, only: [where: 3, limit: 2, order_by: 2]
 
-  def id_filter(query, id_list) do
+  @spec id_filter(Ecto.Queryable.t, map | String.t) :: Ecto.Queryable.t
+  def id_filter(query, %{"filter" => %{"id" => id_csv}}) do
+    query |> id_filter(id_csv)
+  end
+  def id_filter(query, %{}), do: query
+  def id_filter(query, id_list) when is_binary(id_list) do
     ids = id_list |> coalesce_id_string
     query |> where([object], object.id in ^ids)
   end
