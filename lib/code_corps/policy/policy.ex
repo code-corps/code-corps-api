@@ -15,17 +15,17 @@ defmodule CodeCorps.Policy do
   The resource can be a record, when performing an action on an existing record,
   or it can be a map of parameters, when creating a new record.
   """
-  @spec authorize(User.t, atom, map | struct) :: {:ok, :authorized} | {:error, :not_authorized}
-  def authorize(%User{} = user, action, resource) do
-    case user |> can?(action, resource) do
+  @spec authorize(User.t, atom, struct, map) :: {:ok, :authorized} | {:error, :not_authorized}
+  def authorize(%User{} = user, action, struct, %{} = params \\ %{}) do
+    case user |> can?(action, struct, params) do
       true -> {:ok, :authorized}
       false -> {:error, :not_authorized}
     end
   end
 
-  @spec can?(User.t, atom, map | struct) :: boolean
-  defp can?(%User{} = user, :update, %Comment{} = comment), do: Policy.Comment.update?(user, comment)
-  defp can?(%User{} = user, :create, %{} = params), do: Policy.Comment.create?(user, params)
+  @spec can?(User.t, atom, struct, map) :: boolean
+  defp can?(%User{} = user, :create, %Comment{}, %{} = params), do: Policy.Comment.create?(user, params)
+  defp can?(%User{} = user, :update, %Comment{} = comment, %{}), do: Policy.Comment.update?(user, comment)
 
   defimpl Canada.Can, for: User do
     # NOTE: Canary sets an :unauthorized and a :not_found handler on a config level
