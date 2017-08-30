@@ -3,9 +3,10 @@ defmodule CodeCorpsWeb.UserView do
 
   use CodeCorpsWeb.PreloadHelpers,
       default_preloads: [
-        :project_users, :slugged_route, :stripe_connect_subscriptions,
-        :stripe_platform_card, :stripe_platform_customer,
-        :user_categories, :user_roles, :user_skills
+        :github_app_installations, :project_users, :slugged_route,
+        :stripe_connect_subscriptions, :stripe_platform_card,
+        :stripe_platform_customer, :user_categories, :user_roles,
+        :user_skills
       ]
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
@@ -22,6 +23,7 @@ defmodule CodeCorpsWeb.UserView do
   has_one :stripe_platform_card, serializer: CodeCorpsWeb.StripePlatformCardView
   has_one :stripe_platform_customer, serializer: CodeCorpsWeb.StripePlatformCustomerView
 
+  has_many :github_app_installations, serializer: CodeCorpsWeb.GithubAppInstallationView, identifiers: :always
   has_many :project_users, serializer: CodeCorpsWeb.ProjectUserView, identifiers: :always
   has_many :stripe_connect_subscriptions, serializer: CodeCorpsWeb.StripeConnectSubscriptionView, identifiers: :always
   has_many :user_categories, serializer: CodeCorpsWeb.UserCategoryView, identifiers: :always

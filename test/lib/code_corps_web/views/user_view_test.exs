@@ -6,6 +6,7 @@ defmodule CodeCorpsWeb.UserViewTest do
 
   test "renders all attributes and relationships properly" do
     user = insert(:user, first_name: "First", github_avatar_url: "foo", github_id: 123, github_username: "githubuser", last_name: "Last", default_color: "blue")
+    github_app_installation = insert(:github_app_installation, user: user)
     slugged_route = insert(:slugged_route, user: user)
     stripe_connect_subscription = insert(:stripe_connect_subscription, user: user)
     stripe_platform_card = insert(:stripe_platform_card, user: user)
@@ -45,6 +46,11 @@ defmodule CodeCorpsWeb.UserViewTest do
           "website" => user.website
         },
         "relationships" => %{
+          "github-app-installations" => %{
+            "data" => [
+              %{"id" => github_app_installation.id |> Integer.to_string, "type" => "github-app-installation"}
+            ]
+          },
           "project-users" => %{
             "data" => [
               %{"id" => project_user.id |> Integer.to_string, "type" => "project-user"}
