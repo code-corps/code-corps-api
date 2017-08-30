@@ -1,9 +1,7 @@
 defmodule CodeCorps.Policy.Category do
-  alias CodeCorps.User
+  def create?(%{admin: true}), do: true
+  def create?(%{admin: false}), do: false
 
-  def create?(%User{admin: true}), do: true
-  def create?(%User{admin: false}), do: false
-
-  def update?(%User{admin: true}), do: true
-  def update?(%User{admin: false}), do: false
+  def update?(%{admin: true}), do: true
+  def update?(%{admin: false}), do: false
 end
