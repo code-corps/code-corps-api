@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.5.4
--- Dumped by pg_dump version 9.5.4
+-- Dumped from database version 9.5.1
+-- Dumped by pg_dump version 9.5.1
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -185,6 +185,187 @@ ALTER SEQUENCE donation_goals_id_seq OWNED BY donation_goals.id;
 
 
 --
+-- Name: github_app_installations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE github_app_installations (
+    id integer NOT NULL,
+    github_id integer,
+    installed boolean DEFAULT true,
+    state character varying(255),
+    project_id integer,
+    user_id integer,
+    inserted_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    access_token character varying(255),
+    access_token_expires_at timestamp without time zone,
+    sender_github_id integer,
+    origin character varying(255) DEFAULT 'codecorps'::character varying NOT NULL,
+    github_account_avatar_url character varying(255),
+    github_account_id integer,
+    github_account_login character varying(255),
+    github_account_type character varying(255)
+);
+
+
+--
+-- Name: github_app_installations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE github_app_installations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: github_app_installations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE github_app_installations_id_seq OWNED BY github_app_installations.id;
+
+
+--
+-- Name: github_events; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE github_events (
+    id integer NOT NULL,
+    action character varying(255),
+    github_delivery_id character varying(255),
+    status character varying(255),
+    source character varying(255),
+    type character varying(255),
+    inserted_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: github_events_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE github_events_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: github_events_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE github_events_id_seq OWNED BY github_events.id;
+
+
+--
+-- Name: github_repos; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE github_repos (
+    id integer NOT NULL,
+    github_id integer,
+    name character varying(255),
+    github_account_id integer,
+    github_account_login character varying(255),
+    github_account_avatar_url character varying(255),
+    github_account_type character varying(255),
+    github_app_installation_id integer,
+    inserted_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: github_repos_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE github_repos_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: github_repos_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE github_repos_id_seq OWNED BY github_repos.id;
+
+
+--
+-- Name: organization_github_app_installations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE organization_github_app_installations (
+    id integer NOT NULL,
+    organization_id integer,
+    github_app_installation_id integer,
+    inserted_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_github_app_installations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE organization_github_app_installations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_github_app_installations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE organization_github_app_installations_id_seq OWNED BY organization_github_app_installations.id;
+
+
+--
+-- Name: organization_invites; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE organization_invites (
+    id integer NOT NULL,
+    code character varying(255) NOT NULL,
+    email character varying(255) NOT NULL,
+    title character varying(255) NOT NULL,
+    fulfilled boolean DEFAULT false NOT NULL,
+    inserted_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_invites_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE organization_invites_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_invites_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE organization_invites_id_seq OWNED BY organization_invites.id;
+
+
+--
 -- Name: organizations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -284,6 +465,38 @@ CREATE SEQUENCE project_categories_id_seq
 --
 
 ALTER SEQUENCE project_categories_id_seq OWNED BY project_categories.id;
+
+
+--
+-- Name: project_github_repos; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE project_github_repos (
+    id integer NOT NULL,
+    project_id integer,
+    github_repo_id integer,
+    inserted_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: project_github_repos_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE project_github_repos_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: project_github_repos_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE project_github_repos_id_seq OWNED BY project_github_repos.id;
 
 
 --
@@ -1143,7 +1356,6 @@ CREATE TABLE tasks (
     body text,
     markdown text,
     number integer NOT NULL,
-    state character varying(255) NOT NULL,
     status character varying(255) DEFAULT 'open'::character varying NOT NULL,
     title text NOT NULL,
     project_id integer NOT NULL,
@@ -1309,8 +1521,8 @@ ALTER SEQUENCE user_tasks_id_seq OWNED BY user_tasks.id;
 
 CREATE TABLE users (
     id integer NOT NULL,
-    username character varying(255) NOT NULL,
-    email character varying(255) NOT NULL,
+    username character varying(255),
+    email character varying(255),
     encrypted_password character varying(255),
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -1324,8 +1536,11 @@ CREATE TABLE users (
     cloudinary_public_id character varying(255),
     default_color character varying(255),
     sign_up_context character varying(255) DEFAULT 'default'::character varying,
-    github_id character varying(255),
-    github_auth_token character varying(255)
+    github_auth_token character varying(255),
+    github_avatar_url character varying(255),
+    github_email character varying(255),
+    github_username character varying(255),
+    github_id integer
 );
 
 
@@ -1380,6 +1595,41 @@ ALTER TABLE ONLY donation_goals ALTER COLUMN id SET DEFAULT nextval('donation_go
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY github_app_installations ALTER COLUMN id SET DEFAULT nextval('github_app_installations_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_events ALTER COLUMN id SET DEFAULT nextval('github_events_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_repos ALTER COLUMN id SET DEFAULT nextval('github_repos_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY organization_github_app_installations ALTER COLUMN id SET DEFAULT nextval('organization_github_app_installations_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY organization_invites ALTER COLUMN id SET DEFAULT nextval('organization_invites_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY organizations ALTER COLUMN id SET DEFAULT nextval('organizations_id_seq'::regclass);
 
 
@@ -1395,6 +1645,13 @@ ALTER TABLE ONLY previews ALTER COLUMN id SET DEFAULT nextval('previews_id_seq':
 --
 
 ALTER TABLE ONLY project_categories ALTER COLUMN id SET DEFAULT nextval('project_categories_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY project_github_repos ALTER COLUMN id SET DEFAULT nextval('project_github_repos_id_seq'::regclass);
 
 
 --
@@ -1619,6 +1876,46 @@ ALTER TABLE ONLY donation_goals
 
 
 --
+-- Name: github_app_installations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_app_installations
+    ADD CONSTRAINT github_app_installations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: github_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_events
+    ADD CONSTRAINT github_events_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: github_repos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_repos
+    ADD CONSTRAINT github_repos_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: organization_github_app_installations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY organization_github_app_installations
+    ADD CONSTRAINT organization_github_app_installations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: organization_invites_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY organization_invites
+    ADD CONSTRAINT organization_invites_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1640,6 +1937,14 @@ ALTER TABLE ONLY previews
 
 ALTER TABLE ONLY project_categories
     ADD CONSTRAINT project_categories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: project_github_repos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY project_github_repos
+    ADD CONSTRAINT project_github_repos_pkey PRIMARY KEY (id);
 
 
 --
@@ -1854,6 +2159,34 @@ CREATE INDEX donation_goals_project_id_index ON donation_goals USING btree (proj
 
 
 --
+-- Name: github_app_installations_github_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX github_app_installations_github_id_index ON github_app_installations USING btree (github_id);
+
+
+--
+-- Name: github_app_installations_project_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX github_app_installations_project_id_index ON github_app_installations USING btree (project_id);
+
+
+--
+-- Name: github_app_installations_user_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX github_app_installations_user_id_index ON github_app_installations USING btree (user_id);
+
+
+--
+-- Name: github_repos_github_app_installation_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX github_repos_github_app_installation_id_index ON github_repos USING btree (github_app_installation_id);
+
+
+--
 -- Name: index_categories_on_slug; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1889,6 +2222,34 @@ CREATE UNIQUE INDEX index_skills_on_title ON skills USING btree (lower((title)::
 
 
 --
+-- Name: organization_github_app_installations_github_app_installation_i; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX organization_github_app_installations_github_app_installation_i ON organization_github_app_installations USING btree (github_app_installation_id);
+
+
+--
+-- Name: organization_github_app_installations_organization_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX organization_github_app_installations_organization_id_index ON organization_github_app_installations USING btree (organization_id);
+
+
+--
+-- Name: organization_invites_code_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX organization_invites_code_index ON organization_invites USING btree (code);
+
+
+--
+-- Name: organization_invites_email_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX organization_invites_email_index ON organization_invites USING btree (email);
+
+
+--
 -- Name: organizations_approved_index; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1907,6 +2268,13 @@ CREATE UNIQUE INDEX organizations_lower_slug_index ON organizations USING btree 
 --
 
 CREATE UNIQUE INDEX project_categories_project_id_category_id_index ON project_categories USING btree (project_id, category_id);
+
+
+--
+-- Name: project_github_repos_project_id_github_repo_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX project_github_repos_project_id_github_repo_id_index ON project_github_repos USING btree (project_id, github_repo_id);
 
 
 --
@@ -2236,6 +2604,46 @@ ALTER TABLE ONLY donation_goals
 
 
 --
+-- Name: github_app_installations_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_app_installations
+    ADD CONSTRAINT github_app_installations_project_id_fkey FOREIGN KEY (project_id) REFERENCES projects(id);
+
+
+--
+-- Name: github_app_installations_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_app_installations
+    ADD CONSTRAINT github_app_installations_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
+-- Name: github_repos_github_app_installation_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_repos
+    ADD CONSTRAINT github_repos_github_app_installation_id_fkey FOREIGN KEY (github_app_installation_id) REFERENCES github_app_installations(id);
+
+
+--
+-- Name: organization_github_app_installations_github_app_installation_i; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY organization_github_app_installations
+    ADD CONSTRAINT organization_github_app_installations_github_app_installation_i FOREIGN KEY (github_app_installation_id) REFERENCES github_app_installations(id);
+
+
+--
+-- Name: organization_github_app_installations_organization_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY organization_github_app_installations
+    ADD CONSTRAINT organization_github_app_installations_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES organizations(id);
+
+
+--
 -- Name: organizations_owner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2265,6 +2673,22 @@ ALTER TABLE ONLY project_categories
 
 ALTER TABLE ONLY project_categories
     ADD CONSTRAINT project_categories_project_id_fkey FOREIGN KEY (project_id) REFERENCES projects(id);
+
+
+--
+-- Name: project_github_repos_github_repo_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY project_github_repos
+    ADD CONSTRAINT project_github_repos_github_repo_id_fkey FOREIGN KEY (github_repo_id) REFERENCES github_repos(id) ON DELETE CASCADE;
+
+
+--
+-- Name: project_github_repos_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY project_github_repos
+    ADD CONSTRAINT project_github_repos_project_id_fkey FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
 
 
 --
@@ -2599,5 +3023,5 @@ ALTER TABLE ONLY user_tasks
 -- PostgreSQL database dump complete
 --
 
-INSERT INTO "schema_migrations" (version) VALUES (20160723215749), (20160804000000), (20160804001111), (20160805132301), (20160805203929), (20160808143454), (20160809214736), (20160810124357), (20160815125009), (20160815143002), (20160816020347), (20160816034021), (20160817220118), (20160818000944), (20160818132546), (20160820113856), (20160820164905), (20160822002438), (20160822004056), (20160822011624), (20160822020401), (20160822044612), (20160830081224), (20160830224802), (20160911233738), (20160912002705), (20160912145957), (20160918003206), (20160928232404), (20161003185918), (20161019090945), (20161019110737), (20161020144622), (20161021131026), (20161031001615), (20161121005339), (20161121014050), (20161121043941), (20161121045709), (20161122015942), (20161123081114), (20161123150943), (20161124085742), (20161125200620), (20161126045705), (20161127054559), (20161205024856), (20161207112519), (20161209192504), (20161212005641), (20161214005935), (20161215052051), (20161216051447), (20161218005913), (20161219160401), (20161219163909), (20161220141753), (20161221085759), (20161226213600), (20161231063614), (20170102130055), (20170102181053), (20170104113708), (20170104212623), (20170104235423), (20170106013143), (20170115035159), (20170115230549), (20170121014100), (20170131234029), (20170201014901), (20170201025454), (20170201035458), (20170201183258), (20170220032224), (20170224233516), (20170226050552), (20170228085250), (20170308214128), (20170308220713), (20170308222552), (20170313130611), (20170318032449), (20170318082740), (20170324194827), (20170424215355), (20170501225441), (20170526095401);
+INSERT INTO "schema_migrations" (version) VALUES (20160723215749), (20160804000000), (20160804001111), (20160805132301), (20160805203929), (20160808143454), (20160809214736), (20160810124357), (20160815125009), (20160815143002), (20160816020347), (20160816034021), (20160817220118), (20160818000944), (20160818132546), (20160820113856), (20160820164905), (20160822002438), (20160822004056), (20160822011624), (20160822020401), (20160822044612), (20160830081224), (20160830224802), (20160911233738), (20160912002705), (20160912145957), (20160918003206), (20160928232404), (20161003185918), (20161019090945), (20161019110737), (20161020144622), (20161021131026), (20161031001615), (20161121005339), (20161121014050), (20161121043941), (20161121045709), (20161122015942), (20161123081114), (20161123150943), (20161124085742), (20161125200620), (20161126045705), (20161127054559), (20161205024856), (20161207112519), (20161209192504), (20161212005641), (20161214005935), (20161215052051), (20161216051447), (20161218005913), (20161219160401), (20161219163909), (20161220141753), (20161221085759), (20161226213600), (20161231063614), (20170102130055), (20170102181053), (20170104113708), (20170104212623), (20170104235423), (20170106013143), (20170115035159), (20170115230549), (20170121014100), (20170131234029), (20170201014901), (20170201025454), (20170201035458), (20170201183258), (20170220032224), (20170224233516), (20170226050552), (20170228085250), (20170308214128), (20170308220713), (20170308222552), (20170313130611), (20170318032449), (20170318082740), (20170324194827), (20170424215355), (20170501225441), (20170526095401), (20170602000208), (20170622205732), (20170626231059), (20170628092119), (20170628213609), (20170629183404), (20170630140136), (20170706132431), (20170707213648), (20170711122252), (20170717092127), (20170725060612), (20170727052644), (20170731130121);
 

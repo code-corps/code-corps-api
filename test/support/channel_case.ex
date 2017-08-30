@@ -1,4 +1,4 @@
-defmodule CodeCorps.ChannelCase do
+defmodule CodeCorpsWeb.ChannelCase do
   @moduledoc """
   This module defines the test case to be used by
   channel tests.
@@ -27,7 +27,7 @@ defmodule CodeCorps.ChannelCase do
 
 
       # The default endpoint for testing
-      @endpoint CodeCorps.Endpoint
+      @endpoint CodeCorpsWeb.Endpoint
     end
   end
 

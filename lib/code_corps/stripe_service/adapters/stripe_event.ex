@@ -4,7 +4,8 @@ defmodule CodeCorps.StripeService.Adapters.StripeEventAdapter do
   attributes suitable for work with our own `StripeEvent` database objects.
   """
   import CodeCorps.MapUtils, only: [keys_to_string: 1]
-  import CodeCorps.StripeService.Util, only: [transform_map: 2]
+
+  alias CodeCorps.Adapter.MapTransformer
 
   # Mapping of stripe record attributes to locally stored attributes
   # Format is {:local_key, [:nesting, :of, :stripe, :keys]}
@@ -23,7 +24,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeEventAdapter do
     result =
       stripe_event
       |> Map.from_struct
-      |> transform_map(@stripe_mapping)
+      |> MapTransformer.transform(@stripe_mapping)
       |> add_non_stripe_attributes(attributes)
       |> add_object_type(stripe_event)
       |> add_object_id(stripe_event)

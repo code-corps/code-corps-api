@@ -1,4 +1,4 @@
-defmodule CodeCorps.ConnCase do
+defmodule CodeCorpsWeb.ConnCase do
   @moduledoc """
   This module defines the test case to be used by
   tests that require setting up a connection.
@@ -25,11 +25,11 @@ defmodule CodeCorps.ConnCase do
       import Ecto.Changeset
       import Ecto.Query
 
-      import CodeCorps.Router.Helpers
+      import CodeCorpsWeb.Router.Helpers
       import CodeCorps.Factories
 
       # The default endpoint for testing
-      @endpoint CodeCorps.Endpoint
+      @endpoint CodeCorpsWeb.Endpoint
     end
   end
 

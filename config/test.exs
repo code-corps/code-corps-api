@@ -2,7 +2,7 @@ use Mix.Config
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
-config :code_corps, CodeCorps.Endpoint,
+config :code_corps, CodeCorpsWeb.Endpoint,
   http: [port: 4001],
   server: false
 
@@ -32,8 +32,6 @@ config :guardian, Guardian,
 
 config :code_corps, :analytics, CodeCorps.Analytics.TestAPI
 
-config :code_corps, :github_api, CodeCorps.GitHub.TestAPI
-
 # Configures stripe for test mode
 config :code_corps, :stripe, CodeCorps.StripeTesting
 config :code_corps, :stripe_env, :test
@@ -56,3 +54,11 @@ config :code_corps,
 
 config :code_corps, :cloudex, CloudexTest
 config :cloudex, api_key: "test_key", secret: "test_secret", cloud_name: "test_cloud_name"
+
+# fall back to sample pem if none is available as an ENV variable
+pem = case System.get_env("GITHUB_APP_PEM") do
+  nil -> "./test/fixtures/github/app.pem" |> File.read!
+  encoded_pem -> encoded_pem |> Base.decode64!
+end
+
+config :code_corps, github_app_pem: pem

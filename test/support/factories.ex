@@ -29,6 +29,21 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def github_app_installation_factory do
+    %CodeCorps.GithubAppInstallation{
+      project: build(:project),
+      user: build(:user)
+    }
+  end
+
+  def github_event_factory do
+    %CodeCorps.GithubEvent{}
+  end
+
+  def github_repo_factory do
+    %CodeCorps.GithubRepo{}
+  end
+
   def organization_factory do
     %CodeCorps.Organization{
       name: sequence(:username, &"Organization #{&1}"),
@@ -38,12 +53,20 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def organization_invite_factory do
+    %CodeCorps.OrganizationInvite{
+      email: sequence(:email, &"email_#{&1}@mail.com"),
+      title: sequence(:title, &"organization-#{&1}"),
+      code: sequence(:code, &"n43crhiqR-#{&1}"),
+      fulfilled: false
+    }
+  end
+
   def task_factory do
     %CodeCorps.Task{
       title: "Test task",
       markdown: "A test task",
       status: "open",
-      state: "published",
       project: build(:project),
       user: build(:user),
       task_list: build(:task_list)
@@ -62,6 +85,13 @@ defmodule CodeCorps.Factories do
     %CodeCorps.TaskSkill{
       skill: build(:skill),
       task: build(:task)
+    }
+  end
+
+  def organization_github_app_installation_factory do
+    %CodeCorps.OrganizationGithubAppInstallation{
+      github_app_installation: build(:github_app_installation),
+      organization: build(:organization)
     }
   end
 
@@ -89,6 +119,13 @@ defmodule CodeCorps.Factories do
     %CodeCorps.ProjectCategory{
       project: build(:project),
       category: build(:category)
+    }
+  end
+
+  def project_github_repo_factory do
+    %CodeCorps.ProjectGithubRepo{
+      project: build(:project),
+      github_repo: build(:github_repo)
     }
   end
 

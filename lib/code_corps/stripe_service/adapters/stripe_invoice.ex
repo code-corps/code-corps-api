@@ -1,8 +1,11 @@
 defmodule CodeCorps.StripeService.Adapters.StripeInvoiceAdapter do
-  alias CodeCorps.{Repo, StripeConnectCustomer, StripeConnectSubscription}
-
-  import CodeCorps.MapUtils, only: [keys_to_string: 1]
-  import CodeCorps.StripeService.Util, only: [transform_map: 2]
+  alias CodeCorps.{
+    Adapter.MapTransformer,
+    MapUtils,
+    Repo,
+    StripeConnectCustomer,
+    StripeConnectSubscription
+  }
 
   # Mapping of stripe record attributes to locally stored attributes
   # Format is {:local_key, [:nesting, :of, :stripe, :keys]}
@@ -44,10 +47,10 @@ defmodule CodeCorps.StripeService.Adapters.StripeInvoiceAdapter do
     result =
       stripe_invoice
       |> Map.from_struct
-      |> transform_map(@stripe_mapping)
+      |> MapTransformer.transform(@stripe_mapping)
       |> add_stripe_connect_subscription_id
       |> add_user_id
-      |> keys_to_string
+      |> MapUtils.keys_to_string()
 
     {:ok, result}
   end

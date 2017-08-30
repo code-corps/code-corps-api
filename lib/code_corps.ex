@@ -3,7 +3,7 @@ defmodule CodeCorps do
 
   use Application
 
-  alias CodeCorps.Endpoint
+  alias CodeCorpsWeb.Endpoint
 
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
@@ -15,10 +15,11 @@ defmodule CodeCorps do
       # Start the Ecto repository
       supervisor(CodeCorps.Repo, []),
       # Start the endpoint when the application starts
-      supervisor(CodeCorps.Endpoint, []),
+      supervisor(CodeCorpsWeb.Endpoint, []),
+      # Start supervisor for any background processing we do
+      supervisor(Task.Supervisor, [[name: :background_processor, restart: :transient]]),
       # Start your own worker by calling: CodeCorps.Worker.start_link(arg1, arg2, arg3)
       # worker(CodeCorps.Worker, [arg1, arg2, arg3]),
-      supervisor(Task.Supervisor, [[name: :webhook_processor, restart: :transient]]),
       worker(Segment, [Application.get_env(:segment, :write_key)])
     ]
 

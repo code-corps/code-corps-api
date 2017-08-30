@@ -1,6 +1,6 @@
 defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter do
-  import CodeCorps.MapUtils, only: [keys_to_string: 1]
-  import CodeCorps.StripeService.Util, only: [transform_attributes: 2, transform_map: 2]
+  alias CodeCorps.MapUtils
+  alias CodeCorps.Adapter.MapTransformer
 
   # Mapping of stripe record attributes to locally stored attributes
   # Format is {:local_key, [:nesting, :of, :stripe, :keys]}
@@ -70,7 +70,8 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter do
     result =
       attributes
       |> remove_attributes()
-      |> transform_attributes(@stripe_mapping)
+      |> MapUtils.keys_to_atom()
+      |> MapTransformer.transform_inverse(@stripe_mapping)
 
     {:ok, result}
   end
@@ -83,9 +84,9 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter do
     result =
       stripe_account
       |> Map.from_struct
-      |> transform_map(@stripe_mapping)
+      |> MapTransformer.transform(@stripe_mapping)
       |> add_nested_attributes(stripe_account)
-      |> keys_to_string
+      |> MapUtils.keys_to_string()
       |> add_non_stripe_attributes(attributes)
 
     {:ok, result}
