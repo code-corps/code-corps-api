@@ -7,6 +7,7 @@ defmodule CodeCorps.GitHub.Event.Issues.TaskSyncerTest do
 
   alias CodeCorps.{
     GitHub.Event.Issues.TaskSyncer,
+    Project,
     Repo,
     Task
   }
@@ -24,6 +25,12 @@ defmodule CodeCorps.GitHub.Event.Issues.TaskSyncerTest do
 
       task_1 = insert(:task, project: project_1, user: user, github_id: issue_github_id)
 
+      project_ids = project_github_repos |> Enum.map(&Map.get(&1, :project_id))
+
+      project_ids |> Enum.each(fn project_id ->
+        project = Project |> Repo.get_by(id: project_id)
+        insert(:task_list, project: project, inbox: true)
+      end)
 
       {:ok, tasks} = %{github_repo | project_github_repos: project_github_repos}
       |> TaskSyncer.sync_all(user, @payload)

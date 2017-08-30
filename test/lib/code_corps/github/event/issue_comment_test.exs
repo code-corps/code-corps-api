@@ -8,6 +8,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
   alias CodeCorps.{
     Comment,
     GitHub.Event.IssueComment,
+    Project,
     Task,
     Repo,
     User
@@ -55,6 +56,11 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
         project_ids =
           insert_list(3, :project_github_repo, github_repo: github_repo)
           |> Enum.map(&Map.get(&1, :project_id))
+
+        project_ids |> Enum.each(fn project_id ->
+          project = Project |> Repo.get_by(id: project_id)
+          insert(:task_list, project: project, inbox: true)
+        end)
 
         {:ok, comments} = IssueComment.handle(@event, @payload)
 
@@ -123,6 +129,11 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
           project_github_repos = insert_list(3, :project_github_repo, github_repo: github_repo)
 
         project_ids = project_github_repos |> Enum.map(&Map.get(&1, :project_id))
+
+        project_ids |> Enum.each(fn project_id ->
+          project = Project |> Repo.get_by(id: project_id)
+          insert(:task_list, project: project, inbox: true)
+        end)
 
         # there's a task for project 1
         task_1 = insert(:task, project: project_1, user: issue_user, github_id: issue_github_id)
@@ -201,6 +212,11 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
 
         project_ids = project_github_repos |> Enum.map(&Map.get(&1, :project_id))
 
+        project_ids |> Enum.each(fn project_id ->
+          project = Project |> Repo.get_by(id: project_id)
+          insert(:task_list, project: project, inbox: true)
+        end)
+
         {:ok, comments} = IssueComment.handle(@event, @payload)
 
         assert Enum.count(comments) == 3
@@ -270,6 +286,11 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
           project_github_repos = insert_list(3, :project_github_repo, github_repo: github_repo)
 
         project_ids = project_github_repos |> Enum.map(&Map.get(&1, :project_id))
+
+        project_ids |> Enum.each(fn project_id ->
+          project = Project |> Repo.get_by(id: project_id)
+          insert(:task_list, project: project, inbox: true)
+        end)
 
         # there's a task and comment for project 1
         task_1 = insert(:task, project: project_1, user: issue_user, github_id: issue_github_id)
