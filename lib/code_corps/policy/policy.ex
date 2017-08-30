@@ -24,6 +24,10 @@ defmodule CodeCorps.Policy do
   end
 
   @spec can?(User.t, atom, struct, map) :: boolean
+  defp can?(%User{} = user, :create, %Category{}, %{}), do: Policy.Category.create?(user)
+  defp can?(%User{} = user, :update, %Category{}, %{}), do: Policy.Category.update?(user)
+
+  @spec can?(User.t, atom, struct, map) :: boolean
   defp can?(%User{} = user, :create, %Comment{}, %{} = params), do: Policy.Comment.create?(user, params)
   defp can?(%User{} = user, :update, %Comment{} = comment, %{}), do: Policy.Comment.update?(user, comment)
 
@@ -38,9 +42,6 @@ defmodule CodeCorps.Policy do
     def can?(%User{}, _action, nil), do: true
 
     def can?(%User{} = current_user, :update, %User{} = user), do: Policy.User.update?(user, current_user)
-
-    def can?(%User{} = user, :create, Category), do: Policy.Category.create?(user)
-    def can?(%User{} = user, :update, %Category{}), do: Policy.Category.update?(user)
 
     def can?(%User{} = user, :create, %Changeset{data: %DonationGoal{}} = changeset), do: Policy.DonationGoal.create?(user, changeset)
     def can?(%User{} = user, :update, %DonationGoal{} = comment), do: Policy.DonationGoal.update?(user, comment)
