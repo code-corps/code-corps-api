@@ -1,26 +1,33 @@
 defmodule CodeCorpsWeb.UserController do
   use CodeCorpsWeb, :controller
-  use JaResource
 
-  import CodeCorps.Helpers.Query, only: [id_filter: 2, user_filter: 2, limit_filter: 2]
+  #  import CodeCorps.Helpers.Query, only: [id_filter: 2, user_filter: 2, limit_filter: 2]
 
-  alias CodeCorps.{Category, Services.UserService, User}
+  alias CodeCorps.{Helpers.Query, Services.UserService, User}
+  alias CodeCorps.GitHub
 
   action_fallback CodeCorpsWeb.FallbackController
   plug CodeCorpsWeb.Plug.DataToAttributes
   plug :login, only: [:create]
-  plug JaResource, except: [:create, :update]
 
-  def handle_index(_conn, params) do
-    User
-    |> user_filter(params)
-    |> limit_filter(params)
+  @spec index(Conn.t, map) :: Conn.t
+  def index(%Conn{} = conn, %{} = params) do
+    with users <- User |> Query.id_filter(params) |> Query.limit_filter(params) |> Repo.all do
+      conn |> render("index.json-api", data: users)
+    end
+  end
+
+  @spec show(Conn.t, map) :: Conn.t
+  def show(%Conn{} = conn, %{"id" => id}) do
+    with %User{} = user <- User |> Repo.get(id) do
+      conn |> render("show.json-api", data: user)
+    end
   end
 
   @spec create(Conn.t, map) :: Conn.t
   def create(%Conn{} = conn, %{} = params) do
     with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
-         {:ok, :authorized} <- current_user |> Policy.authorize(:create, params),
+         {:ok, :authorized} <- current_user |> Policy.authorize(:create, %User{}, params),
          {:ok, %User{} = user} <- %User{} |> User.registration_changeset(params) |> Repo.insert
     do
       conn |> put_status(:created) |> render("show.json-api", data: user)
@@ -35,8 +42,6 @@ defmodule CodeCorpsWeb.UserController do
          {:ok, user, _, _} <- user |> UserService.update(params)
     do
        conn |> render("show.json-api", data: user) 
-    else
-      {:error, changeset} -> {:error, changeset}
     end
   end
 
