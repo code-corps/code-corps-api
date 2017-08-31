@@ -4,20 +4,12 @@ defmodule CodeCorpsWeb.UserController do
 
   import CodeCorps.Helpers.Query, only: [id_filter: 2, user_filter: 2, limit_filter: 2]
 
-  alias CodeCorps.GitHub
-  alias CodeCorps.Services.UserService
-  alias CodeCorps.User
+  alias CodeCorps.{Category, Services.UserService, User}
 
-  @spec model :: module
-  def model, do: CodeCorps.User
-
-  plug :load_and_authorize_resource, model: User, only: [:update]
-  plug JaResource
+  action_fallback CodeCorpsWeb.FallbackController
+  plug CodeCorpsWeb.Plug.DataToAttributes
   plug :login, only: [:create]
-
-  def filter(_conn, query, "id", id_list) do
-    query |> id_filter(id_list)
-  end
+  plug JaResource, except: [:create, :update]
 
   def handle_index(_conn, params) do
     User
@@ -25,14 +17,24 @@ defmodule CodeCorpsWeb.UserController do
     |> limit_filter(params)
   end
 
-  def handle_create(_conn, attributes) do
-    %User{} |> User.registration_changeset(attributes)
+  @spec create(Conn.t, map) :: Conn.t
+  def create(%Conn{} = conn, %{} = params) do
+    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+         {:ok, :authorized} <- current_user |> Policy.authorize(:create, params),
+         {:ok, %User{} = user} <- %User{} |> User.registration_changeset(params) |> Repo.insert
+    do
+      conn |> put_status(:created) |> render("show.json-api", data: user)
+    end
   end
 
-  def handle_update(_conn, record, attributes) do
-    with {:ok, user, _, _} <- UserService.update(record, attributes)
+  @spec update(Conn.t, map) :: Conn.t
+  def update(%Conn{} = conn, %{"id" => id} = params) do
+    with %User{} = user <- User |> Repo.get(id),
+         %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+         {:ok, :authorized} <- current_user |> Policy.authorize(:update, user),
+         {:ok, user, _, _} <- user |> UserService.update(params)
     do
-      {:ok, user}
+       conn |> render("show.json-api", data: user) 
     else
       {:error, changeset} -> {:error, changeset}
     end
