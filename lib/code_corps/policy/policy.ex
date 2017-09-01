@@ -28,6 +28,8 @@ defmodule CodeCorps.Policy do
   defp can?(%User{} = user, :update, %Category{}, %{}), do: Policy.Category.update?(user)
   defp can?(%User{} = user, :create, %Comment{}, %{} = params), do: Policy.Comment.create?(user, params)
   defp can?(%User{} = user, :update, %Comment{} = comment, %{}), do: Policy.Comment.update?(user, comment)
+  defp can?(%User{} = user, :create, %Organization{}, %{}), do: Policy.Organization.create?(user)
+  defp can?(%User{} = user, :update, %Organization{} = organization, %{}), do: Policy.Organization.update?(user, organization)  
 
   defimpl Canada.Can, for: User do
     # NOTE: Canary sets an :unauthorized and a :not_found handler on a config level
@@ -46,9 +48,6 @@ defmodule CodeCorps.Policy do
     def can?(%User{} = user, :delete, %DonationGoal{} = comment), do: Policy.DonationGoal.delete?(user, comment)
 
     def can?(%User{} = user, :create, %Changeset{data: %GithubAppInstallation{}} = changeset), do: Policy.GithubAppInstallation.create?(user, changeset)
-
-    def can?(%User{} = user, :create, Organization), do: Policy.Organization.create?(user)
-    def can?(%User{} = user, :update, %Organization{} = organization), do: Policy.Organization.update?(user, organization)
 
     def can?(%User{} = user, :create, OrganizationInvite), do: Policy.OrganizationInvite.create?(user)
     def can?(%User{} = user, :update, %OrganizationInvite{}), do: Policy.OrganizationInvite.update?(user)
