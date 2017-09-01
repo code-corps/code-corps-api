@@ -42,8 +42,9 @@ defmodule CodeCorps.Policy do
     # will never do anything
     #
     # The only solution is to have a catch_all match for the resource being nil, which returns true
+    
+    # NOTE: other tests are using the User policy for the time being.
     def can?(%User{}, _action, nil), do: true
-
     def can?(%User{} = current_user, :update, %User{} = user), do: Policy.User.update?(user, current_user)
 
     def can?(%User{} = user, :create, %Changeset{data: %DonationGoal{}} = changeset), do: Policy.DonationGoal.create?(user, changeset)
