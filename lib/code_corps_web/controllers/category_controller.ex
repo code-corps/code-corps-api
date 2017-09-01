@@ -1,7 +1,7 @@
 defmodule CodeCorpsWeb.CategoryController do
   use CodeCorpsWeb, :controller
 
-  alias CodeCorps.{ Category, User, Helpers.Query}
+  alias CodeCorps.{Category, User, Helpers.Query}
 
   action_fallback CodeCorpsWeb.FallbackController
   plug CodeCorpsWeb.Plug.DataToAttributes
@@ -20,7 +20,7 @@ defmodule CodeCorpsWeb.CategoryController do
     end
   end
 
-  @spec create(Plug.Conn.t, map) :: Conn.t
+  @spec create(Conn.t, map) :: Conn.t
   def create(%Conn{} = conn, %{} = params) do
     with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
       {:ok, :authorized} <- current_user |> Policy.authorize(:create, %Category{}, params),
@@ -30,7 +30,7 @@ defmodule CodeCorpsWeb.CategoryController do
     end
   end
 
-  @spec update(Plug.Conn.t, map) :: Conn.t
+  @spec update(Conn.t, map) :: Conn.t
   def update(%Conn{} = conn, %{"id" => id} = params) do
     with %Category{} = category <- Category |> Repo.get(id),
       %User{} = current_user <- conn |> Guardian.Plug.current_resource,

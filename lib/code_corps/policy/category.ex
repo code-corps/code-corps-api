@@ -1,5 +1,5 @@
 defmodule CodeCorps.Policy.Category do
-  alias CodeCorps.{ User }
+  alias CodeCorps.User
 
   @spec create?(User.t) :: boolean
   def create?(%User{admin: true}), do: true
