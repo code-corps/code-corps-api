@@ -1,8 +1,6 @@
 defmodule CodeCorpsWeb.UserController do
   use CodeCorpsWeb, :controller
 
-  #  import CodeCorps.Helpers.Query, only: [id_filter: 2, user_filter: 2, limit_filter: 2]
-
   alias CodeCorps.{Helpers.Query, Services.UserService, User}
   alias CodeCorps.GitHub
 
@@ -12,7 +10,7 @@ defmodule CodeCorpsWeb.UserController do
 
   @spec index(Conn.t, map) :: Conn.t
   def index(%Conn{} = conn, %{} = params) do
-    with users <- User |> Query.id_filter(params) |> Query.limit_filter(params) |> Repo.all do
+    with users <- User |> Query.id_filter(params) |> Query.limit_filter(params) |> Query.user_filter(params) |> Repo.all do
       conn |> render("index.json-api", data: users)
     end
   end
