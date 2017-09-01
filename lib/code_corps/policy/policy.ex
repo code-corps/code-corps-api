@@ -33,7 +33,6 @@ defmodule CodeCorps.Policy do
   defp can?(%User{} = current_user, :update, %User{} = user, %{}), do: Policy.User.update?(user, current_user)
   defp can?(%User{}, _action, %User{} = _user, %{}), do: true
 
-
   defimpl Canada.Can, for: User do
     # NOTE: Canary sets an :unauthorized and a :not_found handler on a config level
     # The problem is, it will still go through the authorization process first and only call the
