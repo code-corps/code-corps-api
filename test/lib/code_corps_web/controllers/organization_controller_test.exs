@@ -82,5 +82,10 @@ defmodule CodeCorpsWeb.OrganizationControllerTest do
     test "renders 403 when not authorized", %{conn: conn} do
       assert conn |> request_update |> json_response(403)
     end
+
+    @tag :authenticated
+    test "renders 404 when id is nonexistent", %{conn: conn} do
+      assert conn |> request_update(:not_found) |> json_response(404)
+    end    
   end
 end
