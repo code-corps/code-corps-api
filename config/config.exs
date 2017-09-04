@@ -68,6 +68,7 @@ config :code_corps, :corsica_log_level, [rejected: :warn]
 {:ok, pem} = (System.get_env("GITHUB_APP_PEM") || "") |> Base.decode64()
 
 config :code_corps,
+  github: CodeCorps.GitHub.API,
   github_app_id: System.get_env("GITHUB_APP_ID"),
   github_app_client_id: System.get_env("GITHUB_APP_CLIENT_ID"),
   github_app_client_secret: System.get_env("GITHUB_APP_CLIENT_SECRET"),

@@ -1,7 +1,7 @@
 defmodule CodeCorps.GitHub.Event.Common.RepoFinderTest do
   use CodeCorps.DbAccessCase
 
-  import CodeCorps.{Factories, TestHelpers.GitHub}
+  import CodeCorps.GitHub.TestHelpers
 
   alias CodeCorps.GitHub.Event.Common.RepoFinder
 

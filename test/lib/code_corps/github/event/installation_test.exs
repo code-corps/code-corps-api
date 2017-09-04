@@ -1,9 +1,9 @@
 defmodule CodeCorps.GitHub.Event.InstallationTest do
   @moduledoc false
 
-  use CodeCorps.{DbAccessCase, GitHubCase}
+  use CodeCorps.DbAccessCase
 
-  import CodeCorps.{Factories, TestHelpers.GitHub}
+  import CodeCorps.GitHub.TestHelpers
 
   alias CodeCorps.{
     GithubAppInstallation,
@@ -12,12 +12,7 @@ defmodule CodeCorps.GitHub.Event.InstallationTest do
     Repo
   }
 
-  @access_token "v1.1f699f1069f60xxx"
-  @expires_at Timex.now() |> Timex.shift(hours: 1) |> DateTime.to_iso8601()
-  @access_token_create_response %{"token" => @access_token, "expires_at" => @expires_at}
-
   @installation_created load_event_fixture("installation_created")
-  @installation_repositories load_endpoint_fixture("installation_repositories")
 
   describe "handle/2" do
     test "returns error if payload is wrong" do
@@ -42,10 +37,6 @@ defmodule CodeCorps.GitHub.Event.InstallationTest do
   end
 
   describe "handle/2 for Installation::created" do
-    @tag bypass: %{
-      "/installation/repositories" => {200, @installation_repositories},
-      "/installations/#{@installation_created["installation"]["id"]}/access_tokens" => {200, @access_token_create_response}
-    }
     test "creates installation for unmatched user if no user, syncs repos" do
       payload = %{"installation" => %{"id" => installation_github_id}} = @installation_created
       event = build(:github_event, action: "created", type: "installation")
@@ -65,10 +56,6 @@ defmodule CodeCorps.GitHub.Event.InstallationTest do
       assert Repo.one(GithubAppInstallation).state == "processed"
     end
 
-    @tag bypass: %{
-      "/installation/repositories" => {200, @installation_repositories},
-      "/installations/#{@installation_created["installation"]["id"]}/access_tokens" => {200, @access_token_create_response}
-    }
     test "creates installation if user matched but installation unmatched, syncs repos" do
       %{"sender" => %{"id" => user_github_id}} = payload = @installation_created
       event = build(:github_event, action: "created", type: "installation")
@@ -90,10 +77,6 @@ defmodule CodeCorps.GitHub.Event.InstallationTest do
       assert Repo.one(GithubAppInstallation).state == "processed"
     end
 
-    @tag bypass: %{
-      "/installation/repositories" => {200, @installation_repositories},
-      "/installations/#{@installation_created["installation"]["id"]}/access_tokens" => {200, @access_token_create_response}
-    }
     test "updates installation, if both user and installation matched, syncs repos" do
       %{"sender" => %{"id" => user_github_id}, "installation" => %{"id" => installation_github_id}} = payload = @installation_created
       event = build(:github_event, action: "created", type: "installation")
@@ -120,10 +103,6 @@ defmodule CodeCorps.GitHub.Event.InstallationTest do
       assert Repo.one(GithubAppInstallation).state == "processed"
     end
 
-    @tag bypass: %{
-      "/installation/repositories" => {200, @installation_repositories},
-      "/installations/#{@installation_created["installation"]["id"]}/access_tokens" => {200, @access_token_create_response}
-    }
     test "updates installation if there is an installation, but no user, syncs repos" do
       %{"installation" => %{"id" => installation_github_id}, "sender" => %{"id" => sender_github_id}} = payload = @installation_created
       insert(:github_app_installation, github_id: installation_github_id)

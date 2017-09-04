@@ -1,15 +1,9 @@
 defmodule CodeCorps.GitHub.Event.InstallationRepositoriesTest do
   @moduledoc false
 
-  use CodeCorps.{
-    DbAccessCase,
-    GitHubCase
-  }
+  use CodeCorps.DbAccessCase
 
-  import CodeCorps.{
-    Factories,
-    TestHelpers.GitHub
-  }
+  import CodeCorps.GitHub.TestHelpers
 
   alias CodeCorps.{
     GithubRepo,
