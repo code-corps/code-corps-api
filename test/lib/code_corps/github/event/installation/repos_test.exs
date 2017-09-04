@@ -2,10 +2,8 @@ defmodule CodeCorps.GitHub.Event.Installation.ReposTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
-  use CodeCorps.GitHubCase
 
-  import CodeCorps.Factories
-  import CodeCorps.TestHelpers.GitHub
+  import CodeCorps.GitHub.TestHelpers
 
   alias CodeCorps.{
     GithubAppInstallation,
@@ -16,20 +14,34 @@ defmodule CodeCorps.GitHub.Event.Installation.ReposTest do
 
   alias CodeCorps.GitHub.Adapters.GithubRepo, as: GithubRepoAdapter
 
-  @access_token "v1.1f699f1069f60xxx"
-  @expires_at Timex.now() |> Timex.shift(hours: 1) |> DateTime.to_iso8601()
-  @access_token_create_response %{"token" => @access_token, "expires_at" => @expires_at}
+  defmodule BadRepoRequest do
+    def request(:get, "https://api.github.com/installation/repositories", _, _, _) do
+      body = load_endpoint_fixture("forbidden")
+      {:error, CodeCorps.GitHub.APIError.new({404, %{"message" => body}})}
+    end
+    def request(method, endpoint, headers, body, options) do
+      CodeCorps.GitHub.SuccessAPI.request(method, endpoint, headers, body, options)
+    end
+  end
 
+  defmodule InvalidRepoRequest do
+    def request(:get, "https://api.github.com/installation/repositories", _, _, _) do
+      payload =
+        "installation_repositories"
+        |> load_endpoint_fixture
+        |> Map.put("repositories", [%{}])
+      {:ok, payload}
+    end
+    def request(method, endpoint, headers, body, options) do
+      CodeCorps.GitHub.SuccessAPI.request(method, endpoint, headers, body, options)
+    end
+  end
+
+  # from fixture
   @installation_repositories load_endpoint_fixture("installation_repositories")
-  @forbidden load_endpoint_fixture("forbidden")
-
   @app_github_id 2
 
   describe "process_async/1" do
-    @tag bypass: %{
-      "/installation/repositories" => {200, @installation_repositories},
-      "/installations/#{@app_github_id}/access_tokens" => {200, @access_token_create_response}
-    }
     test "syncs repos by performing a diff using payload as master list, asynchronously" do
       installation = insert(:github_app_installation, github_id: @app_github_id, state: "initiated_on_code_corps")
 
@@ -66,10 +78,6 @@ defmodule CodeCorps.GitHub.Event.Installation.ReposTest do
   end
 
   describe "process/1" do
-    @tag bypass: %{
-      "/installation/repositories" => {200, @installation_repositories},
-      "/installations/#{@app_github_id}/access_tokens" => {200, @access_token_create_response}
-    }
     test "syncs repos by performing a diff using payload as master list" do
       installation = insert(:github_app_installation, github_id: @app_github_id, state: "initiated_on_code_corps")
 
@@ -93,25 +101,23 @@ defmodule CodeCorps.GitHub.Event.Installation.ReposTest do
       assert GithubRepo |> Repo.aggregate(:count, :id) == 2
     end
 
-    @tag bypass: %{
-      "/installation/repositories" => {403, @forbidden},
-      "/installations/#{@app_github_id}/access_tokens" => {200, @access_token_create_response}
-    }
     test "returns installation as errored if api error" do
       installation = insert(:github_app_installation, github_id: @app_github_id, state: "initiated_on_code_corps")
-      {:error, %GithubAppInstallation{state: state}, %CodeCorps.GitHub.APIError{}} = Repos.process(installation)
+
+      with_mock_api(BadRepoRequest) do
+        {:error, %GithubAppInstallation{state: state}, %CodeCorps.GitHub.APIError{}} = Repos.process(installation)
+      end
+
       assert state == "errored"
     end
 
-    @tag bypass: %{
-      "/installation/repositories" => {200, @installation_repositories |> Map.put("repositories", [%{}])},
-      "/installations/#{@app_github_id}/access_tokens" => {200, @access_token_create_response}
-    }
     test "returns installation as errored if error creating repos" do
       installation = insert(:github_app_installation, github_id: @app_github_id, state: "initiated_on_code_corps")
 
-      {:error, %GithubAppInstallation{state: state}, _changesets}
-        = installation |> Repo.preload(:github_repos) |> Repos.process()
+      with_mock_api(InvalidRepoRequest) do
+        {:error, %GithubAppInstallation{state: state}, _changesets}
+          = installation |> Repo.preload(:github_repos) |> Repos.process()
+      end
 
       assert state == "errored"
     end

@@ -78,8 +78,8 @@ defmodule CodeCorps.GitHub.User do
   @spec me(String.t, Keyword.t) :: {:ok, map} | {:error, GitHub.api_error_struct}
   def me(access_token, opts \\ []) do
     case GitHub.Request.retrieve(@single_endpoint, opts ++ [access_token: access_token]) do
-      {:ok, %{"error" => error}} -> {:error, error}
-      {:ok, %{} = user_payload} -> {:ok, user_payload}
+      {:ok, response} -> {:ok, response}
+      {:error, error} -> {:error, error}
     end
   end
 end

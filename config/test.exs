@@ -61,4 +61,6 @@ pem = case System.get_env("GITHUB_APP_PEM") do
   encoded_pem -> encoded_pem |> Base.decode64!
 end
 
-config :code_corps, github_app_pem: pem
+config :code_corps,
+  github: CodeCorps.GitHub.SuccessAPI,
+  github_app_pem: pem

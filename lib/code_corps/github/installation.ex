@@ -61,7 +61,7 @@ defmodule CodeCorps.GitHub.Installation do
   def refresh_token(%GithubAppInstallation{github_id: installation_id} = installation) do
     endpoint = "installations/#{installation_id}/access_tokens"
     with {:ok, %{"token" => token, "expires_at" => expires_at}} <-
-           GitHub.authenticated_integration_request(%{}, :post, endpoint, %{}, []),
+           GitHub.integration_request(:post, endpoint, %{}, %{}, []),
          {:ok, %GithubAppInstallation{}} <-
            update_token(installation, token, expires_at)
     do

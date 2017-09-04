@@ -6,6 +6,14 @@ defmodule CodeCorps.DbAccessCase do
 
   use ExUnit.CaseTemplate
 
+  using do
+    quote do
+      alias CodeCorps.Repo
+
+      import CodeCorps.Factories
+    end
+  end
+
   setup tags do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(CodeCorps.Repo)
 

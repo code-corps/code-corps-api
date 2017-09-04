@@ -1,22 +1,12 @@
 defmodule CodeCorps.GitHub.UserTest do
   @moduledoc false
 
-  use CodeCorps.ModelCase
-  use CodeCorps.GitHubCase
+  use CodeCorps.DbAccessCase
+  import CodeCorps.GitHub.TestHelpers
 
   alias CodeCorps.{GitHub, GithubAppInstallation, User}
 
-  @user_data %{
-    "avatar_url" => "foo_url",
-    "email" => "foo_email",
-    "id" => 123,
-    "login" => "foo_login"
-  }
-
-  @token_data %{"access_token" => "foo_auth_token"}
-
   describe "connect/2" do
-    @tag bypass: %{"/user" => {200, @user_data}, "/" => {200, @token_data}}
     test "posts to github, associates user and installations, returns updated user" do
       user = insert(:user)
 
@@ -44,13 +34,23 @@ defmodule CodeCorps.GitHub.UserTest do
       refute Repo.get(GithubAppInstallation, installation_3.id).user_id == returned_user.id
     end
 
-    @error_data %{"error" => "Not Found"}
+    defmodule NotFoundRequest do
+      def request(:get, "https://api.github.com/user", _, _, _) do
+        {:error, GitHub.APIError.new({404, %{"message" => "{\"error\":\"Not Found\"}"}})}
+      end
+      def request(method, endpoint, headers, body, options) do
+        CodeCorps.GitHub.SuccessAPI.request(method, endpoint, headers, body, options)
+      end
+    end
 
-    @tag bypass: %{"/" => {404, @error_data}}
     test "posts to github, returns error if reply is not ok" do
       user = insert(:user)
+
       error = GitHub.APIError.new({404, %{"message" => "{\"error\":\"Not Found\"}"}})
-      assert {:error, error} == GitHub.User.connect(user, "foo_code", "foo_state")
+
+      with_mock_api(NotFoundRequest) do
+        assert {:error, error } == GitHub.User.connect(user, "foo_code", "foo_state")
+      end
     end
   end
 end

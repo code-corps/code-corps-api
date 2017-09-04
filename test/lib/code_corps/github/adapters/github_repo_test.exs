@@ -3,7 +3,7 @@ defmodule CodeCorps.GitHub.Adapters.GithubRepoTest do
 
   use ExUnit.Case, async: true
 
-  import CodeCorps.TestHelpers.GitHub
+  import CodeCorps.GitHub.TestHelpers
 
   alias CodeCorps.GitHub.Adapters.GithubRepo
 

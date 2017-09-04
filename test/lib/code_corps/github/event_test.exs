@@ -3,8 +3,6 @@ defmodule CodeCorps.GitHub.EventTest do
 
   use CodeCorps.DbAccessCase
 
-  import CodeCorps.Factories
-
   alias CodeCorps.{
     GithubEvent,
     GitHub.Event

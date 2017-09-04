@@ -48,7 +48,7 @@ defmodule CodeCorps.Mixfile do
       {:gettext, "~> 0.12"},
       {:cowboy, "~> 1.0"},
       {:benchfella, "~> 0.3.0", only: :dev},
-      {:bypass, "~> 0.6", only: :test},
+      {:bypass, "~> 0.8.1", only: :test},
       {:canary, "~> 1.1"}, # Authorization
       {:cloudex, "~> 0.1.10"},
       {:comeonin, "~> 2.0"},
