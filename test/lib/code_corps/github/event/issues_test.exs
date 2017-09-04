@@ -7,6 +7,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
 
   alias CodeCorps.{
     GitHub.Event.Issues,
+    Project,
     Repo,
     Task,
     User
@@ -51,6 +52,11 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         project_github_repos
         |> Enum.map(&Map.get(&1, :project))
         |> Enum.map(&Map.get(&1, :id))
+
+      project_ids |> Enum.each(fn project_id ->
+        project = Project |> Repo.get_by(id: project_id)
+        insert(:task_list, project: project, inbox: true)
+      end)
 
       {:ok, tasks} = Issues.handle(@event, @payload)
 
@@ -100,6 +106,11 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         project_github_repos
         |> Enum.map(&Map.get(&1, :project))
         |> Enum.map(&Map.get(&1, :id))
+
+      project_ids |> Enum.each(fn project_id ->
+        project = Project |> Repo.get_by(id: project_id)
+        insert(:task_list, project: project, inbox: true)
+      end)
 
       %{id: existing_task_id} = insert(:task, project: project, user: user, github_id: github_id)
 
@@ -170,6 +181,11 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         |> Enum.map(&Map.get(&1, :project))
         |> Enum.map(&Map.get(&1, :id))
 
+      project_ids |> Enum.each(fn project_id ->
+        project = Project |> Repo.get_by(id: project_id)
+        insert(:task_list, project: project, inbox: true)
+      end)
+
       {:ok, tasks} = Issues.handle(@event, @payload)
 
       assert Enum.count(tasks) == 3
@@ -218,6 +234,11 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         project_github_repos
         |> Enum.map(&Map.get(&1, :project))
         |> Enum.map(&Map.get(&1, :id))
+
+      project_ids |> Enum.each(fn project_id ->
+        project = Project |> Repo.get_by(id: project_id)
+        insert(:task_list, project: project, inbox: true)
+      end)
 
       %{id: existing_task_id} = insert(:task, project: project, user: user, github_id: github_id)
 
@@ -288,6 +309,11 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         |> Enum.map(&Map.get(&1, :project))
         |> Enum.map(&Map.get(&1, :id))
 
+      project_ids |> Enum.each(fn project_id ->
+        project = Project |> Repo.get_by(id: project_id)
+        insert(:task_list, project: project, inbox: true)
+      end)
+
       {:ok, tasks} = Issues.handle(@event, @payload)
 
       assert Enum.count(tasks) == 3
@@ -336,6 +362,11 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         project_github_repos
         |> Enum.map(&Map.get(&1, :project))
         |> Enum.map(&Map.get(&1, :id))
+
+      project_ids |> Enum.each(fn project_id ->
+        project = Project |> Repo.get_by(id: project_id)
+        insert(:task_list, project: project, inbox: true)
+      end)
 
       %{id: existing_task_id} = insert(:task, project: project, user: user, github_id: github_id)
 
@@ -406,6 +437,11 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         |> Enum.map(&Map.get(&1, :project))
         |> Enum.map(&Map.get(&1, :id))
 
+      project_ids |> Enum.each(fn project_id ->
+        project = Project |> Repo.get_by(id: project_id)
+        insert(:task_list, project: project, inbox: true)
+      end)
+
       {:ok, tasks} = Issues.handle(@event, @payload)
 
       assert Enum.count(tasks) == 3
@@ -454,6 +490,11 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         project_github_repos
         |> Enum.map(&Map.get(&1, :project))
         |> Enum.map(&Map.get(&1, :id))
+
+      project_ids |> Enum.each(fn project_id ->
+        project = Project |> Repo.get_by(id: project_id)
+        insert(:task_list, project: project, inbox: true)
+      end)
 
       %{id: existing_task_id} = insert(:task, project: project, user: user, github_id: github_id)
 

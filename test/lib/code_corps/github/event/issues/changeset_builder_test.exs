@@ -15,8 +15,10 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilderTest do
     test "assigns proper changes to the task" do
       payload = load_event_fixture("issues_opened")
       task = %Task{}
-      project_github_repo = insert(:project_github_repo)
+      project = insert(:project)
+      project_github_repo = insert(:project_github_repo, project: project)
       user = insert(:user)
+      task_list = insert(:task_list, project: project, inbox: true)
 
       changeset = ChangesetBuilder.build_changeset(
         task, payload, project_github_repo, user
@@ -34,6 +36,7 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilderTest do
 
       # relationships are proper
       assert get_change(changeset, :project_id) == project_github_repo.project_id
+      assert get_change(changeset, :task_list_id) == task_list.id
       assert get_change(changeset, :user_id) == user.id
 
       assert changeset.valid?
