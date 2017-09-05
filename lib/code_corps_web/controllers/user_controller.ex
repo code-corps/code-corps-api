@@ -25,7 +25,7 @@ defmodule CodeCorpsWeb.UserController do
   def create(%Conn{} = conn, %{} = params) do
     with {:ok, %User{} = user} <- %User{} |> User.registration_changeset(params) |> Repo.insert
     do
-      conn |> put_status(:created) |> render("show.json-api", data: user)
+      conn |> Plug.Conn.fetch_session |> Guardian.Plug.sign_in(user) |> put_status(:created) |> render("show.json-api", data: user)
     end
   end
 
