@@ -44,7 +44,6 @@ defmodule CodeCorps.Policy do
     
     # NOTE: other tests are using the User policy for the time being.
     def can?(%User{}, _action, nil), do: true
-    def can?(%User{} = current_user, :update, %User{} = user), do: Policy.User.update?(user, current_user)
 
     def can?(%User{} = user, :create, %Changeset{data: %DonationGoal{}} = changeset), do: Policy.DonationGoal.create?(user, changeset)
     def can?(%User{} = user, :update, %DonationGoal{} = comment), do: Policy.DonationGoal.update?(user, comment)

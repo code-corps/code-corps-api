@@ -6,7 +6,6 @@ defmodule CodeCorpsWeb.UserController do
 
   action_fallback CodeCorpsWeb.FallbackController
   plug CodeCorpsWeb.Plug.DataToAttributes
-  # plug :login, only: [:create]
 
   @spec index(Conn.t, map) :: Conn.t
   def index(%Conn{} = conn, %{} = params) do
@@ -71,9 +70,4 @@ defmodule CodeCorpsWeb.UserController do
     conn |> json(hash)
   end
 
-  # defp login(conn, _opts) do
-  #   Plug.Conn.register_before_send(conn, &do_login(&1))
-  # end
-
-  # defp do_login(conn), do: Plug.Conn.assign(conn, :current_user, conn.assigns[:data])
 end
