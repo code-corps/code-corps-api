@@ -30,6 +30,7 @@ defmodule CodeCorps.Policy do
   defp can?(%User{} = user, :update, %Comment{} = comment, %{}), do: Policy.Comment.update?(user, comment)
   defp can?(%User{} = user, :create, %Organization{}, %{}), do: Policy.Organization.create?(user)
   defp can?(%User{} = user, :update, %Organization{} = organization, %{}), do: Policy.Organization.update?(user, organization)  
+  defp can?(%User{} = current_user, :update, %User{} = user, %{}), do: Policy.User.update?(user, current_user)
 
   defimpl Canada.Can, for: User do
     # NOTE: Canary sets an :unauthorized and a :not_found handler on a config level
@@ -39,9 +40,9 @@ defmodule CodeCorps.Policy do
     # will never do anything
     #
     # The only solution is to have a catch_all match for the resource being nil, which returns true
+    
+    # NOTE: other tests are using the User policy for the time being.
     def can?(%User{}, _action, nil), do: true
-
-    def can?(%User{} = current_user, :update, %User{} = user), do: Policy.User.update?(user, current_user)
 
     def can?(%User{} = user, :create, %Changeset{data: %DonationGoal{}} = changeset), do: Policy.DonationGoal.create?(user, changeset)
     def can?(%User{} = user, :update, %DonationGoal{} = comment), do: Policy.DonationGoal.update?(user, comment)

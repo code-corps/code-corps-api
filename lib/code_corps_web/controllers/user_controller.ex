@@ -1,40 +1,42 @@
 defmodule CodeCorpsWeb.UserController do
   use CodeCorpsWeb, :controller
-  use JaResource
 
-  import CodeCorps.Helpers.Query, only: [id_filter: 2, user_filter: 2, limit_filter: 2]
-
+  alias CodeCorps.{Helpers.Query, Services.UserService, User}
   alias CodeCorps.GitHub
-  alias CodeCorps.Services.UserService
-  alias CodeCorps.User
 
-  @spec model :: module
-  def model, do: CodeCorps.User
+  action_fallback CodeCorpsWeb.FallbackController
+  plug CodeCorpsWeb.Plug.DataToAttributes
 
-  plug :load_and_authorize_resource, model: User, only: [:update]
-  plug JaResource
-  plug :login, only: [:create]
-
-  def filter(_conn, query, "id", id_list) do
-    query |> id_filter(id_list)
+  @spec index(Conn.t, map) :: Conn.t
+  def index(%Conn{} = conn, %{} = params) do
+    with users <- User |> Query.id_filter(params) |> Query.limit_filter(params) |> Query.user_filter(params) |> Repo.all do
+      conn |> render("index.json-api", data: users)
+    end
   end
 
-  def handle_index(_conn, params) do
-    User
-    |> user_filter(params)
-    |> limit_filter(params)
+  @spec show(Conn.t, map) :: Conn.t
+  def show(%Conn{} = conn, %{"id" => id}) do
+    with %User{} = user <- User |> Repo.get(id) do
+      conn |> render("show.json-api", data: user)
+    end
   end
 
-  def handle_create(_conn, attributes) do
-    %User{} |> User.registration_changeset(attributes)
-  end
-
-  def handle_update(_conn, record, attributes) do
-    with {:ok, user, _, _} <- UserService.update(record, attributes)
+  @spec create(Conn.t, map) :: Conn.t
+  def create(%Conn{} = conn, %{} = params) do
+    with {:ok, %User{} = user} <- %User{} |> User.registration_changeset(params) |> Repo.insert
     do
-      {:ok, user}
-    else
-      {:error, changeset} -> {:error, changeset}
+      conn |> put_status(:created) |> render("show.json-api", data: user)
+    end
+  end
+
+  @spec update(Conn.t, map) :: Conn.t
+  def update(%Conn{} = conn, %{"id" => id} = params) do
+    with %User{} = user <- User |> Repo.get(id),
+         %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+         {:ok, :authorized} <- current_user |> Policy.authorize(:update, user),
+         {:ok, user, _, _} <- user |> UserService.update(params)
+    do
+       conn |> render("show.json-api", data: user) 
     end
   end
 
@@ -68,9 +70,4 @@ defmodule CodeCorpsWeb.UserController do
     conn |> json(hash)
   end
 
-  defp login(conn, _opts) do
-    Plug.Conn.register_before_send(conn, &do_login(&1))
-  end
-
-  defp do_login(conn), do: Plug.Conn.assign(conn, :current_user, conn.assigns[:data])
 end
