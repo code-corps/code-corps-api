@@ -86,9 +86,10 @@ defmodule CodeCorps.Policy.Helpers do
   @doc """
   Retrieves task from associated record
   """
-  @spec get_task(Changeset.t | TaskSkill.t | UserTask.t) :: Task.t
+  @spec get_task(Changeset.t | TaskSkill.t | UserTask.t | map) :: Task.t
   def get_task(%TaskSkill{task_id: task_id}), do: Repo.get(Task, task_id)
   def get_task(%UserTask{task_id: task_id}), do: Repo.get(Task, task_id)
+  def get_task(%{"task_id" => task_id}), do: Repo.get(Task, task_id)
   def get_task(%Changeset{changes: %{task_id: task_id}}), do: Repo.get(Task, task_id)
 
   @doc """
