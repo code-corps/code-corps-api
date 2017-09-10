@@ -20,7 +20,7 @@ defmodule CodeCorps.GitHub.API do
     case body |> Poison.decode do
       {:ok, json} ->
         {:ok, json}
-      {:error, {_decoding_error, _decoding_value}} ->
+      {:error, _value} ->
         marshall_response({:error, :body_decoding_error})
     end
   end
@@ -31,7 +31,7 @@ defmodule CodeCorps.GitHub.API do
     case body |> Poison.decode do
       {:ok, json} ->
         {:error, APIError.new({status, json})}
-      {:error, {_decoding_error, _decoding_value}} ->
+      {:error, _value} ->
         marshall_response({:error, :body_decoding_error})
     end
   end

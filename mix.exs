@@ -6,7 +6,7 @@ defmodule CodeCorps.Mixfile do
   def project do
     [app: :code_corps,
      version: "0.0.1",
-     elixir: "~> 1.4",
+     elixir: "~> 1.5.1",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
      dialyzer: [plt_add_deps: :transitive],
@@ -24,6 +24,7 @@ defmodule CodeCorps.Mixfile do
   def application do
     [
       mod: {CodeCorps, []},
+      extra_applications: [:timber, :timex, :tzdata]
     ]
   end
 
@@ -37,7 +38,7 @@ defmodule CodeCorps.Mixfile do
   defp deps do
     [
       {:bamboo, "~> 0.7"}, # emails
-      {:bamboo_postmark, "~> 0.2.0"}, # postmark adapter for emails
+      {:bamboo_postmark, "~> 0.4.1"}, # postmark adapter for emails
       {:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false},
       {:phoenix, "~> 1.3"},
       {:phoenix_pubsub, "~> 1.0.2"},
@@ -49,33 +50,33 @@ defmodule CodeCorps.Mixfile do
       {:cowboy, "~> 1.0"},
       {:benchfella, "~> 0.3.0", only: :dev},
       {:bypass, "~> 0.8.1", only: :test},
-      {:canary, "~> 1.1"}, # Authorization
-      {:cloudex, "~> 0.1.10"},
-      {:comeonin, "~> 2.0"},
-      {:corsica, "~> 0.4"}, # CORS
-      {:credo, "~> 0.5", only: [:dev, :test]}, # Code style suggestions
-      {:earmark, "~> 1.1"}, # Markdown rendering
+      {:canary, "~> 1.1.1"}, # Authorization
+      {:cloudex, "~> 0.1.17"},
+      {:comeonin, "~> 3.1"},
+      {:corsica, "~> 1.0"}, # CORS
+      {:credo, "~> 0.8", only: [:dev, :test]}, # Code style suggestions
+      {:earmark, "~> 1.2"}, # Markdown rendering
       {:ex_aws, "~> 1.0"}, # Amazon AWS
-      {:excoveralls, "~> 0.5", only: :test}, # Test coverage
-      {:ex_doc, "~> 0.14", only: [:dev, :test]},
-      {:ex_machina, "~> 1.0", only: :test}, # test factories
+      {:excoveralls, "~> 0.7", only: :test}, # Test coverage
+      {:ex_doc, "~> 0.16", only: [:dev, :test]},
+      {:ex_machina, "~> 2.0", only: :test}, # test factories
       {:guardian, "~> 0.14.5"}, # Authentication (JWT)
       {:hackney, ">= 1.4.4"},
       {:inch_ex, "~> 0.5", only: [:dev, :test]}, # Inch CI
-      {:inflex, "~> 1.8"},
+      {:inflex, "~> 1.8.1"},
       {:ja_resource, "~> 0.2"},
-      {:ja_serializer, "~> 0.11.0"}, # JSON API
-      {:joken, "~> 1.1"}, # JWT encoding
-      {:mix_test_watch, "~> 0.2", only: :dev}, # Test watcher
+      {:ja_serializer, "~> 0.12"}, # JSON API
+      {:joken, "~> 1.5"}, # JWT encoding
+      {:mix_test_watch, "~> 0.4", only: :dev}, # Test watcher
       {:money, "~> 1.2.1"},
-      {:poison, "~> 2.0"},
-      {:scrivener_ecto, "~> 1.0"}, # DB query pagination
+      {:poison, "~> 3.0", override: true},
+      {:scrivener_ecto, "~> 1.2"}, # DB query pagination
       {:segment, "~> 0.1"}, # Segment analytics
-      {:sentry, "~> 2.0"}, # Sentry error tracking
+      {:sentry, "~> 6.0"}, # Sentry error tracking
       {:stripity_stripe, git: "https://github.com/code-corps/stripity_stripe.git", branch: "2.0"}, # Stripe
       {:sweet_xml, "~> 0.5"},
       {:tentacat, "~> 0.5"},
-      {:timber, "~> 0.4"}, # Logging
+      {:timber, "~> 2.0"}, # Logging
       {:timex, "~> 3.0"},
       {:timex_ecto, "~> 3.0"},
       {:ecto_ordered, "0.2.0-beta1"}
