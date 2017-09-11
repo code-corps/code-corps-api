@@ -15,10 +15,10 @@ defmodule CodeCorps.Policy.UserTask do
   alias Ecto.Changeset
 
   @spec create?(User.t, Changeset.t) :: boolean
-  def create?(%User{} = user, %Changeset{} = changeset) do
+  def create?(%User{} = user, params) do
     cond do
-      changeset |> get_task |> task_authored_by?(user) -> true
-      changeset |> get_task |> get_project |> contributed_by?(user) -> true
+      params |> get_task |> task_authored_by?(user) -> true
+      params |> get_task |> get_project |> contributed_by?(user) -> true
       true -> false
     end
   end
