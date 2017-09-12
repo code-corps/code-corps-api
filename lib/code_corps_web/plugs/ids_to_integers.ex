@@ -1,9 +1,7 @@
 defmodule CodeCorpsWeb.Plug.IdsToIntegers do
   @moduledoc ~S"""
-  Converts params in the JSON api "data" format into flat params convient for
-  changeset casting.
-
-  This is done using `JaSerializer.Params.to_attributes/1`
+  Converts id values (primary or relationships) in a conn params map into
+  integers, if applicable.
   """
 
   alias Plug.Conn
@@ -73,6 +71,8 @@ defmodule CodeCorpsWeb.Plug.IdsToIntegers do
   defp convert?("user_task_id"), do: true
   defp convert?(_other), do: false
 
-  defp ensure_integer(value) when is_binary(value), do: value |> String.parse
+  defp ensure_integer(value) when is_binary(value) do
+    value |> String.to_integer
+  end
   defp ensure_integer(value), do: value
 end
