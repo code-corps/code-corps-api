@@ -24,16 +24,16 @@ defmodule CodeCorps.Policy do
   end
 
   @spec can?(User.t, atom, struct, map) :: boolean
-  defp can?(%User{} = user, :create, %Category{}, %{}), do: Policy.Category.create?(user)
-  defp can?(%User{} = user, :update, %Category{}, %{}), do: Policy.Category.update?(user)
-  defp can?(%User{} = user, :create, %Comment{}, %{} = params), do: Policy.Comment.create?(user, params)
-  defp can?(%User{} = user, :update, %Comment{} = comment, %{}), do: Policy.Comment.update?(user, comment)
-  defp can?(%User{} = user, :create, %Organization{}, %{}), do: Policy.Organization.create?(user)
-  defp can?(%User{} = user, :update, %Organization{} = organization, %{}), do: Policy.Organization.update?(user, organization)  
-  defp can?(%User{} = current_user, :update, %User{} = user, %{}), do: Policy.User.update?(user, current_user)
-  defp can?(%User{} = user, :create, %UserTask{}, %{} = params), do: Policy.UserTask.create?(user, params)
-  defp can?(%User{} = user, :update, %UserTask{} = user_task, %{}), do: Policy.UserTask.update?(user, user_task)
-  defp can?(%User{} = user, :delete, %UserTask{} = user_task, %{}), do: Policy.UserTask.delete?(user, user_task)
+  defp can?(%User{} = current_user, :create, %Category{}, %{}), do: Policy.Category.create?(current_user)
+  defp can?(%User{} = current_user, :update, %Category{}, %{}), do: Policy.Category.update?(current_user)
+  defp can?(%User{} = current_user, :create, %Comment{}, %{} = params), do: Policy.Comment.create?(current_user, params)
+  defp can?(%User{} = current_user, :update, %Comment{} = comment, %{}), do: Policy.Comment.update?(current_user, comment)
+  defp can?(%User{} = current_user, :create, %Organization{}, %{}), do: Policy.Organization.create?(current_user)
+  defp can?(%User{} = current_user, :update, %Organization{} = organization, %{}), do: Policy.Organization.update?(current_user, organization)
+  defp can?(%User{} = current_user, :update, %User{} = user, %{}), do: Policy.User.update?(current_user, user)
+  defp can?(%User{} = current_user, :create, %UserTask{}, %{} = params), do: Policy.UserTask.create?(current_user, params)
+  defp can?(%User{} = current_user, :update, %UserTask{} = user_task, %{}), do: Policy.UserTask.update?(current_user, user_task)
+  defp can?(%User{} = current_user, :delete, %UserTask{} = user_task, %{}), do: Policy.UserTask.delete?(current_user, user_task)
 
   defimpl Canada.Can, for: User do
     # NOTE: Canary sets an :unauthorized and a :not_found handler on a config level
@@ -43,7 +43,7 @@ defmodule CodeCorps.Policy do
     # will never do anything
     #
     # The only solution is to have a catch_all match for the resource being nil, which returns true
-    
+
     # NOTE: other tests are using the User policy for the time being.
     def can?(%User{}, _action, nil), do: true
 
