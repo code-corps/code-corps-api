@@ -26,11 +26,10 @@ defmodule CodeCorps.GitHub.Webhook.Handler do
     end
   end
 
-  defp build_params(type, id, %{"action" => action, "sender" => sender}) do
+  defp build_params(type, id, %{"action" => action, "sender" => _}) do
     %{
       action: action,
       github_delivery_id: id,
-      source: sender |> get_source(),
       status: type |> get_status(),
       type: type
     }
@@ -39,8 +38,6 @@ defmodule CodeCorps.GitHub.Webhook.Handler do
   defp create_event(params) do
     %GithubEvent{} |> GithubEvent.changeset(params) |> Repo.insert
   end
-
-  defp get_source(_), do: "not implemented"
 
   defp get_status(type) do
     case EventSupport.status(type) do
