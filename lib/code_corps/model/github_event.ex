@@ -6,7 +6,6 @@ defmodule CodeCorps.GithubEvent do
   schema "github_events" do
     field :action, :string
     field :github_delivery_id, :string
-    field :source, :string
     field :status, :string
     field :type, :string
 
@@ -18,7 +17,7 @@ defmodule CodeCorps.GithubEvent do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:action, :github_delivery_id, :source, :status, :type])
-    |> validate_required([:action, :github_delivery_id, :source, :status, :type])
+    |> cast(params, [:action, :github_delivery_id, :status, :type])
+    |> validate_required([:action, :github_delivery_id, :status, :type])
   end
 end
