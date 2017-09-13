@@ -37,7 +37,7 @@ defmodule CodeCorpsWeb.UserSkillController do
       {:ok, :authorized} <- current_user |> Policy.authorize(:delete, user_skill),
       {:ok, %UserSkill{} = _user_skill} <- user_skill |> Repo.delete
     do
-      conn |> send_resp(:no_content, "")
+      conn |> Conn.assign(:user_skill, user_skill) |> send_resp(:no_content, "")
     end
   end
 end
