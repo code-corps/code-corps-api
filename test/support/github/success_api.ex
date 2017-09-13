@@ -62,6 +62,12 @@ defmodule CodeCorps.GitHub.SuccessAPI do
   defp mock_response(:patch, ["repos", _owner, _repo, "issues", _number], _, _, _) do
     load_endpoint_fixture("issue")
   end
+  defp mock_response(:post, ["repos", _owner, _repo, "issues", _number, "comments"], _, _, _) do
+    load_endpoint_fixture("issue_comment")
+  end
+  defp mock_response(:patch, ["repos", _owner, _repo, "issues", _number, "comments", _id], _, _, _) do
+    load_endpoint_fixture("issue_comment")
+  end
   defp mock_response(method, endpoint, _, _, _) when is_binary(endpoint) do
     raise UnhandledGitHubEndpointError, message: "You have an unhandled :#{method} request to #{endpoint}"
   end
