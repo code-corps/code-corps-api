@@ -45,6 +45,8 @@ defmodule CodeCorps.Policy do
     %OrganizationGithubAppInstallation{} = organization_github_app_installation, %{}),
       do: Policy.OrganizationGithubAppInstallation.delete?(user, organization_github_app_installation)
   defp can?(%User{} = user, :create, %OrganizationGithubAppInstallation{}, %{} = params), do: Policy.OrganizationGithubAppInstallation.create?(user, params)
+  defp can?(%User{} = current_user, :create, %UserSkill{}, %{} = params), do: Policy.UserSkill.create?(current_user, params)
+  defp can?(%User{} = current_user, :delete, %UserSkill{} = user_skill, %{}), do: Policy.UserSkill.delete?(current_user, user_skill)
 
   defimpl Canada.Can, for: User do
     # NOTE: Canary sets an :unauthorized and a :not_found handler on a config level
@@ -110,9 +112,6 @@ defmodule CodeCorps.Policy do
 
     def can?(%User{} = user, :create, %Changeset{data: %UserRole{}} = changeset), do: Policy.UserRole.create?(user, changeset)
     def can?(%User{} = user, :delete, %UserRole{} = user_role), do: Policy.UserRole.delete?(user, user_role)
-
-    def can?(%User{} = user, :create, %Changeset{data: %UserSkill{}} = changeset), do: Policy.UserSkill.create?(user, changeset)
-    def can?(%User{} = user, :delete, %UserSkill{} = user_skill), do: Policy.UserSkill.delete?(user, user_skill)
 
   end
 end

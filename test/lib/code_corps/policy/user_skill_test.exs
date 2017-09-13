@@ -16,9 +16,9 @@ defmodule CodeCorps.Policy.UserSkillTest do
 
     test "returns true if user is creating their own record" do
       user = insert(:user)
-      changeset = %UserSkill{} |> create_changeset(%{user_id: user.id})
+      user_skill = %UserSkill{user_id: user.id}
 
-      assert create?(user, changeset) 
+      assert create?(user, user_skill) 
     end
 
     test "returns false if user is creating someone else's record" do
