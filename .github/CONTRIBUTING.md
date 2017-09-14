@@ -73,7 +73,7 @@ By creating small, modular pieces, we can assemble complex data structures that 
 
 #### Previewing your changes
 
-You can preview your changes by [walking through our guide on how to generate API documentation locally](docs/API.md).
+You can preview your changes by [walking through our guide on how to generate API documentation locally](/docs/API.md).
 
 [Done with your changes?](#i-finished-my-changes)
 
@@ -178,7 +178,7 @@ The CircleCI builds also rely on some environment variables for reporting, deplo
 
 If you've had a pull request reviewed and accepted, congratulations! Before we can merge your changes, we'll need you to rebase off `origin/develop` and squash your commits into one. This will give us a cleaner git history.
 
-Never done this before? No problem. [We'll walk you through it in our guide](docs/SQUASHING.md), and you can read [a deeper guide about rewriting history to understand more](https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History).
+Never done this before? No problem. [We'll walk you through it in our guide](/docs/SQUASHING.md), and you can read [a deeper guide about rewriting history to understand more](https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History).
 
 ## Running Tests
 
