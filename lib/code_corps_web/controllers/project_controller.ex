@@ -1,39 +1,56 @@
 defmodule CodeCorpsWeb.ProjectController do
   use CodeCorpsWeb, :controller
-  use JaResource
 
-  import CodeCorps.Helpers.Query, only: [approved_filter: 2, slug_finder: 2]
+  alias CodeCorps.{Helpers.Query, Project, User}
 
-  alias CodeCorps.Project
+  action_fallback CodeCorpsWeb.FallbackController
+  plug CodeCorpsWeb.Plug.DataToAttributes  
 
-  plug :load_and_authorize_changeset, model: Project, only: [:create]
-  plug :load_and_authorize_resource, model: Project, only: [:update]
-  plug JaResource
-
-  @spec model :: module
-  def model, do: CodeCorps.Project
-
-  def record(%Plug.Conn{params: %{"project_slug" => project_slug}}, nil) do
-    Project |> slug_finder(project_slug)
-  end
-  def record(%Plug.Conn{} = conn, id), do: super(conn, id)
-
-  def handle_index(_conn, %{"slug" => slug}) do
-    slugged_route = CodeCorps.SluggedRoute |> slug_finder(slug)
-
-    Project
-    |> Repo.all(organization_id: slugged_route.organization_id)
-  end
-  def handle_index(_conn, _params) do
-    Project
-    |> approved_filter(true)
+  @spec index(Conn.t, map) :: Conn.t
+  def index(%Conn{} = conn, _params) do
+    with projects <- Project |> Query.approved_filter(true) |> Repo.all do
+      conn |> render("index.json-api", data: projects)
+    end
   end
 
-  def handle_create(_conn, attributes) do
-    %Project{} |> Project.create_changeset(attributes)
+  @spec index(Conn.t, map) :: Conn.t
+  def index(%Conn{} = conn, %{"slug" => slug}) do
+    slugged_route = CodeCorps.SluggedRoute |> Query.slug_finder(slug)
+    with projects <- Project |> Repo.all(organization_id: slugged_route.organization_id) do
+      conn |> render("index.json-api", data: projects)
+    end
   end
 
-  def handle_update(_conn, project, attributes) do
-    project |> Project.update_changeset(attributes)
+  @spec show(Conn.t, map) :: Conn.t
+  def show(%Conn{} = conn, %{"id" => id}) do
+    with %Project{} = project <- Project |> Repo.get(id) do
+      conn |> render("show.json-api", data: project)
+    end
+  end
+
+  @spec show(Conn.t, map) :: Conn.t
+  def show(%Conn{} = conn, %{"project_slug" => project_slug}) do
+    with %Project{} = project <- Project |> Query.slug_finder(project_slug) do
+      conn |> render("show.json-api", data: project)
+    end
+  end
+
+  @spec create(Plug.Conn.t, map) :: Conn.t
+  def create(%Conn{} = conn, %{} = params) do
+    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+         {:ok, :authorized} <- current_user |> Policy.authorize(:create, %Project{}, params),
+         {:ok, %Project{} = project} <- %Project{} |> Project.create_changeset(params) |> Repo.insert do
+      conn |> put_status(:created) |> render("show.json-api", data: project)
+    end
+  end
+
+  @spec update(Conn.t, map) :: Conn.t
+  def update(%Conn{} = conn, %{"id" => id} = params) do
+    with %Project{} = project <- Project |> Repo.get(id),
+      %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+      {:ok, :authorized} <- current_user |> Policy.authorize(:update, project),
+      {:ok, %Project{} = project} <- project |> Project.changeset(params) |> Repo.update do
+        conn |> render("show.json-api", data: project)
+    end
   end
 end
