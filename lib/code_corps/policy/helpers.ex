@@ -48,6 +48,7 @@ defmodule CodeCorps.Policy.Helpers do
   Returns `CodeCorps.Organization`
   """
   @spec get_organization(struct | Changeset.t | any) :: Organization.t
+  def get_organization(%{"organization_id" => id}), do: Organization |> Repo.get(id)
   def get_organization(%{organization_id: id}), do: Organization |> Repo.get(id)
   def get_organization(%Changeset{changes: %{organization_id: id}}), do: Organization |> Repo.get(id)
   def get_organization(_), do: nil

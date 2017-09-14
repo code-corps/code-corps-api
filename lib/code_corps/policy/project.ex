@@ -5,9 +5,9 @@ defmodule CodeCorps.Policy.Project do
   alias CodeCorps.{Project, User}
   alias Ecto.Changeset
 
-  @spec create?(User.t, Changeset.t) :: boolean
-  def create?(%User{} = user, %Changeset{} = changeset) do
-    changeset |> get_organization() |> owned_by?(user)
+  @spec create?(User.t, map) :: boolean
+  def create?(%User{} = user, params) do
+    params |> get_organization() |> owned_by?(user)
   end
 
   @spec update?(User.t, Project.t) :: boolean
