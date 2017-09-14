@@ -5,6 +5,7 @@ defmodule CodeCorpsWeb.FallbackController do
 
   @type supported_fallbacks :: {:error, Changeset.t} |
                                {:error, :not_authorized} |
+                               {:error, :github} |
                                nil
 
   @doc ~S"""
@@ -26,5 +27,10 @@ defmodule CodeCorpsWeb.FallbackController do
     conn
     |> put_status(:not_found)
     |> render(CodeCorpsWeb.ErrorView, "404.json")
+  end
+  def call(%Conn{} = conn, {:error, :github}) do
+    conn
+    |> put_status(500)
+    |> render(CodeCorpsWeb.ErrorView, "500.json", message: "An unknown error occurred with GitHub's API.")
   end
 end

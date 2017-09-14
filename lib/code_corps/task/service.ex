@@ -6,6 +6,8 @@ defmodule CodeCorps.Task.Service do
   alias CodeCorps.{GitHub, Task, Repo}
   alias Ecto.{Changeset, Multi}
 
+  require Logger
+
   @doc ~S"""
   Performs all actions involved in creating a task on a project
   """
@@ -30,7 +32,11 @@ defmodule CodeCorps.Task.Service do
   @spec marshall_result(tuple) :: {:ok, Task.t} | {:error, Changeset.t} | {:error, :github}
   defp marshall_result({:ok, %{github: %Task{} = task}}), do: {:ok, task}
   defp marshall_result({:error, :task, %Changeset{} = changeset, _steps}), do: {:error, changeset}
-  defp marshall_result({:error, :github, _value, _steps}), do: {:error, :github}
+  defp marshall_result({:error, :github, result, _steps}) do
+    Logger.warn "An error occurred when creating/updating the task with the GitHub API"
+    Logger.warn "#{inspect result}"
+    {:error, :github}
+  end
 
   @preloads [[github_repo: :github_app_installation], :user]
 
