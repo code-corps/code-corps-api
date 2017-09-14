@@ -10,12 +10,12 @@ defmodule CodeCorps.Task.QueryTest do
       tasks |> Enum.map(&Map.get(&1, :id)) |> Enum.sort
     end
 
-    defp filter_sorted_ids(params) do
-      Task |> Task.Query.filter(params) |> Repo.all |> get_sorted_ids()
+    defp list_sorted_ids(params) do
+      params |> Task.Query.list |> get_sorted_ids()
     end
 
     defp find_with_query(params) do
-      Task |> Task.Query.query(params) |> Repo.one
+      params |> Task.Query.find
     end
 
     test "filters by project_id" do
@@ -28,10 +28,10 @@ defmodule CodeCorps.Task.QueryTest do
       project_2_task_ids = project_2_tasks |> get_sorted_ids()
 
       assert project_1_task_ids ==
-        filter_sorted_ids(%{"project_id" => project_1.id})
+        list_sorted_ids(%{"project_id" => project_1.id})
 
       assert project_2_task_ids ==
-        filter_sorted_ids(%{"project_id" => project_2.id})
+        list_sorted_ids(%{"project_id" => project_2.id})
     end
 
     test "filters by coalesced task_list_ids" do
@@ -48,22 +48,22 @@ defmodule CodeCorps.Task.QueryTest do
       list_3_task_ids = list_3_tasks |> get_sorted_ids()
 
       assert list_1_task_ids ==
-        filter_sorted_ids(%{"task_list_ids" => "#{task_list_1.id}"})
+        list_sorted_ids(%{"task_list_ids" => "#{task_list_1.id}"})
 
       assert list_2_task_ids ==
-        filter_sorted_ids(%{"task_list_ids" => "#{task_list_2.id}"})
+        list_sorted_ids(%{"task_list_ids" => "#{task_list_2.id}"})
 
       assert list_3_task_ids ==
-        filter_sorted_ids(%{"task_list_ids" => "#{task_list_3.id}"})
+        list_sorted_ids(%{"task_list_ids" => "#{task_list_3.id}"})
 
       assert (list_1_task_ids ++ list_2_task_ids) |> Enum.sort ==
-        filter_sorted_ids(%{"task_list_ids" => "#{task_list_1.id},#{task_list_2.id}"})
+        list_sorted_ids(%{"task_list_ids" => "#{task_list_1.id},#{task_list_2.id}"})
 
       assert (list_2_task_ids ++ list_3_task_ids) |> Enum.sort ==
-        filter_sorted_ids(%{"task_list_ids" => "#{task_list_2.id},#{task_list_3.id}"})
+        list_sorted_ids(%{"task_list_ids" => "#{task_list_2.id},#{task_list_3.id}"})
 
       assert (list_1_task_ids ++ list_3_task_ids) |> Enum.sort ==
-        filter_sorted_ids(%{"task_list_ids" => "#{task_list_1.id},#{task_list_3.id}"})
+        list_sorted_ids(%{"task_list_ids" => "#{task_list_1.id},#{task_list_3.id}"})
     end
 
     test "filters by status" do
@@ -74,10 +74,10 @@ defmodule CodeCorps.Task.QueryTest do
       closed_task_ids = closed_tasks |> get_sorted_ids()
 
       assert open_task_ids ==
-        filter_sorted_ids(%{"status" => "open"})
+        list_sorted_ids(%{"status" => "open"})
 
       assert closed_task_ids ==
-        filter_sorted_ids(%{"status" => "closed"})
+        list_sorted_ids(%{"status" => "closed"})
     end
 
     test "works with multiple filters" do
@@ -98,41 +98,41 @@ defmodule CodeCorps.Task.QueryTest do
       task_8 = insert(:task, status: "closed", project: project_2, task_list: list_2)
 
       assert [task_1.id] ==
-        filter_sorted_ids(%{"status" => "open", "project_id" => project_1.id, "task_list_ids" => "#{list_1.id}"})
+        list_sorted_ids(%{"status" => "open", "project_id" => project_1.id, "task_list_ids" => "#{list_1.id}"})
 
       assert [task_2.id] ==
-        filter_sorted_ids(%{"status" => "closed", "project_id" => project_1.id, "task_list_ids" => "#{list_1.id}"})
+        list_sorted_ids(%{"status" => "closed", "project_id" => project_1.id, "task_list_ids" => "#{list_1.id}"})
 
       assert [task_1, task_2] |> get_sorted_ids() ==
-        filter_sorted_ids(%{"project_id" => project_1.id, "task_list_ids" => "#{list_1.id}"})
+        list_sorted_ids(%{"project_id" => project_1.id, "task_list_ids" => "#{list_1.id}"})
 
       assert [task_1, task_5] |> get_sorted_ids() ==
-        filter_sorted_ids(%{"status" => "open", "task_list_ids" => "#{list_1.id}"})
+        list_sorted_ids(%{"status" => "open", "task_list_ids" => "#{list_1.id}"})
 
       assert [task_1, task_3, task_5, task_7] |> get_sorted_ids() ==
-        filter_sorted_ids(%{"status" => "open", "task_list_ids" => "#{list_1.id},#{list_2.id}"})
+        list_sorted_ids(%{"status" => "open", "task_list_ids" => "#{list_1.id},#{list_2.id}"})
 
       assert [task_2, task_4, task_6, task_8] |> get_sorted_ids() ==
-        filter_sorted_ids(%{"status" => "closed", "task_list_ids" => "#{list_1.id},#{list_2.id}"})
+        list_sorted_ids(%{"status" => "closed", "task_list_ids" => "#{list_1.id},#{list_2.id}"})
 
       assert [task_1, task_3] |> get_sorted_ids() ==
-        filter_sorted_ids(%{"status" => "open", "project_id" => project_1.id})
+        list_sorted_ids(%{"status" => "open", "project_id" => project_1.id})
     end
   end
 
   describe "query/2" do
-    test "queries by project_id and id as number" do
+    test "queries by project_id and number" do
       [task, _] = insert_pair(:task)
       retrieved_task =
-        find_with_query(%{"id" => task.number, "project_id" => task.project_id})
+        find_with_query(%{"number" => task.number, "project_id" => task.project_id})
 
       assert retrieved_task.id == task.id
     end
 
-    test "queries by task_list_id and id as number" do
+    test "queries by task_list_id and number" do
       [task, _] = insert_pair(:task)
       retrieved_task =
-        find_with_query(%{"id" => task.number, "task_list_id" => task.task_list_id})
+        find_with_query(%{"number" => task.number, "task_list_id" => task.task_list_id})
 
       assert retrieved_task.id == task.id
     end

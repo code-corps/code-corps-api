@@ -9,14 +9,14 @@ defmodule CodeCorpsWeb.TaskController do
 
   @spec index(Conn.t, map) :: Conn.t
   def index(%Conn{} = conn, %{} = params) do
-    with tasks <- Task |> Task.Query.filter(params) |> Ecto.Query.order_by([asc: :order]) |> Repo.all do
+    with tasks <- Task.Query.list(params) do
       conn |> render("index.json-api", data: tasks)
     end
   end
 
   @spec show(Conn.t, map) :: Conn.t
   def show(%Conn{} = conn, %{} = params) do
-    with %Task{} = task <- Task |> Task.Query.query(params) |> Repo.one do
+    with %Task{} = task <- Task.Query.find(params) do
       conn |> render("show.json-api", data: task)
     end
   end
@@ -32,7 +32,7 @@ defmodule CodeCorpsWeb.TaskController do
 
   @spec update(Conn.t, map) :: Conn.t
   def update(%Conn{} = conn, %{} = params) do
-    with %Task{} = task <- Task |> Task.Query.query(params) |> Repo.one,
+    with %Task{} = task <- Task.Query.find(params),
          %User{} = current_user <- conn |> Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:update, task),
          {:ok, %Task{} = task} <- task |> Task.Service.update(params) do

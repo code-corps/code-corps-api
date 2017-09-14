@@ -5,50 +5,65 @@ defmodule CodeCorps.Task.Query do
   """
   import Ecto.Query
 
-  alias CodeCorps.Helpers
+  alias CodeCorps.{Helpers, Task, Repo}
   alias Ecto.Queryable
 
   @doc ~S"""
-  Returns a `Queryable` to which a map of provided parameters has been applied
-  recursively.
+  Returns a list of `Task` records, filtered by a map of parameters.
 
-  The `Queryable` is intended to be used with `Repo.all` to retrieve a list of
-  `Task` records.
+  Accepted parameters are a `project_id`, or a list of comma separated
+  `task_list_ids`, combined with a `status`.
+
+  The records are returned ordered by the `:order` field, ascending.
   """
-  @spec filter(Queryable.t, map) :: Queryable.t
-  def filter(query, %{"filter" => %{} = params}), do: query |> filter(params)
-  def filter(query, %{"project_id" => project_id} = params) do
-    query
+  @spec list(map) :: list(Project.t)
+  def list(%{} = params) do
+    Task
+    |> do_list(params)
+    |> order_by([asc: :order])
+    |> Repo.all
+  end
+
+  @spec do_list(Queryable.t, map) :: Queryable.t
+  defp do_list(queryable, %{"filter" => %{} = params}) do
+    queryable |> do_list(params)
+  end
+  defp do_list(queryable, %{"project_id" => project_id} = params) do
+    queryable
     |> where(project_id: ^project_id)
-    |> filter(params |> Map.delete("project_id"))
+    |> do_list(params |> Map.delete("project_id"))
   end
-  def filter(query, %{"task_list_ids" => task_list_ids} = params) do
+  defp do_list(queryable, %{"task_list_ids" => task_list_ids} = params) do
     task_list_ids = task_list_ids |> Helpers.String.coalesce_id_string
-    query
+
+    queryable
     |> where([r], r.task_list_id in ^task_list_ids)
-    |> filter(params |> Map.delete("task_list_ids"))
+    |> do_list(params |> Map.delete("task_list_ids"))
   end
-  def filter(query, %{"status" => status} = params) do
-    query
+  defp do_list(queryable, %{"status" => status} = params) do
+    queryable
     |> where(status: ^status)
-    |> filter(params |> Map.delete("status"))
+    |> do_list(params |> Map.delete("status"))
   end
-  def filter(query, %{}), do: query
+  defp do_list(queryable, %{}), do: queryable
 
   @doc ~S"""
-  Returns a `Queryable` to which a map of provided parameters has been applied.
+  Returns a `Task` record retrived using a set of parameters.
 
-  The `Queryable` is intended to be used with `Repo.one` to retrieve a single
-  `Task` record.
+  This set can be
+
+  - a combination of `project_id` and `number`
+  - a combination of `task_list_id` and `number`
+  - an `id`
   """
-  @spec query(Queryable.t, map) :: Queryable.t
-  def query(query, %{"project_id" => project_id, "id" => number}) do
-    query |> where(project_id: ^project_id, number: ^number)
+  @spec find(map) :: Queryable.t
+  def find(%{"project_id" => project_id, "number" => number}) do
+    Task |> Repo.get_by(project_id: project_id, number: number)
   end
-  def query(query, %{"task_list_id" => task_list_id, "id" => number}) do
-    query |> where(task_list_id: ^task_list_id, number: ^number)
+  def find(%{"task_list_id" => task_list_id, "number" => number}) do
+    Task |> Repo.get_by(task_list_id: task_list_id, number: number)
   end
-  def query(query, %{"id" => id}) do
-    query |> where(id: ^id)
+  def find(%{"id" => id}) do
+    Task |> Repo.get(id)
   end
 end
