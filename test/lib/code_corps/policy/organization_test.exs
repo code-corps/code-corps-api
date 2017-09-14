@@ -23,7 +23,7 @@ defmodule CodeCorps.Policy.OrganizationTest do
     end
 
     test "returns true when user is the organization owner" do
-      user = insert(:user, admin: true)
+      user = insert(:user)
       organization = build(:organization, owner_id: user.id)
       assert update?(user, organization)
     end
