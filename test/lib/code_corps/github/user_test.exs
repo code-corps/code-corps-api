@@ -49,7 +49,7 @@ defmodule CodeCorps.GitHub.UserTest do
       error = GitHub.APIError.new({404, %{"message" => "{\"error\":\"Not Found\"}"}})
 
       with_mock_api(NotFoundRequest) do
-        assert {:error, error } == GitHub.User.connect(user, "foo_code", "foo_state")
+        assert {:error, error} == GitHub.User.connect(user, "foo_code", "foo_state")
       end
     end
   end
