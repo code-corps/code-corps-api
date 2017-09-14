@@ -1,4 +1,6 @@
 defmodule CodeCorpsWeb.ProjectControllerTest do
+  @moduledoc false
+
   use CodeCorpsWeb.ApiCase, resource_name: :project
 
   @valid_attrs %{title: "Valid project"}
@@ -7,26 +9,37 @@ defmodule CodeCorpsWeb.ProjectControllerTest do
   describe "index" do
     test "lists all approved entries on index", %{conn: conn} do
       [project_1, project_2] = insert_pair(:project, approved: true)
-      insert(:project, approved: false)
+      project_3 = insert(:project, approved: false)
 
-      conn
-      |> request_index
-      |> json_response(200)
-      |> assert_ids_from_response([project_1.id, project_2.id])
+      returned_ids =
+        conn
+        |> request_index
+        |> json_response(200)
+        |> ids_from_response
+
+      assert project_1.id in returned_ids
+      assert project_2.id in returned_ids
+      refute project_3.id in returned_ids
     end
 
     test "lists all entries for organization specified by slug", %{conn: conn} do
       organization_slug = "test-organization"
       organization = insert(:organization, name: "Test Organization", slug: organization_slug)
       insert(:slugged_route, organization: organization, slug: organization_slug)
-      [project_1, project_2] = insert_pair(:project)
+      [project_1, project_2] = insert_pair(:project, organization: organization)
+      project_3 = insert(:project)
 
       path = ("/#{organization_slug}/projects")
 
-      conn
-      |> get(path)
-      |> json_response(200)
-      |> assert_ids_from_response([project_1.id, project_2.id])
+      returned_ids =
+        conn
+        |> get(path)
+        |> json_response(200)
+        |> ids_from_response
+
+      assert project_1.id in returned_ids
+      assert project_2.id in returned_ids
+      refute project_3.id in returned_ids
     end
 
     test "listing by organization slug is case insensitive", %{conn: conn} do

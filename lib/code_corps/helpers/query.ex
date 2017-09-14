@@ -12,14 +12,6 @@ defmodule CodeCorps.Helpers.Query do
     query |> where([object], object.id in ^ids)
   end
 
-  # project queries
-
-  def approved_filter(query, approved) do
-    query |> where([object], object.approved == ^approved)
-  end
-
-  # end project queries
-
   # skill queries
 
   def limit_filter(query, %{"limit" => count}), do: query |> add_limit(count |> Integer.parse)
