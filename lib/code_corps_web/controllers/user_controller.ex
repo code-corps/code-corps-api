@@ -36,23 +36,20 @@ defmodule CodeCorpsWeb.UserController do
          {:ok, :authorized} <- current_user |> Policy.authorize(:update, user),
          {:ok, user, _, _} <- user |> UserService.update(params)
     do
-       conn |> render("show.json-api", data: user) 
+       conn |> render("show.json-api", data: user)
     end
   end
 
   @doc """
   Differs from other resources by path: `/oauth/github`
   """
-  def github_oauth(conn, %{"code" => code, "state" => state}) do
+  @spec github_oauth(Conn.t, map) :: Conn.t
+  def github_oauth(%Conn{} = conn, %{"code" => code, "state" => state}) do
     current_user = Guardian.Plug.current_resource(conn)
     with {:ok, user} <- GitHub.User.connect(current_user, code, state)
     do
       conn |> render("show.json-api", data: user)
     else
-      {:error, %Ecto.Changeset{} = changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(CodeCorpsWeb.ChangesetView, "error.json-api", changeset: changeset)
       {:error, _error} ->
         conn
         |> put_status(:internal_server_error)
@@ -60,12 +57,14 @@ defmodule CodeCorpsWeb.UserController do
     end
   end
 
-  def email_available(conn, %{"email" => email}) do
+  @spec email_available(Conn.t, map) :: Conn.t
+  def email_available(%Conn{} = conn, %{"email" => email}) do
     hash = User.check_email_availability(email)
     conn |> json(hash)
   end
 
-  def username_available(conn, %{"username" => username}) do
+  @spec username_available(Conn.t, map) :: Conn.t
+  def username_available(%Conn{} = conn, %{"username" => username}) do
     hash = User.check_username_availability(username)
     conn |> json(hash)
   end
