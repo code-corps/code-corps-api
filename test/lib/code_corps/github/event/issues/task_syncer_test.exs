@@ -19,11 +19,11 @@ defmodule CodeCorps.GitHub.Event.Issues.TaskSyncerTest do
       user = insert(:user)
       github_repo = insert(:github_repo)
 
-      %{"issue" => %{"id" => issue_github_id, "body" => issue_body}} = @payload
+      %{"issue" => %{"number" => issue_number, "body" => issue_body}} = @payload
 
       [%{project: project_1}, _, _] = project_github_repos = insert_list(3, :project_github_repo, github_repo: github_repo)
 
-      task_1 = insert(:task, project: project_1, user: user, github_id: issue_github_id)
+      task_1 = insert(:task, project: project_1, github_repo: github_repo, user: user, github_issue_number: issue_number)
 
       project_ids = project_github_repos |> Enum.map(&Map.get(&1, :project_id))
 
@@ -40,7 +40,7 @@ defmodule CodeCorps.GitHub.Event.Issues.TaskSyncerTest do
       tasks |> Enum.each(fn task ->
         assert task.user_id == user.id
         assert task.markdown == issue_body
-        assert task.github_id == issue_github_id
+        assert task.github_issue_number == issue_number
       end)
 
       task_ids = tasks |> Enum.map(&Map.get(&1, :id))

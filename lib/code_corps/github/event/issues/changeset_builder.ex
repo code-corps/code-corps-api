@@ -15,8 +15,6 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilder do
   alias CodeCorps.GitHub.Adapters.Task, as: TaskAdapter
   alias Ecto.Changeset
 
-  import Ecto.Query, only: [where: 3]
-
   @doc ~S"""
   Constructs a changeset for syncing a task when processing an Issues webhook
   """
@@ -24,27 +22,30 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilder do
   def build_changeset(
     %Task{id: task_id} = task,
     %{"issue" => issue_attrs},
-    %ProjectGithubRepo{project_id: project_id},
-    %User{id: user_id}) do
+    %ProjectGithubRepo{} = project_github_repo,
+    %User{} = user) do
 
     case is_nil(task_id) do
-      true -> create_changeset(task, issue_attrs, project_id, user_id)
+      true -> create_changeset(task, issue_attrs, project_github_repo, user)
       false -> update_changeset(task, issue_attrs)
     end
   end
 
-  defp create_changeset(%Task{} = task, issue_attrs, project_id, user_id) do
+  defp create_changeset(
+    %Task{} = task,
+    %{} = issue_attrs,
+    %ProjectGithubRepo{project_id: project_id, github_repo_id: github_repo_id},
+    %User{id: user_id}) do
+
     %TaskList{id: task_list_id} =
-      TaskList
-      |> where([l], l.project_id == ^project_id)
-      |> where([l], l.inbox == true)
-      |> Repo.one
+      TaskList |> Repo.get_by(project_id: project_id, inbox: true)
 
     task
     |> Changeset.change(issue_attrs |> TaskAdapter.from_issue())
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
     |> Changeset.put_change(:project_id, project_id)
     |> Changeset.put_change(:task_list_id, task_list_id)
+    |> Changeset.put_change(:github_repo_id, github_repo_id)
     |> Changeset.put_change(:user_id, user_id)
     |> Changeset.validate_required([:project_id, :task_list_id, :user_id, :markdown, :body, :title])
     |> Changeset.assoc_constraint(:project)
@@ -58,6 +59,7 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilder do
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
     |> Changeset.validate_required([:project_id, :user_id, :markdown, :body, :title])
     |> Changeset.assoc_constraint(:project)
+    |> Changeset.assoc_constraint(:github_repo)
     |> Changeset.assoc_constraint(:user)
   end
 end

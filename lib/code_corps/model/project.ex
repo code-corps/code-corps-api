@@ -29,7 +29,8 @@ defmodule CodeCorps.Project do
     field :title, :string
     field :total_monthly_donated, :integer, default: 0
     field :website, :string
-    field :github_id, :integer
+    field :github_repo, :string
+    field :github_owner, :string
 
     belongs_to :organization, CodeCorps.Organization
 
@@ -75,16 +76,6 @@ defmodule CodeCorps.Project do
     |> put_member_assoc()
     |> generate_icon_color(:default_color)
     |> assoc_constraint(:organization)
-  end
-
-  @doc """
-  Builds a changeset for creating a project that has a connected GitHub repo.
-  """
-  def github_create_changeset(struct, params) do
-    struct
-    |> create_changeset(params)
-    |> cast(params, [:github_id])
-    |> validate_required([:github_id])
   end
 
   @doc """

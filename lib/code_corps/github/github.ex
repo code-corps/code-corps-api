@@ -102,13 +102,16 @@ defmodule CodeCorps.GitHub do
   """
   @spec request(method, String.t, headers, body, list) :: response
   def request(method, endpoint, headers, body, options) do
-    api().request(
-      method,
-      api_url_for(endpoint),
-      headers |> Headers.user_request(options),
-      body |> Poison.encode!,
-      options |> add_default_options()
-    )
+    with {:ok, encoded_body} <- body |> Poison.encode do
+      api().request(
+        method,
+        api_url_for(endpoint),
+        headers |> Headers.user_request(options),
+        encoded_body,
+        options |> add_default_options())
+    else
+      _ -> {:error, HTTPClientError.new(reason: :body_encoding_error)}
+    end
   end
 
   @doc """
@@ -117,13 +120,16 @@ defmodule CodeCorps.GitHub do
   """
   @spec integration_request(method, String.t, headers, body, list) :: response
   def integration_request(method, endpoint, headers, body, options) do
-    api().request(
-      method,
-      api_url_for(endpoint),
-      headers |> Headers.integration_request,
-      body |> Poison.encode!,
-      options |> add_default_options()
-    )
+    with {:ok, encoded_body} <- body |> Poison.encode do
+      api().request(
+        method,
+        api_url_for(endpoint),
+        headers |> Headers.integration_request,
+        encoded_body,
+        options |> add_default_options())
+    else
+      _ -> {:error, HTTPClientError.new(reason: :body_encoding_error)}
+    end
   end
 
   @token_url "https://github.com/login/oauth/access_token"
@@ -133,13 +139,16 @@ defmodule CodeCorps.GitHub do
   """
   @spec user_access_token_request(String.t, String.t) :: response
   def user_access_token_request(code, state) do
-    api().request(
-      :post,
-      @token_url,
-      Headers.access_token_request,
-      code |> build_access_token_params(state) |> Poison.encode!,
-      [] |> add_default_options()
-    )
+    with {:ok, encoded_body} <- code |> build_access_token_params(state) |> Poison.encode do
+      api().request(
+        :post,
+        @token_url,
+        Headers.access_token_request,
+        encoded_body,
+        [] |> add_default_options())
+    else
+      _ -> {:error, HTTPClientError.new(reason: :body_encoding_error)}
+    end
   end
 
   @spec api :: module

@@ -85,6 +85,8 @@ defmodule CodeCorps.GitHub.Installation do
     |> Timex.parse!("{ISO:Extended:Z}")
     |> token_expired?()
   end
-  def token_expired?(%DateTime{} = expires_at), do: Timex.now > expires_at
+  def token_expired?(%DateTime{} = expires_at) do
+    Timex.before?(expires_at, Timex.now)
+  end
   def token_expired?(nil), do: true
 end

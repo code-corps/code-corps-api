@@ -4,8 +4,13 @@ defmodule CodeCorps.GitHub.Adapters.Task do
   a `CodeCorps.Task`.
   """
 
+  alias CodeCorps.{
+    Adapter.MapTransformer,
+    Task
+  }
+
   @mapping [
-    {:github_id, ["id"]},
+    {:github_issue_number, ["number"]},
     {:markdown, ["body"]},
     {:status, ["state"]},
     {:title, ["title"]}
@@ -13,6 +18,14 @@ defmodule CodeCorps.GitHub.Adapters.Task do
 
   @spec from_issue(map) :: map
   def from_issue(%{} = payload) do
-    payload |> CodeCorps.Adapter.MapTransformer.transform(@mapping)
+    payload |> MapTransformer.transform(@mapping)
+  end
+
+  @spec to_issue(Task.t) :: map
+  def to_issue(%Task{} = task) do
+    task
+    |> Map.from_struct
+    |> MapTransformer.transform_inverse(@mapping)
+    |> Map.delete("number")
   end
 end

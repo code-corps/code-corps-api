@@ -1,4 +1,4 @@
-defmodule CodeCorps.Repo.Migrations.AddGithubAuthTokenToUsers do
+defmodule CodeCorps.Repo.Migrations.AddGitHubAuthTokenToUsers do
   use Ecto.Migration
 
   def change do

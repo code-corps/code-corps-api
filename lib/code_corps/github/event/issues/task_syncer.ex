@@ -31,8 +31,17 @@ defmodule CodeCorps.GitHub.Event.Issues.TaskSyncer do
   end
 
   @spec find_or_init_task(ProjectGithubRepo.t, map) :: Task.t
-  defp find_or_init_task(%ProjectGithubRepo{project_id: project_id}, %{"issue" => %{"id" => github_id}}) do
-    case Task |> Repo.get_by(github_id: github_id, project_id: project_id) do
+  defp find_or_init_task(
+    %ProjectGithubRepo{project_id: project_id, github_repo_id: github_repo_id},
+    %{"issue" => %{"number" => github_issue_number}}) do
+
+    query_params = [
+      github_issue_number: github_issue_number,
+      project_id: project_id,
+      github_repo_id: github_repo_id
+    ]
+
+    case Task |> Repo.get_by(query_params) do
       nil -> %Task{}
       %Task{} = task -> task
     end

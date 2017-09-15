@@ -31,6 +31,8 @@ defmodule CodeCorps.Policy do
   defp can?(%User{} = current_user, :create, %Organization{}, %{}), do: Policy.Organization.create?(current_user)
   defp can?(%User{} = current_user, :update, %Organization{} = organization, %{}), do: Policy.Organization.update?(current_user, organization)
   defp can?(%User{} = current_user, :update, %User{} = user, %{}), do: Policy.User.update?(current_user, user)
+  defp can?(%User{} = current_user, :create, %Task{}, %{} = params), do: Policy.Task.create?(current_user, params)
+  defp can?(%User{} = current_user, :update, %Task{} = task, %{}), do: Policy.Task.update?(current_user, task)
   defp can?(%User{} = current_user, :create, %UserTask{}, %{} = params), do: Policy.UserTask.create?(current_user, params)
   defp can?(%User{} = current_user, :update, %UserTask{} = user_task, %{}), do: Policy.UserTask.update?(current_user, user_task)
   defp can?(%User{} = current_user, :delete, %UserTask{} = user_task, %{}), do: Policy.UserTask.delete?(current_user, user_task)
@@ -99,9 +101,6 @@ defmodule CodeCorps.Policy do
 
     def can?(%User{} = user, :create, %Changeset{data: %StripePlatformCustomer{}} = changeset), do: Policy.StripePlatformCustomer.create?(user, changeset)
     def can?(%User{} = user, :show, %StripePlatformCustomer{} = stripe_platform_customer), do: Policy.StripePlatformCustomer.show?(user, stripe_platform_customer)
-
-    def can?(%User{} = user, :create, %Changeset{data: %Task{}} = changeset), do: Policy.Task.create?(user, changeset)
-    def can?(%User{} = user, :update, %Task{} = task), do: Policy.Task.update?(user, task)
 
     def can?(%User{} = user, :create, %Changeset{data: %TaskSkill{}} = changeset), do: Policy.TaskSkill.create?(user, changeset)
     def can?(%User{} = user, :delete, %TaskSkill{} = task_skill), do: Policy.TaskSkill.delete?(user, task_skill)

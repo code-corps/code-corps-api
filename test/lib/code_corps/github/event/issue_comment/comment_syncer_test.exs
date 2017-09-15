@@ -19,16 +19,16 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentSyncerTest do
       github_repo = insert(:github_repo)
 
       %{
-        "issue" => %{"id" => issue_github_id},
+        "issue" => %{"number" => issue_number},
         "comment" => %{"id" => comment_github_id, "body" => comment_body}
       } = @payload
 
       [%{project: project_1}, %{project: project_2}, %{project: project_3}]
         = insert_list(3, :project_github_repo, github_repo: github_repo)
 
-      task_1 = insert(:task, project: project_1, user: user, github_id: issue_github_id)
-      task_2 = insert(:task, project: project_2, user: user, github_id: issue_github_id)
-      task_3 = insert(:task, project: project_3, user: user, github_id: issue_github_id)
+      task_1 = insert(:task, project: project_1, user: user, github_repo: github_repo, github_issue_number: issue_number)
+      task_2 = insert(:task, project: project_2, user: user, github_repo: github_repo, github_issue_number: issue_number)
+      task_3 = insert(:task, project: project_3, user: user, github_repo: github_repo, github_issue_number: issue_number)
 
       comment_1 = insert(:comment, task: task_1, user: user, github_id: comment_github_id)
 

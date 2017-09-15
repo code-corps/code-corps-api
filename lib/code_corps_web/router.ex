@@ -118,13 +118,15 @@ defmodule CodeCorpsWeb.Router do
     resources "/project-users", ProjectUserController, only: [:index, :show]
     resources "/projects", ProjectController, only: [:index, :show] do
       resources "/task-lists", TaskListController, only: [:index, :show]
-      resources "/tasks", TaskController, only: [:index, :show]
+      get "/tasks/:number", TaskController, :show
+      resources "/tasks", TaskController, only: [:index]
     end
     resources "/role-skills", RoleSkillController, only: [:index, :show]
     resources "/roles", RoleController, only: [:index, :show]
     resources "/skills", SkillController, only: [:index, :show]
     resources "/task-lists", TaskListController, only: [:index, :show] do
-      resources "/tasks", TaskController, only: [:index, :show]
+      resources "/tasks", TaskController, only: [:index]
+      get "/tasks/:number", TaskController, :show
     end
     resources "/task-skills", TaskSkillController, only: [:index, :show]
     resources "/tasks", TaskController, only: [:index, :show]
