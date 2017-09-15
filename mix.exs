@@ -76,7 +76,6 @@ defmodule CodeCorps.Mixfile do
       {:sentry, "~> 6.0"}, # Sentry error tracking
       {:stripity_stripe, git: "https://github.com/code-corps/stripity_stripe.git", branch: "2.0"}, # Stripe
       {:sweet_xml, "~> 0.5"},
-      {:tentacat, "~> 0.5"},
       {:timber, "~> 2.0"}, # Logging
       {:timex, "~> 3.0"},
       {:timex_ecto, "~> 3.0"}

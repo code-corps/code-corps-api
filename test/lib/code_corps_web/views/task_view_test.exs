@@ -2,7 +2,8 @@ defmodule CodeCorpsWeb.TaskViewTest do
   use CodeCorpsWeb.ViewCase
 
   test "renders all attributes and relationships properly" do
-    task = insert(:task, order: 1000)
+    github_repo = insert(:github_repo)
+    task = insert(:task, order: 1000, github_repo: github_repo)
     comment = insert(:comment, task: task)
     task_skill = insert(:task_skill, task: task)
     user_task = insert(:user_task, task: task)
@@ -19,7 +20,7 @@ defmodule CodeCorpsWeb.TaskViewTest do
           "order" => task.order,
           "status" => task.status,
           "title" => task.title,
-          "updated-at" => task.updated_at
+          "updated-at" => task.updated_at,
         },
         "id" => task.id |> Integer.to_string,
         "relationships" => %{
@@ -35,6 +36,12 @@ defmodule CodeCorpsWeb.TaskViewTest do
             "data" => %{
               "id" => task.project_id |> Integer.to_string,
               "type" => "project"
+            }
+          },
+          "github-repo" => %{
+            "data" => %{
+              "id" => task.github_repo_id |> Integer.to_string,
+              "type" => "github-repo"
             }
           },
           "task-skills" => %{

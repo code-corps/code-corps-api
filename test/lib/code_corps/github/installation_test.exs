@@ -59,7 +59,7 @@ defmodule CodeCorps.GitHub.InstallationTest do
 
   describe "token_expired?/1" do
     test "returns false for a future ISO8601 timestamp" do
-      time = Timex.now() |> Timex.shift(hours: 1) |> DateTime.to_iso8601()
+      time = Timex.now() |> Timex.shift(days: 14) |> DateTime.to_iso8601()
       refute Installation.token_expired?(time)
     end
 
@@ -69,7 +69,7 @@ defmodule CodeCorps.GitHub.InstallationTest do
     end
 
     test "returns true for a past ISO8601 timestamp" do
-      time = Timex.now() |> Timex.shift(hours: -1) |> DateTime.to_iso8601()
+      time = Timex.now() |> Timex.shift(days: -14) |> DateTime.to_iso8601()
       assert Installation.token_expired?(time)
     end
 

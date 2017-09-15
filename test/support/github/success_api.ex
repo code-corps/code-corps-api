@@ -56,11 +56,17 @@ defmodule CodeCorps.GitHub.SuccessAPI do
       "expires_at" => Timex.now() |> Timex.shift(hours: 1) |> DateTime.to_iso8601
     }
   end
+  defp mock_response(:post, ["repos", _owner, _repo, "issues"], _, _, _) do
+    load_endpoint_fixture("issue")
+  end
+  defp mock_response(:patch, ["repos", _owner, _repo, "issues", _number], _, _, _) do
+    load_endpoint_fixture("issue")
+  end
   defp mock_response(method, endpoint, _, _, _) when is_binary(endpoint) do
-    raise UnhandledGitHubEndpointError, message: "You have an unhandled " <> to_string(method) <> " request to " <> endpoint
+    raise UnhandledGitHubEndpointError, message: "You have an unhandled :#{method} request to #{endpoint}"
   end
   defp mock_response(method, uri_parts, _, _, _) when is_list uri_parts do
     endpoint = uri_parts |> Enum.join("/")
-    raise UnhandledGitHubEndpointError, message: "You have an unhandled API " <> to_string(method) <> " request to " <> endpoint
+    raise UnhandledGitHubEndpointError, message: "You have an unhandled API :#{method} request to #{endpoint}"
   end
 end

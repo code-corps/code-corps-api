@@ -1,4 +1,4 @@
-defmodule CodeCorps.Repo.Migrations.AddGithubIds do
+defmodule CodeCorps.Repo.Migrations.AddGitHubIds do
   use Ecto.Migration
 
   def change do

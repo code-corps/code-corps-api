@@ -5,12 +5,12 @@ defmodule CodeCorpsWeb.FallbackController do
 
   @type supported_fallbacks :: {:error, Changeset.t} |
                                {:error, :not_authorized} |
+                               {:error, :github} |
                                nil
 
   @doc ~S"""
-  Default fallback for validation errors.
-
-  Renders validation errors for the provided changeset using `JaSerializer`
+  Default fallback for different `with` clause errors in controllers across the
+  application.
   """
   @spec call(Conn.t, supported_fallbacks) :: Conn.t
   def call(%Conn{} = conn, {:error, %Changeset{} = changeset}) do
@@ -27,5 +27,10 @@ defmodule CodeCorpsWeb.FallbackController do
     conn
     |> put_status(:not_found)
     |> render(CodeCorpsWeb.ErrorView, "404.json")
+  end
+  def call(%Conn{} = conn, {:error, :github}) do
+    conn
+    |> put_status(500)
+    |> render(CodeCorpsWeb.ErrorView, "500.json", message: "An unknown error occurred with GitHub's API.")
   end
 end
