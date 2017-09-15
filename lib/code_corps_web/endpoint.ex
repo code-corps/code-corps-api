@@ -42,5 +42,10 @@ defmodule CodeCorpsWeb.Endpoint do
     allow_headers: ["accept", "authorization", "content-type", "origin", "x-requested-with"],
     log: Application.get_env(:code_corps, :corsica_log_level)
   ]
+  # Add Timber plugs for capturing HTTP context and events
+  plug Timber.Integrations.SessionContextPlug
+  plug Timber.Integrations.HTTPContextPlug
+  plug Timber.Integrations.EventPlug
+
   plug CodeCorpsWeb.Router
 end

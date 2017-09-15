@@ -67,7 +67,7 @@ config :code_corps,
 # If the dev environment has no CLOUDEX_API_KEY set, we want the app
 # to still run, with cloudex in test API mode
 if System.get_env("CLOUDEX_API_KEY") == nil do
-  IO.puts("NOTE: No Cloudex configuration found. Cloudex is runnning in test mode.")
+  IO.puts("NOTE: No Cloudex configuration found. Cloudex is running in test mode.")
   config :code_corps, :cloudex, CloudexTest
   config :cloudex, api_key: "test_key", secret: "test_secret", cloud_name: "test_cloud_name"
 end

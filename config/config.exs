@@ -89,3 +89,6 @@ config :ja_resource,
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"
+
+# Import Timber, structured logging
+import_config "timber.exs"

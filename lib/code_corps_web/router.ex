@@ -11,11 +11,6 @@ defmodule CodeCorpsWeb.Router do
     plug :put_secure_browser_headers
   end
 
-  pipeline :logging do
-    plug Timber.ContextPlug
-    plug Timber.EventPlug
-  end
-
   pipeline :api do
     plug :accepts, ["json-api", "json"]
     plug JaSerializer.Deserializer
@@ -49,26 +44,26 @@ defmodule CodeCorpsWeb.Router do
   end
 
   scope "/", CodeCorpsWeb do
-    pipe_through [:logging, :browser] # Use the default browser stack
+    pipe_through [:browser] # Use the default browser stack
 
     get "/", PageController, :index
   end
 
   scope "/", CodeCorpsWeb, host: "api." do
-    pipe_through [:logging, :stripe_webhooks]
+    pipe_through [:stripe_webhooks]
 
     post "/webhooks/stripe/connect", StripeConnectEventsController, :create
     post "/webhooks/stripe/platform", StripePlatformEventsController, :create
   end
 
   scope "/", CodeCorpsWeb, host: "api." do
-    pipe_through [:logging, :github_webhooks]
+    pipe_through [:github_webhooks]
 
     post "/webhooks/github", GitHubEventsController, :create, as: :github_events
   end
 
   scope "/", CodeCorpsWeb, host: "api." do
-    pipe_through [:logging, :api, :bearer_auth, :ensure_auth, :current_user, :tracking]
+    pipe_through [:api, :bearer_auth, :ensure_auth, :current_user, :tracking]
 
     resources "/categories", CategoryController, only: [:create, :update]
     resources "/comments", CommentController, only: [:create, :update]
@@ -102,7 +97,7 @@ defmodule CodeCorpsWeb.Router do
   end
 
   scope "/", CodeCorpsWeb, host: "api." do
-    pipe_through [:logging, :api, :bearer_auth, :current_user, :tracking]
+    pipe_through [:api, :bearer_auth, :current_user, :tracking]
 
     post "/token", TokenController, :create
     post "/token/refresh", TokenController, :refresh

@@ -30,7 +30,7 @@ defmodule CodeCorpsWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller, namespace: CodeCorpsWeb
+      use Phoenix.Controller, log: false, namespace: CodeCorpsWeb
 
       import Ecto
       import Ecto.Query
@@ -71,7 +71,7 @@ defmodule CodeCorpsWeb do
 
   def channel do
     quote do
-      use Phoenix.Channel
+      use Phoenix.Channel, log_join: false, log_handle_in: false
 
       alias CodeCorps.Repo
       import Ecto
