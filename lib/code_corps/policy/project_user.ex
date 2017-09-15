@@ -5,19 +5,19 @@ defmodule CodeCorps.Policy.ProjectUser do
   import CodeCorps.Policy.Helpers, only: [get_role: 1]
 
   alias CodeCorps.{ProjectUser, Repo, User}
-  alias Ecto.Changeset
 
-  @spec create?(User.t, Ecto.Changeset.t) :: boolean
-  def create?(%User{id: id}, %Changeset{changes: %{user_id: user_id}}), do:  id == user_id
-  def create?(%User{}, %Changeset{}), do: false
+  @spec create?(User.t, map) :: boolean
+  def create?(%User{id: user_id}, %{"user_id" => author_id})
+    when user_id == author_id and not is_nil(user_id), do: true
+  def create?(%User{}, %{}), do: false
 
-  @spec update?(User.t, Ecto.Changeset.t) :: boolean
-  def update?(%User{} = user, %Changeset{data: %ProjectUser{} = record} = changeset) do
-    user_membership = record |> get_project_membership(user)
+  @spec update?(User.t, ProjectUser.t, map) :: boolean
+  def update?(%User{} = user, %ProjectUser{} = existing_record, params) do
+    user_membership = existing_record |> get_project_membership(user)
 
     user_role = user_membership |> get_role
-    old_role = record |> get_role
-    new_role = changeset |> get_role
+    old_role = existing_record |> get_role
+    new_role = Map.get(params, "role")
 
     case [user_role, old_role, new_role] do
       # Non-member, pending and contributors can't do anything
