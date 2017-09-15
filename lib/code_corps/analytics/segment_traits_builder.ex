@@ -6,7 +6,7 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilder do
   @spec build(struct) :: map
   def build(record), do: traits(record)
 
-  defp traits(%CodeCorps.User{} = user) do
+  defp traits(user = %CodeCorps.User{}) do
     %{
       admin: user.admin,
       biography: user.biography,

@@ -7,7 +7,7 @@ defmodule CodeCorps.StripeTesting.Plan do
     %Stripe.Plan{
       id: "plan_9aMOFmqy1esIRE",
       amount: 5000,
-      created: 1479472835,
+      created: 1_479_472_835,
       currency: "usd",
       interval: "month",
       interval_count: 1,

@@ -27,7 +27,8 @@ defmodule CodeCorps.Github.JWT do
   end
 
   defp rsa_key do
-    Application.get_env(:code_corps, :github_app_pem)
+    :code_corps
+    |> Application.get_env(:github_app_pem)
     |> JOSE.JWK.from_pem()
   end
 

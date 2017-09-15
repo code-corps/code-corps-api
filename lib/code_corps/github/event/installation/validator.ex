@@ -11,7 +11,7 @@ defmodule CodeCorps.GitHub.Event.Installation.Validator do
   """
   @spec valid?(map) :: boolean
   def valid?(%{
-    "installation" => %{"id" => _,"account" => %{"id" => _}},
+    "installation" => %{"id" => _, "account" => %{"id" => _}},
     "sender" => %{"id" => _}}), do: true
   def valid?(_), do: false
 end

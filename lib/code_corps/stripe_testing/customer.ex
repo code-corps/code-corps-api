@@ -15,7 +15,7 @@ defmodule CodeCorps.StripeTesting.Customer do
     %Stripe.Customer{
       id: "cus_9aMOFmqy1esIRE",
       account_balance: 0,
-      created: 1479472835,
+      created: 1_479_472_835,
       currency: "usd",
       default_source: nil,
       delinquent: false,
@@ -30,7 +30,7 @@ defmodule CodeCorps.StripeTesting.Customer do
     %Stripe.Customer{
       id: id,
       account_balance: 0,
-      created: 1479472835,
+      created: 1_479_472_835,
       currency: "usd",
       default_source: nil,
       delinquent: false,
@@ -42,7 +42,7 @@ defmodule CodeCorps.StripeTesting.Customer do
   end
 
   defp do_retrieve(id) do
-    created = 1479472835
+    created = 1_479_472_835
 
     %Stripe.Customer{
       id: id,

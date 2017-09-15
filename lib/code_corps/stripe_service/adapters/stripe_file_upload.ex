@@ -6,7 +6,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeFileUploadAdapter do
 
   import CodeCorps.MapUtils, only: [rename: 3, keys_to_string: 1]
 
-  @stripe_attributes [:created, :id, :purpose, :size, :type,]
+  @stripe_attributes [:created, :id, :purpose, :size, :type]
 
   @doc """
   Converts a struct received from the Stripe API into a map that can be used

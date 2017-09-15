@@ -26,7 +26,8 @@ defmodule CodeCorps.Emails.ProjectUserAcceptanceEmail do
   defp preload(%Project{} = project), do: project |> Repo.preload(:organization)
 
   defp url(project) do
-    Application.get_env(:code_corps, :site_url)
+    :code_corps
+    |> Application.get_env(:site_url)
     |> URI.merge(project.organization.slug <> "/" <> project.slug)
     |> URI.to_string
   end
