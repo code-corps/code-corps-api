@@ -38,6 +38,10 @@ defmodule CodeCorps.Policy do
   defp can?(%User{} = current_user, :delete, %UserTask{} = user_task, %{}), do: Policy.UserTask.delete?(current_user, user_task)
   defp can?(%User{} = current_user, :create, %Project{}, %{} = params), do: Policy.Project.create?(current_user, params)
   defp can?(%User{} = current_user, :update, %Project{} = project, %{}), do: Policy.Project.update?(current_user, project)  
+  defp can?(%User{} = user, :delete,
+    %OrganizationGithubAppInstallation{} = organization_github_app_installation, %{}),
+      do: Policy.OrganizationGithubAppInstallation.delete?(user, organization_github_app_installation)
+  defp can?(%User{} = user, :create, %OrganizationGithubAppInstallation{}, %{} = params), do: Policy.OrganizationGithubAppInstallation.create?(user, params)
 
   defimpl Canada.Can, for: User do
     # NOTE: Canary sets an :unauthorized and a :not_found handler on a config level
@@ -59,9 +63,6 @@ defmodule CodeCorps.Policy do
 
     def can?(%User{} = user, :create, OrganizationInvite), do: Policy.OrganizationInvite.create?(user)
     def can?(%User{} = user, :update, %OrganizationInvite{}), do: Policy.OrganizationInvite.update?(user)
-
-    def can?(%User{} = user, :create, %Changeset{data: %OrganizationGithubAppInstallation{}} = changeset), do: Policy.OrganizationGithubAppInstallation.create?(user, changeset)
-    def can?(%User{} = user, :delete, %OrganizationGithubAppInstallation{} = github_app_installation), do: Policy.OrganizationGithubAppInstallation.delete?(user, github_app_installation)
 
     def can?(%User{} = user, :create, %Changeset{data: %Preview{}} = changeset), do: Policy.Preview.create?(user, changeset)
 

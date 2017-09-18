@@ -75,7 +75,6 @@ defmodule CodeCorpsWeb.OrganizationGithubAppInstallationControllerTest do
     test "deletes resource", %{conn: conn, current_user: user} do
       organization = insert(:organization, owner: user)
       record = insert(:organization_github_app_installation, organization: organization)
-
       assert conn |> request_delete(record) |> response(204)
     end
 
