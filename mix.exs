@@ -68,7 +68,6 @@ defmodule CodeCorps.Mixfile do
       {:ja_resource, "~> 0.2"},
       {:ja_serializer, "~> 0.12"}, # JSON API
       {:joken, "~> 1.5"}, # JWT encoding
-      {:mix_test_watch, "~> 0.4", only: :dev}, # Test watcher
       {:money, "~> 1.2.1"},
       {:poison, "~> 3.0", override: true},
       {:scrivener_ecto, "~> 1.2"}, # DB query pagination
