@@ -1,8 +1,6 @@
 defmodule CodeCorpsWeb.OrganizationGithubAppInstallationController do
   use CodeCorpsWeb, :controller
 
-  import CodeCorps.Helpers.Query, only: [id_filter: 2]
-
   alias CodeCorps.{OrganizationGithubAppInstallation, User, Helpers.Query}
 
   action_fallback CodeCorpsWeb.FallbackController

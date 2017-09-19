@@ -3,7 +3,6 @@ defmodule CodeCorps.Policy.Project do
     only: [get_organization: 1, owned_by?: 2, administered_by?: 2]
 
   alias CodeCorps.{Project, User}
-  alias Ecto.Changeset
 
   @spec create?(User.t, map) :: boolean
   def create?(%User{} = user, params) do
