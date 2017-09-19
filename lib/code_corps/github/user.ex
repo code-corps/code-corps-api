@@ -3,7 +3,7 @@ defmodule CodeCorps.GitHub.User do
   Used to perform user actions on the github API
   """
 
-  alias CodeCorps.{GitHub, GithubAppInstallation, Repo, Task, User}
+  alias CodeCorps.{Comment, GitHub, GithubAppInstallation, Repo, Task, User}
   alias CodeCorps.GitHub.Adapters.User, as: UserAdapter
   alias Ecto.{Changeset, Multi}
 
@@ -18,8 +18,8 @@ defmodule CodeCorps.GitHub.User do
   Also associates any orphaned `GithubAppInstallation` records matching their
   `sender_github_id` field with the user's `github_id`
 
-  Also associates any prexisting tasks connected to a premade user with the same
-  user id, to the newly connected user.
+  Also associates any existing tasks and comments to the newly connected user,
+  based on the user's `github_id`
 
   Returns one of the following:
 
@@ -54,6 +54,7 @@ defmodule CodeCorps.GitHub.User do
       |> Multi.update(:user, changeset)
       |> Multi.run(:installations, fn %{user: %User{} = user} -> user |> associate_installations() end)
       |> Multi.run(:tasks, fn %{user: %User{} = user} -> user |> associate_tasks() end)
+      |> Multi.run(:comments, fn %{user: %User{} = user} -> user |> associate_comments() end)
 
     case Repo.transaction(multi) do
       {:ok, %{user: %User{} = user, installations: installations}} ->
@@ -91,6 +92,23 @@ defmodule CodeCorps.GitHub.User do
     |> where([t], t.user_id in ^existing_user_ids)
     |> Repo.update_all(updates, update_options)
     |> (fn {_count, tasks} -> {:ok, tasks} end).()
+  end
+
+  @spec associate_comments(User.t) :: {:ok, list(Comment.t)}
+  defp associate_comments(%User{id: user_id, github_id: github_id}) do
+    updates = [set: [user_id: user_id]]
+    update_options = [returning: true]
+
+    existing_user_ids =
+      User
+      |> where(github_id: ^github_id)
+      |> select([u], u.id)
+      |> Repo.all
+
+    Comment
+    |> where([c], c.user_id in ^existing_user_ids)
+    |> Repo.update_all(updates, update_options)
+    |> (fn {_count, comments} -> {:ok, comments} end).()
   end
 
   @doc ~S"""

@@ -4,7 +4,7 @@ defmodule CodeCorps.GitHub.UserTest do
   use CodeCorps.DbAccessCase
   import CodeCorps.GitHub.TestHelpers
 
-  alias CodeCorps.{GitHub, GithubAppInstallation, Task, User}
+  alias CodeCorps.{Comment, GitHub, GithubAppInstallation, Task, User}
 
   describe "connect/2" do
     test "posts to github, returns updated user" do
@@ -64,6 +64,25 @@ defmodule CodeCorps.GitHub.UserTest do
 
       assert Repo.get(Task, task_1.id).user_id == returned_user.id
       refute Repo.get(Task, task_2.id).user_id == returned_user.id
+    end
+
+    test "posts to github, associates user and comments" do
+      user = insert(:user)
+      %{"id" => github_id} = load_endpoint_fixture("user")
+      premade_user = insert(:user, github_id: github_id)
+
+      # 2 test comments
+      # this one should associate,
+      # because the associated user has the same github id
+      comment_1 = insert(:comment, user: premade_user)
+      # this one should not associate, because the associated user has a
+      # different (or no) github id
+      comment_2 = insert(:comment)
+
+      {:ok, %User{} = returned_user} = GitHub.User.connect(user, "foo_code", "foo_state")
+
+      assert Repo.get(Comment, comment_1.id).user_id == returned_user.id
+      refute Repo.get(Comment, comment_2.id).user_id == returned_user.id
     end
 
     defmodule NotFoundRequest do
