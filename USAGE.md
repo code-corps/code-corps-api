@@ -2,6 +2,7 @@
 
 - [How do I interact with the app?](#interacting-with-the-app)
 - [How do I stop and start the server?](#stopping-and-starting-the-server)
+- [How do I make requests to API endpoints?](#making-requests-to-api-endpoints)
 - [How do I run tests?](#running-tests)
 - [How do I view the API docs?](#api-docs)
 - [How do I lint the code?](#linting-code-with-credo)
@@ -17,6 +18,12 @@ You'll generally interact with the app using `mix` tasks. You can [read the Phoe
 To start the server, run `mix phoenix.server`.
 
 To stop the server, hit `Ctrl+C` twice.
+
+### Making requests to API endpoints
+
+You can make requests to `http://api.lvh.me:4000/YOUR_ENDPOINT` (`lvh.me` resolves itself and all subdomains to your `localhost` accordingly).
+
+> Note: some browsers like Safari and Firefox may ask to download a file instead of displaying contents directly. This is a [known issue for JSON API](https://github.com/json-api/json-api/issues/1048) and if you find this inconvenient, please use Chrome or Opera. We recommend you use specialized tools for API development and discovery like [Postman](https://www.getpostman.com/) or [Paw](https://paw.cloud/).
 
 ### Running tests
 
