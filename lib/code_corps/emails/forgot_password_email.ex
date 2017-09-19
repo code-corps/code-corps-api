@@ -13,7 +13,8 @@ defmodule CodeCorps.Emails.ForgotPasswordEmail do
   defp template_id, do: Application.get_env(:code_corps, :postmark_forgot_password_template)
 
   defp link(token) do
-    Application.get_env(:code_corps, :site_url)
+    :code_corps
+    |> Application.get_env(:site_url)
     |> URI.merge("password/reset?token=#{token}")
     |> URI.to_string
   end

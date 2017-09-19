@@ -5,7 +5,7 @@ Thanks for thinking about helping! How would you like to help?
 - [I want to build a new feature.](#how-to-tackle-a-new-feature)
 - [I want to improve the documentation.](#what-kind-of-documentation-are-you-writing)
 - [I want to fix a bug.](#how-to-fix-a-bug)
-- [I want to refactor some code.](#how-to-refactor-code)
+- [I want to refactor some code.](#how-to-refactor-some-code)
 - [I don't know how to help.](#what-if-i-dont-know-how-to-help)
 
 ## Before you get started

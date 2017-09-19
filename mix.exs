@@ -56,6 +56,7 @@ defmodule CodeCorps.Mixfile do
       {:corsica, "~> 1.0"}, # CORS
       {:credo, "~> 0.8", only: [:dev, :test]}, # Code style suggestions
       {:earmark, "~> 1.2"}, # Markdown rendering
+      {:ecto_ordered, "0.2.0-beta1"},
       {:ex_aws, "~> 1.0"}, # Amazon AWS
       {:excoveralls, "~> 0.7", only: :test}, # Test coverage
       {:ex_doc, "~> 0.16", only: [:dev, :test]},
@@ -67,7 +68,6 @@ defmodule CodeCorps.Mixfile do
       {:ja_resource, "~> 0.2"},
       {:ja_serializer, "~> 0.12"}, # JSON API
       {:joken, "~> 1.5"}, # JWT encoding
-      {:mix_test_watch, "~> 0.4", only: :dev}, # Test watcher
       {:money, "~> 1.2.1"},
       {:poison, "~> 3.0", override: true},
       {:scrivener_ecto, "~> 1.2"}, # DB query pagination
@@ -77,8 +77,7 @@ defmodule CodeCorps.Mixfile do
       {:sweet_xml, "~> 0.5"},
       {:timber, "~> 2.0"}, # Logging
       {:timex, "~> 3.0"},
-      {:timex_ecto, "~> 3.0"},
-      {:ecto_ordered, "0.2.0-beta1"}
+      {:timex_ecto, "~> 3.0"}
     ]
   end
 

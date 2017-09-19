@@ -11,22 +11,16 @@ defmodule CodeCorps.Policy.OrganizationGithubAppInstallationTest do
       user = insert(:user)
       organization = insert(:organization, owner: user)
       github_app_installation = insert(:github_app_installation)
-      changeset =
-        %OrganizationGithubAppInstallation{}
-        |> create_changeset(%{github_app_installation_id: github_app_installation.id, organization_id: organization.id})
 
-      assert create?(user, changeset)
+      assert create?(user, %{github_app_installation_id: github_app_installation.id, organization_id: organization.id})
     end
 
     test "returns false for normal user" do
       user = insert(:user)
       organization = insert(:organization)
-      github_app_installation = insert(:github_app_installation)
-      changeset =
-        %OrganizationGithubAppInstallation{}
-        |> create_changeset(%{github_app_installation_id: github_app_installation.id, organization_id: organization.id})
 
-      refute create?(user, changeset)
+      github_app_installation = insert(:github_app_installation)
+      refute create?(user, %{github_app_installation_id: github_app_installation.id, organization_id: organization.id})
     end
   end
 
