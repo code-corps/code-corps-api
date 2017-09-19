@@ -2,9 +2,6 @@ defmodule CodeCorps.Policy.OrganizationGithubAppInstallationTest do
   use CodeCorps.PolicyCase
 
   import CodeCorps.Policy.OrganizationGithubAppInstallation, only: [create?: 2, delete?: 2]
-  import CodeCorps.OrganizationGithubAppInstallation, only: [create_changeset: 2]
-
-  alias CodeCorps.OrganizationGithubAppInstallation
 
   describe "create?/2" do
     test "returns true when user is creating installation for organization where they're an owner" do
