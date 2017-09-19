@@ -11,21 +11,19 @@ defmodule CodeCorps.Policy.UserSkillTest do
       user = build(:user, admin: true)
       changeset = %UserSkill{} |> create_changeset(%{})
 
-      assert create?(user, changeset) 
+      assert create?(user, %{"user_id" => user.id}) 
     end
 
     test "returns true if user is creating their own record" do
       user = insert(:user)
-      user_skill = %UserSkill{user_id: user.id}
 
-      assert create?(user, user_skill) 
+      assert create?(user, %{"user_id" => user.id}) 
     end
 
     test "returns false if user is creating someone else's record" do
       user = build(:user)
-      changeset = %UserSkill{} |> create_changeset(%{user_id: "someone-else"})
 
-      refute create?(user, changeset) 
+      refute create?(user, %{"user_id" => "someone-else"}) 
     end
   end
 
