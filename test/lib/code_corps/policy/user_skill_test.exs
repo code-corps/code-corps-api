@@ -2,30 +2,24 @@ defmodule CodeCorps.Policy.UserSkillTest do
   use CodeCorps.PolicyCase
 
   import CodeCorps.Policy.UserSkill, only: [create?: 2, delete?: 2]
-  import CodeCorps.UserSkill, only: [create_changeset: 2]
-
-  alias CodeCorps.UserSkill
 
   describe "create?" do
     test "returns true when user is an admin" do
       user = build(:user, admin: true)
-      changeset = %UserSkill{} |> create_changeset(%{})
 
-      assert create?(user, changeset) 
+      assert create?(user, %{"user_id" => user.id}) 
     end
 
     test "returns true if user is creating their own record" do
       user = insert(:user)
-      changeset = %UserSkill{} |> create_changeset(%{user_id: user.id})
 
-      assert create?(user, changeset) 
+      assert create?(user, %{"user_id" => user.id}) 
     end
 
     test "returns false if user is creating someone else's record" do
       user = build(:user)
-      changeset = %UserSkill{} |> create_changeset(%{user_id: "someone-else"})
 
-      refute create?(user, changeset) 
+      refute create?(user, %{"user_id" => "someone-else"}) 
     end
   end
 

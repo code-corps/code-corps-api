@@ -8,8 +8,8 @@ defmodule CodeCorpsWeb.UserTaskController do
 
   @spec index(Conn.t, map) :: Conn.t
   def index(%Conn{} = conn, %{} = params) do
-    with categories <- UserTask |> Query.id_filter(params) |> Repo.all do
-      conn |> render("index.json-api", data: categories)
+    with user_tasks <- UserTask |> Query.id_filter(params) |> Repo.all do
+      conn |> render("index.json-api", data: user_tasks)
     end
   end
 
