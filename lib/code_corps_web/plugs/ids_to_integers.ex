@@ -1,7 +1,11 @@
 defmodule CodeCorpsWeb.Plug.IdsToIntegers do
   @moduledoc ~S"""
-  Converts id values (primary or relationships) in a conn params map into
-  integers, if applicable.
+  Converts `id` values in a `conn` parameters map into integers, if applicable.
+
+  The JSON API specification expects `id` values in resource objects to be
+  strings.
+
+  See http://jsonapi.org/format/#document-resource-object-identification
   """
 
   alias Plug.Conn
@@ -22,7 +26,7 @@ defmodule CodeCorpsWeb.Plug.IdsToIntegers do
 
   @spec convert_key_value(tuple) :: tuple
   defp convert_key_value({key, value}) do
-    case key |> convert?() do
+    case convert?(key) do
       true -> {key, value |> ensure_integer()}
       false -> {key, value}
     end

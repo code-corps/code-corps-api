@@ -3,14 +3,19 @@ defmodule CodeCorps.JsonAPIHelpers do
     with attributes <- build_attributes(attrs),
          relationships <- build_relationships(attrs)
     do
-      build_payload(attributes, relationships)
+      %{
+        "data" => %{
+          "attributes" => attributes,
+          "relationships" => relationships
+        }
+      }
     end
   end
 
   defp build_attributes(attrs) do
     attrs
     |> Enum.filter(&is_attribute(&1))
-    |> Enum.reduce(%{}, &insert_string_key(&1, &2))
+    |> Enum.reduce(%{}, &add_attribute(&1, &2))
   end
 
   defp build_relationships(attrs) do
@@ -19,11 +24,12 @@ defmodule CodeCorps.JsonAPIHelpers do
     |> Enum.reduce(%{}, &Map.merge(&2, &1))
   end
 
-  defp build_relationship({key, record}) do
-    with id <- record.id,
-         type <- model_name_as_string(record)
+  defp build_relationship({atom_key, record}) do
+    with id <- record.id |> to_correct_type(),
+         type <- record |> model_name_as_string(),
+         string_key = atom_key |> Atom.to_string
     do
-      %{} |> Map.put(Atom.to_string(key), %{"data" => %{"id" => id, "type" => type}})
+      %{} |> Map.put(string_key, %{"data" => %{"id" => id, "type" => type}})
     end
   end
 
@@ -40,16 +46,10 @@ defmodule CodeCorps.JsonAPIHelpers do
     |> String.downcase
   end
 
-  defp insert_string_key({key, value}, map) do
-    with string_key <- Atom.to_string(key), do: Map.put(map, string_key, value)
+  defp add_attribute({key, value}, %{} = attrs) do
+    attrs |> Map.put(key |> Atom.to_string, value)
   end
 
-  defp build_payload(attributes, relationships) do
-    %{
-      "data" => %{
-        "attributes" => attributes,
-        "relationships" => relationships
-      }
-    }
-  end
+  defp to_correct_type(value) when is_integer(value), do: value |> Integer.to_string
+  defp to_correct_type(value), do: value
 end
