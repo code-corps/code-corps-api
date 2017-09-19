@@ -11,7 +11,7 @@ defmodule CodeCorps.StripeTesting.Event do
       id: "evt_123",
       object: "event",
       api_version: "2016-07-06",
-      created: 1479472835,
+      created: 1_479_472_835,
       data: %{
         object: %Stripe.Customer{
           id: "cus_123",
@@ -30,7 +30,7 @@ defmodule CodeCorps.StripeTesting.Event do
       id: "evt_123",
       object: "event",
       api_version: "2016-07-06",
-      created: 1479472835,
+      created: 1_479_472_835,
       data: %{
         object: %Stripe.Customer{
           id: "cus_123",

@@ -5,7 +5,7 @@ defmodule CodeCorpsWeb.StripeConnectSubscriptionController do
   alias CodeCorps.StripeConnectSubscription
   alias CodeCorps.StripeService.StripeConnectSubscriptionService
 
-  plug :load_and_authorize_resource, model: StripeConnectSubscription, only: [:show,], preload: [:user]
+  plug :load_and_authorize_resource, model: StripeConnectSubscription, only: [:show], preload: [:user]
   plug :load_and_authorize_changeset, model: StripeConnectSubscription, only: [:create]
 
   plug JaResource

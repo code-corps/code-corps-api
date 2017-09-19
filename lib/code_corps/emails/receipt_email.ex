@@ -77,7 +77,8 @@ defmodule CodeCorps.Emails.ReceiptEmail do
   end
 
   defp url(project) do
-    Application.get_env(:code_corps, :site_url)
+    :code_corps
+    |> Application.get_env(:site_url)
     |> URI.merge(project.organization.slug <> "/" <> project.slug)
     |> URI.to_string
   end

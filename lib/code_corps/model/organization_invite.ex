@@ -38,7 +38,10 @@ defmodule CodeCorps.OrganizationInvite do
     case changeset do
       %Ecto.Changeset{valid?: true}  ->
         length = 10
-        code = :crypto.strong_rand_bytes(length) |> Base.encode64 |> binary_part(0, length)
+        code = length
+        |> :crypto.strong_rand_bytes
+        |> Base.encode64
+        |> binary_part(0, length)
         put_change(changeset, :code, code)
       _ -> changeset
      end
