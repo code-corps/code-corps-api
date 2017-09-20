@@ -5,11 +5,10 @@ defmodule CodeCorps.GitHub.Event.Issues.UserLinker do
   """
 
   alias CodeCorps.{
+    Accounts,
     Repo,
     User
   }
-  alias CodeCorps.GitHub.Adapters.User, as: UserAdapter
-  alias Ecto.Changeset
 
   @doc ~S"""
   Finds or creates a user using information contained in an Issues webhook
@@ -18,7 +17,7 @@ defmodule CodeCorps.GitHub.Event.Issues.UserLinker do
   @spec find_or_create_user(map) :: {:ok, User.t}
   def find_or_create_user(%{"issue" => %{"user" => user_attrs}}) do
     case user_attrs |> find_user() do
-      nil -> user_attrs |> create_user()
+      nil -> user_attrs |> Accounts.create_from_github
       %User{} = user -> {:ok, user}
     end
   end
@@ -26,12 +25,5 @@ defmodule CodeCorps.GitHub.Event.Issues.UserLinker do
   @spec find_user(map) :: User.t | nil
   defp find_user(%{"id" => github_id}) do
     User |> Repo.get_by(github_id: github_id)
-  end
-
-  @spec create_user(map) :: {:ok, User.t}
-  defp create_user(%{} = user_attrs) do
-    %User{}
-    |> Changeset.change(user_attrs |> UserAdapter.from_github_user())
-    |> Repo.insert
   end
 end
