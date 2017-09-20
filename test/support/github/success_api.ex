@@ -39,14 +39,7 @@ defmodule CodeCorps.GitHub.SuccessAPI do
   defp mock_response(method, "https://api.github.com/" <> endpoint, headers, body, options) do
     mock_response(method, endpoint |> String.split("/"), headers, body, options)
   end
-  defp mock_response(:get, ["user"], _, _, _) do
-    %{
-      "avatar_url" => "foo_url",
-      "email" => "foo_email",
-      "id" => 123,
-      "login" => "foo_login"
-    }
-  end
+  defp mock_response(:get, ["user"], _, _, _), do: load_endpoint_fixture("user")
   defp mock_response(_method, ["installation", "repositories"], _, _, _) do
     load_endpoint_fixture("installation_repositories")
   end
