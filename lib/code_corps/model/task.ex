@@ -15,6 +15,8 @@ defmodule CodeCorps.Task do
     field :status, :string, default: "open"
     field :title, :string
     field :github_issue_number, :integer
+    field :task_created_at, :naive_datetime
+    field :task_updated_at, :naive_datetime
 
     field :position, :integer, virtual: true
 
@@ -50,6 +52,7 @@ defmodule CodeCorps.Task do
     |> assoc_constraint(:project)
     |> assoc_constraint(:user)
     |> assoc_constraint(:github_repo)
+    |> set_datetime(:task_created_at)
     |> put_change(:status, "open")
   end
 
@@ -57,6 +60,7 @@ defmodule CodeCorps.Task do
     struct
     |> changeset(params)
     |> cast(params, [:status])
+    |> set_datetime(:task_updated_at)
     |> validate_inclusion(:status, statuses())
   end
 
@@ -66,6 +70,10 @@ defmodule CodeCorps.Task do
         put_change(changeset, :position, 0)
       _ -> changeset
     end
+  end
+
+  defp set_datetime(changeset, field) do
+    put_change(changeset, field, NaiveDateTime.utc_now)
   end
 
   defp statuses do

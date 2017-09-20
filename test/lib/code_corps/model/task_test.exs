@@ -37,5 +37,10 @@ defmodule CodeCorps.TaskTest do
       changeset = Task.update_changeset(%Task{}, changes)
       refute changeset.valid?
     end
+
+    test "sets task_updated_at" do
+      changeset = Task.update_changeset(%Task{}, @valid_attrs)
+      assert changeset |> get_change(:task_updated_at)
+    end
   end
 end
