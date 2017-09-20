@@ -47,6 +47,8 @@ defmodule CodeCorps.Policy do
   defp can?(%User{} = user, :create, %OrganizationGithubAppInstallation{}, %{} = params), do: Policy.OrganizationGithubAppInstallation.create?(user, params)
   defp can?(%User{} = current_user, :create, %UserSkill{}, %{} = params), do: Policy.UserSkill.create?(current_user, params)
   defp can?(%User{} = current_user, :delete, %UserSkill{} = user_skill, %{}), do: Policy.UserSkill.delete?(current_user, user_skill)
+  defp can?(%User{} = current_user, :create, %UserRole{} = user_role, %{}), do: Policy.UserRole.create?(current_user, user_role)
+  defp can?(%User{} = current_user, :delete, %UserRole{} = user_role, %{}), do: Policy.UserRole.delete?(current_user, user_role)
 
   defimpl Canada.Can, for: User do
     # NOTE: Canary sets an :unauthorized and a :not_found handler on a config level
@@ -109,9 +111,6 @@ defmodule CodeCorps.Policy do
 
     def can?(%User{} = user, :create, %Changeset{data: %UserCategory{}} = changeset), do: Policy.UserCategory.create?(user, changeset)
     def can?(%User{} = user, :delete, %UserCategory{} = user_category), do: Policy.UserCategory.delete?(user, user_category)
-
-    def can?(%User{} = user, :create, %Changeset{data: %UserRole{}} = changeset), do: Policy.UserRole.create?(user, changeset)
-    def can?(%User{} = user, :delete, %UserRole{} = user_role), do: Policy.UserRole.delete?(user, user_role)
 
   end
 end
