@@ -34,7 +34,7 @@ defmodule CodeCorps.Task do
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:title, :markdown, :task_list_id, :position])
-    |> validate_required([:title, :markdown, :task_list_id])
+    |> validate_required([:title, :task_list_id])
     |> assoc_constraint(:task_list)
     |> apply_position()
     |> set_order(:position, :order, :task_list_id)

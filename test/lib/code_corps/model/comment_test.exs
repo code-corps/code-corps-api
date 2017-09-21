@@ -11,11 +11,6 @@ defmodule CodeCorps.CommentTest do
     assert changeset.valid?
   end
 
-  test "changeset with invalid attributes" do
-    changeset = Comment.changeset(%Comment{}, @invalid_attrs)
-    refute changeset.valid?
-  end
-
   test "create changeset with valid attributes" do
     attrs =
       @valid_attrs
