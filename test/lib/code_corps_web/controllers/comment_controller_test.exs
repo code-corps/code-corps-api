@@ -98,14 +98,6 @@ defmodule CodeCorpsWeb.CommentControllerTest do
       assert_received {:track, ^user_id, "Edited Comment", ^tracking_properties}
     end
 
-    @tag :authenticated
-    test "does not update chosen resource and renders errors when data is invalid", %{conn: conn, current_user: current_user} do
-      comment = insert(:comment, user: current_user)
-      attrs = @invalid_attrs |> Map.merge(%{user: current_user})
-      json = conn |> request_update(comment, attrs) |> json_response(422)
-      assert json["errors"] != %{}
-    end
-
     test "does not update resource and renders 401 when not authenticated", %{conn: conn} do
       assert conn |> request_update(@valid_attrs) |> json_response(401)
     end
