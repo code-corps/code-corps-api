@@ -35,8 +35,8 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilderTest do
         Earmark.as_html!(payload["issue"]["body"], %Earmark.Options{code_class_prefix: "language-"})
 
       # relationships are proper
-      assert get_change(changeset, :project_id) == project_github_repo.project_id
       assert get_change(changeset, :github_repo_id) == project_github_repo.github_repo_id
+      assert get_change(changeset, :project_id) == project_github_repo.project_id
       assert get_change(changeset, :task_list_id) == task_list.id
       assert get_change(changeset, :user_id) == user.id
 
