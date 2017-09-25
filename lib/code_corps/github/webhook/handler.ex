@@ -26,10 +26,11 @@ defmodule CodeCorps.GitHub.Webhook.Handler do
     end
   end
 
-  defp build_params(type, id, %{"action" => action, "sender" => _}) do
+  defp build_params(type, id, %{"action" => action, "sender" => _} = payload) do
     %{
       action: action,
       github_delivery_id: id,
+      payload: payload,
       status: type |> get_status(),
       type: type
     }

@@ -3,7 +3,13 @@ defmodule CodeCorps.GithubEventTest do
 
   alias CodeCorps.GithubEvent
 
-  @valid_attrs %{action: "some content", source: "some content", status: "some content", type: "some content", github_delivery_id: "foo"}
+  @valid_attrs %{
+    action: "some content",
+    github_delivery_id: "71aeab80-9e59-11e7-81ac-198364bececc",
+    payload: %{"key" => "value"},
+    status: "some content",
+    type: "some content"
+  }
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do
