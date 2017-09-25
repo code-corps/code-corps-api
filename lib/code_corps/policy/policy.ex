@@ -55,6 +55,9 @@ defmodule CodeCorps.Policy do
   defp can?(%User{} = current_user, :delete, %UserSkill{} = user_skill, %{}), do: Policy.UserSkill.delete?(current_user, user_skill)
   defp can?(%User{} = current_user, :create, %UserRole{} = user_role, %{}), do: Policy.UserRole.create?(current_user, user_role)
   defp can?(%User{} = current_user, :delete, %UserRole{} = user_role, %{}), do: Policy.UserRole.delete?(current_user, user_role)
+  defp can?(%User{} = user, :show, %StripeConnectAccount{} = stripe_connect_account, %{}), do: Policy.StripeConnectAccount.show?(user, stripe_connect_account)
+  defp can?(%User{} = user, :create, %StripeConnectAccount{}, %{} = params), do: Policy.StripeConnectAccount.create?(user, params)
+  defp can?(%User{} = user, :update, %StripeConnectAccount{} = stripe_connect_account, %{}), do: Policy.StripeConnectAccount.update?(user, stripe_connect_account)
 
   defimpl Canada.Can, for: User do
     # NOTE: Canary sets an :unauthorized and a :not_found handler on a config level
@@ -91,10 +94,6 @@ defmodule CodeCorps.Policy do
     def can?(%User{} = user, :delete, %RoleSkill{}), do: Policy.RoleSkill.delete?(user)
 
     def can?(%User{} = user, :create, Skill), do: Policy.Skill.create?(user)
-
-    def can?(%User{} = user, :show, %StripeConnectAccount{} = stripe_connect_account), do: Policy.StripeConnectAccount.show?(user, stripe_connect_account)
-    def can?(%User{} = user, :create, %Changeset{ data: %StripeConnectAccount{}} = changeset), do: Policy.StripeConnectAccount.create?(user, changeset)
-    def can?(%User{} = user, :update, %StripeConnectAccount{} = stripe_connect_account), do: Policy.StripeConnectAccount.update?(user, stripe_connect_account)
 
     def can?(%User{} = user, :show, %StripeConnectPlan{} = stripe_connect_plan), do: Policy.StripeConnectPlan.show?(user, stripe_connect_plan)
     def can?(%User{} = user, :create, %Changeset{ data: %StripeConnectPlan{}} = changeset), do: Policy.StripeConnectPlan.create?(user, changeset)
