@@ -15,7 +15,11 @@ defmodule CodeCorps.GitHub.Event do
   are already being processed.
   """
   @spec start_processing(GithubEvent.t) :: {:ok, GithubEvent.t}
-  def start_processing(%GithubEvent{} = event), do: event |> set_status("processing")
+  def start_processing(%GithubEvent{} = event) do
+    event
+    |> Changeset.change(%{status: "processing"})
+    |> Repo.update()
+  end
 
   @doc ~S"""
   Sets record status to "processed" or "errored" based on the first element of
@@ -24,16 +28,16 @@ defmodule CodeCorps.GitHub.Event do
   the tuple is suported.
   """
   @spec stop_processing(tuple, GithubEvent.t) :: {:ok, GithubEvent.t}
-  def stop_processing(result, %GithubEvent{} = event) when is_tuple(result) do
-    result |> Tuple.to_list |> do_stop_processing(event)
+  def stop_processing({:ok, _data}, %GithubEvent{} = event) do
+    event
+    |> Changeset.change(%{status: "processed"})
+    |> Repo.update()
   end
+  def stop_processing({:error, reason}, %GithubEvent{} = event) do
+    changes = %{status: "errored", failure_reason: reason |> Atom.to_string}
 
-  @spec do_stop_processing(list, GithubEvent.t) :: {:ok, GithubEvent.t}
-  defp do_stop_processing([:ok | _data], %GithubEvent{} = event), do: event |> set_status("processed")
-  defp do_stop_processing([:error | _reason], %GithubEvent{} = event), do: event |> set_status("errored")
-
-  @spec set_status(GithubEvent.t, String.t) :: {:ok, GithubEvent.t}
-  defp set_status(%GithubEvent{} = event, status) when status in ~w(processing processed errored) do
-    event |> Changeset.change(%{status: status}) |> Repo.update()
+    event
+    |> Changeset.change(changes)
+    |> Repo.update()
   end
 end

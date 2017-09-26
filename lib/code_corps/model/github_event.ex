@@ -9,6 +9,7 @@ defmodule CodeCorps.GithubEvent do
     field :payload, :map
     field :status, :string
     field :type, :string
+    field :failure_reason, :string
 
     timestamps()
   end
