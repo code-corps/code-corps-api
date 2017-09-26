@@ -5,8 +5,6 @@ defmodule CodeCorps.Policy.TaskSkillTest do
 
   import CodeCorps.Policy.TaskSkill, only: [create?: 2, delete?: 2]
 
-  alias CodeCorps.TaskSkill
-
   describe "create?" do
     test "returns false when user is not member of project" do
       user = insert(:user)

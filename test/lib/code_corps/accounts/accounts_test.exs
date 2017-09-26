@@ -15,6 +15,7 @@ defmodule CodeCorps.AccountsTest do
 
       assert user.id
       assert user.context == "github"
+      assert user.type == "user"
     end
 
     test "returns changeset if there was a validation error" do
@@ -25,6 +26,14 @@ defmodule CodeCorps.AccountsTest do
 
       {:error, %Changeset{} = changeset} = payload |> Accounts.create_from_github
       assert changeset.errors[:email] == {"has already been taken", []}
+    end
+  end
+
+  describe "create_from_github_changeset/1" do
+    test "validates inclusion of type" do
+      params = %{"email" => "test@email.com", "type" => "Organization"}
+      changeset = Accounts.create_from_github_changeset(%User{}, params)
+      assert changeset.errors[:type] == {"is invalid", [validation: :inclusion]}
     end
   end
 end

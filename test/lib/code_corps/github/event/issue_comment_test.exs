@@ -277,17 +277,16 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
         %{
           "issue" => %{
             "body" => issue_markdown, "title" => issue_title, "number" => issue_number, "state" => issue_state,
-            "user" => %{"id" => issue_user_github_id}
+            "user" => %{"id" => user_github_id}
           },
           "comment" => %{
             "body" => comment_markdown, "id" => comment_github_id,
-            "user" => %{"id" => comment_user_github_id}
+            "user" => _same_as_issue_user_payload
           },
           "repository" => %{"id" => repo_github_id}
         } = @payload
 
-        comment_user = insert(:user, github_id: comment_user_github_id)
-        issue_user = insert(:user, github_id: issue_user_github_id)
+        user = insert(:user, github_id: user_github_id)
         github_repo = insert(:github_repo, github_id: repo_github_id)
 
         [%{project: project_1}, %{project: project_2}, %{project: _project_3}] =
@@ -301,11 +300,11 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
         end)
 
         # there's a task and comment for project 1
-        task_1 = insert(:task, project: project_1, user: issue_user, github_repo: github_repo, github_issue_number: issue_number)
-        comment_1 = insert(:comment, task: task_1, user: comment_user, github_id: comment_github_id)
+        task_1 = insert(:task, project: project_1, user: user, github_repo: github_repo, github_issue_number: issue_number)
+        comment_1 = insert(:comment, task: task_1, user: user, github_id: comment_github_id)
 
         # there is only a task for project 2
-        task_2 = insert(:task, project: project_2, user: issue_user, github_repo: github_repo, github_issue_number: issue_number)
+        task_2 = insert(:task, project: project_2, user: user, github_repo: github_repo, github_issue_number: issue_number)
 
         {:ok, comments} = IssueComment.handle(@event, @payload)
 
@@ -321,7 +320,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
           assert task.project_id in project_ids
           assert task.status == issue_state
           assert task.title == issue_title
-          assert task.user_id == issue_user.id
+          assert task.user_id == user.id
           assert task.github_repo_id == github_repo.id
         end)
 
@@ -334,7 +333,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
           assert comment.body
           assert comment.github_id == comment_github_id
           assert comment.markdown == comment_markdown
-          assert comment.user_id == comment_user.id
+          assert comment.user_id == user.id
         end)
 
         comment_ids = comments |> Enum.map(&Map.get(&1, :id))

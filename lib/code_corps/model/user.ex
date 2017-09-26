@@ -33,6 +33,7 @@ defmodule CodeCorps.User do
     field :password_confirmation, :string, virtual: true
     field :sign_up_context, :string, default: "default"
     field :twitter, :string
+    field :type, :string, default: "user"
     field :username, :string
     field :website, :string
     field :state, :string, default: "signed_up"
@@ -88,6 +89,7 @@ defmodule CodeCorps.User do
     |> validate_slug(:username)
     |> unique_constraint(:username, name: :users_lower_username_index)
     |> unique_constraint(:email)
+    |> put_change(:type, "user")
     |> put_pass_hash()
     |> put_slugged_route()
     |> generate_icon_color(:default_color)
