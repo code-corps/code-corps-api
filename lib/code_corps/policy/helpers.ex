@@ -60,6 +60,7 @@ defmodule CodeCorps.Policy.Helpers do
   Returns `CodeCorps.Project`
   """
   @spec get_project(struct | Changeset.t | any) :: Project.t
+  def get_project(%{"project_id" =>  id}), do: Project |> Repo.get(id)
   def get_project(%{project_id: id}), do: Project |> Repo.get(id)
   def get_project(%Changeset{changes: %{project_id: id}}), do: Project |> Repo.get(id)
   def get_project(_), do: nil

@@ -38,9 +38,11 @@ defmodule CodeCorps.Policy do
   defp can?(%User{} = current_user, :delete, %UserTask{} = user_task, %{}), do: Policy.UserTask.delete?(current_user, user_task)
   defp can?(%User{} = current_user, :create, %Project{}, %{} = params), do: Policy.Project.create?(current_user, params)
   defp can?(%User{} = current_user, :update, %Project{} = project, %{}), do: Policy.Project.update?(current_user, project)
+  defp can?(%User{} = current_user, :create, %ProjectSkill{}, %{} = params), do: Policy.ProjectSkill.create?(current_user, params)
+  defp can?(%User{} = current_user, :delete, %ProjectSkill{} = project_skill, %{}), do: Policy.ProjectSkill.delete?(current_user, project_skill)
   defp can?(%User{} = current_user, :create, %ProjectUser{}, %{} = params), do: Policy.ProjectUser.create?(current_user, params)
   defp can?(%User{} = current_user, :update, %ProjectUser{} = project_user, %{} = params), do: Policy.ProjectUser.update?(current_user, project_user, params)
-  defp can?(%User{} = current_user, :delete, %ProjectUser{} = project_user, %{}), do: Policy.ProjectUser.delete?(current_user, project_user)  
+  defp can?(%User{} = current_user, :delete, %ProjectUser{} = project_user, %{}), do: Policy.ProjectUser.delete?(current_user, project_user)
   defp can?(%User{} = user, :delete,
     %OrganizationGithubAppInstallation{} = organization_github_app_installation, %{}),
       do: Policy.OrganizationGithubAppInstallation.delete?(user, organization_github_app_installation)
@@ -82,9 +84,6 @@ defmodule CodeCorps.Policy do
 
     def can?(%User{} = user, :create, %Changeset{data: %ProjectGithubRepo{}} = changeset), do: Policy.ProjectGithubRepo.create?(user, changeset)
     def can?(%User{} = user, :delete, %ProjectGithubRepo{} = project_github_repo), do: Policy.ProjectGithubRepo.delete?(user, project_github_repo)
-
-    def can?(%User{} = user, :create, %Changeset{data: %ProjectSkill{}} = changeset), do: Policy.ProjectSkill.create?(user, changeset)
-    def can?(%User{} = user, :delete, %ProjectSkill{} = project_skill), do: Policy.ProjectSkill.delete?(user, project_skill)
 
     def can?(%User{} = user, :create, Role), do: Policy.Role.create?(user)
 
