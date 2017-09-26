@@ -22,6 +22,7 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
 
       assert event.action == "opened"
       assert event.github_delivery_id == "abc-123"
+      assert event.payload == payload
       assert event.status == "processed"
       assert event.type == "issues"
     end
@@ -36,6 +37,7 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
 
       assert event.action == "closed"
       assert event.github_delivery_id == "abc-123"
+      assert event.payload == payload
       assert event.status == "processed"
       assert event.type == "issues"
     end
@@ -50,6 +52,7 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
 
       assert event.action == "edited"
       assert event.github_delivery_id == "abc-123"
+      assert event.payload == payload
       assert event.status == "processed"
       assert event.type == "issues"
     end
@@ -64,6 +67,7 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
 
       assert event.action == "reopened"
       assert event.github_delivery_id == "abc-123"
+      assert event.payload == payload
       assert event.status == "processed"
       assert event.type == "issues"
     end
@@ -78,6 +82,7 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
 
       assert event.action == "created"
       assert event.github_delivery_id == "abc-123"
+      assert event.payload == payload
       assert event.status == "processed"
       assert event.type == "issue_comment"
     end
@@ -92,6 +97,7 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
 
       assert event.action == "edited"
       assert event.github_delivery_id == "abc-123"
+      assert event.payload == payload
       assert event.status == "processed"
       assert event.type == "issue_comment"
     end
@@ -106,6 +112,7 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
 
       assert event.action == "deleted"
       assert event.github_delivery_id == "abc-123"
+      assert event.payload == payload
       assert event.status == "processed"
       assert event.type == "issue_comment"
     end
@@ -125,6 +132,7 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
 
       assert event.action == "added"
       assert event.github_delivery_id == "abc-123"
+      assert event.payload == payload
       assert event.status == "processed"
       assert event.type == "installation_repositories"
     end
@@ -144,6 +152,7 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
 
       assert event.action == "removed"
       assert event.github_delivery_id == "abc-123"
+      assert event.payload == payload
       assert event.status == "processed"
       assert event.type == "installation_repositories"
     end
@@ -157,6 +166,7 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
 
       assert event.action == "created"
       assert event.github_delivery_id == "abc-123"
+      assert event.payload == @installation_created_payload
       assert event.status == "processed"
       assert event.type == "installation"
     end
