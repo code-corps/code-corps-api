@@ -52,7 +52,7 @@ defmodule CodeCorps.GitHub.Event.Installation.ReposTest do
       unmatched_repo = insert(:github_repo, github_app_installation: installation)
       _matched_repo = insert(:github_repo, matched_repo_attrs |> Map.put(:github_app_installation, installation))
 
-      {:ok, %GithubAppInstallation{state: intermediate_state}, task} =
+      {:ok, {%GithubAppInstallation{state: intermediate_state}, task}} =
         installation
         |> Repo.preload(:github_repos)
         |> Repos.process_async()

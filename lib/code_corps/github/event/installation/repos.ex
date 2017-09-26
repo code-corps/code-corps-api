@@ -25,11 +25,13 @@ defmodule CodeCorps.GitHub.Event.Installation.Repos do
   """
   @spec process_async(GithubAppInstallation.t) :: {:ok, GithubAppInstallation.t, Task.t}
   def process_async(%GithubAppInstallation{} = installation) do
-    {:ok, %GithubAppInstallation{} = processing_installation} = installation |> set_state("processing")
+    {:ok, %GithubAppInstallation{} = updated_installation} =
+      installation |> set_state("processing")
 
-    task = Task.Supervisor.async(:background_processor, fn -> processing_installation |> process() end)
+    repo_processing_task = Task.Supervisor.async(
+      :background_processor, fn -> updated_installation |> process() end)
 
-    {:ok, processing_installation, task}
+    {:ok, {updated_installation, repo_processing_task}}
   end
 
   @doc ~S"""
@@ -58,7 +60,9 @@ defmodule CodeCorps.GitHub.Event.Installation.Repos do
   end
 
   @spec set_state(GithubAppInstallation.t, String.t) :: {:ok, GithubAppInstallation.t}
-  defp set_state(%GithubAppInstallation{} = installation, state) when state in ~w(processing processed errored) do
+  defp set_state(%GithubAppInstallation{} = installation, state)
+    when state in ~w(processing processed errored) do
+
     installation
     |> Changeset.change(%{state: state})
     |> Repo.update

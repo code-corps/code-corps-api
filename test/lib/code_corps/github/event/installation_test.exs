@@ -41,7 +41,7 @@ defmodule CodeCorps.GitHub.Event.InstallationTest do
       payload = %{"installation" => %{"id" => installation_github_id}} = @installation_created
       event = build(:github_event, action: "created", type: "installation")
 
-      {:ok, %GithubAppInstallation{} = installation, %Task{} = task}
+      {:ok, {%GithubAppInstallation{} = installation, %Task{} = task}}
         = Installation.handle(event, payload)
 
       assert installation.github_id == installation_github_id
@@ -62,7 +62,7 @@ defmodule CodeCorps.GitHub.Event.InstallationTest do
 
       user = insert(:user, github_id: user_github_id)
 
-      {:ok, %GithubAppInstallation{} = installation, %Task{} = task}
+      {:ok, {%GithubAppInstallation{} = installation, %Task{} = task}}
         = Installation.handle(event, payload)
 
       assert installation.github_id == (payload |> get_in(["installation", "id"]))
@@ -89,7 +89,7 @@ defmodule CodeCorps.GitHub.Event.InstallationTest do
         github_id: nil
       )
 
-      {:ok, %GithubAppInstallation{} = installation, %Task{} = task}
+      {:ok, {%GithubAppInstallation{} = installation, %Task{} = task}}
         = Installation.handle(event, payload)
 
       assert installation.origin == "codecorps"
@@ -109,7 +109,7 @@ defmodule CodeCorps.GitHub.Event.InstallationTest do
       insert(:github_app_installation, github_id: installation_github_id)
       event = build(:github_event, action: "created", type: "installation")
 
-      {:ok, %GithubAppInstallation{} = installation, %Task{} = task}
+      {:ok, {%GithubAppInstallation{} = installation, %Task{} = task}}
         = Installation.handle(event, payload)
 
       assert installation.origin == "codecorps"
