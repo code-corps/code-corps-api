@@ -18,7 +18,8 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentSyncer do
   def sync_all(tasks, %User{} = user, %{} = payload) do
     tasks
     |> Enum.map(&sync(&1, user, payload))
-    |> aggregate()
+    |> collect()
+    |> summarize()
   end
 
   @spec sync(Task.t, User.t, map) :: {:ok, Comment.t} | {:error, Changeset.t}
@@ -41,11 +42,17 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentSyncer do
   defp commit(%Changeset{data: %Comment{id: nil}} = changeset), do: changeset |> Repo.insert
   defp commit(%Changeset{} = changeset), do: changeset |> Repo.update
 
-  @spec aggregate(list({:ok, Comment.t})) :: {:ok, list(Comment.t)}
-  defp aggregate(results) do
-    results
-    |> Enum.map(&Tuple.to_list/1)
-    |> Enum.map(&List.last/1)
-    |> (fn comments -> {:ok, comments} end).()
+  @spec collect(list, list, list) :: tuple
+  defp collect(results, comments \\ [], errors \\ [])
+  defp collect([{:ok, %Comment{} = comment} | tail], comments, errors) do
+    collect(tail, comments ++ [comment], errors)
   end
+  defp collect([{:error, %Changeset{} = changeset} | tail], comments, errors) do
+    collect(tail, comments, errors ++ [changeset])
+  end
+  defp collect([], comments, errors), do: {comments, errors}
+
+  @spec summarize(tuple) :: tuple
+  defp summarize({comments, []}), do: {:ok, comments}
+  defp summarize({comments, errors}), do: {:error, {comments, errors}}
 end

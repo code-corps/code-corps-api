@@ -49,5 +49,29 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentSyncerTest do
       comment_ids = comments |> Enum.map(&Map.get(&1, :id))
       assert comment_1.id in comment_ids
     end
+
+    test "fails on validation errors" do
+      bad_payload = @payload |> put_in(~w(comment body), nil)
+
+      %{
+        "issue" => %{"number" => issue_number},
+        "comment" => %{"id" => comment_github_id}
+      } = bad_payload
+
+      %{project: project, github_repo: github_repo} =
+        insert(:project_github_repo)
+
+      task = insert(
+        :task, project: project, github_repo: github_repo,
+        github_issue_number: issue_number)
+
+      %{user: user} = insert(:comment, task: task, github_id: comment_github_id)
+
+      {:error, {comments, errors}} =
+        [task] |> CommentSyncer.sync_all(user, bad_payload)
+
+      assert Enum.count(comments) == 0
+      assert Enum.count(errors) == 1
+    end
   end
 end
