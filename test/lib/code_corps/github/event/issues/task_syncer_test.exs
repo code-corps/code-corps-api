@@ -46,5 +46,24 @@ defmodule CodeCorps.GitHub.Event.Issues.TaskSyncerTest do
       task_ids = tasks |> Enum.map(&Map.get(&1, :id))
       assert task_1.id in task_ids
     end
+
+    test "fails on validation errors" do
+      bad_payload = @payload |> put_in(~w(issue title), nil)
+
+      %{"issue" => %{"number" => issue_number}} = bad_payload
+
+      %{project: project, github_repo: github_repo} = insert(:project_github_repo)
+      %{user: user} = insert(:task, project: project, github_repo: github_repo, github_issue_number: issue_number)
+
+      insert(:task_list, project: project, inbox: true)
+
+      {:error, {tasks, errors}} =
+        github_repo
+        |> Repo.preload(:project_github_repos)
+        |> TaskSyncer.sync_all(user, bad_payload)
+
+      assert tasks |> Enum.count == 0
+      assert errors |> Enum.count == 1
+    end
   end
 end
