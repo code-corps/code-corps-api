@@ -91,7 +91,7 @@ defmodule CodeCorps.GitHub.CommentTest do
 
       assert_received({
         :patch,
-        "https://api.github.com/repos/foo/bar/issues/5/comments/6",
+        "https://api.github.com/repos/foo/bar/issues/comments/6",
         [
           {"Accept", "application/vnd.github.machine-man-preview+json"},
           {"Authorization", "token" <> _tok}
@@ -113,7 +113,7 @@ defmodule CodeCorps.GitHub.CommentTest do
 
       assert_received({
         :patch,
-        "https://api.github.com/repos/foo/bar/issues/5/comments/6",
+        "https://api.github.com/repos/foo/bar/issues/comments/6",
         [
           {"Accept", "application/vnd.github.machine-man-preview+json"},
           {"Authorization", "token" <> _tok}
@@ -137,7 +137,7 @@ defmodule CodeCorps.GitHub.CommentTest do
 
       assert_received({
         :patch,
-        "https://api.github.com/repos/foo/bar/issues/5/comments/6",
+        "https://api.github.com/repos/foo/bar/issues/comments/6",
         [
           {"Accept", "application/vnd.github.machine-man-preview+json"},
           {"Authorization", "token" <> _tok}

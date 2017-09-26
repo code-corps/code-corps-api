@@ -15,7 +15,7 @@ defmodule CodeCorps.GitHub.Comment do
     user:
     %User{} = user} = comment) do
 
-    endpoint = task |> get_endpoint()
+    endpoint = comment |> create_endpoint_for()
     attrs = comment |> GitHub.Adapters.Comment.to_github_comment
 
     with opts when is_list(opts) <- opts_for(user, installation) do
@@ -35,7 +35,7 @@ defmodule CodeCorps.GitHub.Comment do
     user: %User{} = user,
     github_id: id} = comment) do
 
-    endpoint = "#{task |> get_endpoint()}/#{id}"
+    endpoint = comment |> update_endpoint_for()
     attrs = comment |> GitHub.Adapters.Comment.to_github_comment
 
     with opts when is_list(opts) <- opts_for(user, installation) do
@@ -45,11 +45,29 @@ defmodule CodeCorps.GitHub.Comment do
     end
   end
 
-  @spec get_endpoint(Task.t) :: String.t
-  defp get_endpoint(%Task{
-    github_repo: %GithubRepo{github_account_login: owner, name: repo},
-    github_issue_number: number}) do
+  @spec update_endpoint_for(Comment.t) :: String.t
+  defp update_endpoint_for(
+    %Comment{
+      github_id: id,
+      task: %Task{
+        github_repo: %GithubRepo{
+          github_account_login: owner, name: repo
+        }
+      }
+    }) do
+    "/repos/#{owner}/#{repo}/issues/comments/#{id}"
+  end
 
+  @spec create_endpoint_for(Comment.t) :: String.t
+  defp create_endpoint_for(
+    %Comment{
+      task: %Task{
+        github_issue_number: number,
+        github_repo: %GithubRepo{
+          github_account_login: owner, name: repo
+        },
+      }
+    }) do
     "/repos/#{owner}/#{repo}/issues/#{number}/comments"
   end
 

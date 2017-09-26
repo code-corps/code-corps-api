@@ -86,15 +86,6 @@ defmodule CodeCorps.Comment.ServiceTest do
       refute_received({:post, _string, {}, "{}", []})
     end
 
-    test "returns {:error, changeset} if there are validation errors" do
-      comment = insert(:comment)
-      {:error, changeset} = comment |> Comment.Service.update(%{"markdown" => nil})
-
-      refute changeset.valid?
-
-      refute_received({:post, _string, {}, "{}", []})
-    end
-
     test "propagates changes to github if comment is synced to github comment" do
       github_repo =
         :github_repo
@@ -110,7 +101,7 @@ defmodule CodeCorps.Comment.ServiceTest do
       assert updated_comment.body != comment.body
       assert updated_comment.github_id
 
-      assert_received({:patch, "https://api.github.com/repos/foo/bar/issues/5/comments/6", _headers, _body, _options})
+      assert_received({:patch, "https://api.github.com/repos/foo/bar/issues/comments/6", _headers, _body, _options})
     end
 
     test "reports {:error, :github}, makes no changes at all if there is a github api error" do
@@ -132,7 +123,7 @@ defmodule CodeCorps.Comment.ServiceTest do
       assert updated_comment.body == comment.body
       assert updated_comment.github_id == comment.github_id
 
-      assert_received({:patch, "https://api.github.com/repos/foo/bar/issues/5/comments/6", _headers, _body, _options})
+      assert_received({:patch, "https://api.github.com/repos/foo/bar/issues/comments/6", _headers, _body, _options})
     end
   end
 end

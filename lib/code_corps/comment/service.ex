@@ -7,6 +7,8 @@ defmodule CodeCorps.Comment.Service do
   alias CodeCorps.{Comment, GitHub, GithubRepo, Task, Repo}
   alias Ecto.{Changeset, Multi}
 
+  require Logger
+
   @preloads [:user, task: [github_repo: :github_app_installation]]
 
   @doc ~S"""
@@ -39,7 +41,11 @@ defmodule CodeCorps.Comment.Service do
   @spec marshall_result(tuple) :: {:ok, Comment.t} | {:error, Changeset.t} | {:error, :github}
   defp marshall_result({:ok, %{github: %Comment{} = comment}}), do: {:ok, comment}
   defp marshall_result({:error, :comment, %Changeset{} = changeset, _steps}), do: {:error, changeset}
-  defp marshall_result({:error, :github, _value, _steps}), do: {:error, :github}
+  defp marshall_result({:error, :github, result, _steps}) do
+    Logger.warn "An error occurred when creating/updating the comment with the GitHub API"
+    Logger.warn "#{inspect result}"
+    {:error, :github}
+  end
 
   @spec connect_to_github(Comment.t) :: {:ok, Comment.t} :: {:error, GitHub.api_error_struct}
   defp connect_to_github(
