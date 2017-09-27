@@ -8,37 +8,52 @@ config :code_corps, CodeCorpsWeb.Endpoint,
 config :code_corps, CodeCorps.Repo,
   loggers: [{Timber.Integrations.EctoLogger, :log, []}]
 
-# Use Timber as the logger backend
-# Feel free to add additional backends if you want to send you logs to multiple devices.
-# For Heroku, use the `:console` backend provided with Logger but customize
-# it to use Timber's internal formatting system
+# Sets the Logger application to use the `:console` backend with UTC-oriented
+# timestamps
 config :logger,
   backends: [:console],
   utc_log: true
 
+# Configures the `:console` backend to:
+#   - Use Timber.Formatter.format/4 to format log lines
+#   - Pass _all_ metadata for every log line into formatters
 config :logger, :console,
   format: {Timber.Formatter, :format},
-  metadata: [:timber_context, :event, :application, :file, :function, :line, :module, :meta]
+  metadata: :all
 
-# For the following environments, do not log to the Timber service. Instead, log to STDOUT
-# and format the logs properly so they are human readable.
-environments_to_exclude = [:test]
-if Enum.member?(environments_to_exclude, Mix.env()) do
-  # Fall back to the default `:console` backend with the Timber custom formatter
-  config :logger,
-    backends: [:console],
-    utc_log: true
+# Configures the Timber.Formatter to:
+#   - Colorize the log level
+#   - Format metadata using logfmt (if metadata printing is enabled)
+#   - Print the log level
+#   - Print the timestamp
+# Note: print_metadata is false, so the format key will be ignored
+config :timber, Timber.Formatter,
+  colorize: true,
+  format: :logfmt,
+  print_log_level: true,
+  print_metadata: false,
+  print_timestamps: true
 
-  config :logger, :console,
-    format: {Timber.Formatter, :format},
-    metadata: [:timber_context, :event, :application, :file, :function, :line, :module, :meta]
+# Compiling the configuration from the following Mix environments will result
+# in the Timber.Formatter using a "production friendly" configuration.
+environments_to_include = [
+  :prod,
+  :staging
+]
 
+if Enum.member?(environments_to_include, Mix.env()) do
+  # Configures the Timber.Formatter for outputting to Heroku Logplex
+  #   - Removes log level colorization (since the colorization codes are not machine-friendly)
+  #   - Formats the data using the JSON formatter
+  #   - Removes the log level (this is in the metadata)
+  #   - Prints the metadata at the end of the line
+  #   - Removes the timestamp (this is in the metadata and Heroku will also add its own)
   config :timber, Timber.Formatter,
-    colorize: true,
-    format: :logfmt,
-    print_timestamps: true,
-    print_log_level: true,
-    print_metadata: false # turn this on to view the additiional metadata
+    colorize: false,
+    format: :json,
+    print_log_level: false,
+    print_metadata: true,
+    print_timestamps: false
 end
 
 # Need help?
