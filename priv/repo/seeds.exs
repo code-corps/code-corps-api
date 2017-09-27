@@ -1,6 +1,6 @@
 alias CodeCorps.{
   Category, Organization, ProjectUser, Project, ProjectCategory, ProjectSkill,
-  Repo, Role, Skill, SluggedRoute, Task, TaskList, User, UserCategory, UserRole,
+  Repo, Role, Skill, SluggedRoute, Task, User, UserCategory, UserRole,
   UserSkill
 }
 
@@ -50,37 +50,42 @@ case Repo.all(User) do
 end
 
 organizations = [
-  %Organization{
+  %{
     name: "Code Corps",
     description: "Help build and fund public software projects for social good",
-    owner_id: 1,
-    slug: "code-corps"
+    owner_id: 1
   },
 ]
 
 case Repo.all(Organization) do
   [] ->
     organizations
-    |> Enum.map(&Repo.insert!/1)
-    |> Enum.each(fn %{id: id, slug: slug} ->
-      %SluggedRoute{organization_id: id, slug: slug} |> Repo.insert!()
+    |> Enum.each(fn params ->
+      %Organization{}
+      |> Organization.create_changeset(params)
+      |> Repo.insert!()
     end)
   _ -> IO.puts "Organizations detected, aborting organization seed."
 end
 
 projects = [
-  %Project{
-    approved: true,
+  %{
     description: "A basic project for use in development",
-    long_description_markdown: "A basic project for use in **development**",
-    slug: "code-corps",
+    long_description_markdown: "A basic project for use in `development`",
     title: "Code Corps",
     organization_id: 1
   }
 ]
 
 case Repo.all(Project) do
-  [] -> Enum.each(projects, &Repo.insert!/1)
+  [] ->
+    projects
+    |> Enum.each(fn params ->
+      %Project{}
+      |> Project.create_changeset(params)
+      |> Ecto.Changeset.put_change(:approved, true)
+      |> Repo.insert!()
+    end)
   _ -> IO.puts "Projects detected, aborting project seed."
 end
 
@@ -94,20 +99,6 @@ project_users = [
 case Repo.all(ProjectUser) do
   [] -> Enum.each(project_users, &Repo.insert!/1)
   _ -> IO.puts "Project users detected, aborting this seed."
-end
-
-# task lists
-
-task_lists = [
-  %TaskList{inbox: true, name: "Inbox", position: 1, project_id: 1},
-  %TaskList{inbox: false, name: "Backlog", position: 2, project_id: 1},
-  %TaskList{inbox: false, name: "In Progress", position: 3, project_id: 1},
-  %TaskList{inbox: false, name: "Done", position: 4, project_id: 1}
-]
-
-case Repo.all(TaskList) do
-  [] -> Enum.each(task_lists, &Repo.insert!/1)
-  _ -> IO.puts "TaskLists detected, aborting this seed."
 end
 
 skills = [
