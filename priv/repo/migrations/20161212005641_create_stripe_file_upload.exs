@@ -3,7 +3,7 @@ defmodule CodeCorps.Repo.Migrations.CreateStripeFileUpload do
 
   def change do
     create table(:stripe_file_upload) do
-      add :created, :datetime
+      add :created, :utc_datetime
       add :id_from_stripe, :string, null: false
       add :purpose, :string
       add :size, :integer

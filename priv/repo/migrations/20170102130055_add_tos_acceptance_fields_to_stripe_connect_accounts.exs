@@ -3,7 +3,7 @@ defmodule CodeCorps.Repo.Migrations.AddTosAcceptanceFieldsToStripeConnectAccount
 
   def change do
     alter table(:stripe_connect_accounts) do
-      add :tos_acceptance_date, :datetime
+      add :tos_acceptance_date, :utc_datetime
       add :tos_acceptance_ip, :string
       add :tos_acceptance_user_agent, :string
     end

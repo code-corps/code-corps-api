@@ -48,18 +48,18 @@ defmodule CodeCorps.Repo.Migrations.ConvertStripeTimeStampsToIntegers do
       remove :tos_acceptance_date
       remove :verification_due_by
 
-      add :tos_acceptance_date, :datetime
-      add :verification_due_by, :datetime
+      add :tos_acceptance_date, :utc_datetime
+      add :verification_due_by, :utc_datetime
     end
 
     alter table(:stripe_platform_customers) do
       remove :created
-      add :created, :datetime
+      add :created, :utc_datetime
     end
 
     alter table(:stripe_connect_plans) do
       remove :created
-      add :created, :datetime
+      add :created, :utc_datetime
     end
 
     alter table(:stripe_connect_subscriptions) do
@@ -70,18 +70,18 @@ defmodule CodeCorps.Repo.Migrations.ConvertStripeTimeStampsToIntegers do
       remove :ended_at
       remove :start
 
-      add :cancelled_at, :datetime
-      add :created, :datetime
-      add :current_period_end, :datetime
-      add :current_period_start, :datetime
-      add :ended_at, :datetime
-      add :start, :datetime
+      add :cancelled_at, :utc_datetime
+      add :created, :utc_datetime
+      add :current_period_end, :utc_datetime
+      add :current_period_start, :utc_datetime
+      add :ended_at, :utc_datetime
+      add :start, :utc_datetime
     end
 
     alter table(:stripe_file_upload) do
       remove :created
 
-      add :created, :datetime
+      add :created, :utc_datetime
     end
   end
 end

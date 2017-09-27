@@ -6,14 +6,15 @@ defmodule CodeCorps.GitHub.Comment do
   alias CodeCorps.{Comment, GitHub, GithubAppInstallation, GithubRepo, Task, User}
 
   @spec create(Comment.t) :: GitHub.response
-  def create(%Comment{
-    task: %Task{
-      github_repo: %GithubRepo{
-        github_app_installation: %GithubAppInstallation{} = installation
-      }
-    } = task,
-    user:
-    %User{} = user} = comment) do
+  def create(
+    %Comment{
+      task: %Task{
+        github_repo: %GithubRepo{
+          github_app_installation: %GithubAppInstallation{} = installation
+        }
+      },
+      user: %User{} = user
+    } = comment) do
 
     endpoint = comment |> create_endpoint_for()
     attrs = comment |> GitHub.Adapters.Comment.to_github_comment
@@ -26,14 +27,15 @@ defmodule CodeCorps.GitHub.Comment do
   end
 
   @spec update(Comment.t) :: GitHub.response
-  def update(%Comment{
-    task: %Task{
-      github_repo: %GithubRepo{
-        github_app_installation: %GithubAppInstallation{} = installation
-      }
-    } = task,
-    user: %User{} = user,
-    github_id: id} = comment) do
+  def update(
+    %Comment{
+      task: %Task{
+        github_repo: %GithubRepo{
+          github_app_installation: %GithubAppInstallation{} = installation
+        }
+      },
+      user: %User{} = user
+    } = comment) do
 
     endpoint = comment |> update_endpoint_for()
     attrs = comment |> GitHub.Adapters.Comment.to_github_comment
