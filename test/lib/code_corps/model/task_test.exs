@@ -34,8 +34,24 @@ defmodule CodeCorps.TaskTest do
   describe "update_changeset/2" do
     test "only allows specific values for status" do
       changes = Map.put(@valid_attrs, :status, "nonexistent")
-      changeset = Task.update_changeset(%Task{}, changes)
+      changeset = Task.update_changeset(%Task{task_list_id: 1}, changes)
       refute changeset.valid?
+    end
+
+    test "closed_at is set when status changes to closed" do
+      changes = Map.put(@valid_attrs, :status, "closed")
+      changeset = Task.update_changeset(%Task{task_list_id: 1}, changes)
+      %{closed_at: closed_at} = changeset.changes
+      assert changeset.valid?
+      assert closed_at
+    end
+
+    test "closed_at is set to nil when status changes to open" do
+      changes = Map.put(@valid_attrs, :status, "open")
+      changeset = Task.update_changeset(%Task{task_list_id: 1, status: "closed", closed_at: DateTime.utc_now}, changes)
+      %{closed_at: closed_at} = changeset.changes
+      assert changeset.valid?
+      refute closed_at
     end
   end
 end
