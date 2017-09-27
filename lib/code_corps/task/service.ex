@@ -33,8 +33,8 @@ defmodule CodeCorps.Task.Service do
   defp marshall_result({:ok, %{github: %Task{} = task}}), do: {:ok, task}
   defp marshall_result({:error, :task, %Changeset{} = changeset, _steps}), do: {:error, changeset}
   defp marshall_result({:error, :github, result, _steps}) do
-    Logger.warn "An error occurred when creating/updating the task with the GitHub API"
-    Logger.warn "#{inspect result}"
+    Logger.info "An error occurred when creating/updating the task with the GitHub API"
+    Logger.info "#{inspect result}"
     {:error, :github}
   end
 

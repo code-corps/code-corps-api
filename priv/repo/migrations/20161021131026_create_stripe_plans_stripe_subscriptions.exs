@@ -4,7 +4,7 @@ defmodule CodeCorps.Repo.Migrations.CreateStripePlansStripeSubscriptions do
   def change do
     create table(:stripe_plans) do
       add :amount, :integer
-      add :created, :datetime
+      add :created, :utc_datetime
       add :id_from_stripe, :string, null: false
       add :name, :string
 
@@ -17,16 +17,16 @@ defmodule CodeCorps.Repo.Migrations.CreateStripePlansStripeSubscriptions do
 
     create table(:stripe_subscriptions) do
       add :application_fee_percent, :decimal
-      add :cancelled_at, :datetime
+      add :cancelled_at, :utc_datetime
       add :customer_id_from_stripe, :string
-      add :created, :datetime
-      add :current_period_end, :datetime
-      add :current_period_start, :datetime
-      add :ended_at, :datetime
+      add :created, :utc_datetime
+      add :current_period_end, :utc_datetime
+      add :current_period_start, :utc_datetime
+      add :ended_at, :utc_datetime
       add :id_from_stripe, :string, null: false
       add :plan_id_from_stripe, :string, null: false
       add :quantity, :integer
-      add :start, :datetime
+      add :start, :utc_datetime
       add :status, :string
 
       add :stripe_plan_id, references(:stripe_plans), null: false

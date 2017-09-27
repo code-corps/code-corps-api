@@ -42,8 +42,8 @@ defmodule CodeCorps.Comment.Service do
   defp marshall_result({:ok, %{github: %Comment{} = comment}}), do: {:ok, comment}
   defp marshall_result({:error, :comment, %Changeset{} = changeset, _steps}), do: {:error, changeset}
   defp marshall_result({:error, :github, result, _steps}) do
-    Logger.warn "An error occurred when creating/updating the comment with the GitHub API"
-    Logger.warn "#{inspect result}"
+    Logger.info "An error occurred when creating/updating the comment with the GitHub API"
+    Logger.info "#{inspect result}"
     {:error, :github}
   end
 
