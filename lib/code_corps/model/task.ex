@@ -4,10 +4,12 @@ defmodule CodeCorps.Task do
   import EctoOrdered
 
   alias CodeCorps.Services.MarkdownRendererService
+  alias Ecto.Changeset
 
   @type t :: %__MODULE__{}
 
   schema "tasks" do
+    field :closed_at, :utc_datetime
     field :body, :string
     field :markdown, :string
     field :number, :integer, read_after_writes: true
@@ -58,6 +60,7 @@ defmodule CodeCorps.Task do
     |> changeset(params)
     |> cast(params, [:status])
     |> validate_inclusion(:status, statuses())
+    |> set_closed_at()
   end
 
   def apply_position(changeset) do
@@ -70,5 +73,16 @@ defmodule CodeCorps.Task do
 
   defp statuses do
     ~w{ open closed }
+  end
+
+  defp set_closed_at(changeset) do
+    case changeset do
+      %Changeset{valid?: true, changes: %{status: "closed"}} ->
+        put_change(changeset, :closed_at, DateTime.utc_now)
+      %Changeset{valid?: true, changes: %{status: "open"}} ->  
+        put_change(changeset, :closed_at, nil)
+      _ ->
+        changeset
+    end    
   end
 end
