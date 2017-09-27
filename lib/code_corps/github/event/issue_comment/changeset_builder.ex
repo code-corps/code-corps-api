@@ -18,19 +18,28 @@ defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilder do
   webhook
   """
   @spec build_changeset(Comment.t, map, Task.t, User.t) :: Changeset.t
-  def build_changeset(
-    %Comment{} = comment,
-    %{"comment" => comment_attrs},
-    %Task{id: task_id},
-    %User{id: user_id}) do
+  def build_changeset(%Comment{id: nil} = comment, %{"comment" => attrs}, %Task{} = task, %User{} = user) do
+    comment |> create_changeset(attrs, task, user)
+  end
+  def build_changeset(%Comment{} = comment, %{"comment" => attrs}, %Task{}, %User{}) do
+    comment |> update_changeset(attrs)
+  end
 
+  @spec create_changeset(Comment.t, map, Task.t, User.t) :: Changeset.t
+  defp create_changeset(%Comment{} = comment, %{} = attrs, %Task{} = task, %User{} = user) do
     comment
-    |> Changeset.change(comment_attrs |> CommentAdapter.from_api())
+    |> Changeset.change(attrs |> CommentAdapter.from_api())
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
-    |> Changeset.put_change(:task_id, task_id)
-    |> Changeset.put_change(:user_id, user_id)
-    |> Changeset.validate_required([:task_id, :user_id, :markdown, :body])
-    |> Changeset.assoc_constraint(:task)
-    |> Changeset.assoc_constraint(:user)
+    |> Changeset.put_assoc(:task, task)
+    |> Changeset.put_change(:user, user)
+    |> Changeset.validate_required([:markdown, :body])
+  end
+
+  @spec update_changeset(Comment.t, map) :: Changeset.t
+  defp update_changeset(%Comment{} = comment, %{} = attrs) do
+    comment
+    |> Changeset.change(attrs |> CommentAdapter.from_api())
+    |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
+    |> Changeset.validate_required([:markdown, :body])
   end
 end

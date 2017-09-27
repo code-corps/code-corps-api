@@ -25,7 +25,7 @@ defmodule CodeCorpsWeb.CommentController do
   def create(%Conn{} = conn, %{} = params) do
     with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %Comment{}, params),
-         {:ok, %Comment{} = comment} <- %Comment{} |> Comment.create_changeset(params) |> Repo.insert do
+         {:ok, %Comment{} = comment} <- Comment.Service.create(params) do
       conn |> put_status(:created) |> render("show.json-api", data: comment)
     end
   end
@@ -35,7 +35,7 @@ defmodule CodeCorpsWeb.CommentController do
     with %Comment{} = comment <- Comment |> Repo.get(id),
          %User{} = current_user <- conn |> Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:update, comment),
-         {:ok, %Comment{} = comment} <- comment |> Comment.changeset(params) |> Repo.update do
+         {:ok, %Comment{} = comment} <- comment |> Comment.Service.update(params) do
       conn |> render("show.json-api", data: comment)
     end
   end

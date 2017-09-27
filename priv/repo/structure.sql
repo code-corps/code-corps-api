@@ -55,9 +55,9 @@ SET default_with_oids = false;
 --
 
 CREATE TABLE auth_token (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     value character varying(255),
-    user_id bigint,
+    user_id integer,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -87,7 +87,7 @@ ALTER SEQUENCE auth_token_id_seq OWNED BY auth_token.id;
 --
 
 CREATE TABLE categories (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     name character varying(255) NOT NULL,
     slug character varying(255) NOT NULL,
     description text,
@@ -120,11 +120,11 @@ ALTER SEQUENCE categories_id_seq OWNED BY categories.id;
 --
 
 CREATE TABLE comments (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     body text NOT NULL,
     markdown text,
-    user_id bigint NOT NULL,
-    task_id bigint NOT NULL,
+    user_id integer NOT NULL,
+    task_id integer NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     github_id integer
@@ -155,10 +155,10 @@ ALTER SEQUENCE comments_id_seq OWNED BY comments.id;
 --
 
 CREATE TABLE donation_goals (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     amount integer,
     description text,
-    project_id bigint,
+    project_id integer,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     current boolean DEFAULT false
@@ -189,12 +189,12 @@ ALTER SEQUENCE donation_goals_id_seq OWNED BY donation_goals.id;
 --
 
 CREATE TABLE github_app_installations (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     github_id integer,
     installed boolean DEFAULT true,
     state character varying(255),
-    project_id bigint,
-    user_id bigint,
+    project_id integer,
+    user_id integer,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     access_token character varying(255),
@@ -232,7 +232,7 @@ ALTER SEQUENCE github_app_installations_id_seq OWNED BY github_app_installations
 --
 
 CREATE TABLE github_events (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     action character varying(255),
     github_delivery_id character varying(255),
     status character varying(255),
@@ -268,14 +268,14 @@ ALTER SEQUENCE github_events_id_seq OWNED BY github_events.id;
 --
 
 CREATE TABLE github_repos (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     github_id integer,
     name character varying(255),
     github_account_id integer,
     github_account_login character varying(255),
     github_account_avatar_url character varying(255),
     github_account_type character varying(255),
-    github_app_installation_id bigint,
+    github_app_installation_id integer,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -305,9 +305,9 @@ ALTER SEQUENCE github_repos_id_seq OWNED BY github_repos.id;
 --
 
 CREATE TABLE organization_github_app_installations (
-    id bigint NOT NULL,
-    organization_id bigint,
-    github_app_installation_id bigint,
+    id integer NOT NULL,
+    organization_id integer,
+    github_app_installation_id integer,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -337,7 +337,7 @@ ALTER SEQUENCE organization_github_app_installations_id_seq OWNED BY organizatio
 --
 
 CREATE TABLE organization_invites (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     code character varying(255) NOT NULL,
     email character varying(255) NOT NULL,
     title character varying(255) NOT NULL,
@@ -371,7 +371,7 @@ ALTER SEQUENCE organization_invites_id_seq OWNED BY organization_invites.id;
 --
 
 CREATE TABLE organizations (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     name text NOT NULL,
     description text NOT NULL,
     slug character varying(255) NOT NULL,
@@ -380,7 +380,7 @@ CREATE TABLE organizations (
     approved boolean DEFAULT false,
     cloudinary_public_id character varying(255),
     default_color character varying(255),
-    owner_id bigint
+    owner_id integer
 );
 
 
@@ -408,10 +408,10 @@ ALTER SEQUENCE organizations_id_seq OWNED BY organizations.id;
 --
 
 CREATE TABLE previews (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     markdown text NOT NULL,
     body text NOT NULL,
-    user_id bigint NOT NULL,
+    user_id integer NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -441,9 +441,9 @@ ALTER SEQUENCE previews_id_seq OWNED BY previews.id;
 --
 
 CREATE TABLE project_categories (
-    id bigint NOT NULL,
-    project_id bigint NOT NULL,
-    category_id bigint NOT NULL,
+    id integer NOT NULL,
+    project_id integer NOT NULL,
+    category_id integer NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -473,9 +473,9 @@ ALTER SEQUENCE project_categories_id_seq OWNED BY project_categories.id;
 --
 
 CREATE TABLE project_github_repos (
-    id bigint NOT NULL,
-    project_id bigint,
-    github_repo_id bigint,
+    id integer NOT NULL,
+    project_id integer,
+    github_repo_id integer,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -505,9 +505,9 @@ ALTER SEQUENCE project_github_repos_id_seq OWNED BY project_github_repos.id;
 --
 
 CREATE TABLE project_skills (
-    id bigint NOT NULL,
-    project_id bigint NOT NULL,
-    skill_id bigint NOT NULL,
+    id integer NOT NULL,
+    project_id integer NOT NULL,
+    skill_id integer NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -537,10 +537,10 @@ ALTER SEQUENCE project_skills_id_seq OWNED BY project_skills.id;
 --
 
 CREATE TABLE project_users (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     role character varying(255) NOT NULL,
-    project_id bigint NOT NULL,
-    user_id bigint NOT NULL,
+    project_id integer NOT NULL,
+    user_id integer NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -570,13 +570,13 @@ ALTER SEQUENCE project_users_id_seq OWNED BY project_users.id;
 --
 
 CREATE TABLE projects (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     description text,
     long_description_body text,
     long_description_markdown text,
     slug character varying(255) NOT NULL,
     title character varying(255) NOT NULL,
-    organization_id bigint NOT NULL,
+    organization_id integer NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     total_monthly_donated integer DEFAULT 0,
@@ -615,9 +615,9 @@ ALTER SEQUENCE projects_id_seq OWNED BY projects.id;
 --
 
 CREATE TABLE role_skills (
-    id bigint NOT NULL,
-    role_id bigint NOT NULL,
-    skill_id bigint NOT NULL,
+    id integer NOT NULL,
+    role_id integer NOT NULL,
+    skill_id integer NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     cat integer
@@ -648,7 +648,7 @@ ALTER SEQUENCE role_skills_id_seq OWNED BY role_skills.id;
 --
 
 CREATE TABLE roles (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     name character varying(255) NOT NULL,
     ability character varying(255) NOT NULL,
     kind character varying(255) NOT NULL,
@@ -691,7 +691,7 @@ CREATE TABLE schema_migrations (
 --
 
 CREATE TABLE skills (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     title character varying(255) NOT NULL,
     description text,
     original_row integer,
@@ -724,10 +724,10 @@ ALTER SEQUENCE skills_id_seq OWNED BY skills.id;
 --
 
 CREATE TABLE slugged_routes (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     slug character varying(255) NOT NULL,
-    organization_id bigint,
-    user_id bigint,
+    organization_id integer,
+    user_id integer,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -757,7 +757,7 @@ ALTER SEQUENCE slugged_routes_id_seq OWNED BY slugged_routes.id;
 --
 
 CREATE TABLE stripe_connect_accounts (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     business_name character varying(255),
     business_url character varying(255),
     charges_enabled boolean,
@@ -772,7 +772,7 @@ CREATE TABLE stripe_connect_accounts (
     support_phone character varying(255),
     support_url character varying(255),
     transfers_enabled boolean,
-    organization_id bigint NOT NULL,
+    organization_id integer NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     verification_disabled_reason character varying(255),
@@ -839,10 +839,10 @@ ALTER SEQUENCE stripe_connect_accounts_id_seq OWNED BY stripe_connect_accounts.i
 --
 
 CREATE TABLE stripe_connect_cards (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     id_from_stripe character varying(255) NOT NULL,
-    stripe_connect_account_id bigint NOT NULL,
-    stripe_platform_card_id bigint NOT NULL,
+    stripe_connect_account_id integer NOT NULL,
+    stripe_platform_card_id integer NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -872,7 +872,7 @@ ALTER SEQUENCE stripe_connect_cards_id_seq OWNED BY stripe_connect_cards.id;
 --
 
 CREATE TABLE stripe_connect_charges (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     amount integer,
     amount_refunded integer,
     application_id_from_stripe character varying(255),
@@ -893,9 +893,9 @@ CREATE TABLE stripe_connect_charges (
     source_transfer_id_from_stripe character varying(255),
     statement_descriptor character varying(255),
     status character varying(255),
-    stripe_connect_account_id bigint,
-    stripe_connect_customer_id bigint NOT NULL,
-    user_id bigint NOT NULL,
+    stripe_connect_account_id integer,
+    stripe_connect_customer_id integer NOT NULL,
+    user_id integer NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -925,13 +925,13 @@ ALTER SEQUENCE stripe_connect_charges_id_seq OWNED BY stripe_connect_charges.id;
 --
 
 CREATE TABLE stripe_connect_customers (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     id_from_stripe character varying(255) NOT NULL,
-    stripe_connect_account_id bigint NOT NULL,
-    stripe_platform_customer_id bigint NOT NULL,
+    stripe_connect_account_id integer NOT NULL,
+    stripe_platform_customer_id integer NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    user_id bigint NOT NULL
+    user_id integer NOT NULL
 );
 
 
@@ -959,11 +959,11 @@ ALTER SEQUENCE stripe_connect_customers_id_seq OWNED BY stripe_connect_customers
 --
 
 CREATE TABLE stripe_connect_plans (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     amount integer,
     id_from_stripe character varying(255) NOT NULL,
     name character varying(255),
-    project_id bigint NOT NULL,
+    project_id integer NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     created integer
@@ -994,15 +994,15 @@ ALTER SEQUENCE stripe_connect_plans_id_seq OWNED BY stripe_connect_plans.id;
 --
 
 CREATE TABLE stripe_connect_subscriptions (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     application_fee_percent numeric,
     customer_id_from_stripe character varying(255),
     id_from_stripe character varying(255) NOT NULL,
     plan_id_from_stripe character varying(255) NOT NULL,
     quantity integer,
     status character varying(255),
-    stripe_connect_plan_id bigint NOT NULL,
-    user_id bigint,
+    stripe_connect_plan_id integer NOT NULL,
+    user_id integer,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     cancelled_at integer,
@@ -1038,7 +1038,7 @@ ALTER SEQUENCE stripe_connect_subscriptions_id_seq OWNED BY stripe_connect_subsc
 --
 
 CREATE TABLE stripe_events (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     id_from_stripe character varying(255) NOT NULL,
     status character varying(255) DEFAULT 'unprocessed'::character varying,
     type character varying(255) NOT NULL,
@@ -1076,7 +1076,7 @@ ALTER SEQUENCE stripe_events_id_seq OWNED BY stripe_events.id;
 --
 
 CREATE TABLE stripe_external_accounts (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     id_from_stripe character varying(255) NOT NULL,
     account_id_from_stripe character varying(255) NOT NULL,
     account_holder_name character varying(255),
@@ -1091,7 +1091,7 @@ CREATE TABLE stripe_external_accounts (
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     default_for_currency boolean,
-    stripe_connect_account_id bigint
+    stripe_connect_account_id integer
 );
 
 
@@ -1119,13 +1119,13 @@ ALTER SEQUENCE stripe_external_accounts_id_seq OWNED BY stripe_external_accounts
 --
 
 CREATE TABLE stripe_file_upload (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     id_from_stripe character varying(255) NOT NULL,
     purpose character varying(255),
     size integer,
     type character varying(255),
     url character varying(255),
-    stripe_connect_account_id bigint,
+    stripe_connect_account_id integer,
     created integer
 );
 
@@ -1154,7 +1154,7 @@ ALTER SEQUENCE stripe_file_upload_id_seq OWNED BY stripe_file_upload.id;
 --
 
 CREATE TABLE stripe_invoices (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     amount_due integer,
     application_fee integer,
     attempt_count integer,
@@ -1182,8 +1182,8 @@ CREATE TABLE stripe_invoices (
     tax_percent double precision,
     total integer,
     webhooks_delievered_at integer,
-    stripe_connect_subscription_id bigint NOT NULL,
-    user_id bigint NOT NULL,
+    stripe_connect_subscription_id integer NOT NULL,
+    user_id integer NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -1213,7 +1213,7 @@ ALTER SEQUENCE stripe_invoices_id_seq OWNED BY stripe_invoices.id;
 --
 
 CREATE TABLE stripe_platform_cards (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     brand character varying(255),
     customer_id_from_stripe character varying(255),
     cvc_check character varying(255),
@@ -1222,7 +1222,7 @@ CREATE TABLE stripe_platform_cards (
     id_from_stripe character varying(255) NOT NULL,
     last4 character varying(255),
     name character varying(255),
-    user_id bigint NOT NULL,
+    user_id integer NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -1252,12 +1252,12 @@ ALTER SEQUENCE stripe_platform_cards_id_seq OWNED BY stripe_platform_cards.id;
 --
 
 CREATE TABLE stripe_platform_customers (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     currency character varying(255),
     delinquent boolean,
     email character varying(255),
     id_from_stripe character varying(255) NOT NULL,
-    user_id bigint NOT NULL,
+    user_id integer NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     created integer
@@ -1288,10 +1288,10 @@ ALTER SEQUENCE stripe_platform_customers_id_seq OWNED BY stripe_platform_custome
 --
 
 CREATE TABLE task_lists (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     name character varying(255),
     "order" integer,
-    project_id bigint,
+    project_id integer,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     inbox boolean DEFAULT false
@@ -1322,9 +1322,9 @@ ALTER SEQUENCE task_lists_id_seq OWNED BY task_lists.id;
 --
 
 CREATE TABLE task_skills (
-    id bigint NOT NULL,
-    skill_id bigint NOT NULL,
-    task_id bigint NOT NULL,
+    id integer NOT NULL,
+    skill_id integer NOT NULL,
+    task_id integer NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -1354,20 +1354,20 @@ ALTER SEQUENCE task_skills_id_seq OWNED BY task_skills.id;
 --
 
 CREATE TABLE tasks (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     body text,
     markdown text,
     number integer NOT NULL,
     status character varying(255) DEFAULT 'open'::character varying NOT NULL,
     title text NOT NULL,
-    project_id bigint NOT NULL,
-    user_id bigint NOT NULL,
+    project_id integer NOT NULL,
+    user_id integer NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    task_list_id bigint,
+    task_list_id integer,
     "order" integer,
     github_issue_number integer,
-    github_repo_id bigint
+    github_repo_id integer
 );
 
 
@@ -1395,9 +1395,9 @@ ALTER SEQUENCE tasks_id_seq OWNED BY tasks.id;
 --
 
 CREATE TABLE user_categories (
-    id bigint NOT NULL,
-    user_id bigint NOT NULL,
-    category_id bigint NOT NULL,
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    category_id integer NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -1427,9 +1427,9 @@ ALTER SEQUENCE user_categories_id_seq OWNED BY user_categories.id;
 --
 
 CREATE TABLE user_roles (
-    id bigint NOT NULL,
-    user_id bigint NOT NULL,
-    role_id bigint NOT NULL,
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    role_id integer NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -1459,9 +1459,9 @@ ALTER SEQUENCE user_roles_id_seq OWNED BY user_roles.id;
 --
 
 CREATE TABLE user_skills (
-    id bigint NOT NULL,
-    user_id bigint NOT NULL,
-    skill_id bigint NOT NULL,
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    skill_id integer NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -1491,9 +1491,9 @@ ALTER SEQUENCE user_skills_id_seq OWNED BY user_skills.id;
 --
 
 CREATE TABLE user_tasks (
-    id bigint NOT NULL,
-    task_id bigint NOT NULL,
-    user_id bigint NOT NULL,
+    id integer NOT NULL,
+    task_id integer NOT NULL,
+    user_id integer NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -1523,7 +1523,7 @@ ALTER SEQUENCE user_tasks_id_seq OWNED BY user_tasks.id;
 --
 
 CREATE TABLE users (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     username character varying(255),
     email character varying(255),
     encrypted_password character varying(255),
