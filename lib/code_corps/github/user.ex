@@ -3,11 +3,9 @@ defmodule CodeCorps.GitHub.User do
   Used to perform user actions on the github API
   """
 
-  alias CodeCorps.{Comment, GitHub, GithubAppInstallation, Repo, Task, User}
-  alias CodeCorps.GitHub.Adapters.User, as: UserAdapter
-  alias Ecto.{Changeset, Multi}
+  alias CodeCorps.{Accounts, GitHub, User}
+  alias Ecto.{Changeset}
 
-  import Ecto.Query
 
   @single_endpoint "user"
 
@@ -42,73 +40,7 @@ defmodule CodeCorps.GitHub.User do
   @spec do_connect(User.t, map, String.t) :: {:ok, User.t} | {:error, Changeset.t}
   defp do_connect(%User{} = user, %{} = user_payload, access_token)
     when is_binary(access_token) do
-
-    changeset =
-      user
-      |> Changeset.change(user_payload |> UserAdapter.from_github_user)
-      |> Changeset.put_change(:github_auth_token, access_token)
-      |> Changeset.validate_required([:github_auth_token, :github_avatar_url, :github_id, :github_username])
-
-    multi =
-      Multi.new
-      |> Multi.update(:user, changeset)
-      |> Multi.run(:installations, fn %{user: %User{} = user} -> user |> associate_installations() end)
-      |> Multi.run(:tasks, fn %{user: %User{} = user} -> user |> associate_tasks() end)
-      |> Multi.run(:comments, fn %{user: %User{} = user} -> user |> associate_comments() end)
-
-    case Repo.transaction(multi) do
-      {:ok, %{user: %User{} = user, installations: installations}} ->
-        {:ok, user |> Map.put(:github_app_installations, installations)}
-      {:error, :user, %Changeset{} = changeset, _actions_done} ->
-        {:error, changeset}
-    end
-  end
-
-
-  @spec associate_installations(User.t) :: {:ok, list(GithubAppInstallation.t)}
-  defp associate_installations(%User{id: user_id, github_id: github_id}) do
-    updates = [set: [user_id: user_id]]
-    update_options = [returning: true]
-
-    GithubAppInstallation
-    |> where([i], i.sender_github_id == ^github_id)
-    |> where([i], is_nil(i.user_id))
-    |> Repo.update_all(updates, update_options)
-    |> (fn {_count, installations} -> {:ok, installations} end).()
-  end
-
-  @spec associate_tasks(User.t) :: {:ok, list(Task.t)}
-  defp associate_tasks(%User{id: user_id, github_id: github_id}) do
-    updates = [set: [user_id: user_id]]
-    update_options = [returning: true]
-
-    existing_user_ids =
-      User
-      |> where(github_id: ^github_id)
-      |> select([u], u.id)
-      |> Repo.all
-
-    Task
-    |> where([t], t.user_id in ^existing_user_ids)
-    |> Repo.update_all(updates, update_options)
-    |> (fn {_count, tasks} -> {:ok, tasks} end).()
-  end
-
-  @spec associate_comments(User.t) :: {:ok, list(Comment.t)}
-  defp associate_comments(%User{id: user_id, github_id: github_id}) do
-    updates = [set: [user_id: user_id]]
-    update_options = [returning: true]
-
-    existing_user_ids =
-      User
-      |> where(github_id: ^github_id)
-      |> select([u], u.id)
-      |> Repo.all
-
-    Comment
-    |> where([c], c.user_id in ^existing_user_ids)
-    |> Repo.update_all(updates, update_options)
-    |> (fn {_count, comments} -> {:ok, comments} end).()
+    Accounts.update_from_github_oauth(user, user_payload, access_token)
   end
 
   @doc ~S"""

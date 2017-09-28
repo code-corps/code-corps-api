@@ -1,7 +1,6 @@
 alias CodeCorps.{
   Category, Organization, ProjectUser, Project, ProjectCategory, ProjectSkill,
-  Repo, Role, Skill, SluggedRoute, Task, User, UserCategory, UserRole,
-  UserSkill
+  Repo, Role, Skill, Task, User, UserCategory, UserRole, UserSkill
 }
 
 users = [
