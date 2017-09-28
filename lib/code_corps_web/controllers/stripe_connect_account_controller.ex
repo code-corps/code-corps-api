@@ -27,9 +27,9 @@ defmodule CodeCorpsWeb.StripeConnectAccountController do
   def create(%Conn{} = conn, params) do
     params =
       params
+      |> Map.put("managed", true)
       |> Map.put("tos_acceptance_ip", conn |> ConnUtils.extract_ip)
       |> Map.put("tos_acceptance_user_agent", conn |> ConnUtils.extract_user_agent)
-      |> Map.put("managed", true)
     with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %StripeConnectAccount{}, params),
          {:ok, %StripeConnectAccount{} = account} <- StripeConnectAccountService.create(params) do
@@ -42,8 +42,8 @@ defmodule CodeCorpsWeb.StripeConnectAccountController do
     with %StripeConnectAccount{} = account <- StripeConnectAccount |> Repo.get(id),
          %User{} = current_user <- conn |> Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:update, account, params),
-         {:ok, %StripeConnectAccount{} = account} <- account |> StripeConnectAccount.webhook_update_changeset(params) |> Repo.update do
-      conn |> render("show.json-api", data: account)
+         {:ok, %StripeConnectAccount{} = updated_account} <- account |> StripeConnectAccountService.update(params) do
+      conn |> render("show.json-api", data: updated_account)
     end
   end
 end
