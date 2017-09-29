@@ -14,8 +14,10 @@ defmodule CodeCorpsWeb.TaskViewTest do
       "data" => %{
         "attributes" => %{
           "body" => task.body,
+          "created-at" => task.created_at,
           "inserted-at" => task.inserted_at,
           "markdown" => task.markdown,
+          "modified-at" => task.modified_at,
           "number" => task.number,
           "order" => task.order,
           "status" => task.status,
