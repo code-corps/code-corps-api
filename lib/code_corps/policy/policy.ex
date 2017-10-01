@@ -47,6 +47,7 @@ defmodule CodeCorps.Policy do
     %OrganizationGithubAppInstallation{} = organization_github_app_installation, %{}),
       do: Policy.OrganizationGithubAppInstallation.delete?(user, organization_github_app_installation)
   defp can?(%User{} = user, :create, %OrganizationGithubAppInstallation{}, %{} = params), do: Policy.OrganizationGithubAppInstallation.create?(user, params)
+  defp can?(%User{} = current_user, :create, %Role{}, %{}), do: Policy.Role.create?(current_user)
   defp can?(%User{} = current_user, :create, %RoleSkill{}, %{}), do: Policy.RoleSkill.create?(current_user)
   defp can?(%User{} = current_user, :delete, %RoleSkill{}, %{}), do: Policy.RoleSkill.delete?(current_user)
   defp can?(%User{} = current_user, :create, %Skill{}, %{}), do: Policy.Skill.create?(current_user)
