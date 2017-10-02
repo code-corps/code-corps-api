@@ -1,24 +1,37 @@
 defmodule CodeCorpsWeb.SkillController do
   use CodeCorpsWeb, :controller
-  use JaResource
 
-  import CodeCorps.Helpers.Query, only: [id_filter: 2, title_filter: 2, limit_filter: 2]
+  alias CodeCorps.{Skill, User, Helpers.Query}
 
-  alias CodeCorps.Skill
+  action_fallback CodeCorpsWeb.FallbackController
+  plug CodeCorpsWeb.Plug.DataToAttributes
+  plug CodeCorpsWeb.Plug.IdsToIntegers
 
-  plug :load_and_authorize_resource, model: Skill, only: [:create]
-  plug JaResource
-
-  @spec model :: module
-  def model, do: CodeCorps.Skill
-
-  def filter(_conn, query, "id", id_list) do
-    query |> id_filter(id_list)
+  @spec index(Conn.t, map) :: Conn.t
+  def index(%Conn{} = conn, %{} = params) do
+    with skills <- Skill
+         |> Query.id_filter(params)
+         |> Query.title_filter(params)
+         |> Query.limit_filter(params)
+         |> Repo.all
+    do
+      conn |> render("index.json-api", data: skills)
+    end
   end
 
-  def handle_index(_conn, params) do
-    Skill
-    |> title_filter(params)
-    |> limit_filter(params)
+  @spec show(Conn.t, map) :: Conn.t
+  def show(%Conn{} = conn, %{"id" => id}) do
+    with %Skill{} = skill <- Skill |> Repo.get(id) do
+      conn |> render("show.json-api", data: skill)
+    end
+  end
+
+  @spec create(Plug.Conn.t, map) :: Conn.t
+  def create(%Conn{} = conn, %{} = params) do
+    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+         {:ok, :authorized} <- current_user |> Policy.authorize(:create, %Skill{}, params),
+         {:ok, %Skill{} = skill} <- %Skill{} |> Skill.create_changeset(params) |> Repo.insert do
+      conn |> put_status(:created) |> render("show.json-api", data: skill)
+    end
   end
 end

@@ -10,13 +10,13 @@ defmodule CodeCorps.SkillTest do
   }
   @invalid_attrs %{description: "test", original_row: 1}
 
-  test "changeset with valid attributes" do
-    changeset = Skill.changeset(%Skill{}, @valid_attrs)
+  test "create_changeset with valid attributes" do
+    changeset = Skill.create_changeset(%Skill{}, @valid_attrs)
     assert changeset.valid?
   end
 
-  test "changeset with invalid attributes" do
-    changeset = Skill.changeset(%Skill{}, @invalid_attrs)
+  test "create_changeset with invalid attributes" do
+    changeset = Skill.create_changeset(%Skill{}, @invalid_attrs)
     refute changeset.valid?
   end
 end
