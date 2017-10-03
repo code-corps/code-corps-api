@@ -8,12 +8,14 @@ defmodule CodeCorps.GitHub.UserTest do
 
   describe "connect/2" do
     test "posts to github, returns updated user" do
-      user = insert(:user)
+      original_email = "original@email.com"
+      user = insert(:user, email: original_email)
       %{
         "avatar_url" => avatar_url,
-        "email" => email,
+        "email" => github_email,
         "id" => github_id,
-        "login" => login
+        "login" => login,
+        "type" => type
       } = load_endpoint_fixture("user")
 
       {:ok, %User{} = returned_user} = GitHub.User.connect(user, "foo_code", "foo_state")
@@ -21,9 +23,11 @@ defmodule CodeCorps.GitHub.UserTest do
       assert returned_user.id == user.id
       assert returned_user.github_auth_token == "foo_auth_token"
       assert returned_user.github_avatar_url == avatar_url
-      assert returned_user.email == email
+      assert returned_user.email == original_email
+      refute returned_user.email == github_email
       assert returned_user.github_id == github_id
       assert returned_user.github_username == login
+      assert returned_user.type == String.downcase(type)
     end
 
     test "posts to github, associates user and installations" do
