@@ -9,12 +9,7 @@ defmodule CodeCorpsWeb.SkillController do
 
   @spec index(Conn.t, map) :: Conn.t
   def index(%Conn{} = conn, %{} = params) do
-    with skills <- Skill
-         |> Query.id_filter(params)
-         |> Query.title_filter(params)
-         |> Query.limit_filter(params)
-         |> Repo.all
-    do
+    with skills <- params |> load_skills() do
       conn |> render("index.json-api", data: skills)
     end
   end
@@ -33,5 +28,14 @@ defmodule CodeCorpsWeb.SkillController do
          {:ok, %Skill{} = skill} <- %Skill{} |> Skill.changeset(params) |> Repo.insert do
       conn |> put_status(:created) |> render("show.json-api", data: skill)
     end
+  end
+
+  @spec load_skills(map) :: list(Skill.t)
+  defp load_skills(%{} = params) do
+    Skill
+    |> Query.id_filter(params)
+    |> Query.title_filter(params)
+    |> Query.limit_filter(params)
+    |> Repo.all
   end
 end
