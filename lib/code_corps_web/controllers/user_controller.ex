@@ -49,11 +49,6 @@ defmodule CodeCorpsWeb.UserController do
     with {:ok, user} <- GitHub.User.connect(current_user, code, state)
     do
       conn |> render("show.json-api", data: user)
-    else
-      {:error, _error} ->
-        conn
-        |> put_status(:internal_server_error)
-        |> render(CodeCorpsWeb.ErrorView, "500.json-api")
     end
   end
 

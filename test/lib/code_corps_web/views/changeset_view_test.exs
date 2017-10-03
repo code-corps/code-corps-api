@@ -6,27 +6,30 @@ defmodule CodeCorpsWeb.ChangesetViewTest do
   test "renders all errors properly" do
     changeset = Preview.create_changeset(%Preview{}, %{})
 
-    rendered_json = render(CodeCorpsWeb.ChangesetView, "error.json-api", %{changeset: changeset})
+    rendered_json = render(CodeCorpsWeb.ChangesetView, "422.json", %{changeset: changeset})
 
     expected_json = %{
       errors: [
         %{
-          id: "VALIDATION_ERROR",
-          detail: "can't be blank",
+          detail: "Markdown can't be blank",
           source: %{
             pointer: "data/attributes/markdown"
           },
-          status: 422
+          status: "422",
+          title: "can't be blank"
         },
         %{
-          id: "VALIDATION_ERROR",
-          detail: "can't be blank",
+          detail: "User can't be blank",
           source: %{
             pointer: "data/attributes/user_id"
           },
-          status: 422
+          status: "422",
+          title: "can't be blank"
         }
-      ]
+      ],
+      jsonapi: %{
+        version: "1.0"
+      }
     }
 
     assert rendered_json == expected_json

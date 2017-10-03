@@ -37,6 +37,21 @@ defmodule CodeCorps.AccountsTest do
       assert changeset.errors[:email] == {"has already been taken", []}
     end
 
+    test "validates the uniqueness of the github_id" do
+      %{"id" => github_id} = payload = TestHelpers.load_endpoint_fixture("user")
+
+      # Ensure a user exists so there's a duplicate github_id
+      insert(:user, github_id: github_id)
+
+      {:error, %Changeset{} = changeset} =
+        payload
+        |> Accounts.create_from_github
+
+      wait_for_supervisor()
+
+      assert changeset.errors[:github_id] == {"account is already connected to someone else", []}
+    end
+
     test "uploads photo from GitHub avatar" do
       {:ok, %User{} = user} =
         "user"
