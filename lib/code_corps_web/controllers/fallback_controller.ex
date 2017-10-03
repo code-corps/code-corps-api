@@ -3,6 +3,8 @@ defmodule CodeCorpsWeb.FallbackController do
 
   alias Ecto.Changeset
 
+  require Logger
+
   @type supported_fallbacks :: {:error, Changeset.t} |
                                {:error, :not_authorized} |
                                {:error, :github} |
@@ -32,5 +34,11 @@ defmodule CodeCorpsWeb.FallbackController do
     conn
     |> put_status(500)
     |> render(CodeCorpsWeb.ErrorView, "500.json", message: "An unknown error occurred with GitHub's API.")
+  end
+  def call(%Conn{} = conn, {:error, %Stripe.APIErrorResponse{message: message}}) do
+    Logger.info message
+    conn
+    |> put_status(500)
+    |> render(CodeCorpsWeb.ErrorView, "500.json", message: "An unknown error occurred with Stripe's API.")
   end
 end
