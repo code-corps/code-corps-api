@@ -20,13 +20,8 @@ defmodule CodeCorps.Skill do
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """
-  @spec create_changeset(CodeCorps.Skill.t, map) :: Ecto.Changeset.t
-  def create_changeset(struct, params \\ %{}) do
-    changeset(struct, params)
-  end
-
   @spec changeset(CodeCorps.Skill.t, map) :: Ecto.Changeset.t
-  defp changeset(struct, params \\ %{}) do
+  def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:title, :description, :original_row])
     |> validate_required([:title])

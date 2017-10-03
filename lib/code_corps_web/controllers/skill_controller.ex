@@ -30,7 +30,7 @@ defmodule CodeCorpsWeb.SkillController do
   def create(%Conn{} = conn, %{} = params) do
     with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %Skill{}, params),
-         {:ok, %Skill{} = skill} <- %Skill{} |> Skill.create_changeset(params) |> Repo.insert do
+         {:ok, %Skill{} = skill} <- %Skill{} |> Skill.changeset(params) |> Repo.insert do
       conn |> put_status(:created) |> render("show.json-api", data: skill)
     end
   end
