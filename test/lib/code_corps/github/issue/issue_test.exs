@@ -29,7 +29,7 @@ defmodule CodeCorps.GitHub.IssueTest do
         _options
       })
 
-      assert body == Adapters.Task.to_issue(task) |> Poison.encode!
+      assert body == Adapters.Task.to_api(task) |> Poison.encode!
     end
 
     test "calls github API to create an issue for assigned task, makes integration request if user is not connected, returns response" do
@@ -50,7 +50,7 @@ defmodule CodeCorps.GitHub.IssueTest do
         _options
       })
 
-      assert body == Adapters.Task.to_issue(task) |> Poison.encode!
+      assert body == Adapters.Task.to_api(task) |> Poison.encode!
     end
 
     test "returns error response if there was trouble" do
@@ -73,7 +73,7 @@ defmodule CodeCorps.GitHub.IssueTest do
         _options
       })
 
-      assert body == Adapters.Task.to_issue(task) |> Poison.encode!
+      assert body == Adapters.Task.to_api(task) |> Poison.encode!
     end
   end
 
@@ -96,7 +96,7 @@ defmodule CodeCorps.GitHub.IssueTest do
         _options
       })
 
-      assert body == Adapters.Task.to_issue(task) |> Poison.encode!
+      assert body == Adapters.Task.to_api(task) |> Poison.encode!
     end
 
     test "calls github API to create an issue for assigned task, makes integration request if user is not connected, returns response" do
@@ -117,7 +117,7 @@ defmodule CodeCorps.GitHub.IssueTest do
         _options
       })
 
-      assert body == Adapters.Task.to_issue(task) |> Poison.encode!
+      assert body == Adapters.Task.to_api(task) |> Poison.encode!
     end
 
     test "returns error response if there was trouble" do
@@ -140,7 +140,7 @@ defmodule CodeCorps.GitHub.IssueTest do
         _options
       })
 
-      assert body == Adapters.Task.to_issue(task) |> Poison.encode!
+      assert body == Adapters.Task.to_api(task) |> Poison.encode!
     end
   end
 end

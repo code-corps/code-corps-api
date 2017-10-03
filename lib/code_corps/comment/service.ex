@@ -32,7 +32,7 @@ defmodule CodeCorps.Comment.Service do
   @spec update(Comment.t, map) :: {:ok, Comment.t} | {:error, Changeset.t}
   def update(%Comment{} = comment, %{} = attributes) do
     Multi.new
-    |> Multi.update(:comment, comment |> Comment.changeset(attributes))
+    |> Multi.update(:comment, comment |> Comment.update_changeset(attributes))
     |> Multi.run(:github, (fn %{comment: %Comment{} = comment} -> comment |> sync_to_github() end))
     |> Repo.transaction
     |> marshall_result()

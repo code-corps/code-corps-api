@@ -4,12 +4,12 @@ defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilderTest do
   use CodeCorps.DbAccessCase
 
   import CodeCorps.GitHub.TestHelpers
+  import Ecto.Changeset
 
   alias CodeCorps.{
     GitHub.Event.IssueComment.ChangesetBuilder,
     Comment
   }
-  alias Ecto.Changeset
 
   describe "build_changeset/3" do
     test "assigns proper changes to the comment, when it's new" do
@@ -22,12 +22,21 @@ defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilderTest do
         comment, payload, task, user
       )
 
+      {:ok, created_at, _} = payload["issue"]["created_at"] |> DateTime.from_iso8601()
+      {:ok, updated_at, _} = payload["issue"]["updated_at"] |> DateTime.from_iso8601()
+
       # adapted fields
-      assert Changeset.get_change(changeset, :github_id) == payload["comment"]["id"]
-      assert Changeset.get_change(changeset, :markdown) == payload["comment"]["body"]
+      assert get_change(changeset, :created_at) == created_at
+      assert get_change(changeset, :github_id) == payload["comment"]["id"]
+      assert get_change(changeset, :markdown) == payload["comment"]["body"]
+      assert get_change(changeset, :modified_at) == updated_at
+
+      # manual fields
+      assert get_change(changeset, :created_from) == "github"
+      assert get_change(changeset, :modified_from) == "github"
 
       # html was rendered
-      assert Changeset.get_change(changeset, :body) ==
+      assert get_change(changeset, :body) ==
         Earmark.as_html!(payload["comment"]["body"], %Earmark.Options{code_class_prefix: "language-"})
 
       # relationships are proper
@@ -49,17 +58,24 @@ defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilderTest do
         comment, payload, task, user
       )
 
+      {:ok, updated_at, _} = payload["issue"]["updated_at"] |> DateTime.from_iso8601()
+
       # adapted fields
-      assert Changeset.get_change(changeset, :github_id) == payload["comment"]["id"]
-      assert Changeset.get_change(changeset, :markdown) == payload["comment"]["body"]
+      assert get_change(changeset, :github_id) == payload["comment"]["id"]
+      assert get_change(changeset, :markdown) == payload["comment"]["body"]
+      assert get_change(changeset, :modified_at) == updated_at
+
+      # modified from is updated, but created from is unchanged
+      assert get_field(changeset, :created_from) == "code_corps"
+      assert get_change(changeset, :modified_from) == "github"
 
       # html was rendered
-      assert Changeset.get_change(changeset, :body) ==
+      assert get_change(changeset, :body) ==
         Earmark.as_html!(payload["comment"]["body"], %Earmark.Options{code_class_prefix: "language-"})
 
       # relationships are proper
-      refute changeset |> Changeset.get_change(:task)
-      refute changeset |> Changeset.get_change(:user)
+      refute changeset |> get_change(:task)
+      refute changeset |> get_change(:user)
 
       assert changeset.valid?
     end
