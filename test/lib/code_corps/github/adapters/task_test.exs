@@ -12,9 +12,11 @@ defmodule CodeCorps.GitHub.Adapters.TaskTest do
       %{"issue" => payload} = load_event_fixture("issues_opened")
 
       assert Adapters.Task.from_issue(payload) == %{
+        created_at: payload["created_at"],
         github_issue_number: payload["number"],
-        title: payload["title"],
         markdown: payload["body"],
+        modified_at: payload["updated_at"],
+        title: payload["title"],
         status: payload["state"]
       }
     end
@@ -26,10 +28,12 @@ defmodule CodeCorps.GitHub.Adapters.TaskTest do
         %Task{number: 5, title: "Foo", markdown: "bar", status: "open"}
         |> Adapters.Task.to_issue
 
-      assert payload["title"] == "Foo"
       assert payload["body"] == "bar"
       assert payload["state"] == "open"
+      assert payload["title"] == "Foo"
+      refute payload["created_at"]
       refute payload["number"]
+      refute payload["updated_at"]
     end
   end
 end

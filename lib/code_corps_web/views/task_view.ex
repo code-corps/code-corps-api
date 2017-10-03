@@ -4,7 +4,10 @@ defmodule CodeCorpsWeb.TaskView do
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
 
-  attributes ~w(body markdown number status title order inserted_at updated_at)a
+  attributes ~w(
+    body created_at inserted_at markdown modified_at number order status title
+    updated_at
+  )a
 
   has_one :github_repo, serializer: CodeCorpsWeb.GithubRepoView
   has_one :project, serializer: CodeCorpsWeb.ProjectView

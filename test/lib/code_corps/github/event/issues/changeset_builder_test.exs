@@ -24,15 +24,21 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilderTest do
         task, payload, project_github_repo, user
       )
 
+      {:ok, created_at, _} = payload["issue"]["created_at"] |> DateTime.from_iso8601()
+      {:ok, updated_at, _} = payload["issue"]["updated_at"] |> DateTime.from_iso8601()
+
       # adapted fields
-      assert get_change(changeset, :name) == payload["issue"]["name"]
+      assert get_change(changeset, :created_at) == created_at
       assert get_change(changeset, :github_issue_number) == payload["issue"]["number"]
       assert get_change(changeset, :markdown) == payload["issue"]["body"]
+      assert get_change(changeset, :modified_at) == updated_at
+      assert get_change(changeset, :name) == payload["issue"]["name"]
       assert get_field(changeset, :status) == payload["issue"]["state"]
 
-      # html was rendered
+      # markdown was rendered into html
       assert get_change(changeset, :body) ==
-        Earmark.as_html!(payload["issue"]["body"], %Earmark.Options{code_class_prefix: "language-"})
+        payload["issue"]["body"]
+        |> Earmark.as_html!(%Earmark.Options{code_class_prefix: "language-"})
 
       # relationships are proper
       assert get_change(changeset, :github_repo_id) == project_github_repo.github_repo_id

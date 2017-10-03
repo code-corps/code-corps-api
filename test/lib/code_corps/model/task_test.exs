@@ -31,6 +31,23 @@ defmodule CodeCorps.TaskTest do
     end
   end
 
+  describe "create_changeset/2" do
+    test "sets created_at and modified_at to the same time" do
+      project = insert(:project)
+      task_list = insert(:task_list)
+      user = insert(:user)
+      changes = Map.merge(@valid_attrs, %{
+        project_id: project.id,
+        task_list_id: task_list.id,
+        user_id: user.id
+      })
+      changeset = Task.create_changeset(%Task{}, changes)
+      assert changeset.valid?
+      {:ok, %Task{created_at: created_at, modified_at: modified_at}} = Repo.insert(changeset)
+      assert created_at == modified_at
+    end
+  end
+
   describe "update_changeset/2" do
     test "only allows specific values for status" do
       changes = Map.put(@valid_attrs, :status, "nonexistent")
