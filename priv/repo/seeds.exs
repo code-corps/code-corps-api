@@ -222,22 +222,17 @@ end
 case Repo.all(Task) do
   [] ->
     for i <- 1..50 do
-      markdown = "test *body* #{i}"
-      options = %Earmark.Options{code_class_prefix: "language-"}
-      html = Earmark.as_html!(markdown, options)
-
-      task = %Task{
+      params = %{
         title: "test task #{i}",
-        markdown: markdown,
-        body: html,
-        status: "open",
-        number: i,
+        markdown: "test *body* #{i}",
         project_id: 1,
         user_id: 1,
         task_list_id: Enum.random([1, 2, 3, 4])
       }
 
-      task |> Repo.insert!
+      %Task{}
+      |> Task.create_changeset(params)
+      |> Repo.insert!
     end
   _ -> IO.puts "Tasks detected, aborting this seed."
 end
