@@ -26,6 +26,7 @@ defmodule CodeCorps.Comment do
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:markdown])
+    |> validate_required([:markdown])
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
   end
 
