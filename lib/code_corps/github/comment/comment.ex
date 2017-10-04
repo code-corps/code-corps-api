@@ -17,7 +17,7 @@ defmodule CodeCorps.GitHub.Comment do
     } = comment) do
 
     endpoint = comment |> create_endpoint_for()
-    attrs = comment |> GitHub.Adapters.Comment.to_github_comment
+    attrs = comment |> GitHub.Adapters.Comment.to_api
 
     with opts when is_list(opts) <- opts_for(user, installation) do
       GitHub.request(:post, endpoint, %{}, attrs, opts)
@@ -38,7 +38,7 @@ defmodule CodeCorps.GitHub.Comment do
     } = comment) do
 
     endpoint = comment |> update_endpoint_for()
-    attrs = comment |> GitHub.Adapters.Comment.to_github_comment
+    attrs = comment |> GitHub.Adapters.Comment.to_api
 
     with opts when is_list(opts) <- opts_for(user, installation) do
       GitHub.request(:patch, endpoint, %{}, attrs, opts)
