@@ -14,6 +14,7 @@ defmodule CodeCorps.AccountsTest do
         |> Accounts.create_from_github
 
       assert user.id
+      assert user.default_color
       assert user.sign_up_context == "github"
       assert user.type == "user"
     end
@@ -27,7 +28,7 @@ defmodule CodeCorps.AccountsTest do
       {:error, %Changeset{} = changeset} =
         payload
         |> Accounts.create_from_github
-        
+
       assert changeset.errors[:email] == {"has already been taken", []}
     end
   end

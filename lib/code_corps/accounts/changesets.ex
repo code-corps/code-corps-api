@@ -4,6 +4,7 @@ defmodule CodeCorps.Accounts.Changesets do
   """
 
   alias CodeCorps.GitHub.Adapters
+  alias CodeCorps.Helpers.RandomIconColor
   alias Ecto.Changeset
 
   @doc ~S"""
@@ -16,6 +17,7 @@ defmodule CodeCorps.Accounts.Changesets do
     |> Changeset.put_change(:sign_up_context, "github")
     |> Changeset.unique_constraint(:email)
     |> Changeset.validate_inclusion(:type, ["bot", "user"])
+    |> RandomIconColor.generate_icon_color(:default_color)
   end
 
   @doc ~S"""
