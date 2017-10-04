@@ -1,6 +1,7 @@
 defmodule CodeCorps.AccountsTest do
   @moduledoc false
 
+  use CodeCorps.BackgroundProcessingCase
   use CodeCorps.DbAccessCase
 
   alias CodeCorps.{Accounts, User, GitHub.TestHelpers}
@@ -12,6 +13,8 @@ defmodule CodeCorps.AccountsTest do
         "user"
         |> TestHelpers.load_endpoint_fixture
         |> Accounts.create_from_github
+
+      wait_for_supervisor()
 
       assert user.id
       assert user.default_color
@@ -29,7 +32,21 @@ defmodule CodeCorps.AccountsTest do
         payload
         |> Accounts.create_from_github
 
+      wait_for_supervisor()
+
       assert changeset.errors[:email] == {"has already been taken", []}
+    end
+
+    test "uploads photo from GitHub avatar" do
+      {:ok, %User{} = user} =
+        "user"
+        |> TestHelpers.load_endpoint_fixture
+        |> Accounts.create_from_github
+
+      wait_for_supervisor()
+
+      user = Repo.get(User, user.id)
+      assert user.cloudinary_public_id
     end
   end
 
