@@ -5,14 +5,15 @@ defmodule CodeCorps.Accounts do
   All actions to accounts should go through here.
   """
 
+  alias Task.Supervisor, as: TaskSupervisor
   alias CodeCorps.{
     Accounts.Changesets,
     Comment,
     GitHub.Adapters,
     GithubAppInstallation,
+    Task,
     User,
-    Repo,
-    Task
+    Repo
   }
   alias Ecto.{Changeset, Multi}
 
@@ -23,6 +24,16 @@ defmodule CodeCorps.Accounts do
   """
   @spec create_from_github(map) :: {:ok, User.t} | {:error, Changeset.t}
   def create_from_github(%{} = attrs) do
+    with {:ok, user} <- do_create_from_github(attrs) do
+      user |> upload_github_photo_async
+      {:ok, user}
+    else
+      error -> error
+    end
+  end
+
+  @spec do_create_from_github(map) :: {:ok, User.t} | {:error, Changeset.t}
+  defp do_create_from_github(%{} = attrs) do
     %User{}
     |> Changesets.create_from_github_changeset(attrs)
     |> Repo.insert
@@ -54,6 +65,20 @@ defmodule CodeCorps.Accounts do
       {:error, :user, %Changeset{} = changeset, _actions_done} ->
         {:error, changeset}
     end
+  end
+
+  defp upload_github_photo_async(%User{} = user) do
+    TaskSupervisor.start_child(:background_processor, fn -> upload_github_photo(user) end)
+  end
+
+  defp upload_github_photo(%User{github_avatar_url: github_avatar_url} = user) do
+    [ok: %Cloudex.UploadedImage{public_id: cloudinary_public_id}] =
+      github_avatar_url
+      |> CodeCorps.Cloudex.Uploader.upload()
+
+    user
+    |> Changeset.change(%{cloudinary_public_id: cloudinary_public_id})
+    |> Repo.update!
   end
 
   @spec associate_installations(User.t) :: {:ok, list(GithubAppInstallation.t)}
