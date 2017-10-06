@@ -15,8 +15,8 @@ defmodule CodeCorpsWeb.OrganizationInviteViewTest do
         "attributes" => %{
           "email" => organization_invite.email,
           "fulfilled" => organization_invite.fulfilled,
-          "title" => organization_invite.title,
           "inserted-at" => organization_invite.inserted_at,
+          "organization-name" => organization_invite.organization_name,
           "updated-at" => organization_invite.updated_at
         }
       },
