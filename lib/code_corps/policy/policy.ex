@@ -40,7 +40,7 @@ defmodule CodeCorps.Policy do
   defp can?(%User{} = current_user, :update, %Project{} = project, %{}), do: Policy.Project.update?(current_user, project)
   defp can?(%User{} = current_user, :create, %ProjectUser{}, %{} = params), do: Policy.ProjectUser.create?(current_user, params)
   defp can?(%User{} = current_user, :update, %ProjectUser{} = project_user, %{} = params), do: Policy.ProjectUser.update?(current_user, project_user, params)
-  defp can?(%User{} = current_user, :delete, %ProjectUser{} = project_user, %{}), do: Policy.ProjectUser.delete?(current_user, project_user)  
+  defp can?(%User{} = current_user, :delete, %ProjectUser{} = project_user, %{}), do: Policy.ProjectUser.delete?(current_user, project_user)
   defp can?(%User{} = user, :delete,
     %OrganizationGithubAppInstallation{} = organization_github_app_installation, %{}),
       do: Policy.OrganizationGithubAppInstallation.delete?(user, organization_github_app_installation)
@@ -53,6 +53,10 @@ defmodule CodeCorps.Policy do
   defp can?(%User{} = current_user, :delete, %UserSkill{} = user_skill, %{}), do: Policy.UserSkill.delete?(current_user, user_skill)
   defp can?(%User{} = current_user, :create, %UserRole{} = user_role, %{}), do: Policy.UserRole.create?(current_user, user_role)
   defp can?(%User{} = current_user, :delete, %UserRole{} = user_role, %{}), do: Policy.UserRole.delete?(current_user, user_role)
+  defp can?(%User{} = user, :create, %DonationGoal{}, %{} = params), do: Policy.DonationGoal.create?(user, params)
+  defp can?(%User{} = user, :update, %DonationGoal{} = donation_goal), do: Policy.DonationGoal.update?(user, donation_goal)
+  defp can?(%User{} = user, :delete, %DonationGoal{} = donation_goal), do: Policy.DonationGoal.delete?(user, donation_goal)
+
 
   defimpl Canada.Can, for: User do
     # NOTE: Canary sets an :unauthorized and a :not_found handler on a config level
@@ -65,10 +69,6 @@ defmodule CodeCorps.Policy do
 
     # NOTE: other tests are using the User policy for the time being.
     def can?(%User{}, _action, nil), do: true
-
-    def can?(%User{} = user, :create, %Changeset{data: %DonationGoal{}} = changeset), do: Policy.DonationGoal.create?(user, changeset)
-    def can?(%User{} = user, :update, %DonationGoal{} = comment), do: Policy.DonationGoal.update?(user, comment)
-    def can?(%User{} = user, :delete, %DonationGoal{} = comment), do: Policy.DonationGoal.delete?(user, comment)
 
     def can?(%User{} = user, :create, %Changeset{data: %GithubAppInstallation{}} = changeset), do: Policy.GithubAppInstallation.create?(user, changeset)
 
