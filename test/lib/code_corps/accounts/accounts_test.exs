@@ -75,10 +75,40 @@ defmodule CodeCorps.AccountsTest do
         user
         |> Accounts.update_from_github_oauth(params, token)
 
+      wait_for_supervisor()
+
       assert user.id
       assert user.github_auth_token == token
       assert user.sign_up_context == "default"
       assert user.type == "user"
+    end
+
+    test "does not update their image if it already exists" do
+      user = insert(:user, cloudinary_public_id: "123")
+      params = TestHelpers.load_endpoint_fixture("user")
+
+      {:ok, %User{} = user} =
+        user
+        |> Accounts.update_from_github_oauth(params, "random_token")
+
+      wait_for_supervisor()
+      user = Repo.get(User, user.id)
+
+      assert user.cloudinary_public_id === "123"
+    end
+
+    test "updates their image if does not exist" do
+      user = insert(:user, cloudinary_public_id: nil)
+      params = TestHelpers.load_endpoint_fixture("user")
+
+      {:ok, %User{} = user} =
+        user
+        |> Accounts.update_from_github_oauth(params, "random_token")
+
+      wait_for_supervisor()
+      user = Repo.get(User, user.id)
+
+      assert user.cloudinary_public_id
     end
   end
 end

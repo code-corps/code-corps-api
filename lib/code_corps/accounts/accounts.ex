@@ -61,15 +61,17 @@ defmodule CodeCorps.Accounts do
 
     case Repo.transaction(multi) do
       {:ok, %{user: %User{} = user, installations: installations}} ->
+        user |> upload_github_photo_async
         {:ok, user |> Map.put(:github_app_installations, installations)}
       {:error, :user, %Changeset{} = changeset, _actions_done} ->
         {:error, changeset}
     end
   end
 
-  defp upload_github_photo_async(%User{} = user) do
+  defp upload_github_photo_async(%User{cloudinary_public_id: nil} = user) do
     TaskSupervisor.start_child(:background_processor, fn -> upload_github_photo(user) end)
   end
+  defp upload_github_photo_async(%User{} = user), do: user
 
   defp upload_github_photo(%User{github_avatar_url: github_avatar_url} = user) do
     [ok: %Cloudex.UploadedImage{public_id: cloudinary_public_id}] =
