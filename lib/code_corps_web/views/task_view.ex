@@ -5,8 +5,8 @@ defmodule CodeCorpsWeb.TaskView do
   use JaSerializer.PhoenixView
 
   attributes [
-    :body, :created_at, :created_from, :inserted_at, :markdown, :modified_at,
-    :modified_from, :number, :order, :status, :title, :updated_at
+    :archived, :body, :created_at, :created_from, :inserted_at, :markdown,
+    :modified_at, :modified_from, :number, :order, :status, :title, :updated_at
   ]
 
   has_one :github_repo, serializer: CodeCorpsWeb.GithubRepoView

@@ -9,6 +9,7 @@ defmodule CodeCorps.Task do
   @type t :: %__MODULE__{}
 
   schema "tasks" do
+    field :archived, :boolean, default: false
     field :body, :string
     field :closed_at, :utc_datetime
     field :created_at, :utc_datetime
@@ -63,7 +64,7 @@ defmodule CodeCorps.Task do
   def update_changeset(struct, params) do
     struct
     |> changeset(params)
-    |> cast(params, [:status])
+    |> cast(params, [:archived, :status])
     |> validate_inclusion(:status, statuses())
     |> set_closed_at()
     |> update_modified_at()

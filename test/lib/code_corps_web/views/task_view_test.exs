@@ -13,6 +13,7 @@ defmodule CodeCorpsWeb.TaskViewTest do
     expected_json = %{
       "data" => %{
         "attributes" => %{
+          "archived" => task.archived,
           "body" => task.body,
           "created-at" => task.created_at,
           "created-from" => task.created_from,
@@ -24,7 +25,7 @@ defmodule CodeCorpsWeb.TaskViewTest do
           "order" => task.order,
           "status" => task.status,
           "title" => task.title,
-          "updated-at" => task.updated_at,
+          "updated-at" => task.updated_at
         },
         "id" => task.id |> Integer.to_string,
         "relationships" => %{
