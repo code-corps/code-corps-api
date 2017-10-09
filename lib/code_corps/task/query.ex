@@ -19,34 +19,44 @@ defmodule CodeCorps.Task.Query do
   @spec list(map) :: list(Project.t)
   def list(%{} = params) do
     Task
-    |> do_list(params)
+    |> apply_archived_status(params)
+    |> apply_optional_filters(params)
     |> order_by([asc: :order])
     |> Repo.all
   end
 
-  @spec do_list(Queryable.t, map) :: Queryable.t
-  defp do_list(queryable, %{"filter" => %{} = params}) do
-    queryable |> do_list(params)
+  @spec apply_optional_filters(Queryable.t, map) :: Queryable.t
+  defp apply_optional_filters(queryable, %{"filter" => %{} = params}) do
+    queryable |> apply_optional_filters(params)
   end
-  defp do_list(queryable, %{"project_id" => project_id} = params) do
+  defp apply_optional_filters(queryable, %{"project_id" => project_id} = params) do
     queryable
     |> where(project_id: ^project_id)
-    |> do_list(params |> Map.delete("project_id"))
+    |> apply_optional_filters(params |> Map.delete("project_id"))
   end
-  defp do_list(queryable, %{"task_list_ids" => task_list_ids} = params) do
+  defp apply_optional_filters(queryable, %{"task_list_ids" => task_list_ids} = params) do
     task_list_ids = task_list_ids |> Helpers.String.coalesce_id_string
 
     queryable
     |> where([r], r.task_list_id in ^task_list_ids)
-    |> do_list(params |> Map.delete("task_list_ids"))
+    |> apply_optional_filters(params |> Map.delete("task_list_ids"))
   end
-  defp do_list(queryable, %{"status" => status} = params) do
+  defp apply_optional_filters(queryable, %{"status" => status} = params) do
     queryable
     |> where(status: ^status)
-    |> do_list(params |> Map.delete("status"))
+    |> apply_optional_filters(params |> Map.delete("status"))
   end
-  defp do_list(queryable, %{}), do: queryable
+  defp apply_optional_filters(queryable, %{}), do: queryable
 
+  @spec apply_archived_status(Queryable.t, map) :: Queryable.t
+  defp apply_archived_status(queryable, %{"archived" => archived}) do
+    queryable
+    |> where(archived: ^archived)
+  end
+  defp apply_archived_status(queryable, %{}) do
+    queryable
+    |> where(archived: false)
+  end
   @doc ~S"""
   Returns a `Task` record retrived using a set of parameters.
 
