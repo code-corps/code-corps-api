@@ -18,7 +18,7 @@ defmodule CodeCorpsWeb.FallbackController do
   def call(%Conn{} = conn, {:error, %Changeset{} = changeset}) do
     conn
     |> put_status(:unprocessable_entity)
-    |> render(:errors, data: changeset)
+    |> render(CodeCorpsWeb.ChangesetView, "422.json", changeset: changeset)
   end
   def call(%Conn{} = conn, {:error, :not_authorized}) do
     conn
@@ -40,5 +40,11 @@ defmodule CodeCorpsWeb.FallbackController do
     conn
     |> put_status(500)
     |> render(CodeCorpsWeb.ErrorView, "500.json", message: "An unknown error occurred with Stripe's API.")
+  end
+  def call(%Conn{} = conn, {:error, %CodeCorps.GitHub.APIError{message: message}}) do
+    Logger.info message
+    conn
+    |> put_status(500)
+    |> render(CodeCorpsWeb.ErrorView, "github-error.json", message: message)
   end
 end

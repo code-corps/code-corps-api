@@ -35,6 +35,10 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilderTest do
       assert get_change(changeset, :name) == payload["issue"]["name"]
       assert get_field(changeset, :status) == payload["issue"]["state"]
 
+      # manual fields
+      assert get_change(changeset, :created_from) == "github"
+      assert get_change(changeset, :modified_from) == "github"
+
       # markdown was rendered into html
       assert get_change(changeset, :body) ==
         payload["issue"]["body"]

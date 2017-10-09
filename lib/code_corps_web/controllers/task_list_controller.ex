@@ -1,6 +1,5 @@
 defmodule CodeCorpsWeb.TaskListController do
   use CodeCorpsWeb, :controller
-  use JaResource
 
   import CodeCorps.Helpers.Query, only: [
     project_filter: 2, sort_by_order: 1,
@@ -8,26 +7,21 @@ defmodule CodeCorpsWeb.TaskListController do
 
   alias CodeCorps.TaskList
 
-  plug :load_resource, model: TaskList, only: [:show]
-  plug JaResource
+  action_fallback CodeCorpsWeb.FallbackController
+  plug CodeCorpsWeb.Plug.DataToAttributes
+  plug CodeCorpsWeb.Plug.IdsToIntegers
 
-  @spec model :: module
-  def model, do: CodeCorps.TaskList
-
-  def handle_index(conn, params) do
-    tasks = TaskList
-    |> project_filter(params)
-    |> sort_by_order
-    |> Repo.all()
-
-    conn
-    |> render("index.json-api", data: tasks)
+  @spec index(Conn.t, map) :: Conn.t
+  def index(%Conn{} = conn, %{} = params) do
+    with task_lists <- TaskList |> project_filter(params) |> sort_by_order() |> Repo.all do
+      conn |> render("index.json-api", data: task_lists)
+    end
   end
 
-  def record(%Plug.Conn{params: %{"project_id" => _project_id} = params}, id) do
-    TaskList
-    |> project_filter(params)
-    |> Repo.get(id)
+  @spec show(Conn.t, map) :: Conn.t
+  def show(%Conn{} = conn, %{"id" => id}) do
+    with %TaskList{} = task_list <- TaskList |> Repo.get(id) do
+      conn |> render("show.json-api", data: task_list)
+    end
   end
-  def record(_conn, id), do: TaskList |> Repo.get(id)
 end

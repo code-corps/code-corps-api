@@ -52,14 +52,14 @@ defmodule CodeCorps.GitHub.UserTest do
     end
 
     test "posts to github, associates user and tasks" do
-      user = insert(:user)
-      %{"id" => github_id} = load_endpoint_fixture("user")
-      premade_user = insert(:user, github_id: github_id)
+      %{"email" => email} = load_endpoint_fixture("user")
+      user = insert(:user, email: email)
+      insert(:user)
 
       # 2 test tasks
       # this one should associate,
-      # because the associated user has the same github id
-      task_1 = insert(:task, user: premade_user)
+      # because the associated user has the same email
+      task_1 = insert(:task, user: user)
       # this one should not associate, because the associated user has a
       # different (or no) github id
       task_2 = insert(:task)
@@ -71,14 +71,14 @@ defmodule CodeCorps.GitHub.UserTest do
     end
 
     test "posts to github, associates user and comments" do
-      user = insert(:user)
-      %{"id" => github_id} = load_endpoint_fixture("user")
-      premade_user = insert(:user, github_id: github_id)
+      %{"email" => email} = load_endpoint_fixture("user")
+      user = insert(:user, email: email)
+      insert(:user)
 
       # 2 test comments
       # this one should associate,
       # because the associated user has the same github id
-      comment_1 = insert(:comment, user: premade_user)
+      comment_1 = insert(:comment, user: user)
       # this one should not associate, because the associated user has a
       # different (or no) github id
       comment_2 = insert(:comment)

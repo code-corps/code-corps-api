@@ -9,10 +9,12 @@ defmodule CodeCorps.Task do
   @type t :: %__MODULE__{}
 
   schema "tasks" do
+    field :archived, :boolean, default: false
     field :body, :string
     field :closed_at, :utc_datetime
     field :created_at, :utc_datetime
     field :created_from, :string, default: "code_corps"
+    field :github_issue_number, :integer
     field :markdown, :string
     field :modified_at, :utc_datetime
     field :modified_from, :string, default: "code_corps"
@@ -20,7 +22,6 @@ defmodule CodeCorps.Task do
     field :order, :integer
     field :status, :string, default: "open"
     field :title, :string
-    field :github_issue_number, :integer
 
     field :position, :integer, virtual: true
 
@@ -63,7 +64,7 @@ defmodule CodeCorps.Task do
   def update_changeset(struct, params) do
     struct
     |> changeset(params)
-    |> cast(params, [:status])
+    |> cast(params, [:archived, :status])
     |> validate_inclusion(:status, statuses())
     |> set_closed_at()
     |> update_modified_at()

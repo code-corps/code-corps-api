@@ -58,10 +58,10 @@ defmodule CodeCorps.Factories do
 
   def organization_invite_factory do
     %CodeCorps.OrganizationInvite{
-      email: sequence(:email, &"email_#{&1}@mail.com"),
-      title: sequence(:title, &"organization-#{&1}"),
       code: sequence(:code, &"n43crhiqR-#{&1}"),
-      fulfilled: false
+      email: sequence(:email, &"email_#{&1}@mail.com"),
+      fulfilled: false,
+      organization_name: sequence(:organization_name, &"organization-#{&1}")
     }
   end
 

@@ -30,7 +30,7 @@ defmodule CodeCorps.GitHub.CommentTest do
         _options
       })
 
-      assert body == Adapters.Comment.to_github_comment(comment) |> Poison.encode!
+      assert body == Adapters.Comment.to_api(comment) |> Poison.encode!
     end
 
     test "calls github API to create a github comment for assigned comment, makes integration request if user is not connected, returns response" do
@@ -52,7 +52,7 @@ defmodule CodeCorps.GitHub.CommentTest do
         _options
       })
 
-      assert body == Adapters.Comment.to_github_comment(comment) |> Poison.encode!
+      assert body == Adapters.Comment.to_api(comment) |> Poison.encode!
     end
 
     test "returns error response if there was trouble" do
@@ -76,7 +76,7 @@ defmodule CodeCorps.GitHub.CommentTest do
         _options
       })
 
-      assert body == Adapters.Comment.to_github_comment(comment) |> Poison.encode!
+      assert body == Adapters.Comment.to_api(comment) |> Poison.encode!
     end
   end
 
@@ -100,7 +100,7 @@ defmodule CodeCorps.GitHub.CommentTest do
         _options
       })
 
-      assert body == Adapters.Comment.to_github_comment(comment) |> Poison.encode!
+      assert body == Adapters.Comment.to_api(comment) |> Poison.encode!
     end
 
     test "calls github API to update a github comment for assigned comment, makes integration request if user is not connected, returns response" do
@@ -122,7 +122,7 @@ defmodule CodeCorps.GitHub.CommentTest do
         _options
       })
 
-      assert body == Adapters.Comment.to_github_comment(comment) |> Poison.encode!
+      assert body == Adapters.Comment.to_api(comment) |> Poison.encode!
     end
 
     test "returns error response if there was trouble" do
@@ -146,7 +146,7 @@ defmodule CodeCorps.GitHub.CommentTest do
         _options
       })
 
-      assert body == Adapters.Comment.to_github_comment(comment) |> Poison.encode!
+      assert body == Adapters.Comment.to_api(comment) |> Poison.encode!
     end
   end
 end

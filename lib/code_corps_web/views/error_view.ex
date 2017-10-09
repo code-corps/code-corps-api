@@ -2,29 +2,29 @@ defmodule CodeCorpsWeb.ErrorView do
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
 
-  def render("stripe-400.json-api", _assigns) do
-    %{
-      id: "INVALID_GRANT",
-      title: "This authorization code has already been used. All tokens issued with this code have been revoked.",
-      status: 400
-    }
-    |> JaSerializer.ErrorSerializer.format
-  end
-
   def render("404.json-api", _assigns) do
     %{
-      id: "NOT_FOUND",
-      title: "404 Resource not found",
-      status: 404
+      title: "404 Not Found",
+      detail: "404 Not Found",
+      status: "404"
     }
     |> JaSerializer.ErrorSerializer.format
   end
 
   def render("500.json-api", _assigns) do
     %{
-      id: "INTERNAL_SERVER_ERROR",
-      title: "500 Internal server error",
-      status: 500
+      title: "500 Internal Server Error",
+      detail: "500 Internal Server Error",
+      status: "500"
+    }
+    |> JaSerializer.ErrorSerializer.format
+  end
+
+  def render("github-error.json", %{message: message}) do
+    %{
+      title: "GitHub API error",
+      detail: message,
+      status: "500"
     }
     |> JaSerializer.ErrorSerializer.format
   end

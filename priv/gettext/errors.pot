@@ -7,7 +7,6 @@
 ## Run `mix gettext.extract` to bring this file up to
 ## date. Leave `msgstr`s empty as changing them here as no
 ## effect: edit them in PO (`.po`) files instead.
-
 ## From Ecto.Changeset.cast/4
 msgid "can't be blank"
 msgstr ""
@@ -18,6 +17,10 @@ msgstr ""
 
 ## From Ecto.Changeset.put_change/3
 msgid "is invalid"
+msgstr ""
+
+## From Ecto.Changeset.validate_acceptance/3
+msgid "must be accepted"
 msgstr ""
 
 ## From Ecto.Changeset.validate_format/3
@@ -37,10 +40,10 @@ msgid "does not match confirmation"
 msgstr ""
 
 ## From Ecto.Changeset.no_assoc_constraint/3
-msgid "is still associated to this entry"
+msgid "is still associated with this entry"
 msgstr ""
 
-msgid "are still associated to this entry"
+msgid "are still associated with this entry"
 msgstr ""
 
 ## From Ecto.Changeset.validate_length/3
@@ -88,4 +91,12 @@ msgid "must be greater than or equal to %{number}"
 msgstr ""
 
 msgid "must be equal to %{number}"
+msgstr ""
+
+#: lib/code_corps/accounts/changesets.ex:50
+msgid "account is already connected to someone else"
+msgstr ""
+
+#: lib/code_corps_web/views/changeset_view.ex:63
+msgid "Github"
 msgstr ""

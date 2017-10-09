@@ -17,7 +17,7 @@ defmodule CodeCorps.GitHub.Event.Issues.UserLinker do
   }
 
   @typep linking_result :: {:ok, User.t} |
-                           {:error, Ecto.Changeset.t}
+                           {:error, Ecto.Changeset.t} |
                            {:error, :multiple_users}
 
   @doc ~S"""
@@ -47,7 +47,8 @@ defmodule CodeCorps.GitHub.Event.Issues.UserLinker do
   defp match_users(
     %{
       "issue" => %{"number" => github_issue_number},
-      "repository" =>%{"id" => github_repo_id}}) do
+      "repository" =>%{"id" => github_repo_id}
+    }) do
 
     query = from u in User,
       distinct: u.id,
