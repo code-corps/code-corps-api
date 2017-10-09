@@ -17,6 +17,7 @@ defmodule CodeCorpsWeb.TaskViewTest do
           "body" => task.body,
           "created-at" => task.created_at,
           "created-from" => task.created_from,
+          "github-issue-number" => task.github_issue_number,
           "inserted-at" => task.inserted_at,
           "markdown" => task.markdown,
           "modified-at" => task.modified_at,
