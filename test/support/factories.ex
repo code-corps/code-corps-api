@@ -15,7 +15,9 @@ defmodule CodeCorps.Factories do
   def comment_factory do
     %CodeCorps.Comment{
       body: "I love elixir!",
+      created_at: DateTime.utc_now,
       markdown: "I love elixir!",
+      modified_at: DateTime.utc_now,
       task: build(:task),
       user: build(:user)
     }
@@ -67,9 +69,11 @@ defmodule CodeCorps.Factories do
 
   def task_factory do
     %CodeCorps.Task{
-      title: "Test task",
+      created_at: DateTime.utc_now,
       markdown: "A test task",
+      modified_at: DateTime.utc_now,
       status: "open",
+      title: "Test task",
       project: build(:project),
       user: build(:user),
       task_list: build(:task_list)

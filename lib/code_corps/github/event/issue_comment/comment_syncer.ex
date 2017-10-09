@@ -10,9 +10,9 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentSyncer do
   alias Ecto.Changeset
 
   @doc """
-  When provided a `GithubRepo`, a `User` and a GitHub API payload, for each
-  `Project` associated to that `GithubRepo` via a `ProjectGithubRepo`, it
-  creates or updates a `Task` associated to the specified `User`.
+  When provided a list of `Task`s, a `User` and a GitHub API payload, for each
+  `Comment` associated to those `Task`s it creates or updates a `Comment`
+  associated to the specified `User`.
   """
   @spec sync_all(list(Task.t), User.t, map) :: {:ok, list(Comment.t)}
   def sync_all(tasks, %User{} = user, %{} = payload) do

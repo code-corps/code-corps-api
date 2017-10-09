@@ -8,7 +8,8 @@ defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilder do
     Comment,
     Services.MarkdownRendererService,
     Task,
-    User
+    User,
+    Validators.TimeValidator
   }
   alias CodeCorps.GitHub.Adapters.Comment, as: CommentAdapter
   alias Ecto.Changeset
@@ -45,6 +46,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilder do
     |> Changeset.cast(CommentAdapter.from_api(attrs), @update_attrs)
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
     |> Changeset.put_change(:modified_from, "github")
+    |> TimeValidator.validate_time_after(:modified_at)
     |> Changeset.validate_required([:markdown, :body])
   end
 end

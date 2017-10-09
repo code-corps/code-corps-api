@@ -7,9 +7,8 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentDeleter do
   import Ecto.Query
 
   @doc """
-  When provided a `GithubRepo`, a `User` and a GitHub API payload, for each
-  `Project` associated to that `GithubRepo` via a `ProjectGithubRepo`, it
-  creates or updates a `Task` associated to the specified `User`.
+  When provided a GitHub API payload, it deletes each `Comment` associated to
+  the specified `IssueComment`.
   """
   @spec delete_all(map) :: {:ok, list(Comment.t)}
   def delete_all(%{"comment" => %{"id" => github_id}}) do
