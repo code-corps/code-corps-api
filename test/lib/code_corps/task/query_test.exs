@@ -80,6 +80,23 @@ defmodule CodeCorps.Task.QueryTest do
         list_sorted_ids(%{"status" => "closed"})
     end
 
+    test "filter by archived" do
+      tasks = insert_list(3, :task)
+      task_ids = tasks |> get_sorted_ids()
+
+      archived_tasks = insert_list(3, :task, archived: true)
+      archived_task_ids = archived_tasks |> get_sorted_ids()
+
+      assert task_ids ==
+        list_sorted_ids(%{})
+
+      assert task_ids ==
+        list_sorted_ids(%{"archived" => false})
+
+      assert archived_task_ids ==
+        list_sorted_ids(%{"archived" => true})
+    end
+
     test "works with multiple filters" do
       project_1 = insert(:project)
       project_2 = insert(:project)
@@ -96,6 +113,10 @@ defmodule CodeCorps.Task.QueryTest do
       task_6 = insert(:task, status: "closed", project: project_2, task_list: list_1)
       task_7 = insert(:task, status: "open", project: project_2, task_list: list_2)
       task_8 = insert(:task, status: "closed", project: project_2, task_list: list_2)
+
+      task_9 = insert(:task, status: "open", project: project_1, task_list: list_2, archived: true)
+      task_10 = insert(:task, status: "closed", project: project_1, task_list: list_1, archived: true)
+      task_11 = insert(:task, status: "open", project: project_2, task_list: list_1, archived: true)
 
       assert [task_1.id] ==
         list_sorted_ids(%{"status" => "open", "project_id" => project_1.id, "task_list_ids" => "#{list_1.id}"})
@@ -117,6 +138,21 @@ defmodule CodeCorps.Task.QueryTest do
 
       assert [task_1, task_3] |> get_sorted_ids() ==
         list_sorted_ids(%{"status" => "open", "project_id" => project_1.id})
+
+      assert [task_9, task_10] |> get_sorted_ids() ==
+        list_sorted_ids(%{"archived" => true, "project_id" => project_1.id})
+
+      assert [task_10, task_11] |> get_sorted_ids() ==
+        list_sorted_ids(%{"archived" => true, "task_list_ids" => "#{list_1.id}"})
+
+      assert [task_9, task_11] |> get_sorted_ids() ==
+        list_sorted_ids(%{"archived" => true, "status" => "open"})
+
+      assert [task_11] |> get_sorted_ids() ==
+        list_sorted_ids(%{"archived" => true,
+          "project_id" => project_2.id,
+          "status" => "open",
+          "task_list_ids" => "#{list_1.id}"})
     end
   end
 
