@@ -50,7 +50,15 @@ defmodule CodeCorps.Policy do
   defp can?(%User{} = current_user, :create, %Role{}, %{}), do: Policy.Role.create?(current_user)
   defp can?(%User{} = current_user, :create, %RoleSkill{}, %{}), do: Policy.RoleSkill.create?(current_user)
   defp can?(%User{} = current_user, :delete, %RoleSkill{}, %{}), do: Policy.RoleSkill.delete?(current_user)
+  defp can?(%User{} = current_user, :show, %StripeConnectPlan{} = stripe_connect_plan, %{}),
+    do: Policy.StripeConnectPlan.show?(current_user, stripe_connect_plan)
+  defp can?(%User{} = current_user, :create, %StripeConnectPlan{}, %{} = params),
+    do: Policy.StripeConnectPlan.create?(current_user, params)
   defp can?(%User{} = current_user, :create, %Skill{}, %{}), do: Policy.Skill.create?(current_user)
+  defp can?(%User{} = current_user, :show, %StripePlatformCard{} = stripe_platform_card, %{}),
+    do: Policy.StripePlatformCard.show?(current_user, stripe_platform_card)
+  defp can?(%User{} = current_user, :create, %StripePlatformCard{}, %{} = params),
+    do: Policy.StripePlatformCard.create?(current_user, params)
   defp can?(%User{} = current_user, :create, %TaskSkill{}, %{} = params), do: Policy.TaskSkill.create?(current_user, params)
   defp can?(%User{} = current_user, :delete, %TaskSkill{} = task_skill, %{}), do: Policy.TaskSkill.delete?(current_user, task_skill)
   defp can?(%User{} = current_user, :create, %UserCategory{} = user_category, %{}), do: Policy.UserCategory.create?(current_user, user_category)
@@ -62,6 +70,11 @@ defmodule CodeCorps.Policy do
   defp can?(%User{} = user, :show, %StripeConnectAccount{} = stripe_connect_account, %{}), do: Policy.StripeConnectAccount.show?(user, stripe_connect_account)
   defp can?(%User{} = user, :create, %StripeConnectAccount{}, %{} = params), do: Policy.StripeConnectAccount.create?(user, params)
   defp can?(%User{} = user, :update, %StripeConnectAccount{} = stripe_connect_account, %{}), do: Policy.StripeConnectAccount.update?(user, stripe_connect_account)
+  defp can?(%User{} = current_user, :create, %StripePlatformCustomer{}, %{} = params),
+    do: Policy.StripePlatformCustomer.create?(current_user, params)
+  defp can?(%User{} = current_user, :show, %StripePlatformCustomer{} = stripe_platform_customer, %{}),
+    do: Policy.StripePlatformCustomer.show?(current_user, stripe_platform_customer)
+
 
   defimpl Canada.Can, for: User do
     # NOTE: Canary sets an :unauthorized and a :not_found handler on a config level
@@ -94,18 +107,7 @@ defmodule CodeCorps.Policy do
 
     def can?(%User{} = user, :create, Role), do: Policy.Role.create?(user)
 
-    def can?(%User{} = user, :show, %StripeConnectPlan{} = stripe_connect_plan), do: Policy.StripeConnectPlan.show?(user, stripe_connect_plan)
-    def can?(%User{} = user, :create, %Changeset{ data: %StripeConnectPlan{}} = changeset), do: Policy.StripeConnectPlan.create?(user, changeset)
-
     def can?(%User{} = user, :show, %StripeConnectSubscription{} = stripe_connect_subscription), do: Policy.StripeConnectSubscription.show?(user, stripe_connect_subscription)
     def can?(%User{} = user, :create, %Changeset{ data: %StripeConnectSubscription{}} = changeset), do: Policy.StripeConnectSubscription.create?(user, changeset)
-
-    def can?(%User{} = user, :show, %StripePlatformCard{} = stripe_platform_card), do: Policy.StripePlatformCard.show?(user, stripe_platform_card)
-    def can?(%User{} = user, :create, %Changeset{ data: %StripePlatformCard{}} = changeset), do: Policy.StripePlatformCard.create?(user, changeset)
-    def can?(%User{} = user, :delete, %StripePlatformCard{} = stripe_platform_card), do: Policy.StripePlatformCard.delete?(user, stripe_platform_card)
-
-    def can?(%User{} = user, :create, %Changeset{data: %StripePlatformCustomer{}} = changeset), do: Policy.StripePlatformCustomer.create?(user, changeset)
-    def can?(%User{} = user, :show, %StripePlatformCustomer{} = stripe_platform_customer), do: Policy.StripePlatformCustomer.show?(user, stripe_platform_customer)
-
   end
 end
