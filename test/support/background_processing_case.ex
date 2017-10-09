@@ -27,4 +27,15 @@ defmodule CodeCorps.BackgroundProcessingCase do
       end
     end
   end
+
+  setup do
+    on_exit fn ->
+      Task.Supervisor.children(:background_processor)
+      |> Enum.map(&terminate_child/1)
+    end
+  end
+
+  defp terminate_child(child) do
+    Task.Supervisor.terminate_child(:background_processor, child)
+  end
 end

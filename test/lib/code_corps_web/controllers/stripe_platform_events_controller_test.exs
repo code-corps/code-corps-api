@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.StripePlatformEventsControllerTest do
+  use CodeCorps.BackgroundProcessingCase
   use CodeCorpsWeb.ConnCase
 
   alias CodeCorps.StripeEvent
@@ -10,21 +11,6 @@ defmodule CodeCorpsWeb.StripePlatformEventsControllerTest do
       |> put_req_header("content-type", "application/json")
 
     {:ok, conn: conn}
-  end
-
-  defp wait_for_supervisor(), do: wait_for_children(:background_processor)
-
-  # used to have the test wait for or the children of a supervisor to exit
-
-  defp wait_for_children(supervisor_ref) do
-    Task.Supervisor.children(supervisor_ref)
-    |> Enum.each(&wait_for_child/1)
-  end
-
-  defp wait_for_child(pid) do
-    # Wait until the pid is dead
-    ref = Process.monitor(pid)
-    assert_receive {:DOWN, ^ref, _, _, _}
   end
 
   test "responds with 200 when the event will be processed", %{conn: conn} do
