@@ -3,10 +3,10 @@ defmodule CodeCorps.OrganizationInviteTest do
 
   alias CodeCorps.OrganizationInvite
 
-  @valid_attrs %{email: "code@corps.com", title: "Code Corps"}
+  @valid_attrs %{email: "code@corps.com", organization_name: "Code Corps"}
   @invalid_attrs %{}
 
-  describe "changeset" do
+  describe "changeset/2" do
     test "with valid attributes" do
       changeset = OrganizationInvite.changeset(%OrganizationInvite{}, @valid_attrs)
       assert changeset.valid?
@@ -27,7 +27,7 @@ defmodule CodeCorps.OrganizationInviteTest do
   end
 
 
- describe "creation_changeset" do
+ describe "create_changeset/2" do
    test "with valid attributes" do
      changeset = OrganizationInvite.create_changeset(%OrganizationInvite{}, @valid_attrs)
      assert changeset.valid?
@@ -38,7 +38,7 @@ defmodule CodeCorps.OrganizationInviteTest do
      refute changeset.valid?
    end
 
-   test "genearates code" do
+   test "generates code" do
      changeset = OrganizationInvite.create_changeset(%OrganizationInvite{}, @valid_attrs)
      assert changeset.changes.code != nil
    end

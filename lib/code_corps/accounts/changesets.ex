@@ -3,7 +3,10 @@ defmodule CodeCorps.Accounts.Changesets do
   Changesets for Code Corps accounts.
   """
 
+  import CodeCorpsWeb.Gettext
+
   alias CodeCorps.GitHub.Adapters
+  alias CodeCorps.Helpers.RandomIconColor
   alias Ecto.Changeset
 
   @doc ~S"""
@@ -14,8 +17,10 @@ defmodule CodeCorps.Accounts.Changesets do
     struct
     |> Changeset.change(params |> Adapters.User.from_github_user())
     |> Changeset.put_change(:sign_up_context, "github")
-    |> Changeset.unique_constraint(:email)
     |> Changeset.validate_inclusion(:type, ["bot", "user"])
+    |> RandomIconColor.generate_icon_color(:default_color)
+    |> Changeset.unique_constraint(:email)
+    |> unique_github_constraint()
   end
 
   @doc ~S"""
@@ -26,8 +31,9 @@ defmodule CodeCorps.Accounts.Changesets do
     struct
     |> Changeset.cast(params, [:github_auth_token, :github_avatar_url, :github_id, :github_username, :type])
     |> ensure_email_without_overwriting(params)
-    |> Changeset.unique_constraint(:email)
     |> Changeset.validate_required([:github_auth_token, :github_avatar_url, :github_id, :github_username, :type])
+    |> Changeset.unique_constraint(:email)
+    |> unique_github_constraint()
   end
 
   @spec ensure_email_without_overwriting(Changeset.t, map) :: Changeset.t
@@ -38,4 +44,9 @@ defmodule CodeCorps.Accounts.Changesets do
     end
   end
   defp ensure_email_without_overwriting(%Changeset{} = changeset, _params), do: changeset
+
+  defp unique_github_constraint(struct) do
+    struct
+    |> Changeset.unique_constraint(:github_id, message: dgettext("errors", "account is already connected to someone else"))
+  end
 end

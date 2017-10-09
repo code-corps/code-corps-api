@@ -2,13 +2,13 @@ defmodule CodeCorps.Presenters.ImagePresenter do
   alias CodeCorps.{Project, User}
   alias CodeCorps.Cloudex.CloudinaryUrl
 
-  @logo_options %{crop: "fill", height: 500, width: 500}
+  @large_options %{crop: "fill", height: 500, width: 500}
 
   def large(%Project{} = project), do: do_large(project, "project")
   def large(%User{} = user), do: do_large(user, "user")
 
   defp do_large(%{cloudinary_public_id: cloudinary_id, default_color: color}, type),
-    do: cloudinary_image(cloudinary_id, @logo_options, "large", color, type)
+    do: cloudinary_image(cloudinary_id, @large_options, "large", color, type)
 
   @thumb_options %{crop: "fill", height: 100, width: 100}
 

@@ -14,7 +14,7 @@ defmodule CodeCorps.GitHub.Issue do
     } = task) do
 
     endpoint = github_repo |> get_endpoint()
-    attrs = task |> GitHub.Adapters.Task.to_issue
+    attrs = task |> GitHub.Adapters.Task.to_api
 
     with opts when is_list(opts) <- opts_for(user, installation) do
       GitHub.request(:post, endpoint, %{}, attrs, opts)
@@ -33,7 +33,7 @@ defmodule CodeCorps.GitHub.Issue do
     } = task) do
 
     endpoint = "#{github_repo |> get_endpoint()}/#{number}"
-    attrs = task |> GitHub.Adapters.Task.to_issue
+    attrs = task |> GitHub.Adapters.Task.to_api
 
     with opts when is_list(opts) <- opts_for(user, installation) do
       GitHub.request(:patch, endpoint, %{}, attrs, opts)

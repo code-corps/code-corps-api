@@ -1,21 +1,29 @@
 defmodule CodeCorpsWeb.StripeConnectPlanController do
   use CodeCorpsWeb, :controller
-  use JaResource
 
-  alias CodeCorps.StripeConnectPlan
+  alias CodeCorps.{StripeConnectPlan, User}
   alias CodeCorps.StripeService.StripeConnectPlanService
 
-  plug :load_and_authorize_changeset, model: StripeConnectPlan, only: [:create]
-  plug :load_and_authorize_resource, model: StripeConnectPlan, only: [:show]
-  plug JaResource
+  action_fallback CodeCorpsWeb.FallbackController
+  plug CodeCorpsWeb.Plug.DataToAttributes
+  plug CodeCorpsWeb.Plug.IdsToIntegers
 
-  @spec model :: module
-  def model, do: CodeCorps.StripeConnectPlan
+  @spec show(Conn.t, map) :: Conn.t
+  def show(%Conn{} = conn, %{"id" => id} = params) do
+    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+         %StripeConnectPlan{} = stripe_platform_plan <- StripeConnectPlan |> Repo.get(id),
+         {:ok, :authorized} <- current_user |> Policy.authorize(:show, stripe_platform_plan, params) do
+      conn |> render("show.json-api", data: stripe_platform_plan)
+    end
+  end
 
-  def handle_create(conn, attributes) do
-    attributes
-    |> StripeConnectPlanService.create
-    |> handle_create_result(conn)
+  @spec create(Plug.Conn.t, map) :: Conn.t
+  def create(%Conn{} = conn, %{} = params) do
+    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+         {:ok, :authorized} <- current_user |> Policy.authorize(:create, %StripeConnectPlan{}, params),
+         {:ok, %StripeConnectPlan{} = stripe_platform_plan} <- StripeConnectPlanService.create(params) |> handle_create_result(conn) do
+      conn |> put_status(:created) |> render("show.json-api", data: stripe_platform_plan)
+    end
   end
 
   defp handle_create_result({:error, :project_not_ready}, conn) do

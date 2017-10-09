@@ -22,8 +22,8 @@ defmodule CodeCorps.GitHub.Adapters.Task do
   Converts a GitHub issue payled into a set of attributes used to update or
   create a `Task` record.
   """
-  @spec from_issue(map) :: map
-  def from_issue(%{} = payload) do
+  @spec from_api(map) :: map
+  def from_api(%{} = payload) do
     payload |> MapTransformer.transform(@mapping)
   end
 
@@ -33,8 +33,8 @@ defmodule CodeCorps.GitHub.Adapters.Task do
   Converts a `Task` into a set of attributes used to update or create an
   associated GitHub issue
   """
-  @spec to_issue(Task.t) :: map
-  def to_issue(%Task{} = task) do
+  @spec to_api(Task.t) :: map
+  def to_api(%Task{} = task) do
     task
     |> Map.from_struct
     |> MapTransformer.transform_inverse(@mapping)

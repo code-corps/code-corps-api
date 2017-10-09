@@ -33,6 +33,7 @@ defmodule CodeCorps.GitHub.User do
     do
        user |> do_connect(user_payload, access_token)
     else
+      {:ok, %{"error" => _} = error} -> handle_oauth_error(error)
       {:error, error} -> {:error, error}
     end
   end
@@ -40,6 +41,7 @@ defmodule CodeCorps.GitHub.User do
   @spec do_connect(User.t, map, String.t) :: {:ok, User.t} | {:error, Changeset.t}
   defp do_connect(%User{} = user, %{} = user_payload, access_token)
     when is_binary(access_token) do
+
     Accounts.update_from_github_oauth(user, user_payload, access_token)
   end
 
@@ -52,5 +54,9 @@ defmodule CodeCorps.GitHub.User do
       {:ok, response} -> {:ok, response}
       {:error, error} -> {:error, error}
     end
+  end
+
+  defp handle_oauth_error(%{"error_description" => message, "error_uri" => documentation_url}) do
+    {:error, GitHub.APIError.new({401, %{"message" => message, "documentation_url" => documentation_url}})}
   end
 end

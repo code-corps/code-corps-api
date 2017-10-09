@@ -1,17 +1,14 @@
 defmodule CodeCorpsWeb.SluggedRouteController do
   use CodeCorpsWeb, :controller
-  use JaResource
 
-  import CodeCorps.Helpers.Query, only: [slug_finder: 2]
+  alias CodeCorps.{SluggedRoute, Helpers.Query}
 
-  alias CodeCorps.SluggedRoute
+  action_fallback CodeCorpsWeb.FallbackController
 
-  plug JaResource
-
-  @spec model :: module
-  def model, do: CodeCorps.SluggedRoute
-
-  def record(%Plug.Conn{params: %{"slug" => slug}}, _id) do
-    SluggedRoute |> slug_finder(slug)
+  @spec show(Conn.t, map) :: Conn.t
+  def show(%Conn{} = conn, %{"slug" => slug}) do
+    with %SluggedRoute{} = slugged_route <- SluggedRoute |> Query.slug_finder(slug) do
+      conn |> render("show.json-api", data: slugged_route)
+    end
   end
 end

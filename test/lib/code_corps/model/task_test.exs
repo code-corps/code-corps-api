@@ -70,5 +70,13 @@ defmodule CodeCorps.TaskTest do
       assert changeset.valid?
       refute closed_at
     end
+
+    test "archived field changes appropriately" do
+      changes = Map.put(@valid_attrs, :archived, true)
+      changeset = Task.update_changeset(%Task{task_list_id: 1}, changes)
+      %{archived: archived} = changeset.changes
+      assert changeset.valid?
+      assert archived
+    end
   end
 end

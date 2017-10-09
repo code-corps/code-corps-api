@@ -12,20 +12,24 @@ defmodule CodeCorps.GitHub.Adapters.CommentTest do
       payload = load_event_fixture("issue_comment_created")
 
       assert Adapters.Comment.from_api(payload) == %{
+        created_at: payload["created_at"],
         github_id: payload["id"],
-        markdown: payload["body"]
+        markdown: payload["body"],
+        modified_at: payload["updated_at"]
       }
     end
   end
 
-  describe "to_github_comment/1" do
+  describe "to_api/1" do
     test "maps Comment correctly" do
       payload =
         %Comment{github_id: 6, markdown: "bar"}
-        |> Adapters.Comment.to_github_comment
+        |> Adapters.Comment.to_api
 
       assert payload["body"] == "bar"
       refute payload["id"]
+      refute payload["created_at"]
+      refute payload["updated_at"]
     end
   end
 end

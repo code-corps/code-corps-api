@@ -5,7 +5,6 @@ defmodule CodeCorps.StripeService.Adapters.StripePlatformCardTest do
 
   @stripe_platform_card %Stripe.Card{
     id: "card_123",
-    metadata: %{},
     address_city: nil,
     address_country: nil,
     address_line1: nil,

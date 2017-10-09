@@ -3,8 +3,7 @@ defmodule CodeCorpsWeb.OrganizationInviteController do
   use JaResource
 
   import CodeCorps.Helpers.Query, only: [id_filter: 2]
-
-  alias CodeCorps.OrganizationInvite
+  alias CodeCorps.{Emails, Mailer, OrganizationInvite}
 
   plug :load_and_authorize_resource, model: OrganizationInvite, only: [:create, :update]
   plug JaResource
@@ -18,5 +17,18 @@ defmodule CodeCorpsWeb.OrganizationInviteController do
 
   def handle_create(_conn, attributes) do
     OrganizationInvite.create_changeset(%OrganizationInvite{}, attributes)
+  end
+
+  def render_create(conn, model) do
+    send_email(model)
+    conn
+    |> put_status(:created)
+    |> Phoenix.Controller.render(:show, data: model)
+  end
+
+  defp send_email(organization_invite) do
+    organization_invite
+    |> Emails.OrganizationInviteEmail.create()
+    |> Mailer.deliver_later()
   end
 end
