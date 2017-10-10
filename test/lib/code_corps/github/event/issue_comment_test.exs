@@ -15,7 +15,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
   }
 
   describe "handle/2" do
-    @payload load_event_fixture("issue_comment_created")
+    @payload load_event_fixture("issue_comment_created") |> Map.put("action", "foo")
 
     test "returns error if action of the event is wrong" do
       event = build(:github_event, action: "foo", type: "issue_comment")
@@ -96,7 +96,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
       end
 
       test "with unmatched both users, returns error if unmatched repository" do
-        assert IssueComment.handle(@event, @payload) == {:error, :unmatched_repository}
+        assert IssueComment.handle(@event, @payload) == {:error, :repository_not_found}
         refute Repo.one(User)
       end
 
@@ -180,7 +180,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
 
         _issue_user = insert(:user, github_id: issue_user_github_id)
 
-        assert IssueComment.handle(@event, @payload) == {:error, :unmatched_repository}
+        assert IssueComment.handle(@event, @payload) == {:error, :repository_not_found}
       end
 
       test "with unmatched issue user, matched comment_user, passes with no changes made if no matching projects" do
@@ -255,7 +255,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
 
         _comment_user = insert(:user, github_id: comment_user_github_id)
 
-        assert IssueComment.handle(@event, @payload) == {:error, :unmatched_repository}
+        assert IssueComment.handle(@event, @payload) == {:error, :repository_not_found}
       end
 
       test "with matched issue and comment_user, passes with no changes made if no matching projects" do
@@ -350,7 +350,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
         insert(:user, github_id: comment_user_github_id)
         insert(:user, github_id: issue_user_github_id)
 
-        assert IssueComment.handle(@event, @payload) == {:error, :unmatched_repository}
+        assert IssueComment.handle(@event, @payload) == {:error, :repository_not_found}
       end
 
       test "returns error if payload is wrong" do
