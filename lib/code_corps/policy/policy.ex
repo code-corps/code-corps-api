@@ -54,6 +54,10 @@ defmodule CodeCorps.Policy do
     do: Policy.StripeConnectPlan.show?(current_user, stripe_connect_plan)
   defp can?(%User{} = current_user, :create, %StripeConnectPlan{}, %{} = params),
     do: Policy.StripeConnectPlan.create?(current_user, params)
+  defp can?(%User{} = current_user, :show, %StripeConnectSubscription{} = stripe_connect_subscription, %{}),
+    do: Policy.StripeConnectSubscription.show?(current_user, stripe_connect_subscription)
+  defp can?(%User{} = current_user, :create, %StripeConnectSubscription{}, %{} = params),
+    do: Policy.StripeConnectSubscription.create?(current_user, params)
   defp can?(%User{} = current_user, :create, %Skill{}, %{}), do: Policy.Skill.create?(current_user)
   defp can?(%User{} = current_user, :show, %StripePlatformCard{} = stripe_platform_card, %{}),
     do: Policy.StripePlatformCard.show?(current_user, stripe_platform_card)
@@ -106,8 +110,5 @@ defmodule CodeCorps.Policy do
     def can?(%User{} = user, :delete, %ProjectGithubRepo{} = project_github_repo), do: Policy.ProjectGithubRepo.delete?(user, project_github_repo)
 
     def can?(%User{} = user, :create, Role), do: Policy.Role.create?(user)
-
-    def can?(%User{} = user, :show, %StripeConnectSubscription{} = stripe_connect_subscription), do: Policy.StripeConnectSubscription.show?(user, stripe_connect_subscription)
-    def can?(%User{} = user, :create, %Changeset{ data: %StripeConnectSubscription{}} = changeset), do: Policy.StripeConnectSubscription.create?(user, changeset)
   end
 end
