@@ -14,7 +14,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
   }
 
   describe "handle/2" do
-    @payload load_event_fixture("issues_opened")
+    @payload load_event_fixture("issues_opened") |> Map.put("action", "foo")
 
     test "returns error if action of the event is wrong" do
       event = build(:github_event, action: "foo", type: "issues")
@@ -83,7 +83,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
     end
 
     test "with unmatched user, returns error if unmatched repository" do
-      assert Issues.handle(@event, @payload) == {:error, :unmatched_repository}
+      assert Issues.handle(@event, @payload) == {:error, :repository_not_found}
       refute Repo.one(User)
     end
 
@@ -142,7 +142,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       %{"issue" => %{"user" => %{"id" => user_github_id}}} = @payload
       insert(:user, github_id: user_github_id)
 
-      assert Issues.handle(@event, @payload) == {:error, :unmatched_repository}
+      assert Issues.handle(@event, @payload) == {:error, :repository_not_found}
     end
 
     test "returns error if payload is wrong" do
@@ -217,7 +217,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
     end
 
     test "with unmatched user, returns error if unmatched repository" do
-      assert Issues.handle(@event, @payload) == {:error, :unmatched_repository}
+      assert Issues.handle(@event, @payload) == {:error, :repository_not_found}
       refute Repo.one(User)
     end
 
@@ -276,7 +276,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       %{"issue" => %{"user" => %{"id" => user_github_id}}} = @payload
       insert(:user, github_id: user_github_id)
 
-      assert Issues.handle(@event, @payload) == {:error, :unmatched_repository}
+      assert Issues.handle(@event, @payload) == {:error, :repository_not_found}
     end
 
     test "returns error if payload is wrong" do
@@ -351,7 +351,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
     end
 
     test "with unmatched user, returns error if unmatched repository" do
-      assert Issues.handle(@event, @payload) == {:error, :unmatched_repository}
+      assert Issues.handle(@event, @payload) == {:error, :repository_not_found}
       refute Repo.one(User)
     end
 
@@ -410,7 +410,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       %{"issue" => %{"user" => %{"id" => user_github_id}}} = @payload
       insert(:user, github_id: user_github_id)
 
-      assert Issues.handle(@event, @payload) == {:error, :unmatched_repository}
+      assert Issues.handle(@event, @payload) == {:error, :repository_not_found}
     end
 
     test "returns error if payload is wrong" do
@@ -485,7 +485,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
     end
 
     test "with unmatched user, returns error if unmatched repository" do
-      assert Issues.handle(@event, @payload) == {:error, :unmatched_repository}
+      assert Issues.handle(@event, @payload) == {:error, :repository_not_found}
       refute Repo.one(User)
     end
 
@@ -544,7 +544,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       %{"issue" => %{"user" => %{"id" => user_github_id}}} = @payload
       insert(:user, github_id: user_github_id)
 
-      assert Issues.handle(@event, @payload) == {:error, :unmatched_repository}
+      assert Issues.handle(@event, @payload) == {:error, :repository_not_found}
     end
 
     test "returns error if payload is wrong" do
@@ -560,57 +560,24 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
     end
   end
 
-  describe "handle/2 for Issues::assigned" do
-    @payload %{}
+  @unimplemented_actions ~w(assigned unassigned labeled unlabeled milestoned demilestoned)
 
-    test "is not implemented" do
-      event = build(:github_event, action: "assigned", type: "issues")
-      assert Issues.handle(event, @payload) == {:error, :not_fully_implemented}
+  @unimplemented_actions |> Enum.each(fn action ->
+    describe "handle/2 for Issues::#{action}" do
+      @payload %{
+        "action" => action,
+        "issue" => %{
+          "id" => 1, "title" => "foo", "body" => "bar", "state" => "baz",
+          "user" => %{"id" => "bat"}
+        },
+        "repository" => %{"id" => 2}
+      }
+
+      @event build(:github_event, action: action, type: "issues")
+
+      test "is not implemented" do
+        assert Issues.handle(@event, @payload) == {:error, :not_fully_implemented}
+      end
     end
-  end
-
-  describe "handle/2 for Issues::unassigned" do
-    @payload %{}
-
-    test "is not implemented" do
-      event = build(:github_event, action: "unassigned", type: "issues")
-      assert Issues.handle(event, @payload) == {:error, :not_fully_implemented}
-    end
-  end
-
-  describe "handle/2 for Issues::labeled" do
-    @payload %{}
-
-    test "is not implemented" do
-      event = build(:github_event, action: "labeled", type: "issues")
-      assert Issues.handle(event, @payload) == {:error, :not_fully_implemented}
-    end
-  end
-
-  describe "handle/2 for Issues::unlabeled" do
-    @payload %{}
-
-    test "is not implemented" do
-      event = build(:github_event, action: "unlabeled", type: "issues")
-      assert Issues.handle(event, @payload) == {:error, :not_fully_implemented}
-    end
-  end
-
-  describe "handle/2 for Issues::milestoned" do
-    @payload %{}
-
-    test "is not implemented" do
-      event = build(:github_event, action: "milestoned", type: "issues")
-      assert Issues.handle(event, @payload) == {:error, :not_fully_implemented}
-    end
-  end
-
-  describe "handle/2 for Issues::demilestoned" do
-    @payload %{}
-
-    test "is not implemented" do
-      event = build(:github_event, action: "demilestoned", type: "issues")
-      assert Issues.handle(event, @payload) == {:error, :not_fully_implemented}
-    end
-  end
+  end)
 end
