@@ -10,9 +10,6 @@ defmodule CodeCorpsWeb.StripeConnectAccountController do
   plug CodeCorpsWeb.Plug.DataToAttributes
   plug CodeCorpsWeb.Plug.IdsToIntegers
 
-  @spec model :: module
-  def model, do: CodeCorps.StripeConnectAccount
-
   @spec show(Conn.t, map) :: Conn.t
   def show(%Conn{} = conn, %{"id" => id} = params) do
     with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
