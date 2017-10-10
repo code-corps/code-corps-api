@@ -13,7 +13,7 @@ defmodule CodeCorps.GitHub.Event.Installation.MatchedUser do
   }
 
   @typep process_outcome :: {:ok, GithubAppInstallation.t} | {:error, Changeset.t}
-  @typep outcome :: process_outcome | {:error, :too_many_unprocessed_installations}
+  @type outcome :: process_outcome | {:error, :too_many_unprocessed_installations}
 
   @doc """
   Handles the installation event in the case of a matched user.
