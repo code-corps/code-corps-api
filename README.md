@@ -6,7 +6,6 @@
 [![Deps Status](https://beta.hexfaktor.org/badge/prod/github/code-corps/code-corps-api.svg)](https://beta.hexfaktor.org/github/code-corps/code-corps-api)
 [![Deps Status](https://beta.hexfaktor.org/badge/all/github/code-corps/code-corps-api.svg)](https://beta.hexfaktor.org/github/code-corps/code-corps-api)
 [![Slack Status](http://slack.codecorps.org/badge.svg)](http://slack.codecorps.org)
-</p>
 
 ---
 
