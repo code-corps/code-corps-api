@@ -52,5 +52,29 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilderTest do
 
       assert changeset.valid?
     end
+
+    test "validates that modified_at has not already happened" do
+      payload = load_event_fixture("issues_opened")
+      %{"issue" => %{"number" => issue_number, "updated_at" => updated_at}} = payload
+
+      # Set the modified_at in the future
+      modified_at =
+        updated_at
+        |> Timex.parse!("{ISO:Extended:Z}")
+        |> Timex.shift(days: 1)
+
+      project = insert(:project)
+      github_repo = insert(:github_repo)
+      project_github_repo = insert(:project_github_repo, github_repo: github_repo, project: project)
+      user = insert(:user)
+      task = insert(:task, project: project, github_repo: github_repo, github_issue_number: issue_number, user: user, modified_at: modified_at)
+
+      changeset = ChangesetBuilder.build_changeset(
+        task, payload, project_github_repo, user
+      )
+
+      refute changeset.valid?
+      assert changeset.errors[:modified_at] == {"cannot be before the last recorded time", []}
+    end
   end
 end
