@@ -50,6 +50,9 @@ config :ex_aws, :code_corps,
 config :code_corps,
   asset_host: System.get_env("CLOUDFRONT_DOMAIN")
 
+config :code_corps,
+  intercom_identity_secret_key: System.get_env("INTERCOM_IDENTITY_SECRET_KEY")
+
 config :segment,
   write_key: System.get_env("SEGMENT_WRITE_KEY")
 
