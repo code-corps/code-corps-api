@@ -8,12 +8,12 @@ defmodule CodeCorps.GitHub.Event.Common.ResultAggregator do
   @doc ~S"""
   Aggregates a list of database commit results into an `:ok`, or `:error` tuple.
 
-  All list members are assumed to be either an `{:ok, commited_record}` or
+  All list members are assumed to be either an `{:ok, committed_record}` or
   `{:error, changeset}`.
 
-  The aggregate is an `{:ok, commited_records}` if all results are
-  `{:ok, committed_record}`, or an `{:error, {commited_records, changesets}}` if
-  any of the results is an `{:error, changeset}`.
+  The aggregate is an `{:ok, committed_records}` if all results are
+  `{:ok, committed_record}`, or an `{:error, {committed_records, changesets}}`
+  if any of the results is an `{:error, changeset}`.
   """
   @spec aggregate(list) :: {:ok, list} | {:error, {list, list}}
   def aggregate(results) when is_list(results) do

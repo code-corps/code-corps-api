@@ -1,89 +1,97 @@
 defmodule CodeCorps.GitHub.Event.InstallationRepositories do
-  @moduledoc """
-  In charge of dealing with "InstallationRepositories" GitHub Webhook events
+  @moduledoc ~S"""
+  In charge of handling a GitHub Webhook payload for the
+  InstallationRepositories event type.
+
+  [https://developer.github.com/v3/activity/events/types/#installationrepositoriesevent](https://developer.github.com/v3/activity/events/types/#installationrepositoriesevent)
   """
+
+  @behaviour CodeCorps.GitHub.Event.Handler
 
   alias CodeCorps.{
     GithubAppInstallation,
     GithubEvent,
     GithubRepo,
+    GitHub.Event.Common.ResultAggregator,
+    GitHub.Event.InstallationRepositories,
     Repo
   }
 
-  alias Ecto.Changeset
+  alias Ecto.{Changeset, Multi}
 
-  @typep outcome :: {:ok, [GithubRepo.t]} |
-                    {:error, :no_installation} |
-                    {:error, :unexpected_action_or_payload} |
-                    {:error, :unexpected_installation_payload} |
-                    {:error, :unexpected_repo_payload}
+  @type outcome :: {:ok, list(GithubRepo.t)} |
+                    {:error, :unmatched_installation} |
+                    {:error, :unexpected_action} |
+                    {:error, :unexpected_payload} |
+                    {:error, :validation_error_on_syncing_repos} |
+                    {:error, :unexpected_transaction_outcome}
 
   @doc """
   Handles an "InstallationRepositories" GitHub Webhook event. The event could be
   of subtype "added" or "removed" and is handled differently based on that.
 
-  `InstallationRepositories::added` will
-    - find `GithubAppInstallation`
-      - marks event as errored if not found
-      - marks event as errored if payload does not have keys it needs, meaning
-        there's something wrong with our code and we need to updated
-    - find or create `GithubRepo` records affected
+  - the process of handling the "added" subtype is as follows
+    - try to match with `CodeCorps.GithubAppInstallation` record
+    - sync affected `CodeCorps.GithubRepo` records (update, create)
 
-  `InstallationRepositories::removed` will
-    - find `GithubAppInstallation`
-      - marks event as errored if not found
-      - marks event as errored if payload does not have keys it needs, meaning
-        there's something wrong with our code and we need to updated
-    - find `GithubRepo` records affected and delete them
-      - if there is no `GithubRepo` to delete, it just skips it
-      - `ProjectGithubRepo` are deleted automatically, since they are set to
-        `on_delete: :delete_all`
+  - the process of handling the "removed" subtype is as follows
+    - try to match with a `CodeCorps.GithubAppInstallation` record
+    - delete affected `CodeCorps.GithubRepo` records, respecting the rules
+      - if the GitHub payload for a repo is not matched with a record in our
+        database, just skip deleting it
+      - if the deleted `CodeCorps.GithubRepo` record is associated with
+        `CodeCorps.ProjectGithubRepo` records, they are deleted automatically,
+        due to `on_delete: :delete_all` set at the database level.
   """
   @spec handle(GithubEvent.t, map) :: outcome
-  def handle(%GithubEvent{action: action}, payload), do: do_handle(action, payload)
+  def handle(%GithubEvent{}, payload) do
+    Multi.new
+    |> Multi.run(:payload, fn _ -> payload |> validate_payload() end)
+    |> Multi.run(:action, fn _ -> payload |> validate_action() end)
+    |> Multi.run(:installation, fn _ -> payload |> match_installation() end)
+    |> Multi.run(:repos, fn %{installation: installation} -> installation |> sync_repos(payload) end)
+    |> Repo.transaction
+    |> marshall_result()
+  end
 
-  @spec do_handle(String.t, map) :: outcome
-  defp do_handle("added", %{"installation" => installation_attrs, "repositories_added" => repositories_attr_list}) do
-    case installation_attrs |> find_installation() do
-      nil -> {:error, :no_installation}
-      :unexpected_installation_payload -> {:error, :unexpected_installation_payload}
-      %GithubAppInstallation{} = installation ->
-        case repositories_attr_list |> Enum.all?(&valid?/1) do
-          true -> find_or_create_all(installation, repositories_attr_list)
-          false -> {:error, :unexpected_repo_payload}
-        end
+  @spec validate_payload(map) :: {:ok, :valid} | {:error, :invalid}
+  defp validate_payload(%{} = payload) do
+    case payload |> InstallationRepositories.Validator.valid? do
+      true -> {:ok, :valid}
+      false -> {:error, :invalid}
     end
   end
-  defp do_handle("removed", %{"installation" => installation_attrs, "repositories_removed" => repositories_attr_list}) do
-    case installation_attrs |> find_installation() do
-      nil -> {:error, :no_installation}
-      :unexpected_installation_payload -> {:error, :unexpected_installation_payload}
-      %GithubAppInstallation{} = installation ->
-        case repositories_attr_list |> Enum.all?(&valid?/1) do
-          true -> delete_all(installation, repositories_attr_list)
-          false -> {:error, :unexpected_repo_payload}
-        end
+
+  @valid_actions ~w(added removed)
+  @spec validate_action(map) :: {:ok, :implemented} | {:error, :unexpected_action}
+  defp validate_action(%{"action" => action}) when action in @valid_actions, do: {:ok, :implemented}
+  defp validate_action(%{}), do: {:error, :unexpected_action}
+
+  @spec match_installation(map) :: {:ok, GithubAppInstallation.t} |
+                                   {:error, :unmatched_installation}
+  defp match_installation(%{"installation" => %{"id" => github_id}}) do
+    case GithubAppInstallation |> Repo.get_by(github_id: github_id) do
+      nil -> {:error, :unmatched_installation}
+      %GithubAppInstallation{} = installation -> {:ok, installation}
     end
   end
-  defp do_handle(_action, _payload), do: {:error, :unexpected_action_or_payload}
+  defp match_installation(%{}), do: {:error, :unmatched_installation}
 
-  @spec find_installation(any) :: GithubAppInstallation.t | nil | :unexpected_installation_payload
-  defp find_installation(%{"id" => github_id}), do: GithubAppInstallation |> Repo.get_by(github_id: github_id)
-  defp find_installation(_payload), do: :unexpected_installation_payload
-
-  # should return true if the payload is a map and has the expected keys
-  @spec valid?(any) :: boolean
-  defp valid?(%{"id" => _, "name" => _}), do: true
-  defp valid?(_), do: false
-
-  @spec find_or_create_all(GithubAppInstallation.t, list(map)) :: {:ok, list(GithubRepo.t)}
-  defp find_or_create_all(%GithubAppInstallation{} = installation, repositories_attr_list) when is_list(repositories_attr_list) do
-    repositories_attr_list
+  @spec sync_repos(GithubAppInstallation.t, map) :: {:ok, list(GithubRepo.t)} | {:error, {list(GithubRepo.t), list(Changeset.t)}}
+  defp sync_repos(%GithubAppInstallation{} = installation, %{"action" => "added", "repositories_added" => repositories}) do
+    repositories
     |> Enum.map(&find_or_create(installation, &1))
-    |> aggregate()
+    |> ResultAggregator.aggregate
+  end
+  defp sync_repos(%GithubAppInstallation{} = installation, %{"action" => "removed", "repositories_removed" => repositories}) do
+    repositories
+    |> Enum.map(&find_repo(installation, &1))
+    |> Enum.reject(&is_nil/1)
+    |> Enum.map(&Repo.delete/1)
+    |> ResultAggregator.aggregate
   end
 
-  @spec find_or_create(GithubAppInstallation.t, map) :: {:ok, GithubRepo.t}
+  @spec find_or_create(GithubAppInstallation.t, map) :: {:ok, GithubRepo.t} | {:error, Changeset.t}
   defp find_or_create(%GithubAppInstallation{} = installation, %{"id" => github_id, "name" => name} = attrs) do
     case find_repo(installation, attrs) do
       nil ->
@@ -92,17 +100,10 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositories do
         |> Changeset.put_assoc(:github_app_installation, installation)
         |> Repo.insert()
       %GithubRepo{} = github_repo ->
-        {:ok, github_repo}
+        github_repo
+        |> Changeset.change(%{name: name})
+        |> Repo.update()
     end
-  end
-
-  @spec delete_all(GithubAppInstallation.t, list(map)) :: {:ok, [GithubRepo.t]}
-  defp delete_all(%GithubAppInstallation{} = installation, repositories_attr_list) when is_list(repositories_attr_list) do
-    repositories_attr_list
-    |> Enum.map(&find_repo(installation, &1))
-    |> Enum.reject(&is_nil/1)
-    |> Enum.map(&Repo.delete/1)
-    |> aggregate()
   end
 
   @spec find_repo(GithubAppInstallation.t, map) :: GithubRepo.t | nil
@@ -111,13 +112,11 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositories do
     |> Repo.get_by(github_app_installation_id: installation_id, github_id: github_id)
   end
 
-  # [{:ok, repo_1}, {:ok, repo_2}, {:ok, repo_3}] -> {:ok, [repo_1, repo_2, repo_3]}
-  @spec aggregate(list({:ok, GithubRepo.t})) :: {:ok, list(GithubRepo.t)}
-  defp aggregate(results) do
-    repositories =
-      results
-      |> Enum.map(fn {:ok, %GithubRepo{} = github_repo} -> github_repo end)
-
-    {:ok, repositories}
-  end
+  @spec marshall_result(tuple) :: tuple
+  defp marshall_result({:ok, %{repos: repos}}), do: {:ok, repos}
+  defp marshall_result({:error, :payload, :invalid, _steps}), do: {:error, :unexpected_payload}
+  defp marshall_result({:error, :action, :unexpected_action, _steps}), do: {:error, :unexpected_action}
+  defp marshall_result({:error, :installation, :unmatched_installation, _steps}), do: {:error, :unmatched_installation}
+  defp marshall_result({:error, :repos, {_repos, _changesets}, _steps}), do: {:error, :validation_error_on_syncing_repos}
+  defp marshall_result({:error, _errored_step, _error_response, _steps}), do: {:error, :unexpected_transaction_outcome}
 end
