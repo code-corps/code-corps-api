@@ -18,6 +18,23 @@ defmodule CodeCorps.GitHub.Event.Installation.ReposTest do
   @installation_repositories load_endpoint_fixture("installation_repositories")
   @app_github_id 2
 
+  defmodule InvalidRepoRequest do
+    def request(:get, "https://api.github.com/installation/repositories", _, _, _) do
+      good_payload = "installation_repositories" |> load_endpoint_fixture
+      %{"repositories" => [repo_1, repo_2]} = good_payload
+
+      bad_repo_1 = repo_1 |> Map.put("name", nil)
+
+      bad_payload =
+        good_payload |> Map.put("repositories", [bad_repo_1, repo_2])
+
+      {:ok, bad_payload}
+    end
+    def request(method, endpoint, headers, body, options) do
+      CodeCorps.GitHub.SuccessAPI.request(method, endpoint, headers, body, options)
+    end
+  end
+
   describe "process/1" do
     test "syncs repos by performing a diff using payload as master list" do
       installation = insert(:github_app_installation, github_id: @app_github_id, state: "initiated_on_code_corps")
@@ -47,6 +64,20 @@ defmodule CodeCorps.GitHub.Event.Installation.ReposTest do
 
       # ensure no other repos have been created
       assert GithubRepo |> Repo.aggregate(:count, :id) == 2
+    end
+
+    test "returned multi fails if there are repo validation erorrs" do
+      installation = insert(:github_app_installation, github_id: @app_github_id, state: "initiated_on_code_corps")
+      with_mock_api(InvalidRepoRequest) do
+        {:error, :synced_repos, {repos, changesets}, _steps} =
+          installation
+          |> Repo.preload(:github_repos)
+          |> Repos.process()
+          |> Repo.transaction
+
+        assert repos |> Enum.count == 1
+        assert changesets |> Enum.count == 1
+      end
     end
   end
 end

@@ -24,11 +24,15 @@ defmodule CodeCorps.GitHub.Event.InstallationTest do
 
   defmodule InvalidRepoRequest do
     def request(:get, "https://api.github.com/installation/repositories", _, _, _) do
-      payload =
-        "installation_repositories"
-        |> load_endpoint_fixture
-        |> Map.put("repositories", [%{}])
-      {:ok, payload}
+      good_payload = "installation_repositories" |> load_endpoint_fixture
+      %{"repositories" => [repo_1, repo_2]} = good_payload
+
+      bad_repo_1 = repo_1 |> Map.put("name", nil)
+
+      bad_payload =
+        good_payload |> Map.put("repositories", [bad_repo_1, repo_2])
+
+      {:ok, bad_payload}
     end
     def request(method, endpoint, headers, body, options) do
       CodeCorps.GitHub.SuccessAPI.request(method, endpoint, headers, body, options)
