@@ -6,9 +6,6 @@ defmodule CodeCorps.Policy.GithubAppInstallation do
 
   alias CodeCorps.{GithubAppInstallation, User}
 
-  def create?(%User{} = user, %Ecto.Changeset{} = changeset),
-    do: changeset |> get_project |> owned_by?(user)
+  def create?(%User{} = user, params), do: params |> get_project |> owned_by?(user)
 
-  def update?(%User{} = user, %GithubAppInstallation{} = github_app_installation),
-    do: github_app_installation |> get_project |> owned_by?(user)
 end
