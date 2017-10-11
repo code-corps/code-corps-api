@@ -8,7 +8,6 @@ defmodule CodeCorps.GitHub.Event.Installation do
 
   alias CodeCorps.{
     GithubAppInstallation,
-    GithubEvent,
     GitHub.Event.Installation,
     Repo,
     User
@@ -48,8 +47,8 @@ defmodule CodeCorps.GitHub.Event.Installation do
   If a step in the process failes, an `:error` tuple will be returned, where the
   second element is an atom indicating which step of the process failed.
   """
-  @spec handle(GithubEvent.t, map) :: outcome
-  def handle(%GithubEvent{}, payload) do
+  @spec handle(map) :: outcome
+  def handle(payload) do
     Multi.new
     |> Multi.run(:payload, fn _ -> payload |> validate_payload() end)
     |> Multi.run(:action, fn _ -> payload |> validate_action() end)

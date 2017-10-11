@@ -44,56 +44,47 @@ defmodule CodeCorps.GitHub.Event.InstallationTest do
   @bad_sender_payload @installation_created |> Map.put("sender", "foo")
   @bad_installation_payload @installation_created |> Map.put("installation", "foo")
 
-  describe "handle/2" do
+  describe "handle/1" do
     test "returns error if action of the event is wrong" do
-      event = build(:github_event, action: "foo", type: "installation")
       assert {:error, :unexpected_action} ==
-        Installation.handle(event, @bad_action_payload)
+        Installation.handle(@bad_action_payload)
     end
 
     test "returns error if payload is wrong" do
-      event = build(:github_event, action: "created", type: "installation")
-      assert {:error, :unexpected_payload} == Installation.handle(event, %{})
+      assert {:error, :unexpected_payload} == Installation.handle(%{})
     end
 
     test "returns error if user payload is wrong" do
-      event = build(:github_event, action: "created", type: "installation")
       assert {:error, :unexpected_payload} ==
-        Installation.handle(event, @bad_sender_payload)
+        Installation.handle(@bad_sender_payload)
     end
 
     test "returns error if installation payload is wrong" do
-      event = build(:github_event, action: "created", type: "installation")
       assert {:error, :unexpected_payload} ==
-        Installation.handle(event, @bad_installation_payload)
+        Installation.handle(@bad_installation_payload)
     end
 
     test "returns installation as errored if api error" do
-      event = build(:github_event, action: "created", type: "installation")
-
       with_mock_api(BadRepoRequest) do
         assert {:error, :github_api_error_on_syncing_repos}
-          = Installation.handle(event, @installation_created)
+          = Installation.handle(@installation_created)
       end
     end
 
     test "returns installation as errored if error creating repos" do
-      event = build(:github_event, action: "created", type: "installation")
-
       with_mock_api(InvalidRepoRequest) do
         assert {:error, :validation_error_on_syncing_existing_repos} ==
-          Installation.handle(event, @installation_created)
+          Installation.handle(@installation_created)
       end
     end
   end
 
-  describe "handle/2 for Installation::created" do
+  describe "handle/1 for Installation::created" do
     test "creates installation for unmatched user if no user, syncs repos" do
       payload = %{"installation" => %{"id" => installation_github_id}} = @installation_created
-      event = build(:github_event, action: "created", type: "installation")
 
       {:ok, %GithubAppInstallation{} = installation}
-        = Installation.handle(event, payload)
+        = Installation.handle(payload)
 
       assert installation.github_id == installation_github_id
       assert installation.origin == "github"
@@ -105,12 +96,11 @@ defmodule CodeCorps.GitHub.Event.InstallationTest do
 
     test "creates installation if user matched but installation unmatched, syncs repos" do
       %{"sender" => %{"id" => user_github_id}} = payload = @installation_created
-      event = build(:github_event, action: "created", type: "installation")
 
       user = insert(:user, github_id: user_github_id)
 
       {:ok, %GithubAppInstallation{} = installation}
-        = Installation.handle(event, payload)
+        = Installation.handle(payload)
 
       assert installation.github_id == (payload |> get_in(["installation", "id"]))
       assert installation.origin == "github"
@@ -123,7 +113,6 @@ defmodule CodeCorps.GitHub.Event.InstallationTest do
 
     test "updates installation, if both user and installation matched, syncs repos" do
       %{"sender" => %{"id" => user_github_id}, "installation" => %{"id" => installation_github_id}} = payload = @installation_created
-      event = build(:github_event, action: "created", type: "installation")
 
       user = insert(:user, github_id: user_github_id)
       insert(
@@ -134,7 +123,7 @@ defmodule CodeCorps.GitHub.Event.InstallationTest do
       )
 
       {:ok, %GithubAppInstallation{} = installation}
-        = Installation.handle(event, payload)
+        = Installation.handle(payload)
 
       assert installation.origin == "codecorps"
       assert installation.state == "processed"
@@ -148,10 +137,9 @@ defmodule CodeCorps.GitHub.Event.InstallationTest do
     test "updates installation if there is an installation, but no user, syncs repos" do
       %{"installation" => %{"id" => installation_github_id}, "sender" => %{"id" => sender_github_id}} = payload = @installation_created
       insert(:github_app_installation, github_id: installation_github_id)
-      event = build(:github_event, action: "created", type: "installation")
 
       {:ok, %GithubAppInstallation{} = installation}
-        = Installation.handle(event, payload)
+        = Installation.handle(payload)
 
       assert installation.origin == "codecorps"
       assert installation.state == "processed"

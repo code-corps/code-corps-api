@@ -8,7 +8,6 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
 
   alias CodeCorps.{
     Comment,
-    GithubEvent,
     GitHub.Event.Common.RepoFinder,
     GitHub.Event.Issues,
     GitHub.Event.Issues.TaskSyncer,
@@ -50,8 +49,8 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
   If it fails, it will instead return an `:error` tuple, where the second
   element is the atom indicating a reason.
   """
-  @spec handle(GithubEvent.t, map) :: outcome
-  def handle(%GithubEvent{}, payload) do
+  @spec handle(map) :: outcome
+  def handle(payload) do
     Multi.new
     |> Multi.run(:payload, fn _ -> payload |> validate_payload() end)
     |> Multi.run(:action, fn _ -> payload |> validate_action() end)

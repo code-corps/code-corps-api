@@ -10,7 +10,6 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositories do
 
   alias CodeCorps.{
     GithubAppInstallation,
-    GithubEvent,
     GithubRepo,
     GitHub.Event.Common.ResultAggregator,
     GitHub.Event.InstallationRepositories,
@@ -43,8 +42,8 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositories do
         `CodeCorps.ProjectGithubRepo` records, they are deleted automatically,
         due to `on_delete: :delete_all` set at the database level.
   """
-  @spec handle(GithubEvent.t, map) :: outcome
-  def handle(%GithubEvent{}, payload) do
+  @spec handle(map) :: outcome
+  def handle(payload) do
     Multi.new
     |> Multi.run(:payload, fn _ -> payload |> validate_payload() end)
     |> Multi.run(:action, fn _ -> payload |> validate_action() end)
