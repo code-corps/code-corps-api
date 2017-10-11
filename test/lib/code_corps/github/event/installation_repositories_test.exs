@@ -13,16 +13,19 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositoriesTest do
   }
 
   describe "handle/2" do
+    @payload load_event_fixture("installation_repositories_added")
+
     test "marks event as errored if invalid action" do
-      payload = %{}
+      payload = @payload |> Map.put("action", "foo")
       event = build(:github_event, action: "foo", type: "installation_repositories")
-      assert {:error, :unexpected_action_or_payload} == InstallationRepositories.handle(event, payload)
+      assert {:error, :unexpected_action} == InstallationRepositories.handle(event, payload)
     end
 
     test "marks event as errored if invalid payload" do
-      payload = %{}
       event = build(:github_event, action: "added", type: "installation_repositories")
-      assert {:error, :unexpected_action_or_payload} == InstallationRepositories.handle(event, payload)
+      payload = @payload |> Map.delete("action")
+      assert {:error, :unexpected_payload} ==
+        InstallationRepositories.handle(event, payload)
     end
   end
 
@@ -76,18 +79,18 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositoriesTest do
 
     test "marks event as errored if invalid instalation payload" do
       event = insert(:github_event, action: "added", type: "installation_repositories")
-      assert {:error, :unexpected_installation_payload} == InstallationRepositories.handle(event, @payload |> Map.put("installation", "foo"))
+      assert {:error, :unexpected_payload} == InstallationRepositories.handle(event, @payload |> Map.put("installation", "foo"))
     end
 
     test "marks event as errored if invalid repo payload" do
       event = insert(:github_event, action: "added", type: "installation_repositories")
       insert(:github_app_installation, github_id: @payload["installation"]["id"])
-      assert {:error, :unexpected_repo_payload} == InstallationRepositories.handle(event, @payload |> Map.put("repositories_added", ["foo"]))
+      assert {:error, :unexpected_payload} == InstallationRepositories.handle(event, @payload |> Map.put("repositories_added", ["foo"]))
     end
 
     test "marks event as errored if no installation" do
       event = insert(:github_event, action: "added", type: "installation_repositories")
-      assert {:error, :no_installation} == InstallationRepositories.handle(event, @payload)
+      assert {:error, :unmatched_installation} == InstallationRepositories.handle(event, @payload)
     end
   end
 
@@ -131,18 +134,22 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositoriesTest do
 
     test "marks event as errored if invalid instalation payload" do
       event = build(:github_event, action: "removed", type: "installation_repositories")
-      assert {:error, :unexpected_installation_payload} == InstallationRepositories.handle(event, @payload |> Map.put("installation", "foo"))
+      payload = @payload |> Map.put("installation", "foo")
+      assert {:error, :unexpected_payload} ==
+        InstallationRepositories.handle(event, payload)
     end
 
     test "marks event as errored if invalid repo payload" do
       event = build(:github_event, action: "removed", type: "installation_repositories")
       insert(:github_app_installation, github_id: @payload["installation"]["id"])
-      assert {:error, :unexpected_repo_payload} == InstallationRepositories.handle(event, @payload |> Map.put("repositories_removed", ["foo"]))
+      payload = @payload |> Map.put("repositories_removed", ["foo"])
+      assert {:error, :unexpected_payload} ==
+        InstallationRepositories.handle(event, payload)
     end
 
     test "marks event as errored if no installation" do
       event = build(:github_event, action: "added", type: "installation_repositories")
-      assert {:error, :no_installation} == InstallationRepositories.handle(event, @payload)
+      assert {:error, :unmatched_installation} == InstallationRepositories.handle(event, @payload)
     end
   end
 end
