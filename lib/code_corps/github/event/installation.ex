@@ -1,80 +1,114 @@
 defmodule CodeCorps.GitHub.Event.Installation do
   @moduledoc """
-  In charge of dealing with "Installation" GitHub Webhook events
+  In charge of handling a GitHub Webhook payload for the Installation event type
+  [https://developer.github.com/v3/activity/events/types/#installationevent](https://developer.github.com/v3/activity/events/types/#installationevent)
   """
+
+  @behaviour CodeCorps.GitHub.Event.Handler
 
   alias CodeCorps.{
     GithubAppInstallation,
     GithubEvent,
-    GitHub.Event.Installation.UnmatchedUser,
-    GitHub.Event.Installation.MatchedUser,
-    GitHub.Event.Installation.Repos,
-    GitHub.Event.Installation.Validator,
+    GitHub.Event.Installation,
     Repo,
     User
   }
 
-  @typep outcome :: {:ok, GithubAppInstallation.t, Task.t} | {:error, any}
+  alias Ecto.{Changeset, Multi}
+
+  @type outcome :: {:ok, GithubAppInstallation.t} |
+                    {:error, :not_yet_implemented} |
+                    {:error, :unexpected_action} |
+                    {:error, :unexpected_payload} |
+                    {:error, :validation_error_on_syncing_installation} |
+                    {:error, :multiple_unprocessed_installations_found} |
+                    {:error, :github_api_error_on_syncing_repos} |
+                    {:error, :validation_error_on_deleting_removed_repos} |
+                    {:error, :validation_error_on_syncing_existing_repos} |
+                    {:error, :validation_error_on_marking_installation_processed}
 
   @doc """
-  Handles an "Installation" GitHub Webhook event. The event could be
-  of subtype "created" or "deleted". Only the "created" variant is handled at
-  the moment.
+  Handles the "Installation" GitHub Webhook event.
 
-  `Installation::created` will first try to find the `User` using information
-  from the payload.
+  The event could be of subtype `created` or `deleted`. Only the `created`
+  variant is handled at the moment.
 
-  Depending on the outcame of that operation, it will either call one of
+  The process of handling the "created" event subtype is as follows
 
-  - `CodeCorps.GitHub.Event.Installation.UnmatchedUser.handle/2`
-  - `CodeCorps.GitHub.Event.Installation.MatchedUser.handle/2`
+  - try to match the sender with an existing `CodeCorps.User`
+  - call specific matching module depending on the user being matched or not
+    - `CodeCorps.GitHub.Event.Installation.MatchedUser.handle/2`
+    - `CodeCorps.GitHub.Event.Installation.UnmatchedUser.handle/1`
+  - sync installation repositories using a third modules
+    - `CodeCorps.GitHub.Event.Installation.Repos.process/1`
 
-  These helper modules will create or update the `GithubAppInstallation` with
-  proper data.
+  If everything goes as expected, an `:ok` tuple will be returned, with a
+  `CodeCorps.GithubAppInstallation`, marked as "processed".
 
-  Once that is done, the outcome will be returned.
-
-  Additionally, a background task will launch
-  `CodeCorps.GitHub.Event.Installation.Repos.process_async` to asynchronously
-  fetch and process repositories for the installation.
-
-  The installation will initially be returned with the state "processing", but
-  in the background, it will eventually switch to either "processed" or
-  "errored".
+  If a step in the process failes, an `:error` tuple will be returned, where the
+  second element is an atom indicating which step of the process failed.
   """
   @spec handle(GithubEvent.t, map) :: outcome
-  def handle(%GithubEvent{action: "created"}, payload) do
-    case payload |> Validator.valid? do
-      true -> payload |> do_handle() |> postprocess()
-      false -> {:error, :unexpected_payload}
-    end
-  end
-  def handle(%GithubEvent{action: "deleted"}, _) do
-    {:error, :not_fully_implemented}
-  end
-  def handle(%GithubEvent{action: _action}, _payload) do
-    {:error, :unexpected_action}
+  def handle(%GithubEvent{}, payload) do
+    Multi.new
+    |> Multi.run(:payload, fn _ -> payload |> validate_payload() end)
+    |> Multi.run(:action, fn _ -> payload |> validate_action() end)
+    |> Multi.run(:user, fn _ -> payload |> find_user() end)
+    |> Multi.run(:installation, fn %{user: user} -> install_for_user(user, payload) end)
+    |> Multi.merge(&process_repos/1)
+    |> Repo.transaction
+    |> marshall_result()
   end
 
-  @spec do_handle(map) :: outcome
-  defp do_handle(%{"sender" => sender_attrs} = payload) do
-    case sender_attrs |> find_user() do
-      # No user was found with the specified github_id
-      nil -> UnmatchedUser.handle(payload)
-      # A user was found, matching the sspecified github_id
-      %User{} = user -> MatchedUser.handle(user, payload)
-    end
+  @spec find_user(map) :: {:ok, User.t} | {:ok, nil} | {:error, :unexpected_user_payload}
+  defp find_user(%{"sender" => %{"id" => github_id}}) do
+    user = Repo.get_by(User, github_id: github_id)
+    {:ok, user}
+  end
+  defp find_user(_), do: {:error, :unexpected_user_payload}
+
+  @spec install_for_user(User.t, map) :: outcome
+  defp install_for_user(%User{} = user, payload) do
+    Installation.MatchedUser.handle(user, payload)
+  end
+  defp install_for_user(nil, payload) do
+    Installation.UnmatchedUser.handle(payload)
   end
 
-  @spec postprocess({:ok, GithubAppInstallation.t} | {:error, any}) :: {:ok, GithubAppInstallation.t} | {:error, any}
-  defp postprocess({:ok, %GithubAppInstallation{} = installation}) do
+  @spec process_repos(%{installation: GithubAppInstallation.t}) :: Multi.t
+  defp process_repos(%{installation: %GithubAppInstallation{} = installation}) do
     installation
     |> Repo.preload(:github_repos)
-    |> Repos.process_async
+    |> Installation.Repos.process
   end
-  defp postprocess({:error, error}), do: {:error, error}
 
-  @spec find_user(any) :: User.t | nil
-  defp find_user(%{"id" => github_id}), do: User |> Repo.get_by(github_id: github_id)
-  defp find_user(_), do: :unexpected_user_payload
+  @spec marshall_result(tuple) :: tuple
+  defp marshall_result({:ok, %{processed_installation: installation}}), do: {:ok, installation}
+  defp marshall_result({:error, :payload, :invalid, _steps}), do: {:error, :unexpected_payload}
+  defp marshall_result({:error, :action, :unexpected_action, _steps}), do: {:error, :unexpected_action}
+  defp marshall_result({:error, :action, :not_yet_implemented, _steps}), do: {:error, :not_yet_implemented}
+  defp marshall_result({:error, :user, :unexpected_user_payload, _steps}), do: {:error, :unexpected_payload}
+  defp marshall_result({:error, :installation, :unexpected_installation_payload, _steps}), do: {:error, :unexpected_payload}
+  defp marshall_result({:error, :installation, %Changeset{}, _steps}), do: {:error, :validation_error_on_syncing_installation}
+  defp marshall_result({:error, :installation, :too_many_unprocessed_installations, _steps}), do: {:error, :multiple_unprocessed_installations_found}
+  defp marshall_result({:error, :api_response, %CodeCorps.GitHub.APIError{}, _steps}), do: {:error, :github_api_error_on_syncing_repos}
+  defp marshall_result({:error, :deleted_repos, {_results, _changesets}, _steps}), do: {:error, :validation_error_on_deleting_removed_repos}
+  defp marshall_result({:error, :synced_repos, {_results, _changesets}, _steps}), do: {:error, :validation_error_on_syncing_existing_repos}
+  defp marshall_result({:error, :processed_installation, %Changeset{}, _steps}), do: {:error, :validation_error_on_marking_installation_processed}
+  defp marshall_result({:error, _errored_step, _error_response, _steps}), do: {:error, :unexpected_transaction_outcome}
+
+  @spec validate_payload(map) :: {:ok, :valid} | {:error, :invalid}
+  defp validate_payload(%{} = payload) do
+    case payload |> Installation.Validator.valid? do
+      true -> {:ok, :valid}
+      false -> {:error, :invalid}
+    end
+  end
+
+  @spec validate_action(map) :: {:ok, :implemented} |
+                                {:error, :not_yet_implemented} |
+                                {:error, :unexpected_action}
+  defp validate_action(%{"action" => "created"}), do: {:ok, :implemented}
+  defp validate_action(%{"action" => "deleted"}), do: {:error, :not_yet_implemented}
+  defp validate_action(%{}), do: {:error, :unexpected_action}
 end

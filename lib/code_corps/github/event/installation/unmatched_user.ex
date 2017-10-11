@@ -1,5 +1,5 @@
 defmodule CodeCorps.GitHub.Event.Installation.UnmatchedUser do
-  @moduledoc """
+  @moduledoc ~S"""
   In charge of handling the unmatched user case of an installation event
   """
 
@@ -10,9 +10,9 @@ defmodule CodeCorps.GitHub.Event.Installation.UnmatchedUser do
   }
 
   @typep process_outcome :: {:ok, GithubAppInstallation.t} | {:error, Changeset.t}
-  @typep outcome :: process_outcome |  {:error, :unexpected_installation_payload}
+  @type outcome :: process_outcome |  {:error, :unexpected_installation_payload}
 
-  @doc """
+  @doc ~S"""
   Handles the installation event in the case of an unmatched user.
 
   This is done by attempting to find a `GithubAppInstallation` record by it's

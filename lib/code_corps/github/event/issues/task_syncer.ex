@@ -1,6 +1,7 @@
 defmodule CodeCorps.GitHub.Event.Issues.TaskSyncer do
   alias CodeCorps.{
     GithubRepo,
+    GitHub.Event.Common.ResultAggregator,
     GitHub.Event.Issues.ChangesetBuilder,
     ProjectGithubRepo,
     Task,
@@ -9,6 +10,9 @@ defmodule CodeCorps.GitHub.Event.Issues.TaskSyncer do
   }
 
   alias Ecto.Changeset
+
+  @type outcome :: {:ok, list(Task.t)} |
+                   {:error, {list(Task.t), list(Changeset.t)}}
 
   @doc """
   When provided a `GithubRepo`, a `User` and a GitHub API payload, for each
@@ -19,8 +23,7 @@ defmodule CodeCorps.GitHub.Event.Issues.TaskSyncer do
   def sync_all(%GithubRepo{project_github_repos: project_github_repos}, %User{} = user, %{} = payload) do
     project_github_repos
     |> Enum.map(&sync(&1, user, payload))
-    |> collect()
-    |> summarize()
+    |> ResultAggregator.aggregate
   end
 
   @spec sync(ProjectGithubRepo.t, User.t, map) :: {:ok, ProjectGithubRepo.t} | {:error, Changeset.t}
@@ -51,18 +54,4 @@ defmodule CodeCorps.GitHub.Event.Issues.TaskSyncer do
   @spec commit(Changeset.t) :: {:ok, Task.t} | {:error, Changeset.t}
   defp commit(%Changeset{data: %Task{id: nil}} = changeset), do: changeset |> Repo.insert
   defp commit(%Changeset{} = changeset), do: changeset |> Repo.update
-
-  @spec collect(list, list, list) :: tuple
-  defp collect(results, tasks \\ [], errors \\ [])
-  defp collect([{:ok, %Task{} = task} | tail], tasks, errors) do
-    collect(tail, tasks ++ [task], errors)
-  end
-  defp collect([{:error, %Changeset{} = changeset} | tail], tasks, errors) do
-    collect(tail, tasks, errors ++ [changeset])
-  end
-  defp collect([], tasks, errors), do: {tasks, errors}
-
-  @spec summarize(tuple) :: tuple
-  defp summarize({tasks, []}), do: {:ok, tasks}
-  defp summarize({tasks, errors}), do: {:error, {tasks, errors}}
 end
