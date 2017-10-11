@@ -17,14 +17,12 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
     @payload load_event_fixture("issues_opened") |> Map.put("action", "foo")
 
     test "returns error if action of the event is wrong" do
-      event = build(:github_event, action: "foo", type: "issues")
-      assert {:error, :unexpected_action} == Issues.handle(event, @payload)
+      assert {:error, :unexpected_action} == Issues.handle(@payload)
     end
   end
 
   describe "handle/2 for Issues::opened" do
     @payload load_event_fixture("issues_opened")
-    @event build(:github_event, action: "opened", type: "issues")
 
     test "with unmatched user, passes with no changes made if no matching projects" do
       %{
@@ -35,7 +33,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       } = @payload
 
       insert(:github_repo, github_id: repo_github_id)
-      assert Issues.handle(@event, @payload) == {:ok, []}
+      assert Issues.handle(@payload) == {:ok, []}
       assert Repo.aggregate(Task, :count, :id) == 0
       refute Repo.get_by(User, github_id: user_github_id)
     end
@@ -63,7 +61,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         insert(:task_list, project: project, inbox: true)
       end)
 
-      {:ok, tasks} = Issues.handle(@event, @payload)
+      {:ok, tasks} = Issues.handle(@payload)
 
       assert Enum.count(tasks) == 3
       assert Repo.aggregate(Task, :count, :id) == 3
@@ -83,7 +81,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
     end
 
     test "with unmatched user, returns error if unmatched repository" do
-      assert Issues.handle(@event, @payload) == {:error, :repository_not_found}
+      assert Issues.handle(@payload) == {:error, :repository_not_found}
       refute Repo.one(User)
     end
 
@@ -92,7 +90,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       insert(:user, github_id: user_github_id)
 
       insert(:github_repo, github_id: repo_github_id)
-      assert Issues.handle(@event, @payload) == {:ok, []}
+      assert Issues.handle(@payload) == {:ok, []}
       assert Repo.aggregate(Task, :count, :id) == 0
     end
 
@@ -121,7 +119,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       %{id: existing_task_id} =
         insert(:task, project: project, user: user, github_repo: github_repo, github_issue_number: number)
 
-      {:ok, tasks} = Issues.handle(@event, @payload)
+      {:ok, tasks} = Issues.handle(@payload)
 
       assert Enum.count(tasks) == 3
       assert Repo.aggregate(Task, :count, :id) == 3
@@ -142,25 +140,24 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       %{"issue" => %{"user" => %{"id" => user_github_id}}} = @payload
       insert(:user, github_id: user_github_id)
 
-      assert Issues.handle(@event, @payload) == {:error, :repository_not_found}
+      assert Issues.handle(@payload) == {:error, :repository_not_found}
     end
 
     test "returns error if payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(@event, %{})
+      assert {:error, :unexpected_payload} == Issues.handle(%{})
     end
 
     test "returns error if repo payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(@event, @payload |> Map.put("repository", "foo"))
+      assert {:error, :unexpected_payload} == Issues.handle(@payload |> Map.put("repository", "foo"))
     end
 
     test "returns error if issue payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(@event, @payload |> Map.put("issue", "foo"))
+      assert {:error, :unexpected_payload} == Issues.handle(@payload |> Map.put("issue", "foo"))
     end
   end
 
   describe "handle/2 for Issues::closed" do
     @payload load_event_fixture("issues_closed")
-    @event build(:github_event, action: "closed", type: "issues")
 
     test "with unmatched user, passes with no changes made if no matching projects" do
       %{
@@ -169,7 +166,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       } = @payload
 
       insert(:github_repo, github_id: repo_github_id)
-      assert Issues.handle(@event, @payload) == {:ok, []}
+      assert Issues.handle(@payload) == {:ok, []}
       assert Repo.aggregate(Task, :count, :id) == 0
       refute Repo.get_by(User, github_id: user_github_id)
     end
@@ -197,7 +194,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         insert(:task_list, project: project, inbox: true)
       end)
 
-      {:ok, tasks} = Issues.handle(@event, @payload)
+      {:ok, tasks} = Issues.handle(@payload)
 
       assert Enum.count(tasks) == 3
       assert Repo.aggregate(Task, :count, :id) == 3
@@ -217,7 +214,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
     end
 
     test "with unmatched user, returns error if unmatched repository" do
-      assert Issues.handle(@event, @payload) == {:error, :repository_not_found}
+      assert Issues.handle(@payload) == {:error, :repository_not_found}
       refute Repo.one(User)
     end
 
@@ -226,7 +223,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       insert(:user, github_id: user_github_id)
 
       insert(:github_repo, github_id: repo_github_id)
-      assert Issues.handle(@event, @payload) == {:ok, []}
+      assert Issues.handle(@payload) == {:ok, []}
       assert Repo.aggregate(Task, :count, :id) == 0
     end
 
@@ -255,7 +252,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       %{id: existing_task_id} =
         insert(:task, project: project, user: user, github_repo: github_repo, github_issue_number: number)
 
-      {:ok, tasks} = Issues.handle(@event, @payload)
+      {:ok, tasks} = Issues.handle(@payload)
 
       assert Enum.count(tasks) == 3
       assert Repo.aggregate(Task, :count, :id) == 3
@@ -276,25 +273,24 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       %{"issue" => %{"user" => %{"id" => user_github_id}}} = @payload
       insert(:user, github_id: user_github_id)
 
-      assert Issues.handle(@event, @payload) == {:error, :repository_not_found}
+      assert Issues.handle(@payload) == {:error, :repository_not_found}
     end
 
     test "returns error if payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(@event, %{})
+      assert {:error, :unexpected_payload} == Issues.handle(%{})
     end
 
     test "returns error if repo payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(@event, @payload |> Map.put("repository", "foo"))
+      assert {:error, :unexpected_payload} == Issues.handle(@payload |> Map.put("repository", "foo"))
     end
 
     test "returns error if issue payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(@event, @payload |> Map.put("issue", "foo"))
+      assert {:error, :unexpected_payload} == Issues.handle(@payload |> Map.put("issue", "foo"))
     end
   end
 
   describe "handle/2 for Issues::edited" do
     @payload load_event_fixture("issues_edited")
-    @event build(:github_event, action: "edited", type: "issues")
 
     test "with unmatched user, passes with no changes made if no matching projects" do
       %{
@@ -303,7 +299,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       } = @payload
 
       insert(:github_repo, github_id: repo_github_id)
-      assert Issues.handle(@event, @payload) == {:ok, []}
+      assert Issues.handle(@payload) == {:ok, []}
       assert Repo.aggregate(Task, :count, :id) == 0
       refute Repo.get_by(User, github_id: user_github_id)
     end
@@ -331,7 +327,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         insert(:task_list, project: project, inbox: true)
       end)
 
-      {:ok, tasks} = Issues.handle(@event, @payload)
+      {:ok, tasks} = Issues.handle(@payload)
 
       assert Enum.count(tasks) == 3
       assert Repo.aggregate(Task, :count, :id) == 3
@@ -351,7 +347,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
     end
 
     test "with unmatched user, returns error if unmatched repository" do
-      assert Issues.handle(@event, @payload) == {:error, :repository_not_found}
+      assert Issues.handle(@payload) == {:error, :repository_not_found}
       refute Repo.one(User)
     end
 
@@ -360,7 +356,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       insert(:user, github_id: user_github_id)
 
       insert(:github_repo, github_id: repo_github_id)
-      assert Issues.handle(@event, @payload) == {:ok, []}
+      assert Issues.handle(@payload) == {:ok, []}
       assert Repo.aggregate(Task, :count, :id) == 0
     end
 
@@ -389,7 +385,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       %{id: existing_task_id} =
         insert(:task, project: project, user: user, github_repo: github_repo, github_issue_number: number)
 
-      {:ok, tasks} = Issues.handle(@event, @payload)
+      {:ok, tasks} = Issues.handle(@payload)
 
       assert Enum.count(tasks) == 3
       assert Repo.aggregate(Task, :count, :id) == 3
@@ -410,25 +406,24 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       %{"issue" => %{"user" => %{"id" => user_github_id}}} = @payload
       insert(:user, github_id: user_github_id)
 
-      assert Issues.handle(@event, @payload) == {:error, :repository_not_found}
+      assert Issues.handle(@payload) == {:error, :repository_not_found}
     end
 
     test "returns error if payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(@event, %{})
+      assert {:error, :unexpected_payload} == Issues.handle(%{})
     end
 
     test "returns error if repo payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(@event, @payload |> Map.put("repository", "foo"))
+      assert {:error, :unexpected_payload} == Issues.handle(@payload |> Map.put("repository", "foo"))
     end
 
     test "returns error if issue payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(@event, @payload |> Map.put("issue", "foo"))
+      assert {:error, :unexpected_payload} == Issues.handle(@payload |> Map.put("issue", "foo"))
     end
   end
 
   describe "handle/2 for Issues::reopened" do
     @payload load_event_fixture("issues_reopened")
-    @event build(:github_event, action: "reopened", type: "issues")
 
     test "with unmatched user, passes with no changes made if no matching projects" do
       %{
@@ -437,7 +432,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       } = @payload
 
       insert(:github_repo, github_id: repo_github_id)
-      assert Issues.handle(@event, @payload) == {:ok, []}
+      assert Issues.handle(@payload) == {:ok, []}
       assert Repo.aggregate(Task, :count, :id) == 0
       refute Repo.get_by(User, github_id: user_github_id)
     end
@@ -465,7 +460,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         insert(:task_list, project: project, inbox: true)
       end)
 
-      {:ok, tasks} = Issues.handle(@event, @payload)
+      {:ok, tasks} = Issues.handle(@payload)
 
       assert Enum.count(tasks) == 3
       assert Repo.aggregate(Task, :count, :id) == 3
@@ -485,7 +480,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
     end
 
     test "with unmatched user, returns error if unmatched repository" do
-      assert Issues.handle(@event, @payload) == {:error, :repository_not_found}
+      assert Issues.handle(@payload) == {:error, :repository_not_found}
       refute Repo.one(User)
     end
 
@@ -494,7 +489,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       insert(:user, github_id: user_github_id)
 
       insert(:github_repo, github_id: repo_github_id)
-      assert Issues.handle(@event, @payload) == {:ok, []}
+      assert Issues.handle(@payload) == {:ok, []}
       assert Repo.aggregate(Task, :count, :id) == 0
     end
 
@@ -523,7 +518,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       %{id: existing_task_id} =
         insert(:task, project: project, user: user, github_repo: github_repo, github_issue_number: number)
 
-      {:ok, tasks} = Issues.handle(@event, @payload)
+      {:ok, tasks} = Issues.handle(@payload)
 
       assert Enum.count(tasks) == 3
       assert Repo.aggregate(Task, :count, :id) == 3
@@ -544,19 +539,19 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       %{"issue" => %{"user" => %{"id" => user_github_id}}} = @payload
       insert(:user, github_id: user_github_id)
 
-      assert Issues.handle(@event, @payload) == {:error, :repository_not_found}
+      assert Issues.handle(@payload) == {:error, :repository_not_found}
     end
 
     test "returns error if payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(@event, %{})
+      assert {:error, :unexpected_payload} == Issues.handle(%{})
     end
 
     test "returns error if repo payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(@event, @payload |> Map.put("repository", "foo"))
+      assert {:error, :unexpected_payload} == Issues.handle(@payload |> Map.put("repository", "foo"))
     end
 
     test "returns error if issue payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(@event, @payload |> Map.put("issue", "foo"))
+      assert {:error, :unexpected_payload} == Issues.handle(@payload |> Map.put("issue", "foo"))
     end
   end
 
@@ -573,10 +568,8 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         "repository" => %{"id" => 2}
       }
 
-      @event build(:github_event, action: action, type: "issues")
-
       test "is not implemented" do
-        assert Issues.handle(@event, @payload) == {:error, :not_fully_implemented}
+        assert Issues.handle(@payload) == {:error, :not_fully_implemented}
       end
     end
   end)
