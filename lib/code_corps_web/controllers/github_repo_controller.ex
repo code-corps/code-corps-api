@@ -1,22 +1,23 @@
 defmodule CodeCorpsWeb.GithubRepoController do
   use CodeCorpsWeb, :controller
-  use JaResource
 
-  import CodeCorps.Helpers.Query, only: [id_filter: 2]
+  alias CodeCorps.{GithubRepo, Helpers.Query}
 
-  alias CodeCorps.{GithubRepo}
+  action_fallback CodeCorpsWeb.FallbackController
+  plug CodeCorpsWeb.Plug.DataToAttributes
+  plug CodeCorpsWeb.Plug.IdsToIntegers
 
-  @preloads [:github_app_installation]
+  @spec index(Conn.t, map) :: Conn.t
+  def index(%Conn{} = conn, %{} = params) do
+    with github_repos <- GithubRepo |> Query.id_filter(params) |> Repo.all do
+      conn |> render("index.json-api", data: github_repos)
+    end
+  end
 
-  plug :load_resource, model: GithubRepo, only: [:show], preload: @preloads
-
-  plug JaResource
-
-  @spec model :: module
-  def model, do: CodeCorps.GithubRepo
-
-  @spec filter(Plug.Conn.t, Ecto.Query.t, String.t, String.t) :: Ecto.Query.t
-  def filter(_conn, query, "id", id_list) do
-    query |> id_filter(id_list)
+  @spec show(Conn.t, map) :: Conn.t
+  def show(%Conn{} = conn, %{"id" => id}) do
+    with %GithubRepo{} = github_repo <- GithubRepo |> Repo.get(id) do
+      conn |> render("show.json-api", data: github_repo)
+    end
   end
 end

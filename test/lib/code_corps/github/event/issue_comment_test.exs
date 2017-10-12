@@ -14,19 +14,17 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
     User
   }
 
-  describe "handle/2" do
+  describe "handle/1" do
     @payload load_event_fixture("issue_comment_created") |> Map.put("action", "foo")
 
     test "returns error if action of the event is wrong" do
-      event = build(:github_event, action: "foo", type: "issue_comment")
-      assert {:error, :unexpected_action} == IssueComment.handle(event, @payload)
+      assert {:error, :unexpected_action} == IssueComment.handle(@payload)
     end
   end
 
   for action <- ["created", "edited"] do
-    describe "handle/2 for IssueComment::#{action}" do
+    describe "handle/1 for IssueComment::#{action}" do
       @payload load_event_fixture("issue_comment_#{action}")
-      @event build(:github_event, action: action, type: "issue_comment")
 
       test "with unmatched both users, passes with no changes made if no matching projects" do
         %{
@@ -36,7 +34,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
         } = @payload
 
         insert(:github_repo, github_id: repo_github_id)
-        assert IssueComment.handle(@event, @payload) == {:ok, []}
+        assert IssueComment.handle(@payload) == {:ok, []}
         assert Repo.aggregate(Task, :count, :id) == 0
         assert Repo.aggregate(Comment, :count, :id) == 0
         refute Repo.get_by(User, github_id: issue_user_github_id)
@@ -67,7 +65,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
           insert(:task_list, project: project, inbox: true)
         end)
 
-        {:ok, comments} = IssueComment.handle(@event, @payload)
+        {:ok, comments} = IssueComment.handle(@payload)
 
         assert Enum.count(comments) == 3
         assert Repo.aggregate(Task, :count, :id) == 3
@@ -96,7 +94,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
       end
 
       test "with unmatched both users, returns error if unmatched repository" do
-        assert IssueComment.handle(@event, @payload) == {:error, :repository_not_found}
+        assert IssueComment.handle(@payload) == {:error, :repository_not_found}
         refute Repo.one(User)
       end
 
@@ -109,7 +107,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
 
         insert(:user, github_id: issue_user_github_id)
         insert(:github_repo, github_id: repo_github_id)
-        assert IssueComment.handle(@event, @payload) == {:ok, []}
+        assert IssueComment.handle(@payload) == {:ok, []}
         assert Repo.aggregate(Task, :count, :id) == 0
         assert Repo.aggregate(Comment, :count, :id) == 0
         refute Repo.get_by(User, github_id: comment_user_github_id)
@@ -144,7 +142,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
         # there's a task for project 1
         task_1 = insert(:task, project: project_1, user: issue_user, github_repo: github_repo, github_issue_number: issue_number)
 
-        {:ok, comments} = IssueComment.handle(@event, @payload)
+        {:ok, comments} = IssueComment.handle(@payload)
 
         assert Enum.count(comments) == 3
         assert Repo.aggregate(Task, :count, :id) == 3
@@ -180,7 +178,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
 
         _issue_user = insert(:user, github_id: issue_user_github_id)
 
-        assert IssueComment.handle(@event, @payload) == {:error, :repository_not_found}
+        assert IssueComment.handle(@payload) == {:error, :repository_not_found}
       end
 
       test "with unmatched issue user, matched comment_user, passes with no changes made if no matching projects" do
@@ -192,7 +190,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
 
         insert(:user, github_id: comment_user_github_id)
         insert(:github_repo, github_id: repo_github_id)
-        assert IssueComment.handle(@event, @payload) == {:ok, []}
+        assert IssueComment.handle(@payload) == {:ok, []}
         assert Repo.aggregate(Task, :count, :id) == 0
         assert Repo.aggregate(Comment, :count, :id) == 0
         refute Repo.get_by(User, github_id: issue_user_github_id)
@@ -224,7 +222,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
           insert(:task_list, project: project, inbox: true)
         end)
 
-        {:ok, comments} = IssueComment.handle(@event, @payload)
+        {:ok, comments} = IssueComment.handle(@payload)
 
         assert Enum.count(comments) == 3
         assert Repo.aggregate(Task, :count, :id) == 3
@@ -255,7 +253,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
 
         _comment_user = insert(:user, github_id: comment_user_github_id)
 
-        assert IssueComment.handle(@event, @payload) == {:error, :repository_not_found}
+        assert IssueComment.handle(@payload) == {:error, :repository_not_found}
       end
 
       test "with matched issue and comment_user, passes with no changes made if no matching projects" do
@@ -268,7 +266,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
         insert(:user, github_id: comment_user_github_id)
         insert(:user, github_id: issue_user_github_id)
         insert(:github_repo, github_id: repo_github_id)
-        assert IssueComment.handle(@event, @payload) == {:ok, []}
+        assert IssueComment.handle(@payload) == {:ok, []}
         assert Repo.aggregate(Task, :count, :id) == 0
         assert Repo.aggregate(Comment, :count, :id) == 0
       end
@@ -306,7 +304,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
         # there is only a task for project 2
         task_2 = insert(:task, project: project_2, user: user, github_repo: github_repo, github_issue_number: issue_number)
 
-        {:ok, comments} = IssueComment.handle(@event, @payload)
+        {:ok, comments} = IssueComment.handle(@payload)
 
         assert Enum.count(comments) == 3
         assert Repo.aggregate(Task, :count, :id) == 3
@@ -350,30 +348,29 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
         insert(:user, github_id: comment_user_github_id)
         insert(:user, github_id: issue_user_github_id)
 
-        assert IssueComment.handle(@event, @payload) == {:error, :repository_not_found}
+        assert IssueComment.handle(@payload) == {:error, :repository_not_found}
       end
 
       test "returns error if payload is wrong" do
-        assert {:error, :unexpected_payload} == IssueComment.handle(@event, %{})
+        assert {:error, :unexpected_payload} == IssueComment.handle(%{})
       end
 
       test "returns error if repo payload is wrong" do
-        assert {:error, :unexpected_payload} == IssueComment.handle(@event, @payload |> Map.put("repository", "foo"))
+        assert {:error, :unexpected_payload} == IssueComment.handle(@payload |> Map.put("repository", "foo"))
       end
 
       test "returns error if issue payload is wrong" do
-        assert {:error, :unexpected_payload} == IssueComment.handle(@event, @payload |> Map.put("issue", "foo"))
+        assert {:error, :unexpected_payload} == IssueComment.handle(@payload |> Map.put("issue", "foo"))
       end
 
       test "returns error if comment payload is wrong" do
-        assert {:error, :unexpected_payload} == IssueComment.handle(@event, @payload |> Map.put("comment", "foo"))
+        assert {:error, :unexpected_payload} == IssueComment.handle(@payload |> Map.put("comment", "foo"))
       end
     end
   end
 
-  describe "handle/2 for IssueComment::deleted" do
+  describe "handle/1 for IssueComment::deleted" do
     @payload load_event_fixture("issue_comment_deleted")
-    @event build(:github_event, action: "deleted", type: "issue_comment")
 
     test "deletes all comments with github_id specified in the payload" do
       %{"comment" => %{"id" => github_id}} = @payload
@@ -381,7 +378,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
       insert_list(2, :comment, github_id: nil)
       insert_list(4, :comment, github_id: 1)
 
-      {:ok, comments} = IssueComment.handle(@event, @payload)
+      {:ok, comments} = IssueComment.handle(@payload)
       assert Enum.count(comments) == 3
       assert Repo.aggregate(Comment, :count, :id) == 6
     end

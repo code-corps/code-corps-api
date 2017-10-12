@@ -20,9 +20,9 @@ defmodule CodeCorps.GitHub.Webhook.Handler do
   def handle(type, id, payload) do
     with %{} = params <- build_params(type, id, payload),
          {:ok, %GithubEvent{} = event} <- params |> create_event(),
-         {:ok, %GithubEvent{status: "processing"} = processing_event} <- event |> Event.start_processing
+         {:ok, %GithubEvent{status: "processing"} = event} <- event |> Event.start_processing
     do
-      processing_event |> do_handle(payload) |> Event.stop_processing(event)
+      payload |> do_handle(type) |> Event.stop_processing(event)
     end
   end
 
@@ -47,8 +47,8 @@ defmodule CodeCorps.GitHub.Webhook.Handler do
     end
   end
 
-  defp do_handle(%GithubEvent{type: "installation"} = event, payload), do: Installation.handle(event, payload)
-  defp do_handle(%GithubEvent{type: "installation_repositories"} = event, payload), do: InstallationRepositories.handle(event, payload)
-  defp do_handle(%GithubEvent{type: "issue_comment"} = event, payload), do: IssueComment.handle(event, payload)
-  defp do_handle(%GithubEvent{type: "issues"} = event, payload), do: Issues.handle(event, payload)
+  defp do_handle(payload, "installation"), do: Installation.handle(payload)
+  defp do_handle(payload, "installation_repositories"), do: InstallationRepositories.handle(payload)
+  defp do_handle(payload, "issue_comment"), do: IssueComment.handle(payload)
+  defp do_handle(payload, "issues"), do: Issues.handle(payload)
 end

@@ -43,10 +43,15 @@ defmodule CodeCorps.Policy do
   defp can?(%User{} = current_user, :create, %ProjectUser{}, %{} = params), do: Policy.ProjectUser.create?(current_user, params)
   defp can?(%User{} = current_user, :update, %ProjectUser{} = project_user, %{} = params), do: Policy.ProjectUser.update?(current_user, project_user, params)
   defp can?(%User{} = current_user, :delete, %ProjectUser{} = project_user, %{}), do: Policy.ProjectUser.delete?(current_user, project_user)
+  defp can?(%User{} = current_user, :create, %OrganizationInvite{}, %{}), do: Policy.OrganizationInvite.create?(current_user)
+  defp can?(%User{} = current_user, :update, %OrganizationInvite{} = _invite, %{}), do: Policy.OrganizationInvite.update?(current_user)
   defp can?(%User{} = user, :delete,
     %OrganizationGithubAppInstallation{} = organization_github_app_installation, %{}),
       do: Policy.OrganizationGithubAppInstallation.delete?(user, organization_github_app_installation)
   defp can?(%User{} = user, :create, %OrganizationGithubAppInstallation{}, %{} = params), do: Policy.OrganizationGithubAppInstallation.create?(user, params)
+  defp can?(%User{} = current_user, :create, %Preview{}, %{} = params), do: Policy.Preview.create?(current_user, params)
+  defp can?(%User{} = current_user, :create, %ProjectCategory{}, %{} = params), do: Policy.ProjectCategory.create?(current_user, params)
+  defp can?(%User{} = current_user, :delete, %ProjectCategory{} = project_category, %{}), do: Policy.ProjectCategory.delete?(current_user, project_category)
   defp can?(%User{} = current_user, :create, %ProjectGithubRepo{}, %{} = params), do: Policy.ProjectGithubRepo.create?(current_user, params)
   defp can?(%User{} = current_user, :delete, %ProjectGithubRepo{} = project_github_repo, %{}),
     do: Policy.ProjectGithubRepo.delete?(current_user, project_github_repo)
@@ -99,14 +104,6 @@ defmodule CodeCorps.Policy do
     def can?(%User{} = user, :update, %DonationGoal{} = comment), do: Policy.DonationGoal.update?(user, comment)
     def can?(%User{} = user, :delete, %DonationGoal{} = comment), do: Policy.DonationGoal.delete?(user, comment)
 
-
-    def can?(%User{} = user, :create, OrganizationInvite), do: Policy.OrganizationInvite.create?(user)
-    def can?(%User{} = user, :update, %OrganizationInvite{}), do: Policy.OrganizationInvite.update?(user)
-
-    def can?(%User{} = user, :create, %Changeset{data: %Preview{}} = changeset), do: Policy.Preview.create?(user, changeset)
-
-    def can?(%User{} = user, :create, %Changeset{data: %ProjectCategory{}} = changeset), do: Policy.ProjectCategory.create?(user, changeset)
-    def can?(%User{} = user, :delete, %ProjectCategory{} = project_category), do: Policy.ProjectCategory.delete?(user, project_category)
 
     def can?(%User{} = user, :create, Role), do: Policy.Role.create?(user)
   end
