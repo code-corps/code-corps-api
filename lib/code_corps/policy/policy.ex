@@ -50,6 +50,8 @@ defmodule CodeCorps.Policy do
       do: Policy.OrganizationGithubAppInstallation.delete?(user, organization_github_app_installation)
   defp can?(%User{} = user, :create, %OrganizationGithubAppInstallation{}, %{} = params), do: Policy.OrganizationGithubAppInstallation.create?(user, params)
   defp can?(%User{} = current_user, :create, %Preview{}, %{} = params), do: Policy.Preview.create?(current_user, params)
+  defp can?(%User{} = current_user, :create, %ProjectCategory{}, %{} = params), do: Policy.ProjectCategory.create?(current_user, params)
+  defp can?(%User{} = current_user, :delete, %ProjectCategory{} = project_category, %{}), do: Policy.ProjectCategory.delete?(current_user, project_category)
   defp can?(%User{} = current_user, :create, %ProjectGithubRepo{}, %{} = params), do: Policy.ProjectGithubRepo.create?(current_user, params)
   defp can?(%User{} = current_user, :delete, %ProjectGithubRepo{} = project_github_repo, %{}),
     do: Policy.ProjectGithubRepo.delete?(current_user, project_github_repo)
@@ -103,9 +105,6 @@ defmodule CodeCorps.Policy do
     def can?(%User{} = user, :delete, %DonationGoal{} = comment), do: Policy.DonationGoal.delete?(user, comment)
 
     def can?(%User{} = user, :create, %Changeset{data: %GithubAppInstallation{}} = changeset), do: Policy.GithubAppInstallation.create?(user, changeset)
-
-    def can?(%User{} = user, :create, %Changeset{data: %ProjectCategory{}} = changeset), do: Policy.ProjectCategory.create?(user, changeset)
-    def can?(%User{} = user, :delete, %ProjectCategory{} = project_category), do: Policy.ProjectCategory.delete?(user, project_category)
 
     def can?(%User{} = user, :create, Role), do: Policy.Role.create?(user)
   end
