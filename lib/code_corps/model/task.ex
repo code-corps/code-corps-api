@@ -14,7 +14,6 @@ defmodule CodeCorps.Task do
     field :closed_at, :utc_datetime
     field :created_at, :utc_datetime
     field :created_from, :string, default: "code_corps"
-    field :github_issue_number, :integer
     field :markdown, :string
     field :modified_at, :utc_datetime
     field :modified_from, :string, default: "code_corps"
@@ -25,6 +24,7 @@ defmodule CodeCorps.Task do
 
     field :position, :integer, virtual: true
 
+    belongs_to :github_issue, CodeCorps.GithubIssue
     belongs_to :github_repo, CodeCorps.GithubRepo
     belongs_to :project, CodeCorps.Project
     belongs_to :task_list, CodeCorps.TaskList
@@ -52,12 +52,12 @@ defmodule CodeCorps.Task do
   def create_changeset(struct, %{} = params) do
     struct
     |> changeset(params)
-    |> cast(params, [:project_id, :user_id, :github_repo_id])
+    |> cast(params, [:github_repo_id, :project_id, :user_id])
     |> set_created_and_modified_at()
     |> validate_required([:project_id, :user_id])
+    |> assoc_constraint(:github_repo)
     |> assoc_constraint(:project)
     |> assoc_constraint(:user)
-    |> assoc_constraint(:github_repo)
     |> put_change(:status, "open")
   end
 

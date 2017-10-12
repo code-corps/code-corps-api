@@ -17,13 +17,14 @@ defmodule CodeCorps.GitHub.Event.Issues.TaskSyncerTest do
 
     test "creates missing, updates existing tasks for each project associated with the github repo" do
       user = insert(:user)
+      github_issue = insert(:github_issue)
       github_repo = insert(:github_repo)
 
-      %{"issue" => %{"number" => issue_number, "body" => issue_body}} = @payload
+      %{"issue" => %{"body" => issue_body}} = @payload
 
       [%{project: project_1}, _, _] = project_github_repos = insert_list(3, :project_github_repo, github_repo: github_repo)
 
-      task_1 = insert(:task, project: project_1, github_repo: github_repo, user: user, github_issue_number: issue_number)
+      task_1 = insert(:task, project: project_1, github_issue: github_issue, github_repo: github_repo, user: user)
 
       project_ids = project_github_repos |> Enum.map(&Map.get(&1, :project_id))
 
@@ -32,15 +33,18 @@ defmodule CodeCorps.GitHub.Event.Issues.TaskSyncerTest do
         insert(:task_list, project: project, inbox: true)
       end)
 
-      {:ok, tasks} = %{github_repo | project_github_repos: project_github_repos}
-      |> TaskSyncer.sync_all(user, @payload)
+      github_repo = Repo.preload(github_repo, :project_github_repos)
+
+      {:ok, tasks} =
+        github_issue
+        |> TaskSyncer.sync_all(github_repo, user, @payload)
 
       assert Repo.aggregate(Task, :count, :id) == 3
 
       tasks |> Enum.each(fn task ->
         assert task.user_id == user.id
         assert task.markdown == issue_body
-        assert task.github_issue_number == issue_number
+        assert task.github_issue_id == github_issue.id
       end)
 
       task_ids = tasks |> Enum.map(&Map.get(&1, :id))
@@ -48,19 +52,20 @@ defmodule CodeCorps.GitHub.Event.Issues.TaskSyncerTest do
     end
 
     test "fails on validation errors" do
+      github_issue = insert(:github_issue)
+
       bad_payload = @payload |> put_in(~w(issue title), nil)
 
-      %{"issue" => %{"number" => issue_number}} = bad_payload
-
       %{project: project, github_repo: github_repo} = insert(:project_github_repo)
-      %{user: user} = insert(:task, project: project, github_repo: github_repo, github_issue_number: issue_number)
+      %{user: user} = insert(:task, project: project, github_issue: github_issue, github_repo: github_repo)
 
       insert(:task_list, project: project, inbox: true)
 
+      github_repo = Repo.preload(github_repo, :project_github_repos)
+
       {:error, {tasks, errors}} =
-        github_repo
-        |> Repo.preload(:project_github_repos)
-        |> TaskSyncer.sync_all(user, bad_payload)
+        github_issue
+        |> TaskSyncer.sync_all(github_repo, user, bad_payload)
 
       assert tasks |> Enum.count == 0
       assert errors |> Enum.count == 1

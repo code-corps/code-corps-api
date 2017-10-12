@@ -12,9 +12,10 @@ defmodule CodeCorps.GitHub.CommentTest do
 
   describe "create/1" do
     test "calls github API to create a github comment for assigned comment, makes user request if user is connected, returns response" do
+      github_issue = insert(:github_issue, number: 5)
       github_repo = insert(:github_repo, github_account_login: "foo", name: "bar")
       user = insert(:user, github_auth_token: "baz")
-      task = insert(:task, github_repo: github_repo, github_issue_number: 5)
+      task = insert(:task, github_issue: github_issue, github_repo: github_repo)
       comment = insert(:comment, task: task, user: user)
 
       assert Comment.create(comment)
@@ -34,9 +35,10 @@ defmodule CodeCorps.GitHub.CommentTest do
     end
 
     test "calls github API to create a github comment for assigned comment, makes integration request if user is not connected, returns response" do
+      github_issue = insert(:github_issue, number: 5)
       github_repo = insert(:github_repo, github_account_login: "foo", name: "bar")
       user = insert(:user, github_auth_token: nil)
-      task = insert(:task, github_repo: github_repo, github_issue_number: 5)
+      task = insert(:task, github_issue: github_issue, github_repo: github_repo)
       comment = insert(:comment, task: task, user: user)
 
       assert Comment.create(comment)
@@ -56,9 +58,10 @@ defmodule CodeCorps.GitHub.CommentTest do
     end
 
     test "returns error response if there was trouble" do
+      github_issue = insert(:github_issue, number: 5)
       github_repo = insert(:github_repo, github_account_login: "foo", name: "bar")
       user = insert(:user, github_auth_token: nil)
-      task = insert(:task, github_repo: github_repo, github_issue_number: 5)
+      task = insert(:task, github_issue: github_issue, github_repo: github_repo)
       comment = insert(:comment, task: task, user: user)
 
       with_mock_api CodeCorps.GitHub.FailureAPI do
@@ -82,9 +85,10 @@ defmodule CodeCorps.GitHub.CommentTest do
 
   describe "update/1" do
     test "calls github API to update a github comment for assigned comment, makes user request if user is connected, returns response" do
+      github_issue = insert(:github_issue, number: 5)
       github_repo = insert(:github_repo, github_account_login: "foo", name: "bar")
       user = insert(:user, github_auth_token: "baz")
-      task = insert(:task, github_repo: github_repo, github_issue_number: 5)
+      task = insert(:task, github_issue: github_issue, github_repo: github_repo)
       comment = insert(:comment, task: task, user: user, github_id: 6)
 
       assert Comment.update(comment)
@@ -104,9 +108,10 @@ defmodule CodeCorps.GitHub.CommentTest do
     end
 
     test "calls github API to update a github comment for assigned comment, makes integration request if user is not connected, returns response" do
+      github_issue = insert(:github_issue, number: 5)
       github_repo = insert(:github_repo, github_account_login: "foo", name: "bar")
       user = insert(:user, github_auth_token: nil)
-      task = insert(:task, github_repo: github_repo, github_issue_number: 5)
+      task = insert(:task, github_issue: github_issue, github_repo: github_repo)
       comment = insert(:comment, task: task, user: user, github_id: 6)
 
       assert Comment.update(comment)
@@ -126,9 +131,10 @@ defmodule CodeCorps.GitHub.CommentTest do
     end
 
     test "returns error response if there was trouble" do
+      github_issue = insert(:github_issue, number: 5)
       github_repo = insert(:github_repo, github_account_login: "foo", name: "bar")
       user = insert(:user, github_auth_token: nil)
-      task = insert(:task, github_repo: github_repo, github_issue_number: 5)
+      task = insert(:task, github_issue: github_issue, github_repo: github_repo)
       comment = insert(:comment, task: task, user: user, github_id: 6)
 
       with_mock_api CodeCorps.GitHub.FailureAPI do

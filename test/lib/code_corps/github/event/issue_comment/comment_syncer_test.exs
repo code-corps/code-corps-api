@@ -15,20 +15,21 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentSyncerTest do
     @payload load_event_fixture("issue_comment_created")
 
     test "creates missing, updates existing comments for each project associated with the github repo" do
-      user = insert(:user)
-      github_repo = insert(:github_repo)
-
       %{
-        "issue" => %{"number" => issue_number},
+        "issue" => %{"number" => number},
         "comment" => %{"id" => comment_github_id, "body" => comment_body}
       } = @payload
+
+      user = insert(:user)
+      github_issue = insert(:github_issue, number: number)
+      github_repo = insert(:github_repo)
 
       [%{project: project_1}, %{project: project_2}, %{project: project_3}]
         = insert_list(3, :project_github_repo, github_repo: github_repo)
 
-      task_1 = insert(:task, project: project_1, user: user, github_repo: github_repo, github_issue_number: issue_number)
-      task_2 = insert(:task, project: project_2, user: user, github_repo: github_repo, github_issue_number: issue_number)
-      task_3 = insert(:task, project: project_3, user: user, github_repo: github_repo, github_issue_number: issue_number)
+      task_1 = insert(:task, project: project_1, user: user, github_issue: github_issue, github_repo: github_repo)
+      task_2 = insert(:task, project: project_2, user: user, github_issue: github_issue, github_repo: github_repo)
+      task_3 = insert(:task, project: project_3, user: user, github_issue: github_issue, github_repo: github_repo)
 
       comment_1 = insert(:comment, task: task_1, user: user, github_id: comment_github_id)
 
@@ -54,16 +55,15 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentSyncerTest do
       bad_payload = @payload |> put_in(~w(comment body), nil)
 
       %{
-        "issue" => %{"number" => issue_number},
+        "issue" => %{"number" => number},
         "comment" => %{"id" => comment_github_id}
       } = bad_payload
 
+      github_issue = insert(:github_issue, number: number)
       %{project: project, github_repo: github_repo} =
         insert(:project_github_repo)
 
-      task = insert(
-        :task, project: project, github_repo: github_repo,
-        github_issue_number: issue_number)
+      task = insert(:task, project: project, github_issue: github_issue, github_repo: github_repo)
 
       %{user: user} = insert(:comment, task: task, github_id: comment_github_id)
 

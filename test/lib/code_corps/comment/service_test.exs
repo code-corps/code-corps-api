@@ -38,7 +38,8 @@ defmodule CodeCorps.Comment.ServiceTest do
     test "if comment is assigned a github repo, creates github comment on assigned issue" do
       user = insert(:user)
       github_repo = insert(:github_repo, github_account_login: "foo", name: "bar")
-      task = insert(:task, github_repo: github_repo, github_issue_number: 5)
+      github_issue = insert(:github_issue, number: 5)
+      task = insert(:task, github_issue: github_issue, github_repo: github_repo)
 
       {:ok, comment} =
         @base_attrs
@@ -56,7 +57,8 @@ defmodule CodeCorps.Comment.ServiceTest do
     test "if github process fails, returns {:error, :github}" do
       user = insert(:user)
       github_repo = insert(:github_repo, github_account_login: "foo", name: "bar")
-      task = insert(:task, github_repo: github_repo, github_issue_number: 5)
+      github_issue = insert(:github_issue, number: 5)
+      task = insert(:task, github_issue: github_issue, github_repo: github_repo)
 
       with_mock_api(CodeCorps.GitHub.FailureAPI) do
         assert {:error, :github} ==
@@ -90,8 +92,8 @@ defmodule CodeCorps.Comment.ServiceTest do
       github_repo =
         :github_repo
         |> insert(github_account_login: "foo", name: "bar")
-
-      task = insert(:task, github_repo: github_repo, github_issue_number: 5)
+      github_issue = insert(:github_issue, number: 5)
+      task = insert(:task, github_issue: github_issue, github_repo: github_repo)
       comment = insert(:comment, github_id: 6, task: task)
 
       {:ok, updated_comment} = comment |> Comment.Service.update(@update_attrs)
@@ -108,8 +110,8 @@ defmodule CodeCorps.Comment.ServiceTest do
       github_repo =
         :github_repo
         |> insert(github_account_login: "foo", name: "bar")
-
-      task = insert(:task, github_repo: github_repo, github_issue_number: 5)
+      github_issue = insert(:github_issue, number: 5)
+      task = insert(:task, github_issue: github_issue, github_repo: github_repo)
       comment = insert(:comment, github_id: 6, task: task)
 
       with_mock_api(CodeCorps.GitHub.FailureAPI) do

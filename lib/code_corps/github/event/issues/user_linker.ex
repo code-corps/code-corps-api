@@ -10,7 +10,7 @@ defmodule CodeCorps.GitHub.Event.Issues.UserLinker do
 
   alias CodeCorps.{
     Accounts,
-    GithubRepo,
+    GithubIssue,
     Repo,
     Task,
     User
@@ -21,8 +21,8 @@ defmodule CodeCorps.GitHub.Event.Issues.UserLinker do
                            {:error, :multiple_users}
 
   @doc ~S"""
-  Finds or creates a user using information contained in a GitHub Issue
-  webhook payload.
+  Finds or creates a user using information in a `GithubIssue` record and a
+  Github Issue payload.
 
   The process is as follows:
   - Find all affected tasks and extract their user data.
@@ -32,28 +32,22 @@ defmodule CodeCorps.GitHub.Event.Issues.UserLinker do
       someone who does not have a matching GitHub-connected Code Corps account.
       We create a placeholder user account until that GitHub user is claimed by
       a Code Corps user.
-  created.
     - If there are multiple matching users, this is an unexpected scenario and
       should error out.
   """
-  @spec find_or_create_user(map) :: linking_result
-  def find_or_create_user(%{"issue" => %{"user" => user_attrs}} = attrs) do
-    attrs
+  @spec find_or_create_user(GithubIssue.t, map) :: linking_result
+  def find_or_create_user(%GithubIssue{} = issue, %{"issue" => %{"user" => user_attrs}}) do
+    issue
     |> match_users
     |> marshall_response(user_attrs)
   end
 
-  @spec match_users(map) :: list(User.t)
-  defp match_users(
-    %{
-      "issue" => %{"number" => github_issue_number},
-      "repository" =>%{"id" => github_repo_id}
-    }) do
+  @spec match_users(GithubIssue.t) :: list(User.t)
+  defp match_users(%GithubIssue{id: github_issue_id}) do
 
     query = from u in User,
       distinct: u.id,
-      join: t in Task, on: u.id == t.user_id, where: t.github_issue_number == ^github_issue_number,
-      join: r in GithubRepo, on: r.id == t.github_repo_id, where: r.github_id == ^github_repo_id
+      join: t in Task, on: u.id == t.user_id, where: t.github_issue_id == ^github_issue_id
 
     query |> Repo.all
   end

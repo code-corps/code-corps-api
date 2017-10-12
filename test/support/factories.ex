@@ -43,6 +43,19 @@ defmodule CodeCorps.Factories do
     %CodeCorps.GithubEvent{}
   end
 
+  def github_issue_factory do
+    %CodeCorps.GithubIssue{
+      body: "I love elixir!",
+      github_created_at: DateTime.utc_now,
+      github_id: sequence(:id, (fn number -> number end)),
+      github_updated_at: DateTime.utc_now,
+      locked: false,
+      number: sequence(:id, (fn number -> number end)),
+      state: "open",
+      title: "I love Elixir!"
+    }
+  end
+
   def github_repo_factory do
     %CodeCorps.GithubRepo{
       github_app_installation: build(:github_app_installation)

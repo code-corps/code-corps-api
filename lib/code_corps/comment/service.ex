@@ -9,7 +9,7 @@ defmodule CodeCorps.Comment.Service do
 
   require Logger
 
-  @preloads [:user, task: [github_repo: :github_app_installation]]
+  @preloads [:user, task: [:github_issue, github_repo: :github_app_installation]]
 
   @doc ~S"""
   Creates a `Comment` record using the provided parameters
@@ -49,9 +49,9 @@ defmodule CodeCorps.Comment.Service do
 
   @spec connect_to_github(Comment.t) :: {:ok, Comment.t} :: {:error, GitHub.api_error_struct}
   defp connect_to_github(
-    %Comment{task: %Task{github_repo: nil, github_issue_number: nil}} = comment), do: {:ok, comment}
+    %Comment{task: %Task{github_repo: nil}} = comment), do: {:ok, comment}
   defp connect_to_github(
-    %Comment{task: %Task{github_repo: %GithubRepo{} = _, github_issue_number: _}} = comment) do
+    %Comment{task: %Task{github_repo: %GithubRepo{}}} = comment) do
 
     with {:ok, github_comment} <- comment |> GitHub.Comment.create do
       comment |> link_with_github_changeset(github_comment) |> Repo.update

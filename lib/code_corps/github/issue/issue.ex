@@ -1,9 +1,9 @@
 defmodule CodeCorps.GitHub.Issue do
   @moduledoc ~S"""
-  In charge of performing actions on the Issue endpoint of the github API
+  Functions for working with issues on GitHub.
   """
 
-  alias CodeCorps.{GitHub, GithubRepo, GithubAppInstallation, Task, User}
+  alias CodeCorps.{GitHub, GithubAppInstallation, GithubIssue, GithubRepo, Task, User}
 
   @spec create(Task.t) :: GitHub.response
   def create(%Task{
@@ -25,11 +25,13 @@ defmodule CodeCorps.GitHub.Issue do
 
   @spec update(Task.t) :: GitHub.response
   def update(%Task{
+    github_issue: %GithubIssue{
+      number: number
+    } = github_issue,
     github_repo: %GithubRepo{
       github_app_installation: %GithubAppInstallation{} = installation
     } = github_repo,
     user: %User{} = user,
-    github_issue_number: number
     } = task) do
 
     endpoint = "#{github_repo |> get_endpoint()}/#{number}"

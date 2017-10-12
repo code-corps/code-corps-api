@@ -32,7 +32,7 @@ defmodule CodeCorps.Task.ServiceTest do
       assert task.markdown == @base_attrs["markdown"]
       assert task.body
       assert task.status == "open"
-      refute task.github_issue_number
+      refute task.github_issue_id
       refute task.github_repo_id
 
       refute_received({:post, _string, {}, "{}", []})
@@ -64,7 +64,7 @@ defmodule CodeCorps.Task.ServiceTest do
       assert task.markdown == @base_attrs["markdown"]
       assert task.body
       assert task.status == "open"
-      assert task.github_issue_number
+      assert task.github_issue_id
       assert task.github_repo_id == github_repo.id
 
       assert_received({:post, "https://api.github.com/repos/foo/bar/issues", _headers, _body, _options})
@@ -102,7 +102,7 @@ defmodule CodeCorps.Task.ServiceTest do
       assert updated_task.title == @update_attrs["title"]
       assert updated_task.markdown == @update_attrs["markdown"]
       assert updated_task.body != task.body
-      refute task.github_issue_number
+      refute task.github_issue_id
       refute task.github_repo_id
 
       refute_received({:post, _string, {}, "{}", []})
@@ -122,7 +122,8 @@ defmodule CodeCorps.Task.ServiceTest do
         :github_repo
         |> insert(github_account_login: "foo", name: "bar")
 
-      task = insert(:task, github_repo: github_repo, github_issue_number: 5)
+      github_issue = insert(:github_issue, number: 5)
+      task = insert(:task, github_repo: github_repo, github_issue: github_issue)
 
       {:ok, updated_task} = task |> Task.Service.update(@update_attrs)
 
@@ -130,7 +131,7 @@ defmodule CodeCorps.Task.ServiceTest do
       assert updated_task.title == @update_attrs["title"]
       assert updated_task.markdown == @update_attrs["markdown"]
       assert updated_task.body != task.body
-      assert updated_task.github_issue_number
+      assert updated_task.github_issue_id
       assert updated_task.github_repo_id
 
       assert_received({:patch, "https://api.github.com/repos/foo/bar/issues/5", _headers, _body, _options})
@@ -141,7 +142,8 @@ defmodule CodeCorps.Task.ServiceTest do
         :github_repo
         |> insert(github_account_login: "foo", name: "bar")
 
-      task = insert(:task, github_repo: github_repo, github_issue_number: 5)
+      github_issue = insert(:github_issue, number: 5)
+      task = insert(:task, github_repo: github_repo, github_issue: github_issue)
 
       with_mock_api(CodeCorps.GitHub.FailureAPI) do
         assert {:error, :github} == task |> Task.Service.update(@update_attrs)
@@ -153,7 +155,7 @@ defmodule CodeCorps.Task.ServiceTest do
       assert updated_task.title == task.title
       assert updated_task.markdown == task.markdown
       assert updated_task.body == task.body
-      assert updated_task.github_issue_number == task.github_issue_number
+      assert updated_task.github_issue_id == task.github_issue_id
       assert updated_task.github_repo_id == task.github_repo_id
 
       assert_received({:patch, "https://api.github.com/repos/foo/bar/issues/5", _headers, _body, _options})

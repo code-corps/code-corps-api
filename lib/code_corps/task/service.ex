@@ -3,7 +3,8 @@ defmodule CodeCorps.Task.Service do
   Handles special CRUD operations for `CodeCorps.Task`.
   """
 
-  alias CodeCorps.{GitHub, Task, Repo}
+  alias CodeCorps.{GitHub, GithubIssue, Repo, Task}
+  alias GitHub.Event.Issues.IssueLinker
   alias Ecto.{Changeset, Multi}
 
   require Logger
@@ -15,7 +16,7 @@ defmodule CodeCorps.Task.Service do
   def create(%{} = attributes) do
     Multi.new
     |> Multi.insert(:task, %Task{} |> Task.create_changeset(attributes))
-    |> Multi.run(:github, (fn %{task: %Task{} = task} -> task |> connect_to_github() end))
+    |> Multi.run(:github, (fn %{task: %Task{} = task} -> task |> create_on_github() end))
     |> Repo.transaction
     |> marshall_result()
   end
@@ -24,7 +25,7 @@ defmodule CodeCorps.Task.Service do
   def update(%Task{} = task, %{} = attributes) do
     Multi.new
     |> Multi.update(:task, task |> Task.update_changeset(attributes))
-    |> Multi.run(:github, (fn %{task: %Task{} = task} -> task |> sync_to_github() end))
+    |> Multi.run(:github, (fn %{task: %Task{} = task} -> task |> update_on_github() end))
     |> Repo.transaction
     |> marshall_result()
   end
@@ -38,27 +39,31 @@ defmodule CodeCorps.Task.Service do
     {:error, :github}
   end
 
-  @preloads [[github_repo: :github_app_installation], :user]
+  @preloads [:github_issue, [github_repo: :github_app_installation], :user]
 
-  @spec connect_to_github(Task.t) :: {:ok, Task.t} :: {:error, GitHub.api_error_struct}
-  defp connect_to_github(%Task{github_repo_id: nil} = task), do: {:ok, task}
-  defp connect_to_github(%Task{github_repo_id: _} = task) do
-    with {:ok, issue} <- task |> Repo.preload(@preloads) |> GitHub.Issue.create do
-      task |> link_with_github_changeset(issue) |> Repo.update
+  @spec create_on_github(Task.t) :: {:ok, Task.t} :: {:error, GitHub.api_error_struct}
+  defp create_on_github(%Task{github_repo_id: nil} = task), do: {:ok, task}
+  defp create_on_github(%Task{github_repo: _} = task) do
+    with %Task{github_repo: github_repo} = task <- task |> Repo.preload(@preloads),
+         {:ok, payload} <- GitHub.Issue.create(task),
+         {:ok, %GithubIssue{} = github_issue } <- IssueLinker.create_or_update_issue(github_repo, payload) do
+      task |> link_with_github_changeset(github_issue) |> Repo.update
     else
-      {:error, github_error} -> {:error, github_error}
+      {:error, error} -> {:error, error}
     end
   end
 
-  @spec link_with_github_changeset(Task.t, map) :: Changeset.t
-  defp link_with_github_changeset(%Task{} = task, %{"number" => number}) do
-    task |> Changeset.change(%{github_issue_number: number})
+  @spec link_with_github_changeset(Task.t, GithubIssue.t) :: Changeset.t
+  defp link_with_github_changeset(%Task{} = task, %GithubIssue{} = github_issue) do
+    task |> Changeset.change(%{github_issue: github_issue})
   end
 
-  @spec sync_to_github(Task.t) :: {:ok, Task.t} :: {:error, GitHub.api_error_struct}
-  defp sync_to_github(%Task{github_repo_id: nil} = task), do: {:ok, task}
-  defp sync_to_github(%Task{github_repo_id: _} = task) do
-    with {:ok, _issue} <- task |> Repo.preload(@preloads) |> GitHub.Issue.update do
+  @spec update_on_github(Task.t) :: {:ok, Task.t} :: {:error, GitHub.api_error_struct}
+  defp update_on_github(%Task{github_repo_id: nil} = task), do: {:ok, task}
+  defp update_on_github(%Task{github_repo_id: _} = task) do
+    with %Task{github_repo: github_repo} = task <- task |> Repo.preload(@preloads),
+         {:ok, payload} <- GitHub.Issue.update(task),
+         {:ok, %GithubIssue{} } <- IssueLinker.create_or_update_issue(github_repo, payload) do
       {:ok, task}
     else
       {:error, github_error} -> {:error, github_error}
