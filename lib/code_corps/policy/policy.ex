@@ -86,7 +86,7 @@ defmodule CodeCorps.Policy do
     do: Policy.StripePlatformCustomer.create?(current_user, params)
   defp can?(%User{} = current_user, :show, %StripePlatformCustomer{} = stripe_platform_customer, %{}),
     do: Policy.StripePlatformCustomer.show?(current_user, stripe_platform_customer)
-
+  defp can?(%User{} = user, :create, %GithubAppInstallation{}, %{} = params), do: Policy.GithubAppInstallation.create?(user, params)
 
   defimpl Canada.Can, for: User do
     # NOTE: Canary sets an :unauthorized and a :not_found handler on a config level
@@ -104,7 +104,6 @@ defmodule CodeCorps.Policy do
     def can?(%User{} = user, :update, %DonationGoal{} = comment), do: Policy.DonationGoal.update?(user, comment)
     def can?(%User{} = user, :delete, %DonationGoal{} = comment), do: Policy.DonationGoal.delete?(user, comment)
 
-    def can?(%User{} = user, :create, %Changeset{data: %GithubAppInstallation{}} = changeset), do: Policy.GithubAppInstallation.create?(user, changeset)
 
     def can?(%User{} = user, :create, Role), do: Policy.Role.create?(user)
   end
