@@ -28,6 +28,9 @@ defmodule CodeCorps.Policy do
   defp can?(%User{} = current_user, :update, %Category{}, %{}), do: Policy.Category.update?(current_user)
   defp can?(%User{} = current_user, :create, %Comment{}, %{} = params), do: Policy.Comment.create?(current_user, params)
   defp can?(%User{} = current_user, :update, %Comment{} = comment, %{}), do: Policy.Comment.update?(current_user, comment)
+  defp can?(%User{} = current_user, :create, %DonationGoal{}, %{} = params), do: Policy.DonationGoal.create?(current_user, params)
+  defp can?(%User{} = current_user, :update, %DonationGoal{} = donation_goal, %{}), do: Policy.DonationGoal.update?(current_user, donation_goal)
+  defp can?(%User{} = current_user, :delete, %DonationGoal{} = donation_goal, %{}), do: Policy.DonationGoal.delete?(current_user, donation_goal)
   defp can?(%User{} = current_user, :create, %Organization{}, %{}), do: Policy.Organization.create?(current_user)
   defp can?(%User{} = current_user, :update, %Organization{} = organization, %{}), do: Policy.Organization.update?(current_user, organization)
   defp can?(%User{} = current_user, :update, %User{} = user, %{}), do: Policy.User.update?(current_user, user)
@@ -99,11 +102,6 @@ defmodule CodeCorps.Policy do
 
     # NOTE: other tests are using the User policy for the time being.
     def can?(%User{}, _action, nil), do: true
-
-    def can?(%User{} = user, :create, %Changeset{data: %DonationGoal{}} = changeset), do: Policy.DonationGoal.create?(user, changeset)
-    def can?(%User{} = user, :update, %DonationGoal{} = comment), do: Policy.DonationGoal.update?(user, comment)
-    def can?(%User{} = user, :delete, %DonationGoal{} = comment), do: Policy.DonationGoal.delete?(user, comment)
-
 
     def can?(%User{} = user, :create, Role), do: Policy.Role.create?(user)
   end
