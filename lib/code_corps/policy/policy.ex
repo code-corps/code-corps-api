@@ -6,7 +6,6 @@ defmodule CodeCorps.Policy do
   alias CodeCorps.{Category, Comment, DonationGoal, GithubAppInstallation, Organization, OrganizationInvite, OrganizationGithubAppInstallation, Preview, Project, ProjectCategory, ProjectGithubRepo, ProjectSkill, ProjectUser, Role, RoleSkill, Skill, StripeConnectAccount, StripeConnectPlan, StripeConnectSubscription, StripePlatformCard, StripePlatformCustomer, Task, TaskSkill, User, UserCategory, UserRole, UserSkill, UserTask}
 
   alias CodeCorps.Policy
-  alias Ecto.Changeset
 
   @doc ~S"""
   Determines if the specified user can perform the specified action on the
@@ -90,19 +89,4 @@ defmodule CodeCorps.Policy do
   defp can?(%User{} = current_user, :show, %StripePlatformCustomer{} = stripe_platform_customer, %{}),
     do: Policy.StripePlatformCustomer.show?(current_user, stripe_platform_customer)
   defp can?(%User{} = user, :create, %GithubAppInstallation{}, %{} = params), do: Policy.GithubAppInstallation.create?(user, params)
-
-  defimpl Canada.Can, for: User do
-    # NOTE: Canary sets an :unauthorized and a :not_found handler on a config level
-    # The problem is, it will still go through the authorization process first and only call the
-    # not found handler after the unauthorized handler does its thing. This means that our
-    # unauthorized handler will halt the connection and respond, so the not_found handler
-    # will never do anything
-    #
-    # The only solution is to have a catch_all match for the resource being nil, which returns true
-
-    # NOTE: other tests are using the User policy for the time being.
-    def can?(%User{}, _action, nil), do: true
-
-    def can?(%User{} = user, :create, Role), do: Policy.Role.create?(user)
-  end
 end

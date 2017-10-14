@@ -38,10 +38,6 @@ config :guardian, Guardian,
   secret_key: System.get_env("GUARDIAN_SECRET_KEY"),
   serializer: CodeCorpsWeb.GuardianSerializer
 
-config :canary, repo: CodeCorps.Repo
-config :canary, unauthorized_handler: {CodeCorpsWeb.AuthenticationHelpers, :handle_unauthorized}
-config :canary, not_found_handler: {CodeCorpsWeb.AuthenticationHelpers, :handle_not_found}
-
 # Configures ex_aws with credentials
 config :ex_aws, :code_corps,
   access_key_id: [System.get_env("AWS_ACCESS_KEY_ID"), :instance_role],
@@ -85,9 +81,6 @@ config :sentry,
   dsn: System.get_env("SENTRY_DSN"),
   included_environments: ~w(prod staging)a,
   use_error_logger: true
-
-config :ja_resource,
-  repo: CodeCorps.Repo
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
