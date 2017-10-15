@@ -50,7 +50,6 @@ defmodule CodeCorps.Mixfile do
       {:cowboy, "~> 1.0"},
       {:benchfella, "~> 0.3.0", only: :dev},
       {:bypass, "~> 0.8.1", only: :test},
-      {:canary, "~> 1.1.1"}, # Authorization
       {:cloudex, "~> 0.1.17"},
       {:comeonin, "~> 3.1"},
       {:corsica, "~> 1.0"}, # CORS
@@ -65,7 +64,6 @@ defmodule CodeCorps.Mixfile do
       {:hackney, ">= 1.4.4"},
       {:inch_ex, "~> 0.5", only: [:dev, :test]}, # Inch CI
       {:inflex, "~> 1.8.1"},
-      {:ja_resource, "~> 0.2"},
       {:ja_serializer, "~> 0.12"}, # JSON API
       {:joken, "~> 1.5"}, # JWT encoding
       {:money, "~> 1.2.1"},

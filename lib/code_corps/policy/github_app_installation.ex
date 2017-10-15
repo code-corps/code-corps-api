@@ -4,8 +4,8 @@ defmodule CodeCorps.Policy.GithubAppInstallation do
   """
   import CodeCorps.Policy.Helpers, only: [get_project: 1, owned_by?: 2]
 
-  alias CodeCorps.{GithubAppInstallation, User}
+  alias CodeCorps.User
 
+  @spec create?(User.t, map) :: boolean
   def create?(%User{} = user, params), do: params |> get_project |> owned_by?(user)
-
 end
