@@ -1,6 +1,7 @@
 defmodule CodeCorps.GitHub.Event.IssueComment.CommentDeleter do
   alias CodeCorps.{
     Comment,
+    GithubComment,
     Repo
   }
 
@@ -12,8 +13,11 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentDeleter do
   """
   @spec delete_all(map) :: {:ok, list(Comment.t)}
   def delete_all(%{"comment" => %{"id" => github_id}}) do
-    Comment
-    |> where([c], c.github_id == ^github_id)
+    query =
+      from c in Comment,
+        join: gc in GithubComment, on: gc.id == c.github_comment_id, where: gc.github_id == ^github_id
+
+    query
     |> Repo.delete_all(returning: true)
     |> (fn {_count, comments} -> {:ok, comments} end).()
   end

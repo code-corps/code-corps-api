@@ -57,6 +57,16 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def github_comment_factory do
+    %CodeCorps.GithubComment{
+      body: "I love elixir!",
+      github_created_at: DateTime.utc_now,
+      github_id: sequence(:id, (fn number -> number end)),
+      github_updated_at: DateTime.utc_now,
+      github_issue: build(:github_issue)
+    }
+  end
+
   def github_repo_factory do
     %CodeCorps.GithubRepo{
       github_app_installation: build(:github_app_installation)

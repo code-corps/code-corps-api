@@ -9,6 +9,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment.UserLinker do
   alias CodeCorps.{
     Accounts,
     Comment,
+    GithubComment,
     Repo,
     User
   }
@@ -44,7 +45,8 @@ defmodule CodeCorps.GitHub.Event.IssueComment.UserLinker do
   defp match_users(%{"comment" => %{"id" => github_id}}) do
     query = from u in User,
       distinct: u.id,
-      join: c in Comment, on: u.id == c.user_id, where: c.github_id == ^github_id
+      join: c in Comment, on: u.id == c.user_id,
+      join: gc in GithubComment, on: gc.id == c.github_comment_id, where: gc.github_id == ^github_id
 
     query |> Repo.all
   end

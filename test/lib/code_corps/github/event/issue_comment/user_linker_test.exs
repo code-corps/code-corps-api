@@ -23,7 +23,8 @@ defmodule CodeCorps.GitHub.Event.IssueComment.UserLinkerTest do
       %{"comment" => %{"id" => github_id}} = @payload
       user = insert(:user)
       # multiple comments, but with same user is ok
-      insert_pair(:comment, github_id: github_id, user: user)
+      github_comment = insert(:github_comment, github_id: github_id)
+      insert_pair(:comment, github_comment: github_comment, user: user)
 
       {:ok, %User{} = returned_user} = UserLinker.find_or_create_user(@payload)
 
@@ -34,7 +35,8 @@ defmodule CodeCorps.GitHub.Event.IssueComment.UserLinkerTest do
       %{"comment" => %{"id" => github_id}} = @payload
 
       # multiple matched comments each with different user is not ok
-      insert_pair(:comment, github_id: github_id)
+      github_comment = insert(:github_comment, github_id: github_id)
+      insert_pair(:comment, github_comment: github_comment)
 
       assert {:error, :multiple_users} ==
         UserLinker.find_or_create_user(@payload)
@@ -65,7 +67,9 @@ defmodule CodeCorps.GitHub.Event.IssueComment.UserLinkerTest do
       %{"comment" => %{
         "id" => github_id,
         "user" => %{"id" => bot_user_github_id}}} = @bot_payload
-      %{user: preinserted_user} = insert(:comment, github_id: github_id)
+
+      github_comment = insert(:github_comment, github_id: github_id)
+      %{user: preinserted_user} = insert(:comment, github_comment: github_comment)
 
       {:ok, %User{} = returned_user} =
         UserLinker.find_or_create_user(@bot_payload)

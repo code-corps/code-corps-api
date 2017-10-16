@@ -85,11 +85,13 @@ defmodule CodeCorps.GitHub.CommentTest do
 
   describe "update/1" do
     test "calls github API to update a github comment for assigned comment, makes user request if user is connected, returns response" do
-      github_issue = insert(:github_issue, number: 5)
       github_repo = insert(:github_repo, github_account_login: "foo", name: "bar")
+      github_issue = insert(:github_issue, number: 5, github_repo: github_repo)
       user = insert(:user, github_auth_token: "baz")
       task = insert(:task, github_issue: github_issue, github_repo: github_repo)
-      comment = insert(:comment, task: task, user: user, github_id: 6)
+
+      github_comment = insert(:github_comment, github_id: 6, github_issue: github_issue)
+      comment = insert(:comment, task: task, user: user, github_comment: github_comment)
 
       assert Comment.update(comment)
 
@@ -112,7 +114,9 @@ defmodule CodeCorps.GitHub.CommentTest do
       github_repo = insert(:github_repo, github_account_login: "foo", name: "bar")
       user = insert(:user, github_auth_token: nil)
       task = insert(:task, github_issue: github_issue, github_repo: github_repo)
-      comment = insert(:comment, task: task, user: user, github_id: 6)
+
+      github_comment = insert(:github_comment, github_id: 6, github_issue: github_issue)
+      comment = insert(:comment, task: task, user: user, github_comment: github_comment)
 
       assert Comment.update(comment)
 
@@ -135,7 +139,9 @@ defmodule CodeCorps.GitHub.CommentTest do
       github_repo = insert(:github_repo, github_account_login: "foo", name: "bar")
       user = insert(:user, github_auth_token: nil)
       task = insert(:task, github_issue: github_issue, github_repo: github_repo)
-      comment = insert(:comment, task: task, user: user, github_id: 6)
+
+      github_comment = insert(:github_comment, github_id: 6, github_issue: github_issue)
+      comment = insert(:comment, task: task, user: user, github_comment: github_comment)
 
       with_mock_api CodeCorps.GitHub.FailureAPI do
         assert Comment.update(comment)

@@ -6,6 +6,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilder do
 
   alias CodeCorps.{
     Comment,
+    GithubComment,
     Services.MarkdownRendererService,
     Task,
     User,
@@ -18,28 +19,41 @@ defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilder do
   Constructs a changeset for syncing a task when processing an IssueComment
   webhook
   """
-  @spec build_changeset(Comment.t, map, Task.t, User.t) :: Changeset.t
-  def build_changeset(%Comment{id: nil} = comment, %{"comment" => attrs}, %Task{} = task, %User{} = user) do
-    comment |> create_changeset(attrs, task, user)
+  @spec build_changeset(Comment.t, map, GithubComment.t, Task.t, User.t) :: Changeset.t
+  def build_changeset(
+    %Comment{id: nil} = comment,
+    %{"comment" => attrs},
+    %GithubComment{} = github_comment,
+    %Task{} = task,
+    %User{} = user) do
+
+    comment |> create_changeset(attrs, github_comment, task, user)
   end
-  def build_changeset(%Comment{} = comment, %{"comment" => attrs}, %Task{}, %User{}) do
+  def build_changeset(%Comment{} = comment, %{"comment" => attrs}, %GithubComment{}, %Task{}, %User{}) do
     comment |> update_changeset(attrs)
   end
 
-  @create_attrs ~w(created_at github_id markdown modified_at)a
-  @spec create_changeset(Comment.t, map, Task.t, User.t) :: Changeset.t
-  defp create_changeset(%Comment{} = comment, %{} = attrs, %Task{} = task, %User{} = user) do
+  @create_attrs ~w(created_at markdown modified_at)a
+  @spec create_changeset(Comment.t, map, GithubComment.t, Task.t, User.t) :: Changeset.t
+  defp create_changeset(
+    %Comment{} = comment,
+    %{} = attrs,
+    %GithubComment{} = github_comment,
+    %Task{} = task,
+    %User{} = user) do
+
     comment
     |> Changeset.cast(CommentAdapter.from_api(attrs), @create_attrs)
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
     |> Changeset.put_change(:created_from, "github")
     |> Changeset.put_change(:modified_from, "github")
     |> Changeset.put_assoc(:task, task)
+    |> Changeset.put_assoc(:github_comment, github_comment)
     |> Changeset.put_change(:user, user)
     |> Changeset.validate_required([:markdown, :body])
   end
 
-  @update_attrs ~w(github_id markdown modified_at)a
+  @update_attrs ~w(markdown modified_at)a
   @spec update_changeset(Comment.t, map) :: Changeset.t
   defp update_changeset(%Comment{} = comment, %{} = attrs) do
     comment

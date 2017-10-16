@@ -49,17 +49,4 @@ defmodule CodeCorps.CommentTest do
       assert comment.modified_at < changeset.changes[:modified_at]
     end
   end
-
-  describe "github_create_changeset/2" do
-    test "with valid attributes" do
-      attrs = Map.merge(@valid_attrs, %{
-        task_id: 1,
-        user_id: 1,
-        github_id: 1
-      })
-
-      changeset = Comment.github_create_changeset(%Comment{}, attrs)
-      assert changeset.valid?
-    end
-  end
 end

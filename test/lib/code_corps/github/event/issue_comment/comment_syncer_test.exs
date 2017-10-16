@@ -21,8 +21,10 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentSyncerTest do
       } = @payload
 
       user = insert(:user)
-      github_issue = insert(:github_issue, number: number)
-      github_repo = insert(:github_repo)
+      %{github_repo: github_repo} =
+        github_issue = insert(:github_issue, number: number)
+
+      github_comment = insert(:github_comment, github_issue: github_issue, github_id: comment_github_id)
 
       [%{project: project_1}, %{project: project_2}, %{project: project_3}]
         = insert_list(3, :project_github_repo, github_repo: github_repo)
@@ -31,9 +33,9 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentSyncerTest do
       task_2 = insert(:task, project: project_2, user: user, github_issue: github_issue, github_repo: github_repo)
       task_3 = insert(:task, project: project_3, user: user, github_issue: github_issue, github_repo: github_repo)
 
-      comment_1 = insert(:comment, task: task_1, user: user, github_id: comment_github_id)
+      comment_1 = insert(:comment, task: task_1, user: user, github_comment: github_comment)
 
-      {:ok, comments} = [task_1, task_2, task_3] |> CommentSyncer.sync_all(user, @payload)
+      {:ok, comments} = [task_1, task_2, task_3] |> CommentSyncer.sync_all(github_comment, user, @payload)
 
       assert Enum.count(comments) == 3
       assert Repo.aggregate(Comment, :count, :id) == 3
@@ -43,7 +45,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentSyncerTest do
       comments |> Enum.each(fn comment ->
         assert comment.user_id == user.id
         assert comment.markdown == comment_body
-        assert comment.github_id == comment_github_id
+        assert comment.github_comment_id == github_comment.id
         assert comment.task_id in task_ids
       end)
 
@@ -59,16 +61,17 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentSyncerTest do
         "comment" => %{"id" => comment_github_id}
       } = bad_payload
 
-      github_issue = insert(:github_issue, number: number)
       %{project: project, github_repo: github_repo} =
         insert(:project_github_repo)
 
+      github_issue = insert(:github_issue, number: number, github_repo: github_repo)
+      github_comment = insert(:github_comment, github_id: comment_github_id, github_issue: github_issue)
       task = insert(:task, project: project, github_issue: github_issue, github_repo: github_repo)
 
-      %{user: user} = insert(:comment, task: task, github_id: comment_github_id)
+      %{user: user} = insert(:comment, task: task, github_comment: github_comment)
 
       {:error, {comments, errors}} =
-        [task] |> CommentSyncer.sync_all(user, bad_payload)
+        [task] |> CommentSyncer.sync_all(github_comment, user, bad_payload)
 
       assert Enum.count(comments) == 0
       assert Enum.count(errors) == 1

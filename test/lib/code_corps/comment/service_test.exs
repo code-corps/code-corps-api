@@ -3,7 +3,10 @@ defmodule CodeCorps.Comment.ServiceTest do
 
   import CodeCorps.GitHub.TestHelpers
 
-  alias CodeCorps.Comment
+  alias CodeCorps.{
+    Comment,
+    GithubComment
+  }
 
   @base_attrs %{"markdown" => "A test task"}
 
@@ -22,7 +25,6 @@ defmodule CodeCorps.Comment.ServiceTest do
 
       assert comment.markdown == @base_attrs["markdown"]
       assert comment.body
-      refute comment.github_id
 
       refute_received({:post, _string, {}, "{}", []})
     end
@@ -49,7 +51,8 @@ defmodule CodeCorps.Comment.ServiceTest do
 
       assert comment.markdown == @base_attrs["markdown"]
       assert comment.body
-      assert comment.github_id
+      assert comment.github_comment_id
+      assert Repo.one(GithubComment)
 
       assert_received({:post, "https://api.github.com/repos/foo/bar/issues/5/comments", _headers, _body, _options})
     end
@@ -69,6 +72,7 @@ defmodule CodeCorps.Comment.ServiceTest do
       end
 
       refute Repo.one(Comment)
+      refute Repo.one(GithubComment)
       assert_received({:post, "https://api.github.com/repos/foo/bar/issues/5/comments", _headers, _body, _options})
     end
   end
@@ -83,25 +87,28 @@ defmodule CodeCorps.Comment.ServiceTest do
       assert updated_comment.id == comment.id
       assert updated_comment.markdown == @update_attrs["markdown"]
       assert updated_comment.body != comment.body
-      refute updated_comment.github_id
+      refute updated_comment.github_comment_id
 
       refute_received({:post, _string, {}, "{}", []})
     end
+
+    @preloads [task: [github_repo: :github_app_installation]]
 
     test "propagates changes to github if comment is synced to github comment" do
       github_repo =
         :github_repo
         |> insert(github_account_login: "foo", name: "bar")
-      github_issue = insert(:github_issue, number: 5)
+      github_issue = insert(:github_issue, number: 5, github_repo: github_repo)
+      github_comment = insert(:github_comment, github_id: 6, github_issue: github_issue)
       task = insert(:task, github_issue: github_issue, github_repo: github_repo)
-      comment = insert(:comment, github_id: 6, task: task)
+      comment = insert(:comment, task: task, github_comment: github_comment) |> Repo.preload(@preloads)
 
       {:ok, updated_comment} = comment |> Comment.Service.update(@update_attrs)
 
       assert updated_comment.id == comment.id
       assert updated_comment.markdown == @update_attrs["markdown"]
       assert updated_comment.body != comment.body
-      assert updated_comment.github_id
+      assert updated_comment.github_comment_id == github_comment.id
 
       assert_received({:patch, "https://api.github.com/repos/foo/bar/issues/comments/6", _headers, _body, _options})
     end
@@ -111,8 +118,9 @@ defmodule CodeCorps.Comment.ServiceTest do
         :github_repo
         |> insert(github_account_login: "foo", name: "bar")
       github_issue = insert(:github_issue, number: 5)
+      github_comment = insert(:github_comment, github_id: 6)
       task = insert(:task, github_issue: github_issue, github_repo: github_repo)
-      comment = insert(:comment, github_id: 6, task: task)
+      comment = insert(:comment, github_comment: github_comment, task: task)
 
       with_mock_api(CodeCorps.GitHub.FailureAPI) do
         assert {:error, :github} == comment |> Comment.Service.update(@update_attrs)
@@ -123,7 +131,7 @@ defmodule CodeCorps.Comment.ServiceTest do
       assert updated_comment.id == comment.id
       assert updated_comment.markdown == comment.markdown
       assert updated_comment.body == comment.body
-      assert updated_comment.github_id == comment.github_id
+      assert updated_comment.github_comment_id == github_comment.id
 
       assert_received({:patch, "https://api.github.com/repos/foo/bar/issues/comments/6", _headers, _body, _options})
     end

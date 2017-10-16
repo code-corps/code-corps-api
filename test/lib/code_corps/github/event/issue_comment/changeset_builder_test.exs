@@ -17,9 +17,10 @@ defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilderTest do
       comment = %Comment{}
       task = insert(:task)
       user = insert(:user)
+      github_comment = insert(:github_comment)
 
       changeset = ChangesetBuilder.build_changeset(
-        comment, payload, task, user
+        comment, payload, github_comment, task, user
       )
 
       {:ok, created_at, _} = payload["issue"]["created_at"] |> DateTime.from_iso8601()
@@ -27,7 +28,6 @@ defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilderTest do
 
       # adapted fields
       assert get_change(changeset, :created_at) == created_at
-      assert get_change(changeset, :github_id) == payload["comment"]["id"]
       assert get_change(changeset, :markdown) == payload["comment"]["body"]
       assert get_change(changeset, :modified_at) == updated_at
 
@@ -40,6 +40,8 @@ defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilderTest do
         Earmark.as_html!(payload["comment"]["body"], %Earmark.Options{code_class_prefix: "language-"})
 
       # relationships are proper
+      assert changeset.changes.github_comment.action == :update
+      assert changeset.changes.github_comment.data == github_comment
       assert changeset.changes.task.action == :update
       assert changeset.changes.task.data == task
       assert changeset.changes.user.action == :update
@@ -53,15 +55,15 @@ defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilderTest do
       comment = insert(:comment)
       task = insert(:task)
       user = insert(:user)
+      github_comment = insert(:github_comment)
 
       changeset = ChangesetBuilder.build_changeset(
-        comment, payload, task, user
+        comment, payload, github_comment, task, user
       )
 
       {:ok, updated_at, _} = payload["issue"]["updated_at"] |> DateTime.from_iso8601()
 
       # adapted fields
-      assert get_change(changeset, :github_id) == payload["comment"]["id"]
       assert get_change(changeset, :markdown) == payload["comment"]["body"]
       assert get_change(changeset, :modified_at) == updated_at
 
@@ -75,6 +77,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilderTest do
 
       # relationships are proper
       refute changeset |> get_change(:task)
+      refute changeset |> get_change(:github_comment)
       refute changeset |> get_change(:user)
 
       assert changeset.valid?
@@ -93,9 +96,10 @@ defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilderTest do
       comment = insert(:comment, modified_at: modified_at)
       task = insert(:task)
       user = insert(:user)
+      github_comment = insert(:github_comment)
 
       changeset = ChangesetBuilder.build_changeset(
-        comment, payload, task, user
+        comment, payload, github_comment, task, user
       )
 
       refute changeset.valid?

@@ -12,8 +12,8 @@ defmodule CodeCorps.Comment do
     field :markdown, :string
     field :modified_at, :utc_datetime
     field :modified_from, :string, default: "code_corps"
-    field :github_id, :integer
 
+    belongs_to :github_comment, CodeCorps.GithubComment
     belongs_to :user, CodeCorps.User
     belongs_to :task, CodeCorps.Task
 
@@ -44,16 +44,6 @@ defmodule CodeCorps.Comment do
     struct
     |> changeset(params)
     |> update_modified_at()
-  end
-
-  @doc """
-  Builds a changeset for creating a comment that has a connected GitHub comment.
-  """
-  def github_create_changeset(struct, params) do
-    struct
-    |> create_changeset(params)
-    |> cast(params, [:github_id])
-    |> validate_required([:github_id])
   end
 
   defp set_created_and_modified_at(changeset) do
