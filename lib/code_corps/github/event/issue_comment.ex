@@ -8,11 +8,14 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
 
   alias CodeCorps.{
     Comment,
+    GithubComment,
     GithubRepo,
     GitHub.Event.Common.RepoFinder,
     GitHub.Event.Issues,
+    GitHub.Event.Issues.IssueLinker,
     GitHub.Event.Issues.TaskSyncer,
     GitHub.Event.IssueComment,
+    GitHub.Event.IssueComment.CommentLinker,
     GitHub.Event.IssueComment.CommentSyncer,
     GitHub.Event.IssueComment.CommentDeleter,
     Repo
@@ -24,6 +27,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
                    {:error, :unexpected_payload} |
                    {:error, :repository_not_found} |
                    {:error, :validation_error_on_inserting_issue_for_task} |
+                   {:error, :validation_error_on_inserting_github_comment} |
                    {:error, :validation_error_on_inserting_user_for_task} |
                    {:error, :multiple_github_users_matched_same_cc_user_for_task} |
                    {:error, :validation_error_on_inserting_user_for_comment} |
@@ -62,14 +66,15 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
   end
 
   @spec operational_multi(map) :: Multi.t
-  defp operational_multi(%{"action" => action, "issue" => issue_payload} = payload) when action in ~w(created edited) do
+  defp operational_multi(%{"action" => action, "issue" => issue_payload, "comment" => comment_payload} = payload) when action in ~w(created edited) do
     Multi.new
     |> Multi.run(:repo, fn _ -> RepoFinder.find_repo(payload) end)
-    |> Multi.run(:issue, fn %{repo: %GithubRepo{} = github_repo} -> github_repo |> Issues.IssueLinker.create_or_update_issue(issue_payload) end)
-    |> Multi.run(:issue_user, fn %{issue: github_issue} -> github_issue |> Issues.UserLinker.find_or_create_user(payload) end)
+    |> Multi.run(:github_issue, fn %{repo: github_repo} -> github_repo |> link_issue(payload) end)
+    |> Multi.run(:github_comment, fn %{github_issue: github_issue} -> github_issue |> link_comment(payload) end)
+    |> Multi.run(:issue_user, fn %{github_issue: github_issue} -> github_issue |> Issues.UserLinker.find_or_create_user(payload) end)
     |> Multi.run(:comment_user, fn _ -> IssueComment.UserLinker.find_or_create_user(payload) end)
-    |> Multi.run(:tasks, fn %{issue: github_issue, issue_user: user} -> github_issue |> TaskSyncer.sync_all(user, payload) end)
-    |> Multi.run(:comments, fn %{tasks: tasks, comment_user: user} -> CommentSyncer.sync_all(tasks, user, payload) end)
+    |> Multi.run(:tasks, fn %{github_issue: github_issue, issue_user: user} -> github_issue |> TaskSyncer.sync_all(user, payload) end)
+    |> Multi.run(:comments, fn %{github_comment: github_comment, tasks: tasks, comment_user: user} -> CommentSyncer.sync_all(tasks, github_comment, user, payload) end)
   end
   defp operational_multi(%{"action" => "deleted"} = payload) do
     Multi.new
@@ -77,13 +82,24 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
   end
   defp operational_multi(%{}), do: Multi.new
 
+  @spec link_issue(GithubRepo.t, map) :: {:ok, GithubIssue.t} | {:error, Ecto.Changeset.t}
+  defp link_issue(github_repo, %{"issue" => attrs}) do
+    IssueLinker.create_or_update_issue(github_repo, attrs)
+  end
+
+  @spec link_comment(GithubIssue.t, map) :: {:ok, GithubComment.t} | {:error, Ecto.Changeset.t}
+  defp link_comment(github_issue, %{"comment" => attrs}) do
+    CommentLinker.create_or_update_comment(github_issue, attrs)
+  end
+
   @spec marshall_result(tuple) :: tuple
   defp marshall_result({:ok, %{comments: comments}}), do: {:ok, comments}
   defp marshall_result({:error, :payload, :invalid, _steps}), do: {:error, :unexpected_payload}
   defp marshall_result({:error, :action, :unexpected_action, _steps}), do: {:error, :unexpected_action}
   defp marshall_result({:error, :repo, :unmatched_project, _steps}), do: {:ok, []}
   defp marshall_result({:error, :repo, :unmatched_repository, _steps}), do: {:error, :repository_not_found}
-  defp marshall_result({:error, :issue, %Ecto.Changeset{}, _steps}), do: {:error, :validation_error_on_inserting_issue_for_task}
+  defp marshall_result({:error, :github_issue, %Ecto.Changeset{}, _steps}), do: {:error, :validation_error_on_inserting_issue_for_task}
+  defp marshall_result({:error, :github_comment, %Ecto.Changeset{}, _steps}), do: {:error, :validation_error_on_inserting_github_comment}
   defp marshall_result({:error, :issue_user, %Ecto.Changeset{}, _steps}), do: {:error, :validation_error_on_inserting_user_for_task}
   defp marshall_result({:error, :issue_user, :multiple_users, _steps}), do: {:error, :multiple_github_users_matched_same_cc_user_for_task}
   defp marshall_result({:error, :comment_user, %Ecto.Changeset{}, _steps}), do: {:error, :validation_error_on_inserting_user_for_comment}

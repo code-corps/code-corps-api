@@ -4,12 +4,20 @@ defmodule CodeCorps.Comment.Service do
   additional actions that need to be performed when such an operation happens.
   """
 
-  alias CodeCorps.{Comment, GitHub, GithubRepo, Task, Repo}
+  alias CodeCorps.{
+    Comment,
+    GitHub,
+    GitHub.Event.IssueComment.CommentLinker,
+    GithubComment,
+    GithubIssue,
+    Task,
+    Repo
+  }
   alias Ecto.{Changeset, Multi}
 
   require Logger
 
-  @preloads [:user, task: [:github_issue, github_repo: :github_app_installation]]
+  @preloads [:user, :github_comment, task: [:github_issue, github_repo: :github_app_installation]]
 
   @doc ~S"""
   Creates a `Comment` record using the provided parameters
@@ -21,7 +29,7 @@ defmodule CodeCorps.Comment.Service do
     Multi.new
     |> Multi.insert(:comment, %Comment{} |> Comment.create_changeset(attributes))
     |> Multi.run(:preload, fn %{comment: %Comment{} = comment} -> {:ok, comment |> Repo.preload(@preloads)} end)
-    |> Multi.run(:github, (fn %{preload: %Comment{} = comment} -> comment |> connect_to_github() end))
+    |> Multi.run(:github, (fn %{preload: %Comment{} = comment} -> comment |> create_on_github() end))
     |> Repo.transaction
     |> marshall_result
   end
@@ -33,7 +41,7 @@ defmodule CodeCorps.Comment.Service do
   def update(%Comment{} = comment, %{} = attributes) do
     Multi.new
     |> Multi.update(:comment, comment |> Comment.update_changeset(attributes))
-    |> Multi.run(:github, (fn %{comment: %Comment{} = comment} -> comment |> sync_to_github() end))
+    |> Multi.run(:github, (fn %{comment: %Comment{} = comment} -> comment |> update_on_github() end))
     |> Repo.transaction
     |> marshall_result()
   end
@@ -47,28 +55,31 @@ defmodule CodeCorps.Comment.Service do
     {:error, :github}
   end
 
-  @spec connect_to_github(Comment.t) :: {:ok, Comment.t} :: {:error, GitHub.api_error_struct}
-  defp connect_to_github(
-    %Comment{task: %Task{github_repo: nil}} = comment), do: {:ok, comment}
-  defp connect_to_github(
-    %Comment{task: %Task{github_repo: %GithubRepo{}}} = comment) do
+  @preloads [task: [:github_issue, github_repo: :github_app_installation]]
 
-    with {:ok, github_comment} <- comment |> GitHub.Comment.create do
+  @spec create_on_github(Comment.t) :: {:ok, Comment.t} :: {:error, GitHub.api_error_struct}
+  defp create_on_github(%Comment{task: %Task{github_issue_id: nil}} = comment), do: {:ok, comment}
+  defp create_on_github(%Comment{task: %Task{github_issue: github_issue}} = comment) do
+    with {:ok, payload} <- comment |> GitHub.Comment.create,
+         {:ok, %GithubComment{} = github_comment} <- CommentLinker.create_or_update_comment(github_issue, payload)do
       comment |> link_with_github_changeset(github_comment) |> Repo.update
     else
       {:error, github_error} -> {:error, github_error}
     end
   end
 
-  @spec link_with_github_changeset(Comment.t, map) :: Changeset.t
-  defp link_with_github_changeset(%Comment{} = comment, %{"id" => id}) do
-    comment |> Changeset.change(%{github_id: id})
+  @spec link_with_github_changeset(Comment.t, GithubComment.t) :: Changeset.t
+  defp link_with_github_changeset(%Comment{} = comment, %GithubComment{} = github_comment) do
+    comment |> Changeset.change(%{github_comment: github_comment})
   end
 
-  @spec sync_to_github(Comment.t) :: {:ok, Comment.t} :: {:error, GitHub.api_error_struct}
-  defp sync_to_github(%Comment{github_id: nil} = comment), do: {:ok, comment}
-  defp sync_to_github(%Comment{github_id: _} = comment) do
-    with {:ok, _issue} <- comment |> Repo.preload(@preloads) |> GitHub.Comment.update do
+  @spec update_on_github(Comment.t) :: {:ok, Comment.t} :: {:error, GitHub.api_error_struct}
+  defp update_on_github(%Comment{github_comment_id: nil} = comment), do: {:ok, comment}
+  defp update_on_github(%Comment{} = comment) do
+    with %Comment{task: %Task{github_issue: %GithubIssue{} = github_issue}} = comment <- comment |> Repo.preload(@preloads),
+         {:ok, payload} <- comment |> GitHub.Comment.update,
+         {:ok, %GithubComment{}} <- CommentLinker.create_or_update_comment(github_issue, payload) do
+
       {:ok, comment}
     else
       {:error, github_error} -> {:error, github_error}

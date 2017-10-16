@@ -7,6 +7,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
 
   alias CodeCorps.{
     Comment,
+    GithubComment,
     GithubIssue,
     GitHub.Event.IssueComment,
     Project,
@@ -76,10 +77,16 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
 
         comments |> Enum.each(fn comment ->
           assert comment.body
-          assert comment.github_id == comment_github_id
           assert comment.markdown == comment_markdown
           assert comment.user_id == comment_user.id
         end)
+
+        Repo.all(GithubComment) |> Enum.each(fn github_comment ->
+          assert github_comment.github_id == comment_github_id
+          assert github_comment.body == comment_markdown
+        end)
+
+        assert Repo.aggregate(GithubComment, :count, :id) == 1
       end
 
       test "with unmatched both users, returns error if unmatched repository" do
@@ -147,10 +154,16 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
 
         comments |> Enum.each(fn comment ->
           assert comment.body
-          assert comment.github_id == comment_github_id
           assert comment.markdown == comment_markdown
           assert comment.user_id == comment_user.id
         end)
+
+        Repo.all(GithubComment) |> Enum.each(fn github_comment ->
+          assert github_comment.github_id == comment_github_id
+          assert github_comment.body == comment_markdown
+        end)
+
+        assert Repo.aggregate(GithubComment, :count, :id) == 1
       end
 
       test "with matched issue user, unmatched comment user, returns error if unmatched repository" do
@@ -210,10 +223,16 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
 
         comments |> Enum.each(fn comment ->
           assert comment.body
-          assert comment.github_id == comment_github_id
           assert comment.markdown == comment_markdown
           assert comment.user_id == comment_user.id
         end)
+
+        Repo.all(GithubComment) |> Enum.each(fn github_comment ->
+          assert github_comment.github_id == comment_github_id
+          assert github_comment.body == comment_markdown
+        end)
+
+        assert Repo.aggregate(GithubComment, :count, :id) == 1
       end
 
       test "with unmatched issue user, matched comment user, returns error if unmatched repository" do
@@ -252,10 +271,11 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
         end)
 
         github_issue = insert(:github_issue, github_repo: github_repo, number: issue_number, github_id: issue_github_id)
+        github_comment = insert(:github_comment, github_issue: github_issue, github_id: comment_github_id)
 
         # there's a task and comment for project 1
         task_1 = insert(:task, project: project_1, user: user, github_repo: github_repo, github_issue: github_issue)
-        comment_1 = insert(:comment, task: task_1, user: user, github_id: comment_github_id)
+        comment_1 = insert(:comment, task: task_1, user: user, github_comment: github_comment)
 
         # there is only a task for project 2
         task_2 = insert(:task, project: project_2, user: user, github_repo: github_repo, github_issue: github_issue)
@@ -288,13 +308,19 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
 
         comments |> Enum.each(fn comment ->
           assert comment.body
-          assert comment.github_id == comment_github_id
           assert comment.markdown == comment_markdown
           assert comment.user_id == user.id
         end)
 
         comment_ids = comments |> Enum.map(&Map.get(&1, :id))
         assert comment_1.id in comment_ids
+
+        Repo.all(GithubComment) |> Enum.each(fn github_comment ->
+          assert github_comment.github_id == comment_github_id
+          assert github_comment.body == comment_markdown
+        end)
+
+        assert Repo.aggregate(GithubComment, :count, :id) == 1
       end
 
       test "with matched issue and comment user, returns error if unmatched repository" do
@@ -333,9 +359,12 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
 
     test "deletes all comments with github_id specified in the payload" do
       %{"comment" => %{"id" => github_id}} = @payload
-      insert_list(3, :comment, github_id: github_id)
-      insert_list(2, :comment, github_id: nil)
-      insert_list(4, :comment, github_id: 1)
+      github_comment_1 = insert(:github_comment, github_id: github_id)
+      github_comment_2 = insert(:github_comment)
+
+      insert_list(3, :comment, github_comment: github_comment_1)
+      insert_list(2, :comment)
+      insert_list(4, :comment, github_comment: github_comment_2)
 
       {:ok, comments} = IssueComment.handle(@payload)
       assert Enum.count(comments) == 3

@@ -25,9 +25,7 @@ defmodule CodeCorps.GitHub.Issue do
 
   @spec update(Task.t) :: GitHub.response
   def update(%Task{
-    github_issue: %GithubIssue{
-      number: number
-    } = github_issue,
+    github_issue: %GithubIssue{number: number},
     github_repo: %GithubRepo{
       github_app_installation: %GithubAppInstallation{} = installation
     } = github_repo,
