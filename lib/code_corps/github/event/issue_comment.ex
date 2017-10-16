@@ -68,7 +68,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
     |> Multi.run(:issue, fn %{repo: %GithubRepo{} = github_repo} -> github_repo |> Issues.IssueLinker.create_or_update_issue(issue_payload) end)
     |> Multi.run(:issue_user, fn %{issue: github_issue} -> github_issue |> Issues.UserLinker.find_or_create_user(payload) end)
     |> Multi.run(:comment_user, fn _ -> IssueComment.UserLinker.find_or_create_user(payload) end)
-    |> Multi.run(:tasks, fn %{issue: github_issue, repo: github_repo, issue_user: user} -> github_issue |> TaskSyncer.sync_all(github_repo, user, payload) end)
+    |> Multi.run(:tasks, fn %{issue: github_issue, issue_user: user} -> github_issue |> TaskSyncer.sync_all(user, payload) end)
     |> Multi.run(:comments, fn %{tasks: tasks, comment_user: user} -> CommentSyncer.sync_all(tasks, user, payload) end)
   end
   defp operational_multi(%{"action" => "deleted"} = payload) do

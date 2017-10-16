@@ -27,21 +27,6 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
     describe "handle/1 for IssueComment::#{action}" do
       @payload load_event_fixture("issue_comment_#{action}")
 
-      test "with unmatched both users, passes with no changes made if no matching projects" do
-        %{
-          "issue" => %{"user" => %{"id" => issue_user_github_id}},
-          "comment" => %{"user" => %{"id" => comment_user_github_id}},
-          "repository" => %{"id" => repo_github_id}
-        } = @payload
-
-        insert(:github_repo, github_id: repo_github_id)
-        assert IssueComment.handle(@payload) == {:ok, []}
-        assert Repo.aggregate(Task, :count, :id) == 0
-        assert Repo.aggregate(Comment, :count, :id) == 0
-        refute Repo.get_by(User, github_id: issue_user_github_id)
-        refute Repo.get_by(User, github_id: comment_user_github_id)
-      end
-
       test "with unmatched both users, creates users, creates missing tasks, missing comments, for all projects connected with the github repo" do
         %{
           "issue" => %{
@@ -100,21 +85,6 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
       test "with unmatched both users, returns error if unmatched repository" do
         assert IssueComment.handle(@payload) == {:error, :repository_not_found}
         refute Repo.one(User)
-      end
-
-      test "with matched issue user, unmatched comment_user, passes with no changes made if no matching projects" do
-        %{
-          "issue" => %{"user" => %{"id" => issue_user_github_id}},
-          "comment" => %{"user" => %{"id" => comment_user_github_id}},
-          "repository" => %{"id" => repo_github_id}
-        } = @payload
-
-        insert(:user, github_id: issue_user_github_id)
-        insert(:github_repo, github_id: repo_github_id)
-        assert IssueComment.handle(@payload) == {:ok, []}
-        assert Repo.aggregate(Task, :count, :id) == 0
-        assert Repo.aggregate(Comment, :count, :id) == 0
-        refute Repo.get_by(User, github_id: comment_user_github_id)
       end
 
       test "with matched issue user, unmatched comment user, creates and updates tasks, comments and comment user, for each related project" do
@@ -191,21 +161,6 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
         assert IssueComment.handle(@payload) == {:error, :repository_not_found}
       end
 
-      test "with unmatched issue user, matched comment_user, passes with no changes made if no matching projects" do
-        %{
-          "issue" => %{"user" => %{"id" => issue_user_github_id}},
-          "comment" => %{"user" => %{"id" => comment_user_github_id}},
-          "repository" => %{"id" => repo_github_id}
-        } = @payload
-
-        insert(:user, github_id: comment_user_github_id)
-        insert(:github_repo, github_id: repo_github_id)
-        assert IssueComment.handle(@payload) == {:ok, []}
-        assert Repo.aggregate(Task, :count, :id) == 0
-        assert Repo.aggregate(Comment, :count, :id) == 0
-        refute Repo.get_by(User, github_id: issue_user_github_id)
-      end
-
       test "with unmatched issue user, matched comment user, creates and updates tasks, comments and issue user, for each related project" do
         %{
           "issue" => %{
@@ -267,21 +222,6 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
         _comment_user = insert(:user, github_id: comment_user_github_id)
 
         assert IssueComment.handle(@payload) == {:error, :repository_not_found}
-      end
-
-      test "with matched issue and comment_user, passes with no changes made if no matching projects" do
-        %{
-          "issue" => %{"user" => %{"id" => issue_user_github_id}},
-          "comment" => %{"user" => %{"id" => comment_user_github_id}},
-          "repository" => %{"id" => repo_github_id}
-        } = @payload
-
-        insert(:user, github_id: comment_user_github_id)
-        insert(:user, github_id: issue_user_github_id)
-        insert(:github_repo, github_id: repo_github_id)
-        assert IssueComment.handle(@payload) == {:ok, []}
-        assert Repo.aggregate(Task, :count, :id) == 0
-        assert Repo.aggregate(Comment, :count, :id) == 0
       end
 
       test "with matched issue and comment user, creates and updates tasks, comments, for each related project" do

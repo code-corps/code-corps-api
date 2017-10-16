@@ -52,7 +52,8 @@ defmodule CodeCorps.Factories do
       locked: false,
       number: sequence(:id, (fn number -> number end)),
       state: "open",
-      title: "I love Elixir!"
+      title: "I love Elixir!",
+      github_repo: build(:github_repo)
     }
   end
 

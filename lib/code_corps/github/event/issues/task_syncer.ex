@@ -16,12 +16,18 @@ defmodule CodeCorps.GitHub.Event.Issues.TaskSyncer do
                    {:error, {list(Task.t), list(Changeset.t)}}
 
   @doc """
-  When provided a `GithubRepo`, a `User` and a GitHub API payload, for each
-  `Project` associated to that `GithubRepo` via a `ProjectGithubRepo`, it
-  creates or updates a `Task` associated to the specified `User`.
+  When provided a `CodeCorps.GithubIssue`, a `CodeCorps.User` and a GitHub API
+  payload, for each `CodeCorps.Project` associated to that
+  `CodeCorps.GithubRepo` via a `CodeCorps.ProjectGithubRepo`, it
+  creates or updates a `CodeCorps.Task`.
   """
-  @spec sync_all(GithubIssue.t, GithubRepo.t, User.t, map) :: {:ok, list(Task.t)}
-  def sync_all(%GithubIssue{} = github_issue, %GithubRepo{project_github_repos: project_github_repos}, %User{} = user, %{} = payload) do
+  @spec sync_all(GithubIssue.t, User.t, map) :: {:ok, list(Task.t)}
+  def sync_all(%GithubIssue{} = github_issue, %User{} = user, %{} = payload) do
+
+    %GithubIssue{
+      github_repo: %GithubRepo{project_github_repos: project_github_repos}
+    } = github_issue |> Repo.preload(github_repo: :project_github_repos)
+
     project_github_repos
     |> Enum.map(&sync(github_issue, &1, user, payload))
     |> ResultAggregator.aggregate

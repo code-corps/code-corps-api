@@ -26,11 +26,11 @@ defmodule CodeCorps.GitHub.Event.Issues.UserLinkerTest do
       } = @payload
 
       user = insert(:user)
-      github_issue = insert(:github_issue, number: number)
-      repo = insert(:github_repo, github_id: github_repo_id)
+      github_repo = insert(:github_repo, github_id: github_repo_id)
+      github_issue = insert(:github_issue, number: number, github_repo: github_repo)
       # multiple tasks, all with same user is ok
       insert_pair(
-        :task, user: user, github_repo: repo, github_issue: github_issue)
+        :task, user: user, github_repo: github_repo, github_issue: github_issue)
 
       {:ok, %User{} = returned_user} = UserLinker.find_or_create_user(github_issue, @payload)
 
@@ -43,10 +43,10 @@ defmodule CodeCorps.GitHub.Event.Issues.UserLinkerTest do
         "repository" => %{"id" => github_repo_id}
       } = @payload
 
-      github_issue = insert(:github_issue, number: number)
-      repo = insert(:github_repo, github_id: github_repo_id)
+      github_repo = insert(:github_repo, github_id: github_repo_id)
+      github_issue = insert(:github_issue, number: number, github_repo: github_repo)
       # multiple tasks, each with different user is not ok
-      insert_pair(:task, github_repo: repo, github_issue: github_issue)
+      insert_pair(:task, github_repo: github_repo, github_issue: github_issue)
 
       assert {:error, :multiple_users} ==
         UserLinker.find_or_create_user(github_issue, @payload)
@@ -61,16 +61,15 @@ defmodule CodeCorps.GitHub.Event.Issues.UserLinkerTest do
       {:ok, %User{} = returned_user} = UserLinker.find_or_create_user(github_issue, @payload)
 
       assert preinserted_user.id == returned_user.id
+      assert Repo.get_by(User, attributes)
 
-      assert Repo.one(User)
+
     end
 
     test "creates user if none is found by any other method" do
       %{"issue" => %{"number" => number}} = @payload
       github_issue = insert(:github_issue, number: number)
       {:ok, %User{} = returned_user} = UserLinker.find_or_create_user(github_issue, @payload)
-
-      assert Repo.one(User)
 
       created_attributes = UserAdapter.from_github_user(@user_payload)
       created_user = Repo.get_by(User, created_attributes)
@@ -104,8 +103,6 @@ defmodule CodeCorps.GitHub.Event.Issues.UserLinkerTest do
       %{"issue" => %{"number" => number}} = @bot_payload
       github_issue = insert(:github_issue, number: number)
       {:ok, %User{} = returned_user} = UserLinker.find_or_create_user(github_issue, @bot_payload)
-
-      assert Repo.one(User)
 
       created_attributes = UserAdapter.from_github_user(@bot_user_payload)
       created_user = Repo.get_by(User, created_attributes)

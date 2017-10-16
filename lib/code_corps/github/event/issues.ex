@@ -53,7 +53,7 @@ defmodule CodeCorps.GitHub.Event.Issues do
     |> Multi.run(:repo, fn _ -> RepoFinder.find_repo(payload) end)
     |> Multi.run(:issue, fn %{repo: github_repo} -> link_issue(github_repo, payload) end)
     |> Multi.run(:user, fn %{issue: github_issue} -> UserLinker.find_or_create_user(github_issue, payload) end)
-    |> Multi.run(:tasks, fn %{issue: github_issue, repo: github_repo, user: user} -> TaskSyncer.sync_all(github_issue, github_repo, user, payload) end)
+    |> Multi.run(:tasks, fn %{issue: github_issue, user: user} -> github_issue |> TaskSyncer.sync_all(user, payload) end)
     |> Repo.transaction
     |> marshall_result()
   end
