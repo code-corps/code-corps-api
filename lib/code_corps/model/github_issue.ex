@@ -1,7 +1,6 @@
 defmodule CodeCorps.GithubIssue do
   use Ecto.Schema
   import Ecto.Changeset
-  alias CodeCorps.GithubIssue
 
   schema "github_issues" do
     field :body, :string
@@ -28,7 +27,7 @@ defmodule CodeCorps.GithubIssue do
   def changeset(struct, params) do
     struct
     |> cast(params, [:body, :closed_at, :comments_url, :events_url, :github_created_at, :github_id, :github_updated_at, :html_url, :labels_url, :locked, :number, :state, :title, :url])
-    |> validate_required([:body, :comments_url, :events_url, :github_created_at, :github_id, :github_updated_at, :html_url, :labels_url, :locked, :number, :state, :title, :url])
+    |> validate_required([:comments_url, :events_url, :github_created_at, :github_id, :github_updated_at, :html_url, :labels_url, :locked, :number, :state, :title, :url])
   end
 
   def create_changeset(struct, params) do

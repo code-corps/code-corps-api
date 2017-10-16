@@ -66,7 +66,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
   end
 
   @spec operational_multi(map) :: Multi.t
-  defp operational_multi(%{"action" => action, "issue" => issue_payload, "comment" => comment_payload} = payload) when action in ~w(created edited) do
+  defp operational_multi(%{"action" => action, "issue" => _, "comment" => _} = payload) when action in ~w(created edited) do
     Multi.new
     |> Multi.run(:repo, fn _ -> RepoFinder.find_repo(payload) end)
     |> Multi.run(:github_issue, fn %{repo: github_repo} -> github_repo |> link_issue(payload) end)

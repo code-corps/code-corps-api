@@ -27,6 +27,12 @@ defmodule CodeCorps.GithubIssueTest do
     assert changeset.valid?
   end
 
+  test "changeset with missing body" do
+    attrs = @valid_attrs |> Map.delete(:body)
+    changeset = GithubIssue.changeset(%GithubIssue{}, attrs)
+    assert changeset.valid?
+  end
+
   test "changeset with invalid attributes" do
     changeset = GithubIssue.changeset(%GithubIssue{}, @invalid_attrs)
     refute changeset.valid?
