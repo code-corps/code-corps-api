@@ -10,6 +10,7 @@ defmodule CodeCorps.GitHub.Webhook.Handler do
     GitHub.Event.InstallationRepositories,
     GitHub.Event.IssueComment,
     GitHub.Event.Issues,
+    GitHub.Event.PullRequest,
     GitHub.Webhook.EventSupport,
     Repo
   }
@@ -51,4 +52,5 @@ defmodule CodeCorps.GitHub.Webhook.Handler do
   defp do_handle(payload, "installation_repositories"), do: InstallationRepositories.handle(payload)
   defp do_handle(payload, "issue_comment"), do: IssueComment.handle(payload)
   defp do_handle(payload, "issues"), do: Issues.handle(payload)
+  defp do_handle(payload, "pull_request"), do: PullRequest.handle(payload)
 end

@@ -25,6 +25,7 @@ defmodule CodeCorps.Task do
     field :position, :integer, virtual: true
 
     belongs_to :github_issue, CodeCorps.GithubIssue
+    belongs_to :github_pull_request, CodeCorps.GithubPullRequest
     belongs_to :github_repo, CodeCorps.GithubRepo
     belongs_to :project, CodeCorps.Project
     belongs_to :task_list, CodeCorps.TaskList

@@ -1,17 +1,17 @@
-defmodule CodeCorps.GitHub.Adapters.GithubRepoTest do
+defmodule CodeCorps.GitHub.Adapters.RepoTest do
   @moduledoc false
 
   use ExUnit.Case, async: true
 
   import CodeCorps.GitHub.TestHelpers
 
-  alias CodeCorps.GitHub.Adapters.GithubRepo
+  alias CodeCorps.GitHub.Adapters.Repo
 
   describe "from_api/1" do
     test "maps api payload correctly" do
       %{"repositories" => [repo]} = load_event_fixture("user_repositories")
 
-      assert GithubRepo.from_api(repo) == %{
+      assert Repo.from_api(repo) == %{
         github_id: repo |> get_in(["id"]),
         name: repo |> get_in(["name"]),
         github_account_id: repo |> get_in(["owner", "id"]),

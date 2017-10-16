@@ -3,7 +3,9 @@ defmodule CodeCorps.GitHub.Webhook.EventSupport do
   Determines event support for a GitHub event type
   """
 
-  @supported_events ~w(installation installation_repositories issue_comment issues)
+  @supported_events ~w(
+    installation installation_repositories issue_comment issues pull_request
+  )
 
   @type support_status :: :supported | :unsupported
 
