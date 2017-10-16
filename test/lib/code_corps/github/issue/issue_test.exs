@@ -81,7 +81,8 @@ defmodule CodeCorps.GitHub.IssueTest do
     test "calls github API to create an issue for assigned task, makes user request if user is connected, returns response" do
       github_repo = insert(:github_repo, github_account_login: "foo", name: "bar")
       user = insert(:user, github_auth_token: "baz")
-      task = insert(:task, github_repo: github_repo, user: user, github_issue_number: 5)
+      github_issue = insert(:github_issue, number: 5)
+      task = insert(:task, github_issue: github_issue, github_repo: github_repo, user: user)
 
       assert Issue.update(task)
 
@@ -102,7 +103,8 @@ defmodule CodeCorps.GitHub.IssueTest do
     test "calls github API to create an issue for assigned task, makes integration request if user is not connected, returns response" do
       github_repo = insert(:github_repo, github_account_login: "foo", name: "bar")
       user = insert(:user, github_auth_token: nil)
-      task = insert(:task, github_repo: github_repo, user: user, github_issue_number: 5)
+      github_issue = insert(:github_issue, number: 5)
+      task = insert(:task, github_issue: github_issue, github_repo: github_repo, user: user)
 
       assert Issue.update(task)
 
@@ -123,7 +125,8 @@ defmodule CodeCorps.GitHub.IssueTest do
     test "returns error response if there was trouble" do
       github_repo = insert(:github_repo, github_account_login: "foo", name: "bar")
       user = insert(:user, github_auth_token: nil)
-      task = insert(:task, github_repo: github_repo, user: user, github_issue_number: 5)
+      github_issue = insert(:github_issue, number: 5)
+      task = insert(:task, github_issue: github_issue, github_repo: github_repo, user: user)
 
       with_mock_api CodeCorps.GitHub.FailureAPI do
         assert Issue.update(task)

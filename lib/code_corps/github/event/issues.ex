@@ -9,6 +9,7 @@ defmodule CodeCorps.GitHub.Event.Issues do
 
   alias CodeCorps.{
     GitHub.Event.Common.RepoFinder,
+    GitHub.Event.Issues.IssueLinker,
     GitHub.Event.Issues.TaskSyncer,
     GitHub.Event.Issues.UserLinker,
     GitHub.Event.Issues.Validator,
@@ -50,10 +51,16 @@ defmodule CodeCorps.GitHub.Event.Issues do
     |> Multi.run(:payload, fn _ -> payload |> validate_payload() end)
     |> Multi.run(:action, fn _ -> payload |> validate_action() end)
     |> Multi.run(:repo, fn _ -> RepoFinder.find_repo(payload) end)
-    |> Multi.run(:user, fn _ -> UserLinker.find_or_create_user(payload) end)
-    |> Multi.run(:tasks, fn %{repo: github_repo, user: user} -> TaskSyncer.sync_all(github_repo, user, payload) end)
+    |> Multi.run(:issue, fn %{repo: github_repo} -> link_issue(github_repo, payload) end)
+    |> Multi.run(:user, fn %{issue: github_issue} -> UserLinker.find_or_create_user(github_issue, payload) end)
+    |> Multi.run(:tasks, fn %{issue: github_issue, user: user} -> github_issue |> TaskSyncer.sync_all(user, payload) end)
     |> Repo.transaction
     |> marshall_result()
+  end
+
+  @spec link_issue(GithubRepo.t, map) :: {:ok, GithubIssue.t} | {:error, Ecto.Changeset.t}
+  defp link_issue(github_repo, %{"issue" => attrs}) do
+    IssueLinker.create_or_update_issue(github_repo, attrs)
   end
 
   @spec marshall_result(tuple) :: tuple

@@ -14,13 +14,10 @@ defmodule CodeCorps.GitHub.Event.Common.RepoFinder do
   - `{:error, :unmatched_project}` if record was found, but has no associated
     `ProjectGithubRepo` children
   """
-  @spec find_repo(map) :: {:ok, GithubRepo.t} | {:error, :unmatched_repository} | {:error, :unmatched_project}
+  @spec find_repo(map) :: {:ok, GithubRepo.t} | {:error, :unmatched_repository}
   def find_repo(%{"repository" => %{"id" => github_id}}) do
-    case GithubRepo |> Repo.get_by(github_id: github_id) |> Repo.preload(:project_github_repos) do
-      # a GithubRepo with at least some ProjectGithubRepo children
-      %GithubRepo{project_github_repos: [_ | _]} = github_repo -> {:ok, github_repo}
-      # a GithubRepo with no ProjectGithubRepo children
-      %GithubRepo{project_github_repos: []} -> {:error, :unmatched_project}
+    case GithubRepo |> Repo.get_by(github_id: github_id) do
+      %GithubRepo{} = github_repo -> {:ok, github_repo}
       nil -> {:error, :unmatched_repository}
     end
   end

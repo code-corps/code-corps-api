@@ -5,6 +5,7 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilder do
   """
 
   alias CodeCorps.{
+    GithubIssue,
     ProjectGithubRepo,
     Repo,
     Services.MarkdownRendererService,
@@ -22,24 +23,26 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilder do
 
   The changeset can be used to create or update a `Task`
   """
-  @spec build_changeset(Task.t, map, ProjectGithubRepo.t, User.t) :: Changeset.t
+  @spec build_changeset(Task.t, map, GithubIssue.t, ProjectGithubRepo.t, User.t) :: Changeset.t
   def build_changeset(
     %Task{id: task_id} = task,
     %{"issue" => issue_attrs},
+    %GithubIssue{} = github_issue,
     %ProjectGithubRepo{} = project_github_repo,
     %User{} = user) do
 
     case is_nil(task_id) do
-      true -> create_changeset(task, issue_attrs, project_github_repo, user)
+      true -> create_changeset(task, issue_attrs, github_issue, project_github_repo, user)
       false -> update_changeset(task, issue_attrs)
     end
   end
 
-  @create_attrs ~w(created_at github_issue_number markdown modified_at status title)a
-  @spec create_changeset(Task.t, map, ProjectGithubRepo.t, User.t) :: Changeset.t
+  @create_attrs ~w(created_at markdown modified_at status title)a
+  @spec create_changeset(Task.t, map, GithubIssue.t, ProjectGithubRepo.t, User.t) :: Changeset.t
   defp create_changeset(
     %Task{} = task,
     %{} = issue_attrs,
+    %GithubIssue{id: github_issue_id},
     %ProjectGithubRepo{project_id: project_id, github_repo_id: github_repo_id},
     %User{id: user_id}) do
 
@@ -51,18 +54,20 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilder do
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
     |> Changeset.put_change(:created_from, "github")
     |> Changeset.put_change(:modified_from, "github")
+    |> Changeset.put_change(:github_issue_id, github_issue_id)
     |> Changeset.put_change(:github_repo_id, github_repo_id)
     |> Changeset.put_change(:project_id, project_id)
     |> Changeset.put_change(:task_list_id, task_list_id)
     |> Changeset.put_change(:user_id, user_id)
     |> Changeset.validate_required([:project_id, :task_list_id, :title, :user_id])
+    |> Changeset.assoc_constraint(:github_issue)
     |> Changeset.assoc_constraint(:github_repo)
     |> Changeset.assoc_constraint(:project)
     |> Changeset.assoc_constraint(:task_list)
     |> Changeset.assoc_constraint(:user)
   end
 
-  @update_attrs ~w(github_issue_number markdown modified_at status title)a
+  @update_attrs ~w(markdown modified_at status title)a
   @spec update_changeset(Task.t, map) :: Changeset.t
   defp update_changeset(%Task{} = task, %{} = issue_attrs) do
     task

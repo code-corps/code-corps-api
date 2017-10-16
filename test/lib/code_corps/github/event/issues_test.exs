@@ -24,20 +24,6 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
   describe "handle/2 for Issues::opened" do
     @payload load_event_fixture("issues_opened")
 
-    test "with unmatched user, passes with no changes made if no matching projects" do
-      %{
-        "issue" => %{
-          "user" => %{"id" => user_github_id}
-        },
-        "repository" => %{"id" => repo_github_id}
-      } = @payload
-
-      insert(:github_repo, github_id: repo_github_id)
-      assert Issues.handle(@payload) == {:ok, []}
-      assert Repo.aggregate(Task, :count, :id) == 0
-      refute Repo.get_by(User, github_id: user_github_id)
-    end
-
     test "with unmatched user, creates user, creates task for each project associated to github repo" do
       %{
         "issue" => %{
@@ -70,12 +56,14 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       assert user
 
       tasks |> Enum.each(fn task ->
+        task = task |> Repo.preload(:github_issue)
         assert task.user_id == user.id
+        assert task.github_issue_id
         assert task.github_repo_id == github_repo.id
         assert task.project_id in project_ids
         assert task.markdown == markdown
         assert task.title == title
-        assert task.github_issue_number == number
+        assert task.github_issue.number == number
         assert task.status == "open"
       end)
     end
@@ -85,24 +73,16 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       refute Repo.one(User)
     end
 
-    test "with matched user, passes with no changes made if no matching projects" do
-      %{"issue" => %{"user" => %{"id" => user_github_id}}, "repository" => %{"id" => repo_github_id}} = @payload
-      insert(:user, github_id: user_github_id)
-
-      insert(:github_repo, github_id: repo_github_id)
-      assert Issues.handle(@payload) == {:ok, []}
-      assert Repo.aggregate(Task, :count, :id) == 0
-    end
-
     test "with matched user, creates or updates task for each project associated to github repo" do
       %{
-        "issue" => %{"body" => markdown, "title" => title, "number" => number, "user" => %{"id" => user_github_id}},
+        "issue" => %{"id" => issue_github_id, "body" => markdown, "title" => title, "number" => number, "user" => %{"id" => user_github_id}},
         "repository" => %{"id" => repo_github_id}
       } = @payload
 
       user = insert(:user, github_id: user_github_id)
 
       github_repo = insert(:github_repo, github_id: repo_github_id)
+      github_issue = insert(:github_issue, github_id: issue_github_id, number: number, github_repo: github_repo)
 
       [%{project: project} | _rest] = project_github_repos = insert_list(3, :project_github_repo, github_repo: github_repo)
 
@@ -117,7 +97,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       end)
 
       %{id: existing_task_id} =
-        insert(:task, project: project, user: user, github_repo: github_repo, github_issue_number: number)
+        insert(:task, project: project, user: user, github_repo: github_repo, github_issue: github_issue)
 
       {:ok, tasks} = Issues.handle(@payload)
 
@@ -125,11 +105,13 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       assert Repo.aggregate(Task, :count, :id) == 3
 
       tasks |> Enum.each(fn task ->
+        task = task |> Repo.preload(:github_issue)
+        assert task.github_issue_id == github_issue.id
         assert task.github_repo_id == github_repo.id
         assert task.project_id in project_ids
         assert task.markdown == markdown
         assert task.title == title
-        assert task.github_issue_number == number
+        assert task.github_issue.number == number
         assert task.status == "open"
       end)
 
@@ -159,18 +141,6 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
   describe "handle/2 for Issues::closed" do
     @payload load_event_fixture("issues_closed")
 
-    test "with unmatched user, passes with no changes made if no matching projects" do
-      %{
-        "issue" => %{"user" => %{"id" => user_github_id}},
-        "repository" => %{"id" => repo_github_id}
-      } = @payload
-
-      insert(:github_repo, github_id: repo_github_id)
-      assert Issues.handle(@payload) == {:ok, []}
-      assert Repo.aggregate(Task, :count, :id) == 0
-      refute Repo.get_by(User, github_id: user_github_id)
-    end
-
     test "with unmatched user, creates user, creates task for each project associated to github repo" do
       %{
         "issue" => %{
@@ -203,12 +173,14 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       assert user
 
       tasks |> Enum.each(fn task ->
+        task = task |> Repo.preload(:github_issue)
         assert task.user_id == user.id
+        assert task.github_issue_id
         assert task.github_repo_id == github_repo.id
         assert task.project_id in project_ids
         assert task.markdown == markdown
         assert task.title == title
-        assert task.github_issue_number == number
+        assert task.github_issue.number == number
         assert task.status == "closed"
       end)
     end
@@ -218,24 +190,16 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       refute Repo.one(User)
     end
 
-    test "with matched user, passes with no changes made if no matching projects" do
-      %{"issue" => %{"user" => %{"id" => user_github_id}}, "repository" => %{"id" => repo_github_id}} = @payload
-      insert(:user, github_id: user_github_id)
-
-      insert(:github_repo, github_id: repo_github_id)
-      assert Issues.handle(@payload) == {:ok, []}
-      assert Repo.aggregate(Task, :count, :id) == 0
-    end
-
     test "with matched user, creates or updates task for each project associated to github repo" do
       %{
-        "issue" => %{"body" => markdown, "title" => title, "number" => number, "user" => %{"id" => user_github_id}},
+        "issue" => %{"id" => issue_github_id, "body" => markdown, "title" => title, "number" => number, "user" => %{"id" => user_github_id}},
         "repository" => %{"id" => repo_github_id}
       } = @payload
 
       user = insert(:user, github_id: user_github_id)
 
       github_repo = insert(:github_repo, github_id: repo_github_id)
+      github_issue = insert(:github_issue, github_id: issue_github_id, number: number, github_repo: github_repo)
 
       [%{project: project} | _rest] = project_github_repos = insert_list(3, :project_github_repo, github_repo: github_repo)
 
@@ -250,7 +214,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       end)
 
       %{id: existing_task_id} =
-        insert(:task, project: project, user: user, github_repo: github_repo, github_issue_number: number)
+        insert(:task, project: project, user: user, github_repo: github_repo, github_issue: github_issue)
 
       {:ok, tasks} = Issues.handle(@payload)
 
@@ -258,11 +222,13 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       assert Repo.aggregate(Task, :count, :id) == 3
 
       tasks |> Enum.each(fn task ->
+        task = task |> Repo.preload(:github_issue)
+        assert task.github_issue_id == github_issue.id
         assert task.github_repo_id == github_repo.id
         assert task.project_id in project_ids
         assert task.markdown == markdown
         assert task.title == title
-        assert task.github_issue_number == number
+        assert task.github_issue.number == number
         assert task.status == "closed"
       end)
 
@@ -292,18 +258,6 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
   describe "handle/2 for Issues::edited" do
     @payload load_event_fixture("issues_edited")
 
-    test "with unmatched user, passes with no changes made if no matching projects" do
-      %{
-        "issue" => %{"user" => %{"id" => user_github_id}},
-        "repository" => %{"id" => repo_github_id}
-      } = @payload
-
-      insert(:github_repo, github_id: repo_github_id)
-      assert Issues.handle(@payload) == {:ok, []}
-      assert Repo.aggregate(Task, :count, :id) == 0
-      refute Repo.get_by(User, github_id: user_github_id)
-    end
-
     test "with unmatched user, creates user, creates task for each project associated to github repo" do
       %{
         "issue" => %{
@@ -336,12 +290,14 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       assert user
 
       tasks |> Enum.each(fn task ->
+        task = task |> Repo.preload(:github_issue)
         assert task.user_id == user.id
+        assert task.github_issue_id
         assert task.github_repo_id == github_repo.id
         assert task.project_id in project_ids
         assert task.markdown == markdown
         assert task.title == title
-        assert task.github_issue_number == number
+        assert task.github_issue.number == number
         assert task.status == "open"
       end)
     end
@@ -351,24 +307,16 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       refute Repo.one(User)
     end
 
-    test "with matched user, passes with no changes made if no matching projects" do
-      %{"issue" => %{"user" => %{"id" => user_github_id}}, "repository" => %{"id" => repo_github_id}} = @payload
-      insert(:user, github_id: user_github_id)
-
-      insert(:github_repo, github_id: repo_github_id)
-      assert Issues.handle(@payload) == {:ok, []}
-      assert Repo.aggregate(Task, :count, :id) == 0
-    end
-
     test "with matched user, creates or updates task for each project associated to github repo" do
       %{
-        "issue" => %{"body" => markdown, "title" => title, "number" => number, "user" => %{"id" => user_github_id}},
+        "issue" => %{"id" => issue_github_id, "body" => markdown, "title" => title, "number" => number, "user" => %{"id" => user_github_id}},
         "repository" => %{"id" => repo_github_id}
       } = @payload
 
       user = insert(:user, github_id: user_github_id)
 
       github_repo = insert(:github_repo, github_id: repo_github_id)
+      github_issue = insert(:github_issue, github_id: issue_github_id, number: number, github_repo: github_repo)
 
       [%{project: project} | _rest] = project_github_repos = insert_list(3, :project_github_repo, github_repo: github_repo)
 
@@ -383,7 +331,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       end)
 
       %{id: existing_task_id} =
-        insert(:task, project: project, user: user, github_repo: github_repo, github_issue_number: number)
+        insert(:task, project: project, user: user, github_repo: github_repo, github_issue: github_issue)
 
       {:ok, tasks} = Issues.handle(@payload)
 
@@ -391,11 +339,13 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       assert Repo.aggregate(Task, :count, :id) == 3
 
       tasks |> Enum.each(fn task ->
+        task = task |> Repo.preload(:github_issue)
+        assert task.github_issue_id == github_issue.id
         assert task.github_repo_id == github_repo.id
         assert task.project_id in project_ids
         assert task.markdown == markdown
         assert task.title == title
-        assert task.github_issue_number == number
+        assert task.github_issue.number == number
         assert task.status == "open"
       end)
 
@@ -425,18 +375,6 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
   describe "handle/2 for Issues::reopened" do
     @payload load_event_fixture("issues_reopened")
 
-    test "with unmatched user, passes with no changes made if no matching projects" do
-      %{
-        "issue" => %{"user" => %{"id" => user_github_id}},
-        "repository" => %{"id" => repo_github_id}
-      } = @payload
-
-      insert(:github_repo, github_id: repo_github_id)
-      assert Issues.handle(@payload) == {:ok, []}
-      assert Repo.aggregate(Task, :count, :id) == 0
-      refute Repo.get_by(User, github_id: user_github_id)
-    end
-
     test "with unmatched user, creates user, creates task for each project associated to github repo" do
       %{
         "issue" => %{
@@ -469,12 +407,14 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       assert user
 
       tasks |> Enum.each(fn task ->
+        task = task |> Repo.preload(:github_issue)
         assert task.user_id == user.id
+        assert task.github_issue_id
         assert task.github_repo_id == github_repo.id
         assert task.project_id in project_ids
         assert task.markdown == markdown
         assert task.title == title
-        assert task.github_issue_number == number
+        assert task.github_issue.number == number
         assert task.status == "open"
       end)
     end
@@ -484,24 +424,16 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       refute Repo.one(User)
     end
 
-    test "with matched user, passes with no changes made if no matching projects" do
-      %{"issue" => %{"user" => %{"id" => user_github_id}}, "repository" => %{"id" => repo_github_id}} = @payload
-      insert(:user, github_id: user_github_id)
-
-      insert(:github_repo, github_id: repo_github_id)
-      assert Issues.handle(@payload) == {:ok, []}
-      assert Repo.aggregate(Task, :count, :id) == 0
-    end
-
     test "with matched user, creates or updates task for each project associated to github repo" do
       %{
-        "issue" => %{"body" => markdown, "title" => title, "number" => number, "user" => %{"id" => user_github_id}},
+        "issue" => %{"id" => issue_github_id, "body" => markdown, "title" => title, "number" => number, "user" => %{"id" => user_github_id}},
         "repository" => %{"id" => repo_github_id}
       } = @payload
 
       user = insert(:user, github_id: user_github_id)
 
       github_repo = insert(:github_repo, github_id: repo_github_id)
+      github_issue = insert(:github_issue, github_id: issue_github_id, number: number, github_repo: github_repo)
 
       [%{project: project} | _rest] = project_github_repos = insert_list(3, :project_github_repo, github_repo: github_repo)
 
@@ -516,7 +448,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       end)
 
       %{id: existing_task_id} =
-        insert(:task, project: project, user: user, github_repo: github_repo, github_issue_number: number)
+        insert(:task, project: project, user: user, github_repo: github_repo, github_issue: github_issue)
 
       {:ok, tasks} = Issues.handle(@payload)
 
@@ -524,11 +456,13 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       assert Repo.aggregate(Task, :count, :id) == 3
 
       tasks |> Enum.each(fn task ->
-        assert task.project_id in project_ids
+        task = task |> Repo.preload(:github_issue)
+        assert task.github_issue_id == github_issue.id
         assert task.github_repo_id == github_repo.id
+        assert task.project_id in project_ids
         assert task.markdown == markdown
         assert task.title == title
-        assert task.github_issue_number == number
+        assert task.github_issue.number == number
         assert task.status == "open"
       end)
 

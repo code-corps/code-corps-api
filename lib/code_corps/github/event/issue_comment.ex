@@ -8,6 +8,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
 
   alias CodeCorps.{
     Comment,
+    GithubRepo,
     GitHub.Event.Common.RepoFinder,
     GitHub.Event.Issues,
     GitHub.Event.Issues.TaskSyncer,
@@ -22,6 +23,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
                    {:error, :unexpected_action} |
                    {:error, :unexpected_payload} |
                    {:error, :repository_not_found} |
+                   {:error, :validation_error_on_inserting_issue_for_task} |
                    {:error, :validation_error_on_inserting_user_for_task} |
                    {:error, :multiple_github_users_matched_same_cc_user_for_task} |
                    {:error, :validation_error_on_inserting_user_for_comment} |
@@ -60,12 +62,13 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
   end
 
   @spec operational_multi(map) :: Multi.t
-  defp operational_multi(%{"action" => action} = payload) when action in ~w(created edited) do
+  defp operational_multi(%{"action" => action, "issue" => issue_payload} = payload) when action in ~w(created edited) do
     Multi.new
     |> Multi.run(:repo, fn _ -> RepoFinder.find_repo(payload) end)
-    |> Multi.run(:issue_user, fn _ -> Issues.UserLinker.find_or_create_user(payload) end)
+    |> Multi.run(:issue, fn %{repo: %GithubRepo{} = github_repo} -> github_repo |> Issues.IssueLinker.create_or_update_issue(issue_payload) end)
+    |> Multi.run(:issue_user, fn %{issue: github_issue} -> github_issue |> Issues.UserLinker.find_or_create_user(payload) end)
     |> Multi.run(:comment_user, fn _ -> IssueComment.UserLinker.find_or_create_user(payload) end)
-    |> Multi.run(:tasks, fn %{repo: github_repo, issue_user: user} -> TaskSyncer.sync_all(github_repo, user, payload) end)
+    |> Multi.run(:tasks, fn %{issue: github_issue, issue_user: user} -> github_issue |> TaskSyncer.sync_all(user, payload) end)
     |> Multi.run(:comments, fn %{tasks: tasks, comment_user: user} -> CommentSyncer.sync_all(tasks, user, payload) end)
   end
   defp operational_multi(%{"action" => "deleted"} = payload) do
@@ -80,6 +83,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
   defp marshall_result({:error, :action, :unexpected_action, _steps}), do: {:error, :unexpected_action}
   defp marshall_result({:error, :repo, :unmatched_project, _steps}), do: {:ok, []}
   defp marshall_result({:error, :repo, :unmatched_repository, _steps}), do: {:error, :repository_not_found}
+  defp marshall_result({:error, :issue, %Ecto.Changeset{}, _steps}), do: {:error, :validation_error_on_inserting_issue_for_task}
   defp marshall_result({:error, :issue_user, %Ecto.Changeset{}, _steps}), do: {:error, :validation_error_on_inserting_user_for_task}
   defp marshall_result({:error, :issue_user, :multiple_users, _steps}), do: {:error, :multiple_github_users_matched_same_cc_user_for_task}
   defp marshall_result({:error, :comment_user, %Ecto.Changeset{}, _steps}), do: {:error, :validation_error_on_inserting_user_for_comment}

@@ -1,5 +1,6 @@
 defmodule CodeCorps.GitHub.Event.Issues.TaskSyncer do
   alias CodeCorps.{
+    GithubIssue,
     GithubRepo,
     GitHub.Event.Common.ResultAggregator,
     GitHub.Event.Issues.ChangesetBuilder,
@@ -15,34 +16,41 @@ defmodule CodeCorps.GitHub.Event.Issues.TaskSyncer do
                    {:error, {list(Task.t), list(Changeset.t)}}
 
   @doc """
-  When provided a `GithubRepo`, a `User` and a GitHub API payload, for each
-  `Project` associated to that `GithubRepo` via a `ProjectGithubRepo`, it
-  creates or updates a `Task` associated to the specified `User`.
+  When provided a `CodeCorps.GithubIssue`, a `CodeCorps.User` and a GitHub API
+  payload, for each `CodeCorps.Project` associated to that
+  `CodeCorps.GithubRepo` via a `CodeCorps.ProjectGithubRepo`, it
+  creates or updates a `CodeCorps.Task`.
   """
-  @spec sync_all(GithubRepo.t, User.t, map) :: {:ok, list(Task.t)}
-  def sync_all(%GithubRepo{project_github_repos: project_github_repos}, %User{} = user, %{} = payload) do
+  @spec sync_all(GithubIssue.t, User.t, map) :: {:ok, list(Task.t)}
+  def sync_all(%GithubIssue{} = github_issue, %User{} = user, %{} = payload) do
+
+    %GithubIssue{
+      github_repo: %GithubRepo{project_github_repos: project_github_repos}
+    } = github_issue |> Repo.preload(github_repo: :project_github_repos)
+
     project_github_repos
-    |> Enum.map(&sync(&1, user, payload))
+    |> Enum.map(&sync(github_issue, &1, user, payload))
     |> ResultAggregator.aggregate
   end
 
-  @spec sync(ProjectGithubRepo.t, User.t, map) :: {:ok, ProjectGithubRepo.t} | {:error, Changeset.t}
-  defp sync(%ProjectGithubRepo{} = project_github_repo, %User{} = user, %{} = payload) do
+  @spec sync(GithubIssue.t, ProjectGithubRepo.t, User.t, map) :: {:ok, ProjectGithubRepo.t} | {:error, Changeset.t}
+  defp sync(%GithubIssue{} = github_issue, %ProjectGithubRepo{} = project_github_repo, %User{} = user, %{} = payload) do
     project_github_repo
-    |> find_or_init_task(payload)
-    |> ChangesetBuilder.build_changeset(payload, project_github_repo, user)
+    |> find_or_init_task(github_issue)
+    |> ChangesetBuilder.build_changeset(payload, github_issue, project_github_repo, user)
     |> commit()
   end
 
-  @spec find_or_init_task(ProjectGithubRepo.t, map) :: Task.t
+  @spec find_or_init_task(ProjectGithubRepo.t, GithubIssue.t) :: Task.t
   defp find_or_init_task(
     %ProjectGithubRepo{project_id: project_id, github_repo_id: github_repo_id},
-    %{"issue" => %{"number" => github_issue_number}}) do
+    %GithubIssue{id: github_issue_id}
+  ) do
 
     query_params = [
-      github_issue_number: github_issue_number,
-      project_id: project_id,
-      github_repo_id: github_repo_id
+      github_issue_id: github_issue_id,
+      github_repo_id: github_repo_id,
+      project_id: project_id
     ]
 
     case Task |> Repo.get_by(query_params) do

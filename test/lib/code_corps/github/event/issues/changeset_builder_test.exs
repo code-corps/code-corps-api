@@ -15,13 +15,14 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilderTest do
     test "assigns proper changes to the task" do
       payload = load_event_fixture("issues_opened")
       task = %Task{}
+      github_issue = insert(:github_issue)
       project = insert(:project)
       project_github_repo = insert(:project_github_repo, project: project)
       user = insert(:user)
       task_list = insert(:task_list, project: project, inbox: true)
 
       changeset = ChangesetBuilder.build_changeset(
-        task, payload, project_github_repo, user
+        task, payload, github_issue, project_github_repo, user
       )
 
       {:ok, created_at, _} = payload["issue"]["created_at"] |> DateTime.from_iso8601()
@@ -29,7 +30,6 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilderTest do
 
       # adapted fields
       assert get_change(changeset, :created_at) == created_at
-      assert get_change(changeset, :github_issue_number) == payload["issue"]["number"]
       assert get_change(changeset, :markdown) == payload["issue"]["body"]
       assert get_change(changeset, :modified_at) == updated_at
       assert get_change(changeset, :name) == payload["issue"]["name"]
@@ -45,6 +45,7 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilderTest do
         |> Earmark.as_html!(%Earmark.Options{code_class_prefix: "language-"})
 
       # relationships are proper
+      assert get_change(changeset, :github_issue_id) == github_issue.id
       assert get_change(changeset, :github_repo_id) == project_github_repo.github_repo_id
       assert get_change(changeset, :project_id) == project_github_repo.project_id
       assert get_change(changeset, :task_list_id) == task_list.id
@@ -55,7 +56,7 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilderTest do
 
     test "validates that modified_at has not already happened" do
       payload = load_event_fixture("issues_opened")
-      %{"issue" => %{"number" => issue_number, "updated_at" => updated_at}} = payload
+      %{"issue" => %{"updated_at" => updated_at}} = payload
 
       # Set the modified_at in the future
       modified_at =
@@ -64,13 +65,14 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilderTest do
         |> Timex.shift(days: 1)
 
       project = insert(:project)
+      github_issue = insert(:github_issue)
       github_repo = insert(:github_repo)
       project_github_repo = insert(:project_github_repo, github_repo: github_repo, project: project)
       user = insert(:user)
-      task = insert(:task, project: project, github_repo: github_repo, github_issue_number: issue_number, user: user, modified_at: modified_at)
+      task = insert(:task, project: project, github_issue: github_issue, github_repo: github_repo, user: user, modified_at: modified_at)
 
       changeset = ChangesetBuilder.build_changeset(
-        task, payload, project_github_repo, user
+        task, payload, github_issue, project_github_repo, user
       )
 
       refute changeset.valid?

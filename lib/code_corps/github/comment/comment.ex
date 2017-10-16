@@ -3,7 +3,7 @@ defmodule CodeCorps.GitHub.Comment do
   Handles GitHub API requests for actions on Comments
   """
 
-  alias CodeCorps.{Comment, GitHub, GithubAppInstallation, GithubRepo, Task, User}
+  alias CodeCorps.{Comment, GitHub, GithubAppInstallation, GithubIssue, GithubRepo, Task, User}
 
   @spec create(Comment.t) :: GitHub.response
   def create(
@@ -64,7 +64,9 @@ defmodule CodeCorps.GitHub.Comment do
   defp create_endpoint_for(
     %Comment{
       task: %Task{
-        github_issue_number: number,
+        github_issue: %GithubIssue{
+          number: number
+        },
         github_repo: %GithubRepo{
           github_account_login: owner, name: repo
         },
