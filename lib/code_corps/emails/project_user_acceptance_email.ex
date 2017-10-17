@@ -2,7 +2,7 @@ defmodule CodeCorps.Emails.ProjectUserAcceptanceEmail do
   import Bamboo.Email
   import Bamboo.PostmarkHelper
 
-  alias CodeCorps.{Project, ProjectUser, Repo, User}
+  alias CodeCorps.{Project, ProjectUser, Repo, User, WebClient}
   alias CodeCorps.Emails.BaseEmail
   alias CodeCorps.Presenters.ImagePresenter
 
@@ -26,8 +26,7 @@ defmodule CodeCorps.Emails.ProjectUserAcceptanceEmail do
   defp preload(%Project{} = project), do: project |> Repo.preload(:organization)
 
   defp url(project) do
-    :code_corps
-    |> Application.get_env(:site_url)
+    WebClient.url()
     |> URI.merge(project.organization.slug <> "/" <> project.slug)
     |> URI.to_string
   end

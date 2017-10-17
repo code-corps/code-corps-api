@@ -1,6 +1,7 @@
 defmodule CodeCorps.GitHub.Event.Issues.UserLinkerTest do
   @moduledoc false
 
+  use CodeCorps.BackgroundProcessingCase
   use CodeCorps.DbAccessCase
 
   import CodeCorps.GitHub.TestHelpers
@@ -10,7 +11,6 @@ defmodule CodeCorps.GitHub.Event.Issues.UserLinkerTest do
     Repo,
     User
   }
-
   alias CodeCorps.GitHub.Adapters.User, as: UserAdapter
 
   @payload load_event_fixture("issues_opened")
@@ -62,8 +62,6 @@ defmodule CodeCorps.GitHub.Event.Issues.UserLinkerTest do
 
       assert preinserted_user.id == returned_user.id
       assert Repo.get_by(User, attributes)
-
-
     end
 
     test "creates user if none is found by any other method" do

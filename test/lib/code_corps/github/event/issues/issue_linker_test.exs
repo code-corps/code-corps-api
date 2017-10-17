@@ -25,7 +25,7 @@ defmodule CodeCorps.GitHub.Event.Issues.IssueLinkerTest do
 
       created_attributes =
         attrs
-        |> IssueAdapter.from_api
+        |> IssueAdapter.to_issue
         |> Map.delete(:closed_at)
         |> Map.delete(:repository_url)
       returned_issue = Repo.get_by(GithubIssue, created_attributes)

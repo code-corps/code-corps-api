@@ -30,7 +30,7 @@ defmodule CodeCorps.GitHub.Event.Issues.IssueLinker do
   """
   @spec create_or_update_issue(GithubRepo.t, map) :: linking_result
   def create_or_update_issue(%GithubRepo{} = github_repo, %{"id" => github_issue_id} = attrs) do
-    params = IssueAdapter.from_api(attrs)
+    params = IssueAdapter.to_issue(attrs)
 
     case Repo.get_by(GithubIssue, github_id: github_issue_id) do
       nil -> create_issue(github_repo, params)

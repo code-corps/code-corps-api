@@ -2,7 +2,7 @@ defmodule CodeCorps.Emails.OrganizationInviteEmail do
     import Bamboo.Email
     import Bamboo.PostmarkHelper
 
-    alias CodeCorps.{Emails.BaseEmail, OrganizationInvite}
+    alias CodeCorps.{Emails.BaseEmail, OrganizationInvite, WebClient}
 
     def create(%OrganizationInvite{} = invite) do
       BaseEmail.create
@@ -19,7 +19,7 @@ defmodule CodeCorps.Emails.OrganizationInviteEmail do
     end
 
     defp invite_url(code, organization_name) do
-      Application.get_env(:code_corps, :site_url)
+      WebClient.url()
       |> URI.merge("/invites/organization" <> "?" <> set_params(code, organization_name))
       |> URI.to_string
     end

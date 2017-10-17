@@ -2,7 +2,7 @@ defmodule CodeCorps.Emails.OrganizationInviteEmailTest do
     use CodeCorps.ModelCase
     use Bamboo.Test
 
-    alias CodeCorps.Emails.OrganizationInviteEmail
+    alias CodeCorps.{Emails.OrganizationInviteEmail, WebClient}
 
     test "organization email invite works" do
       invite = insert(:organization_invite)
@@ -15,7 +15,7 @@ defmodule CodeCorps.Emails.OrganizationInviteEmailTest do
       params =
         %{code: invite.code, organization_name: invite.organization_name}
         |> URI.encode_query
-      invite_url = "#{Application.get_env(:code_corps, :site_url)}/invites/organization?#{params}"
+      invite_url = "#{WebClient.url()}/invites/organization?#{params}"
 
       assert template_model == %{
         invite_url: invite_url,

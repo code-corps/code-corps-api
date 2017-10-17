@@ -43,7 +43,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilder do
     %User{} = user) do
 
     comment
-    |> Changeset.cast(CommentAdapter.from_api(attrs), @create_attrs)
+    |> Changeset.cast(CommentAdapter.to_comment(attrs), @create_attrs)
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
     |> Changeset.put_change(:created_from, "github")
     |> Changeset.put_change(:modified_from, "github")
@@ -57,7 +57,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilder do
   @spec update_changeset(Comment.t, map) :: Changeset.t
   defp update_changeset(%Comment{} = comment, %{} = attrs) do
     comment
-    |> Changeset.cast(CommentAdapter.from_api(attrs), @update_attrs)
+    |> Changeset.cast(CommentAdapter.to_comment(attrs), @update_attrs)
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
     |> Changeset.put_change(:modified_from, "github")
     |> TimeValidator.validate_time_after(:modified_at)
