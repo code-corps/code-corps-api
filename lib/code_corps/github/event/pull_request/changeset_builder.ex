@@ -14,7 +14,7 @@ defmodule CodeCorps.GitHub.Event.PullRequest.ChangesetBuilder do
     User,
     Validators.TimeValidator
   }
-  alias CodeCorps.GitHub.Adapters.Task, as: TaskAdapter
+  alias CodeCorps.GitHub.Adapters.Issue, as: IssueAdapter
   alias Ecto.Changeset
 
   @doc ~S"""
@@ -50,7 +50,7 @@ defmodule CodeCorps.GitHub.Event.PullRequest.ChangesetBuilder do
       TaskList |> Repo.get_by(project_id: project_id, inbox: true)
 
     task
-    |> Changeset.cast(TaskAdapter.from_api(pull_request_attrs), @create_attrs)
+    |> Changeset.cast(IssueAdapter.to_task(pull_request_attrs), @create_attrs)
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
     |> Changeset.put_change(:created_from, "github")
     |> Changeset.put_change(:modified_from, "github")
@@ -71,7 +71,7 @@ defmodule CodeCorps.GitHub.Event.PullRequest.ChangesetBuilder do
   @spec update_changeset(Task.t, map) :: Changeset.t
   defp update_changeset(%Task{} = task, %{} = pull_request_attrs) do
     task
-    |> Changeset.cast(TaskAdapter.from_api(pull_request_attrs), @update_attrs)
+    |> Changeset.cast(IssueAdapter.to_task(pull_request_attrs), @update_attrs)
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
     |> Changeset.put_change(:modified_from, "github")
     |> TimeValidator.validate_time_after(:modified_at)

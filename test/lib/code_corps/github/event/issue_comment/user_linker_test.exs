@@ -1,6 +1,7 @@
 defmodule CodeCorps.GitHub.Event.IssueComment.UserLinkerTest do
   @moduledoc false
 
+  use CodeCorps.BackgroundProcessingCase
   use CodeCorps.DbAccessCase
 
   import CodeCorps.GitHub.TestHelpers
@@ -10,7 +11,6 @@ defmodule CodeCorps.GitHub.Event.IssueComment.UserLinkerTest do
     Repo,
     User
   }
-
   alias CodeCorps.GitHub.Adapters.User, as: UserAdapter
 
   @payload load_event_fixture("issue_comment_created")

@@ -3,7 +3,7 @@ defmodule CodeCorps.Emails.ReceiptEmail do
   import Bamboo.PostmarkHelper
 
   alias CodeCorps.Emails.BaseEmail
-  alias CodeCorps.{DonationGoal, Project, Repo, StripeConnectCharge, StripeConnectSubscription}
+  alias CodeCorps.{DonationGoal, Project, Repo, StripeConnectCharge, StripeConnectSubscription, WebClient}
 
   def create(%StripeConnectCharge{} = charge, %Stripe.Invoice{} = invoice) do
     with %StripeConnectCharge{} = charge <- preload(charge),
@@ -77,8 +77,7 @@ defmodule CodeCorps.Emails.ReceiptEmail do
   end
 
   defp url(project) do
-    :code_corps
-    |> Application.get_env(:site_url)
+    WebClient.url()
     |> URI.merge(project.organization.slug <> "/" <> project.slug)
     |> URI.to_string
   end

@@ -39,7 +39,15 @@ defmodule CodeCorps.Task.Service do
     {:error, :github}
   end
 
-  @preloads [:github_issue, [github_repo: :github_app_installation], :user]
+  # :user, :github_issue and :github_repo are required for connecting to github
+  # :project and :organization are required in order to add a header to the
+  # github issue body when the user themselves are not connected to github, but
+  # the task is
+  #
+  # Right now, all of these preloads are loaded at once. If there are
+  # performance issues, we can split them up according the the information
+  # provided here.
+  @preloads [:github_issue, [github_repo: :github_app_installation], :user, [project: :organization]]
 
   @spec create_on_github(Task.t) :: {:ok, Task.t} :: {:error, GitHub.api_error_struct}
   defp create_on_github(%Task{github_repo_id: nil} = task), do: {:ok, task}

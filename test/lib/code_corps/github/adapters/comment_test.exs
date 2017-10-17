@@ -7,27 +7,29 @@ defmodule CodeCorps.GitHub.Adapters.CommentTest do
 
   alias CodeCorps.{GitHub.Adapters, Comment}
 
-  describe "from_api/1" do
+  describe "to_comment/1" do
     test "maps api payload correctly" do
-      payload = load_event_fixture("issue_comment_created")
+      %{"comment" => payload} = load_event_fixture("issue_comment_created")
 
-      assert Adapters.Comment.from_api(payload) == %{
+      assert Adapters.Comment.to_comment(payload) == %{
         created_at: payload["created_at"],
         markdown: payload["body"],
         modified_at: payload["updated_at"]
       }
     end
-  end
 
-  describe "to_api/1" do
-    test "maps Comment correctly" do
-      payload =
-        %Comment{markdown: "bar"}
-        |> Adapters.Comment.to_api
+    test "removes 'Posted by' header from body if one is present" do
+      %{"comment" => %{"body" => body} = payload} =
+        load_event_fixture("issue_comment_created")
 
-      assert payload["body"] == "bar"
-      refute payload["created_at"]
-      refute payload["updated_at"]
+      modified_payload =
+        payload |> Map.put("body", "Posted by \r\n\r\n[//]: # (Please type your edits below this line)\r\n\r\n---\r\n\r\n" <> body)
+
+      assert Adapters.Comment.to_comment(modified_payload) == %{
+        created_at: payload["created_at"],
+        markdown: payload["body"],
+        modified_at: payload["updated_at"]
+      }
     end
   end
 
@@ -43,6 +45,26 @@ defmodule CodeCorps.GitHub.Adapters.CommentTest do
         html_url: payload["html_url"],
         url: payload["url"]
       }
+    end
+  end
+
+  describe "to_api/1" do
+    test "maps Comment correctly" do
+      payload =
+        %Comment{markdown: "bar"}
+        |> Adapters.Comment.to_api
+
+      assert payload["body"] == "bar"
+      refute payload["created_at"]
+      refute payload["updated_at"]
+    end
+
+    test "adds 'Posted by' header to body if comment user is not github connected" do
+      user = insert(:user, github_id: nil)
+      comment = insert(:comment, user: user)
+      payload = comment |> Adapters.Comment.to_api
+
+      assert payload["body"] =~ "Posted by"
     end
   end
 end

@@ -17,7 +17,23 @@ defmodule CodeCorps.Comment.Service do
 
   require Logger
 
-  @preloads [:user, :github_comment, task: [:github_issue, github_repo: :github_app_installation]]
+  # :user, :github_issue and :github_repo are required for connecting to github
+  # :project and :organization are required in order to add a header to the
+  # github comment body when the user themselves are not connected to github,
+  # but the parent task is
+  #
+  # Right now, all of these preloads are loaded at once. If there are
+  # performance issues, we can split them up according the the information
+  # provided here.
+  @preloads [
+    :github_comment,
+    :user,
+    task: [
+      :github_issue,
+      [github_repo: :github_app_installation],
+      [project: :organization]
+    ]
+  ]
 
   @doc ~S"""
   Creates a `Comment` record using the provided parameters
@@ -54,8 +70,6 @@ defmodule CodeCorps.Comment.Service do
     Logger.info "#{inspect result}"
     {:error, :github}
   end
-
-  @preloads [task: [:github_issue, github_repo: :github_app_installation]]
 
   @spec create_on_github(Comment.t) :: {:ok, Comment.t} :: {:error, GitHub.api_error_struct}
   defp create_on_github(%Comment{task: %Task{github_issue_id: nil}} = comment), do: {:ok, comment}
