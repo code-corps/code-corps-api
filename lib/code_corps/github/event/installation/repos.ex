@@ -12,7 +12,7 @@ defmodule CodeCorps.GitHub.Event.Installation.Repos do
     Repo
   }
 
-  alias CodeCorps.GitHub.Adapters.GithubRepo, as: GithubRepoAdapter
+  alias CodeCorps.GitHub.Adapters.Repo, as: RepoAdapter
 
   alias Ecto.{Changeset, Multi}
 
@@ -51,7 +51,7 @@ defmodule CodeCorps.GitHub.Event.Installation.Repos do
   # transaction step 2
   @spec adapt_api_repo_list(map) :: {:ok, list(map)}
   defp adapt_api_repo_list(%{api_response: repositories}) do
-    adapter_results = repositories |> Enum.map(&GithubRepoAdapter.from_api/1)
+    adapter_results = repositories |> Enum.map(&RepoAdapter.from_api/1)
     {:ok, adapter_results}
   end
 

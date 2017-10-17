@@ -8,7 +8,7 @@ defmodule CodeCorps.GitHub.Event.Installation.ChangesetBuilder do
     GithubAppInstallation,
     User
   }
-  alias CodeCorps.GitHub.Adapters.GithubAppInstallation, as: GithubAppInstallationAdapter
+  alias CodeCorps.GitHub.Adapters.AppInstallation, as: AppInstallationAdapter
   alias Ecto.Changeset
 
   @doc """
@@ -20,7 +20,7 @@ defmodule CodeCorps.GitHub.Event.Installation.ChangesetBuilder do
     %GithubAppInstallation{} = github_app_installation,
     %{} = payload) do
 
-    attrs = GithubAppInstallationAdapter.from_installation_event(payload)
+    attrs = AppInstallationAdapter.from_installation_event(payload)
 
     github_app_installation
     |> Changeset.change(attrs)

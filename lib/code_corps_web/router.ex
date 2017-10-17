@@ -108,6 +108,7 @@ defmodule CodeCorpsWeb.Router do
     resources "/donation-goals", DonationGoalController, only: [:index, :show]
     resources "/github-app-installations", GithubAppInstallationController, only: [:index, :show]
     resources "/github-issues", GithubIssueController, only: [:index, :show]
+    resources "/github-pull-requests", GithubPullRequestController, only: [:index, :show]
     resources "/github-repos", GithubRepoController, only: [:index, :show]
     resources "/organization-github-app-installations", OrganizationGithubAppInstallationController, only: [:index, :show]
     resources "/organizations", OrganizationController, only: [:index, :show]

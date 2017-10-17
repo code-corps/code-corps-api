@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Adapters.GithubRepo do
+defmodule CodeCorps.GitHub.Adapters.Repo do
 
   @mapping [
     {:github_account_avatar_url, ["owner", "avatar_url"]},

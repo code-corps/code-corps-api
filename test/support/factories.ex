@@ -67,6 +67,21 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def github_pull_request_factory do
+    %CodeCorps.GithubPullRequest{
+      body: "Here's a change!",
+      github_created_at: DateTime.utc_now,
+      github_id: sequence(:id, (fn number -> number end)),
+      github_updated_at: DateTime.utc_now,
+      locked: false,
+      merged: false,
+      number: sequence(:id, (fn number -> number end)),
+      state: "open",
+      title: "Here's a change!",
+      github_repo: build(:github_repo)
+    }
+  end
+
   def github_repo_factory do
     %CodeCorps.GithubRepo{
       github_app_installation: build(:github_app_installation)

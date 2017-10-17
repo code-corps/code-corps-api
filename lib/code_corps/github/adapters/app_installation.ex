@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Adapters.GithubAppInstallation do
+defmodule CodeCorps.GitHub.Adapters.AppInstallation do
   @moduledoc """
   Module used to convert GitHub payloads into attributes for a
   `GithubAppInstallation`.

@@ -12,7 +12,7 @@ defmodule CodeCorps.GitHub.Event.Installation.ReposTest do
     Repo
   }
 
-  alias CodeCorps.GitHub.Adapters.GithubRepo, as: GithubRepoAdapter
+  alias CodeCorps.GitHub.Adapters.Repo, as: RepoAdapter
 
   # from fixture
   @installation_repositories load_endpoint_fixture("installation_repositories")
@@ -40,8 +40,8 @@ defmodule CodeCorps.GitHub.Event.Installation.ReposTest do
       installation = insert(:github_app_installation, github_id: @app_github_id, state: "initiated_on_code_corps")
 
       %{"repositories" => [matched_repo_payload, new_repo_payload]} = @installation_repositories
-      matched_repo_attrs = matched_repo_payload |> GithubRepoAdapter.from_api
-      new_repo_attrs = new_repo_payload |> GithubRepoAdapter.from_api
+      matched_repo_attrs = matched_repo_payload |> RepoAdapter.from_api
+      new_repo_attrs = new_repo_payload |> RepoAdapter.from_api
 
       unmatched_repo = insert(:github_repo, github_app_installation: installation)
       _matched_repo = insert(:github_repo, matched_repo_attrs |> Map.put(:github_app_installation, installation))

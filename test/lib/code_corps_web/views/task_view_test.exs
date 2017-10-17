@@ -3,8 +3,9 @@ defmodule CodeCorpsWeb.TaskViewTest do
 
   test "renders all attributes and relationships properly" do
     github_issue = insert(:github_issue)
+    github_pull_request = insert(:github_pull_request)
     github_repo = insert(:github_repo)
-    task = insert(:task, order: 1000, github_issue: github_issue, github_repo: github_repo)
+    task = insert(:task, order: 1000, github_issue: github_issue, github_pull_request: github_pull_request, github_repo: github_repo)
     comment = insert(:comment, task: task)
     task_skill = insert(:task_skill, task: task)
     user_task = insert(:user_task, task: task)
@@ -48,6 +49,12 @@ defmodule CodeCorpsWeb.TaskViewTest do
             "data" => %{
               "id" => task.github_issue_id |> Integer.to_string,
               "type" => "github-issue"
+            }
+          },
+          "github-pull-request" => %{
+            "data" => %{
+              "id" => task.github_pull_request_id |> Integer.to_string,
+              "type" => "github-pull-request"
             }
           },
           "github-repo" => %{
