@@ -65,6 +65,7 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilder do
     |> Changeset.assoc_constraint(:project)
     |> Changeset.assoc_constraint(:task_list)
     |> Changeset.assoc_constraint(:user)
+    |> Task.order_task()
   end
 
   @update_attrs ~w(markdown modified_at status title)a
@@ -79,5 +80,6 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilder do
     |> Changeset.assoc_constraint(:github_repo)
     |> Changeset.assoc_constraint(:project)
     |> Changeset.assoc_constraint(:user)
+    |> Task.order_task()
   end
 end

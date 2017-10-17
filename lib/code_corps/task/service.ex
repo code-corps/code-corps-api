@@ -22,6 +22,12 @@ defmodule CodeCorps.Task.Service do
   end
 
   @spec update(Task.t, map) :: {:ok, Task.t} | {:error, Changeset.t} | {:error, :github}
+  def update(%Task{github_issue_id: nil} = task, %{} = attributes) do
+    Multi.new
+    |> Multi.update(:task, task |> Task.update_changeset(attributes))
+    |> Repo.transaction
+    |> marshall_result()
+  end
   def update(%Task{} = task, %{} = attributes) do
     Multi.new
     |> Multi.update(:task, task |> Task.update_changeset(attributes))
@@ -32,6 +38,7 @@ defmodule CodeCorps.Task.Service do
 
   @spec marshall_result(tuple) :: {:ok, Task.t} | {:error, Changeset.t} | {:error, :github}
   defp marshall_result({:ok, %{github: %Task{} = task}}), do: {:ok, task}
+  defp marshall_result({:ok, %{task: %Task{} = task}}), do: {:ok, task}
   defp marshall_result({:error, :task, %Changeset{} = changeset, _steps}), do: {:error, changeset}
   defp marshall_result({:error, :github, result, _steps}) do
     Logger.info "An error occurred when creating/updating the task with the GitHub API"
@@ -50,7 +57,10 @@ defmodule CodeCorps.Task.Service do
   @preloads [:github_issue, [github_repo: :github_app_installation], :user, [project: :organization]]
 
   @spec create_on_github(Task.t) :: {:ok, Task.t} :: {:error, GitHub.api_error_struct}
-  defp create_on_github(%Task{github_repo_id: nil} = task), do: {:ok, task}
+  defp create_on_github(%Task{github_repo_id: nil} = task) do
+    # Don't create: no GitHub repo was selected
+    {:ok, task}
+  end
   defp create_on_github(%Task{github_repo: _} = task) do
     with %Task{github_repo: github_repo} = task <- task |> Repo.preload(@preloads),
          {:ok, payload} <- GitHub.Issue.create(task),

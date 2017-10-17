@@ -137,6 +137,24 @@ defmodule CodeCorps.Task.ServiceTest do
       assert_received({:patch, "https://api.github.com/repos/foo/bar/issues/5", _headers, _body, _options})
     end
 
+    test "does not propagate changes to github if task is synced to github pull request" do
+      github_repo =
+        :github_repo
+        |> insert(github_account_login: "foo", name: "bar")
+
+      github_pull_request = insert(:github_pull_request, number: 5)
+      task = insert(:task, github_repo: github_repo, github_pull_request: github_pull_request)
+
+      {:ok, updated_task} = task |> Task.Service.update(@update_attrs)
+
+      assert updated_task.id == task.id
+      assert updated_task.title == @update_attrs["title"]
+      assert updated_task.markdown == @update_attrs["markdown"]
+      assert updated_task.body != task.body
+      assert updated_task.github_pull_request_id
+      assert updated_task.github_repo_id
+    end
+
     test "reports {:error, :github}, makes no changes at all if there is a github api error" do
       github_repo =
         :github_repo

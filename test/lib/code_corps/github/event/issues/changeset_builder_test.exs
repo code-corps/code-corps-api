@@ -52,6 +52,7 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilderTest do
       assert get_change(changeset, :user_id) == user.id
 
       assert changeset.valid?
+      assert changeset.changes[:position]
     end
 
     test "validates that modified_at has not already happened" do
