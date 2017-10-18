@@ -21,6 +21,7 @@ defmodule CodeCorps.GithubComment do
     struct
     |> Changeset.cast(params, [:body, :github_created_at, :github_id, :github_updated_at, :html_url, :url])
     |> Changeset.validate_required([:body, :github_created_at, :github_id, :github_updated_at, :html_url, :url])
+    |> Changeset.unique_constraint(:github_id)
   end
 
   @doc ~S"""

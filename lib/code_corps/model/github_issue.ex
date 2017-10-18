@@ -28,6 +28,7 @@ defmodule CodeCorps.GithubIssue do
     struct
     |> cast(params, [:body, :closed_at, :comments_url, :events_url, :github_created_at, :github_id, :github_updated_at, :html_url, :labels_url, :locked, :number, :state, :title, :url])
     |> validate_required([:comments_url, :events_url, :github_created_at, :github_id, :github_updated_at, :html_url, :labels_url, :locked, :number, :state, :title, :url])
+    |> unique_constraint(:github_id)
   end
 
   def create_changeset(struct, params) do
