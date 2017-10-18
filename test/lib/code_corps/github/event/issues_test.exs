@@ -65,6 +65,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         assert task.title == title
         assert task.github_issue.number == number
         assert task.status == "open"
+        assert task.order
       end)
     end
 
@@ -113,6 +114,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         assert task.title == title
         assert task.github_issue.number == number
         assert task.status == "open"
+        assert task.order
       end)
 
       assert existing_task_id in (tasks |> Enum.map(&Map.get(&1, :id)))
@@ -182,6 +184,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         assert task.title == title
         assert task.github_issue.number == number
         assert task.status == "closed"
+        assert task.order
       end)
     end
 
@@ -230,6 +233,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         assert task.title == title
         assert task.github_issue.number == number
         assert task.status == "closed"
+        assert task.order
       end)
 
       assert existing_task_id in (tasks |> Enum.map(&Map.get(&1, :id)))
@@ -299,6 +303,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         assert task.title == title
         assert task.github_issue.number == number
         assert task.status == "open"
+        assert task.order
       end)
     end
 
@@ -347,6 +352,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         assert task.title == title
         assert task.github_issue.number == number
         assert task.status == "open"
+        assert task.order
       end)
 
       assert existing_task_id in (tasks |> Enum.map(&Map.get(&1, :id)))
@@ -416,6 +422,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         assert task.title == title
         assert task.github_issue.number == number
         assert task.status == "open"
+        assert task.order
       end)
     end
 
@@ -464,6 +471,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         assert task.title == title
         assert task.github_issue.number == number
         assert task.status == "open"
+        assert task.order
       end)
 
       assert existing_task_id in (tasks |> Enum.map(&Map.get(&1, :id)))

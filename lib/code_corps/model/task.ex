@@ -44,9 +44,14 @@ defmodule CodeCorps.Task do
     |> cast(params, [:title, :markdown, :task_list_id, :position])
     |> validate_required([:title, :task_list_id])
     |> assoc_constraint(:task_list)
+    |> order_task()
+    |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
+  end
+
+  def order_task(changeset) do
+    changeset
     |> apply_position()
     |> set_order(:position, :order, :task_list_id)
-    |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
   end
 
   @spec create_changeset(struct, map) :: Ecto.Changeset.t
