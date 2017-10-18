@@ -1,9 +1,10 @@
 defmodule CodeCorps.GitHub.Event.IssueComment.CommentLinker do
   @moduledoc ~S"""
-  In charge of finding a issue to link with a Task when processing an Issues
-  webhook.
+  In charge of finding a `CodeCorps.GithubComment` to link with a
+  `CodeCorps.Comment` when processing an Issue Comment webhook, or handling a
+  `CodeCorpsWeb.CommentController` request.
 
-  The only entry point is `create_or_update_issue/1`.
+  The only entry point is `create_or_update_comment/1`.
   """
 
   alias CodeCorps.{
@@ -29,16 +30,20 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentLinker do
   payload data.
   """
   @spec create_or_update_comment(GithubIssue.t, map) :: linking_result
-  def create_or_update_comment(%GithubIssue{} = github_issue, %{"id" => github_comment_id} = attrs) do
+  def create_or_update_comment(%GithubIssue{} = github_issue, %{} = attrs) do
     params = Adapters.Comment.to_github_comment(attrs)
 
-    case Repo.get_by(GithubComment, github_id: github_comment_id) do
+    case attrs |> find_comment() do
       nil -> create_comment(github_issue, params)
-      %GithubComment{} = github_comment -> github_comment |> update_issue(params)
+      %GithubComment{} = github_comment -> github_comment |> update_comment(params)
     end
   end
 
-  defp create_comment(%GithubIssue{id: github_issue_id}, params) do
+  @spec find_comment(map) :: GithubComment.t | nil
+  defp find_comment(%{"id" => github_id}), do: GithubComment |> Repo.get_by(github_id: github_id)
+
+  @spec create_comment(GithubIssue.t, map) :: linking_result
+  defp create_comment(%GithubIssue{id: github_issue_id}, %{} = params) do
     params = Map.put(params, :github_issue_id, github_issue_id)
 
     %GithubComment{}
@@ -46,7 +51,8 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentLinker do
     |> Repo.insert
   end
 
-  defp update_issue(%GithubComment{} = github_comment, params) do
+  @spec update_comment(GithubComment.t, map) :: linking_result
+  defp update_comment(%GithubComment{} = github_comment, %{} = params) do
     github_comment
     |> GithubComment.update_changeset(params)
     |> Repo.update
