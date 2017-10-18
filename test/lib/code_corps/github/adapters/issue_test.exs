@@ -39,7 +39,19 @@ defmodule CodeCorps.GitHub.Adapters.IssueTest do
         markdown: payload["body"],
         modified_at: payload["updated_at"],
         status: payload["state"],
-        title: payload["title"]
+        title: payload["title"],
+        closed_at: payload["closed_at"]
+      }
+
+      %{"issue" => closed_payload} = load_event_fixture("issues_closed")
+
+      assert Adapters.Issue.to_task(closed_payload) == %{
+        created_at: closed_payload["created_at"],
+        markdown: closed_payload["body"],
+        modified_at: closed_payload["updated_at"],
+        status: closed_payload["state"],
+        title: closed_payload["title"],
+        closed_at: closed_payload["closed_at"]
       }
     end
   end
