@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.UserTest do
+defmodule CodeCorps.GitHub.API.UserTest do
   @moduledoc false
 
   use CodeCorps.BackgroundProcessingCase
@@ -19,7 +19,7 @@ defmodule CodeCorps.GitHub.UserTest do
         "type" => type
       } = load_endpoint_fixture("user")
 
-      {:ok, %User{} = returned_user} = GitHub.User.connect(user, "foo_code", "foo_state")
+      {:ok, %User{} = returned_user} = GitHub.API.User.connect(user, "foo_code", "foo_state")
 
       assert returned_user.id == user.id
       assert returned_user.github_auth_token == "foo_auth_token"
@@ -43,7 +43,7 @@ defmodule CodeCorps.GitHub.UserTest do
       # this one is orphaned, but does not match github id, should not associate
       installation_3 = insert(:github_app_installation, user: nil, sender_github_id: 234)
 
-      {:ok, %User{} = returned_user} = GitHub.User.connect(user, "foo_code", "foo_state")
+      {:ok, %User{} = returned_user} = GitHub.API.User.connect(user, "foo_code", "foo_state")
 
       assert Enum.count(returned_user.github_app_installations) == 1
 
@@ -65,7 +65,7 @@ defmodule CodeCorps.GitHub.UserTest do
       # different (or no) github id
       task_2 = insert(:task)
 
-      {:ok, %User{} = returned_user} = GitHub.User.connect(user, "foo_code", "foo_state")
+      {:ok, %User{} = returned_user} = GitHub.API.User.connect(user, "foo_code", "foo_state")
 
       assert Repo.get(Task, task_1.id).user_id == returned_user.id
       refute Repo.get(Task, task_2.id).user_id == returned_user.id
@@ -84,7 +84,7 @@ defmodule CodeCorps.GitHub.UserTest do
       # different (or no) github id
       comment_2 = insert(:comment)
 
-      {:ok, %User{} = returned_user} = GitHub.User.connect(user, "foo_code", "foo_state")
+      {:ok, %User{} = returned_user} = GitHub.API.User.connect(user, "foo_code", "foo_state")
 
       assert Repo.get(Comment, comment_1.id).user_id == returned_user.id
       refute Repo.get(Comment, comment_2.id).user_id == returned_user.id
@@ -107,7 +107,7 @@ defmodule CodeCorps.GitHub.UserTest do
       error = GitHub.APIError.new({404, %{"message" => "{\"error\":\"Not Found\"}"}})
 
       with_mock_api(NotFoundRequest) do
-        assert {:error, error} == GitHub.User.connect(user, "foo_code", "foo_state")
+        assert {:error, error} == GitHub.API.User.connect(user, "foo_code", "foo_state")
       end
     end
   end

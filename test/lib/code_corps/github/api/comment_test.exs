@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.CommentTest do
+defmodule CodeCorps.GitHub.API.CommentTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
@@ -6,7 +6,7 @@ defmodule CodeCorps.GitHub.CommentTest do
   import CodeCorps.GitHub.TestHelpers
 
   alias CodeCorps.{
-    GitHub.Comment,
+    GitHub.API.Comment,
     GitHub.Adapters
   }
 

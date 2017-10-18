@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Issue do
+defmodule CodeCorps.GitHub.API.Issue do
   @moduledoc ~S"""
   Functions for working with issues on GitHub.
   """
@@ -49,7 +49,7 @@ defmodule CodeCorps.GitHub.Issue do
 
   @spec opts_for(User.t, GithubAppInstallation.t) :: list
   defp opts_for(%User{github_auth_token: nil}, %GithubAppInstallation{} = installation) do
-    with {:ok, token} <- installation |> GitHub.Installation.get_access_token do
+    with {:ok, token} <- installation |> GitHub.API.Installation.get_access_token do
       [access_token: token]
     else
       {:error, github_error} -> {:error, github_error}

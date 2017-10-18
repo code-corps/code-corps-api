@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.User do
+defmodule CodeCorps.GitHub.API.User do
   @moduledoc """
   Used to perform user actions on the github API
   """
@@ -29,7 +29,7 @@ defmodule CodeCorps.GitHub.User do
     {:ok, User.t} | {:error, Changeset.t} | {:error, GitHub.api_error_struct}
   def connect(%User{} = user, code, state) do
     with {:ok, %{"access_token" => access_token}} <- GitHub.user_access_token_request(code, state),
-         {:ok, %{} = user_payload} <- access_token |> GitHub.User.me()
+         {:ok, %{} = user_payload} <- access_token |> me()
     do
        user |> do_connect(user_payload, access_token)
     else
@@ -50,7 +50,7 @@ defmodule CodeCorps.GitHub.User do
   """
   @spec me(String.t, Keyword.t) :: {:ok, map} | {:error, GitHub.api_error_struct}
   def me(access_token, opts \\ []) do
-    case GitHub.Request.retrieve(@single_endpoint, opts ++ [access_token: access_token]) do
+    case GitHub.request(:get, @single_endpoint, %{}, %{}, opts ++ [access_token: access_token]) do
       {:ok, response} -> {:ok, response}
       {:error, error} -> {:error, error}
     end

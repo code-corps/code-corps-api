@@ -51,7 +51,7 @@ defmodule CodeCorpsWeb.UserController do
   @spec github_oauth(Conn.t, map) :: Conn.t
   def github_oauth(%Conn{} = conn, %{"code" => code, "state" => state}) do
     current_user = Guardian.Plug.current_resource(conn)
-    with {:ok, user} <- GitHub.User.connect(current_user, code, state)
+    with {:ok, user} <- GitHub.API.User.connect(current_user, code, state)
     do
       Analytics.SegmentTracker.track(user.id, "Connected to GitHub", user)
       conn |> render("show.json-api", data: user)

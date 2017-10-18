@@ -1,4 +1,4 @@
-defmodule CodeCorps.Github.JWT do
+defmodule CodeCorps.GitHub.API.JWT do
   @moduledoc """
   In charge of loading a a GitHub app .pem and generating a JSON Web Token from
   it.

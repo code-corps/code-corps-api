@@ -1,6 +1,6 @@
 defmodule CodeCorps.GitHub.Event.Installation.Validator do
   @moduledoc ~S"""
-  In charge of validatng a GitHub Installation webhook payload.
+  In charge of validatng a GitHub.API.Installation webhook payload.
 
   https://developer.github.com/v3/activity/events/types/#installationevent
   """

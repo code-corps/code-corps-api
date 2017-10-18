@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.InstallationTest do
+defmodule CodeCorps.GitHub.API.InstallationTest do
   @moduledoc false
 
   use CodeCorpsWeb.ApiCase
@@ -7,7 +7,7 @@ defmodule CodeCorps.GitHub.InstallationTest do
 
   alias CodeCorps.{
     GithubAppInstallation,
-    GitHub.Installation
+    GitHub.API.Installation
   }
 
   @access_token "v1.1f699f1069f60xxx"
