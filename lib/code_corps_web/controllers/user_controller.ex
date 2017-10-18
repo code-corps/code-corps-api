@@ -1,8 +1,13 @@
 defmodule CodeCorpsWeb.UserController do
   use CodeCorpsWeb, :controller
 
-  alias CodeCorps.{Helpers.Query, Services.UserService, User}
-  alias CodeCorps.GitHub
+  alias CodeCorps.{
+    Analytics,
+    GitHub,
+    Helpers.Query,
+    Services.UserService,
+    User
+  }
 
   action_fallback CodeCorpsWeb.FallbackController
   plug CodeCorpsWeb.Plug.DataToAttributes
@@ -48,6 +53,7 @@ defmodule CodeCorpsWeb.UserController do
     current_user = Guardian.Plug.current_resource(conn)
     with {:ok, user} <- GitHub.User.connect(current_user, code, state)
     do
+      Analytics.SegmentTracker.track(user.id, "Connected to GitHub", user)
       conn |> render("show.json-api", data: user)
     end
   end

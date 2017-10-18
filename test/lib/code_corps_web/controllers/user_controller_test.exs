@@ -247,6 +247,7 @@ defmodule CodeCorpsWeb.UserControllerTest do
 
   describe "github_oauth" do
     @attrs %{"code" => "foo", "state" => "bar"}
+
     @tag :authenticated
     test "return the user when current user connects successfully", %{conn: conn, current_user: current_user} do
       path = user_path(conn, :github_oauth)
@@ -255,6 +256,18 @@ defmodule CodeCorpsWeb.UserControllerTest do
 
       assert json["data"]["id"] |> String.to_integer == current_user.id
       assert json["data"]["attributes"]["github-id"]
+    end
+
+    @tag :authenticated
+    test "tracks event on segment when current user connects successfully", %{conn: conn, current_user: %{id: id}} do
+      path = user_path(conn, :github_oauth)
+
+      assert conn |> post(path, @attrs) |> json_response(200)
+      expected_data =
+        User
+        |> Repo.get(id)
+        |> CodeCorps.Analytics.SegmentTraitsBuilder.build
+      assert_received {:track, ^id, "Connected to GitHub", ^expected_data}
     end
 
     test "requires authentication", %{conn: conn} do

@@ -21,9 +21,13 @@ defmodule CodeCorps.Analytics.SegmentTracker do
   @doc """
   Calls `track` in the configured API module.
   """
-  @spec track(String.t, atom, struct) :: any
-  def track(user_id, action, data) do
+  @spec track(integer, atom | String.t, struct) :: any
+  def track(user_id, action, data) when is_atom(action) do
     event = SegmentEventNameBuilder.build(action, data)
+    traits = SegmentTraitsBuilder.build(data)
+    @api.track(user_id, event, traits)
+  end
+  def track(user_id, event, data) when is_binary(event) do
     traits = SegmentTraitsBuilder.build(data)
     @api.track(user_id, event, traits)
   end
