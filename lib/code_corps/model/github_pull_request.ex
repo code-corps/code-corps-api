@@ -57,6 +57,7 @@ defmodule CodeCorps.GithubPullRequest do
     struct
     |> cast(params, @attrs)
     |> validate_required(@required_attrs)
+    |> unique_constraint(:github_id)
   end
 
   def create_changeset(struct, params) do
