@@ -1,4 +1,12 @@
 defmodule CodeCorps.GitHub.Event.IssueComment.CommentSyncer do
+  @moduledoc ~S"""
+  In charge of syncing `CodeCorps.Comment` records with a GitHub comment
+  payload.
+
+  A single GitHub comment always matches a single `CodeCorps.GithubComment`, but
+  it can match multiple `CodeCorps.Comment` records. This module handles
+  creating or updating all those records.
+  """
 
   import Ecto.Query
 
@@ -17,10 +25,15 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentSyncer do
   @type outcome :: {:ok, list(Comment.t)} |
                    {:error, {list(Comment.t), list(Changeset.t)}}
 
-  @doc """
-  When provided a list of `Task`s, a `User` and a GitHub API payload, for each
-  `Comment` associated to those `Task`s it creates or updates a `Comment`
-  associated to the specified `User`.
+  @doc ~S"""
+  Creates or updates `CodeCorps.Comment` records for the speciifed list of
+  `CodeCorps.Task` records.
+
+  When provided a list of `CodeCorps.Task` records, a `CodeCorps.GithubComment`,
+  a `CodeCorps.User`, and a GitHub API payload , for each `CodeCorps.Task`
+  record, it creates or updates a `CodeCorps.Comment` record, using the provided
+  GitHub API payload, associated to the specified `CodeCorps.GithubComment` and
+  `CodeCorps.User`
   """
   @spec sync_all(list(Task.t), GithubComment.t, User.t, map) :: outcome
   def sync_all(tasks, %GithubComment{} = github_comment, %User{} = user, %{} = payload) do
