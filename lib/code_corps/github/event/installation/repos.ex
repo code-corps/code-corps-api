@@ -6,7 +6,7 @@ defmodule CodeCorps.GitHub.Event.Installation.Repos do
   alias CodeCorps.{
     GithubAppInstallation,
     GithubRepo,
-    GitHub.Installation,
+    GitHub.API.Installation,
     GitHub,
     GitHub.Event.Common.ResultAggregator,
     Repo

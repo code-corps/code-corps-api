@@ -1,5 +1,5 @@
-defmodule CodeCorps.GitHub.Headers do
-  alias CodeCorps.Github.JWT
+defmodule CodeCorps.GitHub.API.Headers do
+  alias CodeCorps.GitHub.API.JWT
 
   @typep header :: {String.t, String.t}
   @type t :: list(header)

@@ -74,7 +74,7 @@ defmodule CodeCorps.Comment.Service do
   @spec create_on_github(Comment.t) :: {:ok, Comment.t} :: {:error, GitHub.api_error_struct}
   defp create_on_github(%Comment{task: %Task{github_issue_id: nil}} = comment), do: {:ok, comment}
   defp create_on_github(%Comment{task: %Task{github_issue: github_issue}} = comment) do
-    with {:ok, payload} <- comment |> GitHub.Comment.create,
+    with {:ok, payload} <- comment |> GitHub.API.Comment.create,
          {:ok, %GithubComment{} = github_comment} <- CommentLinker.create_or_update_comment(github_issue, payload)do
       comment |> link_with_github_changeset(github_comment) |> Repo.update
     else
@@ -91,7 +91,7 @@ defmodule CodeCorps.Comment.Service do
   defp update_on_github(%Comment{github_comment_id: nil} = comment), do: {:ok, comment}
   defp update_on_github(%Comment{} = comment) do
     with %Comment{task: %Task{github_issue: %GithubIssue{} = github_issue}} = comment <- comment |> Repo.preload(@preloads),
-         {:ok, payload} <- comment |> GitHub.Comment.update,
+         {:ok, payload} <- comment |> GitHub.API.Comment.update,
          {:ok, %GithubComment{}} <- CommentLinker.create_or_update_comment(github_issue, payload) do
 
       {:ok, comment}

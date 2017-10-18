@@ -63,7 +63,7 @@ defmodule CodeCorps.Task.Service do
   end
   defp create_on_github(%Task{github_repo: _} = task) do
     with %Task{github_repo: github_repo} = task <- task |> Repo.preload(@preloads),
-         {:ok, payload} <- GitHub.Issue.create(task),
+         {:ok, payload} <- GitHub.API.Issue.create(task),
          {:ok, %GithubIssue{} = github_issue } <- IssueLinker.create_or_update_issue(github_repo, payload) do
       task |> link_with_github_changeset(github_issue) |> Repo.update
     else
@@ -80,7 +80,7 @@ defmodule CodeCorps.Task.Service do
   defp update_on_github(%Task{github_repo_id: nil} = task), do: {:ok, task}
   defp update_on_github(%Task{github_repo_id: _} = task) do
     with %Task{github_repo: github_repo} = task <- task |> Repo.preload(@preloads),
-         {:ok, payload} <- GitHub.Issue.update(task),
+         {:ok, payload} <- GitHub.API.Issue.update(task),
          {:ok, %GithubIssue{} } <- IssueLinker.create_or_update_issue(github_repo, payload) do
       {:ok, task}
     else

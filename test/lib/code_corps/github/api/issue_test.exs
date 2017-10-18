@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.IssueTest do
+defmodule CodeCorps.GitHub.API.IssueTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
@@ -6,7 +6,7 @@ defmodule CodeCorps.GitHub.IssueTest do
   import CodeCorps.GitHub.TestHelpers
 
   alias CodeCorps.{
-    GitHub.Issue,
+    GitHub.API.Issue,
     GitHub.Adapters
   }
 

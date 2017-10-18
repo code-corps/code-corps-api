@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Comment do
+defmodule CodeCorps.GitHub.API.Comment do
   @moduledoc ~S"""
   Handles GitHub API requests for actions on Comments
   """
@@ -86,7 +86,7 @@ defmodule CodeCorps.GitHub.Comment do
 
   @spec opts_for(User.t, GithubAppInstallation.t) :: list
   defp opts_for(%User{github_auth_token: nil}, %GithubAppInstallation{} = installation) do
-    with {:ok, token} <- installation |> GitHub.Installation.get_access_token do
+    with {:ok, token} <- installation |> GitHub.API.Installation.get_access_token do
       [access_token: token]
     else
       {:error, github_error} -> {:error, github_error}

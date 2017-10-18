@@ -1,9 +1,9 @@
-defmodule CodeCorps.GitHub.HeadersTest do
+defmodule CodeCorps.GitHub.API.HeadersTest do
   @moduledoc false
 
   use ExUnit.Case, async: true
 
-  alias CodeCorps.GitHub.Headers
+  alias CodeCorps.GitHub.API.Headers
 
   describe "access_token_request/0" do
     test "works" do

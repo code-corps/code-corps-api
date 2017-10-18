@@ -1,11 +1,10 @@
-defmodule CodeCorps.GitHub.Installation do
+defmodule CodeCorps.GitHub.API.Installation do
   @moduledoc """
   Used to perform installation actions on the GitHub API.
   """
 
   alias CodeCorps.{
     GitHub,
-    GitHub.Request,
     GithubAppInstallation,
     Repo
   }
@@ -29,7 +28,7 @@ defmodule CodeCorps.GitHub.Installation do
   end
 
   defp fetch_repositories(access_token) do
-    Request.retrieve("installation/repositories", [access_token: access_token])
+    GitHub.request(:get, "installation/repositories", %{}, %{}, [access_token: access_token])
   end
 
   @doc """

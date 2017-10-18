@@ -1,5 +1,5 @@
 defmodule CodeCorps.GitHub do
-  alias CodeCorps.GitHub.Headers
+  alias CodeCorps.GitHub.API.Headers
 
   @client_id Application.get_env(:code_corps, :github_app_client_id)
   @client_secret Application.get_env(:code_corps, :github_app_client_secret)
