@@ -91,8 +91,16 @@ defmodule CodeCorps.GitHub.Event.Installation.Repos do
     %{github_id: github_id} = repo_attributes) do
 
     case github_repos |> Enum.find(fn %GithubRepo{} = gr -> gr.github_id == github_id end) do
+      nil -> create_or_update_repo(installation, repo_attributes)
+      %GithubRepo{} = github_repo -> update(github_repo, installation, repo_attributes)
+    end
+  end
+
+  @spec create_or_update_repo(GithubAppInstallation.t, map) :: {:ok, GithubRepo.t}
+  defp create_or_update_repo(%GithubAppInstallation{} = installation, %{github_id: github_id} = repo_attributes) do
+    case Repo.get_by(GithubRepo, github_id: github_id) do
       nil -> create(installation, repo_attributes)
-      %GithubRepo{} = github_repo -> github_repo |> update(repo_attributes)
+      %GithubRepo{} = github_repo -> update(github_repo, installation, repo_attributes)
     end
   end
 
@@ -104,10 +112,12 @@ defmodule CodeCorps.GitHub.Event.Installation.Repos do
     |> Repo.insert()
   end
 
-  @spec update(GithubRepo.t, map) :: {:ok, GithubRepo.t}
-  defp update(%GithubRepo{} = github_repo, %{} = repo_attributes) do
+  @spec update(GithubRepo.t, GithubAppInstallation.t, map) :: {:ok, GithubRepo.t}
+  defp update(%GithubRepo{} = github_repo, %GithubAppInstallation{} = installation, %{} = repo_attributes) do
     github_repo
+    |> Repo.preload([:github_app_installation])
     |> changeset(repo_attributes)
+    |> Changeset.put_assoc(:github_app_installation, installation)
     |> Repo.update()
   end
 
