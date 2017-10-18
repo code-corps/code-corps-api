@@ -13,10 +13,15 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilder do
       created_at: user.inserted_at,
       email: user.email,
       first_name: user.first_name,
+      github_id: user.github_id,
+      github_username: user.github_username,
       last_name: user.last_name,
+      sign_up_context: user.sign_up_context,
       state: user.state,
       twitter: user.twitter,
-      username: user.username
+      type: user.type,
+      username: user.username,
+      website: user.website
     }
   end
 

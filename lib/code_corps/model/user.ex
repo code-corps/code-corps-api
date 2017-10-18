@@ -32,12 +32,12 @@ defmodule CodeCorps.User do
     field :password, :string, virtual: true
     field :password_confirmation, :string, virtual: true
     field :sign_up_context, :string, default: "default"
+    field :state, :string, default: "signed_up"
+    field :state_transition, :string, virtual: true
     field :twitter, :string
     field :type, :string, default: "user"
     field :username, :string
     field :website, :string
-    field :state, :string, default: "signed_up"
-    field :state_transition, :string, virtual: true
 
     has_one :slugged_route, SluggedRoute
 
