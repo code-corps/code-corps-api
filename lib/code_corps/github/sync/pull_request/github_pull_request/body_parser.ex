@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Event.PullRequest.BodyParser do
+defmodule CodeCorps.GitHub.Sync.PullRequest.BodyParser do
   @moduledoc ~S"""
   In charge of extracting ids from markdown content, paired to a predefined list
   of keywords.
