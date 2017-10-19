@@ -20,6 +20,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
     GitHub.Event.IssueComment.CommentDeleter,
     Repo
   }
+  alias CodeCorps.GitHub.Syncers.User.RecordLinker, as: UserRecordLinker
   alias Ecto.Multi
 
   @type outcome :: {:ok, list(Comment.t)} |
@@ -71,8 +72,8 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
     |> Multi.run(:repo, fn _ -> RepoFinder.find_repo(payload) end)
     |> Multi.run(:github_issue, fn %{repo: github_repo} -> github_repo |> link_issue(payload) end)
     |> Multi.run(:github_comment, fn %{github_issue: github_issue} -> github_issue |> link_comment(payload) end)
-    |> Multi.run(:issue_user, fn %{github_issue: github_issue} -> github_issue |> Issues.UserLinker.find_or_create_user(payload) end)
-    |> Multi.run(:comment_user, fn _ -> IssueComment.UserLinker.find_or_create_user(payload) end)
+    |> Multi.run(:issue_user, fn %{github_issue: github_issue} -> UserRecordLinker.link_to(github_issue, payload) end)
+    |> Multi.run(:comment_user, fn %{github_comment: github_comment} -> UserRecordLinker.link_to(github_comment, payload) end)
     |> Multi.run(:tasks, fn %{github_issue: github_issue, issue_user: user} -> github_issue |> TaskSyncer.sync_all(user, payload) end)
     |> Multi.run(:comments, fn %{github_comment: github_comment, tasks: tasks, comment_user: user} -> CommentSyncer.sync_all(tasks, github_comment, user, payload) end)
   end

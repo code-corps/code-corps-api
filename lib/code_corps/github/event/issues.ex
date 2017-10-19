@@ -11,11 +11,11 @@ defmodule CodeCorps.GitHub.Event.Issues do
     GitHub.Event.Common.RepoFinder,
     GitHub.Event.Issues.IssueLinker,
     GitHub.Event.Issues.TaskSyncer,
-    GitHub.Event.Issues.UserLinker,
     GitHub.Event.Issues.Validator,
     Repo,
     Task
   }
+  alias CodeCorps.GitHub.Syncers.User.RecordLinker, as: UserRecordLinker
   alias Ecto.Multi
 
   @type outcome :: {:ok, list(Task.t)} |
@@ -52,7 +52,7 @@ defmodule CodeCorps.GitHub.Event.Issues do
     |> Multi.run(:action, fn _ -> payload |> validate_action() end)
     |> Multi.run(:repo, fn _ -> RepoFinder.find_repo(payload) end)
     |> Multi.run(:issue, fn %{repo: github_repo} -> link_issue(github_repo, payload) end)
-    |> Multi.run(:user, fn %{issue: github_issue} -> UserLinker.find_or_create_user(github_issue, payload) end)
+    |> Multi.run(:user, fn %{issue: github_issue} -> UserRecordLinker.link_to(github_issue, payload) end)
     |> Multi.run(:tasks, fn %{issue: github_issue, user: user} -> github_issue |> TaskSyncer.sync_all(user, payload) end)
     |> Repo.transaction
     |> marshall_result()
