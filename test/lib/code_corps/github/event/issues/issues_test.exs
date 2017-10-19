@@ -6,14 +6,14 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
   import CodeCorps.GitHub.TestHelpers
 
   alias CodeCorps.{
+    GithubIssue,
     GitHub.Event.Issues,
-    Project,
     Repo,
     Task,
     User
   }
 
-  describe "handle/2" do
+  describe "handle/1" do
     @payload load_event_fixture("issues_opened") |> Map.put("action", "foo")
 
     test "returns error if action of the event is wrong" do
@@ -21,486 +21,49 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
     end
   end
 
-  describe "handle/2 for Issues::opened" do
-    @payload load_event_fixture("issues_opened")
+  @implemented_actions ~w(opened closed edited reopened)
 
-    test "with unmatched user, creates user, creates task for each project associated to github repo" do
-      %{
-        "issue" => %{
-          "body" => markdown, "title" => title, "number" => number,
-          "user" => %{"id" => user_github_id}
-        },
-        "repository" => %{"id" => repo_github_id}
-      } = @payload
+  @implemented_actions |> Enum.each(fn action ->
+    describe "handle/1 for Issues::#{action}" do
+      @payload load_event_fixture("issues_#{action}")
 
-      github_repo = insert(:github_repo, github_id: repo_github_id)
+      test "creates or updates associated records" do
+        %{"repository" => %{"id" => repo_github_id}} = @payload
 
-      project_github_repos = insert_list(3, :project_github_repo, github_repo: github_repo)
-
-      project_ids =
-        project_github_repos
-        |> Enum.map(&Map.get(&1, :project))
-        |> Enum.map(&Map.get(&1, :id))
-
-      project_ids |> Enum.each(fn project_id ->
-        project = Project |> Repo.get_by(id: project_id)
+        github_repo = insert(:github_repo, github_id: repo_github_id)
+        %{project: project} = insert(:project_github_repo, github_repo: github_repo)
         insert(:task_list, project: project, inbox: true)
-      end)
 
-      {:ok, tasks} = Issues.handle(@payload)
+        {:ok, tasks} = Issues.handle(@payload)
 
-      assert Enum.count(tasks) == 3
-      assert Repo.aggregate(Task, :count, :id) == 3
+        assert Enum.count(tasks) == 1
+        assert Repo.aggregate(GithubIssue, :count, :id) == 1
+        assert Repo.aggregate(Task, :count, :id) == 1
+      end
 
-      user = Repo.get_by(User, github_id: user_github_id)
-      assert user
+      test "returns error if unmatched repository" do
+        assert Issues.handle(@payload) == {:error, :repository_not_found}
+        refute Repo.one(User)
+      end
 
-      tasks |> Enum.each(fn task ->
-        task = task |> Repo.preload(:github_issue)
-        assert task.user_id == user.id
-        assert task.github_issue_id
-        assert task.github_repo_id == github_repo.id
-        assert task.project_id in project_ids
-        assert task.markdown == markdown
-        assert task.title == title
-        assert task.github_issue.number == number
-        assert task.status == "open"
-        assert task.order
-      end)
+      test "returns error if payload is wrong" do
+        assert {:error, :unexpected_payload} == Issues.handle(%{})
+      end
+
+      test "returns error if repo payload is wrong" do
+        assert {:error, :unexpected_payload} == Issues.handle(@payload |> Map.put("repository", "foo"))
+      end
+
+      test "returns error if issue payload is wrong" do
+        assert {:error, :unexpected_payload} == Issues.handle(@payload |> Map.put("issue", "foo"))
+      end
     end
-
-    test "with unmatched user, returns error if unmatched repository" do
-      assert Issues.handle(@payload) == {:error, :repository_not_found}
-      refute Repo.one(User)
-    end
-
-    test "with matched user, creates or updates task for each project associated to github repo" do
-      %{
-        "issue" => %{"id" => issue_github_id, "body" => markdown, "title" => title, "number" => number, "user" => %{"id" => user_github_id}},
-        "repository" => %{"id" => repo_github_id}
-      } = @payload
-
-      user = insert(:user, github_id: user_github_id)
-
-      github_repo = insert(:github_repo, github_id: repo_github_id)
-      github_issue = insert(:github_issue, github_id: issue_github_id, number: number, github_repo: github_repo)
-
-      [%{project: project} | _rest] = project_github_repos = insert_list(3, :project_github_repo, github_repo: github_repo)
-
-      project_ids =
-        project_github_repos
-        |> Enum.map(&Map.get(&1, :project))
-        |> Enum.map(&Map.get(&1, :id))
-
-      project_ids |> Enum.each(fn project_id ->
-        project = Project |> Repo.get_by(id: project_id)
-        insert(:task_list, project: project, inbox: true)
-      end)
-
-      %{id: existing_task_id} =
-        insert(:task, project: project, user: user, github_repo: github_repo, github_issue: github_issue)
-
-      {:ok, tasks} = Issues.handle(@payload)
-
-      assert Enum.count(tasks) == 3
-      assert Repo.aggregate(Task, :count, :id) == 3
-
-      tasks |> Enum.each(fn task ->
-        task = task |> Repo.preload(:github_issue)
-        assert task.github_issue_id == github_issue.id
-        assert task.github_repo_id == github_repo.id
-        assert task.project_id in project_ids
-        assert task.markdown == markdown
-        assert task.title == title
-        assert task.github_issue.number == number
-        assert task.status == "open"
-        assert task.order
-      end)
-
-      assert existing_task_id in (tasks |> Enum.map(&Map.get(&1, :id)))
-    end
-
-    test "with matched user, returns error if unmatched repository" do
-      %{"issue" => %{"user" => %{"id" => user_github_id}}} = @payload
-      insert(:user, github_id: user_github_id)
-
-      assert Issues.handle(@payload) == {:error, :repository_not_found}
-    end
-
-    test "returns error if payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(%{})
-    end
-
-    test "returns error if repo payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(@payload |> Map.put("repository", "foo"))
-    end
-
-    test "returns error if issue payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(@payload |> Map.put("issue", "foo"))
-    end
-  end
-
-  describe "handle/2 for Issues::closed" do
-    @payload load_event_fixture("issues_closed")
-
-    test "with unmatched user, creates user, creates task for each project associated to github repo" do
-      %{
-        "issue" => %{
-          "body" => markdown, "title" => title, "number" => number,
-          "user" => %{"id" => user_github_id}
-        },
-        "repository" => %{"id" => repo_github_id}
-      } = @payload
-
-      github_repo = insert(:github_repo, github_id: repo_github_id)
-
-      project_github_repos = insert_list(3, :project_github_repo, github_repo: github_repo)
-
-      project_ids =
-        project_github_repos
-        |> Enum.map(&Map.get(&1, :project))
-        |> Enum.map(&Map.get(&1, :id))
-
-      project_ids |> Enum.each(fn project_id ->
-        project = Project |> Repo.get_by(id: project_id)
-        insert(:task_list, project: project, inbox: true)
-      end)
-
-      {:ok, tasks} = Issues.handle(@payload)
-
-      assert Enum.count(tasks) == 3
-      assert Repo.aggregate(Task, :count, :id) == 3
-
-      user = Repo.get_by(User, github_id: user_github_id)
-      assert user
-
-      tasks |> Enum.each(fn task ->
-        task = task |> Repo.preload(:github_issue)
-        assert task.user_id == user.id
-        assert task.github_issue_id
-        assert task.github_repo_id == github_repo.id
-        assert task.project_id in project_ids
-        assert task.markdown == markdown
-        assert task.title == title
-        assert task.github_issue.number == number
-        assert task.status == "closed"
-        assert task.order
-      end)
-    end
-
-    test "with unmatched user, returns error if unmatched repository" do
-      assert Issues.handle(@payload) == {:error, :repository_not_found}
-      refute Repo.one(User)
-    end
-
-    test "with matched user, creates or updates task for each project associated to github repo" do
-      %{
-        "issue" => %{"id" => issue_github_id, "body" => markdown, "title" => title, "number" => number, "user" => %{"id" => user_github_id}},
-        "repository" => %{"id" => repo_github_id}
-      } = @payload
-
-      user = insert(:user, github_id: user_github_id)
-
-      github_repo = insert(:github_repo, github_id: repo_github_id)
-      github_issue = insert(:github_issue, github_id: issue_github_id, number: number, github_repo: github_repo)
-
-      [%{project: project} | _rest] = project_github_repos = insert_list(3, :project_github_repo, github_repo: github_repo)
-
-      project_ids =
-        project_github_repos
-        |> Enum.map(&Map.get(&1, :project))
-        |> Enum.map(&Map.get(&1, :id))
-
-      project_ids |> Enum.each(fn project_id ->
-        project = Project |> Repo.get_by(id: project_id)
-        insert(:task_list, project: project, inbox: true)
-      end)
-
-      %{id: existing_task_id} =
-        insert(:task, project: project, user: user, github_repo: github_repo, github_issue: github_issue)
-
-      {:ok, tasks} = Issues.handle(@payload)
-
-      assert Enum.count(tasks) == 3
-      assert Repo.aggregate(Task, :count, :id) == 3
-
-      tasks |> Enum.each(fn task ->
-        task = task |> Repo.preload(:github_issue)
-        assert task.github_issue_id == github_issue.id
-        assert task.github_repo_id == github_repo.id
-        assert task.project_id in project_ids
-        assert task.markdown == markdown
-        assert task.title == title
-        assert task.github_issue.number == number
-        assert task.status == "closed"
-        assert task.order
-      end)
-
-      assert existing_task_id in (tasks |> Enum.map(&Map.get(&1, :id)))
-    end
-
-    test "with matched user, returns error if unmatched repository" do
-      %{"issue" => %{"user" => %{"id" => user_github_id}}} = @payload
-      insert(:user, github_id: user_github_id)
-
-      assert Issues.handle(@payload) == {:error, :repository_not_found}
-    end
-
-    test "returns error if payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(%{})
-    end
-
-    test "returns error if repo payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(@payload |> Map.put("repository", "foo"))
-    end
-
-    test "returns error if issue payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(@payload |> Map.put("issue", "foo"))
-    end
-  end
-
-  describe "handle/2 for Issues::edited" do
-    @payload load_event_fixture("issues_edited")
-
-    test "with unmatched user, creates user, creates task for each project associated to github repo" do
-      %{
-        "issue" => %{
-          "body" => markdown, "title" => title, "number" => number,
-          "user" => %{"id" => user_github_id}
-        },
-        "repository" => %{"id" => repo_github_id}
-      } = @payload
-
-      github_repo = insert(:github_repo, github_id: repo_github_id)
-
-      project_github_repos = insert_list(3, :project_github_repo, github_repo: github_repo)
-
-      project_ids =
-        project_github_repos
-        |> Enum.map(&Map.get(&1, :project))
-        |> Enum.map(&Map.get(&1, :id))
-
-      project_ids |> Enum.each(fn project_id ->
-        project = Project |> Repo.get_by(id: project_id)
-        insert(:task_list, project: project, inbox: true)
-      end)
-
-      {:ok, tasks} = Issues.handle(@payload)
-
-      assert Enum.count(tasks) == 3
-      assert Repo.aggregate(Task, :count, :id) == 3
-
-      user = Repo.get_by(User, github_id: user_github_id)
-      assert user
-
-      tasks |> Enum.each(fn task ->
-        task = task |> Repo.preload(:github_issue)
-        assert task.user_id == user.id
-        assert task.github_issue_id
-        assert task.github_repo_id == github_repo.id
-        assert task.project_id in project_ids
-        assert task.markdown == markdown
-        assert task.title == title
-        assert task.github_issue.number == number
-        assert task.status == "open"
-        assert task.order
-      end)
-    end
-
-    test "with unmatched user, returns error if unmatched repository" do
-      assert Issues.handle(@payload) == {:error, :repository_not_found}
-      refute Repo.one(User)
-    end
-
-    test "with matched user, creates or updates task for each project associated to github repo" do
-      %{
-        "issue" => %{"id" => issue_github_id, "body" => markdown, "title" => title, "number" => number, "user" => %{"id" => user_github_id}},
-        "repository" => %{"id" => repo_github_id}
-      } = @payload
-
-      user = insert(:user, github_id: user_github_id)
-
-      github_repo = insert(:github_repo, github_id: repo_github_id)
-      github_issue = insert(:github_issue, github_id: issue_github_id, number: number, github_repo: github_repo)
-
-      [%{project: project} | _rest] = project_github_repos = insert_list(3, :project_github_repo, github_repo: github_repo)
-
-      project_ids =
-        project_github_repos
-        |> Enum.map(&Map.get(&1, :project))
-        |> Enum.map(&Map.get(&1, :id))
-
-      project_ids |> Enum.each(fn project_id ->
-        project = Project |> Repo.get_by(id: project_id)
-        insert(:task_list, project: project, inbox: true)
-      end)
-
-      %{id: existing_task_id} =
-        insert(:task, project: project, user: user, github_repo: github_repo, github_issue: github_issue)
-
-      {:ok, tasks} = Issues.handle(@payload)
-
-      assert Enum.count(tasks) == 3
-      assert Repo.aggregate(Task, :count, :id) == 3
-
-      tasks |> Enum.each(fn task ->
-        task = task |> Repo.preload(:github_issue)
-        assert task.github_issue_id == github_issue.id
-        assert task.github_repo_id == github_repo.id
-        assert task.project_id in project_ids
-        assert task.markdown == markdown
-        assert task.title == title
-        assert task.github_issue.number == number
-        assert task.status == "open"
-        assert task.order
-      end)
-
-      assert existing_task_id in (tasks |> Enum.map(&Map.get(&1, :id)))
-    end
-
-    test "with matched user, returns error if unmatched repository" do
-      %{"issue" => %{"user" => %{"id" => user_github_id}}} = @payload
-      insert(:user, github_id: user_github_id)
-
-      assert Issues.handle(@payload) == {:error, :repository_not_found}
-    end
-
-    test "returns error if payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(%{})
-    end
-
-    test "returns error if repo payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(@payload |> Map.put("repository", "foo"))
-    end
-
-    test "returns error if issue payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(@payload |> Map.put("issue", "foo"))
-    end
-  end
-
-  describe "handle/2 for Issues::reopened" do
-    @payload load_event_fixture("issues_reopened")
-
-    test "with unmatched user, creates user, creates task for each project associated to github repo" do
-      %{
-        "issue" => %{
-          "body" => markdown, "title" => title, "number" => number,
-          "user" => %{"id" => user_github_id}
-        },
-        "repository" => %{"id" => repo_github_id}
-      } = @payload
-
-      github_repo = insert(:github_repo, github_id: repo_github_id)
-
-      project_github_repos = insert_list(3, :project_github_repo, github_repo: github_repo)
-
-      project_ids =
-        project_github_repos
-        |> Enum.map(&Map.get(&1, :project))
-        |> Enum.map(&Map.get(&1, :id))
-
-      project_ids |> Enum.each(fn project_id ->
-        project = Project |> Repo.get_by(id: project_id)
-        insert(:task_list, project: project, inbox: true)
-      end)
-
-      {:ok, tasks} = Issues.handle(@payload)
-
-      assert Enum.count(tasks) == 3
-      assert Repo.aggregate(Task, :count, :id) == 3
-
-      user = Repo.get_by(User, github_id: user_github_id)
-      assert user
-
-      tasks |> Enum.each(fn task ->
-        task = task |> Repo.preload(:github_issue)
-        assert task.user_id == user.id
-        assert task.github_issue_id
-        assert task.github_repo_id == github_repo.id
-        assert task.project_id in project_ids
-        assert task.markdown == markdown
-        assert task.title == title
-        assert task.github_issue.number == number
-        assert task.status == "open"
-        assert task.order
-      end)
-    end
-
-    test "with unmatched user, returns error if unmatched repository" do
-      assert Issues.handle(@payload) == {:error, :repository_not_found}
-      refute Repo.one(User)
-    end
-
-    test "with matched user, creates or updates task for each project associated to github repo" do
-      %{
-        "issue" => %{"id" => issue_github_id, "body" => markdown, "title" => title, "number" => number, "user" => %{"id" => user_github_id}},
-        "repository" => %{"id" => repo_github_id}
-      } = @payload
-
-      user = insert(:user, github_id: user_github_id)
-
-      github_repo = insert(:github_repo, github_id: repo_github_id)
-      github_issue = insert(:github_issue, github_id: issue_github_id, number: number, github_repo: github_repo)
-
-      [%{project: project} | _rest] = project_github_repos = insert_list(3, :project_github_repo, github_repo: github_repo)
-
-      project_ids =
-        project_github_repos
-        |> Enum.map(&Map.get(&1, :project))
-        |> Enum.map(&Map.get(&1, :id))
-
-      project_ids |> Enum.each(fn project_id ->
-        project = Project |> Repo.get_by(id: project_id)
-        insert(:task_list, project: project, inbox: true)
-      end)
-
-      %{id: existing_task_id} =
-        insert(:task, project: project, user: user, github_repo: github_repo, github_issue: github_issue)
-
-      {:ok, tasks} = Issues.handle(@payload)
-
-      assert Enum.count(tasks) == 3
-      assert Repo.aggregate(Task, :count, :id) == 3
-
-      tasks |> Enum.each(fn task ->
-        task = task |> Repo.preload(:github_issue)
-        assert task.github_issue_id == github_issue.id
-        assert task.github_repo_id == github_repo.id
-        assert task.project_id in project_ids
-        assert task.markdown == markdown
-        assert task.title == title
-        assert task.github_issue.number == number
-        assert task.status == "open"
-        assert task.order
-      end)
-
-      assert existing_task_id in (tasks |> Enum.map(&Map.get(&1, :id)))
-    end
-
-    test "with matched user, returns error if unmatched repository" do
-      %{"issue" => %{"user" => %{"id" => user_github_id}}} = @payload
-      insert(:user, github_id: user_github_id)
-
-      assert Issues.handle(@payload) == {:error, :repository_not_found}
-    end
-
-    test "returns error if payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(%{})
-    end
-
-    test "returns error if repo payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(@payload |> Map.put("repository", "foo"))
-    end
-
-    test "returns error if issue payload is wrong" do
-      assert {:error, :unexpected_payload} == Issues.handle(@payload |> Map.put("issue", "foo"))
-    end
-  end
+  end)
 
   @unimplemented_actions ~w(assigned unassigned labeled unlabeled milestoned demilestoned)
 
   @unimplemented_actions |> Enum.each(fn action ->
-    describe "handle/2 for Issues::#{action}" do
+    describe "handle/1 for Issues::#{action}" do
       @payload %{
         "action" => action,
         "issue" => %{

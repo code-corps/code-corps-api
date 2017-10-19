@@ -1,9 +1,9 @@
-defmodule CodeCorps.GitHub.Event.Common.RepoFinderTest do
+defmodule CodeCorps.GitHub.Sync.Utils.RepoFinderTest do
   use CodeCorps.DbAccessCase
 
   import CodeCorps.GitHub.TestHelpers
 
-  alias CodeCorps.GitHub.Event.Common.RepoFinder
+  alias CodeCorps.GitHub.Sync.Utils.RepoFinder
 
   @loadable_event_fixtures ~w(issue_comment_created issue_comment_edited issue_comment_deleted issues_closed issues_opened issues_edited issues_reopened)
 
