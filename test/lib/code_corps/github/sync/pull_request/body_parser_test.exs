@@ -1,11 +1,11 @@
-defmodule CodeCorps.GitHub.Event.PullRequest.BodyParserTest do
+defmodule CodeCorps.GitHub.Sync.PullRequest.BodyParserTest do
   @moduledoc false
 
   use ExUnit.Case, async: true
 
 
   alias CodeCorps.{
-    GitHub.Event.PullRequest.BodyParser
+    GitHub.Sync.PullRequest.BodyParser
   }
 
   describe "extract_closing_ids/1" do
