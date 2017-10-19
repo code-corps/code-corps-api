@@ -42,7 +42,8 @@ defmodule CodeCorps.GitHub.Adapters.Issue do
     {:markdown, ["body"]},
     {:modified_at, ["updated_at"]},
     {:status, ["state"]},
-    {:title, ["title"]}
+    {:title, ["title"]},
+    {:closed_at, ["closed_at"]}
   ]
 
   @doc ~S"""

@@ -66,6 +66,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         assert task.github_issue.number == number
         assert task.status == "open"
         assert task.order
+        refute task.closed_at
       end)
     end
 
@@ -115,6 +116,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         assert task.github_issue.number == number
         assert task.status == "open"
         assert task.order
+        refute task.closed_at
       end)
 
       assert existing_task_id in (tasks |> Enum.map(&Map.get(&1, :id)))
@@ -184,6 +186,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         assert task.title == title
         assert task.github_issue.number == number
         assert task.status == "closed"
+        assert task.closed_at ==  Timex.parse!(@payload["issue"]["closed_at"], "{ISO:Extended:Z}")
         assert task.order
       end)
     end
@@ -233,6 +236,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         assert task.title == title
         assert task.github_issue.number == number
         assert task.status == "closed"
+        assert task.closed_at ==  Timex.parse!(@payload["issue"]["closed_at"], "{ISO:Extended:Z}")
         assert task.order
       end)
 
@@ -422,6 +426,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         assert task.title == title
         assert task.github_issue.number == number
         assert task.status == "open"
+        refute task.closed_at
         assert task.order
       end)
     end
@@ -471,6 +476,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         assert task.title == title
         assert task.github_issue.number == number
         assert task.status == "open"
+        refute task.closed_at
         assert task.order
       end)
 

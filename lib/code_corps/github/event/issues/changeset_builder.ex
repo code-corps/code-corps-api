@@ -37,7 +37,7 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilder do
     end
   end
 
-  @create_attrs ~w(created_at markdown modified_at status title)a
+  @create_attrs ~w(created_at markdown modified_at status title closed_at)a
   @spec create_changeset(Task.t, map, GithubIssue.t, ProjectGithubRepo.t, User.t) :: Changeset.t
   defp create_changeset(
     %Task{} = task,
@@ -68,7 +68,7 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilder do
     |> Task.order_task()
   end
 
-  @update_attrs ~w(markdown modified_at status title)a
+  @update_attrs ~w(markdown modified_at status title closed_at)a
   @spec update_changeset(Task.t, map) :: Changeset.t
   defp update_changeset(%Task{} = task, %{} = issue_attrs) do
     task
