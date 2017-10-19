@@ -11,11 +11,11 @@ defmodule CodeCorps.GitHub.Event.PullRequest do
     GitHub.Event.Common.RepoFinder,
     GitHub.Event.PullRequest.PullRequestLinker,
     GitHub.Event.PullRequest.TaskSyncer,
-    GitHub.Event.PullRequest.UserLinker,
     GitHub.Event.PullRequest.Validator,
     Repo,
     Task
   }
+  alias CodeCorps.GitHub.Syncers.User.RecordLinker, as: UserRecordLinker
   alias Ecto.Multi
 
   @type outcome :: {:ok, list(Task.t)} |
@@ -55,7 +55,7 @@ defmodule CodeCorps.GitHub.Event.PullRequest do
     |> Multi.run(:action, fn _ -> payload |> validate_action() end)
     |> Multi.run(:repo, fn _ -> RepoFinder.find_repo(payload) end)
     |> Multi.run(:pull_request, fn %{repo: github_repo} -> link_pull_request(github_repo, payload) end)
-    |> Multi.run(:user, fn %{pull_request: github_pull_request} -> UserLinker.find_or_create_user(github_pull_request, payload) end)
+    |> Multi.run(:user, fn %{pull_request: github_pull_request} -> UserRecordLinker.link_to(github_pull_request, payload) end)
     |> Multi.run(:tasks, fn %{pull_request: github_pull_request, user: user} -> github_pull_request |> TaskSyncer.sync_all(user, payload) end)
     |> Repo.transaction
     |> marshall_result()
