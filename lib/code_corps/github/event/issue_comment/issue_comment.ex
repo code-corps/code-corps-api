@@ -7,117 +7,45 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
   @behaviour CodeCorps.GitHub.Event.Handler
 
   alias CodeCorps.{
-    Comment,
     GitHub,
-    GithubComment,
-    GithubRepo,
-    GitHub.Event.Common.RepoFinder,
-    GitHub.Event.IssueComment.CommentDeleter,
-    GitHub.Event.IssueComment.Validator,
-    Repo
+    GitHub.Event.IssueComment.Validator
   }
-  alias GitHub.Sync.Comment.Comment, as: CommentCommentSyncer
-  alias GitHub.Sync.Comment.GithubComment, as: CommentGithubCommentSyncer
-  alias GitHub.Sync.Issue.GithubIssue, as: IssueGithubIssueSyncer
-  alias GitHub.Sync.Issue.Task, as: IssueTaskSyncer
-  alias GitHub.Sync.User.RecordLinker, as: UserRecordLinker
-  alias Ecto.Multi
+  alias GitHub.Sync.Comment, as: CommentSyncer
 
-  @type outcome :: {:ok, list(Comment.t)} |
-                   {:error, :unexpected_action} |
-                   {:error, :unexpected_payload} |
-                   {:error, :repository_not_found} |
-                   {:error, :validation_error_on_inserting_issue_for_task} |
-                   {:error, :validation_error_on_inserting_github_comment} |
-                   {:error, :validation_error_on_inserting_user_for_task} |
-                   {:error, :multiple_github_users_matched_same_cc_user_for_task} |
-                   {:error, :validation_error_on_inserting_user_for_comment} |
-                   {:error, :multiple_github_users_matched_same_cc_user_for_comment} |
-                   {:error, :validation_error_on_syncing_tasks} |
-                   {:error, :validation_error_on_syncing_comments} |
-                   {:error, :unexpected_transaction_outcome}
+  @type outcome :: CommentSyncer.outcome
+                 | {:error, :unexpected_action}
+                 | {:error, :unexpected_payload}
 
   @doc ~S"""
   Handles the "IssueComment" GitHub webhook
 
-  The process is as follows
+  The process is as follows:
+
   - validate the payload is structured as expected
   - validate the action is properly supported
-  - match payload with affected `CodeCorps.GithubRepo` record using `CodeCorps.GitHub.Event.Common.RepoFinder`
-  - match issue part of the payload with a `CodeCorps.User` using `CodeCorps.GitHub.Event.Issues.UserLinker`
-  - match comment part of the payload with a `CodeCorps.User` using `CodeCorps.GitHub.Event.IssueComment.UserLinker`
-  - for each `CodeCorps.ProjectGithubRepo` belonging to matched repo
-    - match and update, or create a `CodeCorps.Task` on the associated `CodeCorps.Project`
-    - match and update, or create a `CodeCorps.Comment` associated to `CodeCorps.Task`
-
-  If the process runs all the way through, the function will return an `:ok`
-  tuple with a list of affected (created or updated) comments.
-
-  If it fails, it will instead return an `:error` tuple, where the second
-  element is the atom indicating a reason.
+  - sync the comment using `CodeCorps.GitHub.Sync.Comment`
   """
   @spec handle(map) :: outcome
   def handle(payload) do
-    Multi.new
-    |> Multi.run(:payload, fn _ -> payload |> validate_payload() end)
-    |> Multi.run(:action, fn _ -> payload |> validate_action() end)
-    |> Multi.append(payload |> operational_multi())
-    |> Repo.transaction
-    |> marshall_result()
+    with {:ok, :valid} <- validate_payload(payload),
+         {:ok, :implemented} <- validate_action(payload) do
+      CommentSyncer.sync(payload)
+    else
+      {:error, error} -> {:error, error}
+    end
   end
 
-  @spec operational_multi(map) :: Multi.t
-  defp operational_multi(%{"action" => action, "issue" => _, "comment" => _} = payload) when action in ~w(created edited) do
-    Multi.new
-    |> Multi.run(:repo, fn _ -> RepoFinder.find_repo(payload) end)
-    |> Multi.run(:github_issue, fn %{repo: github_repo} -> github_repo |> link_issue(payload) end)
-    |> Multi.run(:github_comment, fn %{github_issue: github_issue} -> github_issue |> sync_comment(payload) end)
-    |> Multi.run(:issue_user, fn %{github_issue: github_issue} -> UserRecordLinker.link_to(github_issue, payload) end)
-    |> Multi.run(:comment_user, fn %{github_comment: github_comment} -> UserRecordLinker.link_to(github_comment, payload) end)
-    |> Multi.run(:tasks, fn %{github_issue: github_issue, issue_user: user} -> github_issue |> IssueTaskSyncer.sync_all(user, payload) end)
-    |> Multi.run(:comments, fn %{github_comment: github_comment, tasks: tasks, comment_user: user} -> CommentCommentSyncer.sync_all(tasks, github_comment, user, payload) end)
-  end
-  defp operational_multi(%{"action" => "deleted"} = payload) do
-    Multi.new
-    |> Multi.run(:comments, fn _ -> CommentDeleter.delete_all(payload) end)
-  end
-  defp operational_multi(%{}), do: Multi.new
-
-  @spec link_issue(GithubRepo.t, map) :: {:ok, GithubIssue.t} | {:error, Ecto.Changeset.t}
-  defp link_issue(github_repo, %{"issue" => attrs}) do
-    IssueGithubIssueSyncer.create_or_update_issue(github_repo, attrs)
-  end
-
-  @spec sync_comment(GithubIssue.t, map) :: {:ok, GithubComment.t} | {:error, Ecto.Changeset.t}
-  defp sync_comment(github_issue, %{"comment" => attrs}) do
-    CommentGithubCommentSyncer.create_or_update_comment(github_issue, attrs)
-  end
-
-  @spec marshall_result(tuple) :: tuple
-  defp marshall_result({:ok, %{comments: comments}}), do: {:ok, comments}
-  defp marshall_result({:error, :payload, :invalid, _steps}), do: {:error, :unexpected_payload}
-  defp marshall_result({:error, :action, :unexpected_action, _steps}), do: {:error, :unexpected_action}
-  defp marshall_result({:error, :repo, :unmatched_project, _steps}), do: {:ok, []}
-  defp marshall_result({:error, :repo, :unmatched_repository, _steps}), do: {:error, :repository_not_found}
-  defp marshall_result({:error, :github_issue, %Ecto.Changeset{}, _steps}), do: {:error, :validation_error_on_inserting_issue_for_task}
-  defp marshall_result({:error, :github_comment, %Ecto.Changeset{}, _steps}), do: {:error, :validation_error_on_inserting_github_comment}
-  defp marshall_result({:error, :issue_user, %Ecto.Changeset{}, _steps}), do: {:error, :validation_error_on_inserting_user_for_task}
-  defp marshall_result({:error, :issue_user, :multiple_users, _steps}), do: {:error, :multiple_github_users_matched_same_cc_user_for_task}
-  defp marshall_result({:error, :comment_user, %Ecto.Changeset{}, _steps}), do: {:error, :validation_error_on_inserting_user_for_comment}
-  defp marshall_result({:error, :comment_user, :multiple_users, _steps}), do: {:error, :multiple_github_users_matched_same_cc_user_for_comment}
-  defp marshall_result({:error, :tasks, {_tasks, _errors}, _steps}), do: {:error, :validation_error_on_syncing_tasks}
-  defp marshall_result({:error, :comments, {_comments, _errors}, _steps}), do: {:error, :validation_error_on_syncing_comments}
-  defp marshall_result({:error, _errored_step, _error_response, _steps}), do: {:error, :unexpected_transaction_outcome}
-
-  @spec validate_payload(map) :: {:ok, :valid} | {:error, :invalid}
+  @spec validate_payload(map) :: {:ok, :valid}
+                               | {:error, :unexpected_payload}
   defp validate_payload(%{} = payload) do
     case payload |> Validator.valid? do
       true -> {:ok, :valid}
-      false -> {:error, :invalid}
+      false -> {:error, :unexpected_payload}
     end
   end
 
   @implemented_actions ~w(created edited deleted)
+
   @spec validate_action(map) :: {:ok, :implemented} | {:error, :unexpected_action}
   defp validate_action(%{"action" => action}) when action in @implemented_actions, do: {:ok, :implemented}
   defp validate_action(%{}), do: {:error, :unexpected_action}

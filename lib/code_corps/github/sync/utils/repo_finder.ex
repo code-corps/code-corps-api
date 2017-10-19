@@ -1,7 +1,6 @@
-defmodule CodeCorps.GitHub.Event.Common.RepoFinder do
+defmodule CodeCorps.GitHub.Sync.Utils.RepoFinder do
   @moduledoc ~S"""
-  In charge of tracking down a relevant `GithubRepo` record for a Github API
-  payload
+  Finds a relevant `GithubRepo` record given a Github API payload.
   """
   alias CodeCorps.{GithubRepo, Repo}
 
