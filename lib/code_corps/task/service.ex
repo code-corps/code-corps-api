@@ -4,7 +4,7 @@ defmodule CodeCorps.Task.Service do
   """
 
   alias CodeCorps.{GitHub, GithubIssue, Repo, Task}
-  alias GitHub.Event.Issues.IssueLinker
+  alias GitHub.Sync.Issue.GithubIssue, as: IssueGithubIssueSyncer
   alias Ecto.{Changeset, Multi}
 
   require Logger
@@ -64,7 +64,7 @@ defmodule CodeCorps.Task.Service do
   defp create_on_github(%Task{github_repo: _} = task) do
     with %Task{github_repo: github_repo} = task <- task |> Repo.preload(@preloads),
          {:ok, payload} <- GitHub.API.Issue.create(task),
-         {:ok, %GithubIssue{} = github_issue } <- IssueLinker.create_or_update_issue(github_repo, payload) do
+         {:ok, %GithubIssue{} = github_issue } <- IssueGithubIssueSyncer.create_or_update_issue(github_repo, payload) do
       task |> link_with_github_changeset(github_issue) |> Repo.update
     else
       {:error, error} -> {:error, error}
@@ -81,7 +81,7 @@ defmodule CodeCorps.Task.Service do
   defp update_on_github(%Task{github_repo_id: _} = task) do
     with %Task{github_repo: github_repo} = task <- task |> Repo.preload(@preloads),
          {:ok, payload} <- GitHub.API.Issue.update(task),
-         {:ok, %GithubIssue{} } <- IssueLinker.create_or_update_issue(github_repo, payload) do
+         {:ok, %GithubIssue{} } <- IssueGithubIssueSyncer.create_or_update_issue(github_repo, payload) do
       {:ok, task}
     else
       {:error, github_error} -> {:error, github_error}
