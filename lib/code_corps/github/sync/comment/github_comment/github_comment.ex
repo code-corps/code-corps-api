@@ -1,10 +1,9 @@
-defmodule CodeCorps.GitHub.Event.IssueComment.CommentLinker do
+defmodule CodeCorps.GitHub.Sync.Comment.GithubComment do
   @moduledoc ~S"""
   In charge of finding a `CodeCorps.GithubComment` to link with a
-  `CodeCorps.Comment` when processing an Issue Comment webhook, or handling a
-  `CodeCorpsWeb.CommentController` request.
+  `CodeCorps.Comment` when processing a GitHub Comment payload.
 
-  The only entry point is `create_or_update_comment/1`.
+  The only entry point is `create_or_update_comment/2`.
   """
 
   alias CodeCorps.{

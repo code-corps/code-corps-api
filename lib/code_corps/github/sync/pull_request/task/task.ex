@@ -2,7 +2,7 @@ defmodule CodeCorps.GitHub.Sync.PullRequest.Task do
   alias CodeCorps.{
     GithubPullRequest,
     GithubRepo,
-    GitHub.Event.Common.ResultAggregator,
+    GitHub.Utils.ResultAggregator,
     ProjectGithubRepo,
     Task,
     User,

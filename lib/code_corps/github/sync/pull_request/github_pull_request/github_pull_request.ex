@@ -1,9 +1,9 @@
-defmodule CodeCorps.GitHub.Event.PullRequest.PullRequestLinker do
+defmodule CodeCorps.GitHub.Sync.PullRequest.GithubPullRequest do
   @moduledoc ~S"""
   In charge of finding a pull request to link with a `GithubPullRequest` record
-  when processing the PullRequest webhook.
+  when processing a GitHub Pull Request payload.
 
-  The only entry point is `create_or_update_pull_request/1`.
+  The only entry point is `create_or_update_pull_request/2`.
   """
 
   alias CodeCorps.{

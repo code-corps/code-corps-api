@@ -8,15 +8,16 @@ defmodule CodeCorps.GitHub.Event.Issues do
   @behaviour CodeCorps.GitHub.Event.Handler
 
   alias CodeCorps.{
+    GitHub,
     GitHub.Event.Common.RepoFinder,
-    GitHub.Event.Issues.IssueLinker,
     GitHub.Event.Issues.Validator,
     GitHub.Sync.Issue.Task,
     Repo,
     Task
   }
-  alias CodeCorps.GitHub.Sync.Issue.Task, as: IssueTaskSyncer
-  alias CodeCorps.GitHub.Sync.User.RecordLinker, as: UserRecordLinker
+  alias GitHub.Sync.Issue.GithubIssue, as: IssueGithubIssueSyncer
+  alias GitHub.Sync.Issue.Task, as: IssueTaskSyncer
+  alias GitHub.Sync.User.RecordLinker, as: UserRecordLinker
   alias Ecto.Multi
 
   @type outcome :: {:ok, list(Task.t)} |
@@ -61,7 +62,7 @@ defmodule CodeCorps.GitHub.Event.Issues do
 
   @spec link_issue(GithubRepo.t, map) :: {:ok, GithubIssue.t} | {:error, Ecto.Changeset.t}
   defp link_issue(github_repo, %{"issue" => attrs}) do
-    IssueLinker.create_or_update_issue(github_repo, attrs)
+    IssueGithubIssueSyncer.create_or_update_issue(github_repo, attrs)
   end
 
   @spec marshall_result(tuple) :: tuple

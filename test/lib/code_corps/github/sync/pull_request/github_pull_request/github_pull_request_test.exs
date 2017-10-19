@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Event.PullRequest.PullRequestLinkerTest do
+defmodule CodeCorps.GitHub.Sync.PullRequest.GithubPullRequestTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
@@ -6,12 +6,12 @@ defmodule CodeCorps.GitHub.Event.PullRequest.PullRequestLinkerTest do
   import CodeCorps.GitHub.TestHelpers
 
   alias CodeCorps.{
+    GitHub,
     GithubPullRequest,
-    GitHub.Event.PullRequest.PullRequestLinker,
     Repo
   }
-
-  alias CodeCorps.GitHub.Adapters.PullRequest, as: PullRequestAdapter
+  alias GitHub.Sync.PullRequest.GithubPullRequest, as: GithubPullRequestSyncer
+  alias GitHub.Adapters.PullRequest, as: PullRequestAdapter
 
   @payload load_event_fixture("pull_request_opened")
 
@@ -19,7 +19,7 @@ defmodule CodeCorps.GitHub.Event.PullRequest.PullRequestLinkerTest do
     test "creates pull request if none exists" do
       %{"pull_request" => attrs} = @payload
       github_repo = insert(:github_repo)
-      {:ok, %GithubPullRequest{} = created_pull_request} = PullRequestLinker.create_or_update_pull_request(github_repo, attrs)
+      {:ok, %GithubPullRequest{} = created_pull_request} = GithubPullRequestSyncer.create_or_update_pull_request(github_repo, attrs)
 
       assert Repo.one(GithubPullRequest)
 
@@ -40,7 +40,7 @@ defmodule CodeCorps.GitHub.Event.PullRequest.PullRequestLinkerTest do
       github_repo = insert(:github_repo)
       pull_request = insert(:github_pull_request, github_id: pull_request_id, github_repo: github_repo)
 
-      {:ok, %GithubPullRequest{} = updated_pull_request} = PullRequestLinker.create_or_update_pull_request(github_repo, attrs)
+      {:ok, %GithubPullRequest{} = updated_pull_request} = GithubPullRequestSyncer.create_or_update_pull_request(github_repo, attrs)
 
       assert updated_pull_request.id == pull_request.id
       assert updated_pull_request.github_repo_id == github_repo.id
@@ -51,7 +51,7 @@ defmodule CodeCorps.GitHub.Event.PullRequest.PullRequestLinkerTest do
       %{"pull_request" => attrs} = bad_payload
       github_repo = insert(:github_repo)
 
-      {:error, changeset} = PullRequestLinker.create_or_update_pull_request(github_repo, attrs)
+      {:error, changeset} = GithubPullRequestSyncer.create_or_update_pull_request(github_repo, attrs)
       refute changeset.valid?
     end
   end

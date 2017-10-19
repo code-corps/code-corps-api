@@ -9,11 +9,11 @@ defmodule CodeCorps.GitHub.Event.PullRequest do
 
   alias CodeCorps.{
     GitHub.Event.Common.RepoFinder,
-    GitHub.Event.PullRequest.PullRequestLinker,
     GitHub.Event.PullRequest.Validator,
     Repo,
     Task
   }
+  alias CodeCorps.GitHub.Sync.PullRequest.GithubPullRequest, as: GithubPullRequestSyncer
   alias CodeCorps.GitHub.Sync.PullRequest.Task, as: PullRequestTaskSyncer
   alias CodeCorps.GitHub.Sync.User.RecordLinker, as: UserRecordLinker
   alias Ecto.Multi
@@ -63,7 +63,7 @@ defmodule CodeCorps.GitHub.Event.PullRequest do
 
   @spec link_pull_request(GithubRepo.t, map) :: {:ok, GithubIssue.t} | {:error, Ecto.Changeset.t}
   defp link_pull_request(github_repo, %{"pull_request" => attrs}) do
-    PullRequestLinker.create_or_update_pull_request(github_repo, attrs)
+    GithubPullRequestSyncer.create_or_update_pull_request(github_repo, attrs)
   end
 
   @spec marshall_result(tuple) :: tuple

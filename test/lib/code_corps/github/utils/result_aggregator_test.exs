@@ -1,15 +1,13 @@
-defmodule CodeCorps.GitHub.Event.Common.ResultAggregatorTest do
+defmodule CodeCorps.GitHub.Utils.ResultAggregatorTest do
   use CodeCorps.DbAccessCase
 
   alias CodeCorps.{
     Comment,
-    Task,
+    GitHub.Utils.ResultAggregator,
     GithubRepo,
-    GitHub.Event.Common.ResultAggregator
+    Task,
   }
-
   alias Ecto.Changeset
-
 
   describe "aggregate/1" do
     test "aggregates Task results correctly" do

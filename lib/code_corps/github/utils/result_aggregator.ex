@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Event.Common.ResultAggregator do
+defmodule CodeCorps.GitHub.Utils.ResultAggregator do
   @moduledoc ~S"""
   Module used for the purpose of aggregating results from multiple repository commit actions.
   """

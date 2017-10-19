@@ -12,7 +12,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment do
 
   alias CodeCorps.{
     Comment,
-    GitHub.Event.Common.ResultAggregator,
+    GitHub.Utils.ResultAggregator,
     GithubComment,
     Task,
     User,
@@ -25,7 +25,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment do
                    {:error, {list(Comment.t), list(Changeset.t)}}
 
   @doc ~S"""
-  Creates or updates `CodeCorps.Comment` records for the speciifed list of
+  Creates or updates `CodeCorps.Comment` records for the specified list of
   `CodeCorps.Task` records.
 
   When provided a list of `CodeCorps.Task` records, a `CodeCorps.GithubComment`,

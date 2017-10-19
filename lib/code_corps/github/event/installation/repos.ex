@@ -8,7 +8,7 @@ defmodule CodeCorps.GitHub.Event.Installation.Repos do
     GithubRepo,
     GitHub.API.Installation,
     GitHub,
-    GitHub.Event.Common.ResultAggregator,
+    GitHub.Utils.ResultAggregator,
     Repo
   }
 

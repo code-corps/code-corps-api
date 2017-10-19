@@ -1,10 +1,9 @@
-defmodule CodeCorps.GitHub.Event.Issues.IssueLinker do
+defmodule CodeCorps.GitHub.Sync.Issue.GithubIssue do
   @moduledoc ~S"""
   In charge of finding a `CodeCorps.GithubIssue` to link with a
-  `CodeCorps.Issue` when processing an Issues webhook, or handling a
-  `CodeCorpsWeb.TaskController` request.
+  `CodeCorps.Issue` when processing a GitHub Issue payload.
 
-  The only entry point is `create_or_update_issue/1`.
+  The only entry point is `create_or_update_issue/2`.
   """
 
   alias CodeCorps.{

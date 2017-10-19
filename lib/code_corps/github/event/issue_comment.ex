@@ -8,18 +8,19 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
 
   alias CodeCorps.{
     Comment,
+    GitHub,
     GithubComment,
     GithubRepo,
     GitHub.Event.Common.RepoFinder,
-    GitHub.Event.Issues.IssueLinker,
-    GitHub.Event.IssueComment.CommentLinker,
     GitHub.Event.IssueComment.CommentDeleter,
     GitHub.Event.IssueComment.Validator,
     Repo
   }
-  alias CodeCorps.GitHub.Sync.Comment.Comment, as: CommentCommentSyncer
-  alias CodeCorps.GitHub.Sync.Issue.Task, as: IssueTaskSyncer
-  alias CodeCorps.GitHub.Sync.User.RecordLinker, as: UserRecordLinker
+  alias GitHub.Sync.Comment.Comment, as: CommentCommentSyncer
+  alias GitHub.Sync.Comment.GithubComment, as: CommentGithubCommentSyncer
+  alias GitHub.Sync.Issue.GithubIssue, as: IssueGithubIssueSyncer
+  alias GitHub.Sync.Issue.Task, as: IssueTaskSyncer
+  alias GitHub.Sync.User.RecordLinker, as: UserRecordLinker
   alias Ecto.Multi
 
   @type outcome :: {:ok, list(Comment.t)} |
@@ -70,7 +71,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
     Multi.new
     |> Multi.run(:repo, fn _ -> RepoFinder.find_repo(payload) end)
     |> Multi.run(:github_issue, fn %{repo: github_repo} -> github_repo |> link_issue(payload) end)
-    |> Multi.run(:github_comment, fn %{github_issue: github_issue} -> github_issue |> link_comment(payload) end)
+    |> Multi.run(:github_comment, fn %{github_issue: github_issue} -> github_issue |> sync_comment(payload) end)
     |> Multi.run(:issue_user, fn %{github_issue: github_issue} -> UserRecordLinker.link_to(github_issue, payload) end)
     |> Multi.run(:comment_user, fn %{github_comment: github_comment} -> UserRecordLinker.link_to(github_comment, payload) end)
     |> Multi.run(:tasks, fn %{github_issue: github_issue, issue_user: user} -> github_issue |> IssueTaskSyncer.sync_all(user, payload) end)
@@ -84,12 +85,12 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
 
   @spec link_issue(GithubRepo.t, map) :: {:ok, GithubIssue.t} | {:error, Ecto.Changeset.t}
   defp link_issue(github_repo, %{"issue" => attrs}) do
-    IssueLinker.create_or_update_issue(github_repo, attrs)
+    IssueGithubIssueSyncer.create_or_update_issue(github_repo, attrs)
   end
 
-  @spec link_comment(GithubIssue.t, map) :: {:ok, GithubComment.t} | {:error, Ecto.Changeset.t}
-  defp link_comment(github_issue, %{"comment" => attrs}) do
-    CommentLinker.create_or_update_comment(github_issue, attrs)
+  @spec sync_comment(GithubIssue.t, map) :: {:ok, GithubComment.t} | {:error, Ecto.Changeset.t}
+  defp sync_comment(github_issue, %{"comment" => attrs}) do
+    CommentGithubCommentSyncer.create_or_update_comment(github_issue, attrs)
   end
 
   @spec marshall_result(tuple) :: tuple

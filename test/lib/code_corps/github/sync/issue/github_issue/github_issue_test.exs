@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Event.Issues.IssueLinkerTest do
+defmodule CodeCorps.GitHub.Sync.Issue.GithubIssueTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
@@ -7,10 +7,9 @@ defmodule CodeCorps.GitHub.Event.Issues.IssueLinkerTest do
 
   alias CodeCorps.{
     GithubIssue,
-    GitHub.Event.Issues.IssueLinker,
     Repo
   }
-
+  alias CodeCorps.GitHub.Sync.Issue.GithubIssue, as: GithubIssueSyncer
   alias CodeCorps.GitHub.Adapters.Issue, as: IssueAdapter
 
   @payload load_event_fixture("issues_opened")
@@ -19,7 +18,7 @@ defmodule CodeCorps.GitHub.Event.Issues.IssueLinkerTest do
     test "creates issue if none exists" do
       %{"issue" => attrs} = @payload
       github_repo = insert(:github_repo)
-      {:ok, %GithubIssue{} = created_issue} = IssueLinker.create_or_update_issue(github_repo, attrs)
+      {:ok, %GithubIssue{} = created_issue} = GithubIssueSyncer.create_or_update_issue(github_repo, attrs)
 
       assert Repo.one(GithubIssue)
 
@@ -39,7 +38,7 @@ defmodule CodeCorps.GitHub.Event.Issues.IssueLinkerTest do
       github_repo = insert(:github_repo)
       issue = insert(:github_issue, github_id: issue_id, github_repo: github_repo)
 
-      {:ok, %GithubIssue{} = updated_issue} = IssueLinker.create_or_update_issue(github_repo, attrs)
+      {:ok, %GithubIssue{} = updated_issue} = GithubIssueSyncer.create_or_update_issue(github_repo, attrs)
 
       assert updated_issue.id == issue.id
       assert updated_issue.github_repo_id == github_repo.id
@@ -50,7 +49,7 @@ defmodule CodeCorps.GitHub.Event.Issues.IssueLinkerTest do
       %{"issue" => attrs} = bad_payload
       github_repo = insert(:github_repo)
 
-      {:error, changeset} = IssueLinker.create_or_update_issue(github_repo, attrs)
+      {:error, changeset} = GithubIssueSyncer.create_or_update_issue(github_repo, attrs)
       refute changeset.valid?
     end
   end
