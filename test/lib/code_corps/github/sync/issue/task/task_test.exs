@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Event.Issues.TaskSyncerTest do
+defmodule CodeCorps.GitHub.Sync.Issue.TaskTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
@@ -6,11 +6,11 @@ defmodule CodeCorps.GitHub.Event.Issues.TaskSyncerTest do
   import CodeCorps.GitHub.TestHelpers
 
   alias CodeCorps.{
-    GitHub.Event.Issues.TaskSyncer,
     Project,
     Repo,
     Task
   }
+  alias CodeCorps.GitHub.Sync.Issue.Task, as: IssueTaskSyncer
 
   describe "sync all/3" do
     @payload load_event_fixture("issues_opened")
@@ -33,7 +33,7 @@ defmodule CodeCorps.GitHub.Event.Issues.TaskSyncerTest do
         insert(:task_list, project: project, inbox: true)
       end)
 
-      {:ok, tasks} = github_issue |> TaskSyncer.sync_all(user, @payload)
+      {:ok, tasks} = github_issue |> IssueTaskSyncer.sync_all(user, @payload)
 
       assert Repo.aggregate(Task, :count, :id) == 3
 
@@ -60,7 +60,7 @@ defmodule CodeCorps.GitHub.Event.Issues.TaskSyncerTest do
       insert(:task_list, project: project, inbox: true)
 
       {:error, {tasks, errors}} =
-        github_issue |> TaskSyncer.sync_all(user, bad_payload)
+        github_issue |> IssueTaskSyncer.sync_all(user, bad_payload)
 
       assert tasks |> Enum.count == 0
       assert errors |> Enum.count == 1

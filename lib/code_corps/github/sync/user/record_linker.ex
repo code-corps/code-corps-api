@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Syncers.User.RecordLinker do
+defmodule CodeCorps.GitHub.Sync.User.RecordLinker do
   @moduledoc ~S"""
   In charge of finding a user to link with a given record given a GitHub API
   payload containing the user.

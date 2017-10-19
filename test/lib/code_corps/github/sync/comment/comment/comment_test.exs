@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Event.IssueComment.CommentSyncerTest do
+defmodule CodeCorps.GitHub.Sync.Comment.CommentTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
@@ -6,10 +6,10 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentSyncerTest do
   import CodeCorps.GitHub.TestHelpers
 
   alias CodeCorps.{
-    GitHub.Event.IssueComment.CommentSyncer,
     Repo,
     Comment
   }
+  alias CodeCorps.GitHub.Sync.Comment.Comment, as: CommentCommentSyncer
 
   describe "sync all/3" do
     @payload load_event_fixture("issue_comment_created")
@@ -35,7 +35,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentSyncerTest do
 
       comment_1 = insert(:comment, task: task_1, user: user, github_comment: github_comment)
 
-      {:ok, comments} = [task_1, task_2, task_3] |> CommentSyncer.sync_all(github_comment, user, @payload)
+      {:ok, comments} = [task_1, task_2, task_3] |> CommentCommentSyncer.sync_all(github_comment, user, @payload)
 
       assert Enum.count(comments) == 3
       assert Repo.aggregate(Comment, :count, :id) == 3
@@ -71,7 +71,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentSyncerTest do
       %{user: user} = insert(:comment, task: task, github_comment: github_comment)
 
       {:error, {comments, errors}} =
-        [task] |> CommentSyncer.sync_all(github_comment, user, bad_payload)
+        [task] |> CommentCommentSyncer.sync_all(github_comment, user, bad_payload)
 
       assert Enum.count(comments) == 0
       assert Enum.count(errors) == 1

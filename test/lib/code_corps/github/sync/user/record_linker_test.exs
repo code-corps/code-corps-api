@@ -1,4 +1,4 @@
-defmodule CodeCorps.Syncers.User.RecordLinkerTest do
+defmodule CodeCorps.Sync.User.RecordLinkerTest do
   @moduledoc false
 
   use CodeCorps.BackgroundProcessingCase
@@ -7,7 +7,7 @@ defmodule CodeCorps.Syncers.User.RecordLinkerTest do
   import CodeCorps.GitHub.TestHelpers
 
   alias CodeCorps.{
-    GitHub.Syncers.User.RecordLinker,
+    GitHub.Sync.User.RecordLinker,
     Repo,
     User
   }

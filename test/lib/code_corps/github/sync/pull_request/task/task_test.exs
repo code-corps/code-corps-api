@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Event.PullRequest.TaskSyncerTest do
+defmodule CodeCorps.GitHub.Sync.PullRequest.TaskTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
@@ -6,11 +6,11 @@ defmodule CodeCorps.GitHub.Event.PullRequest.TaskSyncerTest do
   import CodeCorps.GitHub.TestHelpers
 
   alias CodeCorps.{
-    GitHub.Event.PullRequest.TaskSyncer,
     Project,
     Repo,
     Task
   }
+  alias CodeCorps.GitHub.Sync.PullRequest.Task, as: PullRequestTaskSyncer
 
   describe "sync all/3" do
     @payload load_event_fixture("pull_request_opened")
@@ -33,7 +33,7 @@ defmodule CodeCorps.GitHub.Event.PullRequest.TaskSyncerTest do
         insert(:task_list, project: project, inbox: true)
       end)
 
-      {:ok, tasks} = github_pull_request |> TaskSyncer.sync_all(user, @payload)
+      {:ok, tasks} = github_pull_request |> PullRequestTaskSyncer.sync_all(user, @payload)
 
       assert Repo.aggregate(Task, :count, :id) == 3
 
@@ -60,7 +60,7 @@ defmodule CodeCorps.GitHub.Event.PullRequest.TaskSyncerTest do
       insert(:task_list, project: project, inbox: true)
 
       {:error, {tasks, errors}} =
-        github_pull_request |> TaskSyncer.sync_all(user, bad_payload)
+        github_pull_request |> PullRequestTaskSyncer.sync_all(user, bad_payload)
 
       assert tasks |> Enum.count == 0
       assert errors |> Enum.count == 1

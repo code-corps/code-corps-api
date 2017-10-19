@@ -1,7 +1,7 @@
-defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilder do
+defmodule CodeCorps.GitHub.Sync.Comment.Comment.Changeset do
   @moduledoc ~S"""
   In charge of building a `Changeset` to update a `Comment` with, when handling
-  an IssueComment webhook.
+  a GitHub Comment payload.
   """
 
   alias CodeCorps.{
@@ -16,8 +16,8 @@ defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilder do
   alias Ecto.Changeset
 
   @doc ~S"""
-  Constructs a changeset for syncing a task when processing an IssueComment
-  webhook
+  Constructs a changeset for syncing a task when processing a GitHub Comment
+  payload
   """
   @spec build_changeset(Comment.t, map, GithubComment.t, Task.t, User.t) :: Changeset.t
   def build_changeset(

@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilderTest do
+defmodule CodeCorps.GitHub.Sync.Comment.Comment.ChangesetTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
@@ -6,10 +6,8 @@ defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilderTest do
   import CodeCorps.GitHub.TestHelpers
   import Ecto.Changeset
 
-  alias CodeCorps.{
-    GitHub.Event.IssueComment.ChangesetBuilder,
-    Comment
-  }
+  alias CodeCorps.Comment
+  alias CodeCorps.GitHub.Sync.Comment.Comment.Changeset, as: CommentChangeset
 
   describe "build_changeset/3" do
     test "assigns proper changes to the comment, when it's new" do
@@ -19,7 +17,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilderTest do
       user = insert(:user)
       github_comment = insert(:github_comment)
 
-      changeset = ChangesetBuilder.build_changeset(
+      changeset = CommentChangeset.build_changeset(
         comment, payload, github_comment, task, user
       )
 
@@ -57,7 +55,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilderTest do
       user = insert(:user)
       github_comment = insert(:github_comment)
 
-      changeset = ChangesetBuilder.build_changeset(
+      changeset = CommentChangeset.build_changeset(
         comment, payload, github_comment, task, user
       )
 
@@ -98,7 +96,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment.ChangesetBuilderTest do
       user = insert(:user)
       github_comment = insert(:github_comment)
 
-      changeset = ChangesetBuilder.build_changeset(
+      changeset = CommentChangeset.build_changeset(
         comment, payload, github_comment, task, user
       )
 

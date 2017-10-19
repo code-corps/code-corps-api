@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Event.IssueComment.CommentSyncer do
+defmodule CodeCorps.GitHub.Sync.Comment.Comment do
   @moduledoc ~S"""
   In charge of syncing `CodeCorps.Comment` records with a GitHub comment
   payload.
@@ -13,13 +13,12 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentSyncer do
   alias CodeCorps.{
     Comment,
     GitHub.Event.Common.ResultAggregator,
-    GitHub.Event.IssueComment.ChangesetBuilder,
     GithubComment,
     Task,
     User,
     Repo
   }
-
+  alias CodeCorps.GitHub.Sync.Comment.Comment.Changeset, as: CommentChangeset
   alias Ecto.Changeset
 
   @type outcome :: {:ok, list(Comment.t)} |
@@ -46,7 +45,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentSyncer do
   defp sync(%Task{} = task, %GithubComment{} = github_comment, %User{} = user, %{} = payload) do
     task
     |> find_or_init_comment(payload)
-    |> ChangesetBuilder.build_changeset(payload, github_comment, task, user)
+    |> CommentChangeset.build_changeset(payload, github_comment, task, user)
     |> commit()
   end
 

@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilderTest do
+defmodule CodeCorps.GitHub.Sync.Issue.Task.ChangesetTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
@@ -6,10 +6,8 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilderTest do
   import CodeCorps.GitHub.TestHelpers
   import Ecto.Changeset
 
-  alias CodeCorps.{
-    GitHub.Event.Issues.ChangesetBuilder,
-    Task
-  }
+  alias CodeCorps.Task
+  alias CodeCorps.GitHub.Sync.Issue.Task.Changeset, as: TaskChangeset
 
   describe "build_changeset/3" do
     test "assigns proper changes to the task" do
@@ -21,7 +19,7 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilderTest do
       user = insert(:user)
       task_list = insert(:task_list, project: project, inbox: true)
 
-      changeset = ChangesetBuilder.build_changeset(
+      changeset = TaskChangeset.build_changeset(
         task, payload, github_issue, project_github_repo, user
       )
 
@@ -72,7 +70,7 @@ defmodule CodeCorps.GitHub.Event.Issues.ChangesetBuilderTest do
       user = insert(:user)
       task = insert(:task, project: project, github_issue: github_issue, github_repo: github_repo, user: user, modified_at: modified_at)
 
-      changeset = ChangesetBuilder.build_changeset(
+      changeset = TaskChangeset.build_changeset(
         task, payload, github_issue, project_github_repo, user
       )
 

@@ -11,16 +11,15 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
     GithubComment,
     GithubRepo,
     GitHub.Event.Common.RepoFinder,
-    GitHub.Event.Issues,
     GitHub.Event.Issues.IssueLinker,
-    GitHub.Event.Issues.TaskSyncer,
-    GitHub.Event.IssueComment,
     GitHub.Event.IssueComment.CommentLinker,
-    GitHub.Event.IssueComment.CommentSyncer,
     GitHub.Event.IssueComment.CommentDeleter,
+    GitHub.Event.IssueComment.Validator,
     Repo
   }
-  alias CodeCorps.GitHub.Syncers.User.RecordLinker, as: UserRecordLinker
+  alias CodeCorps.GitHub.Sync.Comment.Comment, as: CommentCommentSyncer
+  alias CodeCorps.GitHub.Sync.Issue.Task, as: IssueTaskSyncer
+  alias CodeCorps.GitHub.Sync.User.RecordLinker, as: UserRecordLinker
   alias Ecto.Multi
 
   @type outcome :: {:ok, list(Comment.t)} |
@@ -74,8 +73,8 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
     |> Multi.run(:github_comment, fn %{github_issue: github_issue} -> github_issue |> link_comment(payload) end)
     |> Multi.run(:issue_user, fn %{github_issue: github_issue} -> UserRecordLinker.link_to(github_issue, payload) end)
     |> Multi.run(:comment_user, fn %{github_comment: github_comment} -> UserRecordLinker.link_to(github_comment, payload) end)
-    |> Multi.run(:tasks, fn %{github_issue: github_issue, issue_user: user} -> github_issue |> TaskSyncer.sync_all(user, payload) end)
-    |> Multi.run(:comments, fn %{github_comment: github_comment, tasks: tasks, comment_user: user} -> CommentSyncer.sync_all(tasks, github_comment, user, payload) end)
+    |> Multi.run(:tasks, fn %{github_issue: github_issue, issue_user: user} -> github_issue |> IssueTaskSyncer.sync_all(user, payload) end)
+    |> Multi.run(:comments, fn %{github_comment: github_comment, tasks: tasks, comment_user: user} -> CommentCommentSyncer.sync_all(tasks, github_comment, user, payload) end)
   end
   defp operational_multi(%{"action" => "deleted"} = payload) do
     Multi.new
@@ -111,7 +110,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
 
   @spec validate_payload(map) :: {:ok, :valid} | {:error, :invalid}
   defp validate_payload(%{} = payload) do
-    case payload |> IssueComment.Validator.valid? do
+    case payload |> Validator.valid? do
       true -> {:ok, :valid}
       false -> {:error, :invalid}
     end

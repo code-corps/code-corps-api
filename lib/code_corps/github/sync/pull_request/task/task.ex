@@ -1,15 +1,14 @@
-defmodule CodeCorps.GitHub.Event.PullRequest.TaskSyncer do
+defmodule CodeCorps.GitHub.Sync.PullRequest.Task do
   alias CodeCorps.{
     GithubPullRequest,
     GithubRepo,
     GitHub.Event.Common.ResultAggregator,
-    GitHub.Event.PullRequest.ChangesetBuilder,
     ProjectGithubRepo,
     Task,
     User,
     Repo
   }
-
+  alias CodeCorps.GitHub.Sync.PullRequest.Task.Changeset, as: TaskChangeset
   alias Ecto.Changeset
 
   @type outcome :: {:ok, list(Task.t)} |
@@ -37,7 +36,7 @@ defmodule CodeCorps.GitHub.Event.PullRequest.TaskSyncer do
   defp sync(%GithubPullRequest{} = github_pull_request, %ProjectGithubRepo{} = project_github_repo, %User{} = user, %{} = payload) do
     project_github_repo
     |> find_or_init_task(github_pull_request)
-    |> ChangesetBuilder.build_changeset(payload, github_pull_request, project_github_repo, user)
+    |> TaskChangeset.build_changeset(payload, github_pull_request, project_github_repo, user)
     |> commit()
   end
 

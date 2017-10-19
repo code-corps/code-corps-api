@@ -1,15 +1,14 @@
-defmodule CodeCorps.GitHub.Event.Issues.TaskSyncer do
+defmodule CodeCorps.GitHub.Sync.Issue.Task do
   alias CodeCorps.{
     GithubIssue,
     GithubRepo,
     GitHub.Event.Common.ResultAggregator,
-    GitHub.Event.Issues.ChangesetBuilder,
     ProjectGithubRepo,
     Task,
     User,
     Repo
   }
-
+  alias CodeCorps.GitHub.Sync.Issue.Task.Changeset, as: TaskChangeset
   alias Ecto.Changeset
 
   @type outcome :: {:ok, list(Task.t)} |
@@ -37,7 +36,7 @@ defmodule CodeCorps.GitHub.Event.Issues.TaskSyncer do
   defp sync(%GithubIssue{} = github_issue, %ProjectGithubRepo{} = project_github_repo, %User{} = user, %{} = payload) do
     project_github_repo
     |> find_or_init_task(github_issue)
-    |> ChangesetBuilder.build_changeset(payload, github_issue, project_github_repo, user)
+    |> TaskChangeset.build_changeset(payload, github_issue, project_github_repo, user)
     |> commit()
   end
 
