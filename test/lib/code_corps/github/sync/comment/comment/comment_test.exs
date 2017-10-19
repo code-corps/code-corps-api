@@ -17,7 +17,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.CommentTest do
     test "creates missing, updates existing comments for each project associated with the github repo" do
       %{
         "issue" => %{"number" => number},
-        "comment" => %{"id" => comment_github_id, "body" => comment_body}
+        "comment" => %{"id" => comment_github_id, "body" => comment_body} = comment
       } = @payload
 
       user = insert(:user)
@@ -35,7 +35,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.CommentTest do
 
       comment_1 = insert(:comment, task: task_1, user: user, github_comment: github_comment)
 
-      {:ok, comments} = [task_1, task_2, task_3] |> CommentCommentSyncer.sync_all(github_comment, user, @payload)
+      {:ok, comments} = [task_1, task_2, task_3] |> CommentCommentSyncer.sync_all(github_comment, user, comment)
 
       assert Enum.count(comments) == 3
       assert Repo.aggregate(Comment, :count, :id) == 3
@@ -58,7 +58,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.CommentTest do
 
       %{
         "issue" => %{"number" => number},
-        "comment" => %{"id" => comment_github_id}
+        "comment" => %{"id" => comment_github_id} = comment
       } = bad_payload
 
       %{project: project, github_repo: github_repo} =
@@ -71,7 +71,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.CommentTest do
       %{user: user} = insert(:comment, task: task, github_comment: github_comment)
 
       {:error, {comments, errors}} =
-        [task] |> CommentCommentSyncer.sync_all(github_comment, user, bad_payload)
+        [task] |> CommentCommentSyncer.sync_all(github_comment, user, comment)
 
       assert Enum.count(comments) == 0
       assert Enum.count(errors) == 1

@@ -26,7 +26,7 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task.Changeset do
   @spec build_changeset(Task.t, map, GithubIssue.t, ProjectGithubRepo.t, User.t) :: Changeset.t
   def build_changeset(
     %Task{id: task_id} = task,
-    %{"issue" => issue_attrs},
+    %{} = issue_attrs,
     %GithubIssue{} = github_issue,
     %ProjectGithubRepo{} = project_github_repo,
     %User{} = user) do

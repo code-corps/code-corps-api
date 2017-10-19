@@ -44,7 +44,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
       end
 
       test "returns error if unmatched repository" do
-        assert IssueComment.handle(@payload) == {:error, :repository_not_found}
+        assert IssueComment.handle(@payload) == {:error, :repo_not_found}
         refute Repo.one(User)
       end
 
@@ -71,7 +71,9 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
 
     test "deletes all comments with github_id specified in the payload" do
       %{"comment" => %{"id" => github_id}} = @payload
-      github_comment = insert(:github_comment, github_id: github_id)
+      github_repo = insert(:github_repo)
+      github_issue = insert(:github_issue, github_repo: github_repo)
+      github_comment = insert(:github_comment, github_id: github_id, github_issue: github_issue)
       insert(:comment, github_comment: github_comment)
 
       {:ok, comments} = IssueComment.handle(@payload)

@@ -15,7 +15,11 @@ defmodule CodeCorps.GitHub.Sync.Utils.RepoFinder do
   """
   @spec find_repo(map) :: {:ok, GithubRepo.t} | {:error, :unmatched_repository}
   def find_repo(%{"repository" => %{"id" => github_id}}) do
-    case GithubRepo |> Repo.get_by(github_id: github_id) do
+    result =
+      GithubRepo
+      |> Repo.get_by(github_id: github_id)
+      |> Repo.preload(:github_app_installation)
+    case result do
       %GithubRepo{} = github_repo -> {:ok, github_repo}
       nil -> {:error, :unmatched_repository}
     end

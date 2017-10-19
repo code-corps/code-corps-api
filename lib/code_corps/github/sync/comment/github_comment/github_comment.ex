@@ -29,22 +29,16 @@ defmodule CodeCorps.GitHub.Sync.Comment.GithubComment do
   payload data.
   """
   @spec create_or_update_comment(GithubIssue.t, map) :: linking_result
-  def create_or_update_comment(%GithubIssue{} = github_issue, %{} = attrs) do
-    params = Adapters.Comment.to_github_comment(attrs)
-
-    case attrs |> find_comment() do
-      nil -> create_comment(github_issue, params)
+  def create_or_update_comment(%GithubIssue{} = github_issue, %{} = %{"id" => github_comment_id} = attrs) do
+    params = to_params(attrs, github_issue)
+    case Repo.get_by(GithubComment, github_id: github_comment_id) do
+      nil -> create_comment(params)
       %GithubComment{} = github_comment -> github_comment |> update_comment(params)
     end
   end
 
-  @spec find_comment(map) :: GithubComment.t | nil
-  defp find_comment(%{"id" => github_id}), do: GithubComment |> Repo.get_by(github_id: github_id)
-
-  @spec create_comment(GithubIssue.t, map) :: linking_result
-  defp create_comment(%GithubIssue{id: github_issue_id}, %{} = params) do
-    params = Map.put(params, :github_issue_id, github_issue_id)
-
+  @spec create_comment(map) :: linking_result
+  defp create_comment(params) do
     %GithubComment{}
     |> GithubComment.create_changeset(params)
     |> Repo.insert
@@ -55,5 +49,12 @@ defmodule CodeCorps.GitHub.Sync.Comment.GithubComment do
     github_comment
     |> GithubComment.update_changeset(params)
     |> Repo.update
+  end
+
+  @spec to_params(map, GithubIssue.t) :: map
+  defp to_params(attrs, %GithubIssue{id: github_issue_id}) do
+    attrs
+    |> Adapters.Comment.to_github_comment()
+    |> Map.put(:github_issue_id, github_issue_id)
   end
 end

@@ -35,16 +35,16 @@ defmodule CodeCorps.GitHub.Event.PullRequestTest do
         %{project: project} = insert(:project_github_repo, github_repo: github_repo)
         insert(:task_list, project: project, inbox: true)
 
-        {:ok, tasks} = PullRequest.handle(@payload)
+        {:ok, github_pull_request} = PullRequest.handle(@payload)
 
-        assert Enum.count(tasks) == 1
-        assert Repo.aggregate(GithubIssue, :count, :id) == 0 # FIXME
+        assert github_pull_request.github_repo_id == github_repo.id
+        assert Repo.aggregate(GithubIssue, :count, :id) == 1
         assert Repo.aggregate(GithubPullRequest, :count, :id) == 1
         assert Repo.aggregate(Task, :count, :id) == 1
       end
 
       test "returns error if unmatched repository" do
-        assert PullRequest.handle(@payload) == {:error, :repository_not_found}
+        assert PullRequest.handle(@payload) == {:error, :repo_not_found}
         refute Repo.one(User)
       end
 

@@ -1,6 +1,6 @@
 defmodule CodeCorps.GitHub.API.Comment do
   @moduledoc ~S"""
-  Handles GitHub API requests for actions on Comments
+  Functions for working with comments on GitHub.
   """
 
   alias CodeCorps.{
@@ -14,6 +14,9 @@ defmodule CodeCorps.GitHub.API.Comment do
     User
   }
 
+  @doc """
+  Create a comment on GitHub's API for a `CodeCorps.Comment`.
+  """
   @spec create(Comment.t) :: GitHub.response
   def create(
     %Comment{
@@ -28,13 +31,16 @@ defmodule CodeCorps.GitHub.API.Comment do
     endpoint = comment |> create_endpoint_for()
     attrs = comment |> GitHub.Adapters.Comment.to_api
 
-    with opts when is_list(opts) <- opts_for(user, installation) do
+    with opts when is_list(opts) <- GitHub.API.opts_for(user, installation) do
       GitHub.request(:post, endpoint, %{}, attrs, opts)
     else
       {:error, github_error} -> {:error, github_error}
     end
   end
 
+  @doc """
+  Update a comment on GitHub's API for a `CodeCorps.Comment`.
+  """
   @spec update(Comment.t) :: GitHub.response
   def update(
     %Comment{
@@ -49,7 +55,7 @@ defmodule CodeCorps.GitHub.API.Comment do
     endpoint = comment |> update_endpoint_for()
     attrs = comment |> GitHub.Adapters.Comment.to_api
 
-    with opts when is_list(opts) <- opts_for(user, installation) do
+    with opts when is_list(opts) <- GitHub.API.opts_for(user, installation) do
       GitHub.request(:patch, endpoint, %{}, attrs, opts)
     else
       {:error, github_error} -> {:error, github_error}
@@ -82,17 +88,5 @@ defmodule CodeCorps.GitHub.API.Comment do
       }
     }) do
     "/repos/#{owner}/#{repo}/issues/#{number}/comments"
-  end
-
-  @spec opts_for(User.t, GithubAppInstallation.t) :: list
-  defp opts_for(%User{github_auth_token: nil}, %GithubAppInstallation{} = installation) do
-    with {:ok, token} <- installation |> GitHub.API.Installation.get_access_token do
-      [access_token: token]
-    else
-      {:error, github_error} -> {:error, github_error}
-    end
-  end
-  defp opts_for(%User{github_auth_token: token}, %GithubAppInstallation{}) do
-    [access_token: token]
   end
 end

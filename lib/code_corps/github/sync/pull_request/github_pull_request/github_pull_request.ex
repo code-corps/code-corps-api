@@ -7,12 +7,11 @@ defmodule CodeCorps.GitHub.Sync.PullRequest.GithubPullRequest do
   """
 
   alias CodeCorps.{
+    GitHub.Adapters,
     GithubPullRequest,
     GithubRepo,
     Repo
   }
-
-  alias CodeCorps.GitHub.Adapters.PullRequest, as: PullRequestAdapter
 
   @typep linking_result :: {:ok, GithubPullRequest.t} |
                            {:error, Ecto.Changeset.t}
@@ -31,25 +30,31 @@ defmodule CodeCorps.GitHub.Sync.PullRequest.GithubPullRequest do
   """
   @spec create_or_update_pull_request(GithubRepo.t, map) :: linking_result
   def create_or_update_pull_request(%GithubRepo{} = github_repo, %{"id" => github_pull_request_id} = attrs) do
-    params = PullRequestAdapter.from_api(attrs)
-
+    params = to_params(attrs, github_repo)
     case Repo.get_by(GithubPullRequest, github_id: github_pull_request_id) do
-      nil -> create_pull_request(github_repo, params)
+      nil -> create_pull_request(params)
       %GithubPullRequest{} = pull_request -> update_pull_request(pull_request, params)
     end
   end
 
-  defp create_pull_request(%GithubRepo{id: github_repo_id}, params) do
-    params = Map.put(params, :github_repo_id, github_repo_id)
-
+  @spec create_pull_request(map) :: linking_result
+  defp create_pull_request(params) do
     %GithubPullRequest{}
     |> GithubPullRequest.create_changeset(params)
     |> Repo.insert
   end
 
+  @spec update_pull_request(GithubPullRequest.t, map) :: linking_result
   defp update_pull_request(%GithubPullRequest{} = github_pull_request, params) do
     github_pull_request
     |> GithubPullRequest.update_changeset(params)
     |> Repo.update
+  end
+
+  @spec to_params(map, GithubIssue.t) :: map
+  defp to_params(attrs, %GithubRepo{id: github_repo_id}) do
+    attrs
+    |> Adapters.PullRequest.from_api()
+    |> Map.put(:github_repo_id, github_repo_id)
   end
 end

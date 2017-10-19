@@ -2,8 +2,8 @@ defmodule CodeCorpsWeb.TaskViewTest do
   use CodeCorpsWeb.ViewCase
 
   test "renders all attributes and relationships properly" do
-    github_issue = insert(:github_issue)
     github_pull_request = insert(:github_pull_request)
+    github_issue = insert(:github_issue, github_pull_request: github_pull_request)
     github_repo = insert(:github_repo)
     task = insert(:task, order: 1000, github_issue: github_issue, github_pull_request: github_pull_request, github_repo: github_repo)
     comment = insert(:comment, task: task)
@@ -53,7 +53,7 @@ defmodule CodeCorpsWeb.TaskViewTest do
           },
           "github-pull-request" => %{
             "data" => %{
-              "id" => task.github_pull_request_id |> Integer.to_string,
+              "id" => task.github_issue.github_pull_request_id |> Integer.to_string,
               "type" => "github-pull-request"
             }
           },

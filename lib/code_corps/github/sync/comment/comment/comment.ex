@@ -50,7 +50,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment do
   end
 
   @spec find_or_init_comment(Task.t, map) :: Comment.t
-  defp find_or_init_comment(%Task{id: task_id}, %{"comment" => %{"id" => github_id}}) do
+  defp find_or_init_comment(%Task{id: task_id}, %{"id" => github_id}) do
     query = from c in Comment,
       where: c.task_id == ^task_id,
       join: gc in GithubComment, on: c.github_comment_id == gc.id, where: gc.github_id == ^github_id

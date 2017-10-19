@@ -12,13 +12,14 @@ defmodule CodeCorps.GitHub.Sync.Issue.GithubIssueTest do
   alias CodeCorps.GitHub.Sync.Issue.GithubIssue, as: GithubIssueSyncer
   alias CodeCorps.GitHub.Adapters.Issue, as: IssueAdapter
 
-  @payload load_event_fixture("issues_opened")
+  @issue_event_payload load_event_fixture("issues_opened")
 
   describe "create_or_update_issue/1" do
     test "creates issue if none exists" do
-      %{"issue" => attrs} = @payload
+      %{"issue" => attrs} = @issue_event_payload
       github_repo = insert(:github_repo)
-      {:ok, %GithubIssue{} = created_issue} = GithubIssueSyncer.create_or_update_issue(github_repo, attrs)
+      github_pull_request = insert(:github_pull_request, github_repo: github_repo)
+      {:ok, %GithubIssue{} = created_issue} = GithubIssueSyncer.create_or_update_issue({github_repo, github_pull_request}, attrs)
 
       assert Repo.one(GithubIssue)
 
@@ -29,27 +30,30 @@ defmodule CodeCorps.GitHub.Sync.Issue.GithubIssueTest do
         |> Map.delete(:repository_url)
       returned_issue = Repo.get_by(GithubIssue, created_attributes)
       assert returned_issue.id == created_issue.id
+      assert returned_issue.github_pull_request_id == github_pull_request.id
       assert returned_issue.github_repo_id == github_repo.id
     end
 
     test "updates issue if it already exists" do
-      %{"issue" => %{"id" => issue_id} = attrs} = @payload
+      %{"issue" => %{"id" => issue_id} = attrs} = @issue_event_payload
 
       github_repo = insert(:github_repo)
+      github_pull_request = insert(:github_pull_request, github_repo: github_repo)
       issue = insert(:github_issue, github_id: issue_id, github_repo: github_repo)
 
-      {:ok, %GithubIssue{} = updated_issue} = GithubIssueSyncer.create_or_update_issue(github_repo, attrs)
+      {:ok, %GithubIssue{} = updated_issue} = GithubIssueSyncer.create_or_update_issue({github_repo, github_pull_request}, attrs)
 
       assert updated_issue.id == issue.id
+      assert updated_issue.github_pull_request_id == github_pull_request.id
       assert updated_issue.github_repo_id == github_repo.id
     end
 
     test "returns changeset if payload is somehow not as expected" do
-      bad_payload = @payload |> put_in(["issue", "number"], nil)
+      bad_payload = @issue_event_payload |> put_in(["issue", "number"], nil)
       %{"issue" => attrs} = bad_payload
       github_repo = insert(:github_repo)
 
-      {:error, changeset} = GithubIssueSyncer.create_or_update_issue(github_repo, attrs)
+      {:error, changeset} = GithubIssueSyncer.create_or_update_issue({github_repo, nil}, attrs)
       refute changeset.valid?
     end
   end
