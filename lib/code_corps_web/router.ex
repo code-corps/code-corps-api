@@ -26,6 +26,7 @@ defmodule CodeCorpsWeb.Router do
 
   pipeline :current_user do
     plug CodeCorpsWeb.Plug.CurrentUser
+    plug CodeCorpsWeb.Plug.SetTimberUserContext
     plug CodeCorpsWeb.Plug.SetSentryUserContext
     plug CodeCorpsWeb.Plug.AnalyticsIdentify
   end
