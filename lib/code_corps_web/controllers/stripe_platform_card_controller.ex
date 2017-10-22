@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.StripePlatformCardController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.StripeService.StripePlatformCardService

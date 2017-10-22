@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.CommentController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.{Comment, User, Helpers.Query}

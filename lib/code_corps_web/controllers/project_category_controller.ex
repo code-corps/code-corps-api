@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.ProjectCategoryController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.{ProjectCategory, User, Helpers.Query}

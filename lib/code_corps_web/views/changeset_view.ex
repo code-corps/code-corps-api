@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.ChangesetView do
+  @moduledoc false
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
 

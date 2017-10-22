@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.UserView do
+  @moduledoc false
   alias CodeCorps.Presenters.ImagePresenter
 
   use CodeCorpsWeb.PreloadHelpers,

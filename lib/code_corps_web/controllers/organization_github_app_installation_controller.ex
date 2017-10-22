@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.OrganizationGithubAppInstallationController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.{OrganizationGithubAppInstallation, User, Helpers.Query}

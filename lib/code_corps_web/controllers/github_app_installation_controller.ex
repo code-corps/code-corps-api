@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.GithubAppInstallationController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   import CodeCorps.Helpers.Query, only: [id_filter: 2]

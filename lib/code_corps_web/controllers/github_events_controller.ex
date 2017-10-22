@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.GitHubEventsController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.GitHub.Webhook.{

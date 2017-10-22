@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.StripeConnectAccountView do
+  @moduledoc false
   use CodeCorpsWeb.PreloadHelpers, default_preloads: [:organization, :stripe_external_account]
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView

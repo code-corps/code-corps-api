@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.TaskSkillController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.{TaskSkill, User, Helpers.Query}

@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.ProjectController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.{Project, User}

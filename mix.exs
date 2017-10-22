@@ -1,6 +1,10 @@
 defmodule CodeCorps.Mixfile do
   @moduledoc false
 
+  alias CodeCorps.{
+    Analytics, GitHub, Policy, StripeService, StripeTesting
+  }
+
   use Mix.Project
 
   def project do
@@ -58,7 +62,7 @@ defmodule CodeCorps.Mixfile do
       {:ecto_ordered, "0.2.0-beta1"},
       {:ex_aws, "~> 1.0"}, # Amazon AWS
       {:excoveralls, "~> 0.7", only: :test}, # Test coverage
-      {:ex_doc, "~> 0.16", only: [:dev, :test]},
+      {:ex_doc, "~> 0.17", only: [:dev, :test]},
       {:ex_machina, "~> 2.0", only: :test}, # test factories
       {:guardian, "~> 0.14.5"}, # Authentication (JWT)
       {:hackney, ">= 1.4.4"},
@@ -81,12 +85,312 @@ defmodule CodeCorps.Mixfile do
 
   defp docs do
     [
+      main: "README",
+      source_url: "https://github.com/code-corps/code-corps-api",
+      groups_for_modules: groups_for_modules(),
       extras: [
         "README.md": [title: "README"],
         "LICENSE.md": [title: "LICENSE"]
       ],
-      main: "README",
-      source_url: "https://github.com/code-corps/code-corps-api/doc"
+    ]
+  end
+
+  defp groups_for_modules do
+    [
+      "Models": [
+        CodeCorps.Accounts,
+        CodeCorps.Accounts.Changesets,
+        CodeCorps.AuthToken,
+        CodeCorps.Category,
+        CodeCorps.Comment,
+        CodeCorps.DonationGoal,
+        CodeCorps.GithubAppInstallation,
+        CodeCorps.GithubComment,
+        CodeCorps.GithubEvent,
+        CodeCorps.GithubIssue,
+        CodeCorps.GithubPullRequest,
+        CodeCorps.GithubRepo,
+        CodeCorps.MapUtils,
+        CodeCorps.Model,
+        CodeCorps.Organization,
+        CodeCorps.OrganizationGithubAppInstallation,
+        CodeCorps.OrganizationInvite,
+        CodeCorps.Preview,
+        CodeCorps.Project,
+        CodeCorps.Project.Query,
+        CodeCorps.ProjectCategory,
+        CodeCorps.ProjectGithubRepo,
+        CodeCorps.ProjectSkill,
+        CodeCorps.ProjectUser,
+        CodeCorps.Repo,
+        CodeCorps.Role,
+        CodeCorps.RoleSkill,
+        CodeCorps.Skill,
+        CodeCorps.SluggedRoute,
+        CodeCorps.StripeConnectAccount,
+        CodeCorps.StripeConnectCard,
+        CodeCorps.StripeConnectCharge,
+        CodeCorps.StripeConnectCustomer,
+        CodeCorps.StripeConnectPlan,
+        CodeCorps.StripeConnectSubscription,
+        CodeCorps.StripeEvent,
+        CodeCorps.StripeExternalAccount,
+        CodeCorps.StripeFileUpload,
+        CodeCorps.StripeInvoice,
+        CodeCorps.StripePlatformCard,
+        CodeCorps.StripePlatformCustomer,
+        CodeCorps.Task,
+        CodeCorps.Task.Query,
+        CodeCorps.TaskList,
+        CodeCorps.TaskSkill,
+        CodeCorps.Transition.UserState,
+        CodeCorps.User,
+        CodeCorps.UserCategory,
+        CodeCorps.UserRole,
+        CodeCorps.UserSkill,
+        CodeCorps.UserTask,
+        CodeCorps.Validators.SlugValidator,
+        CodeCorps.Validators.TimeValidator
+      ],
+
+      "Services": [
+        CodeCorps.Comment.Service,
+        CodeCorps.Services.DonationGoalsService,
+        CodeCorps.Services.ForgotPasswordService,
+        CodeCorps.Services.MarkdownRendererService,
+        CodeCorps.Services.ProjectService,
+        CodeCorps.Services.UserService,
+        CodeCorps.Task.Service
+      ],
+
+      "Policies": [
+        Policy,
+        Policy.Category,
+        Policy.Comment,
+        Policy.DonationGoal,
+        Policy.GithubAppInstallation,
+        Policy.Helpers,
+        Policy.Organization,
+        Policy.OrganizationGithubAppInstallation,
+        Policy.OrganizationInvite,
+        Policy.Preview,
+        Policy.Project,
+        Policy.ProjectCategory,
+        Policy.ProjectGithubRepo,
+        Policy.ProjectSkill,
+        Policy.ProjectUser,
+        Policy.Role,
+        Policy.RoleSkill,
+        Policy.Skill,
+        Policy.StripeConnectAccount,
+        Policy.StripeConnectPlan,
+        Policy.StripeConnectSubscription,
+        Policy.StripePlatformCard,
+        Policy.StripePlatformCustomer,
+        Policy.Task,
+        Policy.TaskSkill,
+        Policy.User,
+        Policy.UserCategory,
+        Policy.UserRole,
+        Policy.UserSkill,
+        Policy.UserTask
+      ],
+
+      "Helpers": [
+        CodeCorps.Helpers.Query,
+        CodeCorps.Helpers.RandomIconColor,
+        CodeCorps.Helpers.Slug,
+        CodeCorps.Helpers.String,
+        CodeCorps.Helpers.URL,
+        CodeCorps.RandomIconColor.Generator,
+        CodeCorps.RandomIconColor.TestGenerator
+      ],
+
+      "Emails": [
+        CodeCorps.Mailer,
+        CodeCorps.Emails.BaseEmail,
+        CodeCorps.Emails.ForgotPasswordEmail,
+        CodeCorps.Emails.OrganizationInviteEmail,
+        CodeCorps.Emails.ProjectUserAcceptanceEmail,
+        CodeCorps.Emails.ReceiptEmail
+      ],
+
+      "Web": [
+        CodeCorpsWeb,
+        CodeCorpsWeb.Endpoint,
+        CodeCorpsWeb.ErrorHelpers,
+        CodeCorpsWeb.Gettext,
+        CodeCorpsWeb.GuardianSerializer,
+        CodeCorpsWeb.Router,
+        CodeCorpsWeb.Router.Helpers,
+        CodeCorpsWeb.UserSocket
+      ],
+
+      "Web – Plugs": [
+        CodeCorpsWeb.Plug.AnalyticsIdentify,
+        CodeCorpsWeb.Plug.CurrentUser,
+        CodeCorpsWeb.Plug.DataToAttributes,
+        CodeCorpsWeb.Plug.IdsToIntegers,
+        CodeCorpsWeb.Plug.Segment,
+        CodeCorpsWeb.Plug.SetSentryUserContext
+      ],
+
+      "Miscellaneous": [
+        CodeCorps.Adapter.MapTransformer,
+        CodeCorps.ConnUtils,
+        CodeCorps.Presenters.ImagePresenter,
+        CodeCorps.WebClient
+      ],
+
+      "GitHub – API": [
+        GitHub,
+        GitHub.HTTPClientError,
+        GitHub.Utils.ResultAggregator,
+        GitHub.API,
+        GitHub.API.Comment,
+        GitHub.API.Headers,
+        GitHub.API.Installation,
+        GitHub.API.Issue,
+        GitHub.API.JWT,
+        GitHub.API.PullRequest,
+        GitHub.API.User,
+        GitHub.APIError,
+        GitHub.APIErrorObject
+      ],
+
+      "GitHub – Sync": [
+        GitHub.Sync,
+        GitHub.Sync.Comment,
+        GitHub.Sync.Comment.Comment,
+        GitHub.Sync.Comment.Comment.Changeset,
+        GitHub.Sync.Comment.GithubComment,
+        GitHub.Sync.Issue,
+        GitHub.Sync.Issue.GithubIssue,
+        GitHub.Sync.Issue.Task,
+        GitHub.Sync.Issue.Task.Changeset,
+        GitHub.Sync.PullRequest,
+        GitHub.Sync.PullRequest.BodyParser,
+        GitHub.Sync.PullRequest.GithubPullRequest,
+        GitHub.Sync.User.RecordLinker,
+        GitHub.Sync.Utils.RepoFinder
+      ],
+
+      "Github – Webhooks": [
+        GitHub.Webhook.EventSupport,
+        GitHub.Webhook.Handler,
+        GitHub.Webhook.Processor,
+        GitHub.Event,
+        GitHub.Event.Handler,
+        GitHub.Event.Installation,
+        GitHub.Event.Installation.ChangesetBuilder,
+        GitHub.Event.Installation.MatchedUser,
+        GitHub.Event.Installation.Repos,
+        GitHub.Event.Installation.UnmatchedUser,
+        GitHub.Event.Installation.Validator,
+        GitHub.Event.InstallationRepositories,
+        GitHub.Event.InstallationRepositories.Validator,
+        GitHub.Event.IssueComment,
+        GitHub.Event.IssueComment.CommentDeleter,
+        GitHub.Event.IssueComment.Validator,
+        GitHub.Event.Issues,
+        GitHub.Event.Issues.Validator,
+        GitHub.Event.PullRequest,
+        GitHub.Event.PullRequest.Validator
+      ],
+
+      "GitHub – Adapters": [
+        GitHub.Adapters.AppInstallation,
+        GitHub.Adapters.Comment,
+        GitHub.Adapters.Issue,
+        GitHub.Adapters.PullRequest,
+        GitHub.Adapters.Repo,
+        GitHub.Adapters.User,
+        GitHub.Adapters.Utils.BodyDecorator
+      ],
+
+      "Stripe – Services": [
+        StripeService.StripeConnectAccountService,
+        StripeService.StripeConnectCardService,
+        StripeService.StripeConnectChargeService,
+        StripeService.StripeConnectCustomerService,
+        StripeService.StripeConnectExternalAccountService,
+        StripeService.StripeConnectPlanService,
+        StripeService.StripeConnectSubscriptionService,
+        StripeService.StripeInvoiceService,
+        StripeService.StripePlatformCardService,
+        StripeService.StripePlatformCustomerService
+      ],
+
+      "Stripe – Webhooks": [
+        StripeService.WebhookProcessing.ConnectEventHandler,
+        StripeService.WebhookProcessing.EnvironmentFilter,
+        StripeService.WebhookProcessing.EventHandler,
+        StripeService.WebhookProcessing.IgnoredEventHandler,
+        StripeService.WebhookProcessing.PlatformEventHandler,
+        StripeService.WebhookProcessing.WebhookProcessor,
+        StripeService.Events.AccountUpdated,
+        StripeService.Events.ConnectChargeSucceeded,
+        StripeService.Events.ConnectExternalAccountCreated,
+        StripeService.Events.CustomerSourceUpdated,
+        StripeService.Events.CustomerSubscriptionDeleted,
+        StripeService.Events.CustomerSubscriptionUpdated,
+        StripeService.Events.CustomerUpdated,
+        StripeService.Events.InvoicePaymentSucceeded
+      ],
+
+      "Stripe – Adapters": [
+        StripeService.Adapters.StripeConnectAccountAdapter,
+        StripeService.Adapters.StripeConnectCardAdapter,
+        StripeService.Adapters.StripeConnectChargeAdapter,
+        StripeService.Adapters.StripeConnectCustomerAdapter,
+        StripeService.Adapters.StripeConnectPlanAdapter,
+        StripeService.Adapters.StripeConnectSubscriptionAdapter,
+        StripeService.Adapters.StripeEventAdapter,
+        StripeService.Adapters.StripeExternalAccountAdapter,
+        StripeService.Adapters.StripeFileUploadAdapter,
+        StripeService.Adapters.StripeInvoiceAdapter,
+        StripeService.Adapters.StripePlatformCardAdapter,
+        StripeService.Adapters.StripePlatformCustomerAdapter,
+      ],
+
+      "Stripe – Validators": [
+        StripeService.Validators.ProjectCanEnableDonations,
+        StripeService.Validators.ProjectSubscribable,
+        StripeService.Validators.UserCanSubscribe,
+      ],
+
+      "Stripe – Testing": [
+        StripeTesting.Account,
+        StripeTesting.Card,
+        StripeTesting.Charge,
+        StripeTesting.Customer,
+        StripeTesting.Event,
+        StripeTesting.ExternalAccount,
+        StripeTesting.Helpers,
+        StripeTesting.Invoice,
+        StripeTesting.Plan,
+        StripeTesting.Subscription,
+        StripeTesting.Token
+      ],
+
+      "Analytics": [
+        Analytics.InMemoryAPI,
+        Analytics.SegmentAPI,
+        Analytics.SegmentDataExtractor,
+        Analytics.SegmentEventNameBuilder,
+        Analytics.SegmentPlugTracker,
+        Analytics.SegmentTracker,
+        Analytics.SegmentTrackingSupport,
+        Analytics.SegmentTraitsBuilder,
+        Analytics.TestAPI
+      ],
+
+      "Cloudinary": [
+        CodeCorps.Cloudex.CloudinaryUrl,
+        CodeCorps.Cloudex.Uploader,
+        CloudexTest,
+        CloudexTest.Url
+      ]
     ]
   end
 

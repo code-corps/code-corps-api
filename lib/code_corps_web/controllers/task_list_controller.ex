@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.TaskListController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   import CodeCorps.Helpers.Query, only: [

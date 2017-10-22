@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.OrganizationView do
+  @moduledoc false
   alias CodeCorps.Cloudex.CloudinaryUrl
   use CodeCorpsWeb.PreloadHelpers, default_preloads: [:organization_github_app_installations, :owner, :projects, :slugged_route, :stripe_connect_account]
   use CodeCorpsWeb, :view

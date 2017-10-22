@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.PreviewController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.{Preview, User}

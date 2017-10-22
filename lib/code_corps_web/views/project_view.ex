@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.ProjectView do
+  @moduledoc false
   alias CodeCorps.StripeService.Validators.ProjectCanEnableDonations
   alias CodeCorps.Presenters.ImagePresenter
 

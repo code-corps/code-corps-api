@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.GithubRepoController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.{GithubRepo, Helpers.Query}

@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.TaskView do
+  @moduledoc false
   use CodeCorpsWeb.PreloadHelpers,
       default_preloads: ~w(github_issue github_repo github_pull_request project user task_list task_skills comments user_task)a
   use CodeCorpsWeb, :view

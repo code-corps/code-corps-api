@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.DonationGoalController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.Services.DonationGoalsService

@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.SluggedRouteController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.{SluggedRoute, Helpers.Query}

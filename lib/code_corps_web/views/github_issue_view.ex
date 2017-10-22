@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.GithubIssueView do
+  @moduledoc false
   use CodeCorpsWeb.PreloadHelpers,
       default_preloads: ~w(github_repo)a
   use CodeCorpsWeb, :view

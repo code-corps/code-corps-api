@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.TaskController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.{Task, Policy, User}
