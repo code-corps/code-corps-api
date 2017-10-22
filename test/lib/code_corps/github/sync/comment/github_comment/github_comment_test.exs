@@ -49,4 +49,27 @@ defmodule CodeCorps.GitHub.Sync.Comment.GithubCommentTest do
       refute changeset.valid?
     end
   end
+
+  describe "delete/1" do
+    test "deletes the GithubComment" do
+      github_comment = insert(:github_comment)
+
+      {:ok, deleted_github_comment} =
+        github_comment.github_id
+        |> GithubCommentSyncer.delete()
+
+      assert Repo.aggregate(GithubComment, :count, :id) == 0
+      assert deleted_github_comment.id == github_comment.id
+    end
+
+    test "works when there are no GithubComment reocrds" do
+      assert Repo.aggregate(GithubComment, :count, :id) == 0
+
+      {:ok, %GithubComment{} = empty_github_comment} =
+        "123"
+        |> GithubCommentSyncer.delete()
+
+      refute empty_github_comment.id
+    end
+  end
 end

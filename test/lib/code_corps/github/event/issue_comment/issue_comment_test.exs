@@ -1,6 +1,7 @@
 defmodule CodeCorps.GitHub.Event.IssueCommentTest do
   @moduledoc false
 
+  use CodeCorps.BackgroundProcessingCase
   use CodeCorps.DbAccessCase
 
   import CodeCorps.GitHub.TestHelpers
@@ -76,10 +77,9 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
       github_comment = insert(:github_comment, github_id: github_id, github_issue: github_issue)
       insert(:comment, github_comment: github_comment)
 
-      {:ok, comments} = IssueComment.handle(@payload)
-      assert Enum.count(comments) == 1
+      {:ok, nil} = IssueComment.handle(@payload)
       assert Repo.aggregate(Comment, :count, :id) == 0
-      assert Repo.aggregate(GithubComment, :count, :id) == 1 # FIXME
+      assert Repo.aggregate(GithubComment, :count, :id) == 0
     end
 
     test "returns error if payload is wrong" do

@@ -37,6 +37,22 @@ defmodule CodeCorps.GitHub.Sync.Comment.GithubComment do
     end
   end
 
+  @doc ~S"""
+  Deletes the `GithubComment` record using the GitHub ID from a GitHub API
+  comment payload.
+
+  Returns the deleted `Comment` record or an empty `Comment` record if no such
+  record existed.
+  """
+  @spec delete(String.t) :: {:ok, GithubComment.t}
+  def delete(github_id) do
+    comment = Repo.get_by(GithubComment, github_id: github_id)
+    case comment do
+      nil -> {:ok, %GithubComment{}}
+      _ -> Repo.delete(comment, returning: true)
+    end
+  end
+
   @spec create_comment(map) :: linking_result
   defp create_comment(params) do
     %GithubComment{}

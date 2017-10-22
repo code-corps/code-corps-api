@@ -3,7 +3,6 @@ defmodule CodeCorps.GitHub.Sync.PullRequest.BodyParserTest do
 
   use ExUnit.Case, async: true
 
-
   alias CodeCorps.{
     GitHub.Sync.PullRequest.BodyParser
   }

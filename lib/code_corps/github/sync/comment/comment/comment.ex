@@ -41,6 +41,23 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment do
     |> ResultAggregator.aggregate
   end
 
+  @doc ~S"""
+  Deletes all `Comment` records related to `GithubComment` using the GitHub ID
+  from a GitHub API comment payload.
+
+  Returns a list of the deleted `Comment` records.
+  """
+  @spec delete_all(String.t) :: {:ok, list(Comment.t)}
+  def delete_all(github_id) do
+    query =
+      from c in Comment,
+        join: gc in GithubComment, on: gc.id == c.github_comment_id, where: gc.github_id == ^github_id
+
+    query
+    |> Repo.delete_all(returning: true)
+    |> (fn {_count, comments} -> {:ok, comments} end).()
+  end
+
   @spec sync(Task.t, GithubComment.t, User.t, map) :: {:ok, Comment.t} | {:error, Changeset.t}
   defp sync(%Task{} = task, %GithubComment{} = github_comment, %User{} = user, %{} = payload) do
     task
