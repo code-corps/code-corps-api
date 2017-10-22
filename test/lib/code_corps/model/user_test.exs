@@ -6,20 +6,39 @@ defmodule CodeCorps.UserTest do
   @valid_attrs %{email: "test@user.com", password: "somepassword", username: "testuser"}
   @invalid_attrs %{}
 
-  test "changeset with valid attributes" do
-    changeset = User.changeset(%User{}, @valid_attrs)
-    assert changeset.valid?
+  describe "full_name/1" do
+    test "returns full name correclty" do
+      names = [
+        {"Josh", "Smith", "Josh Smith"},
+        {"Josh", nil,     "Josh"},
+        {nil,    "Smith", "Smith"},
+        {nil,    nil,     ""},
+        {"",     "",      ""}
+      ]
+      Enum.each names, fn({first_name, last_name, expected_full_name}) ->
+        user = build(:user, first_name: first_name, last_name: last_name)
+
+        assert User.full_name(user) == expected_full_name
+      end
+    end
   end
 
-  test "changeset with invalid attributes" do
-    changeset = User.changeset(%User{}, @invalid_attrs)
-    refute changeset.valid?
-  end
+  describe "changeset/2" do
+    test "changeset with valid attributes" do
+      changeset = User.changeset(%User{}, @valid_attrs)
+      assert changeset.valid?
+    end
 
-  test "changeset with invalid email" do
-    attrs = Map.put(@valid_attrs, :email, "notanemail")
-    changeset = User.changeset(%User{}, attrs)
-    assert_error_message(changeset, :email, "has invalid format")
+    test "changeset with invalid attributes" do
+      changeset = User.changeset(%User{}, @invalid_attrs)
+      refute changeset.valid?
+    end
+
+    test "changeset with invalid email" do
+      attrs = Map.put(@valid_attrs, :email, "notanemail")
+      changeset = User.changeset(%User{}, attrs)
+      assert_error_message(changeset, :email, "has invalid format")
+    end
   end
 
   describe "registration_changeset" do
