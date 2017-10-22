@@ -18,7 +18,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment.ChangesetTest do
       github_comment = insert(:github_comment)
 
       changeset = CommentChangeset.build_changeset(
-        comment, payload, github_comment, task, user
+        comment, payload["comment"], github_comment, task, user
       )
 
       {:ok, created_at, _} = payload["issue"]["created_at"] |> DateTime.from_iso8601()
@@ -56,7 +56,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment.ChangesetTest do
       github_comment = insert(:github_comment)
 
       changeset = CommentChangeset.build_changeset(
-        comment, payload, github_comment, task, user
+        comment, payload["comment"], github_comment, task, user
       )
 
       {:ok, updated_at, _} = payload["issue"]["updated_at"] |> DateTime.from_iso8601()
@@ -97,7 +97,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment.ChangesetTest do
       github_comment = insert(:github_comment)
 
       changeset = CommentChangeset.build_changeset(
-        comment, payload, github_comment, task, user
+        comment, payload["comment"], github_comment, task, user
       )
 
       refute changeset.valid?

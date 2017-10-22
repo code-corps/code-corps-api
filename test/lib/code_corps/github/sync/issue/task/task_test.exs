@@ -19,7 +19,7 @@ defmodule CodeCorps.GitHub.Sync.Issue.TaskTest do
       user = insert(:user)
       %{github_repo: github_repo} = github_issue = insert(:github_issue)
 
-      %{"issue" => %{"body" => issue_body}} = @payload
+      %{"issue" => %{"body" => issue_body} = issue} = @payload
 
       [%{project: project_1}, _, _] = project_github_repos =
         insert_list(3, :project_github_repo, github_repo: github_repo)
@@ -33,7 +33,7 @@ defmodule CodeCorps.GitHub.Sync.Issue.TaskTest do
         insert(:task_list, project: project, inbox: true)
       end)
 
-      {:ok, tasks} = github_issue |> IssueTaskSyncer.sync_all(user, @payload)
+      {:ok, tasks} = github_issue |> IssueTaskSyncer.sync_all(user, issue)
 
       assert Repo.aggregate(Task, :count, :id) == 3
 
@@ -50,7 +50,7 @@ defmodule CodeCorps.GitHub.Sync.Issue.TaskTest do
     test "fails on validation errors" do
       %{github_repo: github_repo} = github_issue = insert(:github_issue)
 
-      bad_payload = @payload |> put_in(~w(issue title), nil)
+      %{"issue" => issue} = @payload |> put_in(~w(issue title), nil)
 
       %{project: project} =
         insert(:project_github_repo, github_repo: github_repo)
@@ -60,7 +60,7 @@ defmodule CodeCorps.GitHub.Sync.Issue.TaskTest do
       insert(:task_list, project: project, inbox: true)
 
       {:error, {tasks, errors}} =
-        github_issue |> IssueTaskSyncer.sync_all(user, bad_payload)
+        github_issue |> IssueTaskSyncer.sync_all(user, issue)
 
       assert tasks |> Enum.count == 0
       assert errors |> Enum.count == 1

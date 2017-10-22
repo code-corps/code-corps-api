@@ -11,7 +11,7 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task.ChangesetTest do
 
   describe "build_changeset/3" do
     test "assigns proper changes to the task" do
-      payload = load_event_fixture("issues_opened")
+      %{"issue" => issue} = load_event_fixture("issues_opened")
       task = %Task{}
       github_issue = insert(:github_issue)
       project = insert(:project)
@@ -20,18 +20,18 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task.ChangesetTest do
       task_list = insert(:task_list, project: project, inbox: true)
 
       changeset = TaskChangeset.build_changeset(
-        task, payload, github_issue, project_github_repo, user
+        task, issue, github_issue, project_github_repo, user
       )
 
-      {:ok, created_at, _} = payload["issue"]["created_at"] |> DateTime.from_iso8601()
-      {:ok, updated_at, _} = payload["issue"]["updated_at"] |> DateTime.from_iso8601()
+      {:ok, created_at, _} = issue["created_at"] |> DateTime.from_iso8601()
+      {:ok, updated_at, _} = issue["updated_at"] |> DateTime.from_iso8601()
 
       # adapted fields
       assert get_change(changeset, :created_at) == created_at
-      assert get_change(changeset, :markdown) == payload["issue"]["body"]
+      assert get_change(changeset, :markdown) == issue["body"]
       assert get_change(changeset, :modified_at) == updated_at
-      assert get_change(changeset, :name) == payload["issue"]["name"]
-      assert get_field(changeset, :status) == payload["issue"]["state"]
+      assert get_change(changeset, :name) == issue["name"]
+      assert get_field(changeset, :status) == issue["state"]
 
       # manual fields
       assert get_change(changeset, :created_from) == "github"
@@ -39,7 +39,7 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task.ChangesetTest do
 
       # markdown was rendered into html
       assert get_change(changeset, :body) ==
-        payload["issue"]["body"]
+        issue["body"]
         |> Earmark.as_html!(%Earmark.Options{code_class_prefix: "language-"})
 
       # relationships are proper
@@ -54,8 +54,8 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task.ChangesetTest do
     end
 
     test "validates that modified_at has not already happened" do
-      payload = load_event_fixture("issues_opened")
-      %{"issue" => %{"updated_at" => updated_at}} = payload
+      %{"issue" => issue} = load_event_fixture("issues_opened")
+      %{"updated_at" => updated_at} = issue
 
       # Set the modified_at in the future
       modified_at =
@@ -71,7 +71,7 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task.ChangesetTest do
       task = insert(:task, project: project, github_issue: github_issue, github_repo: github_repo, user: user, modified_at: modified_at)
 
       changeset = TaskChangeset.build_changeset(
-        task, payload, github_issue, project_github_repo, user
+        task, issue, github_issue, project_github_repo, user
       )
 
       refute changeset.valid?

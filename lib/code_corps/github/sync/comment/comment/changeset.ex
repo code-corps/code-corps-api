@@ -22,14 +22,14 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment.Changeset do
   @spec build_changeset(Comment.t, map, GithubComment.t, Task.t, User.t) :: Changeset.t
   def build_changeset(
     %Comment{id: nil} = comment,
-    %{"comment" => attrs},
+    %{} = attrs,
     %GithubComment{} = github_comment,
     %Task{} = task,
     %User{} = user) do
 
     comment |> create_changeset(attrs, github_comment, task, user)
   end
-  def build_changeset(%Comment{} = comment, %{"comment" => attrs}, %GithubComment{}, %Task{}, %User{}) do
+  def build_changeset(%Comment{} = comment, attrs, %GithubComment{}, %Task{}, %User{}) do
     comment |> update_changeset(attrs)
   end
 

@@ -11,9 +11,9 @@ defmodule CodeCorps.GitHub.Event.Issues do
     GitHub,
     GitHub.Event.Issues.Validator
   }
-  alias GitHub.Sync.Issue, as: IssueSyncer
+  alias GitHub.Sync
 
-  @type outcome :: IssueSyncer.outcome
+  @type outcome :: Sync.outcome
                  | {:error, :unexpected_action}
                  | {:error, :not_fully_implemented}
                  | {:error, :unexpected_payload}
@@ -31,7 +31,7 @@ defmodule CodeCorps.GitHub.Event.Issues do
   def handle(payload) do
     with {:ok, :valid} <- validate_payload(payload),
          {:ok, :implemented} <- validate_action(payload) do
-      IssueSyncer.sync(payload)
+      Sync.issue_event(payload)
     else
       {:error, error} -> {:error, error}
     end

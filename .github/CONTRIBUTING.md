@@ -193,3 +193,5 @@ We've written some convenience helper modules and functions to help with API tes
 - `CodeCorpsWeb.ApiCase` - used to simplify testing JSON API endpoints
 - `CodeCorps.AuthenticationTestHelpers` - provides authentication helpers for authenticating a `conn`
 - `CodeCorps.Factories` - provides factories using [`ex_machina`](https://github.com/thoughtbot/ex_machina), which makes it easy to create test data and associations with Ecto
+- `CodeCorps.GitHub.TestHelpers` - provides test helpers for loading GitHub API endpoint or event JSON fixtures, as well as mocking the API
+- `CodeCorps.GitHub.SuccessAPI` - provides some automatic mocking of the GitHub API, or raises an exception if you have an unhandled request to the API

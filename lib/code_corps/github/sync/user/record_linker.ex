@@ -13,7 +13,6 @@ defmodule CodeCorps.GitHub.Sync.User.RecordLinker do
     Comment,
     GithubComment,
     GithubIssue,
-    GithubPullRequest,
     Repo,
     Task,
     User
@@ -39,10 +38,9 @@ defmodule CodeCorps.GitHub.Sync.User.RecordLinker do
     - If there are multiple matching users, this is an unexpected scenario and
       should error out.
   """
-  @spec link_to(GithubComment.t | GithubIssue.t | GithubPullRequest.t, map) :: linking_result
-  def link_to(%GithubComment{} = comment, %{"comment" => %{"user" => user}}), do: do_link_to(comment, user)
-  def link_to(%GithubIssue{} = issue, %{"issue" => %{"user" => user}}), do: do_link_to(issue, user)
-  def link_to(%GithubPullRequest{} = pull_request, %{"pull_request" => %{"user" => user}}), do: do_link_to(pull_request, user)
+  @spec link_to(GithubComment.t | GithubIssue.t, map) :: linking_result
+  def link_to(%GithubComment{} = comment, %{"user" => user}), do: do_link_to(comment, user)
+  def link_to(%GithubIssue{} = issue, %{"user" => user}), do: do_link_to(issue, user)
 
   defp do_link_to(record, user_attrs) do
     record
@@ -50,7 +48,7 @@ defmodule CodeCorps.GitHub.Sync.User.RecordLinker do
     |> marshall_response(user_attrs)
   end
 
-  @spec match_users(GithubComment.t | GithubIssue.t | GithubPullRequest.t) :: list(User.t)
+  @spec match_users(GithubComment.t | GithubIssue.t) :: list(User.t)
   defp match_users(%GithubComment{github_id: github_id}) do
     query = from u in User,
       distinct: u.id,
@@ -63,13 +61,6 @@ defmodule CodeCorps.GitHub.Sync.User.RecordLinker do
     query = from u in User,
       distinct: u.id,
       join: t in Task, on: u.id == t.user_id, where: t.github_issue_id == ^github_issue_id
-
-    query |> Repo.all
-  end
-  defp match_users(%GithubPullRequest{id: github_pull_request_id}) do
-    query = from u in User,
-      distinct: u.id,
-      join: t in Task, on: u.id == t.user_id, where: t.github_pull_request_id == ^github_pull_request_id
 
     query |> Repo.all
   end

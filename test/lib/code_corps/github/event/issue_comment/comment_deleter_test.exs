@@ -15,7 +15,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentDeleterTest do
     @payload load_event_fixture("issue_comment_deleted")
 
     test "deletes all comments with github id specified in the payload" do
-      %{"comment" => %{"id" => comment_github_id}} = @payload
+      %{"comment" => %{"id" => comment_github_id} = comment} = @payload
 
       github_comment = insert(:github_comment, github_id: comment_github_id)
       github_comment_2 = insert(:github_comment)
@@ -24,7 +24,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment.CommentDeleterTest do
       insert_list(3, :comment, github_comment: nil)
       insert_list(1, :comment, github_comment: github_comment_2)
 
-      {:ok, deleted_comments} = CommentDeleter.delete_all(@payload)
+      {:ok, deleted_comments} = CommentDeleter.delete_all(comment)
 
       assert Enum.count(deleted_comments) == 2
       assert Repo.aggregate(Comment, :count, :id) == 4

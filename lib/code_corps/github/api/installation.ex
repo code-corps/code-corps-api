@@ -1,6 +1,6 @@
 defmodule CodeCorps.GitHub.API.Installation do
   @moduledoc """
-  Used to perform installation actions on the GitHub API.
+  Functions for performing installation actions on the GitHub API.
   """
 
   alias CodeCorps.{

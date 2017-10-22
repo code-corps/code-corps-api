@@ -11,9 +11,9 @@ defmodule CodeCorps.GitHub.Event.PullRequest do
     GitHub,
     GitHub.Event.PullRequest.Validator
   }
-  alias GitHub.Sync.PullRequest, as: PullRequestSyncer
+  alias GitHub.Sync
 
-  @type outcome :: PullRequestSyncer.outcome
+  @type outcome :: Sync.outcome
                  | {:error, :unexpected_action}
                  | {:error, :not_fully_implemented}
                  | {:error, :unexpected_payload}
@@ -31,7 +31,7 @@ defmodule CodeCorps.GitHub.Event.PullRequest do
   def handle(payload) do
     with {:ok, :valid} <- validate_payload(payload),
          {:ok, :implemented} <- validate_action(payload) do
-      PullRequestSyncer.sync(payload)
+      Sync.pull_request_event(payload)
     else
       {:error, error} -> {:error, error}
     end

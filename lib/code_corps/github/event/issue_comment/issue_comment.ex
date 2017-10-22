@@ -10,9 +10,9 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
     GitHub,
     GitHub.Event.IssueComment.Validator
   }
-  alias GitHub.Sync.Comment, as: CommentSyncer
+  alias GitHub.Sync
 
-  @type outcome :: CommentSyncer.outcome
+  @type outcome :: Sync.outcome
                  | {:error, :unexpected_action}
                  | {:error, :unexpected_payload}
 
@@ -29,7 +29,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
   def handle(payload) do
     with {:ok, :valid} <- validate_payload(payload),
          {:ok, :implemented} <- validate_action(payload) do
-      CommentSyncer.sync(payload)
+      Sync.issue_comment_event(payload)
     else
       {:error, error} -> {:error, error}
     end

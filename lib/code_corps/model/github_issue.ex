@@ -18,6 +18,7 @@ defmodule CodeCorps.GithubIssue do
     field :title, :string
     field :url, :string
 
+    belongs_to :github_pull_request, CodeCorps.GithubPullRequest
     belongs_to :github_repo, CodeCorps.GithubRepo
 
     timestamps()
@@ -34,12 +35,15 @@ defmodule CodeCorps.GithubIssue do
   def create_changeset(struct, params) do
     struct
     |> changeset(params)
-    |> cast(params, [:github_repo_id])
+    |> cast(params, [:github_pull_request_id, :github_repo_id])
+    |> assoc_constraint(:github_pull_request)
     |> assoc_constraint(:github_repo)
   end
 
   def update_changeset(struct, params) do
     struct
     |> changeset(params)
+    |> cast(params, [:github_pull_request_id])
+    |> assoc_constraint(:github_pull_request)
   end
 end

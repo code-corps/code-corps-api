@@ -42,7 +42,7 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
       end
 
       test "returns error if unmatched repository" do
-        assert Issues.handle(@payload) == {:error, :repository_not_found}
+        assert Issues.handle(@payload) == {:error, :repo_not_found}
         refute Repo.one(User)
       end
 
