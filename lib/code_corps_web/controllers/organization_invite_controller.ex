@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.OrganizationInviteController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.{Emails, Helpers.Query, Mailer, OrganizationInvite, User}

@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.RoleController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.{Role, User, Helpers.Query}

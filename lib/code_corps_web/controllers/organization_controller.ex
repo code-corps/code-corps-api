@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.OrganizationController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.{Helpers.Query, Organization, User}

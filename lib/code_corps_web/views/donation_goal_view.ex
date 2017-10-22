@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.DonationGoalView do
+  @moduledoc false
   use CodeCorpsWeb.PreloadHelpers, default_preloads: [:project]
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView

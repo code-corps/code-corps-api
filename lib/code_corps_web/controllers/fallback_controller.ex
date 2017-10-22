@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.FallbackController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias Ecto.Changeset

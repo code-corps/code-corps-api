@@ -100,26 +100,19 @@ defmodule CodeCorps.GitHub.Sync do
     |> transact()
   end
 
-  @doc ~S"""
-  Finds the `CodeCorps.GithubRepo` using `GitHub.Sync.Utils.RepoFinder`.
-  """
+  @doc false
   def find_repo(_, payload) do
     Multi.new
     |> Multi.run(:repo, fn _ -> RepoFinder.find_repo(payload) end)
   end
 
-  @doc ~S"""
-  Fetches an issue from the GitHub API using `GitHub.API.Issue.from_url/2`.
-  """
+  @doc false
   def fetch_issue(%{repo: %GithubRepo{} = github_repo}, url) do
     Multi.new
     |> Multi.run(:fetch_issue, fn _ -> GitHub.API.Issue.from_url(url, github_repo) end)
   end
 
-  @doc ~S"""
-  Fetches a pull request from the GitHub API using
-  `GitHub.API.PullRequest.from_url/2`.
-  """
+  @doc false
   def fetch_pull_request(%{repo: %GithubRepo{} = github_repo}, url) do
     Multi.new
     |> Multi.run(:fetch_pull_request, fn _ -> GitHub.API.PullRequest.from_url(url, github_repo) end)

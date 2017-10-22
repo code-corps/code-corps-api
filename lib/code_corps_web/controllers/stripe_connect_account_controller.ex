@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.StripeConnectAccountController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.ConnUtils

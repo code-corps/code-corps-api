@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.StripeConnectSubscriptionController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.{StripeConnectSubscription, User}

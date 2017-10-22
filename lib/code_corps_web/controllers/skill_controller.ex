@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.SkillController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.{Skill, User, Helpers.Query}

@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.GithubPullRequestView do
+  @moduledoc false
   use CodeCorpsWeb.PreloadHelpers, default_preloads: [:github_repo]
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView

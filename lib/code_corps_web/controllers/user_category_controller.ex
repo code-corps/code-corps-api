@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.UserCategoryController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.{UserCategory, User, Helpers.Query}

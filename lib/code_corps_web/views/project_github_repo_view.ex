@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.ProjectGithubRepoView do
+  @moduledoc false
   use CodeCorpsWeb.PreloadHelpers, default_preloads: [:github_repo, :project]
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView

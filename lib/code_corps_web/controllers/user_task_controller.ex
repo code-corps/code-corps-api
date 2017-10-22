@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.UserTaskController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.{UserTask, User, Helpers.Query}
