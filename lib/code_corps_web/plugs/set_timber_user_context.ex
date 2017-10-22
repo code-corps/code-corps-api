@@ -11,20 +11,15 @@ defmodule CodeCorpsWeb.Plug.SetTimberUserContext do
   def init(opts), do: opts
 
   @impl true
-  def call(%{assigns: %{current_user: %User{} = user}} = conn, _), do: add_context(conn, user)
+  def call(%{assigns: %{current_user: user}} = conn, _), do: add_context(conn, user)
   def call(conn, _), do: conn
 
   @impl false
-  def add_context(conn, user) do
-    %Timber.Contexts.UserContext{id: user.id, email: user.email, name: full_name(user)}
+  def add_context(conn, %User{} = user) do
+    %Timber.Contexts.UserContext{id: user.id, email: user.email, name: User.full_name(user)}
     |> Timber.add_context()
 
     conn
   end
-
-  defp full_name(%User{first_name: nil, last_name: nil}), do: ""
-  defp full_name(%User{first_name: first_name, last_name: nil}), do: first_name
-  defp full_name(%User{first_name: nil, last_name: last_name}), do: last_name
-  defp full_name(%User{first_name: first_name, last_name: last_name}), do: first_name <> " " <> last_name
-  defp full_name(_), do: ""
+  def add_context(conn, _), do: conn
 end
