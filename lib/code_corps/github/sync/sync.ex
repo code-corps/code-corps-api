@@ -127,6 +127,7 @@ defmodule CodeCorps.GitHub.Sync do
 
   @spec marshall_result(tuple) :: tuple
   defp marshall_result({:ok, %{comments: comments}}), do: {:ok, comments}
+  defp marshall_result({:ok, %{deleted_comments: _, deleted_github_comment: _}}), do: {:ok, nil}
   defp marshall_result({:ok, %{github_pull_request: pull_request}}), do: {:ok, pull_request}
   defp marshall_result({:ok, %{tasks: tasks}}), do: {:ok, tasks}
   defp marshall_result({:error, :repo, :unmatched_project, _steps}), do: {:ok, []}

@@ -1,8 +1,7 @@
 defmodule CodeCorps.GitHub.Sync.Comment do
   alias CodeCorps.{
     GitHub,
-    GithubComment,
-    GitHub.Event.IssueComment.CommentDeleter
+    GithubComment
   }
   alias GitHub.Sync.Comment.Comment, as: CommentCommentSyncer
   alias GitHub.Sync.Comment.GithubComment, as: CommentGithubCommentSyncer
@@ -33,12 +32,13 @@ defmodule CodeCorps.GitHub.Sync.Comment do
 
   @doc """
   When provided a GitHub API payload, it deletes each `Comment` associated to
-  the specified `IssueComment`.
+  the specified `IssueComment` and then deletes the `GithubComment`.
   """
   @spec delete(map, map) :: Multi.t
-  def delete(_changes, payload) do
+  def delete(_, %{"id" => github_id}) do
     Multi.new
-    |> Multi.run(:comments, fn _ -> CommentDeleter.delete_all(payload) end)
+    |> Multi.run(:deleted_comments, fn _ -> CommentCommentSyncer.delete_all(github_id) end)
+    |> Multi.run(:deleted_github_comment, fn _ -> CommentGithubCommentSyncer.delete(github_id) end)
   end
 
   @spec sync_github_comment(GithubIssue.t, map) :: {:ok, GithubComment.t} | {:error, Ecto.Changeset.t}

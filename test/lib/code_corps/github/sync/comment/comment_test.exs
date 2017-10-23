@@ -1,6 +1,7 @@
 defmodule CodeCorps.GitHub.Sync.CommentTest do
   @moduledoc false
 
+  use CodeCorps.BackgroundProcessingCase
   use CodeCorps.DbAccessCase
 
   import CodeCorps.GitHub.TestHelpers
@@ -67,7 +68,7 @@ defmodule CodeCorps.GitHub.Sync.CommentTest do
     end
   end
 
-  describe "delete/2 for IssueComment::deleted" do
+  describe "delete/2" do
     @payload load_event_fixture("issue_comment_deleted")
 
     test "deletes all comments with github_id specified in the payload" do
@@ -79,10 +80,17 @@ defmodule CodeCorps.GitHub.Sync.CommentTest do
       insert_list(2, :comment)
       insert_list(4, :comment, github_comment: github_comment_2)
 
-      {:ok, %{comments: comments}} = CommentSyncer.delete(%{}, comment) |> Repo.transaction
-      assert Enum.count(comments) == 3
+      changes = %{}
+
+      {:ok, %{deleted_comments: deleted_comments, deleted_github_comment: deleted_github_comment}} =
+        changes
+        |> CommentSyncer.delete(comment)
+        |> Repo.transaction
+
+      assert Enum.count(deleted_comments) == 3
+      assert deleted_github_comment.id == github_comment_1.id
       assert Repo.aggregate(Comment, :count, :id) == 6
-      assert Repo.aggregate(GithubComment, :count, :id) == 2 # FIXME to 1
+      assert Repo.aggregate(GithubComment, :count, :id) == 1
     end
   end
 end

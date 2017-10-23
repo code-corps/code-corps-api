@@ -6,12 +6,13 @@ defmodule CodeCorps.GitHub.Sync.Comment.CommentTest do
   import CodeCorps.GitHub.TestHelpers
 
   alias CodeCorps.{
-    Repo,
-    Comment
+    Comment,
+    GithubComment,
+    Repo
   }
   alias CodeCorps.GitHub.Sync.Comment.Comment, as: CommentCommentSyncer
 
-  describe "sync all/3" do
+  describe "sync_all/3" do
     @payload load_event_fixture("issue_comment_created")
 
     test "creates missing, updates existing comments for each project associated with the github repo" do
@@ -75,6 +76,38 @@ defmodule CodeCorps.GitHub.Sync.Comment.CommentTest do
 
       assert Enum.count(comments) == 0
       assert Enum.count(errors) == 1
+    end
+  end
+
+  describe "delete_all/1" do
+    test "deletes all the Comment records for a GithubComment" do
+      github_comment = insert(:github_comment)
+      comments = insert_list(2, :comment, github_comment: github_comment)
+      insert(:comment)
+
+      comment_ids = Enum.map(comments, &Map.get(&1, :id))
+
+      {:ok, deleted_comments} =
+        github_comment.github_id
+        |> CommentCommentSyncer.delete_all()
+
+      assert Enum.count(deleted_comments) == 2
+      assert Repo.aggregate(Comment, :count, :id) == 1
+      assert Repo.aggregate(GithubComment, :count, :id) == 1
+
+      for deleted_comment <- deleted_comments do
+        assert deleted_comment.id in comment_ids
+      end
+    end
+
+    test "works when there are no Comment records for a GithubComment" do
+      github_comment = insert(:github_comment)
+
+      {:ok, deleted_comments} =
+        github_comment.github_id
+        |> CommentCommentSyncer.delete_all()
+
+      assert Enum.count(deleted_comments) == 0
     end
   end
 end
