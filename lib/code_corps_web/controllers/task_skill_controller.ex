@@ -2,7 +2,12 @@ defmodule CodeCorpsWeb.TaskSkillController do
   @moduledoc false
   use CodeCorpsWeb, :controller
 
-  alias CodeCorps.{TaskSkill, User, Helpers.Query}
+  alias CodeCorps.{
+    Analytics.SegmentTracker,
+    Helpers.Query,
+    TaskSkill,
+    User
+  }
 
   action_fallback CodeCorpsWeb.FallbackController
   plug CodeCorpsWeb.Plug.DataToAttributes
@@ -26,7 +31,9 @@ defmodule CodeCorpsWeb.TaskSkillController do
   def create(%Conn{} = conn, %{} = params) do
     with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %TaskSkill{}, params),
-         {:ok, %TaskSkill{} = task_skill} <- %TaskSkill{} |> TaskSkill.create_changeset(params) |> Repo.insert do
+         {:ok, %TaskSkill{} = task_skill} <- %TaskSkill{} |> TaskSkill.create_changeset(params) |> Repo.insert
+    do
+      SegmentTracker.track(current_user.id, "Added Task Skill", task_skill)
       conn |> put_status(:created) |> render("show.json-api", data: task_skill)
     end
   end
@@ -38,6 +45,7 @@ defmodule CodeCorpsWeb.TaskSkillController do
       {:ok, :authorized} <- current_user |> Policy.authorize(:delete, task_skill),
       {:ok, %TaskSkill{} = _task_skill} <- task_skill |> Repo.delete
     do
+      SegmentTracker.track(current_user.id, "Removed Task Skill", task_skill)
       conn |> Conn.assign(:task_skill, task_skill) |> send_resp(:no_content, "")
     end
   end

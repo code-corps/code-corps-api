@@ -3,7 +3,7 @@ defmodule CodeCorpsWeb.UserTaskControllerTest do
 
   use CodeCorpsWeb.ApiCase, resource_name: :user_task
 
-  alias CodeCorps.{Repo, UserTask}
+  alias CodeCorps.{Analytics.SegmentTraitsBuilder, Repo, UserTask}
 
   describe "index" do
     test "lists all entries on index", %{conn: conn} do
@@ -55,6 +55,33 @@ defmodule CodeCorpsWeb.UserTaskControllerTest do
     end
 
     @tag :authenticated
+    test "tracks when current user assigns task to self", %{conn: conn, current_user: current_user} do
+      task = insert(:task, user: current_user)
+
+      attrs = %{task: task, user: current_user}
+      conn |> request_create(attrs)
+
+      traits = UserTask |> Repo.one |> SegmentTraitsBuilder.build
+      user_id = current_user.id
+
+      assert_received {:track, ^user_id, "Assigned Task to Self", ^traits}
+    end
+
+    @tag :authenticated
+    test "tracks when current user assings task to someone else", %{conn: conn, current_user: current_user} do
+      task = insert(:task, user: current_user)
+      user = insert(:user)
+
+      attrs = %{task: task, user: user}
+      conn |> request_create(attrs)
+
+      traits = UserTask |> Repo.one |> SegmentTraitsBuilder.build
+      user_id = current_user.id
+
+      assert_received {:track, ^user_id, "Assigned Task to Someone Else", ^traits}
+    end
+
+    @tag :authenticated
     test "renders 422 error when data is invalid", %{conn: conn, current_user: current_user} do
       task = insert(:task, user: current_user)
 
@@ -79,6 +106,7 @@ defmodule CodeCorpsWeb.UserTaskControllerTest do
   describe "update" do
     @tag :authenticated
     test "updates chosen resource", %{conn: conn, current_user: current_user} do
+      # task owner or project contributor are the only ones who can re-assign
       task = insert(:task, user: current_user)
       user_task = insert(:user_task, task: task)
       new_user = insert(:user)
@@ -87,6 +115,35 @@ defmodule CodeCorpsWeb.UserTaskControllerTest do
 
       updated_task = Repo.get(UserTask, user_task.id)
       assert updated_task.user_id == new_user.id
+    end
+
+    @tag :authenticated
+    test "tracks when current user assigns task to self", %{conn: conn, current_user: current_user} do
+      # task owner or project contributor are the only ones who can re-assign
+      task = insert(:task, user: current_user)
+      user_task = insert(:user_task, task: task)
+
+      conn |> request_update(user_task,  %{user_id: current_user.id})
+
+      traits = UserTask |> Repo.one |> SegmentTraitsBuilder.build
+      user_id = current_user.id
+
+      assert_received {:track, ^user_id, "Assigned Task to Self", ^traits}
+    end
+
+    @tag :authenticated
+    test "tracks when current user assings task to someone else", %{conn: conn, current_user: current_user} do
+      # task owner or project contributor are the only ones who can re-assign
+      task = insert(:task, user: current_user)
+      user_task = insert(:user_task, task: task)
+      new_user = insert(:user)
+
+      conn |> request_update(user_task, %{user_id: new_user.id})
+
+      traits = UserTask |> Repo.one |> SegmentTraitsBuilder.build
+      user_id = current_user.id
+
+      assert_received {:track, ^user_id, "Assigned Task to Someone Else", ^traits}
     end
 
     test "renders 401 when unauthenticated", %{conn: conn} do
@@ -111,6 +168,33 @@ defmodule CodeCorpsWeb.UserTaskControllerTest do
       assert conn |> request_delete(user_task) |> response(204)
     end
 
+    @tag :authenticated
+    test "tracks when current user unassigns task from self", %{conn: conn, current_user: current_user} do
+      # task owner or project contributor are the only ones who can unassign
+      task = insert(:task, user: current_user)
+      user_task = insert(:user_task, task: task, user: current_user)
+
+      conn |> request_delete(user_task)
+
+      traits = user_task |> SegmentTraitsBuilder.build
+      user_id = current_user.id
+
+      assert_received {:track, ^user_id, "Unassigned Task from Self", ^traits}
+    end
+
+    @tag :authenticated
+    test "tracks when current user unassings task from someone else", %{conn: conn, current_user: current_user} do
+      # task owner or project contributor are the only ones who can unassign
+      task = insert(:task, user: current_user)
+      user_task = insert(:user_task, task: task)
+
+      conn |> request_delete(user_task)
+
+      traits = user_task |> SegmentTraitsBuilder.build
+      user_id = current_user.id
+
+      assert_received {:track, ^user_id, "Unassigned Task from Someone Else", ^traits}
+    end
     test "renders 401 when unauthenticated", %{conn: conn} do
       assert conn |> request_delete |> json_response(401)
     end

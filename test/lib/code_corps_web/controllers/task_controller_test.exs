@@ -1,6 +1,8 @@
 defmodule CodeCorpsWeb.TaskControllerTest do
   use CodeCorpsWeb.ApiCase, resource_name: :task
 
+  alias CodeCorps.{Analytics.SegmentTraitsBuilder, Task}
+
   @valid_attrs %{
     title: "Test task",
     markdown: "A test task",
@@ -120,13 +122,29 @@ defmodule CodeCorpsWeb.TaskControllerTest do
       assert json["data"]["attributes"]["number"] == 1
 
       user_id = current_user.id
-      tracking_properties = %{
-        task: @valid_attrs.title,
-        task_id: String.to_integer(json["data"]["id"]),
-        project_id: project.id
+      traits = Task |> Repo.one |> SegmentTraitsBuilder.build
+      assert_received {:track, ^user_id, "Created Task", ^traits}
+    end
+
+    @tag :authenticated
+    test "tracks connecting to github", %{conn: conn, current_user: current_user} do
+      %{project: project, github_repo: github_repo} =
+        insert(:project_github_repo)
+      task_list = insert(:task_list, project: project)
+      assocs = %{
+        project: project,
+        user: current_user,
+        task_list: task_list,
+        github_repo: github_repo
       }
 
-      assert_received {:track, ^user_id, "Created Task", ^tracking_properties}
+      attrs = @valid_attrs |> Map.merge(assocs)
+
+      conn |> request_create(attrs)
+
+      traits = Task |> Repo.one |> SegmentTraitsBuilder.build
+      user_id = current_user.id
+      assert_received {:track, ^user_id, "Connected Task to GitHub", ^traits}
     end
 
     @tag :authenticated
@@ -148,13 +166,123 @@ defmodule CodeCorpsWeb.TaskControllerTest do
       assert conn |> request_update(task, @valid_attrs) |> json_response(200)
 
       user_id = current_user.id
-      tracking_properties = %{
-        task: task.title,
-        task_id: task.id,
-        project_id: task.project.id
-      }
+      traits = Task |> Repo.get(task.id) |> SegmentTraitsBuilder.build
+      assert_received {:track, ^user_id, "Edited Task", ^traits}
+    end
 
-      assert_received {:track, ^user_id, "Edited Task", ^tracking_properties}
+    @tag :authenticated
+    test "tracks connecting to github", %{conn: conn, current_user: current_user} do
+      %{project: project, github_repo: github_repo} = insert(:project_github_repo)
+      task_list = insert(:task_list, project: project)
+      task = insert(:task, task_list: task_list, project: project, user: current_user)
+
+      attrs = @valid_attrs |> Map.merge(%{github_repo_id: github_repo.id})
+      conn |> request_update(task, attrs)
+
+      traits = Task |> Repo.get(task.id) |> SegmentTraitsBuilder.build
+      user_id = current_user.id
+      assert_received {:track, ^user_id, "Connected Task to GitHub", ^traits}
+    end
+
+    @tag :authenticated
+    test "does not track connecting to github if already connected", %{conn: conn, current_user: current_user} do
+      %{project: project, github_repo: github_repo} = insert(:project_github_repo)
+      task_list = insert(:task_list, project: project)
+      github_issue = insert(:github_issue, github_repo: github_repo)
+      task = insert(:task, task_list: task_list, project: project, user: current_user, github_repo: github_repo, github_issue: github_issue)
+
+      attrs = @valid_attrs |> Map.merge(%{github_repo_id: github_repo.id})
+      conn |> request_update(task, attrs)
+
+      user_id = current_user.id
+      refute_received {:track, ^user_id, "Connected Task to GitHub", _}
+    end
+
+    @tag :authenticated
+    test "tracks move between task lists", %{conn: conn, current_user: current_user} do
+      %{project: project} = task = insert(:task, user: current_user)
+      task_list = insert(:task_list, project: project)
+
+      attrs = @valid_attrs |> Map.put(:task_list_id, task_list.id)
+
+      conn |> request_update(task, attrs)
+
+      traits = Task |> Repo.get(task.id) |> SegmentTraitsBuilder.build
+      user_id = current_user.id
+      assert_received {:track, ^user_id, "Moved Task Between Lists", ^traits}
+    end
+
+    @tag :authenticated
+    test "does not track move between task lists if no move took place", %{conn: conn, current_user: current_user} do
+      task = insert(:task, user: current_user)
+
+      conn |> request_update(task, @valid_attrs)
+
+      user_id = current_user.id
+      refute_received {:track, ^user_id, "Moved Task Between Lists", _}
+    end
+
+    @tag :authenticated
+    test "tracks title change", %{conn: conn, current_user: current_user} do
+      task = insert(:task, user: current_user)
+      attrs = @valid_attrs |> Map.put(:title, "New title")
+      conn |> request_update(task, attrs)
+
+      traits = Task |> Repo.get(task.id) |> SegmentTraitsBuilder.build
+      user_id = current_user.id
+      assert_received {:track, ^user_id, "Edited Task Title", ^traits}
+    end
+
+    @tag :authenticated
+    test "does not track title change if none took place", %{conn: conn, current_user: current_user} do
+      task = insert(:task, user: current_user)
+      attrs = @valid_attrs |> Map.delete(:title)
+      conn |> request_update(task, attrs)
+
+      user_id = current_user.id
+      refute_received {:track, ^user_id, "Edited Task Title", _}
+    end
+
+    @tag :authenticated
+    test "tracks closing task", %{conn: conn, current_user: current_user} do
+      task = insert(:task, user: current_user, status: "open")
+      attrs = @valid_attrs |> Map.put(:status, "closed")
+      conn |> request_update(task, attrs)
+
+      traits = Task |> Repo.get(task.id) |> SegmentTraitsBuilder.build
+      user_id = current_user.id
+      assert_received {:track, ^user_id, "Closed Task", ^traits}
+    end
+
+    @tag :authenticated
+    test "does not track closing task if no close took place", %{conn: conn, current_user: current_user} do
+      task = insert(:task, user: current_user, status: "open")
+      attrs = @valid_attrs |> Map.delete(:status)
+      conn |> request_update(task, attrs)
+
+      user_id = current_user.id
+      refute_received {:track, ^user_id, "Closed Task", _}
+    end
+
+    @tag :authenticated
+    test "tracks archiving task", %{conn: conn, current_user: current_user} do
+      task = insert(:task, user: current_user, archived: false)
+      attrs = @valid_attrs |> Map.put(:archived, true)
+      conn |> request_update(task, attrs)
+
+      traits = Task |> Repo.get(task.id) |> SegmentTraitsBuilder.build
+      user_id = current_user.id
+      assert_received {:track, ^user_id, "Archived Task", ^traits}
+    end
+
+    @tag :authenticated
+    test "does not track archiving task if no archive took place", %{conn: conn, current_user: current_user} do
+      task = insert(:task, user: current_user, archived: false)
+      attrs = @valid_attrs |> Map.delete(:archived)
+      conn |> request_update(task, attrs)
+
+      user_id = current_user.id
+      refute_received {:track, ^user_id, "Archived Task", _}
     end
 
     @tag :authenticated

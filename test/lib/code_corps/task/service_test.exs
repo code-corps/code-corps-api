@@ -117,6 +117,23 @@ defmodule CodeCorps.Task.ServiceTest do
       refute_received({:post, _string, {}, "{}", []})
     end
 
+    test "creates a github issue if task is just now connected to a repo" do
+      github_repo =
+        :github_repo
+        |> insert(github_account_login: "foo", name: "bar")
+
+      task = insert(:task)
+
+      attrs = @update_attrs |> Map.put("github_repo_id", github_repo.id)
+
+      {:ok, updated_task} = task |> Task.Service.update(attrs)
+
+      assert updated_task.github_issue_id
+      assert updated_task.github_repo_id == github_repo.id
+
+      assert_received({:post, "https://api.github.com/repos/foo/bar/issues", _headers, _body, _options})
+    end
+
     test "propagates changes to github if task is synced to github issue" do
       github_repo =
         :github_repo

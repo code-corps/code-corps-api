@@ -27,7 +27,6 @@ defmodule CodeCorpsWeb.UserControllerTest do
   @relationships %{}
 
   describe "index" do
-
     test "lists all entries on index", %{conn: conn} do
       [user_1, user_2] = insert_pair(:user)
 

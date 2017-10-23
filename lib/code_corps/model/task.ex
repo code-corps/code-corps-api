@@ -3,7 +3,7 @@ defmodule CodeCorps.Task do
 
   import EctoOrdered
 
-  alias CodeCorps.Services.MarkdownRendererService
+  alias CodeCorps.{Task, Services.MarkdownRendererService}
   alias Ecto.Changeset
 
   @type t :: %__MODULE__{}
@@ -67,13 +67,15 @@ defmodule CodeCorps.Task do
     |> put_change(:status, "open")
   end
 
-  def update_changeset(struct, params) do
+  @spec update_changeset(struct, map) :: Ecto.Changeset.t
+  def update_changeset(struct, %{} = params) do
     struct
     |> changeset(params)
     |> cast(params, [:archived, :status])
     |> validate_inclusion(:status, statuses())
     |> set_closed_at()
     |> update_modified_at()
+    |> maybe_assoc_with_repo(params)
   end
 
   def apply_position(changeset) do
@@ -109,4 +111,15 @@ defmodule CodeCorps.Task do
   defp update_modified_at(changeset) do
     put_change(changeset, :modified_at, DateTime.utc_now)
   end
+
+  @spec maybe_assoc_with_repo(Changeset.t, map) :: Changeset.t
+  defp maybe_assoc_with_repo(
+    %Changeset{data: %Task{github_repo_id: nil}} = changeset,
+    %{} = params) do
+
+    changeset
+    |> cast(params, [:github_repo_id])
+    |> assoc_constraint(:github_repo)
+  end
+  defp maybe_assoc_with_repo(%Changeset{} = changeset, %{}), do: changeset
 end

@@ -84,7 +84,9 @@ defmodule CodeCorps.Factories do
 
   def github_repo_factory do
     %CodeCorps.GithubRepo{
-      github_app_installation: build(:github_app_installation)
+      github_account_login: sequence(:github_account_login, &"owner_#{&1}"),
+      github_app_installation: build(:github_app_installation),
+      name: sequence(:name, &"repo_#{&1}")
     }
   end
 
@@ -228,6 +230,8 @@ defmodule CodeCorps.Factories do
 
   def stripe_connect_charge_factory do
     %CodeCorps.StripeConnectCharge{
+      amount: 1000,
+      currency: "usd",
       id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
       stripe_connect_account: build(:stripe_connect_account),
       stripe_connect_customer: build(:stripe_connect_customer),

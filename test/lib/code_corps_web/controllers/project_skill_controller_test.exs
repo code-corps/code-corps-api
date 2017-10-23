@@ -1,6 +1,8 @@
 defmodule CodeCorpsWeb.ProjectSkillControllerTest do
   use CodeCorpsWeb.ApiCase, resource_name: :project_skill
 
+  alias CodeCorps.{Analytics.SegmentTraitsBuilder, ProjectSkill, Repo}
+
   describe "index" do
     test "lists all entries on index", %{conn: conn} do
       [project_skill_1, project_skill_2] = insert_pair(:project_skill)
@@ -52,6 +54,21 @@ defmodule CodeCorpsWeb.ProjectSkillControllerTest do
     end
 
     @tag :authenticated
+    test "tracks on segment", %{conn: conn, current_user: current_user} do
+      project = insert(:project)
+      insert(:project_user, project: project, user: current_user, role: "owner")
+      skill = insert(:skill)
+
+      attrs = %{project: project, skill: skill}
+      conn |> request_create(attrs)
+
+      user_id = current_user.id
+      traits = ProjectSkill |> Repo.one |> SegmentTraitsBuilder.build
+
+      assert_received({:track, ^user_id, "Added Project Skill", ^traits})
+    end
+
+    @tag :authenticated
     test "renders 422 error when data is invalid", %{conn: conn, current_user: current_user} do
       project = insert(:project)
       insert(:project_user, project: project, user: current_user, role: "owner")
@@ -77,6 +94,20 @@ defmodule CodeCorpsWeb.ProjectSkillControllerTest do
       insert(:project_user, project: project, user: current_user, role: "owner")
       project_skill = insert(:project_skill, project: project)
       assert conn |> request_delete(project_skill) |> response(204)
+    end
+
+    @tag :authenticated
+    test "tracks on segment", %{conn: conn, current_user: current_user} do
+      project = insert(:project)
+      insert(:project_user, project: project, user: current_user, role: "owner")
+      project_skill = insert(:project_skill, project: project)
+
+      conn |> request_delete(project_skill)
+
+      user_id = current_user.id
+      traits = project_skill |> SegmentTraitsBuilder.build
+
+      assert_received({:track, ^user_id, "Removed Project Skill", ^traits})
     end
 
     test "renders 401 when unauthenticated", %{conn: conn} do
