@@ -48,6 +48,7 @@ defmodule CodeCorps.Policy.Helpers do
   Returns `CodeCorps.Organization`
   """
   @spec get_organization(struct | Changeset.t | any) :: Organization.t
+  def get_organization(%{"organization_id" => id}), do: Organization |> Repo.get(id)
   def get_organization(%{organization_id: id}), do: Organization |> Repo.get(id)
   def get_organization(%Changeset{changes: %{organization_id: id}}), do: Organization |> Repo.get(id)
   def get_organization(_), do: nil
@@ -59,6 +60,7 @@ defmodule CodeCorps.Policy.Helpers do
   Returns `CodeCorps.Project`
   """
   @spec get_project(struct | Changeset.t | any) :: Project.t
+  def get_project(%{"project_id" =>  id}), do: Project |> Repo.get(id)
   def get_project(%{project_id: id}), do: Project |> Repo.get(id)
   def get_project(%Changeset{changes: %{project_id: id}}), do: Project |> Repo.get(id)
   def get_project(_), do: nil
@@ -86,9 +88,10 @@ defmodule CodeCorps.Policy.Helpers do
   @doc """
   Retrieves task from associated record
   """
-  @spec get_task(Changeset.t | TaskSkill.t | UserTask.t) :: Task.t
+  @spec get_task(Changeset.t | TaskSkill.t | UserTask.t | map) :: Task.t
   def get_task(%TaskSkill{task_id: task_id}), do: Repo.get(Task, task_id)
   def get_task(%UserTask{task_id: task_id}), do: Repo.get(Task, task_id)
+  def get_task(%{"task_id" => task_id}), do: Repo.get(Task, task_id)
   def get_task(%Changeset{changes: %{task_id: task_id}}), do: Repo.get(Task, task_id)
 
   @doc """

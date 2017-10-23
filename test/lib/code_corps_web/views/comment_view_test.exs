@@ -14,8 +14,12 @@ defmodule CodeCorpsWeb.CommentViewTest do
         "type" => "comment",
         "attributes" => %{
           "body" => comment.body,
+          "created-at" => comment.created_at,
+          "created-from" => comment.created_from,
           "inserted-at" => comment.inserted_at,
           "markdown" => comment.markdown,
+          "modified-at" => comment.modified_at,
+          "modified-from" => comment.modified_from,
           "updated-at" => comment.updated_at
         },
         "relationships" => %{

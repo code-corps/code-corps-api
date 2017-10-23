@@ -1,22 +1,25 @@
 defmodule CodeCorpsWeb.FallbackController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias Ecto.Changeset
 
+  require Logger
+
   @type supported_fallbacks :: {:error, Changeset.t} |
                                {:error, :not_authorized} |
+                               {:error, :github} |
                                nil
 
   @doc ~S"""
-  Default fallback for validation errors.
-
-  Renders validation errors for the provided changeset using `JaSerializer`
+  Default fallback for different `with` clause errors in controllers across the
+  application.
   """
   @spec call(Conn.t, supported_fallbacks) :: Conn.t
   def call(%Conn{} = conn, {:error, %Changeset{} = changeset}) do
     conn
     |> put_status(:unprocessable_entity)
-    |> render(:errors, data: changeset)
+    |> render(CodeCorpsWeb.ChangesetView, "422.json", changeset: changeset)
   end
   def call(%Conn{} = conn, {:error, :not_authorized}) do
     conn
@@ -27,5 +30,22 @@ defmodule CodeCorpsWeb.FallbackController do
     conn
     |> put_status(:not_found)
     |> render(CodeCorpsWeb.ErrorView, "404.json")
+  end
+  def call(%Conn{} = conn, {:error, :github}) do
+    conn
+    |> put_status(500)
+    |> render(CodeCorpsWeb.ErrorView, "500.json", message: "An unknown error occurred with GitHub's API.")
+  end
+  def call(%Conn{} = conn, {:error, %Stripe.APIErrorResponse{message: message}}) do
+    Logger.info message
+    conn
+    |> put_status(500)
+    |> render(CodeCorpsWeb.ErrorView, "500.json", message: "An unknown error occurred with Stripe's API.")
+  end
+  def call(%Conn{} = conn, {:error, %CodeCorps.GitHub.APIError{message: message}}) do
+    Logger.info message
+    conn
+    |> put_status(500)
+    |> render(CodeCorpsWeb.ErrorView, "github-error.json", message: message)
   end
 end

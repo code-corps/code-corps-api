@@ -8,7 +8,7 @@ defmodule CodeCorpsWeb.ErrorViewTest do
     rendered_json =  render(CodeCorpsWeb.ErrorView, "404.json-api", [])
 
     expected_json = %{
-      "errors" => [%{status: 404,  title: "404 Resource not found", id: "NOT_FOUND"}],
+      "errors" => [%{title: "404 Not Found", detail: "404 Not Found", status: "404"}],
         "jsonapi" => %{"version" => "1.0"}
     }
     assert rendered_json == expected_json
@@ -18,7 +18,7 @@ defmodule CodeCorpsWeb.ErrorViewTest do
     rendered_json =  render(CodeCorpsWeb.ErrorView, "500.json-api", [])
 
     expected_json = %{
-      "errors" => [%{status: 500,  title: "500 Internal server error", id: "INTERNAL_SERVER_ERROR"}],
+      "errors" => [%{title: "500 Internal Server Error", detail: "500 Internal Server Error", status: "500"}],
         "jsonapi" => %{"version" => "1.0"}
     }
     assert rendered_json == expected_json
@@ -27,6 +27,6 @@ defmodule CodeCorpsWeb.ErrorViewTest do
   test "render any other" do
     string = render_to_string(CodeCorpsWeb.ErrorView, "505.json-api", [])
 
-    assert String.contains? string, "Internal server error"
+    assert String.contains? string, "Internal Server Error"
   end
 end

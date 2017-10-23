@@ -45,7 +45,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.IgnoredEventHandler do
   Determines the reason for ignoring the event, then updates the record to
   `status: "ignored"` and `ignored_reason: inferred_message`
 
-  Returns `{:ok, %CodeCorps.StripeEvent{}}
+  Returns `{:ok, %CodeCorps.StripeEvent{}}`
   """
   @spec handle(StripeEvent.t, module) :: {:ok, StripeEvent.t}
   def handle(%StripeEvent{type: type} = local_event, handler) do

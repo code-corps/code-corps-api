@@ -1,31 +1,78 @@
 defmodule CodeCorpsWeb.UserTaskController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
-  use JaResource
 
-  import CodeCorps.Helpers.Query, only: [id_filter: 2]
+  alias CodeCorps.{
+    Analytics.SegmentTracker,
+    UserTask,
+    User,
+    Helpers.Query
+  }
 
-  alias CodeCorps.UserTask
+  action_fallback CodeCorpsWeb.FallbackController
+  plug CodeCorpsWeb.Plug.DataToAttributes
 
-  plug :load_resource, model: UserTask, only: [:show], preload: [:task, :user]
-  plug :load_and_authorize_changeset, model: UserTask, only: [:create]
-  plug :load_and_authorize_resource, model: UserTask, only: [:update, :delete]
-  plug JaResource
-
-  @spec model :: module
-  def model, do: CodeCorps.UserTask
-
-  @spec filter(Plug.Conn.t, Ecto.Query.t, String.t, String.t) :: Plug.Conn.t
-  def filter(_conn, query, "id", id_list) do
-    query |> id_filter(id_list)
+  @spec index(Conn.t, map) :: Conn.t
+  def index(%Conn{} = conn, %{} = params) do
+    with user_tasks <- UserTask |> Query.id_filter(params) |> Repo.all do
+      conn |> render("index.json-api", data: user_tasks)
+    end
   end
 
-  @spec handle_create(Plug.Conn.t, map) :: Ecto.Changeset.t
-  def handle_create(_conn, attributes) do
-    %UserTask{} |> UserTask.create_changeset(attributes)
+  @spec show(Conn.t, map) :: Conn.t
+  def show(%Conn{} = conn, %{"id" => id}) do
+    with %UserTask{} = user_task <- UserTask |> Repo.get(id) do
+      conn |> render("show.json-api", data: user_task)
+    end
   end
 
-  @spec handle_update(Plug.Conn.t, UserTask.t, map) :: Ecto.Changeset.t
-  def handle_update(_conn, user_task, attributes) do
-    user_task |> UserTask.update_changeset(attributes)
+  @spec create(Conn.t, map) :: Conn.t
+  def create(%Conn{} = conn, %{} = params) do
+    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+      {:ok, :authorized} <- current_user |> Policy.authorize(:create, %UserTask{}, params),
+      {:ok, %UserTask{} = user_task} <- %UserTask{} |> UserTask.create_changeset(params) |> Repo.insert
+    do
+      current_user |> track_assigned(user_task)
+
+      conn |> put_status(:created) |> render("show.json-api", data: user_task)
+    end
   end
+
+  @spec update(Conn.t, map) :: Conn.t
+  def update(%Conn{} = conn, %{"id" => id} = params) do
+    with %UserTask{} = user_task <- UserTask |> Repo.get(id),
+      %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+      {:ok, :authorized} <- current_user |> Policy.authorize(:update, user_task),
+      {:ok, %UserTask{} = user_task} <- user_task |> UserTask.update_changeset(params) |> Repo.update
+    do
+      current_user |> track_assigned(user_task)
+
+      conn |> render("show.json-api", data: user_task)
+    end
+  end
+
+  @spec delete(Conn.t, map) :: Conn.t
+  def delete(%Conn{} = conn, %{"id" => id} = _params) do
+    with %UserTask{} = user_task <- UserTask |> Repo.get(id),
+      %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+      {:ok, :authorized} <- current_user |> Policy.authorize(:delete, user_task),
+      {:ok, %UserTask{} = _user_task} <- user_task |> Repo.delete
+    do
+      current_user |> track_unassigned(user_task)
+
+      conn |> send_resp(:no_content, "")
+    end
+  end
+
+  @spec track_assigned(User.t, UserTask.t) :: any
+  defp track_assigned(%User{id: user_id}, %UserTask{user_id: assigned_user_id} = user_task)
+    when user_id == assigned_user_id, do: SegmentTracker.track(user_id, "Assigned Task to Self", user_task)
+  defp track_assigned(%User{id: user_id}, %UserTask{} = user_task),
+    do: SegmentTracker.track(user_id, "Assigned Task to Someone Else", user_task)
+
+  @spec track_unassigned(User.t, UserTask.t) :: any
+  defp track_unassigned(%User{id: user_id}, %UserTask{user_id: assigned_user_id} = user_task)
+    when user_id == assigned_user_id, do: SegmentTracker.track(user_id, "Unassigned Task from Self", user_task)
+  defp track_unassigned(%User{id: user_id}, %UserTask{} = user_task),
+    do: SegmentTracker.track(user_id, "Unassigned Task from Someone Else", user_task)
 end

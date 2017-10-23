@@ -9,21 +9,17 @@ defmodule CodeCorps.GithubAppInstallation do
   schema "github_app_installations" do
     field :access_token, :string
     field :access_token_expires_at, :utc_datetime
-    field :github_id, :integer
-
     field :github_account_avatar_url, :string
     field :github_account_id, :integer
     field :github_account_login, :string
     field :github_account_type, :string
-
+    field :github_id, :integer
     field :installed, :boolean
+    field :origin, :string, default: "codecorps" # "codecorps" or "github"
     field :sender_github_id, :integer
 
     # "unprocessed", "processing", "processed" or "errored"
     field :state, :string, default: "unprocessed"
-
-    # "codecorps" or "github"
-    field :origin, :string, default: "codecorps"
 
     belongs_to :project, CodeCorps.Project # The originating project
     belongs_to :user, CodeCorps.User
@@ -40,11 +36,11 @@ defmodule CodeCorps.GithubAppInstallation do
   def create_changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:project_id, :user_id])
-    |> put_change(:state, "unprocessed")
-    |> put_change(:origin, "codecorps")
     |> validate_required([:project_id, :user_id])
     |> assoc_constraint(:project)
     |> assoc_constraint(:user)
+    |> put_change(:origin, "codecorps")
+    |> put_change(:state, "unprocessed")
   end
 
   @doc ~S"""

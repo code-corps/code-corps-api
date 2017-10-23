@@ -1,6 +1,9 @@
 defmodule CodeCorpsWeb.Plug.DataToAttributes do
-  @moduledoc """
-  Puts authenticated Guardian user into conn.assigns[:current_user]
+  @moduledoc ~S"""
+  Converts params in the JSON api "data" format into flat params convient for
+  changeset casting.
+
+  This is done using `JaSerializer.Params.to_attributes/1`
   """
 
   alias Plug.Conn

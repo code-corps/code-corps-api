@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.StripeConnectAccountView do
+  @moduledoc false
   use CodeCorpsWeb.PreloadHelpers, default_preloads: [:organization, :stripe_external_account]
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
@@ -87,7 +88,7 @@ defmodule CodeCorpsWeb.StripeConnectAccountView do
   def bank_account_routing_number(%{stripe_external_account: nil}, _conn), do: nil
   def bank_account_routing_number(%{stripe_external_account: %{routing_number: routing_number}}, _conn), do: routing_number
 
-  # TODO: Exteact the 4 status mappings into a module
+  # TODO: Extract the 4 status mappings into a module
 
   # recipient_status mapping
 

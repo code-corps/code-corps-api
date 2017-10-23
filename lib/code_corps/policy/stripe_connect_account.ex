@@ -6,8 +6,8 @@ defmodule CodeCorps.Policy.StripeConnectAccount do
   def show?(%User{} = user, %StripeConnectAccount{} = stripe_connect_account),
     do: stripe_connect_account |> get_organization() |> owned_by?(user)
 
-  def create?(%User{} = user, %Ecto.Changeset{} = changeset),
-    do: changeset |> get_organization() |> owned_by?(user)
+  def create?(%User{} = user, %{} = params),
+    do: params |> get_organization() |> owned_by?(user)
 
   def update?(%User{} = user, %StripeConnectAccount{} = stripe_connect_account),
     do: stripe_connect_account |> get_organization() |> owned_by?(user)

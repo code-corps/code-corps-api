@@ -3,6 +3,8 @@ defmodule CodeCorpsWeb.TaskSkillControllerTest do
 
   use CodeCorpsWeb.ApiCase, resource_name: :task_skill
 
+  alias CodeCorps.{Repo, TaskSkill}
+
   describe "index" do
     test "lists all entries on index", %{conn: conn} do
       [task_skill_1, task_skill_2] = insert_pair(:task_skill)
@@ -53,6 +55,24 @@ defmodule CodeCorpsWeb.TaskSkillControllerTest do
     end
 
     @tag :authenticated
+    test "tracks event when data is valid", %{conn: conn, current_user: current_user} do
+      task = insert(:task, user: current_user)
+      skill = insert(:skill)
+      user_id = current_user.id
+
+      attrs = %{task: task, skill: skill}
+      json = conn |> request_create(attrs) |> json_response(201)
+      assert json
+
+      expected_data =
+        TaskSkill
+        |> Repo.get(json["data"]["id"])
+        |> CodeCorps.Analytics.SegmentTraitsBuilder.build
+
+      assert_received {:track, ^user_id, "Added Task Skill", ^expected_data}
+    end
+
+    @tag :authenticated
     test "renders 422 error when data is invalid", %{conn: conn, current_user: current_user} do
       task = insert(:task, user: current_user)
 
@@ -81,6 +101,21 @@ defmodule CodeCorpsWeb.TaskSkillControllerTest do
       task_skill = insert(:task_skill, task: task)
 
       assert conn |> request_delete(task_skill) |> response(204)
+    end
+
+    @tag :authenticated
+    test "tracks event", %{conn: conn, current_user: current_user} do
+      task = insert(:task, user: current_user)
+      task_skill = insert(:task_skill, task: task)
+      user_id = current_user.id
+      expected_data =
+        TaskSkill
+        |> Repo.get(task_skill.id)
+        |> CodeCorps.Analytics.SegmentTraitsBuilder.build
+
+      assert conn |> request_delete(task_skill) |> response(204)
+
+      assert_received {:track, ^user_id, "Removed Task Skill", ^expected_data}
     end
 
     test "renders 401 when unauthenticated", %{conn: conn} do

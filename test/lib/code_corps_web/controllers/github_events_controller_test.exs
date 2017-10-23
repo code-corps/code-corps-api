@@ -2,12 +2,9 @@ defmodule CodeCorpsWeb.GitHubEventsControllerTest do
   @moduledoc false
 
   use CodeCorpsWeb.ConnCase
-  use CodeCorps.{
-    BackgroundProcessingCase,
-    GitHubCase
-  }
+  use CodeCorps.BackgroundProcessingCase
 
-  import CodeCorps.TestHelpers.GitHub
+  import CodeCorps.GitHub.TestHelpers
 
   alias CodeCorps.GithubEvent
 
@@ -26,17 +23,6 @@ defmodule CodeCorpsWeb.GitHubEventsControllerTest do
     |> put_req_header("x-github-delivery", id)
   end
 
-  @access_token "v1.1f699f1069f60xxx"
-  @expires_at Timex.now() |> Timex.shift(hours: 1) |> DateTime.to_iso8601()
-  @access_token_create_response %{"token" => @access_token, "expires_at" => @expires_at}
-
-  @installation_created load_event_fixture("installation_created")
-  @installation_repositories load_endpoint_fixture("installation_repositories")
-
-  @tag bypass: %{
-    "/installation/repositories" => {200, @installation_repositories},
-    "/installations/#{@installation_created["installation"]["id"]}/access_tokens" => {200, @access_token_create_response}
-  }
   test "responds with 200 for a supported event", %{conn: conn} do
     path = conn |> github_events_path(:create)
 

@@ -1,6 +1,6 @@
 defmodule CodeCorps.GitHub.Event.Installation.Validator do
   @moduledoc ~S"""
-  In charge of validatng a GitHub Installation webhook payload.
+  In charge of validatng a GitHub.API.Installation webhook payload.
 
   https://developer.github.com/v3/activity/events/types/#installationevent
   """
@@ -11,7 +11,16 @@ defmodule CodeCorps.GitHub.Event.Installation.Validator do
   """
   @spec valid?(map) :: boolean
   def valid?(%{
-    "installation" => %{"id" => _,"account" => %{"id" => _}},
-    "sender" => %{"id" => _}}), do: true
+    "action" => _,
+    "installation" => %{
+      "id" => _,
+      "account" => %{
+        "id" => _
+      }
+    },
+    "sender" => %{
+      "id" => _
+    }
+  }), do: true
   def valid?(_), do: false
 end

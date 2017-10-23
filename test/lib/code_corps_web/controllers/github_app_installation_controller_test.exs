@@ -3,6 +3,8 @@ defmodule CodeCorpsWeb.GithubAppInstallationControllerTest do
 
   use CodeCorpsWeb.ApiCase, resource_name: :github_app_installation
 
+  alias CodeCorps.{Analytics.SegmentTraitsBuilder, GithubAppInstallation, Repo}
+
   describe "index" do
     test "lists all resources", %{conn: conn} do
       [record_1, record_2] = insert_pair(:github_app_installation)
@@ -47,6 +49,19 @@ defmodule CodeCorpsWeb.GithubAppInstallationControllerTest do
       attrs = %{project: project, user: user}
 
       assert conn |> request_create(attrs) |> json_response(201)
+    end
+
+    @tag :authenticated
+    test "tracks creation", %{conn: conn, current_user: current_user} do
+      project = insert(:project)
+      insert(:project_user, project: project, user: current_user, role: "owner")
+      attrs = %{project: project, user: current_user}
+
+      conn |> request_create(attrs)
+
+      user_id = current_user.id
+      traits = GithubAppInstallation |> Repo.one |> SegmentTraitsBuilder.build
+      assert_receive({:track, ^user_id, "Created GitHub App Installation", ^traits})
     end
 
     @tag :authenticated

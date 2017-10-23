@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.CategoryView do
+  @moduledoc false
   use CodeCorpsWeb.PreloadHelpers, default_preloads: [:project_categories]
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView

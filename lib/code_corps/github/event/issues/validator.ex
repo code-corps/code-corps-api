@@ -11,10 +11,19 @@ defmodule CodeCorps.GitHub.Event.Issues.Validator do
   """
   @spec valid?(map) :: boolean
   def valid?(%{
+    "action" => _,
     "issue" => %{
-      "id" => _, "title" => _, "body" => _, "state" => _,
-      "user" => %{"id" => _}
+      "id" => _,
+      "title" => _,
+      "body" => _,
+      "state" => _,
+      "user" => %{
+        "id" => _
+      }
     },
-    "repository" => %{"id" => _}}), do: true
+    "repository" => %{
+      "id" => _
+    }
+  }), do: true
   def valid?(_), do: false
 end

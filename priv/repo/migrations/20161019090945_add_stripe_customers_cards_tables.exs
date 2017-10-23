@@ -3,7 +3,7 @@ defmodule CodeCorps.Repo.Migrations.AddStripeCustomersCardsTables do
 
   def change do
     create table(:stripe_customers) do
-      add :created, :datetime
+      add :created, :utc_datetime
       add :currency, :string
       add :delinquent, :boolean
       add :email, :string

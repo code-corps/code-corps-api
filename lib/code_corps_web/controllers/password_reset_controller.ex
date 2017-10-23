@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.PasswordResetController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.{User, AuthToken}

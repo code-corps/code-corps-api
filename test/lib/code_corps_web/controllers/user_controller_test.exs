@@ -2,10 +2,10 @@ defmodule CodeCorpsWeb.UserControllerTest do
   @moduledoc false
 
   use CodeCorpsWeb.ApiCase, resource_name: :user
-  use CodeCorps.GitHubCase
 
-  alias CodeCorps.User
-  alias CodeCorps.Repo
+  import CodeCorps.GitHub.TestHelpers
+
+  alias CodeCorps.{User, Repo}
 
   @valid_attrs %{
     email: "test@user.com",
@@ -27,7 +27,6 @@ defmodule CodeCorpsWeb.UserControllerTest do
   @relationships %{}
 
   describe "index" do
-
     test "lists all entries on index", %{conn: conn} do
       [user_1, user_2] = insert_pair(:user)
 
@@ -245,39 +244,43 @@ defmodule CodeCorpsWeb.UserControllerTest do
     end
   end
 
-
   describe "github_oauth" do
-    @github_user_data %{
-      "avatar_url" => "foo_url",
-      "email" => "foo_email",
-      "id" => 123,
-      "login" => "foo_login"
-    }
+    @attrs %{"code" => "foo", "state" => "bar"}
 
-    @github_token_data %{"access_token" => "foo_auth_token"}
+    @tag :authenticated
+    test "return the user when current user connects successfully", %{conn: conn, current_user: current_user} do
+      path = user_path(conn, :github_oauth)
 
-    @tag bypass: %{
-      "/" => {200, @github_token_data},
-      "/user" => {200, @github_user_data}
-    }
-    test "return the user when current user connects successfully", %{conn: conn} do
-      user = insert(:user)
+      json = conn |> post(path, @attrs) |> json_response(200)
 
-      json = %{"code" => "valid_code", "state" => "valid_state"}
-
-      path = user_path(conn, :github_oauth, json)
-
-      json = conn |> authenticate(user) |> post(path) |> json_response(200)
-
-      assert json["data"]["id"] |> String.to_integer == user.id
+      assert json["data"]["id"] |> String.to_integer == current_user.id
+      assert json["data"]["attributes"]["github-id"]
     end
 
-    test "return unauthenticated error code when no current user", %{conn: conn} do
-      json = %{"code" => "client generated code", "state" => "state"}
+    @tag :authenticated
+    test "tracks event on segment when current user connects successfully", %{conn: conn, current_user: %{id: id}} do
+      path = user_path(conn, :github_oauth)
 
-      path = user_path(conn, :github_oauth, json)
+      assert conn |> post(path, @attrs) |> json_response(200)
+      expected_data =
+        User
+        |> Repo.get(id)
+        |> CodeCorps.Analytics.SegmentTraitsBuilder.build
+      assert_received {:track, ^id, "Connected to GitHub", ^expected_data}
+    end
 
-      conn |> post(path) |> json_response(401)
+    test "requires authentication", %{conn: conn} do
+      path = user_path(conn, :github_oauth)
+      assert conn |> post(path, @attrs) |> json_response(401)
+    end
+
+    @tag :authenticated
+    test "renders 500 if there's a GitHub API error", %{conn: conn} do
+      path = user_path(conn, :github_oauth)
+
+      with_mock_api(CodeCorps.GitHub.FailureAPI) do
+        assert conn |> post(path, @attrs) |> json_response(500)
+      end
     end
   end
 

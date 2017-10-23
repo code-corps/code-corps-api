@@ -30,16 +30,13 @@ defmodule CodeCorpsWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller, namespace: CodeCorpsWeb
+      use Phoenix.Controller, log: false, namespace: CodeCorpsWeb
 
       import Ecto
       import Ecto.Query
 
       import CodeCorpsWeb.Router.Helpers
       import CodeCorpsWeb.Gettext
-
-      import Canary.Plugs
-      import CodeCorpsWeb.AuthenticationHelpers, only: [load_and_authorize_changeset: 2]
 
       alias CodeCorps.{Repo, Policy}
       alias Plug.Conn
@@ -71,7 +68,7 @@ defmodule CodeCorpsWeb do
 
   def channel do
     quote do
-      use Phoenix.Channel
+      use Phoenix.Channel, log_join: false, log_handle_in: false
 
       alias CodeCorps.Repo
       import Ecto

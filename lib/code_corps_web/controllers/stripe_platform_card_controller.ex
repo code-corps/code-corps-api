@@ -1,19 +1,29 @@
 defmodule CodeCorpsWeb.StripePlatformCardController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
-  use JaResource
 
-  alias CodeCorps.StripePlatformCard
   alias CodeCorps.StripeService.StripePlatformCardService
+  alias CodeCorps.{StripePlatformCard, User}
 
-  plug :load_and_authorize_resource, model: StripePlatformCard, only: [:show,], preload: [:user]
-  plug :load_and_authorize_changeset, model: StripePlatformCard, only: [:create]
+  action_fallback CodeCorpsWeb.FallbackController
+  plug CodeCorpsWeb.Plug.DataToAttributes
+  plug CodeCorpsWeb.Plug.IdsToIntegers
 
-  plug JaResource
+  @spec show(Conn.t, map) :: Conn.t
+  def show(%Conn{} = conn, %{"id" => id} = params) do
+    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+         %StripePlatformCard{} = stripe_platform_card <- StripePlatformCard |> Repo.get(id),
+         {:ok, :authorized} <- current_user |> Policy.authorize(:show, stripe_platform_card, params) do
+      conn |> render("show.json-api", data: stripe_platform_card)
+    end
+  end
 
-  @spec model :: module
-  def model, do: CodeCorps.StripePlatformCard
-
-  def handle_create(_conn, attributes) do
-    attributes |> StripePlatformCardService.create
+  @spec create(Plug.Conn.t, map) :: Conn.t
+  def create(%Conn{} = conn, %{} = params) do
+    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+         {:ok, :authorized} <- current_user |> Policy.authorize(:create, %StripePlatformCard{}, params),
+         {:ok, %StripePlatformCard{} = stripe_platform_card} <- StripePlatformCardService.create(params) do
+      conn |> put_status(:created) |> render("show.json-api", data: stripe_platform_card)
+    end
   end
 end

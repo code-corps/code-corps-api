@@ -1,24 +1,19 @@
 defmodule CodeCorps.Policy.ProjectUserTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.Policy.ProjectUser, only: [create?: 2, update?: 2, delete?: 2]
-  import CodeCorps.ProjectUser, only: [create_changeset: 2, update_changeset: 2]
-
-  alias CodeCorps.ProjectUser
+  import CodeCorps.Policy.ProjectUser, only: [create?: 2, update?: 3, delete?: 2]
 
   describe "create?/2" do
     test "returns true when user is creating their own membership" do
       user = insert(:user)
-      changeset = %ProjectUser{} |> create_changeset(%{user_id: user.id})
 
-      assert create?(user, changeset)
+      assert create?(user, %{"user_id" => user.id})
     end
 
     test "returns false for normal user, creating someone else's membership" do
       user = insert(:user)
-      changeset = %ProjectUser{} |> create_changeset(%{user_id: "someone_else"})
 
-      refute create?(user, changeset)
+      refute create?(user, %{"user_id" => "someone_else"})
     end
   end
 
@@ -27,9 +22,7 @@ defmodule CodeCorps.Policy.ProjectUserTest do
       user = insert(:user)
       project_user = insert(:project_user)
 
-      changeset = project_user |> update_changeset(%{})
-
-      refute update?(user, changeset)
+      refute update?(user, project_user, %{})
     end
 
     test "returns false when user is pending" do
@@ -39,9 +32,7 @@ defmodule CodeCorps.Policy.ProjectUserTest do
 
       project_user = insert(:project_user, project: project)
 
-      changeset = project_user |> update_changeset(%{})
-
-      refute update?(user, changeset)
+      refute update?(user, project_user, %{})
     end
 
     test "returns false when user is contributor" do
@@ -51,9 +42,7 @@ defmodule CodeCorps.Policy.ProjectUserTest do
 
       project_user = insert(:project_user, project: project)
 
-      changeset = project_user |> update_changeset(%{})
-
-      refute update?(user, changeset)
+      refute update?(user, project_user, %{})
     end
 
     test "returns true when user is admin, approving a pending membership" do
@@ -63,9 +52,7 @@ defmodule CodeCorps.Policy.ProjectUserTest do
 
       project_user = insert(:project_user, project: project, role: "pending")
 
-      changeset = project_user |> update_changeset(%{role: "contributor"})
-
-      assert update?(user, changeset)
+      assert update?(user, project_user, %{"role" => "contributor"})
     end
 
     test "returns false when user is admin, doing something other than approving a pending membership" do
@@ -75,9 +62,7 @@ defmodule CodeCorps.Policy.ProjectUserTest do
 
       project_user = insert(:project_user, project: project, role: "contributor")
 
-      changeset = project_user |> update_changeset(%{})
-
-      refute update?(user, changeset)
+      refute update?(user, project_user, %{})
     end
 
     test "returns true when user is owner and is changing a role other than owner" do
@@ -87,9 +72,7 @@ defmodule CodeCorps.Policy.ProjectUserTest do
 
       project_user = insert(:project_user, project: project, role: "admin")
 
-      changeset = project_user |> update_changeset(%{})
-
-      assert update?(user, changeset)
+      assert update?(user, project_user, %{})
     end
 
     test "returns false when user is owner and is changing another owner" do
@@ -99,9 +82,7 @@ defmodule CodeCorps.Policy.ProjectUserTest do
 
       project_user = insert(:project_user, project: project, role: "owner")
 
-      changeset = project_user |> update_changeset(%{})
-
-      refute update?(user, changeset)
+      refute update?(user, project_user, %{})
     end
   end
 

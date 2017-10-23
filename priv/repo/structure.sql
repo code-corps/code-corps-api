@@ -2,11 +2,12 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.5.1
--- Dumped by pg_dump version 9.5.1
+-- Dumped from database version 10.0
+-- Dumped by pg_dump version 10.0
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
@@ -55,9 +56,9 @@ SET default_with_oids = false;
 --
 
 CREATE TABLE auth_token (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     value character varying(255),
-    user_id integer,
+    user_id bigint,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -87,7 +88,7 @@ ALTER SEQUENCE auth_token_id_seq OWNED BY auth_token.id;
 --
 
 CREATE TABLE categories (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     name character varying(255) NOT NULL,
     slug character varying(255) NOT NULL,
     description text,
@@ -120,14 +121,18 @@ ALTER SEQUENCE categories_id_seq OWNED BY categories.id;
 --
 
 CREATE TABLE comments (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     body text NOT NULL,
-    markdown text NOT NULL,
-    user_id integer NOT NULL,
-    task_id integer NOT NULL,
+    markdown text,
+    user_id bigint NOT NULL,
+    task_id bigint NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    github_id integer
+    created_at timestamp without time zone,
+    modified_at timestamp without time zone,
+    created_from character varying(255) DEFAULT 'code_corps'::character varying,
+    modified_from character varying(255) DEFAULT 'code_corps'::character varying,
+    github_comment_id bigint
 );
 
 
@@ -155,10 +160,10 @@ ALTER SEQUENCE comments_id_seq OWNED BY comments.id;
 --
 
 CREATE TABLE donation_goals (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     amount integer,
     description text,
-    project_id integer,
+    project_id bigint,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     current boolean DEFAULT false
@@ -189,12 +194,12 @@ ALTER SEQUENCE donation_goals_id_seq OWNED BY donation_goals.id;
 --
 
 CREATE TABLE github_app_installations (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     github_id integer,
     installed boolean DEFAULT true,
     state character varying(255),
-    project_id integer,
-    user_id integer,
+    project_id bigint,
+    user_id bigint,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     access_token character varying(255),
@@ -228,18 +233,56 @@ ALTER SEQUENCE github_app_installations_id_seq OWNED BY github_app_installations
 
 
 --
+-- Name: github_comments; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE github_comments (
+    id bigint NOT NULL,
+    body text,
+    github_created_at timestamp without time zone,
+    github_id integer,
+    github_updated_at timestamp without time zone,
+    html_url text,
+    url text,
+    inserted_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    github_issue_id bigint
+);
+
+
+--
+-- Name: github_comments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE github_comments_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: github_comments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE github_comments_id_seq OWNED BY github_comments.id;
+
+
+--
 -- Name: github_events; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE github_events (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     action character varying(255),
     github_delivery_id character varying(255),
     status character varying(255),
-    source character varying(255),
     type character varying(255),
     inserted_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    payload jsonb,
+    failure_reason character varying(255)
 );
 
 
@@ -263,18 +306,124 @@ ALTER SEQUENCE github_events_id_seq OWNED BY github_events.id;
 
 
 --
+-- Name: github_issues; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE github_issues (
+    id bigint NOT NULL,
+    body text,
+    closed_at timestamp without time zone,
+    comments_url text,
+    events_url text,
+    github_created_at timestamp without time zone,
+    github_id integer,
+    github_updated_at timestamp without time zone,
+    html_url text,
+    labels_url text,
+    locked boolean,
+    number integer,
+    state character varying(255),
+    title text,
+    url text,
+    inserted_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    github_repo_id bigint,
+    github_pull_request_id bigint
+);
+
+
+--
+-- Name: github_issues_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE github_issues_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: github_issues_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE github_issues_id_seq OWNED BY github_issues.id;
+
+
+--
+-- Name: github_pull_requests; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE github_pull_requests (
+    id bigint NOT NULL,
+    additions integer,
+    body text,
+    changed_files integer,
+    closed_at timestamp without time zone,
+    comments integer,
+    comments_url text,
+    commits integer,
+    commits_url text,
+    deletions integer,
+    diff_url text,
+    github_created_at timestamp without time zone,
+    github_id integer,
+    github_updated_at timestamp without time zone,
+    html_url text,
+    issue_url text,
+    locked boolean DEFAULT false NOT NULL,
+    merge_commit_sha text,
+    mergeable_state text,
+    merged boolean DEFAULT false NOT NULL,
+    merged_at timestamp without time zone,
+    number integer,
+    patch_url text,
+    review_comment_url text,
+    review_comments integer,
+    review_comments_url text,
+    state character varying(255),
+    statuses_url text,
+    title text,
+    url text,
+    inserted_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    github_repo_id bigint
+);
+
+
+--
+-- Name: github_pull_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE github_pull_requests_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: github_pull_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE github_pull_requests_id_seq OWNED BY github_pull_requests.id;
+
+
+--
 -- Name: github_repos; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE github_repos (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     github_id integer,
     name character varying(255),
     github_account_id integer,
     github_account_login character varying(255),
     github_account_avatar_url character varying(255),
     github_account_type character varying(255),
-    github_app_installation_id integer,
+    github_app_installation_id bigint,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -304,9 +453,9 @@ ALTER SEQUENCE github_repos_id_seq OWNED BY github_repos.id;
 --
 
 CREATE TABLE organization_github_app_installations (
-    id integer NOT NULL,
-    organization_id integer,
-    github_app_installation_id integer,
+    id bigint NOT NULL,
+    organization_id bigint,
+    github_app_installation_id bigint,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -336,10 +485,10 @@ ALTER SEQUENCE organization_github_app_installations_id_seq OWNED BY organizatio
 --
 
 CREATE TABLE organization_invites (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     code character varying(255) NOT NULL,
     email character varying(255) NOT NULL,
-    title character varying(255) NOT NULL,
+    organization_name character varying(255) NOT NULL,
     fulfilled boolean DEFAULT false NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
@@ -370,7 +519,7 @@ ALTER SEQUENCE organization_invites_id_seq OWNED BY organization_invites.id;
 --
 
 CREATE TABLE organizations (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     name text NOT NULL,
     description text NOT NULL,
     slug character varying(255) NOT NULL,
@@ -379,7 +528,7 @@ CREATE TABLE organizations (
     approved boolean DEFAULT false,
     cloudinary_public_id character varying(255),
     default_color character varying(255),
-    owner_id integer
+    owner_id bigint
 );
 
 
@@ -407,10 +556,10 @@ ALTER SEQUENCE organizations_id_seq OWNED BY organizations.id;
 --
 
 CREATE TABLE previews (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     markdown text NOT NULL,
     body text NOT NULL,
-    user_id integer NOT NULL,
+    user_id bigint NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -440,9 +589,9 @@ ALTER SEQUENCE previews_id_seq OWNED BY previews.id;
 --
 
 CREATE TABLE project_categories (
-    id integer NOT NULL,
-    project_id integer NOT NULL,
-    category_id integer NOT NULL,
+    id bigint NOT NULL,
+    project_id bigint NOT NULL,
+    category_id bigint NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -472,9 +621,9 @@ ALTER SEQUENCE project_categories_id_seq OWNED BY project_categories.id;
 --
 
 CREATE TABLE project_github_repos (
-    id integer NOT NULL,
-    project_id integer,
-    github_repo_id integer,
+    id bigint NOT NULL,
+    project_id bigint,
+    github_repo_id bigint,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -504,9 +653,9 @@ ALTER SEQUENCE project_github_repos_id_seq OWNED BY project_github_repos.id;
 --
 
 CREATE TABLE project_skills (
-    id integer NOT NULL,
-    project_id integer NOT NULL,
-    skill_id integer NOT NULL,
+    id bigint NOT NULL,
+    project_id bigint NOT NULL,
+    skill_id bigint NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -536,10 +685,10 @@ ALTER SEQUENCE project_skills_id_seq OWNED BY project_skills.id;
 --
 
 CREATE TABLE project_users (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     role character varying(255) NOT NULL,
-    project_id integer NOT NULL,
-    user_id integer NOT NULL,
+    project_id bigint NOT NULL,
+    user_id bigint NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -569,13 +718,13 @@ ALTER SEQUENCE project_users_id_seq OWNED BY project_users.id;
 --
 
 CREATE TABLE projects (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     description text,
     long_description_body text,
     long_description_markdown text,
     slug character varying(255) NOT NULL,
     title character varying(255) NOT NULL,
-    organization_id integer NOT NULL,
+    organization_id bigint NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     total_monthly_donated integer DEFAULT 0,
@@ -584,7 +733,8 @@ CREATE TABLE projects (
     default_color character varying(255),
     website character varying(255),
     should_link_externally boolean DEFAULT false,
-    github_id integer,
+    github_repo character varying(255),
+    github_owner character varying(255),
     CONSTRAINT set_long_description_markdown_if_approved CHECK (((long_description_markdown IS NOT NULL) OR (approved = false)))
 );
 
@@ -613,9 +763,9 @@ ALTER SEQUENCE projects_id_seq OWNED BY projects.id;
 --
 
 CREATE TABLE role_skills (
-    id integer NOT NULL,
-    role_id integer NOT NULL,
-    skill_id integer NOT NULL,
+    id bigint NOT NULL,
+    role_id bigint NOT NULL,
+    skill_id bigint NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     cat integer
@@ -646,7 +796,7 @@ ALTER SEQUENCE role_skills_id_seq OWNED BY role_skills.id;
 --
 
 CREATE TABLE roles (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     name character varying(255) NOT NULL,
     ability character varying(255) NOT NULL,
     kind character varying(255) NOT NULL,
@@ -689,7 +839,7 @@ CREATE TABLE schema_migrations (
 --
 
 CREATE TABLE skills (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     title character varying(255) NOT NULL,
     description text,
     original_row integer,
@@ -722,10 +872,10 @@ ALTER SEQUENCE skills_id_seq OWNED BY skills.id;
 --
 
 CREATE TABLE slugged_routes (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     slug character varying(255) NOT NULL,
-    organization_id integer,
-    user_id integer,
+    organization_id bigint,
+    user_id bigint,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -755,7 +905,7 @@ ALTER SEQUENCE slugged_routes_id_seq OWNED BY slugged_routes.id;
 --
 
 CREATE TABLE stripe_connect_accounts (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     business_name character varying(255),
     business_url character varying(255),
     charges_enabled boolean,
@@ -770,7 +920,7 @@ CREATE TABLE stripe_connect_accounts (
     support_phone character varying(255),
     support_url character varying(255),
     transfers_enabled boolean,
-    organization_id integer NOT NULL,
+    organization_id bigint NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     verification_disabled_reason character varying(255),
@@ -837,10 +987,10 @@ ALTER SEQUENCE stripe_connect_accounts_id_seq OWNED BY stripe_connect_accounts.i
 --
 
 CREATE TABLE stripe_connect_cards (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     id_from_stripe character varying(255) NOT NULL,
-    stripe_connect_account_id integer NOT NULL,
-    stripe_platform_card_id integer NOT NULL,
+    stripe_connect_account_id bigint NOT NULL,
+    stripe_platform_card_id bigint NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -870,7 +1020,7 @@ ALTER SEQUENCE stripe_connect_cards_id_seq OWNED BY stripe_connect_cards.id;
 --
 
 CREATE TABLE stripe_connect_charges (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     amount integer,
     amount_refunded integer,
     application_id_from_stripe character varying(255),
@@ -891,9 +1041,9 @@ CREATE TABLE stripe_connect_charges (
     source_transfer_id_from_stripe character varying(255),
     statement_descriptor character varying(255),
     status character varying(255),
-    stripe_connect_account_id integer,
-    stripe_connect_customer_id integer NOT NULL,
-    user_id integer NOT NULL,
+    stripe_connect_account_id bigint,
+    stripe_connect_customer_id bigint NOT NULL,
+    user_id bigint NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -923,13 +1073,13 @@ ALTER SEQUENCE stripe_connect_charges_id_seq OWNED BY stripe_connect_charges.id;
 --
 
 CREATE TABLE stripe_connect_customers (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     id_from_stripe character varying(255) NOT NULL,
-    stripe_connect_account_id integer NOT NULL,
-    stripe_platform_customer_id integer NOT NULL,
+    stripe_connect_account_id bigint NOT NULL,
+    stripe_platform_customer_id bigint NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    user_id integer NOT NULL
+    user_id bigint NOT NULL
 );
 
 
@@ -957,11 +1107,11 @@ ALTER SEQUENCE stripe_connect_customers_id_seq OWNED BY stripe_connect_customers
 --
 
 CREATE TABLE stripe_connect_plans (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     amount integer,
     id_from_stripe character varying(255) NOT NULL,
     name character varying(255),
-    project_id integer NOT NULL,
+    project_id bigint NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     created integer
@@ -992,15 +1142,15 @@ ALTER SEQUENCE stripe_connect_plans_id_seq OWNED BY stripe_connect_plans.id;
 --
 
 CREATE TABLE stripe_connect_subscriptions (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     application_fee_percent numeric,
     customer_id_from_stripe character varying(255),
     id_from_stripe character varying(255) NOT NULL,
     plan_id_from_stripe character varying(255) NOT NULL,
     quantity integer,
     status character varying(255),
-    stripe_connect_plan_id integer NOT NULL,
-    user_id integer,
+    stripe_connect_plan_id bigint NOT NULL,
+    user_id bigint,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     cancelled_at integer,
@@ -1036,7 +1186,7 @@ ALTER SEQUENCE stripe_connect_subscriptions_id_seq OWNED BY stripe_connect_subsc
 --
 
 CREATE TABLE stripe_events (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     id_from_stripe character varying(255) NOT NULL,
     status character varying(255) DEFAULT 'unprocessed'::character varying,
     type character varying(255) NOT NULL,
@@ -1074,7 +1224,7 @@ ALTER SEQUENCE stripe_events_id_seq OWNED BY stripe_events.id;
 --
 
 CREATE TABLE stripe_external_accounts (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     id_from_stripe character varying(255) NOT NULL,
     account_id_from_stripe character varying(255) NOT NULL,
     account_holder_name character varying(255),
@@ -1089,7 +1239,7 @@ CREATE TABLE stripe_external_accounts (
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     default_for_currency boolean,
-    stripe_connect_account_id integer
+    stripe_connect_account_id bigint
 );
 
 
@@ -1117,13 +1267,13 @@ ALTER SEQUENCE stripe_external_accounts_id_seq OWNED BY stripe_external_accounts
 --
 
 CREATE TABLE stripe_file_upload (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     id_from_stripe character varying(255) NOT NULL,
     purpose character varying(255),
     size integer,
     type character varying(255),
     url character varying(255),
-    stripe_connect_account_id integer,
+    stripe_connect_account_id bigint,
     created integer
 );
 
@@ -1152,7 +1302,7 @@ ALTER SEQUENCE stripe_file_upload_id_seq OWNED BY stripe_file_upload.id;
 --
 
 CREATE TABLE stripe_invoices (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     amount_due integer,
     application_fee integer,
     attempt_count integer,
@@ -1180,8 +1330,8 @@ CREATE TABLE stripe_invoices (
     tax_percent double precision,
     total integer,
     webhooks_delievered_at integer,
-    stripe_connect_subscription_id integer NOT NULL,
-    user_id integer NOT NULL,
+    stripe_connect_subscription_id bigint NOT NULL,
+    user_id bigint NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -1211,7 +1361,7 @@ ALTER SEQUENCE stripe_invoices_id_seq OWNED BY stripe_invoices.id;
 --
 
 CREATE TABLE stripe_platform_cards (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     brand character varying(255),
     customer_id_from_stripe character varying(255),
     cvc_check character varying(255),
@@ -1220,7 +1370,7 @@ CREATE TABLE stripe_platform_cards (
     id_from_stripe character varying(255) NOT NULL,
     last4 character varying(255),
     name character varying(255),
-    user_id integer NOT NULL,
+    user_id bigint NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -1250,12 +1400,12 @@ ALTER SEQUENCE stripe_platform_cards_id_seq OWNED BY stripe_platform_cards.id;
 --
 
 CREATE TABLE stripe_platform_customers (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     currency character varying(255),
     delinquent boolean,
     email character varying(255),
     id_from_stripe character varying(255) NOT NULL,
-    user_id integer NOT NULL,
+    user_id bigint NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     created integer
@@ -1286,10 +1436,10 @@ ALTER SEQUENCE stripe_platform_customers_id_seq OWNED BY stripe_platform_custome
 --
 
 CREATE TABLE task_lists (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     name character varying(255),
     "order" integer,
-    project_id integer,
+    project_id bigint,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     inbox boolean DEFAULT false
@@ -1320,9 +1470,9 @@ ALTER SEQUENCE task_lists_id_seq OWNED BY task_lists.id;
 --
 
 CREATE TABLE task_skills (
-    id integer NOT NULL,
-    skill_id integer NOT NULL,
-    task_id integer NOT NULL,
+    id bigint NOT NULL,
+    skill_id bigint NOT NULL,
+    task_id bigint NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -1352,19 +1502,26 @@ ALTER SEQUENCE task_skills_id_seq OWNED BY task_skills.id;
 --
 
 CREATE TABLE tasks (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     body text,
     markdown text,
     number integer NOT NULL,
     status character varying(255) DEFAULT 'open'::character varying NOT NULL,
     title text NOT NULL,
-    project_id integer NOT NULL,
-    user_id integer NOT NULL,
+    project_id bigint NOT NULL,
+    user_id bigint NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    task_list_id integer,
+    task_list_id bigint,
     "order" integer,
-    github_id integer
+    github_repo_id bigint,
+    closed_at timestamp without time zone,
+    created_at timestamp without time zone,
+    modified_at timestamp without time zone,
+    created_from character varying(255) DEFAULT 'code_corps'::character varying,
+    modified_from character varying(255) DEFAULT 'code_corps'::character varying,
+    archived boolean DEFAULT false NOT NULL,
+    github_issue_id bigint
 );
 
 
@@ -1392,9 +1549,9 @@ ALTER SEQUENCE tasks_id_seq OWNED BY tasks.id;
 --
 
 CREATE TABLE user_categories (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    category_id integer NOT NULL,
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    category_id bigint NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -1424,9 +1581,9 @@ ALTER SEQUENCE user_categories_id_seq OWNED BY user_categories.id;
 --
 
 CREATE TABLE user_roles (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    role_id integer NOT NULL,
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    role_id bigint NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -1456,9 +1613,9 @@ ALTER SEQUENCE user_roles_id_seq OWNED BY user_roles.id;
 --
 
 CREATE TABLE user_skills (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    skill_id integer NOT NULL,
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    skill_id bigint NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -1488,9 +1645,9 @@ ALTER SEQUENCE user_skills_id_seq OWNED BY user_skills.id;
 --
 
 CREATE TABLE user_tasks (
-    id integer NOT NULL,
-    task_id integer NOT NULL,
-    user_id integer NOT NULL,
+    id bigint NOT NULL,
+    task_id bigint NOT NULL,
+    user_id bigint NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -1520,7 +1677,7 @@ ALTER SEQUENCE user_tasks_id_seq OWNED BY user_tasks.id;
 --
 
 CREATE TABLE users (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     username character varying(255),
     email character varying(255),
     encrypted_password character varying(255),
@@ -1540,7 +1697,8 @@ CREATE TABLE users (
     github_avatar_url character varying(255),
     github_email character varying(255),
     github_username character varying(255),
-    github_id integer
+    github_id integer,
+    type character varying(255) DEFAULT 'user'::character varying
 );
 
 
@@ -1564,287 +1722,308 @@ ALTER SEQUENCE users_id_seq OWNED BY users.id;
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: auth_token id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY auth_token ALTER COLUMN id SET DEFAULT nextval('auth_token_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: categories id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY categories ALTER COLUMN id SET DEFAULT nextval('categories_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: comments id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY comments ALTER COLUMN id SET DEFAULT nextval('comments_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: donation_goals id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY donation_goals ALTER COLUMN id SET DEFAULT nextval('donation_goals_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: github_app_installations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY github_app_installations ALTER COLUMN id SET DEFAULT nextval('github_app_installations_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: github_comments id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_comments ALTER COLUMN id SET DEFAULT nextval('github_comments_id_seq'::regclass);
+
+
+--
+-- Name: github_events id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY github_events ALTER COLUMN id SET DEFAULT nextval('github_events_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: github_issues id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_issues ALTER COLUMN id SET DEFAULT nextval('github_issues_id_seq'::regclass);
+
+
+--
+-- Name: github_pull_requests id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_pull_requests ALTER COLUMN id SET DEFAULT nextval('github_pull_requests_id_seq'::regclass);
+
+
+--
+-- Name: github_repos id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY github_repos ALTER COLUMN id SET DEFAULT nextval('github_repos_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: organization_github_app_installations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organization_github_app_installations ALTER COLUMN id SET DEFAULT nextval('organization_github_app_installations_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: organization_invites id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organization_invites ALTER COLUMN id SET DEFAULT nextval('organization_invites_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: organizations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organizations ALTER COLUMN id SET DEFAULT nextval('organizations_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: previews id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY previews ALTER COLUMN id SET DEFAULT nextval('previews_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: project_categories id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_categories ALTER COLUMN id SET DEFAULT nextval('project_categories_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: project_github_repos id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_github_repos ALTER COLUMN id SET DEFAULT nextval('project_github_repos_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: project_skills id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_skills ALTER COLUMN id SET DEFAULT nextval('project_skills_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: project_users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_users ALTER COLUMN id SET DEFAULT nextval('project_users_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: projects id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY projects ALTER COLUMN id SET DEFAULT nextval('projects_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: role_skills id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY role_skills ALTER COLUMN id SET DEFAULT nextval('role_skills_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: roles id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY roles ALTER COLUMN id SET DEFAULT nextval('roles_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: skills id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY skills ALTER COLUMN id SET DEFAULT nextval('skills_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: slugged_routes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY slugged_routes ALTER COLUMN id SET DEFAULT nextval('slugged_routes_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: stripe_connect_accounts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_accounts ALTER COLUMN id SET DEFAULT nextval('stripe_connect_accounts_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: stripe_connect_cards id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_cards ALTER COLUMN id SET DEFAULT nextval('stripe_connect_cards_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: stripe_connect_charges id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_charges ALTER COLUMN id SET DEFAULT nextval('stripe_connect_charges_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: stripe_connect_customers id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_customers ALTER COLUMN id SET DEFAULT nextval('stripe_connect_customers_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: stripe_connect_plans id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_plans ALTER COLUMN id SET DEFAULT nextval('stripe_connect_plans_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: stripe_connect_subscriptions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_subscriptions ALTER COLUMN id SET DEFAULT nextval('stripe_connect_subscriptions_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: stripe_events id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_events ALTER COLUMN id SET DEFAULT nextval('stripe_events_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: stripe_external_accounts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_external_accounts ALTER COLUMN id SET DEFAULT nextval('stripe_external_accounts_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: stripe_file_upload id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_file_upload ALTER COLUMN id SET DEFAULT nextval('stripe_file_upload_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: stripe_invoices id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_invoices ALTER COLUMN id SET DEFAULT nextval('stripe_invoices_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: stripe_platform_cards id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_platform_cards ALTER COLUMN id SET DEFAULT nextval('stripe_platform_cards_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: stripe_platform_customers id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_platform_customers ALTER COLUMN id SET DEFAULT nextval('stripe_platform_customers_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: task_lists id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY task_lists ALTER COLUMN id SET DEFAULT nextval('task_lists_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: task_skills id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY task_skills ALTER COLUMN id SET DEFAULT nextval('task_skills_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: tasks id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY tasks ALTER COLUMN id SET DEFAULT nextval('tasks_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_categories id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_categories ALTER COLUMN id SET DEFAULT nextval('user_categories_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_roles id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_roles ALTER COLUMN id SET DEFAULT nextval('user_roles_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_skills id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_skills ALTER COLUMN id SET DEFAULT nextval('user_skills_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_tasks id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_tasks ALTER COLUMN id SET DEFAULT nextval('user_tasks_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
 
 
 --
--- Name: auth_token_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: auth_token auth_token_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY auth_token
@@ -1852,7 +2031,7 @@ ALTER TABLE ONLY auth_token
 
 
 --
--- Name: categories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: categories categories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY categories
@@ -1860,7 +2039,7 @@ ALTER TABLE ONLY categories
 
 
 --
--- Name: comments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: comments comments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY comments
@@ -1868,7 +2047,7 @@ ALTER TABLE ONLY comments
 
 
 --
--- Name: donation_goals_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: donation_goals donation_goals_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY donation_goals
@@ -1876,7 +2055,7 @@ ALTER TABLE ONLY donation_goals
 
 
 --
--- Name: github_app_installations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: github_app_installations github_app_installations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY github_app_installations
@@ -1884,7 +2063,15 @@ ALTER TABLE ONLY github_app_installations
 
 
 --
--- Name: github_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: github_comments github_comments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_comments
+    ADD CONSTRAINT github_comments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: github_events github_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY github_events
@@ -1892,7 +2079,23 @@ ALTER TABLE ONLY github_events
 
 
 --
--- Name: github_repos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: github_issues github_issues_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_issues
+    ADD CONSTRAINT github_issues_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: github_pull_requests github_pull_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_pull_requests
+    ADD CONSTRAINT github_pull_requests_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: github_repos github_repos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY github_repos
@@ -1900,7 +2103,7 @@ ALTER TABLE ONLY github_repos
 
 
 --
--- Name: organization_github_app_installations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: organization_github_app_installations organization_github_app_installations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organization_github_app_installations
@@ -1908,7 +2111,7 @@ ALTER TABLE ONLY organization_github_app_installations
 
 
 --
--- Name: organization_invites_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: organization_invites organization_invites_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organization_invites
@@ -1916,7 +2119,7 @@ ALTER TABLE ONLY organization_invites
 
 
 --
--- Name: organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: organizations organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organizations
@@ -1924,7 +2127,7 @@ ALTER TABLE ONLY organizations
 
 
 --
--- Name: previews_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: previews previews_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY previews
@@ -1932,7 +2135,7 @@ ALTER TABLE ONLY previews
 
 
 --
--- Name: project_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: project_categories project_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_categories
@@ -1940,7 +2143,7 @@ ALTER TABLE ONLY project_categories
 
 
 --
--- Name: project_github_repos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: project_github_repos project_github_repos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_github_repos
@@ -1948,7 +2151,7 @@ ALTER TABLE ONLY project_github_repos
 
 
 --
--- Name: project_skills_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: project_skills project_skills_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_skills
@@ -1956,7 +2159,7 @@ ALTER TABLE ONLY project_skills
 
 
 --
--- Name: project_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: project_users project_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_users
@@ -1964,7 +2167,7 @@ ALTER TABLE ONLY project_users
 
 
 --
--- Name: projects_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: projects projects_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY projects
@@ -1972,7 +2175,7 @@ ALTER TABLE ONLY projects
 
 
 --
--- Name: role_skills_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: role_skills role_skills_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY role_skills
@@ -1980,7 +2183,7 @@ ALTER TABLE ONLY role_skills
 
 
 --
--- Name: roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: roles roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY roles
@@ -1988,7 +2191,7 @@ ALTER TABLE ONLY roles
 
 
 --
--- Name: schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY schema_migrations
@@ -1996,7 +2199,7 @@ ALTER TABLE ONLY schema_migrations
 
 
 --
--- Name: skills_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: skills skills_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY skills
@@ -2004,7 +2207,7 @@ ALTER TABLE ONLY skills
 
 
 --
--- Name: slugged_routes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: slugged_routes slugged_routes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY slugged_routes
@@ -2012,7 +2215,7 @@ ALTER TABLE ONLY slugged_routes
 
 
 --
--- Name: stripe_connect_cards_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_cards stripe_connect_cards_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_cards
@@ -2020,7 +2223,7 @@ ALTER TABLE ONLY stripe_connect_cards
 
 
 --
--- Name: stripe_connect_charges_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_charges stripe_connect_charges_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_charges
@@ -2028,7 +2231,7 @@ ALTER TABLE ONLY stripe_connect_charges
 
 
 --
--- Name: stripe_connect_customers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_customers stripe_connect_customers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_customers
@@ -2036,7 +2239,7 @@ ALTER TABLE ONLY stripe_connect_customers
 
 
 --
--- Name: stripe_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_events stripe_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_events
@@ -2044,7 +2247,7 @@ ALTER TABLE ONLY stripe_events
 
 
 --
--- Name: stripe_external_accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_external_accounts stripe_external_accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_external_accounts
@@ -2052,7 +2255,7 @@ ALTER TABLE ONLY stripe_external_accounts
 
 
 --
--- Name: stripe_file_upload_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_file_upload stripe_file_upload_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_file_upload
@@ -2060,7 +2263,7 @@ ALTER TABLE ONLY stripe_file_upload
 
 
 --
--- Name: stripe_invoices_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_invoices stripe_invoices_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_invoices
@@ -2068,7 +2271,7 @@ ALTER TABLE ONLY stripe_invoices
 
 
 --
--- Name: task_lists_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: task_lists task_lists_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY task_lists
@@ -2076,7 +2279,7 @@ ALTER TABLE ONLY task_lists
 
 
 --
--- Name: task_skills_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: task_skills task_skills_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY task_skills
@@ -2084,7 +2287,7 @@ ALTER TABLE ONLY task_skills
 
 
 --
--- Name: user_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: user_categories user_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_categories
@@ -2092,7 +2295,7 @@ ALTER TABLE ONLY user_categories
 
 
 --
--- Name: user_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: user_roles user_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_roles
@@ -2100,7 +2303,7 @@ ALTER TABLE ONLY user_roles
 
 
 --
--- Name: user_skills_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: user_skills user_skills_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_skills
@@ -2108,7 +2311,7 @@ ALTER TABLE ONLY user_skills
 
 
 --
--- Name: user_tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: user_tasks user_tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_tasks
@@ -2116,7 +2319,7 @@ ALTER TABLE ONLY user_tasks
 
 
 --
--- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY users
@@ -2180,10 +2383,38 @@ CREATE INDEX github_app_installations_user_id_index ON github_app_installations 
 
 
 --
+-- Name: github_comments_github_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX github_comments_github_id_index ON github_comments USING btree (github_id);
+
+
+--
+-- Name: github_issues_github_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX github_issues_github_id_index ON github_issues USING btree (github_id);
+
+
+--
+-- Name: github_pull_requests_github_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX github_pull_requests_github_id_index ON github_pull_requests USING btree (github_id);
+
+
+--
 -- Name: github_repos_github_app_installation_id_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX github_repos_github_app_installation_id_index ON github_repos USING btree (github_app_installation_id);
+
+
+--
+-- Name: github_repos_github_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX github_repos_github_id_index ON github_repos USING btree (github_id);
 
 
 --
@@ -2558,6 +2789,13 @@ CREATE UNIQUE INDEX users_email_index ON users USING btree (email);
 
 
 --
+-- Name: users_github_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX users_github_id_index ON users USING btree (github_id);
+
+
+--
 -- Name: users_lower_username_index; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2565,14 +2803,14 @@ CREATE UNIQUE INDEX users_lower_username_index ON users USING btree (lower((user
 
 
 --
--- Name: task_created; Type: TRIGGER; Schema: public; Owner: -
+-- Name: tasks task_created; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER task_created BEFORE INSERT ON tasks FOR EACH ROW EXECUTE PROCEDURE assign_number();
 
 
 --
--- Name: auth_token_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: auth_token auth_token_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY auth_token
@@ -2580,7 +2818,15 @@ ALTER TABLE ONLY auth_token
 
 
 --
--- Name: comments_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: comments comments_github_comment_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY comments
+    ADD CONSTRAINT comments_github_comment_id_fkey FOREIGN KEY (github_comment_id) REFERENCES github_comments(id);
+
+
+--
+-- Name: comments comments_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY comments
@@ -2588,7 +2834,7 @@ ALTER TABLE ONLY comments
 
 
 --
--- Name: comments_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: comments comments_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY comments
@@ -2596,7 +2842,7 @@ ALTER TABLE ONLY comments
 
 
 --
--- Name: donation_goals_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: donation_goals donation_goals_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY donation_goals
@@ -2604,7 +2850,7 @@ ALTER TABLE ONLY donation_goals
 
 
 --
--- Name: github_app_installations_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: github_app_installations github_app_installations_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY github_app_installations
@@ -2612,7 +2858,7 @@ ALTER TABLE ONLY github_app_installations
 
 
 --
--- Name: github_app_installations_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: github_app_installations github_app_installations_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY github_app_installations
@@ -2620,7 +2866,39 @@ ALTER TABLE ONLY github_app_installations
 
 
 --
--- Name: github_repos_github_app_installation_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: github_comments github_comments_github_issue_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_comments
+    ADD CONSTRAINT github_comments_github_issue_id_fkey FOREIGN KEY (github_issue_id) REFERENCES github_issues(id);
+
+
+--
+-- Name: github_issues github_issues_github_pull_request_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_issues
+    ADD CONSTRAINT github_issues_github_pull_request_id_fkey FOREIGN KEY (github_pull_request_id) REFERENCES github_pull_requests(id);
+
+
+--
+-- Name: github_issues github_issues_github_repo_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_issues
+    ADD CONSTRAINT github_issues_github_repo_id_fkey FOREIGN KEY (github_repo_id) REFERENCES github_repos(id);
+
+
+--
+-- Name: github_pull_requests github_pull_requests_github_repo_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_pull_requests
+    ADD CONSTRAINT github_pull_requests_github_repo_id_fkey FOREIGN KEY (github_repo_id) REFERENCES github_repos(id);
+
+
+--
+-- Name: github_repos github_repos_github_app_installation_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY github_repos
@@ -2628,7 +2906,7 @@ ALTER TABLE ONLY github_repos
 
 
 --
--- Name: organization_github_app_installations_github_app_installation_i; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: organization_github_app_installations organization_github_app_installations_github_app_installation_i; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organization_github_app_installations
@@ -2636,7 +2914,7 @@ ALTER TABLE ONLY organization_github_app_installations
 
 
 --
--- Name: organization_github_app_installations_organization_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: organization_github_app_installations organization_github_app_installations_organization_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organization_github_app_installations
@@ -2644,7 +2922,7 @@ ALTER TABLE ONLY organization_github_app_installations
 
 
 --
--- Name: organizations_owner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: organizations organizations_owner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organizations
@@ -2652,7 +2930,7 @@ ALTER TABLE ONLY organizations
 
 
 --
--- Name: previews_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: previews previews_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY previews
@@ -2660,7 +2938,7 @@ ALTER TABLE ONLY previews
 
 
 --
--- Name: project_categories_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: project_categories project_categories_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_categories
@@ -2668,7 +2946,7 @@ ALTER TABLE ONLY project_categories
 
 
 --
--- Name: project_categories_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: project_categories project_categories_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_categories
@@ -2676,7 +2954,7 @@ ALTER TABLE ONLY project_categories
 
 
 --
--- Name: project_github_repos_github_repo_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: project_github_repos project_github_repos_github_repo_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_github_repos
@@ -2684,7 +2962,7 @@ ALTER TABLE ONLY project_github_repos
 
 
 --
--- Name: project_github_repos_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: project_github_repos project_github_repos_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_github_repos
@@ -2692,7 +2970,7 @@ ALTER TABLE ONLY project_github_repos
 
 
 --
--- Name: project_skills_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: project_skills project_skills_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_skills
@@ -2700,7 +2978,7 @@ ALTER TABLE ONLY project_skills
 
 
 --
--- Name: project_skills_skill_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: project_skills project_skills_skill_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_skills
@@ -2708,7 +2986,7 @@ ALTER TABLE ONLY project_skills
 
 
 --
--- Name: project_users_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: project_users project_users_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_users
@@ -2716,7 +2994,7 @@ ALTER TABLE ONLY project_users
 
 
 --
--- Name: project_users_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: project_users project_users_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY project_users
@@ -2724,7 +3002,7 @@ ALTER TABLE ONLY project_users
 
 
 --
--- Name: projects_organization_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: projects projects_organization_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY projects
@@ -2732,7 +3010,7 @@ ALTER TABLE ONLY projects
 
 
 --
--- Name: role_skills_role_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: role_skills role_skills_role_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY role_skills
@@ -2740,7 +3018,7 @@ ALTER TABLE ONLY role_skills
 
 
 --
--- Name: role_skills_skill_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: role_skills role_skills_skill_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY role_skills
@@ -2748,7 +3026,7 @@ ALTER TABLE ONLY role_skills
 
 
 --
--- Name: slugged_routes_organization_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: slugged_routes slugged_routes_organization_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY slugged_routes
@@ -2756,7 +3034,7 @@ ALTER TABLE ONLY slugged_routes
 
 
 --
--- Name: slugged_routes_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: slugged_routes slugged_routes_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY slugged_routes
@@ -2764,7 +3042,7 @@ ALTER TABLE ONLY slugged_routes
 
 
 --
--- Name: stripe_connect_accounts_organization_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_accounts stripe_connect_accounts_organization_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_accounts
@@ -2772,7 +3050,7 @@ ALTER TABLE ONLY stripe_connect_accounts
 
 
 --
--- Name: stripe_connect_cards_stripe_connect_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_cards stripe_connect_cards_stripe_connect_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_cards
@@ -2780,7 +3058,7 @@ ALTER TABLE ONLY stripe_connect_cards
 
 
 --
--- Name: stripe_connect_cards_stripe_platform_card_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_cards stripe_connect_cards_stripe_platform_card_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_cards
@@ -2788,7 +3066,7 @@ ALTER TABLE ONLY stripe_connect_cards
 
 
 --
--- Name: stripe_connect_charges_stripe_connect_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_charges stripe_connect_charges_stripe_connect_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_charges
@@ -2796,7 +3074,7 @@ ALTER TABLE ONLY stripe_connect_charges
 
 
 --
--- Name: stripe_connect_charges_stripe_connect_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_charges stripe_connect_charges_stripe_connect_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_charges
@@ -2804,7 +3082,7 @@ ALTER TABLE ONLY stripe_connect_charges
 
 
 --
--- Name: stripe_connect_charges_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_charges stripe_connect_charges_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_charges
@@ -2812,7 +3090,7 @@ ALTER TABLE ONLY stripe_connect_charges
 
 
 --
--- Name: stripe_connect_customers_stripe_connect_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_customers stripe_connect_customers_stripe_connect_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_customers
@@ -2820,7 +3098,7 @@ ALTER TABLE ONLY stripe_connect_customers
 
 
 --
--- Name: stripe_connect_customers_stripe_platform_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_customers stripe_connect_customers_stripe_platform_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_customers
@@ -2828,7 +3106,7 @@ ALTER TABLE ONLY stripe_connect_customers
 
 
 --
--- Name: stripe_connect_customers_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_customers stripe_connect_customers_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_customers
@@ -2836,7 +3114,7 @@ ALTER TABLE ONLY stripe_connect_customers
 
 
 --
--- Name: stripe_connect_plans_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_plans stripe_connect_plans_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_plans
@@ -2844,7 +3122,7 @@ ALTER TABLE ONLY stripe_connect_plans
 
 
 --
--- Name: stripe_connect_subscriptions_stripe_connect_plan_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_subscriptions stripe_connect_subscriptions_stripe_connect_plan_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_subscriptions
@@ -2852,7 +3130,7 @@ ALTER TABLE ONLY stripe_connect_subscriptions
 
 
 --
--- Name: stripe_connect_subscriptions_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_connect_subscriptions stripe_connect_subscriptions_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_connect_subscriptions
@@ -2860,7 +3138,7 @@ ALTER TABLE ONLY stripe_connect_subscriptions
 
 
 --
--- Name: stripe_external_accounts_stripe_connect_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_external_accounts stripe_external_accounts_stripe_connect_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_external_accounts
@@ -2868,7 +3146,7 @@ ALTER TABLE ONLY stripe_external_accounts
 
 
 --
--- Name: stripe_file_upload_stripe_connect_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_file_upload stripe_file_upload_stripe_connect_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_file_upload
@@ -2876,7 +3154,7 @@ ALTER TABLE ONLY stripe_file_upload
 
 
 --
--- Name: stripe_invoices_stripe_connect_subscription_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_invoices stripe_invoices_stripe_connect_subscription_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_invoices
@@ -2884,7 +3162,7 @@ ALTER TABLE ONLY stripe_invoices
 
 
 --
--- Name: stripe_invoices_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_invoices stripe_invoices_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_invoices
@@ -2892,7 +3170,7 @@ ALTER TABLE ONLY stripe_invoices
 
 
 --
--- Name: stripe_platform_cards_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_platform_cards stripe_platform_cards_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_platform_cards
@@ -2900,7 +3178,7 @@ ALTER TABLE ONLY stripe_platform_cards
 
 
 --
--- Name: stripe_platform_customers_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: stripe_platform_customers stripe_platform_customers_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stripe_platform_customers
@@ -2908,7 +3186,7 @@ ALTER TABLE ONLY stripe_platform_customers
 
 
 --
--- Name: task_lists_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: task_lists task_lists_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY task_lists
@@ -2916,7 +3194,7 @@ ALTER TABLE ONLY task_lists
 
 
 --
--- Name: task_skills_skill_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: task_skills task_skills_skill_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY task_skills
@@ -2924,7 +3202,7 @@ ALTER TABLE ONLY task_skills
 
 
 --
--- Name: task_skills_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: task_skills task_skills_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY task_skills
@@ -2932,7 +3210,23 @@ ALTER TABLE ONLY task_skills
 
 
 --
--- Name: tasks_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: tasks tasks_github_issue_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY tasks
+    ADD CONSTRAINT tasks_github_issue_id_fkey FOREIGN KEY (github_issue_id) REFERENCES github_issues(id);
+
+
+--
+-- Name: tasks tasks_github_repo_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY tasks
+    ADD CONSTRAINT tasks_github_repo_id_fkey FOREIGN KEY (github_repo_id) REFERENCES github_repos(id);
+
+
+--
+-- Name: tasks tasks_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY tasks
@@ -2940,7 +3234,7 @@ ALTER TABLE ONLY tasks
 
 
 --
--- Name: tasks_task_list_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: tasks tasks_task_list_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY tasks
@@ -2948,7 +3242,7 @@ ALTER TABLE ONLY tasks
 
 
 --
--- Name: tasks_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: tasks tasks_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY tasks
@@ -2956,7 +3250,7 @@ ALTER TABLE ONLY tasks
 
 
 --
--- Name: user_categories_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_categories user_categories_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_categories
@@ -2964,7 +3258,7 @@ ALTER TABLE ONLY user_categories
 
 
 --
--- Name: user_categories_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_categories user_categories_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_categories
@@ -2972,7 +3266,7 @@ ALTER TABLE ONLY user_categories
 
 
 --
--- Name: user_roles_role_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_roles user_roles_role_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_roles
@@ -2980,7 +3274,7 @@ ALTER TABLE ONLY user_roles
 
 
 --
--- Name: user_roles_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_roles user_roles_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_roles
@@ -2988,7 +3282,7 @@ ALTER TABLE ONLY user_roles
 
 
 --
--- Name: user_skills_skill_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_skills user_skills_skill_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_skills
@@ -2996,7 +3290,7 @@ ALTER TABLE ONLY user_skills
 
 
 --
--- Name: user_skills_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_skills user_skills_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_skills
@@ -3004,7 +3298,7 @@ ALTER TABLE ONLY user_skills
 
 
 --
--- Name: user_tasks_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_tasks user_tasks_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_tasks
@@ -3012,7 +3306,7 @@ ALTER TABLE ONLY user_tasks
 
 
 --
--- Name: user_tasks_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_tasks user_tasks_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_tasks
@@ -3023,5 +3317,5 @@ ALTER TABLE ONLY user_tasks
 -- PostgreSQL database dump complete
 --
 
-INSERT INTO "schema_migrations" (version) VALUES (20160723215749), (20160804000000), (20160804001111), (20160805132301), (20160805203929), (20160808143454), (20160809214736), (20160810124357), (20160815125009), (20160815143002), (20160816020347), (20160816034021), (20160817220118), (20160818000944), (20160818132546), (20160820113856), (20160820164905), (20160822002438), (20160822004056), (20160822011624), (20160822020401), (20160822044612), (20160830081224), (20160830224802), (20160911233738), (20160912002705), (20160912145957), (20160918003206), (20160928232404), (20161003185918), (20161019090945), (20161019110737), (20161020144622), (20161021131026), (20161031001615), (20161121005339), (20161121014050), (20161121043941), (20161121045709), (20161122015942), (20161123081114), (20161123150943), (20161124085742), (20161125200620), (20161126045705), (20161127054559), (20161205024856), (20161207112519), (20161209192504), (20161212005641), (20161214005935), (20161215052051), (20161216051447), (20161218005913), (20161219160401), (20161219163909), (20161220141753), (20161221085759), (20161226213600), (20161231063614), (20170102130055), (20170102181053), (20170104113708), (20170104212623), (20170104235423), (20170106013143), (20170115035159), (20170115230549), (20170121014100), (20170131234029), (20170201014901), (20170201025454), (20170201035458), (20170201183258), (20170220032224), (20170224233516), (20170226050552), (20170228085250), (20170308214128), (20170308220713), (20170308222552), (20170313130611), (20170318032449), (20170318082740), (20170324194827), (20170424215355), (20170501225441), (20170526095401), (20170602000208), (20170622205732), (20170626231059), (20170628092119), (20170628213609), (20170629183404), (20170630140136), (20170706132431), (20170707213648), (20170711122252), (20170717092127), (20170725060612), (20170727052644), (20170731130121);
+INSERT INTO "schema_migrations" (version) VALUES (20160723215749), (20160804000000), (20160804001111), (20160805132301), (20160805203929), (20160808143454), (20160809214736), (20160810124357), (20160815125009), (20160815143002), (20160816020347), (20160816034021), (20160817220118), (20160818000944), (20160818132546), (20160820113856), (20160820164905), (20160822002438), (20160822004056), (20160822011624), (20160822020401), (20160822044612), (20160830081224), (20160830224802), (20160911233738), (20160912002705), (20160912145957), (20160918003206), (20160928232404), (20161003185918), (20161019090945), (20161019110737), (20161020144622), (20161021131026), (20161031001615), (20161121005339), (20161121014050), (20161121043941), (20161121045709), (20161122015942), (20161123081114), (20161123150943), (20161124085742), (20161125200620), (20161126045705), (20161127054559), (20161205024856), (20161207112519), (20161209192504), (20161212005641), (20161214005935), (20161215052051), (20161216051447), (20161218005913), (20161219160401), (20161219163909), (20161220141753), (20161221085759), (20161226213600), (20161231063614), (20170102130055), (20170102181053), (20170104113708), (20170104212623), (20170104235423), (20170106013143), (20170115035159), (20170115230549), (20170121014100), (20170131234029), (20170201014901), (20170201025454), (20170201035458), (20170201183258), (20170220032224), (20170224233516), (20170226050552), (20170228085250), (20170308214128), (20170308220713), (20170308222552), (20170313130611), (20170318032449), (20170318082740), (20170324194827), (20170424215355), (20170501225441), (20170505224222), (20170526095401), (20170602000208), (20170622205732), (20170626231059), (20170628092119), (20170628213609), (20170629183404), (20170630140136), (20170706132431), (20170707213648), (20170711122252), (20170717092127), (20170725060612), (20170727052644), (20170731130121), (20170814131722), (20170913114958), (20170921014405), (20170925214512), (20170925230419), (20170926134646), (20170927100300), (20170928234412), (20171003134956), (20171003225853), (20171006063358), (20171006161407), (20171012215106), (20171012221231), (20171016125229), (20171016125516), (20171016223356), (20171016235656), (20171017235433), (20171019191035);
 

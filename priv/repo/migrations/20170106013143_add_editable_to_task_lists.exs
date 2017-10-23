@@ -1,8 +1,4 @@
 defmodule CodeCorps.Repo.Migrations.AddEditableToTaskLists do
-  alias CodeCorps.{Repo, TaskList}
-
-  import Ecto.Query
-
   use Ecto.Migration
 
   def up do

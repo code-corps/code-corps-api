@@ -15,7 +15,9 @@ defmodule CodeCorps.Factories do
   def comment_factory do
     %CodeCorps.Comment{
       body: "I love elixir!",
+      created_at: DateTime.utc_now,
       markdown: "I love elixir!",
+      modified_at: DateTime.utc_now,
       task: build(:task),
       user: build(:user)
     }
@@ -32,7 +34,8 @@ defmodule CodeCorps.Factories do
   def github_app_installation_factory do
     %CodeCorps.GithubAppInstallation{
       project: build(:project),
-      user: build(:user)
+      user: build(:user),
+      github_id: sequence(:id, (fn number -> number end))
     }
   end
 
@@ -40,8 +43,51 @@ defmodule CodeCorps.Factories do
     %CodeCorps.GithubEvent{}
   end
 
+  def github_issue_factory do
+    %CodeCorps.GithubIssue{
+      body: "I love elixir!",
+      github_created_at: DateTime.utc_now,
+      github_id: sequence(:id, (fn number -> number end)),
+      github_updated_at: DateTime.utc_now,
+      locked: false,
+      number: sequence(:id, (fn number -> number end)),
+      state: "open",
+      title: "I love Elixir!",
+      github_repo: build(:github_repo)
+    }
+  end
+
+  def github_comment_factory do
+    %CodeCorps.GithubComment{
+      body: "I love elixir!",
+      github_created_at: DateTime.utc_now,
+      github_id: sequence(:id, (fn number -> number end)),
+      github_updated_at: DateTime.utc_now,
+      github_issue: build(:github_issue)
+    }
+  end
+
+  def github_pull_request_factory do
+    %CodeCorps.GithubPullRequest{
+      body: "Here's a change!",
+      github_created_at: DateTime.utc_now,
+      github_id: sequence(:id, (fn number -> number end)),
+      github_updated_at: DateTime.utc_now,
+      locked: false,
+      merged: false,
+      number: sequence(:id, (fn number -> number end)),
+      state: "open",
+      title: "Here's a change!",
+      github_repo: build(:github_repo)
+    }
+  end
+
   def github_repo_factory do
-    %CodeCorps.GithubRepo{}
+    %CodeCorps.GithubRepo{
+      github_account_login: sequence(:github_account_login, &"owner_#{&1}"),
+      github_app_installation: build(:github_app_installation),
+      name: sequence(:name, &"repo_#{&1}")
+    }
   end
 
   def organization_factory do
@@ -55,18 +101,20 @@ defmodule CodeCorps.Factories do
 
   def organization_invite_factory do
     %CodeCorps.OrganizationInvite{
-      email: sequence(:email, &"email_#{&1}@mail.com"),
-      title: sequence(:title, &"organization-#{&1}"),
       code: sequence(:code, &"n43crhiqR-#{&1}"),
-      fulfilled: false
+      email: sequence(:email, &"email_#{&1}@mail.com"),
+      fulfilled: false,
+      organization_name: sequence(:organization_name, &"organization-#{&1}")
     }
   end
 
   def task_factory do
     %CodeCorps.Task{
-      title: "Test task",
+      created_at: DateTime.utc_now,
       markdown: "A test task",
+      modified_at: DateTime.utc_now,
       status: "open",
+      title: "Test task",
       project: build(:project),
       user: build(:user),
       task_list: build(:task_list)
@@ -102,6 +150,8 @@ defmodule CodeCorps.Factories do
       slug: sequence(:slug, &"project-#{&1}"),
       title: sequence(:title, &"Project #{&1}"),
       website: sequence(:website, &"http://test-#{&1}.com"),
+      github_repo: nil,
+      github_owner: nil,
 
       organization: build(:organization)
     }
@@ -180,6 +230,8 @@ defmodule CodeCorps.Factories do
 
   def stripe_connect_charge_factory do
     %CodeCorps.StripeConnectCharge{
+      amount: 1000,
+      currency: "usd",
       id_from_stripe: sequence(:id_from_stripe, &"stripe_id_#{&1}"),
       stripe_connect_account: build(:stripe_connect_account),
       stripe_connect_customer: build(:stripe_connect_customer),

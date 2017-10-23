@@ -13,13 +13,12 @@ defmodule CodeCorps.Policy.TaskSkill do
     ]
 
   alias CodeCorps.{TaskSkill, User}
-  alias Ecto.Changeset
 
-  @spec create?(User.t, Changeset.t) :: boolean
-  def create?(%User{} = user, %Changeset{} = changeset) do
+  @spec create?(User.t, map) :: boolean
+  def create?(%User{} = user, %{} = params) do
     cond do
-      changeset |> get_task |> task_authored_by?(user) -> true
-      changeset |> get_task |> get_project |> contributed_by?(user) -> true
+      params |> get_task |> task_authored_by?(user) -> true
+      params |> get_task |> get_project |> contributed_by?(user) -> true
       true -> false
     end
   end

@@ -8,8 +8,8 @@ defmodule CodeCorps.OrganizationInvite do
   schema "organization_invites" do
     field :code, :string
     field :email, :string
-    field :title, :string
     field :fulfilled, :boolean, default: false
+    field :organization_name, :string
 
     timestamps()
   end
@@ -19,8 +19,8 @@ defmodule CodeCorps.OrganizationInvite do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:email, :title, :fulfilled])
-    |> validate_required([:email, :title])
+    |> cast(params, [:email, :organization_name, :fulfilled])
+    |> validate_required([:email, :organization_name])
     |> validate_format(:email, ~r/@/)
     |> validate_change(:fulfilled, &check_fulfilled_changes_to_true/2)
   end
@@ -32,16 +32,23 @@ defmodule CodeCorps.OrganizationInvite do
     struct
     |> changeset(params)
     |> generate_code
+    |> unique_constraint(:code)
   end
 
   defp generate_code(changeset) do
     case changeset do
       %Ecto.Changeset{valid?: true}  ->
-        length = 10
-        code = :crypto.strong_rand_bytes(length) |> Base.encode64 |> binary_part(0, length)
+        code = do_generate_code(10)
         put_change(changeset, :code, code)
       _ -> changeset
      end
+  end
+
+  defp do_generate_code(length) do
+    length
+    |> :crypto.strong_rand_bytes
+    |> Base.encode64
+    |> binary_part(0, length)
   end
 
   defp check_fulfilled_changes_to_true :fulfilled, fulfilled do

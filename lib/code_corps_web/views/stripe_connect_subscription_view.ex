@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.StripeConnectSubscriptionView do
+  @moduledoc false
   use CodeCorpsWeb.PreloadHelpers, default_preloads: [:user, :project]
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView

@@ -3,38 +3,38 @@ defmodule CodeCorps.RoleSkillTest do
 
   alias CodeCorps.RoleSkill
 
-  test "changeset with valid attributes" do
+  test "create_changeset with valid attributes" do
     role_id = insert(:role).id
     skill_id = insert(:skill).id
 
-    changeset = RoleSkill.changeset(%RoleSkill{}, %{role_id: role_id, skill_id: skill_id})
+    changeset = RoleSkill.create_changeset(%RoleSkill{}, %{role_id: role_id, skill_id: skill_id})
     assert changeset.valid?
   end
 
-  test "changeset requires role_id" do
+  test "create_changeset requires role_id" do
     skill_id = insert(:skill).id
 
-    changeset = RoleSkill.changeset(%RoleSkill{}, %{skill_id: skill_id})
+    changeset = RoleSkill.create_changeset(%RoleSkill{}, %{skill_id: skill_id})
 
     refute changeset.valid?
     assert_error_message(changeset, :role_id, "can't be blank")
   end
 
-  test "changeset requires skill_id" do
+  test "create_changeset requires skill_id" do
     role_id = insert(:role).id
 
-    changeset = RoleSkill.changeset(%RoleSkill{}, %{role_id: role_id})
+    changeset = RoleSkill.create_changeset(%RoleSkill{}, %{role_id: role_id})
 
     refute changeset.valid?
     assert_error_message(changeset, :skill_id, "can't be blank")
   end
 
-  test "changeset requires id of actual role" do
+  test "create_changeset requires id of actual role" do
     role_id = -1
     skill_id = insert(:skill).id
 
     {result, changeset} =
-      RoleSkill.changeset(%RoleSkill{}, %{role_id: role_id, skill_id: skill_id})
+      RoleSkill.create_changeset(%RoleSkill{}, %{role_id: role_id, skill_id: skill_id})
       |> Repo.insert
 
     assert result == :error
@@ -42,12 +42,12 @@ defmodule CodeCorps.RoleSkillTest do
     assert_error_message(changeset, :role, "does not exist")
   end
 
-  test "changeset requires id of actual skill" do
+  test "create_changeset requires id of actual skill" do
     role_id = insert(:role).id
     skill_id = -1
 
     {result, changeset} =
-      RoleSkill.changeset(%RoleSkill{}, %{role_id: role_id, skill_id: skill_id})
+      RoleSkill.create_changeset(%RoleSkill{}, %{role_id: role_id, skill_id: skill_id})
       |> Repo.insert
 
     assert result == :error

@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.PasswordController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.{Services.ForgotPasswordService}

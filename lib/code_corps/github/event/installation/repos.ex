@@ -6,79 +6,57 @@ defmodule CodeCorps.GitHub.Event.Installation.Repos do
   alias CodeCorps.{
     GithubAppInstallation,
     GithubRepo,
-    GitHub.Installation,
+    GitHub.API.Installation,
     GitHub,
+    GitHub.Utils.ResultAggregator,
     Repo
   }
 
-  alias CodeCorps.GitHub.Adapters.GithubRepo, as: GithubRepoAdapter
+  alias CodeCorps.GitHub.Adapters.Repo, as: RepoAdapter
 
   alias Ecto.{Changeset, Multi}
 
-  @typep repo_result :: {:ok | :error, GithubRepo.t | Changeset.t}
-  @typep aggregated_result :: {:ok | :error, list(GithubRepo.t | Changeset.t)}
+  @typep aggregated_result :: {:ok, list(GithubRepo.t)} |
+                              {:error, {list(GithubRepo.t), list(Changeset.t)}}
 
   @doc ~S"""
-  Marks a `GithubAppInstallation` as "processing" and immediately returns it.
+  Creates and returns a multi used to sync a `CodeCorps.GithubRepo` records
+  associated with the provided `CodeCorps.GithubAppInstallation` record, based
+  on freshly retrieved GitHub data.
 
-  In the background, it fires a task to asynchronously call &process/1
+  Note that a GitHub API call is being called as part of this process.
+
+  The list of repositories from the API call is considered the master list.
+  - Anything existing locally, but not on this list is deleted.
+  - Anything existing both locally and on this list is updated.
+  - Anything existing not locally, but on this list is created.
   """
-  @spec process_async(GithubAppInstallation.t) :: {:ok, GithubAppInstallation.t, Task.t}
-  def process_async(%GithubAppInstallation{} = installation) do
-    {:ok, %GithubAppInstallation{} = processing_installation} = installation |> set_state("processing")
-
-    task = Task.Supervisor.async(:background_processor, fn -> processing_installation |> process() end)
-
-    {:ok, processing_installation, task}
-  end
-
-  @doc ~S"""
-  Fetches a list of repositories for a `GithubAppInstallation` from the GitHub
-  API and matches up `GithubRepo` records stored locally using that list as the
-  master list.
-  """
-  @spec process(GithubAppInstallation.t) :: {:ok | :error, GithubAppInstallation.t}
+  @spec process(GithubAppInstallation.t) :: Multi.t
   def process(%GithubAppInstallation{} = installation) do
-    multi =
-      Multi.new
-      |> Multi.run(:processing_installation, fn _ -> {:ok, installation} end)
-      |> Multi.run(:api_response, &fetch_api_repo_list/1)
-      |> Multi.run(:repo_attrs_list, &adapt_api_repo_list/1)
-      |> Multi.run(:deleted_repos, &delete_repos/1)
-      |> Multi.run(:synced_repos, &sync_repos/1)
-      |> Multi.run(:processed_installation, &mark_processed/1)
-
-    case Repo.transaction(multi) do
-      {:ok, %{processed_installation: installation}} ->
-        {:ok, installation}
-      {:error, _errored_step, error_response, _steps} ->
-        {:ok, errored_installation} = installation |> set_state("errored")
-        {:error, errored_installation, error_response}
-    end
-  end
-
-  @spec set_state(GithubAppInstallation.t, String.t) :: {:ok, GithubAppInstallation.t}
-  defp set_state(%GithubAppInstallation{} = installation, state) when state in ~w(processing processed errored) do
-    installation
-    |> Changeset.change(%{state: state})
-    |> Repo.update
+    Multi.new
+    |> Multi.run(:processing_installation, fn _ -> {:ok, installation} end)
+    |> Multi.run(:api_response, &fetch_api_repo_list/1)
+    |> Multi.run(:repo_attrs_list, &adapt_api_repo_list/1)
+    |> Multi.run(:deleted_repos, &delete_repos/1)
+    |> Multi.run(:synced_repos, &sync_repos/1)
+    |> Multi.run(:processed_installation, &mark_processed/1)
   end
 
   # transaction step 1
-  @spec fetch_api_repo_list(%{processing_installation: GithubAppInstallation.t}) :: {:ok, map} | {:error, GitHub.api_error_struct}
+  @spec fetch_api_repo_list(map) :: {:ok, map} | {:error, GitHub.api_error_struct}
   defp fetch_api_repo_list(%{processing_installation: %GithubAppInstallation{} = installation}) do
     installation |> Installation.repositories()
   end
 
   # transaction step 2
-  @spec adapt_api_repo_list(%{api_response: any}) :: {:ok, list(map)}
+  @spec adapt_api_repo_list(map) :: {:ok, list(map)}
   defp adapt_api_repo_list(%{api_response: repositories}) do
-    adapter_results = repositories |> Enum.map(&GithubRepoAdapter.from_api/1)
+    adapter_results = repositories |> Enum.map(&RepoAdapter.from_api/1)
     {:ok, adapter_results}
   end
 
   # transaction step 3
-  @spec delete_repos(%{processing_installation: GithubAppInstallation.t, repo_attrs_list: list(map)}) :: aggregated_result
+  @spec delete_repos(map) :: aggregated_result
   defp delete_repos(%{
     processing_installation: %GithubAppInstallation{github_repos: github_repos},
     repo_attrs_list: attrs_list}) when is_list(attrs_list) do
@@ -93,38 +71,25 @@ defmodule CodeCorps.GitHub.Event.Installation.Repos do
       end
     end)
     |> Enum.reject(&is_nil/1)
-    |> aggregate
+    |> ResultAggregator.aggregate
   end
 
   # transaction step 4
-  @spec sync_repos(%{processing_installation: GithubAppInstallation.t, repo_attrs_list: list(map)}) :: aggregated_result
+  @spec sync_repos(map) :: aggregated_result
   defp sync_repos(%{
     processing_installation: %GithubAppInstallation{} = installation,
     repo_attrs_list: attrs_list }) when is_list(attrs_list) do
 
     attrs_list
     |> Enum.map(&sync(installation, &1))
-    |> aggregate
-  end
-
-  @spec aggregate(list(repo_result)) :: aggregated_result
-  defp aggregate(results) do
-    case results |> Enum.filter(fn {state, _data} -> state == :error end) do
-      [] -> results |> reduce(:ok)
-      errors -> errors |> reduce(:error)
-    end
-  end
-
-  @spec reduce(list(repo_result), :ok | :error) :: aggregated_result
-  defp reduce(data, state) when state in [:ok, :error] do
-    data
-    |> Enum.map(&Tuple.to_list/1) # {:ok, repo} -> [:ok, repo]
-    |> Enum.map(&Enum.at(&1, 1)) # [:ok, repo] -> repo
-    |> (fn data -> {state, data} end).() # repos -> {:ok, repos}
+    |> ResultAggregator.aggregate
   end
 
   @spec sync(GithubAppInstallation.t, map) :: {:ok, GithubRepo.t}
-  defp sync(%GithubAppInstallation{github_repos: github_repos} = installation, %{github_id: github_id} = repo_attributes) do
+  defp sync(
+    %GithubAppInstallation{github_repos: github_repos} = installation,
+    %{github_id: github_id} = repo_attributes) do
+
     case github_repos |> Enum.find(fn %GithubRepo{} = gr -> gr.github_id == github_id end) do
       nil -> create(installation, repo_attributes)
       %GithubRepo{} = github_repo -> github_repo |> update(repo_attributes)
@@ -159,6 +124,8 @@ defmodule CodeCorps.GitHub.Event.Installation.Repos do
   # transaction step 5
   @spec mark_processed(%{processing_installation: GithubAppInstallation.t}) :: {:ok, GithubAppInstallation.t}
   defp mark_processed(%{processing_installation: %GithubAppInstallation{} = installation}) do
-    installation |> set_state("processed")
+    installation
+    |> Changeset.change(%{state: "processed"})
+    |> Repo.update
   end
 end

@@ -12,14 +12,6 @@ defmodule CodeCorps.Helpers.Query do
     query |> where([object], object.id in ^ids)
   end
 
-  # project queries
-
-  def approved_filter(query, approved) do
-    query |> where([object], object.approved == ^approved)
-  end
-
-  # end project queries
-
   # skill queries
 
   def limit_filter(query, %{"limit" => count}), do: query |> add_limit(count |> Integer.parse)
@@ -37,31 +29,10 @@ defmodule CodeCorps.Helpers.Query do
 
   # task queries
 
-  def project_id_with_number_filter(query, %{"id" => number, "project_id" => project_id}) do
-    query |> where([object], object.number == ^number and object.project_id == ^project_id)
-  end
-  def project_id_with_number_filter(query, _), do: query
-
-  def task_list_id_with_number_filter(query, %{"id" => number, "task_list_id" => task_list_id}) do
-    query |> where([object], object.number == ^number and object.task_list_id == ^task_list_id)
-  end
-  def task_list_id_with_number_filter(query, _), do: query
-
   def project_filter(query, %{"project_id" => project_id}) do
     query |> where([object], object.project_id == ^project_id)
   end
   def project_filter(query, _), do: query
-
-  def task_list_filter(query, %{"task_list_ids" => task_list_ids}) do
-    task_list_ids = task_list_ids |> coalesce_id_string
-    query |> where([object], object.task_list_id in ^task_list_ids)
-  end
-  def task_list_filter(query, _), do: query
-
-  def task_status_filter(query, %{"status" => status}) do
-    query |> where([object], object.status == ^status)
-  end
-  def task_status_filter(query, _), do: query
 
   # end task queries
 

@@ -1,4 +1,5 @@
 defmodule CodeCorpsWeb.StripeConnectEventsController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.StripeService.WebhookProcessing.{

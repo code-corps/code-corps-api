@@ -2,23 +2,22 @@ defmodule CodeCorps.Policy.StripeConnectSubscriptionTest do
   use CodeCorps.PolicyCase
 
   import CodeCorps.Policy.StripeConnectSubscription, only: [create?: 2, show?: 2]
-  import CodeCorps.StripeConnectSubscription, only: [create_changeset: 2]
-
-  alias CodeCorps.StripeConnectSubscription
 
   describe "create?" do
     test "returns true if user is creating their own record" do
       user = insert(:user)
-      changeset = %StripeConnectSubscription{} |> create_changeset(%{user_id: user.id})
+      stripe_connect_subscription = insert(:stripe_connect_subscription, user: user)
+      params = %{"id" => stripe_connect_subscription.id, "user_id" => user.id}
 
-      assert create?(user, changeset)
+      assert create?(user, params)
     end
 
     test "returns false if user is creating someone else's record" do
       user = build(:user)
-      changeset = %StripeConnectSubscription{} |> create_changeset(%{user_id: -1})
+      stripe_connect_subscription = insert(:stripe_connect_subscription)
+      params = %{"id" => stripe_connect_subscription.id, "user_id" => -1}
 
-      refute create?(user, changeset)
+      refute create?(user, params)
     end
   end
 

@@ -1,54 +1,127 @@
 defmodule CodeCorpsWeb.TaskController do
+  @moduledoc false
   use CodeCorpsWeb, :controller
-  use JaResource
 
-  import CodeCorps.Helpers.Query, only: [
-    project_filter: 2, project_id_with_number_filter: 2, task_list_id_with_number_filter: 2,
-    sort_by_order: 1, task_list_filter: 2, task_status_filter: 2
-  ]
+  alias CodeCorps.{Analytics.SegmentTracker, Task, Policy, User}
 
-  alias CodeCorps.Task
+  action_fallback CodeCorpsWeb.FallbackController
+  plug CodeCorpsWeb.Plug.DataToAttributes
+  plug CodeCorpsWeb.Plug.IdsToIntegers
 
-  plug :load_and_authorize_changeset, model: Task, only: [:create]
-  plug :load_and_authorize_resource, model: Task, only: [:update]
-  plug JaResource
-
-  @spec model :: module
-  def model, do: CodeCorps.Task
-
-  def handle_index(conn, params) do
-    tasks =
-      Task
-      |> project_filter(params)
-      |> task_list_filter(params)
-      |> task_status_filter(params)
-      |> sort_by_order
-      |> Repo.all
-
-    conn
-    |> render("index.json-api", data: tasks)
+  @spec index(Conn.t, map) :: Conn.t
+  def index(%Conn{} = conn, %{} = params) do
+    with tasks <- Task.Query.list(params) do
+      conn |> render("index.json-api", data: tasks)
+    end
   end
 
-  @spec record(Plug.Conn.t, String.t) :: Task.t | nil
-  def record(%Plug.Conn{params: %{"project_id" => _project_id} = params}, _number_as_id) do
-    Task
-    |> project_id_with_number_filter(params)
-    |> Repo.one
-  end
-  def record(%Plug.Conn{params: %{"task_list_id" => _task_list_id} = params}, _number_as_id) do
-    Task
-    |> task_list_id_with_number_filter(params)
-    |> Repo.one
-  end
-  def record(_conn, id), do: Task |> Repo.get(id)
-
-  @spec handle_create(Plug.Conn.t, map) :: Ecto.Changeset.t
-  def handle_create(_conn, attributes) do
-    %Task{} |> Task.create_changeset(attributes)
+  @spec show(Conn.t, map) :: Conn.t
+  def show(%Conn{} = conn, %{} = params) do
+    with %Task{} = task <- Task.Query.find(params) do
+      conn |> render("show.json-api", data: task)
+    end
   end
 
-  @spec handle_update(Plug.Conn.t, Task.t, map) :: Ecto.Changeset.t
-  def handle_update(_conn, task, attributes) do
-    task |> Task.update_changeset(attributes)
+  @spec create(Conn.t, map) :: Conn.t
+  def create(%Conn{} = conn, %{} = params) do
+    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+         {:ok, :authorized} <- current_user |> Policy.authorize(:create, %Task{}, params),
+         {:ok, %Task{} = task} <- params |> Task.Service.create do
+
+      current_user |> track_created(task)
+      current_user |> maybe_track_connected(task)
+
+      conn |> put_status(:created) |> render("show.json-api", data: task)
+    end
   end
+
+  @spec update(Conn.t, map) :: Conn.t
+  def update(%Conn{} = conn, %{} = params) do
+    with %Task{} = task <- Task.Query.find(params),
+         %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+         {:ok, :authorized} <- current_user |> Policy.authorize(:update, task),
+         {:ok, %Task{} = updated_task} <- task |> Task.Service.update(params) do
+
+      current_user |> track_updated(updated_task)
+      current_user |> maybe_track_connected(updated_task, task)
+      current_user |> maybe_track_list_move(updated_task, task)
+      current_user |> maybe_track_title_change(updated_task, task)
+      current_user |> maybe_track_close(updated_task, task)
+      current_user |> maybe_track_archive(updated_task, task)
+
+      conn |> render("show.json-api", data: updated_task)
+    end
+  end
+
+  # tracking
+
+  @spec track_created(User.t, Task.t) :: any
+  defp track_created(%User{id: user_id}, %Task{} = task) do
+    user_id |> SegmentTracker.track("Created Task", task)
+  end
+
+  @spec track_updated(User.t, Task.t) :: any
+  defp track_updated(%User{id: user_id}, %Task{} = task) do
+    user_id |> SegmentTracker.track("Edited Task", task)
+  end
+
+  @spec maybe_track_connected(User.t, Task.t) :: any
+  defp maybe_track_connected(
+    %User{id: user_id},
+    %Task{github_issue_id: issue_id} = task) when not is_nil(issue_id) do
+
+    user_id |> SegmentTracker.track("Connected Task to GitHub", task)
+  end
+  defp maybe_track_connected(%User{}, %Task{}), do: :nothing
+
+  @spec maybe_track_connected(User.t, Task.t, Task.t) :: any
+  defp maybe_track_connected(
+    %User{id: user_id},
+    %Task{github_issue_id: new_issue_id} = task,
+    %Task{github_issue_id: old_issue_id})
+    when is_nil(old_issue_id) and not is_nil(new_issue_id) do
+
+    user_id |> SegmentTracker.track("Connected Task to GitHub", task)
+  end
+  defp maybe_track_connected(%User{}, %Task{}, %Task{}), do: :nothing
+
+  @spec maybe_track_list_move(User.t, Task.t, Task.t) :: any
+  defp maybe_track_list_move(
+    %User{id: user_id},
+    %Task{task_list_id: new_list_id} = task,
+    %Task{task_list_id: old_list_id}) when new_list_id != old_list_id do
+
+    user_id |> SegmentTracker.track("Moved Task Between Lists", task)
+  end
+  defp maybe_track_list_move(%User{}, %Task{}, %Task{}), do: :nothing
+
+  @spec maybe_track_title_change(User.t, Task.t, Task.t) :: any
+  defp maybe_track_title_change(
+    %User{id: user_id},
+    %Task{title: new_title} = task,
+    %Task{title: old_title}) when new_title != old_title do
+
+    user_id |> SegmentTracker.track("Edited Task Title", task)
+  end
+  defp maybe_track_title_change(%User{}, %Task{}, %Task{}), do: :nothing
+
+  @spec maybe_track_close(User.t, Task.t, Task.t) :: any
+  defp maybe_track_close(
+    %User{id: user_id},
+    %Task{status: "closed"} = task,
+    %Task{status: "open"}) do
+
+    user_id |> SegmentTracker.track("Closed Task", task)
+  end
+  defp maybe_track_close(%User{}, %Task{}, %Task{}), do: :nothing
+
+  @spec maybe_track_archive(User.t, Task.t, Task.t) :: any
+  defp maybe_track_archive(
+    %User{id: user_id},
+    %Task{archived: true} = task,
+    %Task{archived: false}) do
+
+    user_id |> SegmentTracker.track("Archived Task", task)
+  end
+  defp maybe_track_archive(%User{}, %Task{}, %Task{}), do: :nothing
 end

@@ -38,10 +38,6 @@ config :guardian, Guardian,
   secret_key: System.get_env("GUARDIAN_SECRET_KEY"),
   serializer: CodeCorpsWeb.GuardianSerializer
 
-config :canary, repo: CodeCorps.Repo
-config :canary, unauthorized_handler: {CodeCorpsWeb.AuthenticationHelpers, :handle_unauthorized}
-config :canary, not_found_handler: {CodeCorpsWeb.AuthenticationHelpers, :handle_not_found}
-
 # Configures ex_aws with credentials
 config :ex_aws, :code_corps,
   access_key_id: [System.get_env("AWS_ACCESS_KEY_ID"), :instance_role],
@@ -49,6 +45,9 @@ config :ex_aws, :code_corps,
 
 config :code_corps,
   asset_host: System.get_env("CLOUDFRONT_DOMAIN")
+
+config :code_corps,
+  intercom_identity_secret_key: System.get_env("INTERCOM_IDENTITY_SECRET_KEY")
 
 config :segment,
   write_key: System.get_env("SEGMENT_WRITE_KEY")
@@ -68,6 +67,7 @@ config :code_corps, :corsica_log_level, [rejected: :warn]
 {:ok, pem} = (System.get_env("GITHUB_APP_PEM") || "") |> Base.decode64()
 
 config :code_corps,
+  github: CodeCorps.GitHub.API,
   github_app_id: System.get_env("GITHUB_APP_ID"),
   github_app_client_id: System.get_env("GITHUB_APP_CLIENT_ID"),
   github_app_client_secret: System.get_env("GITHUB_APP_CLIENT_SECRET"),
@@ -82,9 +82,9 @@ config :sentry,
   included_environments: ~w(prod staging)a,
   use_error_logger: true
 
-config :ja_resource,
-  repo: CodeCorps.Repo
-
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"
+
+# Import Timber, structured logging
+import_config "timber.exs"

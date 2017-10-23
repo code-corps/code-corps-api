@@ -2,7 +2,10 @@ defmodule CodeCorpsWeb.TaskViewTest do
   use CodeCorpsWeb.ViewCase
 
   test "renders all attributes and relationships properly" do
-    task = insert(:task, order: 1000)
+    github_pull_request = insert(:github_pull_request)
+    github_issue = insert(:github_issue, github_pull_request: github_pull_request)
+    github_repo = insert(:github_repo)
+    task = insert(:task, order: 1000, github_issue: github_issue, github_pull_request: github_pull_request, github_repo: github_repo)
     comment = insert(:comment, task: task)
     task_skill = insert(:task_skill, task: task)
     user_task = insert(:user_task, task: task)
@@ -12,9 +15,14 @@ defmodule CodeCorpsWeb.TaskViewTest do
     expected_json = %{
       "data" => %{
         "attributes" => %{
+          "archived" => task.archived,
           "body" => task.body,
+          "created-at" => task.created_at,
+          "created-from" => task.created_from,
           "inserted-at" => task.inserted_at,
           "markdown" => task.markdown,
+          "modified-at" => task.modified_at,
+          "modified-from" => task.modified_from,
           "number" => task.number,
           "order" => task.order,
           "status" => task.status,
@@ -35,6 +43,24 @@ defmodule CodeCorpsWeb.TaskViewTest do
             "data" => %{
               "id" => task.project_id |> Integer.to_string,
               "type" => "project"
+            }
+          },
+          "github-issue" => %{
+            "data" => %{
+              "id" => task.github_issue_id |> Integer.to_string,
+              "type" => "github-issue"
+            }
+          },
+          "github-pull-request" => %{
+            "data" => %{
+              "id" => task.github_issue.github_pull_request_id |> Integer.to_string,
+              "type" => "github-pull-request"
+            }
+          },
+          "github-repo" => %{
+            "data" => %{
+              "id" => task.github_repo_id |> Integer.to_string,
+              "type" => "github-repo"
             }
           },
           "task-skills" => %{

@@ -1,4 +1,5 @@
 defmodule CodeCorps.Services.ForgotPasswordService do
+  # credo:disable-for-this-file Credo.Check.Refactor.PipeChainStart
 
   alias CodeCorps.{AuthToken, Emails, Mailer, Repo, User}
 

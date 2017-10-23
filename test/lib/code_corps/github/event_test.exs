@@ -3,8 +3,6 @@ defmodule CodeCorps.GitHub.EventTest do
 
   use CodeCorps.DbAccessCase
 
-  import CodeCorps.Factories
-
   alias CodeCorps.{
     GithubEvent,
     GitHub.Event
@@ -18,22 +16,18 @@ defmodule CodeCorps.GitHub.EventTest do
     end
   end
 
-  defp get_resulting_status(tuple) do
-    event = insert(:github_event, status: "processing")
-    {:ok, %GithubEvent{} = updated_event} = Event.stop_processing(tuple, event)
-    updated_event.status
-  end
-
   describe "stop_processing/2" do
-    test "sets proper status for event, based on first argument" do
-      assert {:ok} |> get_resulting_status() == "processed"
-      assert {:ok, "foo"} |> get_resulting_status() == "processed"
-      assert {:ok, "foo", "bar"} |> get_resulting_status() == "processed"
-      assert {:ok, "foo", "bar", "baz"} |> get_resulting_status() == "processed"
-      assert {:error} |> get_resulting_status() == "errored"
-      assert {:error, "foo"} |> get_resulting_status() == "errored"
-      assert {:error, "foo", "bar"} |> get_resulting_status() == "errored"
-      assert {:error, "foo", "bar", "baz"} |> get_resulting_status() == "errored"
+    test "sets event as processed if resulting tuple starts with :ok" do
+      event = insert(:github_event, status: "processing")
+      {:ok, %GithubEvent{} = updated_event} = Event.stop_processing({:ok, "foo"}, event)
+      assert updated_event.status == "processed"
+    end
+
+    test "marks event errored, with failure_reason, if resulting tuple starts with :error" do
+      event = insert(:github_event, status: "processing")
+      {:ok, %GithubEvent{} = updated_event} = Event.stop_processing({:error, :bar}, event)
+      assert updated_event.status == "errored"
+      assert updated_event.failure_reason == "bar"
     end
   end
 end

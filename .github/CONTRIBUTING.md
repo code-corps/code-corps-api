@@ -5,7 +5,7 @@ Thanks for thinking about helping! How would you like to help?
 - [I want to build a new feature.](#how-to-tackle-a-new-feature)
 - [I want to improve the documentation.](#what-kind-of-documentation-are-you-writing)
 - [I want to fix a bug.](#how-to-fix-a-bug)
-- [I want to refactor some code.](#how-to-refactor-code)
+- [I want to refactor some code.](#how-to-refactor-some-code)
 - [I don't know how to help.](#what-if-i-dont-know-how-to-help)
 
 ## Before you get started
@@ -73,7 +73,7 @@ By creating small, modular pieces, we can assemble complex data structures that 
 
 #### Previewing your changes
 
-You can preview your changes by [walking through our guide on how to generate API documentation locally](docs/API.md).
+You can preview your changes by [walking through our guide on how to generate API documentation locally](/docs/API.md).
 
 [Done with your changes?](#i-finished-my-changes)
 
@@ -178,7 +178,7 @@ The CircleCI builds also rely on some environment variables for reporting, deplo
 
 If you've had a pull request reviewed and accepted, congratulations! Before we can merge your changes, we'll need you to rebase off `origin/develop` and squash your commits into one. This will give us a cleaner git history.
 
-Never done this before? No problem. [We'll walk you through it in our guide](docs/SQUASHING.md), and you can read [a deeper guide about rewriting history to understand more](https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History).
+Never done this before? No problem. [We'll walk you through it in our guide](/docs/SQUASHING.md), and you can read [a deeper guide about rewriting history to understand more](https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History).
 
 ## Running Tests
 
@@ -193,3 +193,5 @@ We've written some convenience helper modules and functions to help with API tes
 - `CodeCorpsWeb.ApiCase` - used to simplify testing JSON API endpoints
 - `CodeCorps.AuthenticationTestHelpers` - provides authentication helpers for authenticating a `conn`
 - `CodeCorps.Factories` - provides factories using [`ex_machina`](https://github.com/thoughtbot/ex_machina), which makes it easy to create test data and associations with Ecto
+- `CodeCorps.GitHub.TestHelpers` - provides test helpers for loading GitHub API endpoint or event JSON fixtures, as well as mocking the API
+- `CodeCorps.GitHub.SuccessAPI` - provides some automatic mocking of the GitHub API, or raises an exception if you have an unhandled request to the API

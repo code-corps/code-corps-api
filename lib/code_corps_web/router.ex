@@ -11,11 +11,6 @@ defmodule CodeCorpsWeb.Router do
     plug :put_secure_browser_headers
   end
 
-  pipeline :logging do
-    plug Timber.ContextPlug
-    plug Timber.EventPlug
-  end
-
   pipeline :api do
     plug :accepts, ["json-api", "json"]
     plug JaSerializer.Deserializer
@@ -49,26 +44,26 @@ defmodule CodeCorpsWeb.Router do
   end
 
   scope "/", CodeCorpsWeb do
-    pipe_through [:logging, :browser] # Use the default browser stack
+    pipe_through [:browser] # Use the default browser stack
 
     get "/", PageController, :index
   end
 
   scope "/", CodeCorpsWeb, host: "api." do
-    pipe_through [:logging, :stripe_webhooks]
+    pipe_through [:stripe_webhooks]
 
     post "/webhooks/stripe/connect", StripeConnectEventsController, :create
     post "/webhooks/stripe/platform", StripePlatformEventsController, :create
   end
 
   scope "/", CodeCorpsWeb, host: "api." do
-    pipe_through [:logging, :github_webhooks]
+    pipe_through [:github_webhooks]
 
     post "/webhooks/github", GitHubEventsController, :create, as: :github_events
   end
 
   scope "/", CodeCorpsWeb, host: "api." do
-    pipe_through [:logging, :api, :bearer_auth, :ensure_auth, :current_user, :tracking]
+    pipe_through [:api, :bearer_auth, :ensure_auth, :current_user, :tracking]
 
     resources "/categories", CategoryController, only: [:create, :update]
     resources "/comments", CommentController, only: [:create, :update]
@@ -102,7 +97,7 @@ defmodule CodeCorpsWeb.Router do
   end
 
   scope "/", CodeCorpsWeb, host: "api." do
-    pipe_through [:logging, :api, :bearer_auth, :current_user, :tracking]
+    pipe_through [:api, :bearer_auth, :current_user, :tracking]
 
     post "/token", TokenController, :create
     post "/token/refresh", TokenController, :refresh
@@ -112,6 +107,8 @@ defmodule CodeCorpsWeb.Router do
     resources "/comments", CommentController, only: [:index, :show]
     resources "/donation-goals", DonationGoalController, only: [:index, :show]
     resources "/github-app-installations", GithubAppInstallationController, only: [:index, :show]
+    resources "/github-issues", GithubIssueController, only: [:index, :show]
+    resources "/github-pull-requests", GithubPullRequestController, only: [:index, :show]
     resources "/github-repos", GithubRepoController, only: [:index, :show]
     resources "/organization-github-app-installations", OrganizationGithubAppInstallationController, only: [:index, :show]
     resources "/organizations", OrganizationController, only: [:index, :show]
@@ -123,13 +120,15 @@ defmodule CodeCorpsWeb.Router do
     resources "/project-users", ProjectUserController, only: [:index, :show]
     resources "/projects", ProjectController, only: [:index, :show] do
       resources "/task-lists", TaskListController, only: [:index, :show]
-      resources "/tasks", TaskController, only: [:index, :show]
+      get "/tasks/:number", TaskController, :show
+      resources "/tasks", TaskController, only: [:index]
     end
     resources "/role-skills", RoleSkillController, only: [:index, :show]
     resources "/roles", RoleController, only: [:index, :show]
     resources "/skills", SkillController, only: [:index, :show]
     resources "/task-lists", TaskListController, only: [:index, :show] do
-      resources "/tasks", TaskController, only: [:index, :show]
+      resources "/tasks", TaskController, only: [:index]
+      get "/tasks/:number", TaskController, :show
     end
     resources "/task-skills", TaskSkillController, only: [:index, :show]
     resources "/tasks", TaskController, only: [:index, :show]
