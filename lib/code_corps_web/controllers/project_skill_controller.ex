@@ -2,7 +2,7 @@ defmodule CodeCorpsWeb.ProjectSkillController do
   @moduledoc false
   use CodeCorpsWeb, :controller
 
-  alias CodeCorps.{ProjectSkill, User, Helpers.Query}
+  alias CodeCorps.{Analytics.SegmentTracker, ProjectSkill, User, Helpers.Query}
 
   action_fallback CodeCorpsWeb.FallbackController
   plug CodeCorpsWeb.Plug.DataToAttributes
@@ -27,6 +27,8 @@ defmodule CodeCorpsWeb.ProjectSkillController do
     with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %ProjectSkill{}, params),
          {:ok, %ProjectSkill{} = project_skill} <- %ProjectSkill{} |> ProjectSkill.create_changeset(params) |> Repo.insert do
+
+      current_user.id |> SegmentTracker.track("Added Project Skill", project_skill)
       conn |> put_status(:created) |> render("show.json-api", data: project_skill)
     end
   end
@@ -36,8 +38,9 @@ defmodule CodeCorpsWeb.ProjectSkillController do
     with %ProjectSkill{} = project_skill <- ProjectSkill |> Repo.get(id),
       %User{} = current_user <- conn |> Guardian.Plug.current_resource,
       {:ok, :authorized} <- current_user |> Policy.authorize(:delete, project_skill),
-      {:ok, %ProjectSkill{} = _project_skill} <- project_skill |> Repo.delete
+      {:ok, %ProjectSkill{} = project_skill} <- project_skill |> Repo.delete
     do
+      current_user.id |> SegmentTracker.track("Removed Project Skill", project_skill)
       conn |> Conn.assign(:project_skill, project_skill) |> send_resp(:no_content, "")
     end
   end

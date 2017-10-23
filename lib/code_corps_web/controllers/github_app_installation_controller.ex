@@ -4,7 +4,7 @@ defmodule CodeCorpsWeb.GithubAppInstallationController do
 
   import CodeCorps.Helpers.Query, only: [id_filter: 2]
 
-  alias CodeCorps.{GithubAppInstallation, User}
+  alias CodeCorps.{Analytics.SegmentTracker, GithubAppInstallation, User}
 
   action_fallback CodeCorpsWeb.FallbackController
   plug CodeCorpsWeb.Plug.DataToAttributes
@@ -29,7 +29,14 @@ defmodule CodeCorpsWeb.GithubAppInstallationController do
     with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %GithubAppInstallation{}, params),
          {:ok, %GithubAppInstallation{} = installation} <- %GithubAppInstallation{} |> GithubAppInstallation.create_changeset(params) |> Repo.insert do
+
+      current_user |> track_created(installation)
       conn |> put_status(:created) |> render("show.json-api", data: installation)
     end
+  end
+
+  @spec track_created(User.t, GithubAppInstallation.t) :: any
+  defp track_created(%User{id: user_id}, %GithubAppInstallation{} = installation) do
+    user_id |> SegmentTracker.track("Created GitHub App Installation", installation)
   end
 end

@@ -1,6 +1,8 @@
 defmodule CodeCorpsWeb.ProjectGithubRepoControllerTest do
   use CodeCorpsWeb.ApiCase, resource_name: :project_github_repo
 
+  alias CodeCorps.{Analytics.SegmentTraitsBuilder, ProjectGithubRepo, Repo}
+
   describe "index" do
     test "lists all entries on index", %{conn: conn} do
       [project_github_repo_1, project_github_repo_2] = insert_pair(:project_github_repo)
@@ -52,6 +54,21 @@ defmodule CodeCorpsWeb.ProjectGithubRepoControllerTest do
     end
 
     @tag :authenticated
+    test "is being tracked", %{conn: conn, current_user: current_user} do
+      project = insert(:project)
+      insert(:project_user, project: project, user: current_user, role: "owner")
+      github_repo = insert(:github_repo)
+
+      attrs = %{project: project, github_repo: github_repo}
+      conn |> request_create(attrs)
+
+      user_id = current_user.id
+      traits = ProjectGithubRepo |> Repo.one |> SegmentTraitsBuilder.build
+
+      assert_receive({:track, ^user_id, "Connected GitHub Repo to Project", ^traits})
+    end
+
+    @tag :authenticated
     test "renders 422 error when data is invalid", %{conn: conn, current_user: current_user} do
       project = insert(:project)
       insert(:project_user, project: project, user: current_user, role: "owner")
@@ -77,6 +94,20 @@ defmodule CodeCorpsWeb.ProjectGithubRepoControllerTest do
       insert(:project_user, project: project, user: current_user, role: "owner")
       project_github_repo = insert(:project_github_repo, project: project)
       assert conn |> request_delete(project_github_repo) |> response(204)
+    end
+
+    @tag :authenticated
+    test "is being tracked", %{conn: conn, current_user: current_user} do
+      project = insert(:project)
+      insert(:project_user, project: project, user: current_user, role: "owner")
+      project_github_repo = insert(:project_github_repo, project: project)
+
+      conn |> request_delete(project_github_repo)
+
+      user_id = current_user.id
+      traits = project_github_repo |> SegmentTraitsBuilder.build
+
+      assert_receive({:track, ^user_id, "Disconnected GitHub Repo from Project", ^traits})
     end
 
     test "renders 401 when unauthenticated", %{conn: conn} do

@@ -2,7 +2,7 @@ defmodule CodeCorpsWeb.ProjectGithubRepoController do
   @moduledoc false
   use CodeCorpsWeb, :controller
 
-  alias CodeCorps.{ProjectGithubRepo, User, Helpers.Query}
+  alias CodeCorps.{Analytics.SegmentTracker, ProjectGithubRepo, User, Helpers.Query}
 
   action_fallback CodeCorpsWeb.FallbackController
   plug CodeCorpsWeb.Plug.DataToAttributes
@@ -27,6 +27,9 @@ defmodule CodeCorpsWeb.ProjectGithubRepoController do
     with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %ProjectGithubRepo{}, params),
          {:ok, %ProjectGithubRepo{} = project_github_repo} <- create_project_repo_changeset(params) |> Repo.insert do
+
+      current_user |> track_created(project_github_repo)
+
       conn |> put_status(:created) |> render("show.json-api", data: project_github_repo)
     end
   end
@@ -36,7 +39,10 @@ defmodule CodeCorpsWeb.ProjectGithubRepoController do
     with %ProjectGithubRepo{} = project_github_repo <- ProjectGithubRepo |> Repo.get(id),
          %User{} = current_user <- conn |> Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:delete, project_github_repo, params),
-         {:ok, _project_github_repo} <- project_github_repo |> Repo.delete do
+         {:ok, project_github_repo} <- project_github_repo |> Repo.delete do
+
+      current_user |> track_deleted(project_github_repo)
+
       conn |> send_resp(:no_content, "")
     end
   end
@@ -45,5 +51,15 @@ defmodule CodeCorpsWeb.ProjectGithubRepoController do
   defp create_project_repo_changeset(params) do
     %ProjectGithubRepo{}
     |> ProjectGithubRepo.create_changeset(params)
+  end
+
+  @spec track_created(User.t, ProjectGithubRepo.t) :: any
+  defp track_created(%User{id: user_id}, %ProjectGithubRepo{} = project_github_repo) do
+    user_id |> SegmentTracker.track("Connected GitHub Repo to Project", project_github_repo)
+  end
+
+  @spec track_deleted(User.t, ProjectGithubRepo.t) :: any
+  defp track_deleted(%User{id: user_id}, %ProjectGithubRepo{} = project_github_repo) do
+    user_id |> SegmentTracker.track("Disconnected GitHub Repo from Project", project_github_repo)
   end
 end

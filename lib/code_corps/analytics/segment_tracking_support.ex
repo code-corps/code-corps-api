@@ -19,8 +19,6 @@ defmodule CodeCorps.Analytics.SegmentTrackingSupport do
   def includes?(:create, %CodeCorps.StripeConnectSubscription{}), do: true
   def includes?(:create, %CodeCorps.StripePlatformCard{}), do: true
   def includes?(:create, %CodeCorps.StripePlatformCustomer{}), do: true
-  def includes?(:create, %CodeCorps.Task{}), do: true
-  def includes?(:update, %CodeCorps.Task{}), do: true
   def includes?(:create, %CodeCorps.User{}), do: true
   def includes?(:update, %CodeCorps.User{}), do: true
   def includes?(:create, %CodeCorps.UserCategory{}), do: true

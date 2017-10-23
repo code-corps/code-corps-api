@@ -22,12 +22,6 @@ defmodule CodeCorps.Task.Service do
   end
 
   @spec update(Task.t, map) :: {:ok, Task.t} | {:error, Changeset.t} | {:error, :github}
-  def update(%Task{github_issue_id: nil} = task, %{} = attributes) do
-    Multi.new
-    |> Multi.update(:task, task |> Task.update_changeset(attributes))
-    |> Repo.transaction
-    |> marshall_result()
-  end
   def update(%Task{} = task, %{} = attributes) do
     Multi.new
     |> Multi.update(:task, task |> Task.update_changeset(attributes))
@@ -64,7 +58,7 @@ defmodule CodeCorps.Task.Service do
   defp create_on_github(%Task{github_repo: _} = task) do
     with %Task{github_repo: github_repo} = task <- task |> Repo.preload(@preloads),
          {:ok, payload} <- GitHub.API.Issue.create(task),
-         {:ok, %GithubIssue{} = github_issue } <- IssueGithubIssueSyncer.create_or_update_issue({github_repo, nil}, payload) do
+         {:ok, %GithubIssue{} = github_issue} <- IssueGithubIssueSyncer.create_or_update_issue({github_repo, nil}, payload) do
       task |> link_with_github_changeset(github_issue) |> Repo.update
     else
       {:error, error} -> {:error, error}
@@ -77,12 +71,13 @@ defmodule CodeCorps.Task.Service do
   end
 
   @spec update_on_github(Task.t) :: {:ok, Task.t} :: {:error, GitHub.api_error_struct}
-  defp update_on_github(%Task{github_repo_id: nil} = task), do: {:ok, task}
+  defp update_on_github(%Task{github_repo_id: nil, github_issue_id: nil} = task), do: {:ok, task}
+  defp update_on_github(%Task{github_repo_id: _, github_issue_id: nil} = task), do: task |> create_on_github()
   defp update_on_github(%Task{github_repo_id: _} = task) do
     with %Task{github_repo: github_repo} = task <- task |> Repo.preload(@preloads),
          {:ok, payload} <- GitHub.API.Issue.update(task),
-         {:ok, %GithubIssue{} } <- IssueGithubIssueSyncer.create_or_update_issue({github_repo, nil}, payload) do
-      {:ok, task}
+         {:ok, %GithubIssue{}} <- IssueGithubIssueSyncer.create_or_update_issue({github_repo, nil}, payload) do
+      {:ok, Task |> Repo.get(task.id)}
     else
       {:error, github_error} -> {:error, github_error}
     end
