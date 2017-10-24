@@ -1,14 +1,6 @@
 defmodule CodeCorps.GitHub do
   alias CodeCorps.GitHub.API.Headers
 
-  @client_id Application.get_env(:code_corps, :github_app_client_id)
-  @client_secret Application.get_env(:code_corps, :github_app_client_secret)
-
-  @base_access_token_params %{
-    client_id: @client_id,
-    client_secret: @client_secret
-  }
-
   defmodule APIErrorObject do
     @moduledoc """
     Represents an error object from the GitHub API.
@@ -168,8 +160,11 @@ defmodule CodeCorps.GitHub do
 
   @spec build_access_token_params(String.t, String.t) :: map
   defp build_access_token_params(code, state) do
-    @base_access_token_params
-    |> Map.put(:code, code)
-    |> Map.put(:state, state)
+    %{
+      client_id: Application.get_env(:code_corps, :github_app_client_id),
+      client_secret: Application.get_env(:code_corps, :github_app_client_secret),
+      code: code,
+      state: state
+    }
   end
 end
