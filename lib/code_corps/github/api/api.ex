@@ -14,6 +14,8 @@ defmodule CodeCorps.GitHub.API do
     |> marshall_response()
   end
 
+  defdelegate get_all(url, headers, opts), to: CodeCorps.GitHub.EagerAPI
+
   @doc """
   Get access token headers for a given `CodeCorps.User` and
   `CodeCorps.GithubAppInstallation`.

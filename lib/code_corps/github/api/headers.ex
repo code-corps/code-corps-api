@@ -33,11 +33,12 @@ defmodule CodeCorps.GitHub.API.Headers do
   end
 
   @spec add_access_token_header(%{String.t => String.t}, list) :: %{String.t => String.t}
-  defp add_access_token_header(%{} = headers, [access_token: nil]), do: headers
-  defp add_access_token_header(%{} = headers, [access_token: access_token]) do
-    Map.put(headers, "Authorization", "token #{access_token}")
+  defp add_access_token_header(%{} = headers, opts) do
+    case opts[:access_token] do
+      nil -> headers
+      token -> headers |> Map.put("Authorization", "token #{token}")
+    end
   end
-  defp add_access_token_header(headers, []), do: headers
 
   @spec add_jwt_header(%{String.t => String.t}) :: %{String.t => String.t}
   defp add_jwt_header(%{} = headers) do

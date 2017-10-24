@@ -124,6 +124,14 @@ defmodule CodeCorps.GitHub do
     end
   end
 
+  def get_all(endpoint, headers, options) do
+    api().get_all(
+      api_url_for(endpoint),
+      headers |> Headers.user_request(options),
+      options |> add_default_options()
+    )
+  end
+
   @token_url "https://github.com/login/oauth/access_token"
 
   @doc """

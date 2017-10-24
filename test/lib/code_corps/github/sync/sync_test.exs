@@ -86,4 +86,39 @@ defmodule CodeCorps.GitHub.SyncTest do
       assert comment.user.github_id == comment_user_github_id
     end
   end
+
+  describe "sync_issues/1" do
+    test "syncs issues with the repo" do
+      owner = "baxterthehacker"
+      repo = "public-repo"
+      github_app_installation = insert(:github_app_installation, github_account_login: owner)
+      github_repo = insert(:github_repo, github_app_installation: github_app_installation, name: repo)
+      %{project: project} = insert(:project_github_repo, github_repo: github_repo)
+      insert(:task_list, project: project, inbox: true)
+
+      Sync.sync_issues(github_repo)
+
+      assert Repo.aggregate(GithubComment, :count, :id) == 0
+      assert Repo.aggregate(GithubIssue, :count, :id) == 8
+      assert Repo.aggregate(GithubPullRequest, :count, :id) == 0
+      assert Repo.aggregate(Comment, :count, :id) == 0
+      assert Repo.aggregate(Task, :count, :id) == 8
+    end
+
+    @tag acceptance: true
+    test "syncs issues with the repo with the real API" do
+      github_repo = setup_real_repo()
+
+      with_real_api do
+        Sync.sync_issues(github_repo)
+      end
+
+      assert Repo.aggregate(GithubComment, :count, :id) == 0
+      assert Repo.aggregate(GithubIssue, :count, :id) == 2
+      assert Repo.aggregate(GithubPullRequest, :count, :id) == 0
+      assert Repo.aggregate(Comment, :count, :id) == 0
+      assert Repo.aggregate(Task, :count, :id) == 2
+      assert Repo.aggregate(User, :count, :id) == 1
+    end
+  end
 end
