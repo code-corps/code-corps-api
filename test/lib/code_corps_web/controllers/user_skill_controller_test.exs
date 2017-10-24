@@ -39,12 +39,11 @@ defmodule CodeCorpsWeb.UserSkillControllerTest do
   end
 
   describe "create" do
-    @tag authenticated: :admin
+    @tag :authenticated
     test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
-      user = insert(:user)
       skill = insert(:skill, title: "test-skill")
 
-      attrs = %{user: user, skill: skill}
+      attrs = %{user: current_user, skill: skill}
       assert conn |> request_create(attrs) |> json_response(201)
 
       user_id = current_user.id
