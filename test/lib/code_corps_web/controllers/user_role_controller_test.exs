@@ -38,11 +38,10 @@ defmodule CodeCorpsWeb.UserRoleControllerTest do
   end
 
   describe "create" do
-    @tag authenticated: :admin
+    @tag :authenticated
     test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
-      user = insert(:user)
       role = insert(:role)
-      attrs = (%{user: user, role: role})
+      attrs = (%{user: current_user, role: role})
       assert conn |> request_create(attrs) |> json_response(201)
 
       user_id = current_user.id
@@ -53,19 +52,24 @@ defmodule CodeCorpsWeb.UserRoleControllerTest do
       assert_received {:track, ^user_id, "Added User Role", ^tracking_properties}
     end
 
-    @tag authenticated: :admin
-    test "does not create resource and renders 422 when data is invalid", %{conn: conn} do
-      invalid_attrs = %{}
+    @tag :authenticated
+    test "renders 422 when data is invalid", %{conn: conn, current_user: current_user} do
+      role = build(:role)
+      invalid_attrs = %{role: role, user: current_user}
       assert conn |> request_create(invalid_attrs) |> json_response(422)
     end
 
-    test "does not create resource and renders 401 when unauthenticated", %{conn: conn} do
+    test "renders 401 when unauthenticated", %{conn: conn} do
       assert conn |> request_create |> json_response(401)
     end
 
     @tag :authenticated
-    test "does not create resource and renders 403 when not authorized", %{conn: conn} do
-      assert conn |> request_create |>  json_response(403)
+    test "renders 403 when not authorized", %{conn: conn} do
+      role = insert(:role)
+      user = insert(:user)
+      attrs = %{role: role, user: user}
+
+      assert conn |> request_create(attrs) |>  json_response(403)
     end
   end
 
