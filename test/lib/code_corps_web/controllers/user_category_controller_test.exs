@@ -38,11 +38,10 @@ defmodule CodeCorpsWeb.UserCategoryControllerTest do
   end
 
   describe "create" do
-    @tag authenticated: :admin
+    @tag :authenticated
     test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
-      user = insert(:user)
       category = insert(:category)
-      attrs = (%{user: user, category: category})
+      attrs = (%{user: current_user, category: category})
       assert conn |> request_create(attrs) |> json_response(201)
 
       user_id = current_user.id
@@ -53,9 +52,11 @@ defmodule CodeCorpsWeb.UserCategoryControllerTest do
       assert_received {:track, ^user_id, "Added User Category", ^tracking_properties}
     end
 
-    @tag authenticated: :admin
-    test "renders 422 when data is invalid", %{conn: conn} do
-      assert conn |> request_create |> json_response(422)
+    @tag :authenticated
+    test "renders 422 when data is invalid", %{conn: conn, current_user: current_user} do
+      category = build(:category)
+      invalid_attrs = %{category: category, user: current_user}
+      assert conn |> request_create(invalid_attrs) |> json_response(422)
     end
 
     test "renders 401 when unauthenticated", %{conn: conn} do
@@ -64,7 +65,11 @@ defmodule CodeCorpsWeb.UserCategoryControllerTest do
 
     @tag :authenticated
     test "renders 403 when not authorized", %{conn: conn} do
-      assert conn |> request_create |> json_response(403)
+      category = insert(:category)
+      user = insert(:user)
+      attrs = %{category: category, user: user}
+
+      assert conn |> request_create(attrs) |> json_response(403)
     end
   end
 
