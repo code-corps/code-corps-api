@@ -50,4 +50,35 @@ defmodule CodeCorpsWeb.StripeConnectSubscriptionControllerTest do
       assert conn |> request_create |> json_response(403)
     end
   end
+
+  describe "show" do
+    @tag :authenticated
+    test "shows resource when authenticated and authorized", %{conn: conn, current_user: current_user} do
+      stripe_connect_plan = insert(:stripe_connect_plan)
+      stripe_connect_subscription =
+        insert(:stripe_connect_subscription, user: current_user, stripe_connect_plan: stripe_connect_plan)
+
+      conn
+      |> request_show(stripe_connect_subscription)
+      |> json_response(200)
+      |> assert_id_from_response(stripe_connect_subscription.id)
+    end
+
+    test "renders 401 when unauthenticated", %{conn: conn} do
+      stripe_connect_subscription = insert(:stripe_connect_subscription)
+
+      assert conn |> request_show(stripe_connect_subscription) |> json_response(401)
+    end
+
+    @tag :authenticated
+    test "renders 403 when not authorized", %{conn: conn} do
+      stripe_connect_subscription = insert(:stripe_connect_subscription)
+      assert conn |> request_show(stripe_connect_subscription) |> json_response(403)
+    end
+
+    @tag :authenticated
+    test "renders 404 when record not found", %{conn: conn} do
+      assert conn |> request_show(:not_found) |> json_response(404)
+    end
+  end
 end
