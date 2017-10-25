@@ -28,7 +28,7 @@ defmodule CodeCorps.Mixfile do
   def application do
     [
       mod: {CodeCorps, []},
-      extra_applications: [:timex, :tzdata]
+      extra_applications: [:scout_apm, :timex, :tzdata]
     ]
   end
 
@@ -72,6 +72,7 @@ defmodule CodeCorps.Mixfile do
       {:joken, "~> 1.5"}, # JWT encoding
       {:money, "~> 1.2.1"},
       {:poison, "~> 3.0", override: true},
+      {:scout_apm, "~> 0.0"},
       {:scrivener_ecto, "~> 1.2"}, # DB query pagination
       {:segment, "~> 0.1"}, # Segment analytics
       {:sentry, "~> 6.0"}, # Sentry error tracking

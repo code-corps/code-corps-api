@@ -31,6 +31,7 @@ defmodule CodeCorpsWeb do
   def controller do
     quote do
       use Phoenix.Controller, log: false, namespace: CodeCorpsWeb
+      use ScoutApm.Instrumentation
 
       import Ecto
       import Ecto.Query
