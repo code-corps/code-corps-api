@@ -20,7 +20,7 @@ defmodule CodeCorpsWeb.ProjectView do
     :total_monthly_donated, :updated_at, :website
   ]
 
-  has_one :organization, serializer: CodeCorpsWeb.OrganizationView
+  has_one :organization, type: "organization", field: :organization_id
   has_one :stripe_connect_plan, serializer: CodeCorpsWeb.StripeConnectPlanView
 
   has_many :donation_goals, serializer: CodeCorpsWeb.DonationGoalView, identifiers: :always
