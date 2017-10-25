@@ -1,6 +1,5 @@
 defmodule CodeCorpsWeb.CommentView do
   @moduledoc false
-  use CodeCorpsWeb.PreloadHelpers, default_preloads: [:user, :task]
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
 
@@ -9,6 +8,6 @@ defmodule CodeCorpsWeb.CommentView do
     :modified_from, :updated_at
   ]
 
-  has_one :user, serializer: CodeCorpsWeb.UserView
-  has_one :task, serializer: CodeCorpsWeb.TaskView
+  has_one :task, type: "task", field: :task_id
+  has_one :user, type: "user", field: :user_id
 end

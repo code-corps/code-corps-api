@@ -1,6 +1,5 @@
 defmodule CodeCorpsWeb.GithubRepoView do
   @moduledoc false
-  use CodeCorpsWeb.PreloadHelpers, default_preloads: [:github_app_installation]
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
 
@@ -8,5 +7,5 @@ defmodule CodeCorpsWeb.GithubRepoView do
   :github_account_login, :github_account_type, :github_id, :inserted_at,
   :name, :updated_at]
 
-  has_one :github_app_installation, serializer: CodeCorpsWeb.GithubAppInstallationView
+  has_one :github_app_installation, type: "github-app-installation", field: :github_app_installation_id
 end

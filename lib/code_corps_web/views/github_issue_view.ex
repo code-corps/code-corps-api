@@ -1,7 +1,5 @@
 defmodule CodeCorpsWeb.GithubIssueView do
   @moduledoc false
-  use CodeCorpsWeb.PreloadHelpers,
-      default_preloads: ~w(github_repo)a
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
 
@@ -11,5 +9,6 @@ defmodule CodeCorpsWeb.GithubIssueView do
     :state, :title, :url
   ]
 
-  has_one :github_repo, serializer: CodeCorpsWeb.GithubRepoView
+  has_one :github_pull_request, type: "github-pull-request", field: :github_pull_request_id
+  has_one :github_repo, type: "github-repo", field: :github_repo_id
 end
