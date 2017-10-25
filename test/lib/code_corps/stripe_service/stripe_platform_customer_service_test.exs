@@ -1,6 +1,6 @@
 defmodule CodeCorps.StripeService.StripePlatformCustomerServiceTest do
   @moduledoc false
-  
+
   use CodeCorps.ModelCase
 
   alias CodeCorps.StripePlatformCustomer
@@ -58,9 +58,18 @@ defmodule CodeCorps.StripeService.StripePlatformCustomerServiceTest do
         {:ok, %Stripe.Customer{} = stripe_record_2}
       ] = connect_updates
 
-      assert stripe_record_1.id == connect_customer_1.id_from_stripe
+      original_ids_from_stripe =
+        [connect_customer_1, connect_customer_2]
+        |> Enum.map(&Map.get(&1, :id_from_stripe))
+        |> Enum.sort
+
+      result_ids_from_stripe =
+        [stripe_record_1, stripe_record_2]
+        |> Enum.map(&Map.get(&1, :id))
+        |> Enum.sort
+
+      assert result_ids_from_stripe == original_ids_from_stripe
       assert stripe_record_1.email == "hardcoded@test.com"
-      assert stripe_record_2.id == connect_customer_2.id_from_stripe
       assert stripe_record_2.email == "hardcoded@test.com"
     end
   end
