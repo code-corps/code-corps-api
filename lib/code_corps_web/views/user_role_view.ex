@@ -1,9 +1,8 @@
 defmodule CodeCorpsWeb.UserRoleView do
   @moduledoc false
-  use CodeCorpsWeb.PreloadHelpers, default_preloads: [:user, :role]
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
 
-  has_one :user, serializer: CodeCorpsWeb.UserView
-  has_one :role, serializer: CodeCorpsWeb.RoleView
+  has_one :user, type: "user", field: :user_id
+  has_one :role, type: "role", field: :role_id
 end

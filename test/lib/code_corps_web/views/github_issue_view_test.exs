@@ -3,7 +3,8 @@ defmodule CodeCorpsWeb.GithubIssueViewTest do
 
   test "renders all attributes and relationships properly" do
     github_repo = insert(:github_repo)
-    github_issue = insert(:github_issue, github_repo: github_repo)
+    github_pull_request = insert(:github_pull_request)
+    github_issue = insert(:github_issue, github_pull_request: github_pull_request, github_repo: github_repo)
 
     rendered_json = render(CodeCorpsWeb.GithubIssueView, "show.json-api", data: github_issue)
 
@@ -27,6 +28,12 @@ defmodule CodeCorpsWeb.GithubIssueViewTest do
         },
         "id" => github_issue.id |> Integer.to_string,
         "relationships" => %{
+          "github-pull-request" => %{
+            "data" => %{
+              "id" => github_issue.github_pull_request_id |> Integer.to_string,
+              "type" => "github-pull-request"
+            }
+          },
           "github-repo" => %{
             "data" => %{
               "id" => github_issue.github_repo_id |> Integer.to_string,

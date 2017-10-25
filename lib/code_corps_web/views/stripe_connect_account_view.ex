@@ -1,6 +1,6 @@
 defmodule CodeCorpsWeb.StripeConnectAccountView do
   @moduledoc false
-  use CodeCorpsWeb.PreloadHelpers, default_preloads: [:organization, :stripe_external_account]
+  use CodeCorpsWeb.PreloadHelpers, default_preloads: [:stripe_external_account]
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
 
@@ -70,7 +70,7 @@ defmodule CodeCorpsWeb.StripeConnectAccountView do
     :verification_fields_needed
   ]
 
-  has_one :organization, serializer: CodeCorpsWeb.OrganizationView
+  has_one :organization, type: "organization", field: :organization_id
 
   def can_accept_donations(stripe_connect_account, _conn) do
     case Application.get_env(:code_corps, :stripe_env) do

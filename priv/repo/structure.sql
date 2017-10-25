@@ -2334,6 +2334,13 @@ CREATE INDEX auth_token_user_id_index ON auth_token USING btree (user_id);
 
 
 --
+-- Name: comments_github_comment_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX comments_github_comment_id_index ON comments USING btree (github_comment_id);
+
+
+--
 -- Name: comments_task_id_index; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2390,6 +2397,13 @@ CREATE UNIQUE INDEX github_comments_github_id_index ON github_comments USING btr
 
 
 --
+-- Name: github_comments_github_issue_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX github_comments_github_issue_id_index ON github_comments USING btree (github_issue_id);
+
+
+--
 -- Name: github_issues_github_id_index; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2397,10 +2411,31 @@ CREATE UNIQUE INDEX github_issues_github_id_index ON github_issues USING btree (
 
 
 --
+-- Name: github_issues_github_pull_request_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX github_issues_github_pull_request_id_index ON github_issues USING btree (github_pull_request_id);
+
+
+--
+-- Name: github_issues_github_repo_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX github_issues_github_repo_id_index ON github_issues USING btree (github_repo_id);
+
+
+--
 -- Name: github_pull_requests_github_id_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX github_pull_requests_github_id_index ON github_pull_requests USING btree (github_id);
+
+
+--
+-- Name: github_pull_requests_github_repo_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX github_pull_requests_github_repo_id_index ON github_pull_requests USING btree (github_repo_id);
 
 
 --
@@ -2495,6 +2530,27 @@ CREATE UNIQUE INDEX organizations_lower_slug_index ON organizations USING btree 
 
 
 --
+-- Name: organizations_owner_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX organizations_owner_id_index ON organizations USING btree (owner_id);
+
+
+--
+-- Name: previews_user_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX previews_user_id_index ON previews USING btree (user_id);
+
+
+--
+-- Name: project_categories_category_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX project_categories_category_id_index ON project_categories USING btree (category_id);
+
+
+--
 -- Name: project_categories_project_id_category_id_index; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2502,10 +2558,31 @@ CREATE UNIQUE INDEX project_categories_project_id_category_id_index ON project_c
 
 
 --
+-- Name: project_categories_project_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX project_categories_project_id_index ON project_categories USING btree (project_id);
+
+
+--
+-- Name: project_github_repos_github_repo_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX project_github_repos_github_repo_id_index ON project_github_repos USING btree (github_repo_id);
+
+
+--
 -- Name: project_github_repos_project_id_github_repo_id_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX project_github_repos_project_id_github_repo_id_index ON project_github_repos USING btree (project_id, github_repo_id);
+
+
+--
+-- Name: project_github_repos_project_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX project_github_repos_project_id_index ON project_github_repos USING btree (project_id);
 
 
 --
@@ -2530,6 +2607,20 @@ CREATE INDEX project_skills_skill_id_index ON project_skills USING btree (skill_
 
 
 --
+-- Name: project_users_project_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX project_users_project_id_index ON project_users USING btree (project_id);
+
+
+--
+-- Name: project_users_user_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX project_users_user_id_index ON project_users USING btree (user_id);
+
+
+--
 -- Name: project_users_user_id_project_id_index; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2544,10 +2635,45 @@ CREATE INDEX projects_approved_index ON projects USING btree (approved);
 
 
 --
+-- Name: projects_organization_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX projects_organization_id_index ON projects USING btree (organization_id);
+
+
+--
+-- Name: role_skills_role_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX role_skills_role_id_index ON role_skills USING btree (role_id);
+
+
+--
+-- Name: role_skills_skill_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX role_skills_skill_id_index ON role_skills USING btree (skill_id);
+
+
+--
 -- Name: slugged_routes_lower_slug_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX slugged_routes_lower_slug_index ON slugged_routes USING btree (lower((slug)::text));
+
+
+--
+-- Name: slugged_routes_organization_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX slugged_routes_organization_id_index ON slugged_routes USING btree (organization_id);
+
+
+--
+-- Name: slugged_routes_user_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX slugged_routes_user_id_index ON slugged_routes USING btree (user_id);
 
 
 --
@@ -2579,6 +2705,13 @@ CREATE UNIQUE INDEX stripe_connect_cards_id_from_stripe_index ON stripe_connect_
 
 
 --
+-- Name: stripe_connect_cards_stripe_connect_account_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX stripe_connect_cards_stripe_connect_account_id_index ON stripe_connect_cards USING btree (stripe_connect_account_id);
+
+
+--
 -- Name: stripe_connect_cards_stripe_connect_account_id_stripe_platform_; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2593,6 +2726,27 @@ CREATE UNIQUE INDEX stripe_connect_charges_id_from_stripe_index ON stripe_connec
 
 
 --
+-- Name: stripe_connect_charges_stripe_connect_account_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX stripe_connect_charges_stripe_connect_account_id_index ON stripe_connect_charges USING btree (stripe_connect_account_id);
+
+
+--
+-- Name: stripe_connect_charges_stripe_connect_customer_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX stripe_connect_charges_stripe_connect_customer_id_index ON stripe_connect_charges USING btree (stripe_connect_customer_id);
+
+
+--
+-- Name: stripe_connect_charges_user_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX stripe_connect_charges_user_id_index ON stripe_connect_charges USING btree (user_id);
+
+
+--
 -- Name: stripe_connect_customers_id_from_stripe_index; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2604,6 +2758,20 @@ CREATE UNIQUE INDEX stripe_connect_customers_id_from_stripe_index ON stripe_conn
 --
 
 CREATE UNIQUE INDEX stripe_connect_customers_stripe_connect_account_id_stripe_platf ON stripe_connect_customers USING btree (stripe_connect_account_id, stripe_platform_customer_id);
+
+
+--
+-- Name: stripe_connect_customers_stripe_platform_customer_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX stripe_connect_customers_stripe_platform_customer_id_index ON stripe_connect_customers USING btree (stripe_platform_customer_id);
+
+
+--
+-- Name: stripe_connect_customers_user_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX stripe_connect_customers_user_id_index ON stripe_connect_customers USING btree (user_id);
 
 
 --
@@ -2670,10 +2838,38 @@ CREATE UNIQUE INDEX stripe_events_id_from_stripe_index ON stripe_events USING bt
 
 
 --
+-- Name: stripe_external_accounts_stripe_connect_account_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX stripe_external_accounts_stripe_connect_account_id_index ON stripe_external_accounts USING btree (stripe_connect_account_id);
+
+
+--
+-- Name: stripe_file_upload_stripe_connect_account_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX stripe_file_upload_stripe_connect_account_id_index ON stripe_file_upload USING btree (stripe_connect_account_id);
+
+
+--
 -- Name: stripe_invoices_id_from_stripe_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX stripe_invoices_id_from_stripe_index ON stripe_invoices USING btree (id_from_stripe);
+
+
+--
+-- Name: stripe_invoices_stripe_connect_subscription_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX stripe_invoices_stripe_connect_subscription_id_index ON stripe_invoices USING btree (stripe_connect_subscription_id);
+
+
+--
+-- Name: stripe_invoices_user_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX stripe_invoices_user_id_index ON stripe_invoices USING btree (user_id);
 
 
 --
@@ -2726,10 +2922,38 @@ CREATE INDEX task_lists_project_id_index ON task_lists USING btree (project_id);
 
 
 --
+-- Name: task_skills_skill_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX task_skills_skill_id_index ON task_skills USING btree (skill_id);
+
+
+--
+-- Name: task_skills_task_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX task_skills_task_id_index ON task_skills USING btree (task_id);
+
+
+--
 -- Name: task_skills_task_id_skill_id_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX task_skills_task_id_skill_id_index ON task_skills USING btree (task_id, skill_id);
+
+
+--
+-- Name: tasks_github_issue_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX tasks_github_issue_id_index ON tasks USING btree (github_issue_id);
+
+
+--
+-- Name: tasks_github_repo_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX tasks_github_repo_id_index ON tasks USING btree (github_repo_id);
 
 
 --
@@ -2754,10 +2978,24 @@ CREATE INDEX tasks_project_id_index ON tasks USING btree (project_id);
 
 
 --
+-- Name: tasks_task_list_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX tasks_task_list_id_index ON tasks USING btree (task_list_id);
+
+
+--
 -- Name: tasks_user_id_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX tasks_user_id_index ON tasks USING btree (user_id);
+
+
+--
+-- Name: user_categories_category_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX user_categories_category_id_index ON user_categories USING btree (category_id);
 
 
 --
@@ -2768,10 +3006,59 @@ CREATE UNIQUE INDEX user_categories_user_id_category_id_index ON user_categories
 
 
 --
+-- Name: user_categories_user_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX user_categories_user_id_index ON user_categories USING btree (user_id);
+
+
+--
+-- Name: user_roles_role_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX user_roles_role_id_index ON user_roles USING btree (role_id);
+
+
+--
+-- Name: user_roles_user_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX user_roles_user_id_index ON user_roles USING btree (user_id);
+
+
+--
 -- Name: user_roles_user_id_role_id_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX user_roles_user_id_role_id_index ON user_roles USING btree (user_id, role_id);
+
+
+--
+-- Name: user_skills_skill_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX user_skills_skill_id_index ON user_skills USING btree (skill_id);
+
+
+--
+-- Name: user_skills_user_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX user_skills_user_id_index ON user_skills USING btree (user_id);
+
+
+--
+-- Name: user_tasks_task_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX user_tasks_task_id_index ON user_tasks USING btree (task_id);
+
+
+--
+-- Name: user_tasks_user_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX user_tasks_user_id_index ON user_tasks USING btree (user_id);
 
 
 --
@@ -3317,5 +3604,5 @@ ALTER TABLE ONLY user_tasks
 -- PostgreSQL database dump complete
 --
 
-INSERT INTO "schema_migrations" (version) VALUES (20160723215749), (20160804000000), (20160804001111), (20160805132301), (20160805203929), (20160808143454), (20160809214736), (20160810124357), (20160815125009), (20160815143002), (20160816020347), (20160816034021), (20160817220118), (20160818000944), (20160818132546), (20160820113856), (20160820164905), (20160822002438), (20160822004056), (20160822011624), (20160822020401), (20160822044612), (20160830081224), (20160830224802), (20160911233738), (20160912002705), (20160912145957), (20160918003206), (20160928232404), (20161003185918), (20161019090945), (20161019110737), (20161020144622), (20161021131026), (20161031001615), (20161121005339), (20161121014050), (20161121043941), (20161121045709), (20161122015942), (20161123081114), (20161123150943), (20161124085742), (20161125200620), (20161126045705), (20161127054559), (20161205024856), (20161207112519), (20161209192504), (20161212005641), (20161214005935), (20161215052051), (20161216051447), (20161218005913), (20161219160401), (20161219163909), (20161220141753), (20161221085759), (20161226213600), (20161231063614), (20170102130055), (20170102181053), (20170104113708), (20170104212623), (20170104235423), (20170106013143), (20170115035159), (20170115230549), (20170121014100), (20170131234029), (20170201014901), (20170201025454), (20170201035458), (20170201183258), (20170220032224), (20170224233516), (20170226050552), (20170228085250), (20170308214128), (20170308220713), (20170308222552), (20170313130611), (20170318032449), (20170318082740), (20170324194827), (20170424215355), (20170501225441), (20170505224222), (20170526095401), (20170602000208), (20170622205732), (20170626231059), (20170628092119), (20170628213609), (20170629183404), (20170630140136), (20170706132431), (20170707213648), (20170711122252), (20170717092127), (20170725060612), (20170727052644), (20170731130121), (20170814131722), (20170913114958), (20170921014405), (20170925214512), (20170925230419), (20170926134646), (20170927100300), (20170928234412), (20171003134956), (20171003225853), (20171006063358), (20171006161407), (20171012215106), (20171012221231), (20171016125229), (20171016125516), (20171016223356), (20171016235656), (20171017235433), (20171019191035);
+INSERT INTO "schema_migrations" (version) VALUES (20160723215749), (20160804000000), (20160804001111), (20160805132301), (20160805203929), (20160808143454), (20160809214736), (20160810124357), (20160815125009), (20160815143002), (20160816020347), (20160816034021), (20160817220118), (20160818000944), (20160818132546), (20160820113856), (20160820164905), (20160822002438), (20160822004056), (20160822011624), (20160822020401), (20160822044612), (20160830081224), (20160830224802), (20160911233738), (20160912002705), (20160912145957), (20160918003206), (20160928232404), (20161003185918), (20161019090945), (20161019110737), (20161020144622), (20161021131026), (20161031001615), (20161121005339), (20161121014050), (20161121043941), (20161121045709), (20161122015942), (20161123081114), (20161123150943), (20161124085742), (20161125200620), (20161126045705), (20161127054559), (20161205024856), (20161207112519), (20161209192504), (20161212005641), (20161214005935), (20161215052051), (20161216051447), (20161218005913), (20161219160401), (20161219163909), (20161220141753), (20161221085759), (20161226213600), (20161231063614), (20170102130055), (20170102181053), (20170104113708), (20170104212623), (20170104235423), (20170106013143), (20170115035159), (20170115230549), (20170121014100), (20170131234029), (20170201014901), (20170201025454), (20170201035458), (20170201183258), (20170220032224), (20170224233516), (20170226050552), (20170228085250), (20170308214128), (20170308220713), (20170308222552), (20170313130611), (20170318032449), (20170318082740), (20170324194827), (20170424215355), (20170501225441), (20170505224222), (20170526095401), (20170602000208), (20170622205732), (20170626231059), (20170628092119), (20170628213609), (20170629183404), (20170630140136), (20170706132431), (20170707213648), (20170711122252), (20170717092127), (20170725060612), (20170727052644), (20170731130121), (20170814131722), (20170913114958), (20170921014405), (20170925214512), (20170925230419), (20170926134646), (20170927100300), (20170928234412), (20171003134956), (20171003225853), (20171006063358), (20171006161407), (20171012215106), (20171012221231), (20171016125229), (20171016125516), (20171016223356), (20171016235656), (20171017235433), (20171019191035), (20171025184225);
 

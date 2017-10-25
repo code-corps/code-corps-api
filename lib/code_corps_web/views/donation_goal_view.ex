@@ -1,12 +1,12 @@
 defmodule CodeCorpsWeb.DonationGoalView do
   @moduledoc false
-  use CodeCorpsWeb.PreloadHelpers, default_preloads: [:project]
+  use CodeCorpsWeb.PreloadHelpers, default_preloads: ~w(project)a
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
 
   attributes [:achieved, :amount, :current, :description]
 
-  has_one :project, serializer: CodeCorpsWeb.ProjectView
+  has_one :project, type: "project", field: :project_id
 
   @doc """
   Determines whether the goal has been met by checking the amount against

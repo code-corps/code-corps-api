@@ -1,12 +1,11 @@
 defmodule CodeCorpsWeb.StripePlatformCustomerView do
   @moduledoc false
-  use CodeCorpsWeb.PreloadHelpers, default_preloads: [:user]
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
 
   attributes [:created, :currency, :delinquent, :email, :id_from_stripe, :inserted_at, :updated_at]
 
-  has_one :user, serializer: CodeCorpsWeb.UserView
+  has_one :user, type: "user", field: :user_id
 
   @doc """
   Returns the email or an empty string, depending on the stripe_platform_customer record
