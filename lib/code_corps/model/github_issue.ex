@@ -21,7 +21,7 @@ defmodule CodeCorps.GithubIssue do
     belongs_to :github_pull_request, CodeCorps.GithubPullRequest
     belongs_to :github_repo, CodeCorps.GithubRepo
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc false

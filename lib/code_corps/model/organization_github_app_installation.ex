@@ -5,7 +5,7 @@ defmodule CodeCorps.OrganizationGithubAppInstallation do
     belongs_to :github_app_installation, CodeCorps.GithubAppInstallation
     belongs_to :organization, CodeCorps.Organization
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc """

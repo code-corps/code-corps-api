@@ -13,7 +13,7 @@ defmodule CodeCorps.ProjectUser do
     belongs_to :project, CodeCorps.Project
     belongs_to :user, CodeCorps.User
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
 

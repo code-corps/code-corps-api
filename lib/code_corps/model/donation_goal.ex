@@ -19,7 +19,7 @@ defmodule CodeCorps.DonationGoal do
 
     belongs_to :project, CodeCorps.Project
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc """

@@ -15,7 +15,7 @@ defmodule CodeCorps.TaskList do
     belongs_to :project, CodeCorps.Project
     has_many :tasks, CodeCorps.Task
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   def default_task_lists() do

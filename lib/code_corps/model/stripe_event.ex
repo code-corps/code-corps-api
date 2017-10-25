@@ -33,7 +33,7 @@ defmodule CodeCorps.StripeEvent do
     field :type, :string, null: false
     field :user_id, :string
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc """

@@ -9,7 +9,7 @@ defmodule CodeCorps.StripeConnectCard do
     belongs_to :stripe_connect_account, CodeCorps.StripeConnectAccount
     belongs_to :stripe_platform_card, CodeCorps.StripePlatformCard
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   def create_changeset(struct, params \\ %{}) do

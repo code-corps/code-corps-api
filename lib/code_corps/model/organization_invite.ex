@@ -11,7 +11,7 @@ defmodule CodeCorps.OrganizationInvite do
     field :fulfilled, :boolean, default: false
     field :organization_name, :string
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc """

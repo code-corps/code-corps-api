@@ -7,7 +7,7 @@ defmodule CodeCorps.UserRole do
     belongs_to :user, CodeCorps.User
     belongs_to :role, CodeCorps.Role
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc """

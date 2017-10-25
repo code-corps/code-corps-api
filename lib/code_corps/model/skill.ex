@@ -14,7 +14,7 @@ defmodule CodeCorps.Skill do
     has_many :project_skills, CodeCorps.ProjectSkill
     has_many :projects, through: [:project_skills, :project]
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc """

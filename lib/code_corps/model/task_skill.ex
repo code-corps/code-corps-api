@@ -12,7 +12,7 @@ defmodule CodeCorps.TaskSkill do
     belongs_to :skill, CodeCorps.Skill
     belongs_to :task, CodeCorps.Task
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @permitted_attrs [:skill_id, :task_id]

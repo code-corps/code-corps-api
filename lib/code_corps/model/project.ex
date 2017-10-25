@@ -49,7 +49,7 @@ defmodule CodeCorps.Project do
     has_many :skills, through: [:project_skills, :skill]
     has_many :stripe_connect_subscriptions, through: [:stripe_connect_plan, :stripe_connect_subscriptions]
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   def changeset(struct, params) do

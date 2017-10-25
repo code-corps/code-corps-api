@@ -14,6 +14,6 @@ defmodule CodeCorps.GithubRepo do
     belongs_to :github_app_installation, CodeCorps.GithubAppInstallation
     has_many :project_github_repos, CodeCorps.ProjectGithubRepo
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 end

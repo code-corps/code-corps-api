@@ -35,7 +35,7 @@ defmodule CodeCorps.GithubPullRequest do
 
     belongs_to :github_repo, CodeCorps.GithubRepo
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @attrs [

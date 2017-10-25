@@ -14,7 +14,7 @@ defmodule CodeCorps.StripePlatformCustomer do
 
     has_many :stripe_connect_customers, CodeCorps.StripeConnectCustomer
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   def create_changeset(struct, params \\ %{}) do

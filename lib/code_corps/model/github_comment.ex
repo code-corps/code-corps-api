@@ -13,7 +13,7 @@ defmodule CodeCorps.GithubComment do
 
     belongs_to :github_issue, CodeCorps.GithubIssue
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc false

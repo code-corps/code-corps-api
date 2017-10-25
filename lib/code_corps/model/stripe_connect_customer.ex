@@ -10,7 +10,7 @@ defmodule CodeCorps.StripeConnectCustomer do
     belongs_to :stripe_platform_customer, CodeCorps.StripePlatformCustomer
     belongs_to :user, CodeCorps.User
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   def create_changeset(struct, params \\ %{}) do
