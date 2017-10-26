@@ -10,7 +10,8 @@ defmodule CodeCorpsWeb.TaskViewTest do
     task_skill = insert(:task_skill, task: task)
     user_task = insert(:user_task, task: task)
 
-    rendered_json =  render(CodeCorpsWeb.TaskView, "show.json-api", data: task)
+    task = CodeCorpsWeb.TaskController.preload(task)
+    rendered_json = render(CodeCorpsWeb.TaskView, "show.json-api", data: task)
 
     expected_json = %{
       "data" => %{

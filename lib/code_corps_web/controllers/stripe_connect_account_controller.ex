@@ -16,7 +16,8 @@ defmodule CodeCorpsWeb.StripeConnectAccountController do
     with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
          %StripeConnectAccount{} = account <- StripeConnectAccount |> Repo.get(id),
          {:ok, :authorized} <- current_user |> Policy.authorize(:show, account, params)
-          do
+    do
+      account = preload(account)
       conn |> render("show.json-api", data: account)
     end
   end
@@ -30,7 +31,9 @@ defmodule CodeCorpsWeb.StripeConnectAccountController do
       |> Map.put("tos_acceptance_user_agent", conn |> ConnUtils.extract_user_agent)
     with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %StripeConnectAccount{}, params),
-         {:ok, %StripeConnectAccount{} = account} <- StripeConnectAccountService.create(params) do
+         {:ok, %StripeConnectAccount{} = account} <- StripeConnectAccountService.create(params),
+         account <- preload(account)
+    do
       conn |> put_status(:created) |> render("show.json-api", data: account)
     end
   end
@@ -40,8 +43,16 @@ defmodule CodeCorpsWeb.StripeConnectAccountController do
     with %StripeConnectAccount{} = account <- StripeConnectAccount |> Repo.get(id),
          %User{} = current_user <- conn |> Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:update, account, params),
-         {:ok, %StripeConnectAccount{} = updated_account} <- account |> StripeConnectAccountService.update(params) do
+         {:ok, %StripeConnectAccount{} = updated_account} <- account |> StripeConnectAccountService.update(params),
+         updated_account <- preload(updated_account)
+    do
       conn |> render("show.json-api", data: updated_account)
     end
+  end
+
+  @preloads [:stripe_external_account]
+
+  def preload(data) do
+    Repo.preload(data, @preloads)
   end
 end

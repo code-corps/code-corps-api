@@ -12,10 +12,11 @@ defmodule CodeCorpsWeb.ProjectViewTest do
     project_user = insert(:project_user, project: project)
     stripe_connect_plan = insert(:stripe_connect_plan, project: project)
     task_list = insert(:task_list, project: project)
-    task = insert(:task, project: project, task_list: task_list)
+    task = insert(:task, task_list: task_list, project: project)
 
     host = Application.get_env(:code_corps, :asset_host)
 
+    project = CodeCorpsWeb.ProjectController.preload(project)
     rendered_json = render(CodeCorpsWeb.ProjectView, "show.json-api", data: project)
 
     expected_json = %{
@@ -121,6 +122,7 @@ defmodule CodeCorpsWeb.ProjectViewTest do
     insert(:stripe_connect_account, organization: organization, charges_enabled: true, transfers_enabled: true)
 
     conn = Phoenix.ConnTest.build_conn()
+    project = CodeCorpsWeb.ProjectController.preload(project)
     rendered_json = render(CodeCorpsWeb.ProjectView, "show.json-api", data: project, conn: conn)
     assert rendered_json["data"]["attributes"]["can-activate-donations"] == true
   end
@@ -131,6 +133,7 @@ defmodule CodeCorpsWeb.ProjectViewTest do
     insert(:stripe_connect_plan, project: project)
 
     conn = Phoenix.ConnTest.build_conn()
+    project = CodeCorpsWeb.ProjectController.preload(project)
     rendered_json = render(CodeCorpsWeb.ProjectView, "show.json-api", data: project, conn: conn)
     assert rendered_json["data"]["attributes"]["donations-active"] == true
   end
@@ -140,6 +143,7 @@ defmodule CodeCorpsWeb.ProjectViewTest do
     insert(:donation_goal, project: project)
 
     conn = Phoenix.ConnTest.build_conn()
+    project = CodeCorpsWeb.ProjectController.preload(project)
     rendered_json = render(CodeCorpsWeb.ProjectView, "show.json-api", data: project, conn: conn)
     assert rendered_json["data"]["attributes"]["donations-active"] == false
   end
@@ -148,6 +152,7 @@ defmodule CodeCorpsWeb.ProjectViewTest do
     project = insert(:project)
 
     conn = Phoenix.ConnTest.build_conn()
+    project = CodeCorpsWeb.ProjectController.preload(project)
     rendered_json = render(CodeCorpsWeb.ProjectView, "show.json-api", data: project, conn: conn)
     assert rendered_json["data"]["attributes"]["donations-active"] == false
   end

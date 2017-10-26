@@ -10,14 +10,18 @@ defmodule CodeCorpsWeb.TaskController do
 
   @spec index(Conn.t, map) :: Conn.t
   def index(%Conn{} = conn, %{} = params) do
-    with tasks <- Task.Query.list(params) do
+    with tasks <- Task.Query.list(params),
+         tasks <- preload(tasks)
+    do
       conn |> render("index.json-api", data: tasks)
     end
   end
 
   @spec show(Conn.t, map) :: Conn.t
   def show(%Conn{} = conn, %{} = params) do
-    with %Task{} = task <- Task.Query.find(params) do
+    with %Task{} = task <- Task.Query.find(params),
+         task <- preload(task)
+   do
       conn |> render("show.json-api", data: task)
     end
   end
@@ -26,8 +30,9 @@ defmodule CodeCorpsWeb.TaskController do
   def create(%Conn{} = conn, %{} = params) do
     with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %Task{}, params),
-         {:ok, %Task{} = task} <- params |> Task.Service.create do
-
+         {:ok, %Task{} = task} <- params |> Task.Service.create,
+         task <- preload(task)
+      do
       current_user |> track_created(task)
       current_user |> maybe_track_connected(task)
 
@@ -40,7 +45,9 @@ defmodule CodeCorpsWeb.TaskController do
     with %Task{} = task <- Task.Query.find(params),
          %User{} = current_user <- conn |> Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:update, task),
-         {:ok, %Task{} = updated_task} <- task |> Task.Service.update(params) do
+         {:ok, %Task{} = updated_task} <- task |> Task.Service.update(params),
+         updated_task <- preload(updated_task)
+      do
 
       current_user |> track_updated(updated_task)
       current_user |> maybe_track_connected(updated_task, task)
@@ -51,6 +58,12 @@ defmodule CodeCorpsWeb.TaskController do
 
       conn |> render("show.json-api", data: updated_task)
     end
+  end
+
+  @preloads [:comments, :github_pull_request, :task_skills, :user_task]
+
+  def preload(data) do
+    Repo.preload(data, @preloads)
   end
 
   # tracking
