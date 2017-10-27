@@ -9,7 +9,13 @@ defmodule CodeCorpsWeb.GithubAppInstallationViewTest do
     organization_github_app_installation = insert(:organization_github_app_installation, github_app_installation: github_app_installation, organization: organization)
     github_repo = insert(:github_repo, github_app_installation: github_app_installation)
 
-    rendered_json = render(CodeCorpsWeb.GithubAppInstallationView, "show.json-api", data: github_app_installation)
+    github_app_installation =
+      github_app_installation
+      |> CodeCorpsWeb.GithubAppInstallationController.preload()
+
+    rendered_json =
+      CodeCorpsWeb.GithubAppInstallationView
+      |> render("show.json-api", data: github_app_installation)
 
     expected_json = %{
       "data" => %{

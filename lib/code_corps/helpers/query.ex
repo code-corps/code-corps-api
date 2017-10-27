@@ -36,14 +36,6 @@ defmodule CodeCorps.Helpers.Query do
 
   # end task queries
 
-  # def comment queries
-
-  def task_filter(query, task_id) do
-    query |> where([object], object.task_id == ^task_id)
-  end
-
-  # end comment queries
-
   # user queries
 
   def user_filter(query, %{"query" => query_string}) do
@@ -60,8 +52,6 @@ defmodule CodeCorps.Helpers.Query do
   # end user queries
 
   # sorting
-
-  def sort_by_newest_first(query), do: query |> order_by([desc: :inserted_at])
 
   def sort_by_order(query), do: query |> order_by([asc: :order])
 

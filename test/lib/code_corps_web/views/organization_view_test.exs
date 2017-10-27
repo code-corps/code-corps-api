@@ -12,6 +12,7 @@ defmodule CodeCorpsWeb.OrganizationViewTest do
 
     host = Application.get_env(:code_corps, :asset_host)
 
+    organization = CodeCorpsWeb.OrganizationController.preload(organization)
     rendered_json =  render(CodeCorpsWeb.OrganizationView, "show.json-api", data: organization)
 
     expected_json = %{

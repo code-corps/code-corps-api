@@ -13,7 +13,9 @@ defmodule CodeCorpsWeb.StripeConnectSubscriptionController do
   def show(%Conn{} = conn, %{"id" => id} = params) do
     with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
          %StripeConnectSubscription{} = subscription <- StripeConnectSubscription |> Repo.get(id),
-         {:ok, :authorized} <- current_user |> Policy.authorize(:show, subscription, params) do
+         {:ok, :authorized} <- current_user |> Policy.authorize(:show, subscription, params)
+    do
+      subscription = preload(subscription)
       conn |> render("show.json-api", data: subscription)
     end
   end
@@ -22,8 +24,16 @@ defmodule CodeCorpsWeb.StripeConnectSubscriptionController do
   def create(%Conn{} = conn, %{} = params) do
     with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %StripeConnectSubscription{}, params),
-         {:ok, %StripeConnectSubscription{} = subscription} <- StripeConnectSubscriptionService.find_or_create(params) do
+         {:ok, %StripeConnectSubscription{} = subscription} <- StripeConnectSubscriptionService.find_or_create(params),
+         subscription <- preload(subscription)
+    do
       conn |> put_status(:created) |> render("show.json-api", data: subscription)
     end
+  end
+
+  @preloads [:project]
+
+  def preload(data) do
+    Repo.preload(data, @preloads)
   end
 end

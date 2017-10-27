@@ -10,14 +10,14 @@ defmodule CodeCorpsWeb.SkillController do
 
   @spec index(Conn.t, map) :: Conn.t
   def index(%Conn{} = conn, %{} = params) do
-    with skills <- params |> load_skills() do
+    with skills <- params |> load_skills() |> preload do
       conn |> render("index.json-api", data: skills)
     end
   end
 
   @spec show(Conn.t, map) :: Conn.t
   def show(%Conn{} = conn, %{"id" => id}) do
-    with %Skill{} = skill <- Skill |> Repo.get(id) do
+    with %Skill{} = skill <- Skill |> Repo.get(id) |> preload do
       conn |> render("show.json-api", data: skill)
     end
   end
@@ -26,7 +26,9 @@ defmodule CodeCorpsWeb.SkillController do
   def create(%Conn{} = conn, %{} = params) do
     with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %Skill{}, params),
-         {:ok, %Skill{} = skill} <- %Skill{} |> Skill.changeset(params) |> Repo.insert do
+         {:ok, %Skill{} = skill} <- %Skill{} |> Skill.changeset(params) |> Repo.insert,
+         skill <- preload(skill)
+      do
       conn |> put_status(:created) |> render("show.json-api", data: skill)
     end
   end
@@ -38,5 +40,11 @@ defmodule CodeCorpsWeb.SkillController do
     |> Query.title_filter(params)
     |> Query.limit_filter(params)
     |> Repo.all
+  end
+
+  @preloads [:role_skills]
+
+  def preload(data) do
+    Repo.preload(data, @preloads)
   end
 end

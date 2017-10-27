@@ -5,7 +5,8 @@ defmodule CodeCorpsWeb.SkillViewTest do
     skill = insert(:skill)
     role_skill = insert(:role_skill, skill: skill)
 
-    rendered_json =  render(CodeCorpsWeb.SkillView, "show.json-api", data: skill)
+    skill = CodeCorpsWeb.SkillController.preload(skill)
+    rendered_json = render(CodeCorpsWeb.SkillView, "show.json-api", data: skill)
 
     expected_json = %{
       "data" => %{

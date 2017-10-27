@@ -20,6 +20,7 @@ defmodule CodeCorpsWeb.UserViewTest do
     host = Application.get_env(:code_corps, :asset_host)
     intercom_user_hash = UserView.intercom_user_hash(user, %Plug.Conn{})
 
+    user = CodeCorpsWeb.UserController.preload(user)
     rendered_json = render(UserView, "show.json-api", data: user)
 
     expected_json = %{
@@ -105,6 +106,7 @@ defmodule CodeCorpsWeb.UserViewTest do
       ConnTest.build_conn()
       |> Conn.assign(:current_user, user)
 
+    user = CodeCorpsWeb.UserController.preload(user)
     rendered_json = render(UserView, "show.json-api", data: user, conn: conn)
     assert rendered_json["data"]["attributes"]["email"] == user.email
   end
@@ -117,6 +119,7 @@ defmodule CodeCorpsWeb.UserViewTest do
       ConnTest.build_conn()
       |> Conn.assign(:current_user, auth_user)
 
+    users = CodeCorpsWeb.UserController.preload(users)
     rendered_json = render(UserView, "show.json-api", data: users, conn: conn)
 
     emails =
@@ -157,6 +160,8 @@ defmodule CodeCorpsWeb.UserViewTest do
   end
 
   defp render_user_json(user) do
+    user = CodeCorpsWeb.UserController.preload(user)
+
     conn =
       ConnTest.build_conn()
       |> Conn.assign(:current_user, user)

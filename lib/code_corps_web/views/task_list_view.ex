@@ -1,6 +1,5 @@
 defmodule CodeCorpsWeb.TaskListView do
   @moduledoc false
-  use CodeCorpsWeb.PreloadHelpers, default_preloads: [:tasks]
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
 

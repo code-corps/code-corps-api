@@ -6,6 +6,7 @@ defmodule CodeCorpsWeb.TaskListViewTest do
     task_list = insert(:task_list, order: 1000, project: project)
     task = insert(:task, order: 1000, task_list: task_list)
 
+    task_list = CodeCorpsWeb.TaskListController.preload(task_list)
     rendered_json =  render(CodeCorpsWeb.TaskListView, "show.json-api", data: task_list)
 
     expected_json = %{

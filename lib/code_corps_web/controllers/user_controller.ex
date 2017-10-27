@@ -15,21 +15,28 @@ defmodule CodeCorpsWeb.UserController do
 
   @spec index(Conn.t, map) :: Conn.t
   def index(%Conn{} = conn, %{} = params) do
-    with users <- User |> Query.id_filter(params) |> Query.limit_filter(params) |> Query.user_filter(params) |> Repo.all do
-      conn |> render("index.json-api", data: users)
-    end
+    users =
+      User
+      |> Query.id_filter(params)
+      |> Query.limit_filter(params)
+      |> Query.user_filter(params)
+      |> Repo.all()
+      |> preload()
+
+    conn |> render("index.json-api", data: users)
   end
 
   @spec show(Conn.t, map) :: Conn.t
   def show(%Conn{} = conn, %{"id" => id}) do
-    with %User{} = user <- User |> Repo.get(id) do
+    with %User{} = user <- User |> Repo.get(id) |> preload() do
       conn |> render("show.json-api", data: user)
     end
   end
 
   @spec create(Conn.t, map) :: Conn.t
   def create(%Conn{} = conn, %{} = params) do
-    with {:ok, %User{} = user} <- %User{} |> User.registration_changeset(params) |> Repo.insert
+    with {:ok, %User{} = user} <- %User{} |> User.registration_changeset(params) |> Repo.insert(),
+         user <- preload(user)
     do
       conn |> put_status(:created) |> render("show.json-api", data: user)
     end
@@ -40,7 +47,8 @@ defmodule CodeCorpsWeb.UserController do
     with %User{} = user <- User |> Repo.get(id),
          %User{} = current_user <- conn |> Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:update, user),
-         {:ok, user, _, _} <- user |> UserService.update(params)
+         {:ok, user, _, _} <- user |> UserService.update(params),
+         user <- preload(user)
     do
        conn |> render("show.json-api", data: user)
     end
@@ -52,7 +60,8 @@ defmodule CodeCorpsWeb.UserController do
   @spec github_oauth(Conn.t, map) :: Conn.t
   def github_oauth(%Conn{} = conn, %{"code" => code, "state" => state}) do
     current_user = Guardian.Plug.current_resource(conn)
-    with {:ok, user} <- GitHub.API.User.connect(current_user, code, state)
+    with {:ok, user} <- GitHub.API.User.connect(current_user, code, state),
+         user <- preload(user)
     do
       Analytics.SegmentTracker.track(user.id, "Connected to GitHub", user)
       conn |> render("show.json-api", data: user)
@@ -71,4 +80,13 @@ defmodule CodeCorpsWeb.UserController do
     conn |> json(hash)
   end
 
+  @preloads [
+    :github_app_installations, :project_users, :slugged_route,
+    :stripe_connect_subscriptions, :stripe_platform_card,
+    :stripe_platform_customer, :user_categories, :user_roles, :user_skills
+  ]
+
+  def preload(data) do
+    Repo.preload(data, @preloads)
+  end
 end

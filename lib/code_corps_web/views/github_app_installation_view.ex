@@ -1,6 +1,5 @@
 defmodule CodeCorpsWeb.GithubAppInstallationView do
   @moduledoc false
-  use CodeCorpsWeb.PreloadHelpers, default_preloads: ~w(github_repos organization_github_app_installations)a
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
 
