@@ -5,6 +5,7 @@ defmodule CodeCorpsWeb.RoleViewTest do
     role = insert(:role)
     role_skill = insert(:role_skill, role: role)
 
+    role = CodeCorpsWeb.RoleController.preload(role)
     rendered_json =  render(CodeCorpsWeb.RoleView, "show.json-api", data: role)
 
     expected_json = %{

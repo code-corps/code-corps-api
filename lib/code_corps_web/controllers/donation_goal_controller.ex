@@ -11,14 +11,18 @@ defmodule CodeCorpsWeb.DonationGoalController do
 
   @spec index(Conn.t, map) :: Conn.t
   def index(%Conn{} = conn, %{} = params) do
-    with donation_goals <- DonationGoal |> Query.id_filter(params) |> Repo.all do
-      conn |> render("index.json-api", data: donation_goals)
-    end
+    donation_goals =
+      DonationGoal
+      |> Query.id_filter(params)
+      |> Repo.all
+      |> preload()
+
+    conn |> render("index.json-api", data: donation_goals)
   end
 
   @spec show(Conn.t, map) :: Conn.t
   def show(%Conn{} = conn, %{"id" => id}) do
-    with %DonationGoal{} = donation_goal <- DonationGoal |> Repo.get(id) do
+    with %DonationGoal{} = donation_goal <- DonationGoal |> Repo.get(id) |> preload() do
       conn |> render("show.json-api", data: donation_goal)
     end
   end
@@ -27,7 +31,9 @@ defmodule CodeCorpsWeb.DonationGoalController do
   def create(%Conn{} = conn, %{} = params) do
     with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %DonationGoal{}, params),
-         {:ok, %DonationGoal{} = donation_goal} <- DonationGoalsService.create(params) do
+         {:ok, %DonationGoal{} = donation_goal} <- DonationGoalsService.create(params),
+         donation_goal <- preload(donation_goal)
+    do
       conn |> put_status(:created) |> render("show.json-api", data: donation_goal)
     end
   end
@@ -48,8 +54,16 @@ defmodule CodeCorpsWeb.DonationGoalController do
     with %DonationGoal{} = donation_goal <- DonationGoal |> Repo.get(id),
       %User{} = current_user <- conn |> Guardian.Plug.current_resource,
       {:ok, :authorized} <- current_user |> Policy.authorize(:update, donation_goal),
-      {:ok, %DonationGoal{} = updated_donation_goal} <- donation_goal |> DonationGoalsService.update(params) do
-        conn |> render("show.json-api", data: updated_donation_goal)
+      {:ok, %DonationGoal{} = updated_donation_goal} <- donation_goal |> DonationGoalsService.update(params),
+      updated_donation_goal <- preload(updated_donation_goal)
+    do
+      conn |> render("show.json-api", data: updated_donation_goal)
     end
+  end
+
+  @preloads [:project]
+
+  def preload(data) do
+    Repo.preload(data, @preloads)
   end
 end

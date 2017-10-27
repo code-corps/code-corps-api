@@ -1,6 +1,5 @@
 defmodule CodeCorpsWeb.SkillView do
   @moduledoc false
-  use CodeCorpsWeb.PreloadHelpers, default_preloads: [:role_skills]
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
 

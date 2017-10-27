@@ -7,6 +7,7 @@ defmodule CodeCorpsWeb.StripeConnectSubscriptionViewTest do
     user = insert(:user)
     subscription = insert(:stripe_connect_subscription, stripe_connect_plan: plan, user: user)
 
+    subscription = CodeCorpsWeb.StripeConnectSubscriptionController.preload(subscription)
     rendered_json =  render(CodeCorpsWeb.StripeConnectSubscriptionView, "show.json-api", data: subscription)
 
     expected_json = %{

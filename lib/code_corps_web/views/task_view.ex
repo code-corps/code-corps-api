@@ -1,7 +1,5 @@
 defmodule CodeCorpsWeb.TaskView do
   @moduledoc false
-  use CodeCorpsWeb.PreloadHelpers,
-      default_preloads: [:comments, :github_pull_request, :task_skills, :user_task]
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
 

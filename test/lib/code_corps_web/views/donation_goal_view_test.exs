@@ -8,6 +8,7 @@ defmodule CodeCorpsWeb.DonationGoalViewTest do
     donation_goal = insert(:donation_goal, project: project, amount: 500)
     CodeCorps.Services.DonationGoalsService.update_related_goals(donation_goal)
 
+    donation_goal = CodeCorpsWeb.DonationGoalController.preload(donation_goal)
     rendered_json = render(CodeCorpsWeb.DonationGoalView, "show.json-api", data: donation_goal)
 
     expected_json = %{

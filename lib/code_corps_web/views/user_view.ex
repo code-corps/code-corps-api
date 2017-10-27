@@ -2,13 +2,6 @@ defmodule CodeCorpsWeb.UserView do
   @moduledoc false
   alias CodeCorps.Presenters.ImagePresenter
 
-  use CodeCorpsWeb.PreloadHelpers,
-      default_preloads: [
-        :github_app_installations, :project_users, :slugged_route,
-        :stripe_connect_subscriptions, :stripe_platform_card,
-        :stripe_platform_customer, :user_categories, :user_roles,
-        :user_skills
-      ]
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
 

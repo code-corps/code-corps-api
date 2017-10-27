@@ -3,12 +3,6 @@ defmodule CodeCorpsWeb.ProjectView do
   alias CodeCorps.StripeService.Validators.ProjectCanEnableDonations
   alias CodeCorps.Presenters.ImagePresenter
 
-  use CodeCorpsWeb.PreloadHelpers,
-    default_preloads: [
-      :donation_goals, [organization: :stripe_connect_account],
-      :project_categories, :project_github_repos, :project_skills,
-      :project_users, :stripe_connect_plan, :task_lists, :tasks
-    ]
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
 
@@ -28,8 +22,8 @@ defmodule CodeCorpsWeb.ProjectView do
   has_many :project_github_repos, serializer: CodeCorpsWeb.ProjectGithubRepoView, identifiers: :always
   has_many :project_skills, serializer: CodeCorpsWeb.ProjectSkillView, identifiers: :always
   has_many :project_users, serializer: CodeCorpsWeb.ProjectUserView, identifiers: :always
-  has_many :task_lists, serializer: CodeCorpsWeb.TaskListView, identifiers: :always
   has_many :tasks, serializer: CodeCorpsWeb.TaskView, identifiers: :always
+  has_many :task_lists, serializer: CodeCorpsWeb.TaskListView, identifiers: :always
 
   def can_activate_donations(project, _conn) do
     case ProjectCanEnableDonations.validate(project) do
