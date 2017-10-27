@@ -88,3 +88,9 @@ import_config "#{Mix.env}.exs"
 
 # Import Timber, structured logging
 import_config "timber.exs"
+
+import_config "scout_apm.exs"
+
+config :code_corps, CodeCorps.Repo,
+  loggers: [{Ecto.LogEntry, :log, []},
+            {ScoutApm.Instruments.EctoLogger, :log, []}]
