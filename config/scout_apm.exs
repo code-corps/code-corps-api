@@ -4,8 +4,8 @@
 use Mix.Config
 
 config :scout_apm,
-  name: System.get_env("SCOUT_APP_NAME") || "", # The app name that will appear within the Scout UI
-  key: System.get_env("SCOUT_APP_KEY") || ""
+  name: {:system, "SCOUT_APP_NAME"}, # The app name that will appear within the Scout UI
+  key: {:system, "SCOUT_APP_KEY"}
 
 config :phoenix, :template_engines,
   eex: ScoutApm.Instruments.EExEngine,
