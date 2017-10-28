@@ -33,6 +33,12 @@ defmodule CodeCorps.GitHub.SuccessAPI do
     {:ok, mock_response(method, url, headers, body, options)}
   end
 
+  def get_all(url, headers, options) do
+    send(self(), {url, headers, options})
+
+    mock_response(:get, url, headers, %{}, options)
+  end
+
   defp mock_response(:post, "https://github.com/login/oauth/access_token", _, _, _) do
     %{"access_token" => "foo_auth_token"}
   end
@@ -63,6 +69,9 @@ defmodule CodeCorps.GitHub.SuccessAPI do
   end
   defp mock_response(:patch, ["repos", _owner, _repo, "issues", "comments", _id], _, _, _) do
     load_endpoint_fixture("issue_comment")
+  end
+  defp mock_response(:get, ["repos", _owner, _repo, "issues"], _, _, _) do
+    load_endpoint_fixture("issues")
   end
   defp mock_response(:get, ["repos", _owner, _repo, "pulls", _number], _, _, _) do
     load_endpoint_fixture("pull_request")
