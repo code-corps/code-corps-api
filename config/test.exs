@@ -41,8 +41,18 @@ config :code_corps, :icon_color_generator, CodeCorps.RandomIconColor.TestGenerat
 # Set Corsica logging to output no console warning when rejecting a request
 config :code_corps, :corsica_log_level, [rejected: :debug]
 
-# Set the GitHub module
-config :code_corps, github: CodeCorps.GitHubTesting
+# fall back to sample pem if none is available as an ENV variable
+pem = case System.get_env("GITHUB_TEST_APP_PEM") do
+  nil -> "./test/fixtures/github/app.pem" |> File.read!
+  encoded_pem -> encoded_pem |> Base.decode64!
+end
+
+config :code_corps,
+  github: CodeCorps.GitHub.SuccessAPI,
+  github_app_id: System.get_env("GITHUB_TEST_APP_ID"),
+  github_app_client_id: System.get_env("GITHUB_TEST_APP_CLIENT_ID"),
+  github_app_client_secret: System.get_env("GITHUB_TEST_APP_CLIENT_SECRET"),
+  github_app_pem: pem
 
 config :sentry,
   environment_name: Mix.env || :test
@@ -57,13 +67,3 @@ config :code_corps,
 
 config :code_corps, :cloudex, CloudexTest
 config :cloudex, api_key: "test_key", secret: "test_secret", cloud_name: "test_cloud_name"
-
-# fall back to sample pem if none is available as an ENV variable
-pem = case System.get_env("GITHUB_APP_PEM") do
-  nil -> "./test/fixtures/github/app.pem" |> File.read!
-  encoded_pem -> encoded_pem |> Base.decode64!
-end
-
-config :code_corps,
-  github: CodeCorps.GitHub.SuccessAPI,
-  github_app_pem: pem

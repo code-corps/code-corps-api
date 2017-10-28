@@ -54,7 +54,7 @@ defmodule CodeCorps.Mixfile do
       {:cowboy, "~> 1.0"},
       {:benchfella, "~> 0.3.0", only: :dev},
       {:bypass, "~> 0.8.1", only: :test},
-      {:cloudex, "~> 0.1.17"},
+      {:cloudex, "~> 0.2.2"},
       {:comeonin, "~> 3.1"},
       {:corsica, "~> 1.0"}, # CORS
       {:credo, "~> 0.8", only: [:dev, :test]}, # Code style suggestions
@@ -66,6 +66,7 @@ defmodule CodeCorps.Mixfile do
       {:ex_machina, "~> 2.0", only: :test}, # test factories
       {:guardian, "~> 0.14.5"}, # Authentication (JWT)
       {:hackney, ">= 1.4.4"},
+      {:httpoison, "~> 0.13"},
       {:inch_ex, "~> 0.5", only: [:dev, :test]}, # Inch CI
       {:inflex, "~> 1.8.1"},
       {:ja_serializer, "~> 0.12"}, # JSON API
@@ -406,6 +407,7 @@ defmodule CodeCorps.Mixfile do
      "ecto.reset": ["ecto.drop", "ecto.setup"],
      "ecto.migrate": ["ecto.migrate", "ecto.dump"],
      "ecto.rollback": ["ecto.rollback", "ecto.dump"],
-     "test": ["ecto.create --quiet", "ecto.migrate", "test"]]
+     "test": ["ecto.create --quiet", "ecto.migrate", "test"],
+     "test.acceptance": ["ecto.create --quiet", "ecto.migrate", "test --include acceptance:true"]]
   end
 end

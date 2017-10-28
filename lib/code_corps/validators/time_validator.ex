@@ -11,7 +11,10 @@ defmodule CodeCorps.Validators.TimeValidator do
   def validate_time_after(%{data: data} = changeset, field) do
     previous_time = Map.get(data, field)
     current_time = Changeset.get_change(changeset, field)
-    case current_time |> Timex.after?(previous_time) do
+    is_after = current_time |> Timex.after?(previous_time)
+    is_equal = current_time |> Timex.equal?(previous_time)
+    after_or_equal = is_after || is_equal
+    case after_or_equal do
       true -> changeset
       false -> Changeset.add_error(changeset, field, "cannot be before the last recorded time")
     end

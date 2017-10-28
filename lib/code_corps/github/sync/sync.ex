@@ -6,14 +6,13 @@ defmodule CodeCorps.GitHub.Sync do
     GithubPullRequest,
     GithubRepo,
     GitHub.Sync.Utils.RepoFinder,
-    Repo,
-    Task
+    Repo
   }
   alias Ecto.Multi
 
   @type outcome :: {:ok, list(Comment.t)}
                  | {:ok, GithubPullRequest.t}
-                 | {:ok, list(Task.t)}
+                 | {:ok, list(CodeCorps.Task.t)}
                  | {:error, :repo_not_found}
                  | {:error, :fetching_issue}
                  | {:error, :fetching_pull_request}
@@ -98,6 +97,24 @@ defmodule CodeCorps.GitHub.Sync do
     |> Multi.merge(GitHub.Sync.PullRequest, :sync, [pull_request])
     |> Multi.merge(GitHub.Sync.Issue, :sync, [payload])
     |> transact()
+  end
+
+  def sync_issues(repo) do
+    {:ok, issues} = GitHub.API.Repository.issues(repo)
+    Enum.map(issues, &sync_issue(&1, repo))
+  end
+
+  def sync_issue(issue, repo) do
+    Multi.new
+    |> Multi.merge(__MODULE__, :return_repo, [repo])
+    |> Multi.merge(GitHub.Sync.Issue, :sync, [issue])
+    |> transact()
+  end
+
+  @doc false
+  def return_repo(_, repo) do
+    Multi.new
+    |> Multi.run(:repo, fn _ -> {:ok, repo} end)
   end
 
   @doc false

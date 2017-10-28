@@ -3,6 +3,7 @@
 {:ok, _} = Application.ensure_all_started(:ex_machina)
 {:ok, _} = Application.ensure_all_started(:bypass)
 
+ExUnit.configure exclude: [acceptance: true]
 ExUnit.start
 
 Ecto.Adapters.SQL.Sandbox.mode(CodeCorps.Repo, :manual)
