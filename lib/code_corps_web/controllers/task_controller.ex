@@ -4,15 +4,17 @@ defmodule CodeCorpsWeb.TaskController do
 
   alias CodeCorps.{Analytics.SegmentTracker, Task, Policy, User}
 
+  import ScoutApm.Tracing
+
   action_fallback CodeCorpsWeb.FallbackController
   plug CodeCorpsWeb.Plug.DataToAttributes
   plug CodeCorpsWeb.Plug.IdsToIntegers
 
   @spec index(Conn.t, map) :: Conn.t
   def index(%Conn{} = conn, %{} = params) do
-    with tasks <- Task.Query.list(params),
-         tasks <- preload(tasks)
-    do
+    tasks = Task.Query.list(params)
+    tasks = preload(tasks)
+    timing("JaSerializer", "render") do
       conn |> render("index.json-api", data: tasks)
     end
   end
@@ -21,7 +23,7 @@ defmodule CodeCorpsWeb.TaskController do
   def show(%Conn{} = conn, %{} = params) do
     with %Task{} = task <- Task.Query.find(params),
          task <- preload(task)
-   do
+    do
       conn |> render("show.json-api", data: task)
     end
   end
@@ -63,7 +65,9 @@ defmodule CodeCorpsWeb.TaskController do
   @preloads [:comments, :github_pull_request, :task_skills, :user_task]
 
   def preload(data) do
-    Repo.preload(data, @preloads)
+    timing("TaskController", "preload") do
+      Repo.preload(data, @preloads)
+    end
   end
 
   # tracking
