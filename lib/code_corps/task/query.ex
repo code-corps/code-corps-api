@@ -3,7 +3,9 @@ defmodule CodeCorps.Task.Query do
   Holds queries used to retrieve a list of, or a single `Task` record from the
   database, using a provided map of parameters/filters.
   """
+
   import Ecto.Query
+  import ScoutApm.Tracing
 
   alias CodeCorps.{Helpers, Task, Repo}
   alias Ecto.Queryable
@@ -18,13 +20,15 @@ defmodule CodeCorps.Task.Query do
   """
   @spec list(map) :: list(Project.t)
   def list(%{} = params) do
-    Task
-    |> Helpers.Query.id_filter(params)
-    |> apply_archived_status(params)
-    |> apply_status(params)
-    |> apply_optional_filters(params)
-    |> order_by([asc: :order])
-    |> Repo.all()
+    timing("Task.Query", "list") do
+      Task
+      |> Helpers.Query.id_filter(params)
+      |> apply_archived_status(params)
+      |> apply_status(params)
+      |> apply_optional_filters(params)
+      |> order_by([asc: :order])
+      |> Repo.all()
+    end
   end
 
   @spec apply_optional_filters(Queryable.t, map) :: Queryable.t
