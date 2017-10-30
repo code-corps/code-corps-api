@@ -19,11 +19,11 @@ defmodule CodeCorps.GitHub.API.IssueTest do
       assert_received({
         :get,
         endpoint_url,
+        _body,
         [
           {"Accept", "application/vnd.github.machine-man-preview+json"},
           {"Authorization", "token" <> _tok}
         ],
-        _body,
         _options
       })
       assert endpoint_url == url
@@ -41,11 +41,11 @@ defmodule CodeCorps.GitHub.API.IssueTest do
       assert_received({
         :post,
         "https://api.github.com/repos/foo/bar/issues",
+        body,
         [
           {"Accept", "application/vnd.github.machine-man-preview+json"},
           {"Authorization", "token baz"}
         ],
-        body,
         _options
       })
 
@@ -62,11 +62,11 @@ defmodule CodeCorps.GitHub.API.IssueTest do
       assert_received({
         :post,
         "https://api.github.com/repos/foo/bar/issues",
+        body,
         [
           {"Accept", "application/vnd.github.machine-man-preview+json"},
           {"Authorization", "token" <> _tok}
         ],
-        body,
         _options
       })
 
@@ -85,11 +85,11 @@ defmodule CodeCorps.GitHub.API.IssueTest do
       assert_received({
         :post,
         "https://api.github.com/repos/foo/bar/issues",
+        body,
         [
           {"Accept", "application/vnd.github.machine-man-preview+json"},
           {"Authorization", "token" <> _tok}
         ],
-        body,
         _options
       })
 
@@ -109,11 +109,11 @@ defmodule CodeCorps.GitHub.API.IssueTest do
       assert_received({
         :patch,
         "https://api.github.com/repos/foo/bar/issues/5",
+        body,
         [
           {"Accept", "application/vnd.github.machine-man-preview+json"},
           {"Authorization", "token baz"}
         ],
-        body,
         _options
       })
 
@@ -131,11 +131,11 @@ defmodule CodeCorps.GitHub.API.IssueTest do
       assert_received({
         :patch,
         "https://api.github.com/repos/foo/bar/issues/5",
+        body,
         [
           {"Accept", "application/vnd.github.machine-man-preview+json"},
           {"Authorization", "token" <> _tok}
         ],
-        body,
         _options
       })
 
@@ -155,11 +155,11 @@ defmodule CodeCorps.GitHub.API.IssueTest do
       assert_received({
         :patch,
         "https://api.github.com/repos/foo/bar/issues/5",
+        body,
         [
           {"Accept", "application/vnd.github.machine-man-preview+json"},
           {"Authorization", "token" <> _tok}
         ],
-        body,
         _options
       })
 

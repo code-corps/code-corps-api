@@ -41,7 +41,7 @@ defmodule CodeCorps.GitHub.API.Issue do
     attrs = task |> GitHub.Adapters.Issue.to_api
 
     with opts when is_list(opts) <- GitHub.API.opts_for(user, installation) do
-      GitHub.request(:post, endpoint, %{}, attrs, opts)
+      GitHub.request(:post, endpoint, attrs, %{}, opts)
     else
       {:error, github_error} -> {:error, github_error}
     end
@@ -63,7 +63,7 @@ defmodule CodeCorps.GitHub.API.Issue do
     attrs = task |> GitHub.Adapters.Issue.to_api
 
     with opts when is_list(opts) <- GitHub.API.opts_for(user, installation) do
-      GitHub.request(:patch, endpoint, %{}, attrs, opts)
+      GitHub.request(:patch, endpoint, attrs, %{}, opts)
     else
       {:error, github_error} -> {:error, github_error}
     end

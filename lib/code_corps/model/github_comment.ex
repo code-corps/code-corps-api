@@ -3,6 +3,8 @@ defmodule CodeCorps.GithubComment do
 
   alias Ecto.Changeset
 
+  @type t :: %__MODULE__{}
+
   schema "github_comments" do
     field :body, :string
     field :github_created_at, :utc_datetime

@@ -14,7 +14,7 @@ defmodule CodeCorps.TestHelpers do
   end
 
   def assert_ids_from_response(response, ids) do
-    assert ids_from_response(response) == ids
+    assert response |> ids_from_response() |> Enum.sort() == ids |> Enum.sort()
     response
   end
 

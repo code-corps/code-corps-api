@@ -1,4 +1,5 @@
 defmodule CodeCorps.GitHub.Sync.PullRequest do
+  alias CodeCorps.{GithubIssue, GithubRepo}
   alias CodeCorps.GitHub.Sync.PullRequest.GithubPullRequest, as: GithubPullRequestSyncer
   alias Ecto.Multi
 

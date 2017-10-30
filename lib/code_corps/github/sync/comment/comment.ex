@@ -1,7 +1,8 @@
 defmodule CodeCorps.GitHub.Sync.Comment do
   alias CodeCorps.{
     GitHub,
-    GithubComment
+    GithubComment,
+    GithubIssue
   }
   alias GitHub.Sync.Comment.Comment, as: CommentCommentSyncer
   alias GitHub.Sync.Comment.GithubComment, as: CommentGithubCommentSyncer

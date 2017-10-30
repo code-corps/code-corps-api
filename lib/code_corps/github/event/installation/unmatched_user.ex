@@ -9,7 +9,7 @@ defmodule CodeCorps.GitHub.Event.Installation.UnmatchedUser do
     Repo
   }
 
-  @typep process_outcome :: {:ok, GithubAppInstallation.t} | {:error, Changeset.t}
+  @typep process_outcome :: {:ok, GithubAppInstallation.t} | {:error, Ecto.Changeset.t}
   @type outcome :: process_outcome |  {:error, :unexpected_installation_payload}
 
   @doc ~S"""
@@ -41,14 +41,14 @@ defmodule CodeCorps.GitHub.Event.Installation.UnmatchedUser do
   end
   defp find_installation(_), do: :unexpected_installation_payload
 
-  @spec create_installation(map) :: {:ok, GithubAppInstallation.t} | {:error, Changeset.t}
+  @spec create_installation(map) :: {:ok, GithubAppInstallation.t} | {:error, Ecto.Changeset.t}
   defp create_installation(%{} = payload) do
     %GithubAppInstallation{}
     |> ChangesetBuilder.build_changeset(payload)
     |> Repo.insert()
   end
 
-  @spec update_installation(GithubAppInstallation.t, map) :: {:ok, GithubAppInstallation.t} | {:error, Changeset.t}
+  @spec update_installation(GithubAppInstallation.t, map) :: {:ok, GithubAppInstallation.t} | {:error, Ecto.Changeset.t}
   defp update_installation(%GithubAppInstallation{} = installation, %{} = payload) do
     installation
     |> ChangesetBuilder.build_changeset(payload)

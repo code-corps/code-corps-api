@@ -20,15 +20,16 @@ defmodule CodeCorps.GitHub.API.RepositoryTest do
       {:ok, issues} = Repository.issues(github_repo)
 
       assert_received({
+        :get,
         endpoint_url,
+        "",
         [
           {"Accept", "application/vnd.github.machine-man-preview+json"},
           {"Authorization", "token" <> _tok}
         ],
         [
-          :with_body,
-          _headers,
-          {:params, [per_page: 100, state: "all"]}
+          {:params, [page: 1, per_page: 100, state: "all"]},
+          {:access_token, "v1.1f699f1069f60xxx"}
         ]
       })
       assert url == endpoint_url

@@ -1,5 +1,8 @@
 defmodule CodeCorps.GitHub do
-  alias CodeCorps.GitHub.API.Headers
+  alias CodeCorps.GitHub.{
+    API,
+    API.Headers
+  }
 
   defmodule APIErrorObject do
     @moduledoc """
@@ -82,7 +85,7 @@ defmodule CodeCorps.GitHub do
   end
 
 
-  @type method :: :get | :post | :put | :delete | :patch
+  @type method :: :get | :post | :put | :delete | :patch | :head
 
   @type body :: {:multipart, list} | map
   @type headers :: %{String.t => String.t} | %{}
@@ -92,15 +95,16 @@ defmodule CodeCorps.GitHub do
   @doc """
   A low level utility function to make a direct request to the GitHub API.
   """
-  @spec request(method, String.t, headers, body, list) :: response
-  def request(method, endpoint, headers, body, options) do
+  @spec request(method, String.t, body, headers, list) :: response
+  def request(method, endpoint, body, headers, options) do
     with {:ok, encoded_body} <- body |> Poison.encode do
-      api().request(
+      API.request(
         method,
         api_url_for(endpoint),
-        headers |> Headers.user_request(options),
         encoded_body,
-        options |> add_default_options())
+        headers |> Headers.user_request(options),
+        options
+      )
     else
       _ -> {:error, HTTPClientError.new(reason: :body_encoding_error)}
     end
@@ -110,25 +114,26 @@ defmodule CodeCorps.GitHub do
   A low level utility function to make an authenticated request to the
   GitHub API on behalf of a GitHub App or integration
   """
-  @spec integration_request(method, String.t, headers, body, list) :: response
-  def integration_request(method, endpoint, headers, body, options) do
+  @spec integration_request(method, String.t, body, headers, list) :: response
+  def integration_request(method, endpoint, body, headers, options) do
     with {:ok, encoded_body} <- body |> Poison.encode do
-      api().request(
+      API.request(
         method,
         api_url_for(endpoint),
-        headers |> Headers.integration_request,
         encoded_body,
-        options |> add_default_options())
+        headers |> Headers.integration_request,
+        options
+      )
     else
       _ -> {:error, HTTPClientError.new(reason: :body_encoding_error)}
     end
   end
 
   def get_all(endpoint, headers, options) do
-    api().get_all(
+    API.get_all(
       api_url_for(endpoint),
       headers |> Headers.user_request(options),
-      options |> add_default_options()
+      options
     )
   end
 
@@ -140,30 +145,23 @@ defmodule CodeCorps.GitHub do
   @spec user_access_token_request(String.t, String.t) :: response
   def user_access_token_request(code, state) do
     with {:ok, encoded_body} <- code |> build_access_token_params(state) |> Poison.encode do
-      api().request(
+      API.request(
         :post,
         @token_url,
-        Headers.access_token_request,
         encoded_body,
-        [] |> add_default_options())
+        Headers.access_token_request,
+        []
+      )
     else
       _ -> {:error, HTTPClientError.new(reason: :body_encoding_error)}
     end
   end
-
-  @spec api :: module
-  defp api, do: Application.get_env(:code_corps, :github)
 
   @api_url "https://api.github.com/"
 
   @spec api_url_for(String.t) :: String.t
   defp api_url_for(endpoint) when is_binary(endpoint) do
     @api_url |> URI.merge(endpoint) |> URI.to_string
-  end
-
-  @spec add_default_options(list) :: list
-  defp add_default_options(opts) do
-    [:with_body | opts]
   end
 
   @spec build_access_token_params(String.t, String.t) :: map

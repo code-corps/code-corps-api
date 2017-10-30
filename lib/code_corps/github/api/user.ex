@@ -4,7 +4,7 @@ defmodule CodeCorps.GitHub.API.User do
   """
 
   alias CodeCorps.{Accounts, GitHub, User}
-  alias Ecto.{Changeset}
+  alias Ecto.Changeset
 
 
   @single_endpoint "user"

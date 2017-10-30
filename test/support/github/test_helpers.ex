@@ -95,7 +95,7 @@ defmodule CodeCorps.GitHub.TestHelpers do
   defmacro with_real_api(do: block) do
     quote do
       old_mock = Application.get_env(:code_corps, :github)
-      Application.put_env(:code_corps, :github, CodeCorps.GitHub.API)
+      Application.put_env(:code_corps, :github, CodeCorps.GitHub.API.Gateway)
 
       unquote(block)
 

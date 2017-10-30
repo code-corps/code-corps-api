@@ -2,6 +2,8 @@ defmodule CodeCorps.GithubIssue do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @type t :: %__MODULE__{}
+
   schema "github_issues" do
     field :body, :string
     field :closed_at, :utc_datetime
