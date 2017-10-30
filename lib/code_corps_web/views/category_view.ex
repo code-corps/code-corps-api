@@ -1,9 +1,13 @@
 defmodule CodeCorpsWeb.CategoryView do
   @moduledoc false
   use CodeCorpsWeb, :view
-  use JaSerializer.PhoenixView
+  use JSONAPI.View
 
-  attributes [:name, :slug, :description]
+  def render("show.json-api", %{ data: category, conn: conn, params: params }) do
+    __MODULE__.show(category, conn, params)
+  end
 
-  has_many :project_categories, serializer: CodeCorpsWeb.ProjectCategoryView, identifiers: :always
+  def fields, do: [:name, :slug, :description]
+  def type, do: "category"
+  def relationships, do: [project_categories: CodeCorpsWeb.ProjectCategoryView]
 end

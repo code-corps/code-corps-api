@@ -6,7 +6,7 @@ defmodule CodeCorpsWeb.CategoryViewTest do
     project_category = insert(:project_category, category: category)
 
     category = CodeCorpsWeb.CategoryController.preload(category)
-    rendered_json =  render(CodeCorpsWeb.CategoryView, "show.json-api", data: category)
+    rendered_json = render(CodeCorpsWeb.CategoryView, "show.json-api", %{ data: category, conn: nil, params: category.id })
 
     expected_json = %{
       "data" => %{

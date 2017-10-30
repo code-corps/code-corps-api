@@ -82,6 +82,9 @@ config :sentry,
   included_environments: ~w(prod staging)a,
   use_error_logger: true
 
+config :jsonapi,
+  underscore_to_dash: true
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"

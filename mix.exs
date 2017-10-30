@@ -10,7 +10,7 @@ defmodule CodeCorps.Mixfile do
   def project do
     [app: :code_corps,
      version: "0.0.1",
-     elixir: "~> 1.5.1",
+     elixir: "~> 1.5.0",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
      dialyzer: [plt_add_deps: :transitive],
@@ -71,6 +71,7 @@ defmodule CodeCorps.Mixfile do
       {:inflex, "~> 1.8.1"},
       {:ja_serializer, "~> 0.12"}, # JSON API
       {:joken, "~> 1.5"}, # JWT encoding
+      {:jsonapi, "~> 0.1.0"},
       {:money, "~> 1.2.1"},
       {:poison, "~> 3.0", override: true},
       {:scout_apm, "~> 0.0"},

@@ -16,7 +16,7 @@ defmodule CodeCorpsWeb.CategoryController do
   @spec show(Conn.t, map) :: Conn.t
   def show(%Conn{} = conn, %{"id" => id}) do
     with %Category{} = category <- Category |> Repo.get(id) |> preload() do
-      conn |> render("show.json-api", data: category)
+      conn |> render(CodeCorpsWeb.CategoryView, "show.json-api", %{ data: category, conn: conn, params: id })
     end
   end
 
