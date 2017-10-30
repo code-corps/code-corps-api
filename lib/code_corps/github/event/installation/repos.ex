@@ -97,28 +97,21 @@ defmodule CodeCorps.GitHub.Event.Installation.Repos do
   end
 
   @spec create(GithubAppInstallation.t, map) :: {:ok, GithubRepo.t}
-  defp create(%GithubAppInstallation{} = installation, %{} = repo_attributes) do
+  defp create(%GithubAppInstallation{id: installation_id}, %{} = repo_attributes) do
+    params =
+      repo_attributes
+      |> Map.put(:github_app_installation_id, installation_id)
+
     %GithubRepo{}
-    |> changeset(repo_attributes)
-    |> Changeset.put_assoc(:github_app_installation, installation)
+    |> GithubRepo.changeset(params)
     |> Repo.insert()
   end
 
   @spec update(GithubRepo.t, map) :: {:ok, GithubRepo.t}
   defp update(%GithubRepo{} = github_repo, %{} = repo_attributes) do
     github_repo
-    |> changeset(repo_attributes)
+    |> GithubRepo.changeset(repo_attributes)
     |> Repo.update()
-  end
-
-  @spec changeset(GithubRepo.t, map) :: Changeset.t
-  defp changeset(%GithubRepo{} = github_repo, %{} = repo_attributes) do
-    github_repo
-    |> Changeset.change(repo_attributes)
-    |> Changeset.validate_required([
-      :github_id, :name, :github_account_id,
-      :github_account_avatar_url, :github_account_login, :github_account_type
-    ])
   end
 
   # transaction step 5
