@@ -3,7 +3,7 @@ defmodule CodeCorps.Task do
 
   import EctoOrdered
 
-  alias CodeCorps.{Task, Services.MarkdownRendererService}
+  alias CodeCorps.{Services.MarkdownRendererService, Task}
   alias Ecto.Changeset
 
   @type t :: %__MODULE__{}

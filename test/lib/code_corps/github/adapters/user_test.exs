@@ -7,11 +7,11 @@ defmodule CodeCorps.GitHub.Adapters.UserTest do
 
   alias CodeCorps.GitHub.Adapters.User
 
-  describe "from_github_user/1" do
+  describe "to_user/1" do
     test "maps API payload" do
       %{"issue" => %{"user" => payload}} = load_event_fixture("issues_opened")
 
-      assert User.from_github_user(payload) == %{
+      assert User.to_user(payload) == %{
         github_id: payload["id"],
         github_username: payload["login"],
         github_avatar_url: payload["avatar_url"],
@@ -20,15 +20,15 @@ defmodule CodeCorps.GitHub.Adapters.UserTest do
     end
 
     test "maps Bot type" do
-      assert User.from_github_user(%{"type" => "Bot"}) == %{type: "bot"}
+      assert User.to_user(%{"type" => "Bot"}) == %{type: "bot"}
     end
 
     test "maps User type" do
-      assert User.from_github_user(%{"type" => "User"}) == %{type: "user"}
+      assert User.to_user(%{"type" => "User"}) == %{type: "user"}
     end
 
     test "does not map Organization type" do
-      assert User.from_github_user(%{"type" => "Organization"}) == %{type: "Organization"}
+      assert User.to_user(%{"type" => "Organization"}) == %{type: "Organization"}
     end
   end
 end

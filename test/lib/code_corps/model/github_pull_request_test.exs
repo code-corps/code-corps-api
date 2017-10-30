@@ -17,6 +17,29 @@ defmodule CodeCorps.GithubPullRequestTest do
   }
   @invalid_attrs %{}
 
+  describe "changeset/2" do
+    test "with merged set" do
+      attrs = @valid_attrs |> Map.put(:merged, true)
+      changeset = GithubPullRequest.changeset(%GithubPullRequest{}, attrs)
+      assert changeset.valid?
+      assert changeset.changes[:merged] == true
+    end
+
+    test "with merged_at set" do
+      attrs = @valid_attrs |> Map.put(:merged_at, Timex.now) |> Map.delete(:merged)
+      changeset = GithubPullRequest.changeset(%GithubPullRequest{}, attrs)
+      assert changeset.valid?
+      assert changeset.changes[:merged] == true
+    end
+
+    test "with neither merged nor merged_at set" do
+      attrs = @valid_attrs |> Map.delete(:merged) |> Map.delete(:merged_at)
+      changeset = GithubPullRequest.changeset(%GithubPullRequest{merged: true}, attrs)
+      assert changeset.valid?
+      assert changeset.changes[:merged] == false
+    end
+  end
+
   describe "create_changeset/2" do
     test "with valid attributes" do
       changeset = GithubPullRequest.create_changeset(%GithubPullRequest{}, @valid_attrs)

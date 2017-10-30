@@ -39,6 +39,16 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def github_comment_factory do
+    %CodeCorps.GithubComment{
+      body: "I love elixir!",
+      github_created_at: DateTime.utc_now,
+      github_id: sequence(:id, (fn number -> number end)),
+      github_updated_at: DateTime.utc_now,
+      github_issue: build(:github_issue)
+    }
+  end
+
   def github_event_factory do
     %CodeCorps.GithubEvent{}
   end
@@ -54,16 +64,6 @@ defmodule CodeCorps.Factories do
       state: "open",
       title: "I love Elixir!",
       github_repo: build(:github_repo)
-    }
-  end
-
-  def github_comment_factory do
-    %CodeCorps.GithubComment{
-      body: "I love elixir!",
-      github_created_at: DateTime.utc_now,
-      github_id: sequence(:id, (fn number -> number end)),
-      github_updated_at: DateTime.utc_now,
-      github_issue: build(:github_issue)
     }
   end
 
@@ -89,6 +89,13 @@ defmodule CodeCorps.Factories do
       name: sequence(:name, &"repo_#{&1}")
     }
   end
+
+  def github_user_factory do
+    %CodeCorps.GithubUser{
+      github_id: sequence(:id, (fn number -> number end))
+    }
+  end
+
 
   def organization_factory do
     %CodeCorps.Organization{

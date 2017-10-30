@@ -10,7 +10,9 @@ defmodule CodeCorpsWeb.ProjectGithubRepoViewTest do
       "data" => %{
         "id" => project_github_repo.id |> Integer.to_string,
         "type" => "project-github-repo",
-        "attributes" => %{},
+        "attributes" => %{
+          "sync-state" => project_github_repo.sync_state,
+        },
         "relationships" => %{
           "github-repo" => %{
             "data" => %{"id" => project_github_repo.github_repo_id |> Integer.to_string, "type" => "github-repo"}

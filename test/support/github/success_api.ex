@@ -59,6 +59,9 @@ defmodule CodeCorps.GitHub.SuccessAPI do
       "expires_at" => Timex.now() |> Timex.shift(hours: 1) |> DateTime.to_iso8601
     }
   end
+  defp get_body(:get, ["repos", _owner, _repo, "issues", "comments"], _, _, _) do
+    load_endpoint_fixture("issues_comments")
+  end
   defp get_body(:get, ["repos", _owner, _repo, "issues", _number], _, _, _) do
     load_endpoint_fixture("issue")
   end
@@ -76,6 +79,9 @@ defmodule CodeCorps.GitHub.SuccessAPI do
   end
   defp get_body(:get, ["repos", _owner, _repo, "issues"], _, _, _) do
     load_endpoint_fixture("issues")
+  end
+  defp get_body(:get, ["repos", _owner, _repo, "pulls"], _, _, _) do
+    load_endpoint_fixture("pulls")
   end
   defp get_body(:get, ["repos", _owner, _repo, "pulls", _number], _, _, _) do
     load_endpoint_fixture("pull_request")

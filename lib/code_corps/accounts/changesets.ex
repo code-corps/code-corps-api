@@ -10,21 +10,35 @@ defmodule CodeCorps.Accounts.Changesets do
   alias Ecto.Changeset
 
   @doc ~S"""
-  Casts a changeset used for creating a user account from a github user payload
+  Casts a changeset used for creating a user account from a GitHub user payload
   """
   @spec create_from_github_changeset(struct, map) :: Changeset.t
   def create_from_github_changeset(struct, %{} = params) do
     struct
-    |> Changeset.change(params |> Adapters.User.from_github_user())
+    |> Changeset.change(params |> Adapters.User.to_user())
     |> Changeset.put_change(:sign_up_context, "github")
     |> Changeset.validate_inclusion(:type, ["bot", "user"])
     |> RandomIconColor.generate_icon_color(:default_color)
+    |> Changeset.unique_constraint(:email)
+    |> Changeset.assoc_constraint(:github_user)
+    |> unique_github_constraint()
+  end
+
+  @doc ~S"""
+  Casts a changeset used for updating a user account from a GitHub user payload
+  """
+  @spec update_with_github_user_changeset(struct, map) :: Changeset.t
+  def update_with_github_user_changeset(struct, %{} = params) do
+    struct
+    |> Changeset.cast(params, [:github_avatar_url, :github_id, :github_username, :type])
+    |> ensure_email_without_overwriting(params)
+    |> Changeset.validate_required([:github_avatar_url, :github_id, :github_username, :type])
     |> Changeset.unique_constraint(:email)
     |> unique_github_constraint()
   end
 
   @doc ~S"""
-  Casts a changeset used for creating a user account from a github user payload
+  Casts a changeset used for updating a user account from a GitHub OAuth payload
   """
   @spec update_from_github_oauth_changeset(struct, map) :: Changeset.t
   def update_from_github_oauth_changeset(struct, %{} = params) do

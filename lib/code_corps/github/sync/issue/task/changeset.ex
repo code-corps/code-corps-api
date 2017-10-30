@@ -37,6 +37,20 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task.Changeset do
     end
   end
 
+  @spec build_changeset(Task.t, GithubIssue.t, ProjectGithubRepo.t, User.t) :: Changeset.t
+  def build_changeset(
+    %Task{id: task_id} = task,
+    %GithubIssue{} = github_issue,
+    %ProjectGithubRepo{} = project_github_repo,
+    %User{} = user) do
+
+    issue_attrs = github_issue |> IssueAdapter.to_issue_attrs()
+    case is_nil(task_id) do
+      true -> create_changeset(task, issue_attrs, github_issue, project_github_repo, user)
+      false -> update_changeset(task, issue_attrs)
+    end
+  end
+
   @create_attrs ~w(created_at markdown modified_at status title)a
   @spec create_changeset(Task.t, map, GithubIssue.t, ProjectGithubRepo.t, User.t) :: Changeset.t
   defp create_changeset(
