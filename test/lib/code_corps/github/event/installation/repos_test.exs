@@ -28,10 +28,12 @@ defmodule CodeCorps.GitHub.Event.Installation.ReposTest do
       bad_payload =
         good_payload |> Map.put("repositories", [bad_repo_1, repo_2])
 
-      {:ok, bad_payload}
+      {:ok, body} = bad_payload |> Poison.encode
+
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}}
     end
-    def request(method, endpoint, headers, body, options) do
-      CodeCorps.GitHub.SuccessAPI.request(method, endpoint, headers, body, options)
+    def request(method, endpoint, body, headers, options) do
+      CodeCorps.GitHub.SuccessAPI.request(method, endpoint, body, headers, options)
     end
   end
 

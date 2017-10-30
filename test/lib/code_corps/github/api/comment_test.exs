@@ -23,11 +23,11 @@ defmodule CodeCorps.GitHub.API.CommentTest do
       assert_received({
         :post,
         "https://api.github.com/repos/foo/bar/issues/5/comments",
+        body,
         [
           {"Accept", "application/vnd.github.machine-man-preview+json"},
           {"Authorization", "token baz"}
         ],
-        body,
         _options
       })
 
@@ -46,11 +46,11 @@ defmodule CodeCorps.GitHub.API.CommentTest do
       assert_received({
         :post,
         "https://api.github.com/repos/foo/bar/issues/5/comments",
+        body,
         [
           {"Accept", "application/vnd.github.machine-man-preview+json"},
           {"Authorization", "token" <> _tok}
         ],
-        body,
         _options
       })
 
@@ -71,11 +71,11 @@ defmodule CodeCorps.GitHub.API.CommentTest do
       assert_received({
         :post,
         "https://api.github.com/repos/foo/bar/issues/5/comments",
+        body,
         [
           {"Accept", "application/vnd.github.machine-man-preview+json"},
           {"Authorization", "token" <> _tok}
         ],
-        body,
         _options
       })
 
@@ -98,11 +98,11 @@ defmodule CodeCorps.GitHub.API.CommentTest do
       assert_received({
         :patch,
         "https://api.github.com/repos/foo/bar/issues/comments/6",
+        body,
         [
           {"Accept", "application/vnd.github.machine-man-preview+json"},
           {"Authorization", "token" <> _tok}
         ],
-        body,
         _options
       })
 
@@ -123,11 +123,11 @@ defmodule CodeCorps.GitHub.API.CommentTest do
       assert_received({
         :patch,
         "https://api.github.com/repos/foo/bar/issues/comments/6",
+        body,
         [
           {"Accept", "application/vnd.github.machine-man-preview+json"},
           {"Authorization", "token" <> _tok}
         ],
-        body,
         _options
       })
 
@@ -150,11 +150,11 @@ defmodule CodeCorps.GitHub.API.CommentTest do
       assert_received({
         :patch,
         "https://api.github.com/repos/foo/bar/issues/comments/6",
+        body,
         [
           {"Accept", "application/vnd.github.machine-man-preview+json"},
           {"Authorization", "token" <> _tok}
         ],
-        body,
         _options
       })
 

@@ -2,6 +2,8 @@ defmodule CodeCorps.GithubPullRequest do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @type t :: %__MODULE__{}
+
   schema "github_pull_requests" do
     field :additions, :integer
     field :body, :string

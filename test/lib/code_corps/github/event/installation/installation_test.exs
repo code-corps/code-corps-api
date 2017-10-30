@@ -14,11 +14,11 @@ defmodule CodeCorps.GitHub.Event.InstallationTest do
 
   defmodule BadRepoRequest do
     def request(:get, "https://api.github.com/installation/repositories", _, _, _) do
-      body = load_endpoint_fixture("forbidden")
-      {:error, CodeCorps.GitHub.APIError.new({404, %{"message" => body}})}
+      {:ok, body} = load_endpoint_fixture("forbidden") |> Poison.encode
+      {:ok, %HTTPoison.Response{status_code: 404, body: body}}
     end
-    def request(method, endpoint, headers, body, options) do
-      CodeCorps.GitHub.SuccessAPI.request(method, endpoint, headers, body, options)
+    def request(method, endpoint, body, headers, options) do
+      CodeCorps.GitHub.SuccessAPI.request(method, endpoint, body, headers, options)
     end
   end
 
@@ -32,10 +32,12 @@ defmodule CodeCorps.GitHub.Event.InstallationTest do
       bad_payload =
         good_payload |> Map.put("repositories", [bad_repo_1, repo_2])
 
-      {:ok, bad_payload}
+      {:ok, body} = bad_payload |> Poison.encode
+
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}}
     end
-    def request(method, endpoint, headers, body, options) do
-      CodeCorps.GitHub.SuccessAPI.request(method, endpoint, headers, body, options)
+    def request(method, endpoint, body, headers, options) do
+      CodeCorps.GitHub.SuccessAPI.request(method, endpoint, body, headers, options)
     end
   end
 

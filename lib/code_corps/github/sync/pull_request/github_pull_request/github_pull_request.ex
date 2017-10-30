@@ -8,6 +8,7 @@ defmodule CodeCorps.GitHub.Sync.PullRequest.GithubPullRequest do
 
   alias CodeCorps.{
     GitHub.Adapters,
+    GithubIssue,
     GithubPullRequest,
     GithubRepo,
     Repo

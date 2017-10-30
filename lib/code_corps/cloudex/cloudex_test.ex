@@ -14,7 +14,7 @@ defmodule CloudexTest do
     end
   end
 
-  @spec upload(String.t) :: Cloudex.UploadedImage.t
+  @spec upload(String.t) :: %Cloudex.UploadedImage{}
   def upload(_url) do
     [ok: %Cloudex.UploadedImage{public_id: fake_cloudinary_id()}]
   end

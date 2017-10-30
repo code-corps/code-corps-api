@@ -26,7 +26,7 @@ defmodule CodeCorps.Comment.ServiceTest do
       assert comment.markdown == @base_attrs["markdown"]
       assert comment.body
 
-      refute_received({:post, _string, {}, "{}", []})
+      refute_received({:post, "https://api.github.com/" <> _rest, _body, _headers, _options})
     end
 
     test "returns errored changeset if attributes are invalid" do
@@ -34,7 +34,7 @@ defmodule CodeCorps.Comment.ServiceTest do
       refute changeset.valid?
       refute Repo.one(Comment)
 
-      refute_received({:post, _string, _headers, _body, _options})
+      refute_received({:post, "https://api.github.com/" <> _rest, _body, _headers, _options})
     end
 
     test "if comment is assigned a github repo, creates github comment on assigned issue" do
@@ -54,7 +54,7 @@ defmodule CodeCorps.Comment.ServiceTest do
       assert comment.github_comment_id
       assert Repo.one(GithubComment)
 
-      assert_received({:post, "https://api.github.com/repos/foo/bar/issues/5/comments", _headers, _body, _options})
+      assert_received({:post, "https://api.github.com/repos/foo/bar/issues/5/comments", _body, _headers, _options})
     end
 
     test "if github process fails, returns {:error, :github}" do
@@ -73,7 +73,7 @@ defmodule CodeCorps.Comment.ServiceTest do
 
       refute Repo.one(Comment)
       refute Repo.one(GithubComment)
-      assert_received({:post, "https://api.github.com/repos/foo/bar/issues/5/comments", _headers, _body, _options})
+      assert_received({:post, "https://api.github.com/repos/foo/bar/issues/5/comments", _body, _headers, _options})
     end
   end
 
@@ -89,7 +89,7 @@ defmodule CodeCorps.Comment.ServiceTest do
       assert updated_comment.body != comment.body
       refute updated_comment.github_comment_id
 
-      refute_received({:post, _string, {}, "{}", []})
+      refute_received({:patch, "https://api.github.com/" <> _rest, _body, _headers, _options})
     end
 
     @preloads [task: [github_repo: :github_app_installation]]
@@ -110,7 +110,7 @@ defmodule CodeCorps.Comment.ServiceTest do
       assert updated_comment.body != comment.body
       assert updated_comment.github_comment_id == github_comment.id
 
-      assert_received({:patch, "https://api.github.com/repos/foo/bar/issues/comments/6", _headers, _body, _options})
+      assert_received({:patch, "https://api.github.com/repos/foo/bar/issues/comments/6", _body, _headers, _options})
     end
 
     test "reports {:error, :github}, makes no changes at all if there is a github api error" do
@@ -133,7 +133,7 @@ defmodule CodeCorps.Comment.ServiceTest do
       assert updated_comment.body == comment.body
       assert updated_comment.github_comment_id == github_comment.id
 
-      assert_received({:patch, "https://api.github.com/repos/foo/bar/issues/comments/6", _headers, _body, _options})
+      assert_received({:patch, "https://api.github.com/repos/foo/bar/issues/comments/6", _body, _headers, _options})
     end
   end
 end

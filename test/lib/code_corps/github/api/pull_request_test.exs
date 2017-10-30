@@ -16,11 +16,11 @@ defmodule CodeCorps.GitHub.API.PullRequestTest do
       assert_received({
         :get,
         endpoint_url,
+        _body,
         [
           {"Accept", "application/vnd.github.machine-man-preview+json"},
           {"Authorization", "token" <> _tok}
         ],
-        _body,
         _options
       })
       assert endpoint_url == url
