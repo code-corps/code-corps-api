@@ -53,6 +53,7 @@ Have everything installed and ready to work? Read [our usage guides](USAGE.md) t
 - [Linting and style guidelines](USAGE.md#linting-code-with-credo)
 - [Work with the Ember front-end](USAGE.md#serving-ember)
 - [Set up environment variables](USAGE.md#environment)
+- [Set up Github Integration](https://github.com/code-corps/code-corps-api/wiki/GitHub-Apps-–-How-to-set-up-your-local-environment)
 
 ## Documentation
 
