@@ -53,6 +53,8 @@ defmodule CodeCorps.Mixfile do
       {:gettext, "~> 0.12"},
       {:cowboy, "~> 1.0"},
       {:benchfella, "~> 0.3.0", only: :dev},
+      {:benchee, "~> 0.10", only: :dev},
+      {:jsonapi, git: "https://github.com/jeregrine/jsonapi.git"},
       {:bypass, "~> 0.8.1", only: :test},
       {:cloudex, "~> 0.2.2"},
       {:comeonin, "~> 3.1"},
@@ -403,7 +405,7 @@ defmodule CodeCorps.Mixfile do
   #
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
-    ["ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+    ["ecto.setup": ["ecto.create", "ecto.migrate"],
      "ecto.reset": ["ecto.drop", "ecto.setup"],
      "ecto.migrate": ["ecto.migrate", "ecto.dump"],
      "ecto.rollback": ["ecto.rollback", "ecto.dump"],
