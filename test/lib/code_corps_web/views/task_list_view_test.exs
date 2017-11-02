@@ -40,6 +40,10 @@ defmodule CodeCorpsWeb.TaskListViewTest do
       }
     }
 
+    { included, rendered_json } = Map.pop(rendered_json, "included")
     assert rendered_json == expected_json
+    assert included |> Enum.count == 1
+    [ tasks ] = included
+    assert tasks
   end
 end
