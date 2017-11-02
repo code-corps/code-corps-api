@@ -5,5 +5,5 @@ defmodule CodeCorpsWeb.ProjectCategoryjsonapiView do
 
   def fields, do: []
   def relationships, do: [project: CodeCorpsWeb.ProjectView,
-    category: CodeCorpsWeb.CategoryView]
+    category: CodeCorpsWeb.CategoryjsonapiView]
 end

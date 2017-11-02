@@ -5,6 +5,7 @@ defmodule CodeCorpsWeb.ProjectView do
 
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
+  use JSONAPI.View, type: "project"
 
   attributes [
   	:approved, :can_activate_donations, :cloudinary_public_id,
