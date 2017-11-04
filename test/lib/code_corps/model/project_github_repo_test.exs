@@ -54,4 +54,33 @@ defmodule CodeCorps.ProjectGithubRepoTest do
     refute changeset.valid?
     assert_error_message(changeset, :github_repo, "does not exist")
   end
+
+  describe "update_sync_changeset/2" do
+    test "with valid attributes" do
+      project_id = insert(:project).id
+      github_repo_id = insert(:github_repo).id
+      attrs = %{project_id: project_id, github_repo_id: github_repo_id}
+
+      ProjectGithubRepo.sync_states |> Enum.each(fn state ->
+        attrs =
+          attrs
+          |> Map.put(:sync_state, state)
+
+        changeset = ProjectGithubRepo.update_sync_changeset(%ProjectGithubRepo{}, attrs)
+        assert changeset.valid?
+      end)
+    end
+
+    test "with invalid attributes" do
+      project_id = insert(:project).id
+      github_repo_id = insert(:github_repo).id
+      attrs =
+        %{project_id: project_id, github_repo_id: github_repo_id}
+        |> Map.put(:sync_state, "not_a_valid_sync_state")
+
+      changeset = ProjectGithubRepo.update_sync_changeset(%ProjectGithubRepo{}, attrs)
+      refute changeset.valid?
+      assert changeset.errors[:sync_state] == {"is invalid", [validation: :inclusion]}
+    end
+  end
 end

@@ -16,6 +16,8 @@ defmodule CodeCorps.GithubRepo do
     field :syncing_pull_requests_count, :integer, default: 0
 
     belongs_to :github_app_installation, CodeCorps.GithubAppInstallation
+    has_many :github_comments, CodeCorps.GithubComment
+    has_many :github_issues, CodeCorps.GithubIssue
     has_many :project_github_repos, CodeCorps.ProjectGithubRepo
 
     timestamps()
@@ -49,11 +51,11 @@ defmodule CodeCorps.GithubRepo do
     ~w{
       unsynced
       fetching_pull_requests errored_fetching_pull_requests
-      syncing_pull_requests errored_syncing_pull_requests
+      syncing_github_pull_requests errored_syncing_github_pull_requests
       fetching_issues errored_fetching_issues
-      syncing_issues errored_syncing_issues
+      syncing_github_issues errored_syncing_github_issues
       fetching_comments errored_fetching_comments
-      syncing_comments errored_syncing_comments
+      syncing_github_comments errored_syncing_github_comments
       receiving_webhooks
     }
   end

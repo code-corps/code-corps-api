@@ -62,6 +62,8 @@ defmodule CodeCorps.User do
 
     has_one :github_app_installation, CodeCorps.GithubAppInstallation
 
+    belongs_to :github_user, CodeCorps.GithubUser
+
     timestamps()
   end
 

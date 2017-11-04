@@ -1,5 +1,6 @@
 defmodule CodeCorps.GitHub.Sync.PullRequest do
-  alias CodeCorps.{GithubIssue, GithubRepo}
+
+  alias CodeCorps.{GithubPullRequest, GithubRepo}
   alias CodeCorps.GitHub.Sync.PullRequest.GithubPullRequest, as: GithubPullRequestSyncer
   alias Ecto.Multi
 
@@ -35,7 +36,7 @@ defmodule CodeCorps.GitHub.Sync.PullRequest do
     |> Multi.run(:github_pull_request, fn _ -> link_pull_request(github_repo, pull_request) end)
   end
 
-  @spec link_pull_request(GithubRepo.t, map) :: {:ok, GithubIssue.t} | {:error, Ecto.Changeset.t}
+  @spec link_pull_request(GithubRepo.t, map) :: {:ok, GithubPullRequest.t} | {:error, Ecto.Changeset.t}
   defp link_pull_request(github_repo, attrs) do
     GithubPullRequestSyncer.create_or_update_pull_request(github_repo, attrs)
   end

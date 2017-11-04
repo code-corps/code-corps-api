@@ -5,6 +5,7 @@ defmodule CodeCorps.GitHub.API.Issue do
 
   alias CodeCorps.{
     GitHub,
+    GitHub.API,
     GithubAppInstallation,
     GithubIssue,
     GithubRepo,
@@ -19,7 +20,7 @@ defmodule CodeCorps.GitHub.API.Issue do
   def from_url(url, %GithubRepo{github_app_installation: %GithubAppInstallation{} = installation}) do
     "https://api.github.com/" <> endpoint = url
 
-    with opts when is_list(opts) <- GitHub.API.opts_for(installation) do
+    with opts when is_list(opts) <- API.opts_for(installation) do
       GitHub.request(:get, endpoint, %{}, %{}, opts)
     else
       {:error, github_error} -> {:error, github_error}

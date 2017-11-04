@@ -19,6 +19,10 @@ defmodule CodeCorpsWeb.GithubRepoViewTest do
           "github-id" => github_repo.github_id,
           "inserted-at" => github_repo.inserted_at,
           "name" => github_repo.name,
+          "syncing-comments-count" => github_repo.syncing_comments_count,
+          "syncing-issues-count" => github_repo.syncing_issues_count,
+          "syncing-pull-requests-count" => github_repo.syncing_pull_requests_count,
+          "sync-state" => github_repo.sync_state,
           "updated-at" => github_repo.updated_at
         },
         "relationships" => %{

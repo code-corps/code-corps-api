@@ -11,6 +11,13 @@ defmodule CodeCorps.Validators.TimeValidator do
   def validate_time_after(%{data: data} = changeset, field) do
     previous_time = Map.get(data, field)
     current_time = Changeset.get_change(changeset, field)
+    case current_time do
+      nil -> changeset
+      _ -> do_validate_time_after(changeset, field, previous_time, current_time)
+    end
+  end
+
+  defp do_validate_time_after(changeset, field, previous_time, current_time) do
     is_after = current_time |> Timex.after?(previous_time)
     is_equal = current_time |> Timex.equal?(previous_time)
     after_or_equal = is_after || is_equal
