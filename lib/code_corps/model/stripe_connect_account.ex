@@ -75,7 +75,7 @@ defmodule CodeCorps.StripeConnectAccount do
     belongs_to :organization, CodeCorps.Organization
     has_one :stripe_external_account, CodeCorps.StripeExternalAccount
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @insert_params [

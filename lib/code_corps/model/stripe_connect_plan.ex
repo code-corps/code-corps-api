@@ -21,7 +21,7 @@ defmodule CodeCorps.StripeConnectPlan do
 
     belongs_to :project, CodeCorps.Project
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   def create_changeset(struct, params \\ %{}) do

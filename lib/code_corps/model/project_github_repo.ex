@@ -11,7 +11,7 @@ defmodule CodeCorps.ProjectGithubRepo do
     belongs_to :github_repo, CodeCorps.GithubRepo
     belongs_to :project, CodeCorps.Project
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc """

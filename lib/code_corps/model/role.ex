@@ -17,7 +17,7 @@ defmodule CodeCorps.Role do
     has_many :role_skills, CodeCorps.RoleSkill
     has_many :skills, through: [:role_skills, :skill]
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc """

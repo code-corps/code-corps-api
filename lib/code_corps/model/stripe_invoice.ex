@@ -39,7 +39,7 @@ defmodule CodeCorps.StripeInvoice do
     belongs_to :stripe_connect_subscription, CodeCorps.StripeConnectSubscription
     belongs_to :user, CodeCorps.User
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @create_attributes [

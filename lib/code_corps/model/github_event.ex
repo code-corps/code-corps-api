@@ -11,7 +11,7 @@ defmodule CodeCorps.GithubEvent do
     field :type, :string
     field :failure_reason, :string
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc """

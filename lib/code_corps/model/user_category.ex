@@ -7,7 +7,7 @@ defmodule CodeCorps.UserCategory do
     belongs_to :user, CodeCorps.User
     belongs_to :category, CodeCorps.Category
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc """

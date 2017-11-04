@@ -17,7 +17,7 @@ defmodule CodeCorps.SluggedRoute do
 
     field :slug, :string
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc """

@@ -9,7 +9,7 @@ defmodule CodeCorps.RoleSkill do
     belongs_to :role, CodeCorps.Role
     belongs_to :skill, CodeCorps.Skill
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc """

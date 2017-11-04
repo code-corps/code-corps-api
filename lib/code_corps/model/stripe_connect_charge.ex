@@ -29,7 +29,7 @@ defmodule CodeCorps.StripeConnectCharge do
     belongs_to :stripe_connect_customer, CodeCorps.StripeConnectCustomer
     belongs_to :user, CodeCorps.User
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @create_attributes [

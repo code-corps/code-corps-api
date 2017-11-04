@@ -13,7 +13,7 @@ defmodule CodeCorps.StripeFileUpload do
 
     belongs_to :stripe_connect_account, CodeCorps.StripeConnectAccount
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   def create_changeset(struct, params \\ %{}) do

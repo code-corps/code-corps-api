@@ -11,7 +11,7 @@ defmodule CodeCorps.ProjectCategory do
     belongs_to :project, CodeCorps.Project
     belongs_to :category, CodeCorps.Category
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc """

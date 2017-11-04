@@ -17,7 +17,7 @@ defmodule CodeCorps.Comment do
     belongs_to :user, CodeCorps.User
     belongs_to :task, CodeCorps.Task
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc """

@@ -62,7 +62,7 @@ defmodule CodeCorps.User do
 
     has_one :github_app_installation, CodeCorps.GithubAppInstallation
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc """

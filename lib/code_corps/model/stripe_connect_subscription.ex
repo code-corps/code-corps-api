@@ -48,7 +48,7 @@ defmodule CodeCorps.StripeConnectSubscription do
 
     has_one :project, through: [:stripe_connect_plan, :project]
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @permitted_params [

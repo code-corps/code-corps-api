@@ -17,7 +17,7 @@ defmodule CodeCorps.Category do
     has_many :project_categories, CodeCorps.ProjectCategory
     has_many :projects, through: [:project_categories, :project]
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc """

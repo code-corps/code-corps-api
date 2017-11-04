@@ -36,7 +36,7 @@ defmodule CodeCorps.Task do
     has_many :comments, CodeCorps.Comment
     has_many :task_skills, CodeCorps.TaskSkill
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   def changeset(struct, params \\ %{}) do

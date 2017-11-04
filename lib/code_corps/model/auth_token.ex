@@ -17,7 +17,7 @@ defmodule CodeCorps.AuthToken do
 
     belongs_to :user, CodeCorps.User
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc """

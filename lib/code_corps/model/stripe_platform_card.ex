@@ -19,7 +19,7 @@ defmodule CodeCorps.StripePlatformCard do
 
     has_many :stripe_connect_cards, CodeCorps.StripeConnectCard, foreign_key: :stripe_platform_card_id
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   def create_changeset(struct, params \\ %{}) do

@@ -7,7 +7,7 @@ defmodule CodeCorps.UserSkill do
     belongs_to :user, CodeCorps.User
     belongs_to :skill, CodeCorps.Skill
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc """

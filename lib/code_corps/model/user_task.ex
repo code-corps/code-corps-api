@@ -11,7 +11,7 @@ defmodule CodeCorps.UserTask do
     belongs_to :task, CodeCorps.Task
     belongs_to :user, CodeCorps.User
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @permitted_create_attrs [:user_id, :task_id]

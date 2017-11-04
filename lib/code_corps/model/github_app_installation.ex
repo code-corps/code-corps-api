@@ -27,7 +27,7 @@ defmodule CodeCorps.GithubAppInstallation do
     has_many :github_repos, CodeCorps.GithubRepo
     has_many :organization_github_app_installations, CodeCorps.OrganizationGithubAppInstallation
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc ~S"""
