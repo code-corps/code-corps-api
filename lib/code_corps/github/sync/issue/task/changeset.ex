@@ -89,7 +89,7 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task.Changeset do
     |> Changeset.cast(IssueAdapter.to_task(issue_attrs), @update_attrs)
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
     |> Changeset.put_change(:modified_from, "github")
-    |> TimeValidator.validate_time_after(:modified_at)
+    |> TimeValidator.validate_time_not_before(:modified_at)
     |> Changeset.validate_required([:project_id, :title, :user_id])
     |> Changeset.assoc_constraint(:github_repo)
     |> Changeset.assoc_constraint(:project)
