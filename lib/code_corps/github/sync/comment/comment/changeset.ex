@@ -76,7 +76,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment.Changeset do
     |> Changeset.cast(CommentAdapter.to_comment(attrs), @update_attrs)
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
     |> Changeset.put_change(:modified_from, "github")
-    |> TimeValidator.validate_time_after(:modified_at)
+    |> TimeValidator.validate_time_not_before(:modified_at)
     |> Changeset.validate_required([:markdown, :body])
   end
 end
