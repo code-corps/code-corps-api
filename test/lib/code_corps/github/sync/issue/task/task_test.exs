@@ -3,8 +3,6 @@ defmodule CodeCorps.GitHub.Sync.Issue.TaskTest do
 
   use CodeCorps.DbAccessCase
 
-  import CodeCorps.GitHub.TestHelpers
-
   alias CodeCorps.{
     Project,
     Repo,
@@ -13,13 +11,11 @@ defmodule CodeCorps.GitHub.Sync.Issue.TaskTest do
   alias CodeCorps.GitHub.Sync.Issue.Task, as: IssueTaskSyncer
 
   describe "sync all/3" do
-    @payload load_event_fixture("issues_opened")
-
     test "creates missing, updates existing tasks for each project associated with the github repo" do
       user = insert(:user)
-      %{github_repo: github_repo} = github_issue = insert(:github_issue)
 
-      %{"issue" => %{"body" => issue_body} = issue} = @payload
+      %{github_repo: github_repo} = github_issue =
+        insert(:github_issue, github_updated_at: DateTime.utc_now |> Timex.shift(hours: 1))
 
       [%{project: project_1}, _, _] = project_github_repos =
         insert_list(3, :project_github_repo, github_repo: github_repo)
@@ -33,13 +29,13 @@ defmodule CodeCorps.GitHub.Sync.Issue.TaskTest do
         insert(:task_list, project: project, inbox: true)
       end)
 
-      {:ok, tasks} = github_issue |> IssueTaskSyncer.sync_all(user, issue)
+      {:ok, tasks} = github_issue |> IssueTaskSyncer.sync_all(user)
 
       assert Repo.aggregate(Task, :count, :id) == 3
 
       tasks |> Enum.each(fn task ->
         assert task.user_id == user.id
-        assert task.markdown == issue_body
+        assert task.markdown == github_issue.body
         assert task.github_issue_id == github_issue.id
       end)
 
@@ -48,9 +44,7 @@ defmodule CodeCorps.GitHub.Sync.Issue.TaskTest do
     end
 
     test "fails on validation errors" do
-      %{github_repo: github_repo} = github_issue = insert(:github_issue)
-
-      %{"issue" => issue} = @payload |> put_in(~w(issue title), nil)
+      %{github_repo: github_repo} = github_issue = insert(:github_issue, title: nil)
 
       %{project: project} =
         insert(:project_github_repo, github_repo: github_repo)
@@ -59,8 +53,7 @@ defmodule CodeCorps.GitHub.Sync.Issue.TaskTest do
 
       insert(:task_list, project: project, inbox: true)
 
-      {:error, {tasks, errors}} =
-        github_issue |> IssueTaskSyncer.sync_all(user, issue)
+      {:error, {tasks, errors}} = github_issue |> IssueTaskSyncer.sync_all(user)
 
       assert tasks |> Enum.count == 0
       assert errors |> Enum.count == 1

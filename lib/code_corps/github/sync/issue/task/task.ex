@@ -16,20 +16,18 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task do
                    {:error, {list(Task.t), list(Changeset.t)}}
 
   @doc """
-  When provided a `CodeCorps.GithubIssue`, a `CodeCorps.User` and a GitHub API
-  payload, for each `CodeCorps.Project` associated to that
-  `CodeCorps.GithubRepo` via a `CodeCorps.ProjectGithubRepo`, it
-  creates or updates a `CodeCorps.Task`.
+  When provided a `GithubIssue` and a `User`, for each `Project` associated to
+  that `GithubRepo` via a `ProjectGithubRepo`, it creates or updates a `Task`.
   """
-  @spec sync_all(GithubIssue.t, User.t, map) :: {:ok, list(Task.t)}
-  def sync_all(%GithubIssue{} = github_issue, %User{} = user, %{} = payload) do
+  @spec sync_all(GithubIssue.t, User.t) :: {:ok, list(Task.t)}
+  def sync_all(%GithubIssue{} = github_issue, %User{} = user) do
 
     %GithubIssue{
       github_repo: %GithubRepo{project_github_repos: project_github_repos}
     } = github_issue |> Repo.preload(github_repo: :project_github_repos)
 
     project_github_repos
-    |> Enum.map(&sync(github_issue, &1, user, payload))
+    |> Enum.map(&sync(github_issue, &1, user))
     |> ResultAggregator.aggregate
   end
 
@@ -45,9 +43,7 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task do
   """
   def sync_project_github_repo(%ProjectGithubRepo{github_repo: %GithubRepo{} = _} = project_github_repo) do
     %ProjectGithubRepo{
-      github_repo: %GithubRepo{
-        github_issues: github_issues
-      }
+      github_repo: %GithubRepo{github_issues: github_issues}
     } = project_github_repo |> Repo.preload([:project, github_repo: [github_issues: [github_user: [:user]]]])
 
     github_issues
@@ -55,7 +51,10 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task do
     |> ResultAggregator.aggregate
   end
 
-  defp find_or_create_task(%GithubIssue{github_user: %GithubUser{user: %User{} = user}} = github_issue, %ProjectGithubRepo{} = project_github_repo) do
+  defp find_or_create_task(
+    %GithubIssue{github_user: %GithubUser{user: %User{} = user}} = github_issue,
+    %ProjectGithubRepo{} = project_github_repo) do
+
     sync(github_issue, project_github_repo, user)
   end
 
@@ -64,14 +63,6 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task do
     project_github_repo
     |> find_or_init_task(github_issue)
     |> TaskChangeset.build_changeset(github_issue, project_github_repo, user)
-    |> Repo.insert_or_update()
-  end
-
-  @spec sync(GithubIssue.t, ProjectGithubRepo.t, User.t, map) :: {:ok, ProjectGithubRepo.t} | {:error, Changeset.t}
-  defp sync(%GithubIssue{} = github_issue, %ProjectGithubRepo{} = project_github_repo, %User{} = user, %{} = payload) do
-    project_github_repo
-    |> find_or_init_task(github_issue)
-    |> TaskChangeset.build_changeset(payload, github_issue, project_github_repo, user)
     |> Repo.insert_or_update()
   end
 

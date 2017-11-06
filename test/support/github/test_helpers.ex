@@ -42,9 +42,13 @@ defmodule CodeCorps.GitHub.TestHelpers do
     # - user creating an organization
     # - organization creating a project
     # - project being bootstrapped with an inbox task list to receive new tasks
+    # - project being bootstrapped with a done task list to receive closed tasks
+    # - project being bootstrapped with a pull_requests tasks list to receive pull requests
     organization = insert(:organization, owner: user)
     project = insert(:project, organization: organization)
     insert(:task_list, project: project, inbox: true)
+    insert(:task_list, project: project, done: true)
+    insert(:task_list, project: project, pull_requests: true)
 
     # Create the GitHub App installation on the organization
     #
