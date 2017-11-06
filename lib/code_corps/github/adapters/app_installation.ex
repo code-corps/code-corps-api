@@ -4,6 +4,11 @@ defmodule CodeCorps.GitHub.Adapters.AppInstallation do
   `GithubAppInstallation`.
   """
 
+  alias CodeCorps.{
+    Adapter.MapTransformer,
+    GithubAppInstallation
+  }
+
   @installation_event_mapping [
     {:github_account_avatar_url, ["installation", "account", "avatar_url"]},
     {:github_account_id, ["installation", "account", "id"]},
@@ -21,5 +26,23 @@ defmodule CodeCorps.GitHub.Adapters.AppInstallation do
   def from_installation_event(%{} = payload) do
     payload
     |> CodeCorps.Adapter.MapTransformer.transform(@installation_event_mapping)
+  end
+
+  @github_app_installation_to_repo_mapping [
+    {:github_account_avatar_url, [:github_account_avatar_url]},
+    {:github_account_id, [:github_account_id]},
+    {:github_account_login, [:github_account_login]},
+    {:github_account_type, [:github_account_type]}
+  ]
+
+  @doc ~S"""
+  Converts a `GithubAppInstallation` record attributes into a map of attributes
+  that can be used for a `GithubRepo` record.
+  """
+  @spec to_github_repo_attrs(GithubAppInstallation.t) :: map
+  def to_github_repo_attrs(%GithubAppInstallation{} = installation) do
+    installation
+    |> Map.from_struct
+    |> MapTransformer.transform(@github_app_installation_to_repo_mapping)
   end
 end
