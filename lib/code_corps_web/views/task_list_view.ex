@@ -7,5 +7,5 @@ defmodule CodeCorpsWeb.TaskListView do
 
   has_one :project, type: "project", field: :project_id
 
-  has_many :tasks, serializer: CodeCorpsWeb.TaskInListView, include: true
+  has_many :tasks, serializer: CodeCorpsWeb.TaskView, identifiers: :always
 end
