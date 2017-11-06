@@ -14,14 +14,14 @@ defmodule CodeCorpsWeb.ProjectView do
     :total_monthly_donated, :updated_at, :website
   ]
 
-  has_one :organization, type: "organization", field: :organization_id
+  has_one :organization, serializer: CodeCorpsWeb.OrganizationView, include: true
   has_one :stripe_connect_plan, serializer: CodeCorpsWeb.StripeConnectPlanView
 
   has_many :donation_goals, serializer: CodeCorpsWeb.DonationGoalView, identifiers: :always
   has_many :project_categories, serializer: CodeCorpsWeb.ProjectCategoryView, identifiers: :always
   has_many :project_github_repos, serializer: CodeCorpsWeb.ProjectGithubRepoView, identifiers: :always
   has_many :project_skills, serializer: CodeCorpsWeb.ProjectSkillView, identifiers: :always
-  has_many :project_users, serializer: CodeCorpsWeb.ProjectUserView, identifiers: :always
+  has_many :project_users, serializer: CodeCorpsWeb.ProjectUserView, include: true
   has_many :tasks, serializer: CodeCorpsWeb.TaskView, identifiers: :always
   has_many :task_lists, serializer: CodeCorpsWeb.TaskListView, identifiers: :always
 

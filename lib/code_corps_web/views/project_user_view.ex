@@ -6,5 +6,5 @@ defmodule CodeCorpsWeb.ProjectUserView do
   attributes [:role, :inserted_at, :updated_at]
 
   has_one :project, type: "project", field: :project_id
-  has_one :user, type: "user", field: :user_id
+  has_one :user, serializer: CodeCorpsWeb.UserSlimView, include: true
 end
