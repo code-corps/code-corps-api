@@ -22,7 +22,6 @@ defmodule CodeCorpsWeb.ProjectView do
   has_many :project_github_repos, serializer: CodeCorpsWeb.ProjectGithubRepoView, identifiers: :always
   has_many :project_skills, serializer: CodeCorpsWeb.ProjectSkillView, include: true
   has_many :project_users, serializer: CodeCorpsWeb.ProjectUserView, include: true
-  has_many :tasks, serializer: CodeCorpsWeb.TaskView, identifiers: :always
   has_many :task_lists, serializer: CodeCorpsWeb.TaskListView, identifiers: :always
 
   def can_activate_donations(project, _conn) do
