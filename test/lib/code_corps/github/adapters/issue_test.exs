@@ -4,6 +4,7 @@ defmodule CodeCorps.GitHub.Adapters.IssueTest do
   use ExUnit.Case, async: true
 
   import CodeCorps.GitHub.TestHelpers
+  import CodeCorps.Factories
 
   alias CodeCorps.{GitHub.Adapters, GithubIssue, Task}
 
@@ -31,15 +32,15 @@ defmodule CodeCorps.GitHub.Adapters.IssueTest do
   end
 
   describe "to_task/1" do
-    test "maps api payload correctly" do
-      %{"issue" => payload} = load_event_fixture("issues_opened")
+    test "maps github issue correctly" do
+      github_issue = build(:github_issue)
 
-      assert Adapters.Issue.to_task(payload) == %{
-        created_at: payload["created_at"],
-        markdown: payload["body"],
-        modified_at: payload["updated_at"],
-        status: payload["state"],
-        title: payload["title"]
+      assert github_issue |> Adapters.Issue.to_task == %{
+        created_at: github_issue.github_created_at,
+        markdown: github_issue.body,
+        modified_at: github_issue.github_updated_at,
+        status: github_issue.state,
+        title: github_issue.title
       }
     end
   end

@@ -132,7 +132,7 @@ defmodule CodeCorps.GitHub.Sync.IssueTest do
 
       project_ids |> Enum.each(fn project_id ->
         project = Project |> Repo.get_by(id: project_id)
-        insert(:task_list, project: project, inbox: true)
+        insert(:task_list, project: project, pull_requests: true)
       end)
 
       %{id: existing_task_id} =

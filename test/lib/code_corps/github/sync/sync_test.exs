@@ -16,6 +16,7 @@ defmodule CodeCorps.GitHub.SyncTest do
     GithubUser,
     Repo,
     Task,
+    TaskList,
     User
   }
 
@@ -46,7 +47,9 @@ defmodule CodeCorps.GitHub.SyncTest do
 
       github_repo = insert(:github_repo, github_id: repo_github_id)
       %{project: project} = insert(:project_github_repo, github_repo: github_repo)
+      insert(:task_list, project: project, done: true)
       insert(:task_list, project: project, inbox: true)
+      insert(:task_list, project: project, pull_requests: true)
 
       {:ok, [comment]} = Sync.issue_comment_event(@payload)
 
@@ -96,7 +99,9 @@ defmodule CodeCorps.GitHub.SyncTest do
       github_app_installation = insert(:github_app_installation, github_account_login: owner)
       github_repo = insert(:github_repo, github_app_installation: github_app_installation, name: repo, github_account_id: 6752317, github_account_avatar_url: "https://avatars3.githubusercontent.com/u/6752317?v=4", github_account_type: "User", github_id: 35129377)
       %{project: project} = project_github_repo = insert(:project_github_repo, github_repo: github_repo)
+      insert(:task_list, project: project, done: true)
       insert(:task_list, project: project, inbox: true)
+      insert(:task_list, project: project, pull_requests: true)
 
       # Sync a first time
 
@@ -156,6 +161,17 @@ defmodule CodeCorps.GitHub.SyncTest do
       assert Repo.aggregate(Comment, :count, :id) == 2
       assert Repo.aggregate(Task, :count, :id) == 3
       assert Repo.aggregate(User, :count, :id) == 2
+
+      %TaskList{tasks: done_tasks} =
+        TaskList |> Repo.get_by(done: true) |> Repo.preload(:tasks)
+      %TaskList{tasks: inbox_tasks} =
+        TaskList |> Repo.get_by(inbox: true) |> Repo.preload(:tasks)
+      %TaskList{tasks: pull_requests_tasks} =
+        TaskList |> Repo.get_by(pull_requests: true) |> Repo.preload(:tasks)
+
+      assert Enum.count(done_tasks) == 1
+      assert Enum.count(inbox_tasks) == 1
+      assert Enum.count(pull_requests_tasks) == 1
     end
   end
 end
