@@ -18,9 +18,9 @@ defmodule CodeCorpsWeb.ProjectView do
   has_one :stripe_connect_plan, serializer: CodeCorpsWeb.StripeConnectPlanView
 
   has_many :donation_goals, serializer: CodeCorpsWeb.DonationGoalView, identifiers: :always
-  has_many :project_categories, serializer: CodeCorpsWeb.ProjectCategoryView, identifiers: :always
+  has_many :project_categories, serializer: CodeCorpsWeb.ProjectCategoryView, include: true
   has_many :project_github_repos, serializer: CodeCorpsWeb.ProjectGithubRepoView, identifiers: :always
-  has_many :project_skills, serializer: CodeCorpsWeb.ProjectSkillView, identifiers: :always
+  has_many :project_skills, serializer: CodeCorpsWeb.ProjectSkillView, include: true
   has_many :project_users, serializer: CodeCorpsWeb.ProjectUserView, include: true
   has_many :tasks, serializer: CodeCorpsWeb.TaskView, identifiers: :always
   has_many :task_lists, serializer: CodeCorpsWeb.TaskListView, identifiers: :always
