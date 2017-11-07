@@ -38,6 +38,11 @@ defmodule CodeCorps.Task.ServiceTest do
       refute_received({:post, "https://api.github.com/" <> _rest, _body, _headers, _options})
     end
 
+    test "sets modified_from to 'code_corps'" do
+      {:ok, task} = valid_attrs() |> Task.Service.create
+      assert task.modified_from == "code_corps"
+    end
+
     test "returns errored changeset if attributes are invalid" do
       {:error, changeset} = Task.Service.create(@base_attrs)
       refute changeset.valid?
@@ -106,6 +111,13 @@ defmodule CodeCorps.Task.ServiceTest do
       refute task.github_repo_id
 
       refute_received({:patch, "https://api.github.com/" <> _rest, _body, _headers, _options})
+    end
+
+    test "sets modified_from to 'code_corps'" do
+      task = insert(:task, modified_from: "github")
+      {:ok, updated_task} = task |> Task.Service.update(@update_attrs)
+
+      assert updated_task.modified_from == "code_corps"
     end
 
     test "returns {:error, changeset} if there are validation errors" do

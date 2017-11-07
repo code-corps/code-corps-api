@@ -77,6 +77,7 @@ defmodule CodeCorps.Task do
     |> assoc_constraint(:project)
     |> assoc_constraint(:user)
     |> put_change(:status, "open")
+    |> put_change(:modified_from, "code_corps")
   end
 
   @spec update_changeset(struct, map) :: Ecto.Changeset.t
@@ -88,6 +89,7 @@ defmodule CodeCorps.Task do
     |> set_closed_at()
     |> update_modified_at()
     |> maybe_assoc_with_repo(params)
+    |> put_change(:modified_from, "code_corps")
   end
 
   def apply_position(changeset) do
