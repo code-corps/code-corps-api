@@ -71,7 +71,7 @@ defmodule CodeCorps.Accounts do
     end
   end
 
-  @spec do_update_with_github_user(Usert.t, GithubUser.t) :: {:ok, User.t} | {:error, Changeset.t}
+  @spec do_update_with_github_user(User.t, GithubUser.t) :: {:ok, User.t} | {:error, Changeset.t}
   defp do_update_with_github_user(%User{} = user, %GithubUser{} = github_user) do
     user
     |> Changesets.update_with_github_user_changeset(github_user |> Adapters.User.to_user_attrs())

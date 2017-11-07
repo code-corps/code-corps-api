@@ -5,6 +5,7 @@ defmodule CodeCorps.GitHub.Adapters.Utils.BodyDecorator do
 
   alias CodeCorps.{
     Comment,
+    GithubIssue,
     Task,
     User,
     WebClient
@@ -13,7 +14,7 @@ defmodule CodeCorps.GitHub.Adapters.Utils.BodyDecorator do
   @separator "\r\n\r\n[//]: # (Please type your edits below this line)\r\n\r\n---"
   @linebreak "\r\n\r\n"
 
-  @spec add_code_corps_header(map, Comment.t | Task.t) :: map
+  @spec add_code_corps_header(map, Comment.t | Task.t | GithubIssue.t) :: map
   def add_code_corps_header(%{"body" => body} = attrs, %Comment{user: %User{github_id: nil}} = comment) do
     modified_body = build_header(comment) <> @separator <> @linebreak <> body
     attrs |> Map.put("body", modified_body)

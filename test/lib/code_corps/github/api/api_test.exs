@@ -3,7 +3,8 @@ defmodule CodeCorps.GitHub.APITest do
 
   use ExUnit.Case
 
-  alias CodeCorps.GitHub.{API, APIError, HTTPClientError}
+  alias CodeCorps.GitHub.{
+    API, API.Errors.PaginationError, APIError, HTTPClientError}
 
   describe "request/5" do
     defmodule MockAPI do
@@ -79,19 +80,20 @@ defmodule CodeCorps.GitHub.APITest do
 
   describe "get_all/3" do
     defmodule MockPaginationAPI do
-      def request(:head, "/one-page", _body, _headers, _opts) do
-        {:ok, %HTTPoison.Response{headers: [], status_code: 200}}
-      end
-      def request(:head, "/two-pages", _body, _headers, _opts) do
-        next = '<two-pages/?page=2>; rel="next"'
-        last = '<two-pages/?page=2>; rel="last"'
 
-        headers = [{"Link", [next, last] |> Enum.join(", ")}]
-        {:ok, %HTTPoison.Response{headers: headers, status_code: 200}}
+      def request(:head, "/one-page", _body, _headers, _opts) do
+        {:ok, %HTTPoison.Response{body: "", headers: [], status_code: 200}}
       end
       def request(:get, "/one-page", _body, _headers, [params: [page: 1]]) do
         body = [1] |> Poison.encode!
         {:ok, %HTTPoison.Response{body: body, status_code: 200}}
+      end
+      def request(:head, "/two-pages", _body, _headers, _opts) do
+        next = '<two-pages?page=2>; rel="next"'
+        last = '<two-pages?page=2>; rel="last"'
+
+        headers = [{"Link", [next, last] |> Enum.join(", ")}]
+        {:ok, %HTTPoison.Response{body: "", headers: headers, status_code: 200}}
       end
       def request(:get, "/two-pages", _body, _headers, [params: [page: 1]]) do
         body = [1, 2] |> Poison.encode!
@@ -100,6 +102,38 @@ defmodule CodeCorps.GitHub.APITest do
       def request(:get, "/two-pages", _body, _headers, [params: [page: 2]]) do
         body = [3] |> Poison.encode!
         {:ok, %HTTPoison.Response{body: body, status_code: 200}}
+      end
+      def request(:head, "/pages-with-errors", _body, _headers, _opts) do
+        next = '<three-pages-with-errors?page=2>; rel="next"'
+        last = '<three-pages-with-errors?page=4>; rel="last"'
+
+        headers = [{"Link", [next, last] |> Enum.join(", ")}]
+        {:ok, %HTTPoison.Response{body: "", headers: headers, status_code: 200}}
+      end
+      def request(:get, "/pages-with-errors", _body, _headers, [params: [page: 1]]) do
+        body = [1, 2] |> Poison.encode!
+        {:ok, %HTTPoison.Response{body: body, status_code: 200}}
+      end
+      def request(:get, "/pages-with-errors", _body, _headers, [params: [page: 2]]) do
+        {:error, %HTTPoison.Error{reason: "Test Client Error"}}
+      end
+      def request(:get, "/pages-with-errors", _body, _headers, [params: [page: 3]]) do
+        body = %{"message" => "Test API Error"}
+        {:ok, %HTTPoison.Response{body: body |> Poison.encode!, status_code: 400}}
+      end
+      def request(:get, "/pages-with-errors", _body, _headers, [params: [page: 4]]) do
+        errors = [
+          %{"code" => 1, "field" => "foo", "resource" => "/foo"},
+          %{"code" => 2, "field" => "bar", "resource" => "/bar"}
+        ]
+        body = %{"message" => "Test API Error", "errors" => errors}
+        {:ok, %HTTPoison.Response{body: body |> Poison.encode!, status_code: 400}}
+      end
+      def request(:head, "/head-client-error", _body, _headers, _opts) do
+        {:error, %HTTPoison.Error{reason: "Test Client Error"}}
+      end
+      def request(:head, "/head-api-error", _body, _headers, _opts) do
+        {:ok, %HTTPoison.Response{body: "", status_code: 400}}
       end
     end
 
@@ -115,11 +149,30 @@ defmodule CodeCorps.GitHub.APITest do
     end
 
     test "works when there's just one page" do
-      assert [1] == API.get_all("/one-page", [], [])
+      assert {:ok, [1]} == API.get_all("/one-page", [], [])
     end
 
     test "works with multiple pages" do
-      assert [1, 2, 3] == API.get_all("/two-pages", [], [])
+      assert {:ok, [1, 2, 3]} == API.get_all("/two-pages", [], [])
+    end
+
+    test "fails properly when pages respond in errors" do
+      {:error, %PaginationError{} = error} =
+        API.get_all("/pages-with-errors", [], [])
+
+      assert error.retrieved_pages |> Enum.count == 1
+      assert error.api_errors |> Enum.count == 2
+      assert error.client_errors |> Enum.count == 1
+    end
+
+    test "fails properly when initial head request fails with a client error" do
+      {:error, %HTTPClientError{} = error} = API.get_all("/head-client-error", [], [])
+      assert error
+    end
+
+    test "fails properly when initial head request fails with an api error" do
+      {:error, %APIError{} = error} = API.get_all("/head-api-error", [], [])
+      assert error
     end
   end
 end

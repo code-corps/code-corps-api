@@ -2,9 +2,11 @@ defmodule CodeCorps.GitHub.API do
   alias CodeCorps.{
     GithubAppInstallation,
     GitHub,
+    GitHub.API.Errors.PaginationError,
     GitHub.API.Pagination,
     GitHub.APIError,
     GitHub.HTTPClientError,
+    GitHub.Utils.ResultAggregator,
     User
   }
 
@@ -12,26 +14,31 @@ defmodule CodeCorps.GitHub.API do
 
   def gateway(), do: Application.get_env(:code_corps, :github)
 
-  @spec request(GitHub.method, String.t, GitHub.headers, GitHub.body, list) :: GitHub.response
+  @typep raw_body :: String.t
+  @typep raw_headers :: list({String.t, String.t})
+  @typep raw_options :: Keyword.t
+
+  @spec request(GitHub.method, String.t, raw_body, raw_headers, raw_options) :: GitHub.response
   def request(method, url, body, headers, options) do
     gateway().request(method, url, body, headers, options)
     |> marshall_response()
   end
 
-  @spec get_all(String.t, GitHub.headers, list) :: GitHub.response
+  @spec get_all(String.t, raw_headers, raw_options) :: {:ok, list(map)} | {:error, PaginationError.t} | {:error, GitHub.api_error_struct}
   def get_all(url, headers, options) do
-    {:ok, %Response{request_url: request_url, headers: response_headers}} =
-      gateway().request(:head, url, "", headers, options)
-
-    response_headers
-    |> Pagination.retrieve_total_pages()
-    |> Pagination.to_page_numbers()
-    |> Enum.map(&Pagination.add_page_param(options, &1))
-    |> Enum.map(&gateway().request(:get, url, "", headers, &1))
-    |> Enum.map(&marshall_response/1)
-    |> Enum.map(&Tuple.to_list/1)
-    |> Enum.map(&List.last/1)
-    |> List.flatten
+    case gateway().request(:head, url, "", headers, options) do
+      {:ok, %Response{headers: response_headers, status_code: code}} when code in 200..399 ->
+        response_headers
+        |> Pagination.retrieve_total_pages()
+        |> Pagination.to_page_numbers()
+        |> Enum.map(&Pagination.add_page_param(options, &1))
+        |> Enum.map(&gateway().request(:get, url, "", headers, &1))
+        |> Enum.map(&marshall_response/1)
+        |> ResultAggregator.aggregate
+        |> marshall_paginated_response()
+      other
+        -> other |> marshall_response()
+    end
   end
 
   @doc """
@@ -69,6 +76,9 @@ defmodule CodeCorps.GitHub.API do
   @typep http_failure :: {:error, term}
 
   @spec marshall_response(http_success | http_failure) :: GitHub.response
+  defp marshall_response({:ok, %Response{body: "", status_code: status}}) when status in 200..299 do
+    {:ok, %{}}
+  end
   defp marshall_response({:ok, %Response{body: body, status_code: status}}) when status in 200..299 do
     case body |> Poison.decode do
       {:ok, json} ->
@@ -79,6 +89,9 @@ defmodule CodeCorps.GitHub.API do
   end
   defp marshall_response({:ok, %Response{body: body, status_code: 404}}) do
     {:error, APIError.new({404, %{"message" => body}})}
+  end
+  defp marshall_response({:ok, %Response{body: "", status_code: status}}) when status in 400..599 do
+    {:error, APIError.new({status, %{"message" => "API Error during HEAD request"}})}
   end
   defp marshall_response({:ok, %Response{body: body, status_code: status}}) when status in 400..599 do
     case body |> Poison.decode do
@@ -94,4 +107,8 @@ defmodule CodeCorps.GitHub.API do
   defp marshall_response({:error, reason}) do
     {:error, HTTPClientError.new(reason: reason)}
   end
+
+  @spec marshall_paginated_response(tuple) :: tuple
+  defp marshall_paginated_response({:ok, pages}), do: {:ok, pages |> List.flatten}
+  defp marshall_paginated_response({:error, responses}), do: {:error, responses |> PaginationError.new}
 end

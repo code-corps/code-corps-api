@@ -18,30 +18,27 @@ defmodule CodeCorps.GitHub.API.Installation do
 
   https://developer.github.com/v3/apps/installations/#list-repositories
   """
-  @spec repositories(GithubAppInstallation.t) :: {:ok, list(map)} | {:error, GitHub.api_error_struct}
+  @spec repositories(GithubAppInstallation.t) :: {:ok, list(map)} | {:error, GitHub.paginated_endpoint_error}
   def repositories(%GithubAppInstallation{} = installation) do
     with {:ok, access_token} <- installation |> get_access_token(),
-         {:ok, responses} <- fetch_repositories(access_token),
-         repositories <- extract_repositories(responses) do
-      {:ok, repositories}
+         {:ok, responses} <- access_token |> fetch_repositories() do
+      {:ok, responses |> extract_repositories}
     else
       {:error, error} -> {:error, error}
     end
   end
 
+  @spec fetch_repositories(String.t) :: {:ok, list(map)} | {:error, GitHub.paginated_endpoint_error}
   defp fetch_repositories(access_token) do
     "installation/repositories"
     |> GitHub.get_all(%{}, [access_token: access_token, params: [per_page: 100]])
-    |> (&{:ok, &1}).()
   end
 
+  @spec extract_repositories(list(map)) :: list(map)
   defp extract_repositories(responses) do
     responses
-    |> Enum.reduce([], &merge_repositories/2)
-  end
-
-  defp merge_repositories(response, acc) do
-    acc |> Enum.concat(response |> Map.get("repositories"))
+    |> Enum.map(&Map.get(&1, "repositories"))
+    |> List.flatten
   end
 
   @doc """
