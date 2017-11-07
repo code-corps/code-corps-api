@@ -25,7 +25,7 @@ defmodule CodeCorps.GitHub.Event.Installation.ChangesetBuilder do
     github_app_installation
     |> Changeset.change(attrs)
     |> Changeset.put_change(:installed, true)
-    |> inferr_origin()
+    |> infer_origin()
     |> Changeset.unique_constraint(:github_id, name: :github_app_installations_github_id_index)
   end
 
@@ -47,12 +47,12 @@ defmodule CodeCorps.GitHub.Event.Installation.ChangesetBuilder do
     |> Changeset.assoc_constraint(:user)
   end
 
-  @spec inferr_origin(Changeset.t) :: Changeset.t
-  defp inferr_origin(%Changeset{
+  @spec infer_origin(Changeset.t) :: Changeset.t
+  defp infer_origin(%Changeset{
     data: %GithubAppInstallation{id: nil}} = changeset) do
 
     changeset
     |> Changeset.put_change(:origin, "github")
   end
-  defp inferr_origin(%Changeset{} = changeset), do: changeset
+  defp infer_origin(%Changeset{} = changeset), do: changeset
 end
