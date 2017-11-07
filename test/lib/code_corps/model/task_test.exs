@@ -2,6 +2,7 @@ defmodule CodeCorps.TaskTest do
   use CodeCorps.ModelCase
 
   alias CodeCorps.Task
+  alias Ecto.Changeset
 
   @valid_attrs %{
     title: "Test task",
@@ -63,6 +64,14 @@ defmodule CodeCorps.TaskTest do
       assert changeset.valid?
       {:ok, %Task{created_at: created_at, modified_at: modified_at}} = Repo.insert(changeset)
       assert created_at == modified_at
+    end
+
+    test "sets modified_from to 'code_corps'" do
+      assert(
+        %Task{}
+        |> Task.create_changeset(%{})
+        |> Changeset.get_field(:modified_from) == "code_corps"
+      )
     end
 
     test "sets the order when the task is not archived and position is set" do
@@ -133,6 +142,15 @@ defmodule CodeCorps.TaskTest do
       changeset = Task.update_changeset(task, %{title: "New title"})
       {:ok, %Task{order: order}} = Repo.update(changeset)
       refute order
+    end
+
+    test "sets :modified_from to 'code_corps'" do
+      assert(
+        :task
+        |> insert(modified_from: "github")
+        |> Task.update_changeset(%{})
+        |> Changeset.get_field(:modified_from) == "code_corps"
+      )
     end
   end
 end

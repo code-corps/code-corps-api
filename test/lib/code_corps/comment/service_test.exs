@@ -29,6 +29,11 @@ defmodule CodeCorps.Comment.ServiceTest do
       refute_received({:post, "https://api.github.com/" <> _rest, _body, _headers, _options})
     end
 
+    test "sets modified_from to 'code_corps'" do
+      {:ok, comment} = valid_attrs() |> Comment.Service.create
+      assert comment.modified_from == "code_corps"
+    end
+
     test "returns errored changeset if attributes are invalid" do
       {:error, changeset} = Comment.Service.create(@base_attrs)
       refute changeset.valid?
@@ -90,6 +95,13 @@ defmodule CodeCorps.Comment.ServiceTest do
       refute updated_comment.github_comment_id
 
       refute_received({:patch, "https://api.github.com/" <> _rest, _body, _headers, _options})
+    end
+
+    test "sets modified_from to 'code_corps'" do
+      comment = insert(:comment, modified_from: "github")
+      {:ok, updated_comment} = comment |> Comment.Service.update(@update_attrs)
+
+      assert updated_comment.modified_from == "code_corps"
     end
 
     @preloads [task: [github_repo: :github_app_installation]]

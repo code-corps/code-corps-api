@@ -1,7 +1,10 @@
 defmodule CodeCorps.CommentTest do
+  @moduledoc false
+
   use CodeCorps.ModelCase
 
   alias CodeCorps.Comment
+  alias Ecto.Changeset
 
   @valid_attrs %{markdown: "I love elixir!", state: "published"}
   @invalid_attrs %{}
@@ -40,6 +43,14 @@ defmodule CodeCorps.CommentTest do
       {:ok, %Comment{created_at: created_at, modified_at: modified_at}} = Repo.insert(changeset)
       assert created_at == modified_at
     end
+
+    test "sets modified_from to 'code_corps'" do
+      assert(
+        %Comment{}
+        |> Comment.create_changeset(%{})
+        |> Changeset.get_field(:modified_from) == "code_corps"
+      )
+    end
   end
 
   describe "update_changeset/2" do
@@ -47,6 +58,15 @@ defmodule CodeCorps.CommentTest do
       comment = insert(:comment)
       changeset = Comment.update_changeset(comment, %{})
       assert comment.modified_at < changeset.changes[:modified_at]
+    end
+
+    test "sets modified_from to 'code_corps'" do
+      assert(
+        :comment
+        |> insert(modified_from: "github")
+        |> Comment.update_changeset(%{})
+        |> Changeset.get_field(:modified_from) == "code_corps"
+      )
     end
   end
 end
