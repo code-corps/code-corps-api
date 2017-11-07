@@ -43,7 +43,7 @@ defmodule CodeCorps.GitHub.Event.Installation.Repos do
   end
 
   # transaction step 1
-  @spec fetch_api_repo_list(map) :: {:ok, map} | {:error, GitHub.api_error_struct}
+  @spec fetch_api_repo_list(map) :: {:ok, list(map)} | {:error, GitHub.paginated_endpoint_error}
   defp fetch_api_repo_list(%{processing_installation: %GithubAppInstallation{} = installation}) do
     installation |> Installation.repositories()
   end

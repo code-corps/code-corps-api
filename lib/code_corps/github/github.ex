@@ -84,13 +84,27 @@ defmodule CodeCorps.GitHub do
     end
   end
 
-
   @type method :: :get | :post | :put | :delete | :patch | :head
 
   @type body :: {:multipart, list} | map
   @type headers :: %{String.t => String.t} | %{}
   @type response :: {:ok, map} | {:error, api_error_struct}
   @type api_error_struct :: APIError.t | HTTPClientError.t
+
+  @typedoc ~S"""
+  Potential errors which can happen when retrieving data from a paginated
+  endpoint.
+
+  If a new access token is required, then it is regenerated and stored into an
+  installation, which can result in any of
+    - `Ecto.Changeset.t`
+    - `CodeCorps.GitHub.APIError.t`
+    - `CodeCorps.GitHub.HTTPClientError.t`
+
+  Once that is done, the actual request is made, which can error out with
+    - `CodeCorps.GitHub.Errors.PaginationError.t`
+  """
+  @type paginated_endpoint_error :: Ecto.Changeset.t | APIError.t | HTTPClientError.t | API.Errors.PaginationError.t
 
   @doc """
   A low level utility function to make a direct request to the GitHub API.
@@ -110,6 +124,20 @@ defmodule CodeCorps.GitHub do
     end
   end
 
+  @doc ~S"""
+  A low level utility function to make an authenticated request to a GitHub API
+  endpoint which supports pagination, and fetch all the pages from that endpoint
+  at once, by making parallel requests to each page and aggregating the results.
+  """
+  @spec get_all(String.t, headers, list) :: {:ok, list(map)} | {:error, API.Errors.PaginationError.t} | {:error, api_error_struct}
+  def get_all(endpoint, headers, options) do
+    API.get_all(
+      api_url_for(endpoint),
+      headers |> Headers.user_request(options),
+      options
+    )
+  end
+
   @doc """
   A low level utility function to make an authenticated request to the
   GitHub API on behalf of a GitHub App or integration
@@ -127,14 +155,6 @@ defmodule CodeCorps.GitHub do
     else
       _ -> {:error, HTTPClientError.new(reason: :body_encoding_error)}
     end
-  end
-
-  def get_all(endpoint, headers, options) do
-    API.get_all(
-      api_url_for(endpoint),
-      headers |> Headers.user_request(options),
-      options
-    )
   end
 
   @token_url "https://github.com/login/oauth/access_token"

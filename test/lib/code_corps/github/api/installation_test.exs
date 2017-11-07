@@ -21,6 +21,41 @@ defmodule CodeCorps.GitHub.API.InstallationTest do
 
       assert Installation.repositories(installation) == {:ok, @installation_repositories |> Map.get("repositories")}
     end
+
+    defmodule PaginatedRepositoriesAPI do
+      @url "https://api.github.com/installation/repositories"
+
+      defp build_repo(id), do: %{github_id: id}
+
+      def request(:head, @url, _, _, _) do
+        next = '<#{@url}?page=2>; rel="next"'
+        last = '<#{@url}?page=2>; rel="last"'
+
+        headers = [{"Link", [next, last] |> Enum.join(", ")}]
+        {:ok, %HTTPoison.Response{body: "", headers: headers, status_code: 200}}
+      end
+      def request(:get, @url, _, _, opts) do
+        body = case opts[:params][:page] do
+          1 -> %{"repositories" => 1..100 |> Enum.map(&build_repo/1)}
+          2 -> %{"repositories" => 1..50 |> Enum.map(&build_repo/1)}
+        end
+
+        {:ok, %HTTPoison.Response{body: body |> Poison.encode!, status_code: 200}}
+      end
+      def request(method, url, body, headers, opts) do
+        CodeCorps.GitHub.SuccessAPI.request(method, url, body, headers, opts)
+      end
+    end
+
+    test "supports pagination" do
+      installation = %GithubAppInstallation{access_token: @access_token, access_token_expires_at: @expires_at}
+
+      with_mock_api(PaginatedRepositoriesAPI) do
+        {:ok, issues} = installation |> Installation.repositories
+      end
+
+      assert issues |> Enum.count == 150
+    end
   end
 
   describe "get_access_token/1" do

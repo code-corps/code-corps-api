@@ -90,7 +90,7 @@ defmodule CodeCorps.GitHub.Event.Installation do
   defp marshall_result({:error, :installation, :unexpected_installation_payload, _steps}), do: {:error, :unexpected_payload}
   defp marshall_result({:error, :installation, %Changeset{}, _steps}), do: {:error, :validation_error_on_syncing_installation}
   defp marshall_result({:error, :installation, :too_many_unprocessed_installations, _steps}), do: {:error, :multiple_unprocessed_installations_found}
-  defp marshall_result({:error, :api_response, %CodeCorps.GitHub.APIError{}, _steps}), do: {:error, :github_api_error_on_syncing_repos}
+  defp marshall_result({:error, :api_response, %CodeCorps.GitHub.API.Errors.PaginationError{}, _steps}), do: {:error, :github_api_error_on_syncing_repos}
   defp marshall_result({:error, :deleted_repos, {_results, _changesets}, _steps}), do: {:error, :validation_error_on_deleting_removed_repos}
   defp marshall_result({:error, :synced_repos, {_results, _changesets}, _steps}), do: {:error, :validation_error_on_syncing_existing_repos}
   defp marshall_result({:error, :processed_installation, %Changeset{}, _steps}), do: {:error, :validation_error_on_marking_installation_processed}

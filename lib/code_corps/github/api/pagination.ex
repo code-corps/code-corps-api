@@ -70,7 +70,7 @@ defmodule CodeCorps.GitHub.API.Pagination do
   @doc ~S"""
   From the specified page count, generates a list of integers, `1..count`
   """
-  @spec to_page_numbers(integer) :: list(integer)
+  @spec to_page_numbers(integer) :: Range.t
   def to_page_numbers(total) when is_integer(total), do: 1..total
 
   @doc ~S"""
