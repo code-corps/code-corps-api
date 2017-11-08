@@ -7,10 +7,12 @@ defmodule CodeCorps.TaskList do
   @type t :: %__MODULE__{}
 
   schema "task_lists" do
+    field :done, :boolean, default: false
     field :inbox, :boolean, default: false
     field :name, :string
     field :order, :integer
     field :position, :integer, virtual: true
+    field :pull_requests, :boolean, default: false
 
     belongs_to :project, CodeCorps.Project
     has_many :tasks, CodeCorps.Task
@@ -29,11 +31,11 @@ defmodule CodeCorps.TaskList do
         name: "Backlog",
         position: 2
       }, %{
-        inbox: false,
+        pull_requests: true,
         name: "In Progress",
         position: 3
       }, %{
-        inbox: false,
+        done: true,
         name: "Done",
         position: 4
       }
@@ -52,8 +54,11 @@ defmodule CodeCorps.TaskList do
 
   def create_changeset(struct, params) do
     struct
-    |> cast(params, [:inbox])
+    |> cast(params, [:done, :inbox, :pull_requests])
     |> changeset(params)
-    |> validate_required([:inbox])
+    |> validate_required([:done, :inbox, :pull_requests])
+    |> unique_constraint(:done, name: "task_lists_project_id_done_index")
+    |> unique_constraint(:inbox, name: "task_lists_project_id_inbox_index")
+    |> unique_constraint(:pull_requests, name: "task_lists_project_id_pull_requests_index")
   end
 end

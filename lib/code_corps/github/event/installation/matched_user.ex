@@ -12,7 +12,7 @@ defmodule CodeCorps.GitHub.Event.Installation.MatchedUser do
     User
   }
 
-  @typep process_outcome :: {:ok, GithubAppInstallation.t} | {:error, Changeset.t}
+  @typep process_outcome :: {:ok, GithubAppInstallation.t} | {:error, Ecto.Changeset.t}
   @type outcome :: process_outcome | {:error, :too_many_unprocessed_installations}
 
   @doc """

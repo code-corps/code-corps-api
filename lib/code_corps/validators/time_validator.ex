@@ -6,17 +6,21 @@ defmodule CodeCorps.Validators.TimeValidator do
   alias Ecto.Changeset
 
   @doc """
-  Validates a time after a given time.
+  Validates the new time is not before the previous time.
   """
-  def validate_time_after(%{data: data} = changeset, field) do
+  def validate_time_not_before(%{data: data} = changeset, field) do
     previous_time = Map.get(data, field)
     current_time = Changeset.get_change(changeset, field)
-    is_after = current_time |> Timex.after?(previous_time)
-    is_equal = current_time |> Timex.equal?(previous_time)
-    after_or_equal = is_after || is_equal
-    case after_or_equal do
-      true -> changeset
-      false -> Changeset.add_error(changeset, field, "cannot be before the last recorded time")
+    case current_time do
+      nil -> changeset
+      _ -> do_validate_time_not_before(changeset, field, previous_time, current_time)
+    end
+  end
+
+  defp do_validate_time_not_before(changeset, field, previous_time, current_time) do
+    case Timex.before?(current_time, previous_time) do
+      true -> Changeset.add_error(changeset, field, "cannot be before the last recorded time")
+      false -> changeset
     end
   end
 end

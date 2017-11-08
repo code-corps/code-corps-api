@@ -12,9 +12,11 @@ defmodule CodeCorpsWeb.TaskListViewTest do
     expected_json = %{
       "data" => %{
         "attributes" => %{
+          "done" => task_list.done,
           "inbox" => task_list.inbox,
           "name" => task_list.name,
           "order" => 1000,
+          "pull-requests" => task_list.pull_requests,
           "inserted-at" => task_list.inserted_at,
           "updated-at" => task_list.updated_at,
         },

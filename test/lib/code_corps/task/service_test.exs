@@ -35,7 +35,12 @@ defmodule CodeCorps.Task.ServiceTest do
       refute task.github_issue_id
       refute task.github_repo_id
 
-      refute_received({:post, _string, {}, "{}", []})
+      refute_received({:post, "https://api.github.com/" <> _rest, _body, _headers, _options})
+    end
+
+    test "sets modified_from to 'code_corps'" do
+      {:ok, task} = valid_attrs() |> Task.Service.create
+      assert task.modified_from == "code_corps"
     end
 
     test "returns errored changeset if attributes are invalid" do
@@ -43,7 +48,7 @@ defmodule CodeCorps.Task.ServiceTest do
       refute changeset.valid?
       refute Repo.one(Task)
 
-      refute_received({:post, _string, _headers, _body, _options})
+      refute_received({:post, "https://api.github.com/" <> _rest, _body, _headers, _options})
     end
 
     test "if task is assigned a github repo, creates github issue on assigned repo" do
@@ -67,7 +72,7 @@ defmodule CodeCorps.Task.ServiceTest do
       assert task.github_issue_id
       assert task.github_repo_id == github_repo.id
 
-      assert_received({:post, "https://api.github.com/repos/foo/bar/issues", _headers, _body, _options})
+      assert_received({:post, "https://api.github.com/repos/foo/bar/issues", _body, _headers, _options})
     end
 
     test "if github process fails, returns {:error, :github}" do
@@ -87,7 +92,7 @@ defmodule CodeCorps.Task.ServiceTest do
       end
 
       refute Repo.one(Task)
-      assert_received({:post, "https://api.github.com/repos/foo/bar/issues", _headers, _body, _options})
+      assert_received({:post, "https://api.github.com/repos/foo/bar/issues", _body, _headers, _options})
     end
   end
 
@@ -105,7 +110,14 @@ defmodule CodeCorps.Task.ServiceTest do
       refute task.github_issue_id
       refute task.github_repo_id
 
-      refute_received({:post, _string, {}, "{}", []})
+      refute_received({:patch, "https://api.github.com/" <> _rest, _body, _headers, _options})
+    end
+
+    test "sets modified_from to 'code_corps'" do
+      task = insert(:task, modified_from: "github")
+      {:ok, updated_task} = task |> Task.Service.update(@update_attrs)
+
+      assert updated_task.modified_from == "code_corps"
     end
 
     test "returns {:error, changeset} if there are validation errors" do
@@ -114,7 +126,7 @@ defmodule CodeCorps.Task.ServiceTest do
 
       refute changeset.valid?
 
-      refute_received({:post, _string, {}, "{}", []})
+      refute_received({:patch, "https://api.github.com/" <> _rest, _body, _headers, _options})
     end
 
     test "creates a github issue if task is just now connected to a repo" do
@@ -131,7 +143,7 @@ defmodule CodeCorps.Task.ServiceTest do
       assert updated_task.github_issue_id
       assert updated_task.github_repo_id == github_repo.id
 
-      assert_received({:post, "https://api.github.com/repos/foo/bar/issues", _headers, _body, _options})
+      assert_received({:post, "https://api.github.com/repos/foo/bar/issues", _body, _headers, _options})
     end
 
     test "propagates changes to github if task is synced to github issue" do
@@ -151,7 +163,7 @@ defmodule CodeCorps.Task.ServiceTest do
       assert updated_task.github_issue_id
       assert updated_task.github_repo_id
 
-      assert_received({:patch, "https://api.github.com/repos/foo/bar/issues/5", _headers, _body, _options})
+      assert_received({:patch, "https://api.github.com/repos/foo/bar/issues/5", _body, _headers, _options})
     end
 
     test "reports {:error, :github}, makes no changes at all if there is a github api error" do
@@ -175,7 +187,7 @@ defmodule CodeCorps.Task.ServiceTest do
       assert updated_task.github_issue_id == task.github_issue_id
       assert updated_task.github_repo_id == task.github_repo_id
 
-      assert_received({:patch, "https://api.github.com/repos/foo/bar/issues/5", _headers, _body, _options})
+      assert_received({:patch, "https://api.github.com/repos/foo/bar/issues/5", _body, _headers, _options})
     end
   end
 end

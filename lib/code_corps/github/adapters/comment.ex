@@ -7,6 +7,7 @@ defmodule CodeCorps.GitHub.Adapters.Comment do
   alias CodeCorps.{
     Adapter.MapTransformer,
     Comment,
+    GithubComment,
     GitHub.Adapters.Utils.BodyDecorator
   }
 
@@ -17,8 +18,8 @@ defmodule CodeCorps.GitHub.Adapters.Comment do
   ]
 
   @doc ~S"""
-  Converts a Github Issue Comment payload into a set of attributes suitable to
-  create or update a `CodeCorps.Comment`
+  Converts a Github Issue Comment payload into a set of attributes suitable for
+  creating or updating a `CodeCorps.Comment`
   """
   @spec to_comment(map) :: map
   def to_comment(%{} = payload) do
@@ -35,6 +36,17 @@ defmodule CodeCorps.GitHub.Adapters.Comment do
     {:html_url, ["html_url"]},
     {:url, ["url"]}
   ]
+
+  @doc ~S"""
+  Converts a `GithubComment` record into attributes with the same keys as the
+  GitHub API's Issue Comment
+  """
+  @spec to_comment_attrs(GithubComment.t) :: map
+  def to_comment_attrs(%GithubComment{} = github_comment) do
+    github_comment
+    |> Map.from_struct
+    |> MapTransformer.transform_inverse(@github_comment_mapping)
+  end
 
   @doc ~S"""
   Converts a GitHub Issue Comment payload into a set of attributes suitable for

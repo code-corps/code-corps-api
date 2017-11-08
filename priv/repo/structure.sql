@@ -246,7 +246,9 @@ CREATE TABLE github_comments (
     url text,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    github_issue_id bigint
+    github_issue_id bigint,
+    github_user_id bigint,
+    github_repo_id bigint
 );
 
 
@@ -328,7 +330,8 @@ CREATE TABLE github_issues (
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     github_repo_id bigint,
-    github_pull_request_id bigint
+    github_pull_request_id bigint,
+    github_user_id bigint
 );
 
 
@@ -388,7 +391,8 @@ CREATE TABLE github_pull_requests (
     url text,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    github_repo_id bigint
+    github_repo_id bigint,
+    github_user_id bigint
 );
 
 
@@ -425,7 +429,11 @@ CREATE TABLE github_repos (
     github_account_type character varying(255),
     github_app_installation_id bigint,
     inserted_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    sync_state character varying(255) DEFAULT 'unsynced'::character varying,
+    syncing_comments_count integer DEFAULT 0,
+    syncing_issues_count integer DEFAULT 0,
+    syncing_pull_requests_count integer DEFAULT 0
 );
 
 
@@ -446,6 +454,41 @@ CREATE SEQUENCE github_repos_id_seq
 --
 
 ALTER SEQUENCE github_repos_id_seq OWNED BY github_repos.id;
+
+
+--
+-- Name: github_users; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE github_users (
+    id bigint NOT NULL,
+    avatar_url character varying(255),
+    email character varying(255),
+    github_id integer,
+    username character varying(255),
+    type character varying(255),
+    inserted_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: github_users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE github_users_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: github_users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE github_users_id_seq OWNED BY github_users.id;
 
 
 --
@@ -625,7 +668,8 @@ CREATE TABLE project_github_repos (
     project_id bigint,
     github_repo_id bigint,
     inserted_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    sync_state character varying(255) DEFAULT 'unsynced'::character varying
 );
 
 
@@ -1442,7 +1486,9 @@ CREATE TABLE task_lists (
     project_id bigint,
     inserted_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    inbox boolean DEFAULT false
+    inbox boolean DEFAULT false,
+    done boolean DEFAULT false,
+    pull_requests boolean DEFAULT false
 );
 
 
@@ -1698,7 +1744,8 @@ CREATE TABLE users (
     github_email character varying(255),
     github_username character varying(255),
     github_id integer,
-    type character varying(255) DEFAULT 'user'::character varying
+    type character varying(255) DEFAULT 'user'::character varying,
+    github_user_id bigint
 );
 
 
@@ -1789,6 +1836,13 @@ ALTER TABLE ONLY github_pull_requests ALTER COLUMN id SET DEFAULT nextval('githu
 --
 
 ALTER TABLE ONLY github_repos ALTER COLUMN id SET DEFAULT nextval('github_repos_id_seq'::regclass);
+
+
+--
+-- Name: github_users id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_users ALTER COLUMN id SET DEFAULT nextval('github_users_id_seq'::regclass);
 
 
 --
@@ -2103,6 +2157,14 @@ ALTER TABLE ONLY github_repos
 
 
 --
+-- Name: github_users github_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_users
+    ADD CONSTRAINT github_users_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: organization_github_app_installations organization_github_app_installations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2411,6 +2473,20 @@ CREATE INDEX github_comments_github_issue_id_index ON github_comments USING btre
 
 
 --
+-- Name: github_comments_github_repo_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX github_comments_github_repo_id_index ON github_comments USING btree (github_repo_id);
+
+
+--
+-- Name: github_comments_github_user_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX github_comments_github_user_id_index ON github_comments USING btree (github_user_id);
+
+
+--
 -- Name: github_events_github_delivery_id_index; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2446,6 +2522,13 @@ CREATE INDEX github_issues_github_repo_id_index ON github_issues USING btree (gi
 
 
 --
+-- Name: github_issues_github_user_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX github_issues_github_user_id_index ON github_issues USING btree (github_user_id);
+
+
+--
 -- Name: github_pull_requests_github_id_index; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2460,6 +2543,13 @@ CREATE INDEX github_pull_requests_github_repo_id_index ON github_pull_requests U
 
 
 --
+-- Name: github_pull_requests_github_user_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX github_pull_requests_github_user_id_index ON github_pull_requests USING btree (github_user_id);
+
+
+--
 -- Name: github_repos_github_app_installation_id_index; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2471,6 +2561,20 @@ CREATE INDEX github_repos_github_app_installation_id_index ON github_repos USING
 --
 
 CREATE UNIQUE INDEX github_repos_github_id_index ON github_repos USING btree (github_id);
+
+
+--
+-- Name: github_repos_sync_state_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX github_repos_sync_state_index ON github_repos USING btree (sync_state);
+
+
+--
+-- Name: github_users_github_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX github_users_github_id_index ON github_users USING btree (github_id);
 
 
 --
@@ -2604,6 +2708,13 @@ CREATE UNIQUE INDEX project_github_repos_project_id_github_repo_id_index ON proj
 --
 
 CREATE INDEX project_github_repos_project_id_index ON project_github_repos USING btree (project_id);
+
+
+--
+-- Name: project_github_repos_sync_state_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX project_github_repos_sync_state_index ON project_github_repos USING btree (sync_state);
 
 
 --
@@ -2964,10 +3075,31 @@ CREATE INDEX task_lists_order_index ON task_lists USING btree ("order");
 
 
 --
+-- Name: task_lists_project_id_done_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX task_lists_project_id_done_index ON task_lists USING btree (project_id) WHERE (done = true);
+
+
+--
+-- Name: task_lists_project_id_inbox_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX task_lists_project_id_inbox_index ON task_lists USING btree (project_id) WHERE (inbox = true);
+
+
+--
 -- Name: task_lists_project_id_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX task_lists_project_id_index ON task_lists USING btree (project_id);
+
+
+--
+-- Name: task_lists_project_id_pull_requests_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX task_lists_project_id_pull_requests_index ON task_lists USING btree (project_id) WHERE (pull_requests = true);
 
 
 --
@@ -3003,6 +3135,13 @@ CREATE INDEX tasks_archived_index ON tasks USING btree (archived);
 --
 
 CREATE INDEX tasks_github_issue_id_index ON tasks USING btree (github_issue_id);
+
+
+--
+-- Name: tasks_github_issue_id_project_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX tasks_github_issue_id_project_id_index ON tasks USING btree (github_issue_id, project_id);
 
 
 --
@@ -3160,6 +3299,13 @@ CREATE UNIQUE INDEX users_github_id_index ON users USING btree (github_id);
 
 
 --
+-- Name: users_github_user_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX users_github_user_id_index ON users USING btree (github_user_id);
+
+
+--
 -- Name: users_lower_username_index; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3238,6 +3384,22 @@ ALTER TABLE ONLY github_comments
 
 
 --
+-- Name: github_comments github_comments_github_repo_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_comments
+    ADD CONSTRAINT github_comments_github_repo_id_fkey FOREIGN KEY (github_repo_id) REFERENCES github_repos(id);
+
+
+--
+-- Name: github_comments github_comments_github_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_comments
+    ADD CONSTRAINT github_comments_github_user_id_fkey FOREIGN KEY (github_user_id) REFERENCES github_users(id);
+
+
+--
 -- Name: github_issues github_issues_github_pull_request_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3254,11 +3416,27 @@ ALTER TABLE ONLY github_issues
 
 
 --
+-- Name: github_issues github_issues_github_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_issues
+    ADD CONSTRAINT github_issues_github_user_id_fkey FOREIGN KEY (github_user_id) REFERENCES github_users(id);
+
+
+--
 -- Name: github_pull_requests github_pull_requests_github_repo_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY github_pull_requests
     ADD CONSTRAINT github_pull_requests_github_repo_id_fkey FOREIGN KEY (github_repo_id) REFERENCES github_repos(id);
+
+
+--
+-- Name: github_pull_requests github_pull_requests_github_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY github_pull_requests
+    ADD CONSTRAINT github_pull_requests_github_user_id_fkey FOREIGN KEY (github_user_id) REFERENCES github_users(id);
 
 
 --
@@ -3678,8 +3856,16 @@ ALTER TABLE ONLY user_tasks
 
 
 --
+-- Name: users users_github_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_github_user_id_fkey FOREIGN KEY (github_user_id) REFERENCES github_users(id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
-INSERT INTO "schema_migrations" (version) VALUES (20160723215749), (20160804000000), (20160804001111), (20160805132301), (20160805203929), (20160808143454), (20160809214736), (20160810124357), (20160815125009), (20160815143002), (20160816020347), (20160816034021), (20160817220118), (20160818000944), (20160818132546), (20160820113856), (20160820164905), (20160822002438), (20160822004056), (20160822011624), (20160822020401), (20160822044612), (20160830081224), (20160830224802), (20160911233738), (20160912002705), (20160912145957), (20160918003206), (20160928232404), (20161003185918), (20161019090945), (20161019110737), (20161020144622), (20161021131026), (20161031001615), (20161121005339), (20161121014050), (20161121043941), (20161121045709), (20161122015942), (20161123081114), (20161123150943), (20161124085742), (20161125200620), (20161126045705), (20161127054559), (20161205024856), (20161207112519), (20161209192504), (20161212005641), (20161214005935), (20161215052051), (20161216051447), (20161218005913), (20161219160401), (20161219163909), (20161220141753), (20161221085759), (20161226213600), (20161231063614), (20170102130055), (20170102181053), (20170104113708), (20170104212623), (20170104235423), (20170106013143), (20170115035159), (20170115230549), (20170121014100), (20170131234029), (20170201014901), (20170201025454), (20170201035458), (20170201183258), (20170220032224), (20170224233516), (20170226050552), (20170228085250), (20170308214128), (20170308220713), (20170308222552), (20170313130611), (20170318032449), (20170318082740), (20170324194827), (20170424215355), (20170501225441), (20170505224222), (20170526095401), (20170602000208), (20170622205732), (20170626231059), (20170628092119), (20170628213609), (20170629183404), (20170630140136), (20170706132431), (20170707213648), (20170711122252), (20170717092127), (20170725060612), (20170727052644), (20170731130121), (20170814131722), (20170913114958), (20170921014405), (20170925214512), (20170925230419), (20170926134646), (20170927100300), (20170928234412), (20171003134956), (20171003225853), (20171006063358), (20171006161407), (20171012215106), (20171012221231), (20171016125229), (20171016125516), (20171016223356), (20171016235656), (20171017235433), (20171019191035), (20171025184225), (20171026010933), (20171027061833);
+INSERT INTO "schema_migrations" (version) VALUES (20160723215749), (20160804000000), (20160804001111), (20160805132301), (20160805203929), (20160808143454), (20160809214736), (20160810124357), (20160815125009), (20160815143002), (20160816020347), (20160816034021), (20160817220118), (20160818000944), (20160818132546), (20160820113856), (20160820164905), (20160822002438), (20160822004056), (20160822011624), (20160822020401), (20160822044612), (20160830081224), (20160830224802), (20160911233738), (20160912002705), (20160912145957), (20160918003206), (20160928232404), (20161003185918), (20161019090945), (20161019110737), (20161020144622), (20161021131026), (20161031001615), (20161121005339), (20161121014050), (20161121043941), (20161121045709), (20161122015942), (20161123081114), (20161123150943), (20161124085742), (20161125200620), (20161126045705), (20161127054559), (20161205024856), (20161207112519), (20161209192504), (20161212005641), (20161214005935), (20161215052051), (20161216051447), (20161218005913), (20161219160401), (20161219163909), (20161220141753), (20161221085759), (20161226213600), (20161231063614), (20170102130055), (20170102181053), (20170104113708), (20170104212623), (20170104235423), (20170106013143), (20170115035159), (20170115230549), (20170121014100), (20170131234029), (20170201014901), (20170201025454), (20170201035458), (20170201183258), (20170220032224), (20170224233516), (20170226050552), (20170228085250), (20170308214128), (20170308220713), (20170308222552), (20170313130611), (20170318032449), (20170318082740), (20170324194827), (20170424215355), (20170501225441), (20170505224222), (20170526095401), (20170602000208), (20170622205732), (20170626231059), (20170628092119), (20170628213609), (20170629183404), (20170630140136), (20170706132431), (20170707213648), (20170711122252), (20170717092127), (20170725060612), (20170727052644), (20170731130121), (20170814131722), (20170913114958), (20170921014405), (20170925214512), (20170925230419), (20170926134646), (20170927100300), (20170928234412), (20171003134956), (20171003225853), (20171006063358), (20171006161407), (20171012215106), (20171012221231), (20171016125229), (20171016125516), (20171016223356), (20171016235656), (20171017235433), (20171019191035), (20171025184225), (20171026010933), (20171027061833), (20171028011642), (20171028173508), (20171030182857), (20171031232023), (20171031234356), (20171101023309), (20171104013543), (20171106045740), (20171106050209), (20171106103153), (20171106200036);
 

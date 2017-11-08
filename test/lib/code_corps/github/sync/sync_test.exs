@@ -12,8 +12,11 @@ defmodule CodeCorps.GitHub.SyncTest do
     GithubComment,
     GithubIssue,
     GithubPullRequest,
+    GithubRepo,
+    GithubUser,
     Repo,
     Task,
+    TaskList,
     User
   }
 
@@ -44,7 +47,9 @@ defmodule CodeCorps.GitHub.SyncTest do
 
       github_repo = insert(:github_repo, github_id: repo_github_id)
       %{project: project} = insert(:project_github_repo, github_repo: github_repo)
+      insert(:task_list, project: project, done: true)
       insert(:task_list, project: project, inbox: true)
+      insert(:task_list, project: project, pull_requests: true)
 
       {:ok, [comment]} = Sync.issue_comment_event(@payload)
 
@@ -87,38 +92,86 @@ defmodule CodeCorps.GitHub.SyncTest do
     end
   end
 
-  describe "sync_issues/1" do
-    test "syncs issues with the repo" do
+  describe "sync_project_github_repo/1" do
+    test "syncs and resyncs with the project repo" do
       owner = "baxterthehacker"
       repo = "public-repo"
       github_app_installation = insert(:github_app_installation, github_account_login: owner)
-      github_repo = insert(:github_repo, github_app_installation: github_app_installation, name: repo)
-      %{project: project} = insert(:project_github_repo, github_repo: github_repo)
+      github_repo = insert(:github_repo, github_app_installation: github_app_installation, name: repo, github_account_id: 6752317, github_account_avatar_url: "https://avatars3.githubusercontent.com/u/6752317?v=4", github_account_type: "User", github_id: 35129377)
+      %{project: project} = project_github_repo = insert(:project_github_repo, github_repo: github_repo)
+      insert(:task_list, project: project, done: true)
       insert(:task_list, project: project, inbox: true)
+      insert(:task_list, project: project, pull_requests: true)
 
-      Sync.sync_issues(github_repo)
+      # Sync a first time
 
-      assert Repo.aggregate(GithubComment, :count, :id) == 0
+      Sync.sync_project_github_repo(project_github_repo)
+
+      repo = Repo.one(GithubRepo)
+
+      assert repo.syncing_pull_requests_count == 4
+      assert repo.syncing_issues_count == 8
+      assert repo.syncing_comments_count == 12
+
+      assert Repo.aggregate(GithubComment, :count, :id) == 12
       assert Repo.aggregate(GithubIssue, :count, :id) == 8
-      assert Repo.aggregate(GithubPullRequest, :count, :id) == 0
-      assert Repo.aggregate(Comment, :count, :id) == 0
+      assert Repo.aggregate(GithubPullRequest, :count, :id) == 4
+      assert Repo.aggregate(GithubUser, :count, :id) == 10
+      assert Repo.aggregate(Comment, :count, :id) == 12
       assert Repo.aggregate(Task, :count, :id) == 8
+      assert Repo.aggregate(User, :count, :id) == 13
+
+      # Sync a second time – should run without trouble
+
+      Sync.sync_project_github_repo(project_github_repo)
+
+      repo = Repo.one(GithubRepo)
+
+      assert repo.syncing_pull_requests_count == 4
+      assert repo.syncing_issues_count == 8
+      assert repo.syncing_comments_count == 12
+
+      assert Repo.aggregate(GithubComment, :count, :id) == 12
+      assert Repo.aggregate(GithubIssue, :count, :id) == 8
+      assert Repo.aggregate(GithubPullRequest, :count, :id) == 4
+      assert Repo.aggregate(GithubUser, :count, :id) == 10
+      assert Repo.aggregate(Comment, :count, :id) == 12
+      assert Repo.aggregate(Task, :count, :id) == 8
+      assert Repo.aggregate(User, :count, :id) == 13
     end
 
     @tag acceptance: true
-    test "syncs issues with the repo with the real API" do
-      github_repo = setup_real_repo()
+    test "syncs with the project repo with the real API" do
+      project_github_repo = setup_coderly_project_repo()
 
       with_real_api do
-        Sync.sync_issues(github_repo)
+        Sync.sync_project_github_repo(project_github_repo)
       end
 
-      assert Repo.aggregate(GithubComment, :count, :id) == 0
-      assert Repo.aggregate(GithubIssue, :count, :id) == 2
-      assert Repo.aggregate(GithubPullRequest, :count, :id) == 0
-      assert Repo.aggregate(Comment, :count, :id) == 0
-      assert Repo.aggregate(Task, :count, :id) == 2
-      assert Repo.aggregate(User, :count, :id) == 1
+      repo = Repo.one(GithubRepo)
+
+      assert repo.syncing_pull_requests_count == 1
+      assert repo.syncing_issues_count == 3
+      assert repo.syncing_comments_count == 2
+
+      assert Repo.aggregate(GithubComment, :count, :id) == 2
+      assert Repo.aggregate(GithubIssue, :count, :id) == 3
+      assert Repo.aggregate(GithubPullRequest, :count, :id) == 1
+      assert Repo.aggregate(GithubUser, :count, :id) == 2
+      assert Repo.aggregate(Comment, :count, :id) == 2
+      assert Repo.aggregate(Task, :count, :id) == 3
+      assert Repo.aggregate(User, :count, :id) == 2
+
+      %TaskList{tasks: done_tasks} =
+        TaskList |> Repo.get_by(done: true) |> Repo.preload(:tasks)
+      %TaskList{tasks: inbox_tasks} =
+        TaskList |> Repo.get_by(inbox: true) |> Repo.preload(:tasks)
+      %TaskList{tasks: pull_requests_tasks} =
+        TaskList |> Repo.get_by(pull_requests: true) |> Repo.preload(:tasks)
+
+      assert Enum.count(done_tasks) == 1
+      assert Enum.count(inbox_tasks) == 1
+      assert Enum.count(pull_requests_tasks) == 1
     end
   end
 end

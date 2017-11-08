@@ -32,32 +32,56 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositoriesTest do
 
     test "creates repos" do
       %{
-        "installation" => %{"id" => installation_github_id},
+        "installation" => %{
+          "account" => %{
+            "avatar_url" => installation_account_avatar_url,
+            "id" => installation_account_id,
+            "login" => installation_account_login,
+            "type" => installation_account_type
+          },
+          "id" => installation_github_id
+        },
         "repositories_added" => [repo_1_payload, repo_2_payload]
       } = @payload
 
-      %{id: installation_id} = insert(:github_app_installation, github_id: installation_github_id)
+      %{id: installation_id} = insert(:github_app_installation, github_account_avatar_url: installation_account_avatar_url, github_account_id: installation_account_id, github_account_login: installation_account_login, github_account_type: installation_account_type, github_id: installation_github_id)
 
       {:ok, [%GithubRepo{}, %GithubRepo{}]} = InstallationRepositories.handle(@payload)
 
       github_repo_1 = Repo.get_by(GithubRepo, github_id: repo_1_payload["id"])
       assert github_repo_1
       assert github_repo_1.name == repo_1_payload["name"]
+      assert github_repo_1.github_account_avatar_url == installation_account_avatar_url
+      assert github_repo_1.github_account_id == installation_account_id
+      assert github_repo_1.github_account_login == installation_account_login
+      assert github_repo_1.github_account_type == installation_account_type
       assert github_repo_1.github_app_installation_id == installation_id
 
       github_repo_2 = Repo.get_by(GithubRepo, github_id: repo_2_payload["id"])
       assert github_repo_2
       assert github_repo_2.name == repo_2_payload["name"]
+      assert github_repo_2.github_account_avatar_url == installation_account_avatar_url
+      assert github_repo_2.github_account_id == installation_account_id
+      assert github_repo_2.github_account_login == installation_account_login
+      assert github_repo_2.github_account_type == installation_account_type
       assert github_repo_2.github_app_installation_id == installation_id
     end
 
     test "skips creating existing repos" do
       %{
-        "installation" => %{"id" => installation_github_id},
+        "installation" => %{
+          "account" => %{
+            "avatar_url" => installation_account_avatar_url,
+            "id" => installation_account_id,
+            "login" => installation_account_login,
+            "type" => installation_account_type
+          },
+          "id" => installation_github_id
+        },
         "repositories_added" => [repo_1_payload, repo_2_payload]
       } = @payload
 
-      installation = insert(:github_app_installation, github_id: installation_github_id)
+      installation = insert(:github_app_installation, github_account_avatar_url: installation_account_avatar_url, github_account_id: installation_account_id, github_account_login: installation_account_login, github_account_type: installation_account_type, github_id: installation_github_id)
       preinserted_repo = insert(:github_repo, github_app_installation: installation, github_id: repo_1_payload["id"])
 
       {:ok, [%GithubRepo{}, %GithubRepo{}]} = InstallationRepositories.handle(@payload)
@@ -68,6 +92,10 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositoriesTest do
       github_repo_2 = Repo.get_by(GithubRepo, github_id: repo_2_payload["id"])
       assert github_repo_2
       assert github_repo_2.name == repo_2_payload["name"]
+      assert github_repo_2.github_account_avatar_url == installation_account_avatar_url
+      assert github_repo_2.github_account_id == installation_account_id
+      assert github_repo_2.github_account_login == installation_account_login
+      assert github_repo_2.github_account_type == installation_account_type
       assert github_repo_2.github_app_installation_id == installation.id
 
       assert Repo.aggregate(GithubRepo, :count, :id) == 2

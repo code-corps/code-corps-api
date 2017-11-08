@@ -11,6 +11,7 @@ defmodule CodeCorps.Accounts do
     Comment,
     GitHub.Adapters,
     GithubAppInstallation,
+    GithubUser,
     Task,
     User,
     Repo
@@ -40,6 +41,45 @@ defmodule CodeCorps.Accounts do
   end
 
   @doc ~S"""
+  Creates a user record using attributes from a GitHub payload.
+  """
+  @spec create_from_github_user(GithubUser.t) :: {:ok, User.t} | {:error, Changeset.t}
+  def create_from_github_user(%GithubUser{} = github_user) do
+    with {:ok, user} <- do_create_from_github_user(github_user) do
+      user |> upload_github_photo_async
+      {:ok, user}
+    else
+      error -> error
+    end
+  end
+
+  @spec do_create_from_github_user(GithubUser.t) :: {:ok, User.t} | {:error, Changeset.t}
+  defp do_create_from_github_user(%GithubUser{} = github_user) do
+    %User{}
+    |> Changesets.create_from_github_changeset(github_user |> Adapters.User.to_user_attrs())
+    |> Changeset.put_assoc(:github_user, github_user)
+    |> Repo.insert
+  end
+
+  @spec update_with_github_user(User.t, GithubUser.t) :: {:ok, User.t} | {:error, Changeset.t}
+  def update_with_github_user(%User{} = user, %GithubUser{} = github_user) do
+    with {:ok, user} <- do_update_with_github_user(user, github_user) do
+      user |> upload_github_photo_async
+      {:ok, user}
+    else
+      error -> error
+    end
+  end
+
+  @spec do_update_with_github_user(User.t, GithubUser.t) :: {:ok, User.t} | {:error, Changeset.t}
+  defp do_update_with_github_user(%User{} = user, %GithubUser{} = github_user) do
+    user
+    |> Changesets.update_with_github_user_changeset(github_user |> Adapters.User.to_user_attrs())
+    |> Changeset.put_assoc(:github_user, github_user)
+    |> Repo.update
+  end
+
+  @doc ~S"""
   Updates a user record using attributes from a GitHub payload along with the
   access token.
   """
@@ -47,7 +87,7 @@ defmodule CodeCorps.Accounts do
   def update_from_github_oauth(%User{} = user, %{} = params, access_token) do
     params =
       params
-      |> Adapters.User.from_github_user()
+      |> Adapters.User.to_user()
       |> Map.put(:github_auth_token, access_token)
 
     changeset = user |> Changesets.update_from_github_oauth_changeset(params)

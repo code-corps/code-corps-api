@@ -15,14 +15,13 @@ defmodule CodeCorps.GitHub.FailureAPI do
 
   alias CodeCorps.GitHub.SuccessAPI
 
-  def request(method, url, headers, body, options) do
+  def request(method, url, body, headers, options) do
     case {method, url} |> for_access_token?() do
-      true -> SuccessAPI.request(method, url, headers, body, options)
+      true -> SuccessAPI.request(method, url, body, headers, options)
       false ->
-        send(self(), {method, url, headers, body, options})
-        body = load_endpoint_fixture("forbidden")
-        error = CodeCorps.GitHub.APIError.new({401, body})
-        {:error, error}
+        send(self(), {method, url, body, headers, options})
+        {:ok, body} = load_endpoint_fixture("forbidden") |> Poison.encode
+        {:ok, %HTTPoison.Response{status_code: 401, body: body}}
     end
   end
 

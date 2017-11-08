@@ -38,12 +38,14 @@ defmodule CodeCorps.Comment do
     |> validate_required([:task_id, :user_id])
     |> assoc_constraint(:task)
     |> assoc_constraint(:user)
+    |> put_change(:modified_from, "code_corps")
   end
 
   def update_changeset(struct, params) do
     struct
     |> changeset(params)
     |> update_modified_at()
+    |> put_change(:modified_from, "code_corps")
   end
 
   defp set_created_and_modified_at(changeset) do

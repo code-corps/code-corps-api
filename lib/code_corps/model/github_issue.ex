@@ -2,6 +2,8 @@ defmodule CodeCorps.GithubIssue do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @type t :: %__MODULE__{}
+
   schema "github_issues" do
     field :body, :string
     field :closed_at, :utc_datetime
@@ -20,6 +22,10 @@ defmodule CodeCorps.GithubIssue do
 
     belongs_to :github_pull_request, CodeCorps.GithubPullRequest
     belongs_to :github_repo, CodeCorps.GithubRepo
+    belongs_to :github_user, CodeCorps.GithubUser
+
+    has_many :github_comments, CodeCorps.GithubComment
+    has_many :tasks, CodeCorps.Task
 
     timestamps()
   end
@@ -35,15 +41,17 @@ defmodule CodeCorps.GithubIssue do
   def create_changeset(struct, params) do
     struct
     |> changeset(params)
-    |> cast(params, [:github_pull_request_id, :github_repo_id])
+    |> cast(params, [:github_pull_request_id, :github_repo_id, :github_user_id])
     |> assoc_constraint(:github_pull_request)
     |> assoc_constraint(:github_repo)
+    |> assoc_constraint(:github_user)
   end
 
   def update_changeset(struct, params) do
     struct
     |> changeset(params)
-    |> cast(params, [:github_pull_request_id])
+    |> cast(params, [:github_pull_request_id, :github_user_id])
     |> assoc_constraint(:github_pull_request)
+    |> assoc_constraint(:github_user)
   end
 end

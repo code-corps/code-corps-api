@@ -7,7 +7,7 @@ defmodule CodeCorps.Task.Query do
   import Ecto.Query
   import ScoutApm.Tracing
 
-  alias CodeCorps.{Helpers, Task, Repo}
+  alias CodeCorps.{Helpers, Project, Task, Repo}
   alias Ecto.Queryable
 
   @doc ~S"""

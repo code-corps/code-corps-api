@@ -16,6 +16,7 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositories do
     Repo
   }
 
+  alias CodeCorps.GitHub.Adapters.AppInstallation, as: AppInstallationAdapter
   alias Ecto.{Changeset, Multi}
 
   @type outcome :: {:ok, list(GithubRepo.t)} |
@@ -91,11 +92,19 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositories do
   end
 
   @spec find_or_create(GithubAppInstallation.t, map) :: {:ok, GithubRepo.t} | {:error, Changeset.t}
-  defp find_or_create(%GithubAppInstallation{} = installation, %{"id" => github_id, "name" => name} = attrs) do
+  defp find_or_create(%GithubAppInstallation{} = installation, %{"id" => id, "name" => name} = attrs) do
     case find_repo(installation, attrs) do
       nil ->
+        installation_repo_attributes =
+          installation
+          |> AppInstallationAdapter.to_github_repo_attrs()
+
+        params =
+          %{github_id: id, name: name}
+          |> Map.merge(installation_repo_attributes)
+
         %GithubRepo{}
-        |> Changeset.change(%{github_id: github_id, name: name})
+        |> Changeset.change(params)
         |> Changeset.put_assoc(:github_app_installation, installation)
         |> Repo.insert()
       %GithubRepo{} = github_repo ->

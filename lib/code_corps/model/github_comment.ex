@@ -3,6 +3,8 @@ defmodule CodeCorps.GithubComment do
 
   alias Ecto.Changeset
 
+  @type t :: %__MODULE__{}
+
   schema "github_comments" do
     field :body, :string
     field :github_created_at, :utc_datetime
@@ -12,6 +14,8 @@ defmodule CodeCorps.GithubComment do
     field :url, :string
 
     belongs_to :github_issue, CodeCorps.GithubIssue
+    belongs_to :github_repo, CodeCorps.GithubRepo
+    belongs_to :github_user, CodeCorps.GithubUser
 
     timestamps()
   end
@@ -30,14 +34,21 @@ defmodule CodeCorps.GithubComment do
   def create_changeset(struct, params) do
     struct
     |> changeset(params)
-    |> Changeset.cast(params, [:github_issue_id])
+    |> Changeset.cast(params, [:github_issue_id, :github_repo_id, :github_user_id])
     |> Changeset.assoc_constraint(:github_issue)
+    |> Changeset.assoc_constraint(:github_repo)
+    |> Changeset.assoc_constraint(:github_user)
   end
 
   @doc ~S"""
   Default changeset used to update a `CodeCorps.GithubComment` record.
   """
   def update_changeset(struct, params) do
-    struct |> changeset(params)
+    struct
+    |> changeset(params)
+    |> Changeset.cast(params, [:github_issue_id, :github_repo_id, :github_user_id])
+    |> Changeset.assoc_constraint(:github_issue)
+    |> Changeset.assoc_constraint(:github_repo)
+    |> Changeset.assoc_constraint(:github_user)
   end
 end

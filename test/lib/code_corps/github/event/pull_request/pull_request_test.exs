@@ -34,9 +34,9 @@ defmodule CodeCorps.GitHub.Event.PullRequestTest do
 
         github_repo = insert(:github_repo, github_id: repo_github_id)
         %{project: project} = insert(:project_github_repo, github_repo: github_repo)
-        insert(:task_list, project: project, inbox: true)
+        insert(:task_list, project: project, pull_requests: true)
 
-        {:ok, github_pull_request} = PullRequest.handle(@payload)
+        {:ok, %{github_pull_request: github_pull_request}} = PullRequest.handle(@payload)
 
         assert github_pull_request.github_repo_id == github_repo.id
         assert Repo.aggregate(GithubIssue, :count, :id) == 1

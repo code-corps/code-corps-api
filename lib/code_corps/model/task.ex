@@ -3,7 +3,7 @@ defmodule CodeCorps.Task do
 
   import EctoOrdered
 
-  alias CodeCorps.{Task, Services.MarkdownRendererService}
+  alias CodeCorps.{Services.MarkdownRendererService, Task}
   alias Ecto.Changeset
 
   @type t :: %__MODULE__{}
@@ -41,15 +41,27 @@ defmodule CodeCorps.Task do
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:title, :markdown, :task_list_id, :position])
-    |> validate_required([:title, :task_list_id])
+    |> cast(params, [:archived, :title, :markdown, :task_list_id, :position])
+    |> validate_required([:title])
     |> assoc_constraint(:task_list)
-    |> order_task()
+    |> handle_archived()
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
+  end
+
+  def handle_archived(changeset) do
+    case get_field(changeset, :archived) do
+      true ->
+        changeset
+        |> put_change(:task_list_id, nil)
+        |> put_change(:order, nil)
+      _ ->
+        order_task(changeset)
+    end
   end
 
   def order_task(changeset) do
     changeset
+    |> validate_required([:task_list_id])
     |> apply_position()
     |> set_order(:position, :order, :task_list_id)
   end
@@ -65,17 +77,19 @@ defmodule CodeCorps.Task do
     |> assoc_constraint(:project)
     |> assoc_constraint(:user)
     |> put_change(:status, "open")
+    |> put_change(:modified_from, "code_corps")
   end
 
   @spec update_changeset(struct, map) :: Ecto.Changeset.t
   def update_changeset(struct, %{} = params) do
     struct
     |> changeset(params)
-    |> cast(params, [:archived, :status])
+    |> cast(params, [:status])
     |> validate_inclusion(:status, statuses())
     |> set_closed_at()
     |> update_modified_at()
     |> maybe_assoc_with_repo(params)
+    |> put_change(:modified_from, "code_corps")
   end
 
   def apply_position(changeset) do

@@ -94,10 +94,11 @@ defmodule CodeCorps.GitHub.API.UserTest do
       @moduledoc false
 
       def request(:get, "https://api.github.com/user", _, _, _) do
-        {:error, GitHub.APIError.new({404, %{"message" => "{\"error\":\"Not Found\"}"}})}
+        {:ok, body} = %{"error" => "Not Found"} |> Poison.encode
+        {:ok, %HTTPoison.Response{status_code: 404, body: body}}
       end
-      def request(method, endpoint, headers, body, options) do
-        CodeCorps.GitHub.SuccessAPI.request(method, endpoint, headers, body, options)
+      def request(method, endpoint, body, headers, options) do
+        CodeCorps.GitHub.SuccessAPI.request(method, endpoint, body, headers, options)
       end
     end
 

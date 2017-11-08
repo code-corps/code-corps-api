@@ -16,8 +16,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment.Changeset do
   alias Ecto.Changeset
 
   @doc ~S"""
-  Constructs a changeset for syncing a task when processing a GitHub Comment
-  payload
+  Constructs a changeset for syncing a task from a GitHub API Comment payload.
   """
   @spec build_changeset(Comment.t, map, GithubComment.t, Task.t, User.t) :: Changeset.t
   def build_changeset(
@@ -31,6 +30,23 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment.Changeset do
   end
   def build_changeset(%Comment{} = comment, attrs, %GithubComment{}, %Task{}, %User{}) do
     comment |> update_changeset(attrs)
+  end
+
+  @doc ~S"""
+  Constructs a changeset for syncing a task from a `GithubComment` record.
+  """
+  @spec build_changeset(Comment.t, GithubComment.t, Task.t, User.t) :: Changeset.t
+  def build_changeset(
+    %Comment{id: comment_id} = comment,
+    %GithubComment{} = github_comment,
+    %Task{} = task,
+    %User{} = user) do
+
+    comment_attrs = github_comment |> CommentAdapter.to_comment_attrs()
+    case is_nil(comment_id) do
+      true -> create_changeset(comment, comment_attrs, github_comment, task, user)
+      false -> update_changeset(comment, comment_attrs)
+    end
   end
 
   @create_attrs ~w(created_at markdown modified_at)a
@@ -60,7 +76,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment.Changeset do
     |> Changeset.cast(CommentAdapter.to_comment(attrs), @update_attrs)
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
     |> Changeset.put_change(:modified_from, "github")
-    |> TimeValidator.validate_time_after(:modified_at)
+    |> TimeValidator.validate_time_not_before(:modified_at)
     |> Changeset.validate_required([:markdown, :body])
   end
 end

@@ -2,6 +2,8 @@ defmodule CodeCorps.GithubPullRequest do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @type t :: %__MODULE__{}
+
   schema "github_pull_requests" do
     field :additions, :integer
     field :body, :string
@@ -34,6 +36,7 @@ defmodule CodeCorps.GithubPullRequest do
     field :url, :string
 
     belongs_to :github_repo, CodeCorps.GithubRepo
+    belongs_to :github_user, CodeCorps.GithubUser
 
     timestamps()
   end
@@ -49,13 +52,14 @@ defmodule CodeCorps.GithubPullRequest do
 
   @required_attrs [
     :github_created_at, :github_id, :github_updated_at, :html_url, :locked,
-    :merged, :number, :state, :title
+    :number, :state, :title
   ]
 
   @doc false
   def changeset(struct, params) do
     struct
     |> cast(params, @attrs)
+    |> add_merged()
     |> validate_required(@required_attrs)
     |> unique_constraint(:github_id)
   end
@@ -63,12 +67,26 @@ defmodule CodeCorps.GithubPullRequest do
   def create_changeset(struct, params) do
     struct
     |> changeset(params)
-    |> cast(params, [:github_repo_id])
+    |> cast(params, [:github_repo_id, :github_user_id])
     |> assoc_constraint(:github_repo)
+    |> assoc_constraint(:github_user)
   end
 
   def update_changeset(struct, params) do
     struct
     |> changeset(params)
+    |> cast(params, [:github_repo_id, :github_user_id])
+    |> assoc_constraint(:github_repo)
+    |> assoc_constraint(:github_user)
+  end
+
+  defp add_merged(%Ecto.Changeset{changes: %{merged: merged}} = changeset) when is_boolean(merged) do
+    changeset
+  end
+  defp add_merged(%Ecto.Changeset{changes: %{merged_at: _}} = changeset) do
+    changeset |> put_change(:merged, true)
+  end
+  defp add_merged(%Ecto.Changeset{} = changeset) do
+    changeset |> put_change(:merged, false)
   end
 end
