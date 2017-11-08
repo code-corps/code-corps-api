@@ -59,7 +59,7 @@ defmodule CodeCorpsWeb.Router do
   scope "/", CodeCorpsWeb, host: "api." do
     pipe_through [:github_webhooks]
 
-    post "/webhooks/github", GitHubEventsController, :create, as: :github_events
+    post "/webhooks/github", GithubEventController, :create, as: :github_events
   end
 
   scope "/", CodeCorpsWeb, host: "api." do
@@ -70,6 +70,7 @@ defmodule CodeCorpsWeb.Router do
     resources "/donation-goals", DonationGoalController, only: [:create, :update, :delete]
     post "/oauth/github", UserController, :github_oauth
     resources "/github-app-installations", GithubAppInstallationController, only: [:create]
+    resources "/github-events", GithubEventController, only: [:index, :show]
     resources "/organization-github-app-installations", OrganizationGithubAppInstallationController, only: [:create, :delete]
     resources "/organizations", OrganizationController, only: [:create, :update]
     resources "/organization-invites", OrganizationInviteController, only: [:create, :update]
