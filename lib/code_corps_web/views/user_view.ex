@@ -6,7 +6,7 @@ defmodule CodeCorpsWeb.UserView do
   use JaSerializer.PhoenixView
 
   attributes [
-    :biography, :cloudinary_public_id, :email, :first_name,
+    :admin, :biography, :cloudinary_public_id, :email, :first_name,
     :github_avatar_url, :github_id, :github_username, :intercom_user_hash,
     :inserted_at, :last_name, :name, :photo_large_url, :photo_thumb_url,
     :sign_up_context, :state, :state_transition, :twitter, :username,

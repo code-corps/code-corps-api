@@ -1,15 +1,16 @@
 defmodule CodeCorps.GithubEvent do
   use CodeCorps.Model
+  use Scrivener, page_size: 20
 
   @type t :: %__MODULE__{}
 
   schema "github_events" do
     field :action, :string
+    field :failure_reason, :string
     field :github_delivery_id, :string
     field :payload, :map
     field :status, :string
     field :type, :string
-    field :failure_reason, :string
 
     timestamps()
   end
