@@ -59,7 +59,7 @@ mix ecto.create
 You can now compile and run the server:
 
 ```shell
-mix phoenix.server
+mix phx.server
 ```
 
 You can also run your app inside IEx (Interactive Elixir) as:
@@ -79,6 +79,8 @@ mix ecto.setup
 ```
 
 This is an alias that runs `ecto.create`, `ecto.migrate`, and `run priv/repo/seeds.exs` in succession.
+
+You can open the file [`priv/repo/seeds.exs`](/priv/repo/seeds.exs) to see what data was seeded into your database.
 
 ### Verify it worked
 
