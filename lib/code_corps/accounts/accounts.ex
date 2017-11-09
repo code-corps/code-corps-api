@@ -94,6 +94,7 @@ defmodule CodeCorps.Accounts do
 
     multi =
       Multi.new
+      |> Multi.run(:existing_user, fn _ -> params |> update_existing_user_if_any() end)
       |> Multi.update(:user, changeset)
       |> Multi.run(:installations, fn %{user: %User{} = user} -> user |> associate_installations() end)
       |> Multi.run(:tasks, fn %{user: %User{} = user} -> user |> associate_tasks() end)
@@ -106,6 +107,20 @@ defmodule CodeCorps.Accounts do
       {:error, :user, %Changeset{} = changeset, _actions_done} ->
         {:error, changeset}
     end
+  end
+
+  defp update_existing_user_if_any(%{github_id: github_id}) do
+    case Repo.get_by(User, github_id: github_id, sign_up_context: "github") do
+      %User{} = existing_user -> existing_user |> do_update_existing_user()
+      _ -> {:ok, nil}
+    end
+  end
+
+  defp do_update_existing_user(%User{github_id: github_id} = user) do
+    params = %{github_id: nil, github_id_was: github_id}
+    user
+    |> Changesets.dissociate_github_user_changeset(params)
+    |> Repo.update()
   end
 
   defp upload_github_photo_async(%User{cloudinary_public_id: nil} = user) do

@@ -50,6 +50,12 @@ defmodule CodeCorps.Accounts.Changesets do
     |> unique_github_constraint()
   end
 
+  def dissociate_github_user_changeset(struct, %{} = params) do
+    struct
+    |> Changeset.cast(params, [:github_id, :github_id_was])
+    |> unique_github_constraint()
+  end
+
   @spec ensure_email_without_overwriting(Changeset.t, map) :: Changeset.t
   defp ensure_email_without_overwriting(%Changeset{} = changeset, %{"email" => new_email} = _params) do
     case changeset |> Changeset.get_field(:email) do

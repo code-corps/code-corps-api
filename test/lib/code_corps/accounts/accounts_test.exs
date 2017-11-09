@@ -68,8 +68,12 @@ defmodule CodeCorps.AccountsTest do
   describe "update_from_github_oauth/3" do
     test "updates proper user from provided payload" do
       user = insert(:user)
-      params = TestHelpers.load_endpoint_fixture("user")
+      %{"id" => github_id} = params = TestHelpers.load_endpoint_fixture("user")
       token = "random_token"
+
+      {:ok, %User{} = user_for_github_user} =
+        params
+        |> Accounts.create_from_github()
 
       {:ok, %User{} = user} =
         user
@@ -77,8 +81,14 @@ defmodule CodeCorps.AccountsTest do
 
       wait_for_supervisor()
 
+      user_for_github_user = Repo.get(User, user_for_github_user.id)
+
+      assert user_for_github_user.sign_up_context == "github"
+      assert user_for_github_user.github_id_was == github_id
+      refute user_for_github_user.github_id
       assert user.id
       assert user.github_auth_token == token
+      assert user.github_id == github_id
       assert user.sign_up_context == "default"
       assert user.type == "user"
     end
