@@ -27,6 +27,7 @@ defmodule CodeCorps.User do
     field :github_avatar_url, :string
     field :github_email, :string
     field :github_id, :integer
+    field :github_id_was, :integer
     field :github_username, :string
     field :last_name, :string
     field :password, :string, virtual: true
