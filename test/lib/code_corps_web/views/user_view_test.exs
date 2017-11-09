@@ -28,6 +28,7 @@ defmodule CodeCorpsWeb.UserViewTest do
         "id" => user.id |> Integer.to_string,
         "type" => "user",
         "attributes" => %{
+          "admin" => user.admin,
           "biography" => user.biography,
           "cloudinary-public-id" => nil,
           "email" => "",

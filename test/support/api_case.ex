@@ -50,10 +50,16 @@ defmodule CodeCorpsWeb.ApiCase do
       Ecto.Adapters.SQL.Sandbox.mode(CodeCorps.Repo, {:shared, self()})
     end
 
-    conn =
-      %{build_conn() | host: "api."}
-      |> put_req_header("accept", "application/vnd.api+json")
-      |> put_req_header("content-type", "application/vnd.api+json")
+    conn = cond do
+      tags[:github_webhook] ->
+        %{build_conn() | host: "api."}
+        |> put_req_header("accept", "application/json")
+        |> put_req_header("content-type", "application/json")
+      true ->
+        %{build_conn() | host: "api."}
+        |> put_req_header("accept", "application/vnd.api+json")
+        |> put_req_header("content-type", "application/vnd.api+json")
+      end
 
     {conn, current_user} = cond do
       tags[:authenticated] ->
