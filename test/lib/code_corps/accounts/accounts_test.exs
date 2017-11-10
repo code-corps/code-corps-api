@@ -4,7 +4,7 @@ defmodule CodeCorps.AccountsTest do
   use CodeCorps.BackgroundProcessingCase
   use CodeCorps.DbAccessCase
 
-  alias CodeCorps.{Accounts, User, GitHub.TestHelpers}
+  alias CodeCorps.{Accounts, Comment, Task, User, GitHub.TestHelpers}
   alias Ecto.Changeset
 
   describe "create_from_github/1" do
@@ -66,7 +66,7 @@ defmodule CodeCorps.AccountsTest do
   end
 
   describe "update_from_github_oauth/3" do
-    test "updates proper user from provided payload" do
+    test "updates proper user and associations given GitHub payload" do
       user = insert(:user)
       %{"id" => github_id} = params = TestHelpers.load_endpoint_fixture("user")
       token = "random_token"
@@ -75,6 +75,9 @@ defmodule CodeCorps.AccountsTest do
         params
         |> Accounts.create_from_github()
 
+      comment = insert(:comment, user: user_for_github_user)
+      task = insert(:task, user: user_for_github_user)
+
       {:ok, %User{} = user} =
         user
         |> Accounts.update_from_github_oauth(params, token)
@@ -82,15 +85,24 @@ defmodule CodeCorps.AccountsTest do
       wait_for_supervisor()
 
       user_for_github_user = Repo.get(User, user_for_github_user.id)
+      comment = Repo.get(Comment, comment.id)
+      task = Repo.get(Task, task.id)
 
+      # Unsets the old user's github_id
       assert user_for_github_user.sign_up_context == "github"
       assert user_for_github_user.github_id_was == github_id
       refute user_for_github_user.github_id
+
+      # Sets the new user data
       assert user.id
       assert user.github_auth_token == token
       assert user.github_id == github_id
       assert user.sign_up_context == "default"
       assert user.type == "user"
+
+      # Changes associations
+      assert comment.user_id == user.id
+      assert task.user_id == user.id
     end
 
     test "does not update their image if it already exists" do
