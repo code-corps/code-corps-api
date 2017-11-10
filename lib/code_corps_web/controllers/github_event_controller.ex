@@ -19,6 +19,7 @@ defmodule CodeCorpsWeb.GithubEventController do
       github_events =
         GithubEvent
         |> Query.id_filter(params)
+        |> Ecto.Query.order_by([asc: :inserted_at])
         |> paginate(params)
 
       conn |> render("index.json-api", data: github_events)
