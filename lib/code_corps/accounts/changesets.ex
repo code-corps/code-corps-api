@@ -53,6 +53,7 @@ defmodule CodeCorps.Accounts.Changesets do
   def dissociate_github_user_changeset(struct, %{} = params) do
     struct
     |> Changeset.cast(params, [:github_id, :github_id_was])
+    |> Changeset.unique_constraint(:github_id_was)
     |> unique_github_constraint()
   end
 
