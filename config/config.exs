@@ -94,3 +94,6 @@ import_config "scout_apm.exs"
 config :code_corps, CodeCorps.Repo,
   loggers: [{Ecto.LogEntry, :log, []},
             {ScoutApm.Instruments.EctoLogger, :log, []}]
+
+config :jsonapi,
+  remove_links: true
