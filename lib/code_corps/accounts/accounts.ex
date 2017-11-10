@@ -157,7 +157,7 @@ defmodule CodeCorps.Accounts do
 
     existing_user_ids =
       User
-      |> where(github_id: ^github_id)
+      |> where(github_id_was: ^github_id)
       |> select([u], u.id)
       |> Repo.all
 
@@ -174,7 +174,7 @@ defmodule CodeCorps.Accounts do
 
     existing_user_ids =
       User
-      |> where(github_id: ^github_id)
+      |> where(github_id_was: ^github_id)
       |> select([u], u.id)
       |> Repo.all
 
