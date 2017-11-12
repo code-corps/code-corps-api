@@ -10,7 +10,7 @@ defmodule CodeCorps.Mixfile do
   def project do
     [app: :code_corps,
      version: "0.0.1",
-     elixir: "~> 1.5.1",
+     elixir: "~> 1.5.2",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
      dialyzer: [plt_add_deps: :transitive],
@@ -46,7 +46,7 @@ defmodule CodeCorps.Mixfile do
       {:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false},
       {:phoenix, "~> 1.3"},
       {:phoenix_pubsub, "~> 1.0.2"},
-      {:phoenix_ecto, "~> 3.2.3"},
+      {:phoenix_ecto, "~> 3.3.0"},
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 2.10.3"},
       {:phoenix_live_reload, "~> 1.0.8", only: :dev},

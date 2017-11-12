@@ -1,7 +1,6 @@
 defmodule CodeCorps.AccountsTest do
   @moduledoc false
 
-  use CodeCorps.BackgroundProcessingCase
   use CodeCorps.DbAccessCase
 
   alias CodeCorps.{Accounts, Comment, Task, User, GitHub.TestHelpers}
@@ -13,8 +12,6 @@ defmodule CodeCorps.AccountsTest do
         "user"
         |> TestHelpers.load_endpoint_fixture
         |> Accounts.create_from_github
-
-      wait_for_supervisor()
 
       assert user.id
       assert user.default_color
@@ -32,8 +29,6 @@ defmodule CodeCorps.AccountsTest do
         payload
         |> Accounts.create_from_github
 
-      wait_for_supervisor()
-
       assert changeset.errors[:email] == {"has already been taken", []}
     end
 
@@ -47,8 +42,6 @@ defmodule CodeCorps.AccountsTest do
         payload
         |> Accounts.create_from_github
 
-      wait_for_supervisor()
-
       assert changeset.errors[:github_id] == {"account is already connected to someone else", []}
     end
 
@@ -57,8 +50,6 @@ defmodule CodeCorps.AccountsTest do
         "user"
         |> TestHelpers.load_endpoint_fixture
         |> Accounts.create_from_github
-
-      wait_for_supervisor()
 
       user = Repo.get(User, user.id)
       assert user.cloudinary_public_id
@@ -81,8 +72,6 @@ defmodule CodeCorps.AccountsTest do
       {:ok, %User{} = user} =
         user
         |> Accounts.update_from_github_oauth(params, token)
-
-      wait_for_supervisor()
 
       user_for_github_user = Repo.get(User, user_for_github_user.id)
       comment = Repo.get(Comment, comment.id)
@@ -113,7 +102,6 @@ defmodule CodeCorps.AccountsTest do
         user
         |> Accounts.update_from_github_oauth(params, "random_token")
 
-      wait_for_supervisor()
       user = Repo.get(User, user.id)
 
       assert user.cloudinary_public_id === "123"
@@ -127,7 +115,6 @@ defmodule CodeCorps.AccountsTest do
         user
         |> Accounts.update_from_github_oauth(params, "random_token")
 
-      wait_for_supervisor()
       user = Repo.get(User, user.id)
 
       assert user.cloudinary_public_id

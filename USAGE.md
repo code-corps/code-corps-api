@@ -7,6 +7,7 @@
 - [How do I view the API docs?](#api-docs)
 - [How do I lint the code?](#linting-code-with-credo)
 - [How do I serve the front-end?](#serving-ember)
+- [How do I setup Github Integration?](#github-integration)
 - [Do I need special environment variables?](#environment)
 
 ### Interacting with the app
@@ -80,3 +81,7 @@ In your `.env` you should have a `STRIPE_SECRET_KEY` and `STRIPE_PLATFORM_CLIENT
 
 - `STRIPE_SECRET_KEY` should be set to your "Test Secret Key" from the [API Keys section of your Stripe dashboard](https://dashboard.stripe.com/account/apikeys).
 - `STRIPE_PLATFORM_CLIENT_ID` should be set to "Development `client_id`" key from the [Connect section of your Stripe dashboard](https://dashboard.stripe.com/account/applications/settings).
+
+### Github Integration
+
+To setup github integration follow instructions on this [wiki page]((https://github.com/code-corps/code-corps-api/wiki/GitHub-Apps-–-How-to-set-up-your-local-environment))

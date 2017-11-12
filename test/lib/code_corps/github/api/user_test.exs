@@ -1,7 +1,6 @@
 defmodule CodeCorps.GitHub.API.UserTest do
   @moduledoc false
 
-  use CodeCorps.BackgroundProcessingCase
   use CodeCorps.DbAccessCase
   import CodeCorps.GitHub.TestHelpers
 

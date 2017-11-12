@@ -20,7 +20,6 @@ defmodule CodeCorpsWeb.ApiCase do
   use ExUnit.CaseTemplate
   use Phoenix.ConnTest
 
-
   using(opts) do
     quote do
       # Import conveniences for testing with connections

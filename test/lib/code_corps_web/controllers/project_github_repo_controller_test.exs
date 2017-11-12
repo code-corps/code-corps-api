@@ -1,7 +1,12 @@
 defmodule CodeCorpsWeb.ProjectGithubRepoControllerTest do
   use CodeCorpsWeb.ApiCase, resource_name: :project_github_repo
 
-  alias CodeCorps.{Analytics.SegmentTraitsBuilder, ProjectGithubRepo, Repo}
+  alias CodeCorps.{
+    Analytics.SegmentTraitsBuilder,
+    ProjectGithubRepo,
+    Repo,
+    User
+  }
 
   describe "index" do
     test "lists all entries on index", %{conn: conn} do
@@ -45,20 +50,14 @@ defmodule CodeCorpsWeb.ProjectGithubRepoControllerTest do
   describe "create" do
     @tag :authenticated
     test "creates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
-      project = insert(:project)
-      insert(:project_user, project: project, user: current_user, role: "owner")
-      github_repo = insert(:github_repo)
-
+      {project, github_repo} = setup_project_repo(current_user)
       attrs = %{project: project, github_repo: github_repo}
       assert conn |> request_create(attrs) |> json_response(201)
     end
 
     @tag :authenticated
     test "is being tracked", %{conn: conn, current_user: current_user} do
-      project = insert(:project)
-      insert(:project_user, project: project, user: current_user, role: "owner")
-      github_repo = insert(:github_repo)
-
+      {project, github_repo} = setup_project_repo(current_user)
       attrs = %{project: project, github_repo: github_repo}
       conn |> request_create(attrs)
 
@@ -123,5 +122,18 @@ defmodule CodeCorpsWeb.ProjectGithubRepoControllerTest do
     test "renders 404 when id is nonexistent on delete", %{conn: conn} do
       assert conn |> request_delete(:not_found) |> json_response(404)
     end
+  end
+
+  defp setup_project_repo(%User{} = current_user) do
+    project = insert(:project)
+    insert(:project_user, project: project, user: current_user, role: "owner")
+    owner = "baxterthehacker"
+    repo = "public-repo"
+    github_app_installation = insert(:github_app_installation, github_account_login: owner)
+    github_repo = insert(:github_repo, github_app_installation: github_app_installation, name: repo, github_account_id: 6752317, github_account_avatar_url: "https://avatars3.githubusercontent.com/u/6752317?v=4", github_account_type: "User", github_id: 35129377)
+    insert(:task_list, project: project, done: true)
+    insert(:task_list, project: project, inbox: true)
+    insert(:task_list, project: project, pull_requests: true)
+    {project, github_repo}
   end
 end

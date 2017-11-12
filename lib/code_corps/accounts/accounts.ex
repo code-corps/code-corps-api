@@ -5,13 +5,13 @@ defmodule CodeCorps.Accounts do
   All actions to accounts should go through here.
   """
 
-  alias Task.Supervisor, as: TaskSupervisor
   alias CodeCorps.{
     Accounts.Changesets,
     Comment,
     GitHub.Adapters,
     GithubAppInstallation,
     GithubUser,
+    Processor,
     Task,
     User,
     Repo
@@ -124,7 +124,7 @@ defmodule CodeCorps.Accounts do
   end
 
   defp upload_github_photo_async(%User{cloudinary_public_id: nil} = user) do
-    TaskSupervisor.start_child(:background_processor, fn -> upload_github_photo(user) end)
+    Processor.process(fn -> upload_github_photo(user) end)
   end
   defp upload_github_photo_async(%User{} = user), do: user
 

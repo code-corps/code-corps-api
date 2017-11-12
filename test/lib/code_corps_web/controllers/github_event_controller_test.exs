@@ -2,7 +2,6 @@ defmodule CodeCorpsWeb.GithubEventControllerTest do
   @moduledoc false
 
   use CodeCorpsWeb.ApiCase, resource_name: :github_event
-  use CodeCorps.BackgroundProcessingCase
 
   import CodeCorps.GitHub.TestHelpers
 
@@ -28,13 +27,19 @@ defmodule CodeCorpsWeb.GithubEventControllerTest do
     end
 
     @tag authenticated: :admin
-    test "lists all entries on index", %{conn: conn} do
-      [github_event_1, github_event_2] = insert_pair(:github_event)
+    test "lists all entries on index by inserted_at desc", %{conn: conn} do
+      past_event = insert(:github_event, inserted_at: Timex.now())
+      recent_event = insert(:github_event, inserted_at: Timex.now() |> Timex.shift(days: 3))
 
-      conn
+      data =
+        conn
         |> request_index
         |> json_response(200)
-        |> assert_ids_from_response([github_event_1.id, github_event_2.id])
+        |> Map.get("data")
+
+      [first_event, second_event] = data
+      assert first_event["id"] == recent_event.id |> Integer.to_string
+      assert second_event["id"] == past_event.id |> Integer.to_string
     end
 
     @tag authenticated: :admin
@@ -90,8 +95,6 @@ defmodule CodeCorpsWeb.GithubEventControllerTest do
       payload = load_event_fixture("installation_created")
       assert conn |> for_event("installation", "foo") |> post(path, payload) |> response(200)
 
-      wait_for_supervisor()
-
       assert Repo.get_by(GithubEvent, github_delivery_id: "foo")
     end
 
@@ -100,8 +103,6 @@ defmodule CodeCorpsWeb.GithubEventControllerTest do
       path = conn |> github_events_path(:create)
       assert conn |> for_event("gollum", "foo") |> post(path, %{}) |> response(202)
 
-      wait_for_supervisor()
-
       refute Repo.get_by(GithubEvent, github_delivery_id: "foo")
     end
 
@@ -109,8 +110,6 @@ defmodule CodeCorpsWeb.GithubEventControllerTest do
     test "responds with 202 for an unknown event", %{conn: conn} do
       path = conn |> github_events_path(:create)
       assert conn |> for_event("unknown", "foo") |> post(path, %{}) |> response(202)
-
-      wait_for_supervisor()
 
       refute Repo.get_by(GithubEvent, github_delivery_id: "foo")
     end
