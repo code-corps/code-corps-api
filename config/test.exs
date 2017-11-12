@@ -57,6 +57,8 @@ config :code_corps,
 config :sentry,
   environment_name: Mix.env || :test
 
+config :code_corps, :processor, CodeCorps.Processor.Sync
+
 config :code_corps, CodeCorps.Mailer,
   adapter: Bamboo.TestAdapter
 
