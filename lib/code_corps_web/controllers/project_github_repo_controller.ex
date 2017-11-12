@@ -3,7 +3,7 @@ defmodule CodeCorpsWeb.ProjectGithubRepoController do
   use CodeCorpsWeb, :controller
 
   alias Task.Supervisor, as: TaskSupervisor
-  alias CodeCorps.{Analytics.SegmentTracker, ProjectGithubRepo, User, Helpers.Query}
+  alias CodeCorps.{Analytics.SegmentTracker, Processor, ProjectGithubRepo, User, Helpers.Query}
 
   action_fallback CodeCorpsWeb.FallbackController
   plug CodeCorpsWeb.Plug.DataToAttributes
@@ -29,7 +29,7 @@ defmodule CodeCorpsWeb.ProjectGithubRepoController do
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %ProjectGithubRepo{}, params),
          {:ok, %ProjectGithubRepo{} = project_github_repo} <- create_project_repo_changeset(params) |> Repo.insert do
 
-      TaskSupervisor.start_child(:background_processor, fn ->
+      Processor.process(fn ->
         CodeCorps.GitHub.Sync.sync_project_github_repo(project_github_repo)
       end)
 

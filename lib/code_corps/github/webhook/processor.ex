@@ -5,7 +5,7 @@ defmodule CodeCorps.GitHub.Webhook.Processor do
   Can process them synchronously or asynchronously.
   """
 
-  alias CodeCorps.GitHub.Webhook.Handler
+  alias CodeCorps.{GitHub.Webhook.Handler, Processor}
 
   @doc """
   Used to process a Github webhook event in an async manner.
@@ -15,7 +15,7 @@ defmodule CodeCorps.GitHub.Webhook.Processor do
   Returns `{:ok, pid}`
   """
   def process_async(type, id, payload) do
-    Task.Supervisor.start_child(:background_processor, fn -> process(type, id, payload) end)
+    Processor.process(fn -> process(type, id, payload) end)
   end
 
   defdelegate process(type, id, payload), to: Handler, as: :handle

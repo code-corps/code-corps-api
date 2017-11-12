@@ -2,7 +2,6 @@ defmodule CodeCorpsWeb.GithubEventControllerTest do
   @moduledoc false
 
   use CodeCorpsWeb.ApiCase, resource_name: :github_event
-  use CodeCorps.BackgroundProcessingCase
 
   import CodeCorps.GitHub.TestHelpers
 
@@ -96,8 +95,6 @@ defmodule CodeCorpsWeb.GithubEventControllerTest do
       payload = load_event_fixture("installation_created")
       assert conn |> for_event("installation", "foo") |> post(path, payload) |> response(200)
 
-      wait_for_supervisor()
-
       assert Repo.get_by(GithubEvent, github_delivery_id: "foo")
     end
 
@@ -106,8 +103,6 @@ defmodule CodeCorpsWeb.GithubEventControllerTest do
       path = conn |> github_events_path(:create)
       assert conn |> for_event("gollum", "foo") |> post(path, %{}) |> response(202)
 
-      wait_for_supervisor()
-
       refute Repo.get_by(GithubEvent, github_delivery_id: "foo")
     end
 
@@ -115,8 +110,6 @@ defmodule CodeCorpsWeb.GithubEventControllerTest do
     test "responds with 202 for an unknown event", %{conn: conn} do
       path = conn |> github_events_path(:create)
       assert conn |> for_event("unknown", "foo") |> post(path, %{}) |> response(202)
-
-      wait_for_supervisor()
 
       refute Repo.get_by(GithubEvent, github_delivery_id: "foo")
     end

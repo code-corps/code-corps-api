@@ -1,7 +1,6 @@
 defmodule CodeCorps.GitHub.Event.PullRequestTest do
   @moduledoc false
 
-  use CodeCorps.BackgroundProcessingCase
   use CodeCorps.DbAccessCase
 
   import CodeCorps.GitHub.TestHelpers

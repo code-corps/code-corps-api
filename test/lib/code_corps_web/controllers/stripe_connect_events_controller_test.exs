@@ -1,5 +1,4 @@
 defmodule CodeCorpsWeb.StripeConnectEventsControllerTest do
-  use CodeCorps.BackgroundProcessingCase
   use CodeCorpsWeb.ConnCase
 
   alias CodeCorps.StripeEvent
@@ -18,9 +17,6 @@ defmodule CodeCorpsWeb.StripeConnectEventsControllerTest do
 
     path = conn |> stripe_connect_events_path(:create)
     assert conn |> post(path, event) |> response(200)
-
-    wait_for_supervisor()
-
     assert StripeEvent |> Repo.aggregate(:count, :id) == 1
   end
 
@@ -37,9 +33,6 @@ defmodule CodeCorpsWeb.StripeConnectEventsControllerTest do
 
     path = conn |> stripe_connect_events_path(:create)
     assert conn |> post(path, event) |> response(400)
-
-    wait_for_supervisor()
-
     assert StripeEvent |> Repo.aggregate(:count, :id) == 0
 
     # put env back to original state
@@ -53,9 +46,6 @@ defmodule CodeCorpsWeb.StripeConnectEventsControllerTest do
 
     path = conn |> stripe_connect_events_path(:create)
     assert conn |> post(path, event) |> response(400)
-
-    wait_for_supervisor()
-
     assert StripeEvent |> Repo.aggregate(:count, :id) == 0
 
     # put env back to original state
