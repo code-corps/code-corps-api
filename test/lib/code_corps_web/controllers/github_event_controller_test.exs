@@ -28,19 +28,19 @@ defmodule CodeCorpsWeb.GithubEventControllerTest do
     end
 
     @tag authenticated: :admin
-    test "lists all entries on index by inserted_at", %{conn: conn} do
-      github_event_1 = insert(:github_event, inserted_at: Timex.now())
-      github_event_2 = insert(:github_event, inserted_at: Timex.now() |> Timex.shift(days: 3))
+    test "lists all entries on index by inserted_at desc", %{conn: conn} do
+      past_event = insert(:github_event, inserted_at: Timex.now())
+      recent_event = insert(:github_event, inserted_at: Timex.now() |> Timex.shift(days: 3))
 
-      data = 
+      data =
         conn
         |> request_index
         |> json_response(200)
         |> Map.get("data")
 
       [first_event, second_event] = data
-      assert first_event["id"] == github_event_1.id |> Integer.to_string
-      assert second_event["id"] == github_event_2.id |> Integer.to_string
+      assert first_event["id"] == recent_event.id |> Integer.to_string
+      assert second_event["id"] == past_event.id |> Integer.to_string
     end
 
     @tag authenticated: :admin
