@@ -15,14 +15,6 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
     User
   }
 
-  describe "handle/1" do
-    @payload load_event_fixture("issue_comment_created") |> Map.put("action", "foo")
-
-    test "returns error if action of the event is wrong" do
-      assert {:error, :unexpected_action} == IssueComment.handle(@payload)
-    end
-  end
-
   for action <- ["created", "edited"] do
     describe "handle/1 for IssueComment::#{action}" do
       @payload load_event_fixture("issue_comment_#{action}")

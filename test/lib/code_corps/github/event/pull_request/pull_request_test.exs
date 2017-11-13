@@ -14,14 +14,6 @@ defmodule CodeCorps.GitHub.Event.PullRequestTest do
     User
   }
 
-  describe "handle/2" do
-    @payload load_event_fixture("pull_request_opened") |> Map.put("action", "foo")
-
-    test "returns error if action of the event is wrong" do
-      assert {:error, :unexpected_action} == PullRequest.handle(@payload)
-    end
-  end
-
   @implemented_actions ~w(opened closed edited reopened)
 
   @implemented_actions |> Enum.each(fn action ->
@@ -58,28 +50,6 @@ defmodule CodeCorps.GitHub.Event.PullRequestTest do
 
       test "returns error if pull request payload is wrong" do
         assert {:error, :unexpected_payload} == PullRequest.handle(@payload |> Map.put("pull_request", "foo"))
-      end
-    end
-  end)
-
-  @unimplemented_actions ~w(
-    assigned unassigned review_requested review_request_removed labeled
-    unlabeled
-  )
-
-  @unimplemented_actions |> Enum.each(fn action ->
-    describe "handle/2 for PullRequest::#{action}" do
-      @payload %{
-        "action" => action,
-        "pull_request" => %{
-          "id" => 1, "title" => "foo", "body" => "bar", "state" => "baz",
-          "user" => %{"id" => "bat"}
-        },
-        "repository" => %{"id" => 2}
-      }
-
-      test "is not implemented" do
-        assert PullRequest.handle(@payload) == {:error, :not_fully_implemented}
       end
     end
   end)

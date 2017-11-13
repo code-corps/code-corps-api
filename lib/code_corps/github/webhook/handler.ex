@@ -11,46 +11,59 @@ defmodule CodeCorps.GitHub.Webhook.Handler do
     GitHub.Event.IssueComment,
     GitHub.Event.Issues,
     GitHub.Event.PullRequest,
-    GitHub.Webhook.EventSupport,
     Repo
   }
 
   @doc """
-  Handles a GitHub event based on its type.
+  Handles a fully supported GitHub event based on its type and action.
+
+  The handling process consistes of 3 steps
+
+  - create event record marked as "unprocessed"
+  - mark event record as processing and handle it
+  - mark event record as processed or errored depending on handling outcome
   """
-  def handle(type, id, payload) do
-    with %{} = params <- build_params(type, id, payload),
-         {:ok, %GithubEvent{} = event} <- params |> create_event(),
-         {:ok, %GithubEvent{status: "processing"} = event} <- event |> Event.start_processing
-    do
-      payload |> do_handle(type) |> Event.stop_processing(event)
+  @spec handle_supported(String.t, String.t, map) :: {:ok, GithubEvent.t}
+  def handle_supported(type, id, %{} = payload) do
+    with {:ok, %GithubEvent{} = event} <- type |> build_params(id, "unprocessed", payload) |> create_event() do
+      payload |> apply_handler(type) |> Event.stop_processing(event)
     end
   end
 
-  defp build_params(type, id, %{"action" => action, "sender" => _} = payload) do
+  @doc ~S"""
+  Handles an unsupported supported GitHub event.
+
+  "unsupported" means that, while we generally support this event type,
+  we do not yet support this specific event action.
+
+  The process consistes of simply storing the event and marking it as
+  "unsupported".
+  """
+  @spec handle_unsupported(String.t, String.t, map) :: {:ok, GithubEvent.t}
+  def handle_unsupported(type, id, %{} = payload) do
+    type |> build_params(id, "unsupported", payload) |> create_event()
+  end
+
+  @spec build_params(String.t, String.t, String.t, map) :: map
+  defp build_params(type, id, status, %{"action" => action} = payload) do
     %{
       action: action,
       github_delivery_id: id,
       payload: payload,
-      status: type |> get_status(),
+      status: status,
       type: type
     }
   end
 
-  defp create_event(params) do
-    %GithubEvent{} |> GithubEvent.changeset(params) |> Repo.insert
+  @spec create_event(map) :: {:ok, GithubEvent.t}
+  defp create_event(%{} = params) do
+    %GithubEvent{} |> GithubEvent.changeset(params) |> Repo.insert()
   end
 
-  defp get_status(type) do
-    case EventSupport.status(type) do
-      :unsupported -> "unhandled"
-      :supported -> "unprocessed"
-    end
-  end
-
-  defp do_handle(payload, "installation"), do: Installation.handle(payload)
-  defp do_handle(payload, "installation_repositories"), do: InstallationRepositories.handle(payload)
-  defp do_handle(payload, "issue_comment"), do: IssueComment.handle(payload)
-  defp do_handle(payload, "issues"), do: Issues.handle(payload)
-  defp do_handle(payload, "pull_request"), do: PullRequest.handle(payload)
+  @spec apply_handler(map, String.t) :: tuple
+  defp apply_handler(payload, "installation"), do: Installation.handle(payload)
+  defp apply_handler(payload, "installation_repositories"), do: InstallationRepositories.handle(payload)
+  defp apply_handler(payload, "issue_comment"), do: IssueComment.handle(payload)
+  defp apply_handler(payload, "issues"), do: Issues.handle(payload)
+  defp apply_handler(payload, "pull_request"), do: PullRequest.handle(payload)
 end

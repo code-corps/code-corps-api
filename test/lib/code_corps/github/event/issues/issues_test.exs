@@ -13,14 +13,6 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
     User
   }
 
-  describe "handle/1" do
-    @payload load_event_fixture("issues_opened") |> Map.put("action", "foo")
-
-    test "returns error if action of the event is wrong" do
-      assert {:error, :unexpected_action} == Issues.handle(@payload)
-    end
-  end
-
   @implemented_actions ~w(opened closed edited reopened)
 
   @implemented_actions |> Enum.each(fn action ->
@@ -58,25 +50,6 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
 
       test "returns error if issue payload is wrong" do
         assert {:error, :unexpected_payload} == Issues.handle(@payload |> Map.put("issue", "foo"))
-      end
-    end
-  end)
-
-  @unimplemented_actions ~w(assigned unassigned labeled unlabeled milestoned demilestoned)
-
-  @unimplemented_actions |> Enum.each(fn action ->
-    describe "handle/1 for Issues::#{action}" do
-      @payload %{
-        "action" => action,
-        "issue" => %{
-          "id" => 1, "title" => "foo", "body" => "bar", "state" => "baz",
-          "user" => %{"id" => "bat"}
-        },
-        "repository" => %{"id" => 2}
-      }
-
-      test "is not implemented" do
-        assert Issues.handle(@payload) == {:error, :not_fully_implemented}
       end
     end
   end)

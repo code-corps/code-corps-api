@@ -15,11 +15,6 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositoriesTest do
   describe "handle/1" do
     @payload load_event_fixture("installation_repositories_added")
 
-    test "marks event as errored if invalid action" do
-      payload = @payload |> Map.put("action", "foo")
-      assert {:error, :unexpected_action} == InstallationRepositories.handle(payload)
-    end
-
     test "marks event as errored if invalid payload" do
       payload = @payload |> Map.delete("action")
       assert {:error, :unexpected_payload} ==

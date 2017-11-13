@@ -12,9 +12,7 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
   }
   alias GitHub.Sync
 
-  @type outcome :: Sync.outcome
-                 | {:error, :unexpected_action}
-                 | {:error, :unexpected_payload}
+  @type outcome :: Sync.outcome | {:error, :unexpected_payload}
 
   @doc ~S"""
   Handles the "IssueComment" GitHub webhook
@@ -27,26 +25,18 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
   """
   @spec handle(map) :: outcome
   def handle(payload) do
-    with {:ok, :valid} <- validate_payload(payload),
-         {:ok, :implemented} <- validate_action(payload) do
+    with {:ok, :valid} <- validate_payload(payload) do
       Sync.issue_comment_event(payload)
     else
       {:error, error} -> {:error, error}
     end
   end
 
-  @spec validate_payload(map) :: {:ok, :valid}
-                               | {:error, :unexpected_payload}
+  @spec validate_payload(map) :: {:ok, :valid} | {:error, :unexpected_payload}
   defp validate_payload(%{} = payload) do
     case payload |> Validator.valid? do
       true -> {:ok, :valid}
       false -> {:error, :unexpected_payload}
     end
   end
-
-  @implemented_actions ~w(created edited deleted)
-
-  @spec validate_action(map) :: {:ok, :implemented} | {:error, :unexpected_action}
-  defp validate_action(%{"action" => action}) when action in @implemented_actions, do: {:ok, :implemented}
-  defp validate_action(%{}), do: {:error, :unexpected_action}
 end

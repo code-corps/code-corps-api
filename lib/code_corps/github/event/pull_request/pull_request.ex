@@ -13,10 +13,7 @@ defmodule CodeCorps.GitHub.Event.PullRequest do
   }
   alias GitHub.Sync
 
-  @type outcome :: Sync.outcome
-                 | {:error, :unexpected_action}
-                 | {:error, :not_fully_implemented}
-                 | {:error, :unexpected_payload}
+  @type outcome :: Sync.outcome | {:error, :unexpected_payload}
 
   @doc ~S"""
   Handles the "PullRequest" GitHub webhook
@@ -29,8 +26,7 @@ defmodule CodeCorps.GitHub.Event.PullRequest do
   """
   @spec handle(map) :: outcome
   def handle(payload) do
-    with {:ok, :valid} <- validate_payload(payload),
-         {:ok, :implemented} <- validate_action(payload) do
+    with {:ok, :valid} <- validate_payload(payload) do
       Sync.pull_request_event(payload)
     else
       {:error, error} -> {:error, error}
@@ -45,14 +41,4 @@ defmodule CodeCorps.GitHub.Event.PullRequest do
       false -> {:error, :unexpected_payload}
     end
   end
-
-  @implemented_actions ~w(opened closed edited reopened)
-  @unimplemented_actions ~w(assigned unassigned review_requested review_request_removed labeled unlabeled)
-
-  @spec validate_action(map) :: {:ok, :implemented}
-                              | {:error, :not_fully_implemented }
-                              | {:error, :unexpected_action}
-  defp validate_action(%{"action" => action}) when action in @implemented_actions, do: {:ok, :implemented}
-  defp validate_action(%{"action" => action}) when action in @unimplemented_actions, do: {:error, :not_fully_implemented}
-  defp validate_action(_payload), do: {:error, :unexpected_action}
 end

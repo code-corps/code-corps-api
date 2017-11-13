@@ -20,11 +20,10 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositories do
   alias Ecto.{Changeset, Multi}
 
   @type outcome :: {:ok, list(GithubRepo.t)} |
-                    {:error, :unmatched_installation} |
-                    {:error, :unexpected_action} |
-                    {:error, :unexpected_payload} |
-                    {:error, :validation_error_on_syncing_repos} |
-                    {:error, :unexpected_transaction_outcome}
+                   {:error, :unmatched_installation} |
+                   {:error, :unexpected_payload} |
+                   {:error, :validation_error_on_syncing_repos} |
+                   {:error, :unexpected_transaction_outcome}
 
   @doc """
   Handles an "InstallationRepositories" GitHub Webhook event. The event could be
@@ -47,7 +46,6 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositories do
   def handle(payload) do
     Multi.new
     |> Multi.run(:payload, fn _ -> payload |> validate_payload() end)
-    |> Multi.run(:action, fn _ -> payload |> validate_action() end)
     |> Multi.run(:installation, fn _ -> payload |> match_installation() end)
     |> Multi.run(:repos, fn %{installation: installation} -> installation |> sync_repos(payload) end)
     |> Repo.transaction
@@ -61,11 +59,6 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositories do
       false -> {:error, :invalid}
     end
   end
-
-  @valid_actions ~w(added removed)
-  @spec validate_action(map) :: {:ok, :implemented} | {:error, :unexpected_action}
-  defp validate_action(%{"action" => action}) when action in @valid_actions, do: {:ok, :implemented}
-  defp validate_action(%{}), do: {:error, :unexpected_action}
 
   @spec match_installation(map) :: {:ok, GithubAppInstallation.t} |
                                    {:error, :unmatched_installation}
@@ -123,7 +116,6 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositories do
   @spec marshall_result(tuple) :: tuple
   defp marshall_result({:ok, %{repos: repos}}), do: {:ok, repos}
   defp marshall_result({:error, :payload, :invalid, _steps}), do: {:error, :unexpected_payload}
-  defp marshall_result({:error, :action, :unexpected_action, _steps}), do: {:error, :unexpected_action}
   defp marshall_result({:error, :installation, :unmatched_installation, _steps}), do: {:error, :unmatched_installation}
   defp marshall_result({:error, :repos, {_repos, _changesets}, _steps}), do: {:error, :validation_error_on_syncing_repos}
   defp marshall_result({:error, _errored_step, _error_response, _steps}), do: {:error, :unexpected_transaction_outcome}
