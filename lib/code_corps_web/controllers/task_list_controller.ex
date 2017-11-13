@@ -3,6 +3,7 @@ defmodule CodeCorpsWeb.TaskListController do
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.{Helpers.Query, TaskList}
+  alias CodeCorpsWeb.{TaskListView}
 
   action_fallback CodeCorpsWeb.FallbackController
   plug CodeCorpsWeb.Plug.DataToAttributes
@@ -18,13 +19,13 @@ defmodule CodeCorpsWeb.TaskListController do
       |> Repo.all()
       |> preload()
 
-    conn |> render("index.json-api", data: task_lists)
+    conn |> render(TaskListView, "index.json-api", %{data: task_lists, conn: conn})
   end
 
   @spec show(Conn.t, map) :: Conn.t
   def show(%Conn{} = conn, %{"id" => id}) do
     with %TaskList{} = task_list <- TaskList |> Repo.get(id) |> preload() do
-      conn |> render("show.json-api", data: task_list)
+      conn |> render(TaskListView, "show.json-api", %{data: task_list, conn: conn, params: id})
     end
   end
 
