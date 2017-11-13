@@ -16,7 +16,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
   }
 
   for action <- ["created", "edited"] do
-    describe "handle/1 for IssueComment::#{action}" do
+    describe "handle/1 for issue_comment '#{action}'" do
       @payload load_event_fixture("issue_comment_#{action}")
 
       test "creates or updates associated records" do
@@ -58,7 +58,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
     end
   end
 
-  describe "handle/1 for IssueComment::deleted" do
+  describe "handle/1 for issue_comment 'deleted'" do
     @payload load_event_fixture("issue_comment_deleted")
 
     test "deletes all comments with github_id specified in the payload" do
@@ -89,4 +89,5 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
       assert {:error, :unexpected_payload} == IssueComment.handle(@payload |> Map.put("comment", "foo"))
     end
   end
+
 end

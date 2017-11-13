@@ -13,11 +13,11 @@ defmodule CodeCorps.GitHub.Sync.Comment.GithubComment do
     GithubIssue,
     GithubRepo,
     GithubUser,
-    Repo
+    Repo,
+    Validators
   }
 
   alias Ecto.Changeset
-  alias Sync.User.GithubUser, as: GithubUserSyncer
 
   @typep linking_result :: {:ok, GithubComment.t} | {:error, Changeset.t}
 
@@ -35,11 +35,15 @@ defmodule CodeCorps.GitHub.Sync.Comment.GithubComment do
   payload data.
   """
   @spec create_or_update_comment(GithubIssue.t, map) :: linking_result
-  def create_or_update_comment(%GithubIssue{} = github_issue, %{} = %{"id" => github_comment_id} = attrs) do
-    params = to_params(attrs, github_issue)
-    case Repo.get_by(GithubComment, github_id: github_comment_id) do
-      nil -> create_comment(params)
-      %GithubComment{} = github_comment -> github_comment |> update_comment(params)
+  def create_or_update_comment(%GithubIssue{} = github_issue, %{} = attrs) do
+
+    with {:ok, %GithubUser{} = github_user} <- Sync.User.GithubUser.create_or_update_github_user(attrs) do
+      attrs
+      |> find_or_init()
+      |> prepare_changes(github_issue, github_user, attrs |> Adapters.Comment.to_github_comment)
+      |> commit_if_timestamp_valid()
+    else
+      {:error, error} -> {:error, error}
     end
   end
 
@@ -51,38 +55,63 @@ defmodule CodeCorps.GitHub.Sync.Comment.GithubComment do
   `issue_url` property of the payload.
   """
   @spec create_or_update_comment(GithubRepo.t, map) :: linking_result
-  def create_or_update_comment(%GithubRepo{} = github_repo, %{"id" => _, "issue_url" => _} = attrs) do
-    with {:ok, %GithubUser{} = github_user} <- GithubUserSyncer.create_or_update_github_user(attrs),
-         {:ok, %GithubComment{} = github_comment} <- do_create_or_update_comment(github_repo, attrs, github_user)
+  def create_or_update_comment(
+    %GithubRepo{}, %{"issue_url" => issue_url} = attrs) do
+
+    with {:ok, %GithubUser{} = github_user} <- Sync.User.GithubUser.create_or_update_github_user(attrs),
+         %GithubIssue{} = github_issue <- GithubIssue |> Repo.get_by(url: issue_url)
     do
-      {:ok, github_comment}
+      attrs
+      |> find_or_init()
+      |> prepare_changes(github_issue, github_user, attrs |> Adapters.Comment.to_github_comment)
+      |> commit_if_timestamp_valid()
     else
       {:error, error} -> {:error, error}
     end
   end
 
-  defp do_create_or_update_comment(
-  %GithubRepo{} = github_repo,
-    %{"id" => github_id, "issue_url" => issue_url} = attrs,
-    %GithubUser{} = github_user) do
-
-    case Repo.get_by(GithubComment, github_id: github_id) |> Repo.preload([:github_issue, :github_repo, :github_user]) do
-      nil ->
-        %GithubComment{}
-        |> GithubComment.create_changeset(attrs |> Adapters.Comment.to_github_comment)
-        |> Changeset.put_assoc(:github_issue, GithubIssue |> Repo.get_by(url: issue_url))
-        |> Changeset.put_assoc(:github_repo, github_repo)
-        |> Changeset.put_assoc(:github_user, github_user)
-        |> Repo.insert
-      %GithubComment{} = github_comment ->
-        github_comment
-        |> GithubComment.update_changeset(attrs |> Adapters.Comment.to_github_comment)
-        |> Changeset.put_assoc(:github_issue, GithubIssue |> Repo.get_by(url: issue_url))
-        |> Changeset.put_assoc(:github_repo, github_repo)
-        |> Changeset.put_assoc(:github_user, github_user)
-        |> Repo.update
+  @spec find_or_init(map) :: GithubComment.t
+  defp find_or_init(%{"id" => github_id}) do
+    case Repo.get_by(GithubComment, github_id: github_id) do
+      nil -> %GithubComment{}
+      %GithubComment{} = github_comment -> github_comment
     end
   end
+
+  @spec prepare_changes(GithubComment.t, GithubIssue.t, GithubUser.t, map) :: Changeset.t
+  defp prepare_changes(
+    %GithubComment{id: nil} = github_comment,
+    %GithubIssue{github_repo_id: github_repo_id} = github_issue,
+    %GithubUser{} = github_user,
+    %{} = attrs) do
+
+    github_comment
+    |> GithubComment.create_changeset(attrs)
+    |> Changeset.put_assoc(:github_issue, github_issue)
+    |> Changeset.put_change(:github_repo_id, github_repo_id)
+    |> Changeset.assoc_constraint(:github_repo)
+    |> Changeset.put_assoc(:github_user, github_user)
+  end
+  defp prepare_changes(
+    %GithubComment{} = github_comment,
+    %GithubIssue{},
+    %GithubUser{},
+    %{} = attrs) do
+
+    github_comment
+    |> GithubComment.update_changeset(attrs)
+    # TODO: Implement
+    # |> Validators.TimeValidator.validate_time_not_before(:modified_at)
+  end
+
+  @spec commit_if_timestamp_valid(Changeset.t) :: {:ok, GithubComment.t} | {:error, Changeset.t}
+  defp commit_if_timestamp_valid(%Changeset{
+    data: %GithubComment{} = github_comment,
+    errors: [modified_at: {"cannot be before the last recorded time"}]}) do
+
+    {:ok, github_comment}
+  end
+  defp commit_if_timestamp_valid(%Changeset{} = changeset), do: changeset |> Repo.insert_or_update
 
   @doc ~S"""
   Deletes the `CodeCorps.GithubComment` record using the GitHub ID from a GitHub
@@ -93,31 +122,9 @@ defmodule CodeCorps.GitHub.Sync.Comment.GithubComment do
   """
   @spec delete(String.t) :: {:ok, GithubComment.t}
   def delete(github_id) do
-    comment = Repo.get_by(GithubComment, github_id: github_id)
-    case comment do
+    case Repo.get_by(GithubComment, github_id: github_id) do
       nil -> {:ok, %GithubComment{}}
-      _ -> Repo.delete(comment, returning: true)
+      %GithubComment{} = comment -> Repo.delete(comment, returning: true)
     end
-  end
-
-  @spec create_comment(map) :: linking_result
-  defp create_comment(params) do
-    %GithubComment{}
-    |> GithubComment.create_changeset(params)
-    |> Repo.insert
-  end
-
-  @spec update_comment(GithubComment.t, map) :: linking_result
-  defp update_comment(%GithubComment{} = github_comment, %{} = params) do
-    github_comment
-    |> GithubComment.update_changeset(params)
-    |> Repo.update
-  end
-
-  @spec to_params(map, GithubIssue.t) :: map
-  defp to_params(attrs, %GithubIssue{id: github_issue_id}) do
-    attrs
-    |> Adapters.Comment.to_github_comment()
-    |> Map.put(:github_issue_id, github_issue_id)
   end
 end
