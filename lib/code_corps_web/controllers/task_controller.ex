@@ -62,7 +62,7 @@ defmodule CodeCorpsWeb.TaskController do
     end
   end
 
-  @preloads [:comments, :github_pull_request, :task_skills, :user_task]
+  @preloads [:comments, :github_pull_request, :task_skills, :user, [user_task: :user]]
 
   def preload(data) do
     timing("TaskController", "preload") do
