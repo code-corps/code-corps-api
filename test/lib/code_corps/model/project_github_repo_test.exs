@@ -3,56 +3,73 @@ defmodule CodeCorps.ProjectGithubRepoTest do
 
   alias CodeCorps.ProjectGithubRepo
 
-  test "changeset with valid attributes" do
-    project_id = insert(:project).id
-    github_repo_id = insert(:github_repo).id
+  describe "create_changeset/2" do
+    test "with valid attributes" do
+      project_id = insert(:project).id
+      github_repo_id = insert(:github_repo).id
 
-    changeset = ProjectGithubRepo.create_changeset(%ProjectGithubRepo{}, %{project_id: project_id, github_repo_id: github_repo_id})
-    assert changeset.valid?
-  end
+      changeset = ProjectGithubRepo.create_changeset(%ProjectGithubRepo{}, %{project_id: project_id, github_repo_id: github_repo_id})
+      assert changeset.valid?
+    end
 
-  test "changeset requires project_id" do
-    github_repo_id = insert(:github_repo).id
+    test "requires project_id" do
+      github_repo_id = insert(:github_repo).id
 
-    changeset = ProjectGithubRepo.create_changeset(%ProjectGithubRepo{}, %{github_repo_id: github_repo_id})
+      changeset = ProjectGithubRepo.create_changeset(%ProjectGithubRepo{}, %{github_repo_id: github_repo_id})
 
-    refute changeset.valid?
-    assert_error_message(changeset, :project_id, "can't be blank")
-  end
+      refute changeset.valid?
+      assert_error_message(changeset, :project_id, "can't be blank")
+    end
 
-  test "changeset requires github_repo_id" do
-    project_id = insert(:project).id
 
-    changeset = ProjectGithubRepo.create_changeset(%ProjectGithubRepo{}, %{project_id: project_id})
+    test "requires github_repo_id" do
+      project_id = insert(:project).id
 
-    refute changeset.valid?
-    assert_error_message(changeset, :github_repo_id, "can't be blank")
-  end
+      changeset = ProjectGithubRepo.create_changeset(%ProjectGithubRepo{}, %{project_id: project_id})
 
-  test "changeset requires id of actual project" do
-    project_id = -1
-    github_repo_id = insert(:github_repo).id
+      refute changeset.valid?
+      assert_error_message(changeset, :github_repo_id, "can't be blank")
+    end
 
-    {result, changeset} =
-      ProjectGithubRepo.create_changeset(%ProjectGithubRepo{}, %{project_id: project_id, github_repo_id: github_repo_id})
-      |> Repo.insert
+    test "requires id of actual project" do
+      project_id = -1
+      github_repo_id = insert(:github_repo).id
 
-    assert result == :error
-    refute changeset.valid?
-    assert_error_message(changeset, :project, "does not exist")
-  end
+      {result, changeset} =
+        ProjectGithubRepo.create_changeset(%ProjectGithubRepo{}, %{project_id: project_id, github_repo_id: github_repo_id})
+        |> Repo.insert
 
-  test "changeset requires id of actual github_repo" do
-    project_id = insert(:project).id
-    github_repo_id = -1
+      assert result == :error
+      refute changeset.valid?
+      assert_error_message(changeset, :project, "does not exist")
+    end
 
-    {result, changeset} =
-      ProjectGithubRepo.create_changeset(%ProjectGithubRepo{}, %{project_id: project_id, github_repo_id: github_repo_id})
-      |> Repo.insert
+    test "ensures uniqueness for github repo" do
+      project = insert(:project)
+      github_repo = insert(:github_repo)
+      insert(:project_github_repo, project: project, github_repo: github_repo)
 
-    assert result == :error
-    refute changeset.valid?
-    assert_error_message(changeset, :github_repo, "does not exist")
+      {result, changeset} =
+        ProjectGithubRepo.create_changeset(%ProjectGithubRepo{}, %{project_id: project.id, github_repo_id: github_repo.id})
+        |> Repo.insert
+
+      assert result == :error
+      refute changeset.valid?
+      assert_error_message(changeset, :github_repo, "has already been taken")
+    end
+
+    test "requires id of actual github_repo" do
+      project_id = insert(:project).id
+      github_repo_id = -1
+
+      {result, changeset} =
+        ProjectGithubRepo.create_changeset(%ProjectGithubRepo{}, %{project_id: project_id, github_repo_id: github_repo_id})
+        |> Repo.insert
+
+      assert result == :error
+      refute changeset.valid?
+      assert_error_message(changeset, :github_repo, "does not exist")
+    end
   end
 
   describe "update_sync_changeset/2" do

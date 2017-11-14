@@ -50,7 +50,7 @@ defmodule CodeCorps.GitHub.SyncTest do
       insert(:task_list, project: project, inbox: true)
       insert(:task_list, project: project, pull_requests: true)
 
-      {:ok, [comment]} = Sync.issue_comment_event(@payload)
+      {:ok, comment} = Sync.issue_comment_event(@payload)
 
       assert Repo.aggregate(GithubComment, :count, :id) == 1
       assert Repo.aggregate(GithubIssue, :count, :id) == 1

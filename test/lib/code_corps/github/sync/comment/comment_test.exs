@@ -7,14 +7,11 @@ defmodule CodeCorps.GitHub.Sync.CommentTest do
 
   alias CodeCorps.{
     Comment,
-    GitHub,
+    GitHub.Sync,
     GithubComment,
-    Task,
     Repo,
     User
   }
-  alias GitHub.Sync.Comment, as: CommentSyncer
-
   describe "sync/2" do
     @payload load_event_fixture("issue_comment_created")
 
@@ -34,29 +31,16 @@ defmodule CodeCorps.GitHub.Sync.CommentTest do
       user = insert(:user, github_id: issue_user_github_id)
       github_issue = insert(:github_issue, github_id: issue_github_id)
       github_repo = insert(:github_repo, github_id: repo_github_id)
-      tasks = insert_list(3, :task, github_issue: github_issue, github_repo: github_repo, user: user)
+      task = insert(:task, github_issue: github_issue, github_repo: github_repo, user: user)
 
-      changes = %{repo: github_repo, github_issue: github_issue, tasks: tasks}
-      {:ok, %{comments: comments}} = CommentSyncer.sync(changes, comment) |> Repo.transaction
-
-      assert Enum.count(comments) == 3
-      assert Repo.aggregate(Task, :count, :id) == 3
-      assert Repo.aggregate(Comment, :count, :id) == 3
-
-      issue_user = Repo.get_by(User, github_id: issue_user_github_id)
-
-      Repo.all(Task) |> Enum.each(fn task ->
-        assert task.user_id == issue_user.id
-        assert task.github_repo_id == github_repo.id
-      end)
+      changes = %{repo: github_repo, github_issue: github_issue, task: task}
+      {:ok, %{comment: comment}} = Sync.Comment.sync(changes, comment) |> Repo.transaction
 
       comment_user = Repo.get_by(User, github_id: comment_user_github_id)
 
-      comments |> Enum.each(fn comment ->
-        assert comment.body
-        assert comment.markdown == comment_markdown
-        assert comment.user_id == comment_user.id
-      end)
+      assert comment.body
+      assert comment.markdown == comment_markdown
+      assert comment.user_id == comment_user.id
 
       Repo.all(GithubComment) |> Enum.each(fn github_comment ->
         assert github_comment.github_id == comment_github_id
@@ -70,26 +54,20 @@ defmodule CodeCorps.GitHub.Sync.CommentTest do
   describe "delete/2" do
     @payload load_event_fixture("issue_comment_deleted")
 
-    test "deletes all comments with github_id specified in the payload" do
-      %{"comment" => %{"id" => github_id} = comment} = @payload
-      github_comment_1 = insert(:github_comment, github_id: github_id)
-      github_comment_2 = insert(:github_comment)
+    test "deletes github comment with id specified in payload, and associated comment" do
+      %{"comment" => %{"id" => github_id} = comment_payload} = @payload
+      github_comment = insert(:github_comment, github_id: github_id)
+      comment = insert(:comment, github_comment: github_comment)
 
-      insert_list(3, :comment, github_comment: github_comment_1)
-      insert_list(2, :comment)
-      insert_list(4, :comment, github_comment: github_comment_2)
-
-      changes = %{}
-
-      {:ok, %{deleted_comments: deleted_comments, deleted_github_comment: deleted_github_comment}} =
-        changes
-        |> CommentSyncer.delete(comment)
+      {:ok, %{deleted_comments: [deleted_comment], deleted_github_comment: deleted_github_comment}} =
+        comment_payload
+        |> Sync.Comment.delete
         |> Repo.transaction
 
-      assert Enum.count(deleted_comments) == 3
-      assert deleted_github_comment.id == github_comment_1.id
-      assert Repo.aggregate(Comment, :count, :id) == 6
-      assert Repo.aggregate(GithubComment, :count, :id) == 1
+      assert deleted_comment.id == comment.id
+      assert deleted_github_comment.id == github_comment.id
+      assert Repo.aggregate(Comment, :count, :id) == 0
+      assert Repo.aggregate(GithubComment, :count, :id) == 0
     end
   end
 end

@@ -24,6 +24,7 @@ defmodule CodeCorps.ProjectGithubRepo do
     |> changeset(params)
     |> assoc_constraint(:github_repo)
     |> assoc_constraint(:project)
+    |> unique_constraint(:github_repo, name: :project_github_repos_github_repo_id_index)
   end
 
   defp changeset(struct, params) do

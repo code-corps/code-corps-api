@@ -8,27 +8,27 @@ defmodule CodeCorps.GitHub.Adapters.CommentTest do
   alias CodeCorps.{GitHub.Adapters, Comment}
 
   describe "to_comment/1" do
-    test "maps api payload correctly" do
-      %{"comment" => payload} = load_event_fixture("issue_comment_created")
+    test "maps GithubComment correctly" do
+      github_comment = insert(:github_comment)
 
-      assert Adapters.Comment.to_comment(payload) == %{
-        created_at: payload["created_at"],
-        markdown: payload["body"],
-        modified_at: payload["updated_at"]
+      assert Adapters.Comment.to_comment(github_comment) == %{
+        created_at: github_comment.github_created_at,
+        markdown: github_comment.body,
+        modified_at: github_comment.github_updated_at
       }
     end
 
     test "removes 'Posted by' header from body if one is present" do
-      %{"comment" => %{"body" => body} = payload} =
-        load_event_fixture("issue_comment_created")
+      header =
+        "Posted by \r\n\r\n[//]: # (Please type your edits below this line)\r\n\r\n---\r\n\r\n"
+      body = "test"
 
-      modified_payload =
-        payload |> Map.put("body", "Posted by \r\n\r\n[//]: # (Please type your edits below this line)\r\n\r\n---\r\n\r\n" <> body)
+      github_comment = insert(:github_comment, body: header <> body)
 
-      assert Adapters.Comment.to_comment(modified_payload) == %{
-        created_at: payload["created_at"],
-        markdown: payload["body"],
-        modified_at: payload["updated_at"]
+      assert Adapters.Comment.to_comment(github_comment) == %{
+        created_at: github_comment.github_created_at,
+        markdown: body,
+        modified_at: github_comment.github_updated_at
       }
     end
   end

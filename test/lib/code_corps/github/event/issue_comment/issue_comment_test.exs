@@ -26,9 +26,8 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
         %{project: project} = insert(:project_github_repo, github_repo: github_repo)
         insert(:task_list, project: project, inbox: true)
 
-        {:ok, comments} = IssueComment.handle(@payload)
+        {:ok, %Comment{}} = IssueComment.handle(@payload)
 
-        assert Enum.count(comments) == 1
         assert Repo.aggregate(Comment, :count, :id) == 1
         assert Repo.aggregate(GithubComment, :count, :id) == 1
         assert Repo.aggregate(GithubIssue, :count, :id) == 1

@@ -18,7 +18,7 @@ defmodule CodeCorps.GithubRepo do
     belongs_to :github_app_installation, CodeCorps.GithubAppInstallation
     has_many :github_comments, CodeCorps.GithubComment
     has_many :github_issues, CodeCorps.GithubIssue
-    has_many :project_github_repos, CodeCorps.ProjectGithubRepo
+    has_one :project_github_repo, CodeCorps.ProjectGithubRepo
 
     timestamps()
   end

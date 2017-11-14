@@ -10,12 +10,12 @@ defmodule CodeCorps.GitHub.Sync.Issue do
 
   The process is as follows:
 
-  - match with `CodeCorps.User` using `CodeCorps.GitHub.Sync.User.RecordLinker`
-  - for each `CodeCorps.ProjectGithubRepo` belonging to the matched repo:
-    - create or update `CodeCorps.Task` for the `CodeCorps.Project`
+  - match with `User` using `GitHub.Sync.User.RecordLinker`
+  - for the `ProjectGithubRepo` belonging to the matched repo:
+    - create or update the `Task` for the `Project`
 
-  If the sync succeeds, it will return an `:ok` tuple with a list of created or
-  updated tasks.
+  If the sync succeeds, it will return an `:ok` tuple with the created or
+  updated task.
 
   If the sync fails, it will return an `:error` tuple, where the second element
   is the atom indicating a reason.
@@ -40,7 +40,7 @@ defmodule CodeCorps.GitHub.Sync.Issue do
     Multi.new
     |> Multi.run(:github_issue, fn _ -> link_issue({github_repo, github_pull_request}, payload) end)
     |> Multi.run(:issue_user, fn %{github_issue: github_issue} -> UserRecordLinker.link_to(github_issue, payload) end)
-    |> Multi.run(:tasks, fn %{github_issue: github_issue, issue_user: user} -> github_issue |> IssueTaskSyncer.sync_all(user) end)
+    |> Multi.run(:task, fn %{github_issue: github_issue, issue_user: user} -> github_issue |> IssueTaskSyncer.sync_github_issue(user) end)
   end
 
   @spec link_issue({GithubRepo.t, GithubPullRequest.t}, map) :: {:ok, GithubIssue.t} | {:error, Ecto.Changeset.t}

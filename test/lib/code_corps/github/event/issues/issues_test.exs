@@ -28,9 +28,8 @@ defmodule CodeCorps.GitHub.Event.IssuesTest do
         insert(:task_list, project: project, inbox: true)
         insert(:task_list, project: project, pull_requests: true)
 
-        {:ok, tasks} = Issues.handle(@payload)
+        {:ok, %Task{}} = Issues.handle(@payload)
 
-        assert Enum.count(tasks) == 1
         assert Repo.aggregate(GithubIssue, :count, :id) == 1
         assert Repo.aggregate(Task, :count, :id) == 1
       end

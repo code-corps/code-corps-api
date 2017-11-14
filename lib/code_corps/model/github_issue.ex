@@ -25,7 +25,7 @@ defmodule CodeCorps.GithubIssue do
     belongs_to :github_user, CodeCorps.GithubUser
 
     has_many :github_comments, CodeCorps.GithubComment
-    has_many :tasks, CodeCorps.Task
+    has_one :task, CodeCorps.Task
 
     timestamps()
   end
