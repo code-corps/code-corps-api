@@ -53,7 +53,7 @@ organizations = [
     name: "Code Corps",
     description: "Help build and fund public software projects for social good",
     owner_id: 1
-  },
+  }
 ]
 
 case Repo.all(Organization) do
@@ -72,6 +72,12 @@ projects = [
     description: "A basic project for use in development",
     long_description_markdown: "A basic project for use in `development`",
     title: "Code Corps",
+    organization_id: 1
+  },
+  %{
+    description: "Another basic project for use in development",
+    long_description_markdown: "Another basic project for use in `development`",
+    title: "stripity_stripe",
     organization_id: 1
   }
 ]
@@ -92,7 +98,8 @@ project_users = [
   %ProjectUser{project_id: 1, user_id: 1, role: "owner"},
   %ProjectUser{project_id: 1, user_id: 2, role: "admin"},
   %ProjectUser{project_id: 1, user_id: 3, role: "contributor"},
-  %ProjectUser{project_id: 1, user_id: 4, role: "pending"}
+  %ProjectUser{project_id: 1, user_id: 4, role: "pending"},
+  %ProjectUser{project_id: 2, user_id: 1, role: "owner"},
 ]
 
 case Repo.all(ProjectUser) do

@@ -11,7 +11,7 @@ defmodule CodeCorps.GitHub.Sync.Issue.TaskTest do
       # Creates a user, 3 projects and a github issue all linked to a
       # github repo. Returns that data as a map
       user = insert(:user)
-      projects = insert_list(3, :project)
+      project = insert(:project)
       github_repo = insert(:github_repo)
       github_issue = insert(
         :github_issue,
@@ -19,43 +19,38 @@ defmodule CodeCorps.GitHub.Sync.Issue.TaskTest do
         github_updated_at: DateTime.utc_now |> Timex.shift(hours: 1)
       )
 
-      projects |> Enum.each(&insert(:task_list, project: &1, inbox: true))
+      insert(:task_list, project: project, inbox: true)
+      insert(:project_github_repo, project: project, github_repo: github_repo)
 
-      projects
-      |> Enum.each(&insert(:project_github_repo, project: &1, github_repo: github_repo))
-
-      %{github_issue: github_issue, github_repo: github_repo, projects: projects, user: user}
+      %{github_issue: github_issue, github_repo: github_repo, project: project, user: user}
     end
 
     test "creates missing, updates existing tasks for each project associated with the github repo" do
       %{
         github_issue: github_issue,
         github_repo: github_repo,
-        projects: [project_1 | _] = projects,
+        project: project,
         user: user
       } = setup_test_data()
 
       existing_task =
-        insert(:task, project: project_1, github_issue: github_issue, github_repo: github_repo, user: user)
+        insert(:task, project: project, github_issue: github_issue, github_repo: github_repo, user: user)
 
-      {:ok, tasks} = github_issue |> IssueTaskSyncer.sync_all(user)
+      {:ok, task} = github_issue |> IssueTaskSyncer.sync_github_issue(user)
 
-      assert Repo.aggregate(Task, :count, :id) == projects |> Enum.count
-      assert tasks |> Enum.count == projects |> Enum.count
+      assert Repo.aggregate(Task, :count, :id) == 1
 
-      tasks |> Enum.each(fn task ->
-        assert task.user_id == user.id
-        assert task.markdown == github_issue.body
-        assert task.github_issue_id == github_issue.id
-      end)
+      assert task.user_id == user.id
+      assert task.markdown == github_issue.body
+      assert task.github_issue_id == github_issue.id
 
-      assert existing_task.id in (tasks |> Enum.map(&Map.get(&1, :id)))
+      assert existing_task.id == task.id
     end
 
     test "sets task :modified_from to 'github'" do
       %{github_issue: github_issue, user: user} = setup_test_data()
-      {:ok, tasks} = github_issue |> IssueTaskSyncer.sync_all(user)
-      assert tasks |> Enum.all?(fn task -> task.modified_from == "github" end)
+      {:ok, task} = github_issue |> IssueTaskSyncer.sync_github_issue(user)
+      assert task.modified_from == "github"
     end
 
     test "fails on validation errors" do
@@ -68,10 +63,9 @@ defmodule CodeCorps.GitHub.Sync.Issue.TaskTest do
 
       insert(:task_list, project: project, inbox: true)
 
-      {:error, {tasks, errors}} = github_issue |> IssueTaskSyncer.sync_all(user)
+      {:error, changeset} = github_issue |> IssueTaskSyncer.sync_github_issue(user)
 
-      assert tasks |> Enum.count == 0
-      assert errors |> Enum.count == 1
+      refute changeset.valid?
     end
   end
 end

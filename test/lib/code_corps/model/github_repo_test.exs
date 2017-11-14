@@ -1,7 +1,7 @@
 defmodule CodeCorps.GithubRepoTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.GithubRepo
+  alias CodeCorps.{GithubRepo, ProjectGithubRepo}
 
   @valid_attrs %{
     github_account_avatar_url: "https://avatars.githubusercontent.com/u/6752317?v=3",
@@ -42,12 +42,13 @@ defmodule CodeCorps.GithubRepoTest do
     end
   end
 
-  test "deletes associated ProjectGithubRepo records when deleting GithubRepo" do
+  test "deletes associated ProjectGithubRepo record when deleting GithubRepo" do
     github_repo = insert(:github_repo)
-    insert_pair(:project_github_repo, github_repo: github_repo)
+    insert(:project_github_repo, github_repo: github_repo)
 
     github_repo |> Repo.delete
 
     assert Repo.aggregate(GithubRepo, :count, :id) == 0
+    assert Repo.aggregate(ProjectGithubRepo, :count, :id) == 0
   end
 end

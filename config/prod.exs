@@ -55,7 +55,6 @@ config :code_corps, :stripe_env, :prod
 config :sentry,
   environment_name: Mix.env || :prod
 
-# TODO: Replace with actual adapter
 config :code_corps, CodeCorps.Mailer,
   adapter: Bamboo.PostmarkAdapter,
   api_key: System.get_env("POSTMARK_API_KEY")

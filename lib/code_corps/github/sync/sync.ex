@@ -1,4 +1,8 @@
 defmodule CodeCorps.GitHub.Sync do
+  @moduledoc """
+  Syncs events received from the GitHub API and also syncs entire GitHub
+  repositories.
+  """
 
   alias CodeCorps.{
     Comment,
@@ -26,8 +30,8 @@ defmodule CodeCorps.GitHub.Sync do
                  | {:error, :validating_github_issue}
                  | {:error, :validating_github_comment}
                  | {:error, :validating_user}
-                 | {:error, :validating_tasks}
-                 | {:error, :validating_comments}
+                 | {:error, :validating_task}
+                 | {:error, :validating_comment}
                  | {:error, :unexpected_transaction_outcome}
 
   @doc ~S"""
@@ -38,11 +42,13 @@ defmodule CodeCorps.GitHub.Sync do
 
   [https://developer.github.com/v3/activity/events/types/#issuesevent](https://developer.github.com/v3/activity/events/types/#issuesevent)
   """
-  def issue_event(%{"issue" => issue} = payload) do
+  @spec issue_event(map) :: outcome
+  def issue_event(%{"issue" => issue_payload} = payload) do
     Multi.new
-    |> Multi.merge(__MODULE__, :find_repo, [payload])
-    |> Multi.merge(GitHub.Sync.Issue, :sync, [issue])
-    |> transact()
+    |> Multi.run(:repo, fn _ -> RepoFinder.find_repo(payload) end)
+    |> Multi.merge(GitHub.Sync.Issue, :sync, [issue_payload])
+    |> Repo.transaction()
+    |> marshall_result()
   end
 
   @doc ~S"""
@@ -59,28 +65,37 @@ defmodule CodeCorps.GitHub.Sync do
 
   [https://developer.github.com/v3/activity/events/types/#issuecommentevent](https://developer.github.com/v3/activity/events/types/#issuecommentevent)
   """
-  def issue_comment_event(%{"action" => "deleted", "comment" => comment}) do
+  @spec issue_comment_event(map) :: outcome
+  def issue_comment_event(%{"action" => "deleted", "comment" => comment_payload}) do
     Multi.new
-    |> Multi.merge(GitHub.Sync.Comment, :delete, [comment])
-    |> transact()
+    |> Multi.merge(fn _ -> GitHub.Sync.Comment.delete(comment_payload) end)
+    |> Repo.transaction()
+    |> marshall_result()
   end
-  def issue_comment_event(%{"issue" => %{"pull_request" => %{"url" => pull_request_url}} = issue, "comment" => comment} = payload) do
+  def issue_comment_event(%{
+    "issue" => %{"pull_request" => %{"url" => pull_request_url}} = issue,
+    "comment" => comment} = payload) do
+
     # Pull Request
     Multi.new
-    |> Multi.merge(__MODULE__, :find_repo, [payload])
-    |> Multi.merge(__MODULE__, :fetch_pull_request, [pull_request_url])
+    |> Multi.run(:repo, fn _ -> RepoFinder.find_repo(payload) end)
+    |> Multi.run(:fetch_pull_request, fn %{repo: github_repo} ->
+      GitHub.API.PullRequest.from_url(pull_request_url, github_repo)
+    end)
     |> Multi.merge(GitHub.Sync.PullRequest, :sync, [payload])
     |> Multi.merge(GitHub.Sync.Issue, :sync, [issue])
     |> Multi.merge(GitHub.Sync.Comment, :sync, [comment])
-    |> transact()
+    |> Repo.transaction()
+    |> marshall_result()
   end
   def issue_comment_event(%{"issue" => issue, "comment" => comment} = payload) do
     # Issue
     Multi.new
-    |> Multi.merge(__MODULE__, :find_repo, [payload])
+    |> Multi.run(:repo, fn _ -> RepoFinder.find_repo(payload) end)
     |> Multi.merge(GitHub.Sync.Issue, :sync, [issue])
     |> Multi.merge(GitHub.Sync.Comment, :sync, [comment])
-    |> transact()
+    |> Repo.transaction()
+    |> marshall_result()
   end
 
   @doc ~S"""
@@ -94,13 +109,17 @@ defmodule CodeCorps.GitHub.Sync do
 
   [https://developer.github.com/v3/activity/events/types/#pullrequestevent](https://developer.github.com/v3/activity/events/types/#pullrequestevent)
   """
+  @spec pull_request_event(map) :: outcome
   def pull_request_event(%{"pull_request" => %{"issue_url" => issue_url} = pull_request} = payload) do
     Multi.new
-    |> Multi.merge(__MODULE__, :find_repo, [payload])
-    |> Multi.merge(__MODULE__, :fetch_issue, [issue_url])
+    |> Multi.run(:repo, fn _ -> RepoFinder.find_repo(payload) end)
+    |> Multi.run(:fetch_issue, fn %{repo: github_repo} ->
+      GitHub.API.Issue.from_url(issue_url, github_repo)
+    end)
     |> Multi.merge(GitHub.Sync.PullRequest, :sync, [pull_request])
     |> Multi.merge(GitHub.Sync.Issue, :sync, [payload])
-    |> transact()
+    |> Repo.transaction()
+    |> marshall_result()
   end
 
   @spec sync_step(tuple, atom) :: tuple
@@ -123,12 +142,14 @@ defmodule CodeCorps.GitHub.Sync do
     |> Repo.update
   end
 
-  @count_fields [:syncing_comments_count, :syncing_issues_count, :syncing_pull_requests_count]
+  @count_fields [
+    :syncing_comments_count,
+    :syncing_issues_count,
+    :syncing_pull_requests_count
+  ]
 
-  @doc ~S"""
-  Fetches the optional fields (like counter cache fields) for tracking the sync
-  state.
-  """
+  # Fetches the optional fields (like counter cache fields) for tracking the
+  # sync state.
   @spec build_sync_params(String.t, Keyword.t) :: map
   defp build_sync_params(sync_state, opts) do
     Enum.reduce @count_fields, %{sync_state: sync_state}, fn field, acc ->
@@ -232,37 +253,12 @@ defmodule CodeCorps.GitHub.Sync do
     |> Repo.preload([:project, github_repo: [:github_app_installation, [github_comments: [:github_issue, :github_user], github_issues: [:github_comments, :github_user]]]])
   end
 
-  @doc false
-  def find_repo(_, payload) do
-    Multi.new
-    |> Multi.run(:repo, fn _ -> RepoFinder.find_repo(payload) end)
-  end
-
-  @doc false
-  def fetch_issue(%{repo: %GithubRepo{} = github_repo}, url) do
-    Multi.new
-    |> Multi.run(:fetch_issue, fn _ -> GitHub.API.Issue.from_url(url, github_repo) end)
-  end
-
-  @doc false
-  def fetch_pull_request(%{repo: %GithubRepo{} = github_repo}, url) do
-    Multi.new
-    |> Multi.run(:fetch_pull_request, fn _ -> GitHub.API.PullRequest.from_url(url, github_repo) end)
-  end
-
-  @spec transact(Multi.t) :: any
-  defp transact(multi) do
-    multi
-    |> Repo.transaction
-    |> marshall_result()
-  end
-
   @spec marshall_result(tuple) :: tuple
-  defp marshall_result({:ok, %{comments: comments}}), do: {:ok, comments}
+  defp marshall_result({:ok, %{comment: comment}}), do: {:ok, comment}
   defp marshall_result({:ok, %{deleted_comments: _, deleted_github_comment: _}}), do: {:ok, nil}
   defp marshall_result({:ok, %{github_pull_request: _, github_issue: _}} = result), do: result
   defp marshall_result({:ok, %{github_pull_request: pull_request}}), do: {:ok, pull_request}
-  defp marshall_result({:ok, %{tasks: tasks}}), do: {:ok, tasks}
+  defp marshall_result({:ok, %{task: task}}), do: {:ok, task}
   defp marshall_result({:error, :repo, :unmatched_project, _steps}), do: {:ok, []}
   defp marshall_result({:error, :repo, :unmatched_repository, _steps}), do: {:error, :repo_not_found}
   defp marshall_result({:error, :fetch_issue, _, _steps}), do: {:error, :fetching_issue}
@@ -274,7 +270,7 @@ defmodule CodeCorps.GitHub.Sync do
   defp marshall_result({:error, :comment_user, :multiple_users, _steps}), do: {:error, :multiple_comment_users_match}
   defp marshall_result({:error, :issue_user, %Ecto.Changeset{}, _steps}), do: {:error, :validating_user}
   defp marshall_result({:error, :issue_user, :multiple_users, _steps}), do: {:error, :multiple_issue_users_match}
-  defp marshall_result({:error, :comments, {_comments, _errors}, _steps}), do: {:error, :validating_comments}
-  defp marshall_result({:error, :tasks, {_tasks, _errors}, _steps}), do: {:error, :validating_tasks}
+  defp marshall_result({:error, :comment, {_comments, _errors}, _steps}), do: {:error, :validating_comment}
+  defp marshall_result({:error, :task, %Ecto.Changeset{}, _steps}), do: {:error, :validating_task}
   defp marshall_result({:error, _errored_step, _error_response, _steps}), do: {:error, :unexpected_transaction_outcome}
 end

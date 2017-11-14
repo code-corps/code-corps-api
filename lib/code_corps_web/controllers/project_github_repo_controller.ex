@@ -2,7 +2,6 @@ defmodule CodeCorpsWeb.ProjectGithubRepoController do
   @moduledoc false
   use CodeCorpsWeb, :controller
 
-  alias Task.Supervisor, as: TaskSupervisor
   alias CodeCorps.{Analytics.SegmentTracker, Processor, ProjectGithubRepo, User, Helpers.Query}
 
   action_fallback CodeCorpsWeb.FallbackController

@@ -1,9 +1,9 @@
 defmodule CodeCorps.GitHub.Sync.Issue.Task do
   alias CodeCorps.{
+    GitHub.Utils.ResultAggregator,
     GithubIssue,
     GithubRepo,
     GithubUser,
-    GitHub.Utils.ResultAggregator,
     ProjectGithubRepo,
     Task,
     User,
@@ -16,31 +16,32 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task do
                    {:error, {list(Task.t), list(Changeset.t)}}
 
   @doc """
-  When provided a `GithubIssue` and a `User`, for each `Project` associated to
-  that `GithubRepo` via a `ProjectGithubRepo`, it creates or updates a `Task`.
+  When provided a `CodeCorps.GithubIssue` and a `CodeCorps.User`, for the
+  `CodeCorps.Project` associated to that `CodeCorps.GithubRepo` via a
+  `CodeCorps.ProjectGithubRepo`, it creates or updates a `CodeCorps.Task`.
   """
-  @spec sync_all(GithubIssue.t, User.t) :: {:ok, list(Task.t)}
-  def sync_all(%GithubIssue{} = github_issue, %User{} = user) do
-
+  @spec sync_github_issue(GithubIssue.t, User.t) :: {:ok, Task.t}
+  def sync_github_issue(%GithubIssue{} = github_issue, %User{} = user) do
     %GithubIssue{
-      github_repo: %GithubRepo{project_github_repos: project_github_repos}
-    } = github_issue |> Repo.preload(github_repo: :project_github_repos)
+      github_repo: %GithubRepo{project_github_repo: project_github_repo}
+    } = github_issue |> Repo.preload(github_repo: :project_github_repo)
 
-    project_github_repos
-    |> Enum.map(&sync(github_issue, &1, user))
-    |> ResultAggregator.aggregate
+    github_issue
+    |> sync(project_github_repo, user)
   end
 
   @doc ~S"""
-  Creates or updates `Task` records for the specified `ProjectGithubRepo`.
+  Creates or updates `CodeCorps.Task` records for the specified
+  `CodeCorps.ProjectGithubRepo`.
 
-  For each `GithubIssue` record that relates to the `GithubRepo` for a given
-  `ProjectGithubRepo`:
+  For each `CodeCorps.GithubIssue` record that relates to the
+  `CodeCorps.GithubRepo` for a given `CodeCorps.ProjectGithubRepo`:
 
-  - Create or update the `Task`
-  - Associate the `Task` record with the `User` that relates to the `GithubUser`
-    for the `GithubIssue`
+  - Create or update the `CodeCorps.Task`
+  - Associate the `CodeCorps.Task` record with the `CodeCorps.User` that
+    relates to the `CodeCorps.GithubUser` for the `CodeCorps.GithubIssue`
   """
+  @spec sync_project_github_repo(ProjectGithubRepo.t) :: outcome
   def sync_project_github_repo(%ProjectGithubRepo{github_repo: %GithubRepo{} = _} = project_github_repo) do
     %ProjectGithubRepo{
       github_repo: %GithubRepo{github_issues: github_issues}
