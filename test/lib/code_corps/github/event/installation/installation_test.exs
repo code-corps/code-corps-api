@@ -42,16 +42,10 @@ defmodule CodeCorps.GitHub.Event.InstallationTest do
   end
 
   @installation_created load_event_fixture("installation_created")
-  @bad_action_payload @installation_created |> Map.put("action", "foo")
   @bad_sender_payload @installation_created |> Map.put("sender", "foo")
   @bad_installation_payload @installation_created |> Map.put("installation", "foo")
 
   describe "handle/1" do
-    test "returns error if action of the event is wrong" do
-      assert {:error, :unexpected_action} ==
-        Installation.handle(@bad_action_payload)
-    end
-
     test "returns error if payload is wrong" do
       assert {:error, :unexpected_payload} == Installation.handle(%{})
     end

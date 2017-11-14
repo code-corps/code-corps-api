@@ -91,7 +91,6 @@ defmodule CodeCorpsWeb.GithubEventControllerTest do
     @tag :github_webhook
     test "responds with 200 for a supported event", %{conn: conn} do
       path = conn |> github_events_path(:create)
-
       payload = load_event_fixture("installation_created")
       assert conn |> for_event("installation", "foo") |> post(path, payload) |> response(200)
 
@@ -99,11 +98,12 @@ defmodule CodeCorpsWeb.GithubEventControllerTest do
     end
 
     @tag :github_webhook
-    test "responds with 202 for an unsupported event", %{conn: conn} do
+    test "responds with 200 for an unsupported event", %{conn: conn} do
       path = conn |> github_events_path(:create)
-      assert conn |> for_event("gollum", "foo") |> post(path, %{}) |> response(202)
+      payload = load_event_fixture("pull_request_synchronize")
+      assert conn |> for_event("pull_request", "foo") |> post(path, payload) |> response(200)
 
-      refute Repo.get_by(GithubEvent, github_delivery_id: "foo")
+      assert Repo.get_by(GithubEvent, github_delivery_id: "foo")
     end
 
     @tag :github_webhook
