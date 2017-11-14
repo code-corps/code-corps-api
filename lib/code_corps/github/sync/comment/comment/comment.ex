@@ -39,10 +39,10 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment do
   GitHub API payload, associated to the specified `CodeCorps.GithubComment` and
   `CodeCorps.User`
   """
-  @spec sync_all(list(Task.t), GithubComment.t, User.t, map) :: outcome
-  def sync_all(tasks, %GithubComment{} = github_comment, %User{} = user, %{} = payload) do
+  @spec sync_all(list(Task.t), GithubComment.t, User.t) :: outcome
+  def sync_all(tasks, %GithubComment{} = github_comment, %User{} = user) do
     tasks
-    |> Enum.map(&sync(&1, github_comment, user, payload))
+    |> Enum.map(&sync(&1, github_comment, user))
     |> ResultAggregator.aggregate
   end
 
@@ -114,11 +114,11 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment do
     |> (fn {_count, comments} -> {:ok, comments} end).()
   end
 
-  @spec sync(Task.t, GithubComment.t, User.t, map) :: {:ok, Comment.t} | {:error, Changeset.t}
-  defp sync(%Task{} = task, %GithubComment{} = github_comment, %User{} = user, %{} = payload) do
+  @spec sync(Task.t, GithubComment.t, User.t) :: {:ok, Comment.t} | {:error, Changeset.t}
+  defp sync(%Task{} = task, %GithubComment{} = github_comment, %User{} = user) do
     task
-    |> find_or_init_comment(payload)
-    |> CommentChangeset.build_changeset(payload, github_comment, task, user)
+    |> find_or_init_comment(github_comment)
+    |> CommentChangeset.build_changeset(github_comment, task, user)
     |> Repo.insert_or_update()
   end
 
@@ -127,18 +127,6 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment do
     query = from c in Comment,
       where: c.task_id == ^task_id,
       join: gc in GithubComment, on: c.github_comment_id == gc.id, where: gc.id == ^github_comment_id
-
-    case query |> Repo.one do
-      nil -> %Comment{}
-      %Comment{} = comment -> comment
-    end
-  end
-
-  @spec find_or_init_comment(Task.t, map) :: Comment.t
-  defp find_or_init_comment(%Task{id: task_id}, %{"id" => github_id}) do
-    query = from c in Comment,
-      where: c.task_id == ^task_id,
-      join: gc in GithubComment, on: c.github_comment_id == gc.id, where: gc.github_id == ^github_id
 
     case query |> Repo.one do
       nil -> %Comment{}
