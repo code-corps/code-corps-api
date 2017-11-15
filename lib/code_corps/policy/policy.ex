@@ -3,7 +3,7 @@ defmodule CodeCorps.Policy do
   Handles authorization for various API actions performed on objects in the database.
   """
 
-  alias CodeCorps.{Category, Comment, DonationGoal, GithubAppInstallation, GithubEvent, Organization, OrganizationInvite, OrganizationGithubAppInstallation, Preview, Project, ProjectCategory, ProjectGithubRepo, ProjectSkill, ProjectUser, Role, RoleSkill, Skill, StripeConnectAccount, StripeConnectPlan, StripeConnectSubscription, StripePlatformCard, StripePlatformCustomer, Task, TaskSkill, User, UserCategory, UserRole, UserSkill, UserTask}
+  alias CodeCorps.{Category, Comment, DonationGoal, GithubAppInstallation, GithubEvent, GithubRepo, Organization, OrganizationInvite, OrganizationGithubAppInstallation, Preview, Project, ProjectCategory, ProjectSkill, ProjectUser, Role, RoleSkill, Skill, StripeConnectAccount, StripeConnectPlan, StripeConnectSubscription, StripePlatformCard, StripePlatformCustomer, Task, TaskSkill, User, UserCategory, UserRole, UserSkill, UserTask}
 
   alias CodeCorps.Policy
 
@@ -44,6 +44,9 @@ defmodule CodeCorps.Policy do
   defp can?(%User{} = current_user, :index, %GithubEvent{}, %{}), do: Policy.GithubEvent.index?(current_user)
   defp can?(%User{} = current_user, :show, %GithubEvent{}, %{}), do: Policy.GithubEvent.show?(current_user)
 
+  # GithubRepo
+  defp can?(%User{} = current_user, :update, %GithubRepo{} = github_repo, %{} = params), do: Policy.GithubRepo.update?(current_user, github_repo, params)
+
   # Organization
   defp can?(%User{} = current_user, :create, %Organization{}, %{}), do: Policy.Organization.create?(current_user)
   defp can?(%User{} = current_user, :update, %Organization{} = organization, %{}), do: Policy.Organization.update?(current_user, organization)
@@ -67,11 +70,6 @@ defmodule CodeCorps.Policy do
   # ProjectCategory
   defp can?(%User{} = current_user, :create, %ProjectCategory{}, %{} = params), do: Policy.ProjectCategory.create?(current_user, params)
   defp can?(%User{} = current_user, :delete, %ProjectCategory{} = project_category, %{}), do: Policy.ProjectCategory.delete?(current_user, project_category)
-
-  # ProjectGithubRepo
-  defp can?(%User{} = current_user, :create, %ProjectGithubRepo{}, %{} = params), do: Policy.ProjectGithubRepo.create?(current_user, params)
-  defp can?(%User{} = current_user, :delete, %ProjectGithubRepo{} = project_github_repo, %{}),
-    do: Policy.ProjectGithubRepo.delete?(current_user, project_github_repo)
 
   # ProjectSkill
   defp can?(%User{} = current_user, :create, %ProjectSkill{}, %{} = params), do: Policy.ProjectSkill.create?(current_user, params)

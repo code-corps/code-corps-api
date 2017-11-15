@@ -11,8 +11,8 @@ defmodule CodeCorps.GitHub.TestHelpers do
     "./test/fixtures/github/events/#{id}.json" |> File.read! |> Poison.decode!
   end
 
-  @spec setup_coderly_project_repo :: %CodeCorps.ProjectGithubRepo{}
-  def setup_coderly_project_repo do
+  @spec setup_coderly_repo :: %CodeCorps.GithubRepo{}
+  def setup_coderly_repo do
     # Data is from the coderly/github-app-testing repository
     #
     # Uses:
@@ -22,11 +22,11 @@ defmodule CodeCorps.GitHub.TestHelpers do
     # - the real GitHub user id of the repository owner
     # - the real GitHub App id
     # - the real GitHub repo id
-    setup_real_project_repo("coderly", "github-app-testing", 321667, 63365, 108674236)
+    setup_real_repo("coderly", "github-app-testing", 321667, 63365, 108674236)
   end
 
-  @spec setup_real_project_repo(String.t, String.t, Integer.t, Integer.t, Integer.t) :: %CodeCorps.ProjectGithubRepo{}
-  def setup_real_project_repo(repo_owner, repo_name, repo_owner_id, app_github_id, repo_github_id) do
+  @spec setup_real_repo(String.t, String.t, Integer.t, Integer.t, Integer.t) :: %CodeCorps.GithubRepo{}
+  def setup_real_repo(repo_owner, repo_name, repo_owner_id, app_github_id, repo_github_id) do
     # Create the user
     #
     # Simulates:
@@ -65,11 +65,10 @@ defmodule CodeCorps.GitHub.TestHelpers do
     #
     # - installation or installation_repositories webhook
     # - user connecting the repository to the project
-    github_repo = insert(:github_repo, github_app_installation: github_app_installation, name: repo_name, github_account_id: repo_owner_id, github_account_avatar_url: "https://avatars3.githubusercontent.com/u/#{repo_owner_id}?v=4", github_account_type: "User", github_id: repo_github_id)
-    project_github_repo = insert(:project_github_repo, github_repo: github_repo, project: project)
+    github_repo = insert(:github_repo, github_app_installation: github_app_installation, name: repo_name, github_account_id: repo_owner_id, github_account_avatar_url: "https://avatars3.githubusercontent.com/u/#{repo_owner_id}?v=4", github_account_type: "User", github_id: repo_github_id, project: project)
 
-    # Return the %CodeCorps.ProjectGithubRepo{} record
-    project_github_repo
+    # Return the %CodeCorps.GithubRepo{} record
+    github_repo
   end
 
   @doc ~S"""

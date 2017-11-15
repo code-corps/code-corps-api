@@ -13,8 +13,8 @@ defmodule CodeCorps.GitHub.Sync.PullRequest do
     `CodeCorps.GitHub.Sync.Utils.RepoFinder`
   - match with `CodeCorps.User` using
     `CodeCorps.GitHub.Event.PullRequest.UserLinker`
-  - for each `CodeCorps.ProjectGithubRepo` belonging to matched repo:
-    - create or update `CodeCorps.Task` for the `CodeCorps.Project`
+  - create or update each `CodeCorps.Task` for the `CodeCorps.Project` matching
+    the `CodeCorps.GithubRepo`
 
   If the sync succeeds, it will return an `:ok` tuple with a list of created or
   updated tasks.

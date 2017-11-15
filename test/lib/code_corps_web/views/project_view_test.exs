@@ -7,7 +7,7 @@ defmodule CodeCorpsWeb.ProjectViewTest do
 
     donation_goal = insert(:donation_goal, project: project)
     project_category = insert(:project_category, project: project)
-    project_github_repo = insert(:project_github_repo, project: project)
+    github_repo = insert(:github_repo, project: project)
     project_skill = insert(:project_skill, project: project)
     project_user = insert(:project_user, project: project)
     stripe_connect_plan = insert(:stripe_connect_plan, project: project)
@@ -47,6 +47,14 @@ defmodule CodeCorpsWeb.ProjectViewTest do
               "type" => "donation-goal"
             }
           ]},
+          "github-repos" => %{
+            "data" => [
+              %{
+                "id" => github_repo.id |> Integer.to_string,
+                "type" => "github-repo"
+              }
+            ]
+          },
           "organization" => %{
             "data" => %{
               "id" => organization.id |> Integer.to_string,
@@ -58,14 +66,6 @@ defmodule CodeCorpsWeb.ProjectViewTest do
               %{
                 "id" => project_category.id |> Integer.to_string,
                 "type" => "project-category"
-              }
-            ]
-          },
-          "project-github-repos" => %{
-            "data" => [
-              %{
-                "id" => project_github_repo.id |> Integer.to_string,
-                "type" => "project-github-repo"
               }
             ]
           },

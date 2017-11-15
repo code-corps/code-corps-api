@@ -12,7 +12,6 @@ defmodule CodeCorps.GitHub.Sync do
     GithubRepo,
     GitHub.Sync,
     GitHub.Sync.Utils.RepoFinder,
-    ProjectGithubRepo,
     Repo
   }
 
@@ -134,14 +133,6 @@ defmodule CodeCorps.GitHub.Sync do
     |> Repo.update
   end
 
-  @spec mark_project_repo(ProjectGithubRepo.t, String.t, Keyword.t) :: {:ok, GithubRepo.t} | {:error, Changeset.t}
-  defp mark_project_repo(%ProjectGithubRepo{} = project_github_repo, sync_state, opts \\ []) do
-    params = build_sync_params(sync_state, opts)
-    project_github_repo
-    |> ProjectGithubRepo.update_sync_changeset(params)
-    |> Repo.update
-  end
-
   @count_fields [
     :syncing_comments_count,
     :syncing_issues_count,
@@ -181,9 +172,15 @@ defmodule CodeCorps.GitHub.Sync do
   - Fetches the comments from the API
   - Creates or updates `GithubComment` records (and their related `GithubUser`
     records)
+  - Creates or updates `User` records for the `GithubUser` records
+  - Creates or updates `Task` records, and relates them to any related
+    `GithubIssue` and `User` records created previously
+  - Creates or updates `Comment` records, and relates them to any related
+    `GithubComment` and `User` records created previously
   """
   @spec sync_repo(GithubRepo.t) :: {:ok, GithubRepo.t}
   def sync_repo(%GithubRepo{} = repo) do
+    repo = preload_github_repo(repo)
     with {:ok, repo} <- repo |> mark_repo("fetching_pull_requests"),
          {:ok, pr_payloads} <- repo |> GitHub.API.Repository.pulls |> sync_step(:fetch_pull_requests),
          {:ok, repo} <- repo |> mark_repo("syncing_github_pull_requests", [syncing_pull_requests_count: pr_payloads |> Enum.count]),
@@ -196,7 +193,14 @@ defmodule CodeCorps.GitHub.Sync do
          {:ok, comment_payloads} <- repo |> GitHub.API.Repository.issue_comments |> sync_step(:fetch_comments),
          {:ok, repo} <- repo |> mark_repo("syncing_github_comments", [syncing_comments_count: comment_payloads |> Enum.count]),
          {:ok, _comments} <- comment_payloads |> Enum.map(&Sync.Comment.GithubComment.create_or_update_comment(repo, &1)) |> ResultAggregator.aggregate |> sync_step(:sync_comments),
-         {:ok, repo} <- repo |> mark_repo("receiving_webhooks")
+         repo <- Repo.get(GithubRepo, repo.id) |> preload_github_repo(),
+         {:ok, repo} <- repo |> mark_repo("syncing_users"),
+         {:ok, _users} <- repo |> Sync.User.User.sync_github_repo() |> sync_step(:sync_users),
+         {:ok, repo} <- repo |> mark_repo("syncing_tasks"),
+         {:ok, _tasks} <- repo |> Sync.Issue.Task.sync_github_repo() |> sync_step(:sync_tasks),
+         {:ok, repo} <- repo |> mark_repo("syncing_comments"),
+         {:ok, _comments} <- repo |> Sync.Comment.Comment.sync_github_repo() |> sync_step(:sync_comments),
+         {:ok, repo} <- repo |> mark_repo("synced")
     do
       {:ok, repo}
     else
@@ -206,51 +210,20 @@ defmodule CodeCorps.GitHub.Sync do
       {:error, :sync_issues} -> repo |> mark_repo("errored_syncing_issues")
       {:error, :fetch_comments} -> repo |> mark_repo("errored_fetching_comments")
       {:error, :sync_comments} -> repo |> mark_repo("errored_syncing_comments")
+      {:error, :sync_users} -> repo |> mark_repo("errored_syncing_users")
+      {:error, :sync_tasks} -> repo |> mark_repo("errored_syncing_tasks")
+      {:error, :sync_comments} -> repo |> mark_repo("errored_syncing_comments")
     end
   end
 
-  @doc ~S"""
-  Syncs a `ProjectGithubRepo` with Code Corps.
-
-  Fetches and syncs records from the GitHub API for a given project's GitHub
-  repository, marking progress of the sync state along the way.
-
-  - Finds the `GithubRepo` and syncs it with Github using `sync_repo/1`
-  - Creates or updates `User` records for the `GithubUser` records
-  - Creates or updates `Task` records, and relates them to any related
-    `GithubIssue` and `User` records created previously
-  - Creates or updates `Comment` records, and relates them to any related
-    `GithubComment` and `User` records created previously
-  """
-  @spec sync_project_github_repo(ProjectGithubRepo.t) :: {:ok, ProjectGithubRepo.t}
-  def sync_project_github_repo(%ProjectGithubRepo{} = project_github_repo) do
-    %ProjectGithubRepo{github_repo: %GithubRepo{} = repo} = project_github_repo =
-      project_github_repo
-      |> preload_project_github_repo
-
-    with {:ok, project_github_repo} <- project_github_repo |> mark_project_repo("syncing_github_repo"),
-         {:ok, %GithubRepo{sync_state: "receiving_webhooks"}} <- repo |> sync_repo(),
-         project_github_repo <- Repo.get(ProjectGithubRepo, project_github_repo.id) |> preload_project_github_repo(),
-         {:ok, project_github_repo} <- project_github_repo |> mark_project_repo("syncing_users"),
-         {:ok, _users} <- project_github_repo |> Sync.User.User.sync_project_github_repo() |> sync_step(:sync_users),
-         {:ok, project_github_repo} <- project_github_repo |> mark_project_repo("syncing_tasks"),
-         {:ok, _tasks} <- project_github_repo |> Sync.Issue.Task.sync_project_github_repo() |> sync_step(:sync_tasks),
-         {:ok, project_github_repo} <- project_github_repo |> mark_project_repo("syncing_comments"),
-         {:ok, _comments} <- project_github_repo |> Sync.Comment.Comment.sync_project_github_repo() |> sync_step(:sync_comments),
-         {:ok, project_github_repo} <- project_github_repo |> mark_project_repo("synced")
-    do
-      {:ok, project_github_repo}
-    else
-      {:ok, %GithubRepo{}} -> project_github_repo |> mark_project_repo("errored_syncing_github_repo")
-      {:error, :sync_users} -> repo |> mark_project_repo("errored_syncing_users")
-      {:error, :sync_tasks} -> repo |> mark_project_repo("errored_syncing_tasks")
-      {:error, :sync_comments} -> repo |> mark_project_repo("errored_syncing_comments")
-    end
-  end
-
-  defp preload_project_github_repo(%ProjectGithubRepo{} = project_github_repo) do
-    project_github_repo
-    |> Repo.preload([:project, github_repo: [:github_app_installation, [github_comments: [:github_issue, :github_user], github_issues: [:github_comments, :github_user]]]])
+  defp preload_github_repo(%GithubRepo{} = github_repo) do
+    github_repo
+    |> Repo.preload([
+      :github_app_installation,
+      :project,
+      github_comments: [:github_issue, :github_user],
+      github_issues: [:github_comments, :github_user]
+    ])
   end
 
   @spec marshall_result(tuple) :: tuple

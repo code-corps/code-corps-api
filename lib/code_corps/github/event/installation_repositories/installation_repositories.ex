@@ -38,9 +38,6 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositories do
     - delete affected `CodeCorps.GithubRepo` records, respecting the rules
       - if the GitHub payload for a repo is not matched with a record in our
         database, just skip deleting it
-      - if the deleted `CodeCorps.GithubRepo` record is associated with
-        `CodeCorps.ProjectGithubRepo` records, they are deleted automatically,
-        due to `on_delete: :delete_all` set at the database level.
   """
   @spec handle(map) :: outcome
   def handle(payload) do

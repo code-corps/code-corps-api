@@ -10,9 +10,9 @@ defmodule CodeCorps.GitHub.Sync.Issue do
 
   The process is as follows:
 
-  - match with `User` using `GitHub.Sync.User.RecordLinker`
-  - for the `ProjectGithubRepo` belonging to the matched repo:
-    - create or update the `Task` for the `Project`
+  - match with `CodeCorps.User` using `CodeCorps.GitHub.Sync.User.RecordLinker`
+  - create or update the `CodeCorps.Task` for the `CodeCorps.Project` in the
+    matched `CodeCorps.GithubRepo`
 
   If the sync succeeds, it will return an `:ok` tuple with the created or
   updated task.

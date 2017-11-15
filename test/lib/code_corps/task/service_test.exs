@@ -58,7 +58,7 @@ defmodule CodeCorps.Task.ServiceTest do
         :github_repo
         |> insert(github_account_login: "foo", name: "bar")
 
-      insert(:project_github_repo, project: project, github_repo: github_repo)
+      insert(:github_repo, project: project)
 
       {:ok, task} =
         attrs
@@ -82,7 +82,7 @@ defmodule CodeCorps.Task.ServiceTest do
         :github_repo
         |> insert(github_account_login: "foo", name: "bar")
 
-      insert(:project_github_repo, project: project, github_repo: github_repo)
+      insert(:github_repo, project: project)
 
       with_mock_api(CodeCorps.GitHub.FailureAPI) do
         assert {:error, :github} ==

@@ -128,8 +128,7 @@ defmodule CodeCorpsWeb.TaskControllerTest do
 
     @tag :authenticated
     test "tracks connecting to github", %{conn: conn, current_user: current_user} do
-      %{project: project, github_repo: github_repo} =
-        insert(:project_github_repo)
+      %{project: project} = github_repo = insert(:github_repo)
       task_list = insert(:task_list, project: project)
       assocs = %{
         project: project,
@@ -172,7 +171,7 @@ defmodule CodeCorpsWeb.TaskControllerTest do
 
     @tag :authenticated
     test "tracks connecting to github", %{conn: conn, current_user: current_user} do
-      %{project: project, github_repo: github_repo} = insert(:project_github_repo)
+      %{project: project} = github_repo = insert(:github_repo)
       task_list = insert(:task_list, project: project)
       task = insert(:task, task_list: task_list, project: project, user: current_user)
 
@@ -186,7 +185,7 @@ defmodule CodeCorpsWeb.TaskControllerTest do
 
     @tag :authenticated
     test "does not track connecting to github if already connected", %{conn: conn, current_user: current_user} do
-      %{project: project, github_repo: github_repo} = insert(:project_github_repo)
+      %{project: project} = github_repo = insert(:github_repo)
       task_list = insert(:task_list, project: project)
       github_issue = insert(:github_issue, github_repo: github_repo)
       task = insert(:task, task_list: task_list, project: project, user: current_user, github_repo: github_repo, github_issue: github_issue)

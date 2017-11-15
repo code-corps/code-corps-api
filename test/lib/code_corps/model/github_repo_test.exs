@@ -1,7 +1,7 @@
 defmodule CodeCorps.GithubRepoTest do
   use CodeCorps.ModelCase
 
-  alias CodeCorps.{GithubRepo, ProjectGithubRepo}
+  alias CodeCorps.GithubRepo
 
   @valid_attrs %{
     github_account_avatar_url: "https://avatars.githubusercontent.com/u/6752317?v=3",
@@ -25,6 +25,21 @@ defmodule CodeCorps.GithubRepoTest do
     end
   end
 
+  describe "update_changeset/2" do
+    test "when project added" do
+      attrs = @valid_attrs |> Map.put(:project_id, 1)
+      changeset = GithubRepo.update_changeset(%GithubRepo{}, attrs)
+      assert changeset.valid?
+    end
+
+    test "when project removed" do
+      attrs = @valid_attrs |> Map.put(:project_id, nil)
+      changeset = GithubRepo.update_changeset(%GithubRepo{sync_state: "synced"}, attrs)
+      assert changeset.valid?
+      assert changeset.changes[:sync_state] == "unsynced"
+    end
+  end
+
   describe "update_sync_changeset/2" do
     test "with valid attributes" do
       GithubRepo.sync_states |> Enum.each(fn state ->
@@ -40,15 +55,5 @@ defmodule CodeCorps.GithubRepoTest do
       refute changeset.valid?
       assert changeset.errors[:sync_state] == {"is invalid", [validation: :inclusion]}
     end
-  end
-
-  test "deletes associated ProjectGithubRepo record when deleting GithubRepo" do
-    github_repo = insert(:github_repo)
-    insert(:project_github_repo, github_repo: github_repo)
-
-    github_repo |> Repo.delete
-
-    assert Repo.aggregate(GithubRepo, :count, :id) == 0
-    assert Repo.aggregate(ProjectGithubRepo, :count, :id) == 0
   end
 end

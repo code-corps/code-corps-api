@@ -17,10 +17,10 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilderTest do
       assert :donation_goal |> insert |> SegmentTraitsBuilder.build
 
       assert :github_app_installation |> insert |> SegmentTraitsBuilder.build
+      assert :github_repo |> insert |> SegmentTraitsBuilder.build
 
       assert :project_skill |> insert |> SegmentTraitsBuilder.build
       assert :project_user |> insert |> SegmentTraitsBuilder.build
-      assert :project_github_repo |> insert |> SegmentTraitsBuilder.build
 
       assert :stripe_connect_account |> insert |> SegmentTraitsBuilder.build
       assert :stripe_connect_charge |> insert |> SegmentTraitsBuilder.build

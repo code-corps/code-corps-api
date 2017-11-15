@@ -10,8 +10,6 @@ defmodule CodeCorps.GitHub.Sync.Utils.RepoFinder do
   Returns
   - `{:ok, GithubRepo.t}` if record was found
   - `{:error, :unmatched_repository}` if record was not found
-  - `{:error, :unmatched_project}` if record was found, but has no associated
-    `ProjectGithubRepo` children
   """
   @spec find_repo(map) :: {:ok, GithubRepo.t} | {:error, :unmatched_repository}
   def find_repo(%{"repository" => %{"id" => github_id}}) do

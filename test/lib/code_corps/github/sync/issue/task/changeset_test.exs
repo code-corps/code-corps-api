@@ -16,12 +16,12 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task.ChangesetTest do
         github_created_at: DateTime.utc_now |> Timex.shift(minutes: 1),
         github_updated_at: DateTime.utc_now |> Timex.shift(hours: 1))
       project = insert(:project)
-      project_github_repo = insert(:project_github_repo, project: project)
+      github_repo = insert(:github_repo, project: project)
       user = insert(:user)
       task_list = insert(:task_list, project: project, inbox: true)
 
       changeset = TaskChangeset.build_changeset(
-        task, github_issue, project_github_repo, user
+        task, github_issue, github_repo, user
       )
 
       # adapted fields
@@ -42,8 +42,8 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task.ChangesetTest do
 
       # relationships are proper
       assert get_change(changeset, :github_issue_id) == github_issue.id
-      assert get_change(changeset, :github_repo_id) == project_github_repo.github_repo_id
-      assert get_change(changeset, :project_id) == project_github_repo.project_id
+      assert get_change(changeset, :github_repo_id) == github_repo.id
+      assert get_change(changeset, :project_id) == github_repo.project_id
       assert get_change(changeset, :task_list_id) == task_list.id
       assert get_change(changeset, :user_id) == user.id
 
@@ -57,12 +57,12 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task.ChangesetTest do
       task = %Task{}
       github_issue = insert(:github_issue, state: "open")
       project = insert(:project)
-      project_github_repo = insert(:project_github_repo, project: project)
+      github_repo = insert(:github_repo, project: project)
       user = insert(:user)
       task_list = insert(:task_list, project: project, inbox: true)
 
       changeset = TaskChangeset.build_changeset(
-        task, github_issue, project_github_repo, user
+        task, github_issue, github_repo, user
       )
 
       assert get_change(changeset, :task_list_id) == task_list.id
@@ -73,12 +73,12 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task.ChangesetTest do
       github_pull_request = insert(:github_pull_request)
       github_issue = insert(:github_issue, github_pull_request: github_pull_request, state: "open")
       project = insert(:project)
-      project_github_repo = insert(:project_github_repo, project: project)
+      github_repo = insert(:github_repo, project: project)
       user = insert(:user)
       task_list = insert(:task_list, project: project, pull_requests: true)
 
       changeset = TaskChangeset.build_changeset(
-        task, github_issue, project_github_repo, user
+        task, github_issue, github_repo, user
       )
 
       assert get_change(changeset, :task_list_id) == task_list.id
@@ -88,12 +88,12 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task.ChangesetTest do
       task = %Task{}
       github_issue = insert(:github_issue, state: "closed")
       project = insert(:project)
-      project_github_repo = insert(:project_github_repo, project: project)
+      github_repo = insert(:github_repo, project: project)
       user = insert(:user)
       task_list = insert(:task_list, project: project, done: true)
 
       changeset = TaskChangeset.build_changeset(
-        task, github_issue, project_github_repo, user
+        task, github_issue, github_repo, user
       )
 
       assert get_change(changeset, :task_list_id) == task_list.id
@@ -104,12 +104,12 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task.ChangesetTest do
       github_pull_request = insert(:github_pull_request)
       github_issue = insert(:github_issue, github_pull_request: github_pull_request, state: "closed")
       project = insert(:project)
-      project_github_repo = insert(:project_github_repo, project: project)
+      github_repo = insert(:github_repo, project: project)
       user = insert(:user)
       task_list = insert(:task_list, project: project, done: true)
 
       changeset = TaskChangeset.build_changeset(
-        task, github_issue, project_github_repo, user
+        task, github_issue, github_repo, user
       )
 
       assert get_change(changeset, :task_list_id) == task_list.id
@@ -127,12 +127,12 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task.ChangesetTest do
         github_updated_at: over_a_month_ago)
 
       project = insert(:project)
-      project_github_repo = insert(:project_github_repo, project: project)
+      github_repo = insert(:github_repo, project: project)
       user = insert(:user)
       insert(:task_list, project: project, done: true)
 
       changeset = TaskChangeset.build_changeset(
-        task, github_issue, project_github_repo, user
+        task, github_issue, github_repo, user
       )
 
       assert get_field(changeset, :archived) == true
@@ -142,14 +142,13 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task.ChangesetTest do
     test "validates that modified_at has not already happened" do
       project = insert(:project)
       github_issue = insert(:github_issue, github_updated_at: DateTime.utc_now |> Timex.shift(minutes: -1), state: "open")
-      github_repo = insert(:github_repo)
-      project_github_repo = insert(:project_github_repo, github_repo: github_repo, project: project)
+      github_repo = insert(:github_repo, project: project)
       user = insert(:user)
       task = insert(:task, project: project, github_issue: github_issue, github_repo: github_repo, user: user, modified_at: DateTime.utc_now)
       insert(:task_list, project: project, inbox: true)
 
       changeset = TaskChangeset.build_changeset(
-        task, github_issue, project_github_repo, user
+        task, github_issue, github_repo, user
       )
 
       refute changeset.valid?
