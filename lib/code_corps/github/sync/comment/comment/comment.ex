@@ -18,8 +18,6 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment do
     GithubIssue,
     GithubRepo,
     GithubUser,
-    Project,
-    ProjectGithubRepo,
     Repo,
     Task,
     User
@@ -48,29 +46,28 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment do
 
   @doc ~S"""
   Creates or updates `CodeCorps.Comment` records for the specified
-  `CodeCorps.ProjectGithubRepo`.
+  `CodeCorps.GithubRepo`.
 
   For each `CodeCorps.GithubComment` record that relates to the
-  `CodeCorps.GithubRepo` for a given`CodeCorps.ProjectGithubRepo`:
+  `CodeCorps.GithubRepo` for a given`CodeCorps.GithubRepo`:
 
   - Find the related `CodeCorps.Task` record
   - Create or update the related `CodeCorps.Comment` record
   - Associate the `CodeCorps.Comment` record with the `CodeCorps.User` that
     relates to the `CodeCorps.GithubUser` for the `CodeCorps.GithubComment`
   """
-  @spec sync_project_github_repo(ProjectGithubRepo.t) :: outcome
-  def sync_project_github_repo(%ProjectGithubRepo{github_repo: %GithubRepo{} = _} = project_github_repo) do
+  @spec sync_github_repo(GithubRepo.t) :: outcome
+  def sync_github_repo(%GithubRepo{} = github_repo) do
     preloads = [
-      :project,
-      github_repo: [github_comments: [:github_issue, github_user: [:user]]]
+      github_comments: [:github_issue, github_user: [:user]]
     ]
-    %ProjectGithubRepo{github_repo: %{github_comments: github_comments}} =
-      project_github_repo |> Repo.preload(preloads)
+    %GithubRepo{github_comments: github_comments} =
+      github_repo |> Repo.preload(preloads)
 
     github_comments
     |> Enum.map(fn %GithubComment{github_user: %GithubUser{user: %User{} = user}} = github_comment ->
       github_comment
-      |> find_task(project_github_repo)
+      |> find_task(github_repo)
       |> sync(github_comment, user)
     end)
     |> ResultAggregator.aggregate
@@ -78,7 +75,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment do
 
   defp find_task(
     %GithubComment{github_issue: %GithubIssue{id: github_issue_id}},
-    %ProjectGithubRepo{project: %Project{id: project_id}}) do
+    %GithubRepo{project_id: project_id}) do
     query = from t in Task,
       where: t.project_id == ^project_id,
       join: gi in GithubIssue, on: t.github_issue_id == gi.id, where: gi.id == ^github_issue_id

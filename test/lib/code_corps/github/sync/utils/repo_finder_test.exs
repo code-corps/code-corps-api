@@ -19,7 +19,7 @@ defmodule CodeCorps.GitHub.Sync.Utils.RepoFinderTest do
         assert RepoFinder.find_repo(payload) == {:error, :unmatched_repository}
       end
 
-      test "returns repository if matched, preloads project github repos", %{payload: payload} do
+      test "returns repository if matched, preloads github repos", %{payload: payload} do
         github_repo = insert(:github_repo, github_id: payload["repository"]["id"])
         {:ok, %{id: found_repo_id}} = RepoFinder.find_repo(payload)
         assert found_repo_id == github_repo.id

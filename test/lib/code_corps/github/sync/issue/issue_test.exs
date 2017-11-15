@@ -24,10 +24,8 @@ defmodule CodeCorps.GitHub.Sync.IssueTest do
         "repository" => %{"id" => repo_github_id}
       } = @payload
 
-      github_repo = insert(:github_repo, github_id: repo_github_id)
-
       project = insert(:project)
-      insert(:project_github_repo, github_repo: github_repo, project: project)
+      github_repo = insert(:github_repo, github_id: repo_github_id, project: project)
       insert(:task_list, project: project, inbox: true)
 
       changes = %{repo: github_repo}
@@ -59,11 +57,10 @@ defmodule CodeCorps.GitHub.Sync.IssueTest do
 
       user = insert(:user, github_id: user_github_id)
 
-      github_repo = insert(:github_repo, github_id: repo_github_id)
+      project = insert(:project)
+      github_repo = insert(:github_repo, github_id: repo_github_id, project: project)
       github_issue = insert(:github_issue, github_id: issue_github_id, number: number, github_repo: github_repo)
 
-      project = insert(:project)
-      insert(:project_github_repo, github_repo: github_repo, project: project)
       insert(:task_list, project: project, inbox: true)
 
       existing_task = insert(:task, project: project, user: user, github_repo: github_repo, github_issue: github_issue)
@@ -95,11 +92,10 @@ defmodule CodeCorps.GitHub.Sync.IssueTest do
 
       user = insert(:user, github_id: user_github_id)
 
-      github_repo = insert(:github_repo, github_id: repo_github_id)
+      project = insert(:project)
+      github_repo = insert(:github_repo, github_id: repo_github_id, project: project)
       github_issue = insert(:github_issue, github_id: issue_github_id, number: number, github_repo: github_repo)
 
-      project = insert(:project)
-      insert(:project_github_repo, github_repo: github_repo, project: project)
       task_list = insert(:task_list, project: project, pull_requests: true)
 
       existing_task = insert(:task, project: project, user: user, github_repo: github_repo, github_issue: github_issue)

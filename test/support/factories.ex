@@ -86,7 +86,8 @@ defmodule CodeCorps.Factories do
     %CodeCorps.GithubRepo{
       github_account_login: sequence(:github_account_login, &"owner_#{&1}"),
       github_app_installation: build(:github_app_installation),
-      name: sequence(:name, &"repo_#{&1}")
+      name: sequence(:name, &"repo_#{&1}"),
+      project: build(:project)
     }
   end
 
@@ -176,13 +177,6 @@ defmodule CodeCorps.Factories do
     %CodeCorps.ProjectCategory{
       project: build(:project),
       category: build(:category)
-    }
-  end
-
-  def project_github_repo_factory do
-    %CodeCorps.ProjectGithubRepo{
-      project: build(:project),
-      github_repo: build(:github_repo)
     }
   end
 

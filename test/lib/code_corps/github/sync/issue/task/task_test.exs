@@ -12,7 +12,7 @@ defmodule CodeCorps.GitHub.Sync.Issue.TaskTest do
       # github repo. Returns that data as a map
       user = insert(:user)
       project = insert(:project)
-      github_repo = insert(:github_repo)
+      github_repo = insert(:github_repo, project: project)
       github_issue = insert(
         :github_issue,
         github_repo: github_repo,
@@ -20,7 +20,6 @@ defmodule CodeCorps.GitHub.Sync.Issue.TaskTest do
       )
 
       insert(:task_list, project: project, inbox: true)
-      insert(:project_github_repo, project: project, github_repo: github_repo)
 
       %{github_issue: github_issue, github_repo: github_repo, project: project, user: user}
     end
@@ -54,10 +53,9 @@ defmodule CodeCorps.GitHub.Sync.Issue.TaskTest do
     end
 
     test "fails on validation errors" do
-      %{github_repo: github_repo} = github_issue = insert(:github_issue, title: nil)
-
-      %{project: project} =
-        insert(:project_github_repo, github_repo: github_repo)
+      project = insert(:project)
+      github_repo = insert(:github_repo, project: project)
+      github_issue = insert(:github_issue, title: nil, github_repo: github_repo)
 
       %{user: user} = insert(:task, project: project, github_issue: github_issue, github_repo: github_repo)
 

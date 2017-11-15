@@ -22,8 +22,8 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
       test "creates or updates associated records" do
         %{"repository" => %{"id" => repo_github_id}} = @payload
 
-        github_repo = insert(:github_repo, github_id: repo_github_id)
-        %{project: project} = insert(:project_github_repo, github_repo: github_repo)
+        project = insert(:project)
+        insert(:github_repo, github_id: repo_github_id, project: project)
         insert(:task_list, project: project, inbox: true)
 
         {:ok, %Comment{}} = IssueComment.handle(@payload)

@@ -39,14 +39,13 @@ defmodule CodeCorpsWeb.Plug.IdsToIntegers do
   defp convert?("comment_id"), do: true
   defp convert?("donation_goal_id"), do: true
   defp convert?("github_app_installation_id"), do: true
-  defp convert?("github_repo_id_id"), do: true
+  defp convert?("github_repo_id"), do: true
   defp convert?("organization_github_app_installation_id"), do: true
   defp convert?("organization_invite_id"), do: true
   defp convert?("organization_id"), do: true
   defp convert?("preview_id"), do: true
   defp convert?("project_id"), do: true
   defp convert?("project_category_id"), do: true
-  defp convert?("project_github_repo_id"), do: true
   defp convert?("project_skill_id"), do: true
   defp convert?("project_user_id"), do: true
   defp convert?("role_id"), do: true

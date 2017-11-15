@@ -8,12 +8,10 @@ defmodule CodeCorps.GitHub.Sync.Comment.CommentTest do
   describe "sync/4" do
     test "creates missing comments for each project associated with the github repo" do
       user = insert(:user)
-      github_repo = insert(:github_repo)
+      project = insert(:project)
+      github_repo = insert(:github_repo, project: project)
       github_issue = insert(:github_issue, github_repo: github_repo)
       github_comment = insert(:github_comment, github_issue: github_issue)
-
-      project = insert(:project)
-      insert(:project_github_repo, github_repo: github_repo, project: project)
 
       task = insert(:task, project: project, user: user, github_issue: github_issue, github_repo: github_repo)
 
@@ -35,12 +33,10 @@ defmodule CodeCorps.GitHub.Sync.Comment.CommentTest do
 
     test "updates existing comments for each project associated with the github repo" do
       user = insert(:user)
-      github_repo = insert(:github_repo)
+      project = insert(:project)
+      github_repo = insert(:github_repo, project: project)
       github_issue = insert(:github_issue, github_repo: github_repo)
       github_comment = insert(:github_comment, github_issue: github_issue)
-
-      project = insert(:project)
-      insert(:project_github_repo, github_repo: github_repo, project: project)
 
       task = insert(:task, project: project, user: user, github_issue: github_issue, github_repo: github_repo)
       existing_comment = insert(:comment, task: task, user: user, github_comment: github_comment)
@@ -62,13 +58,11 @@ defmodule CodeCorps.GitHub.Sync.Comment.CommentTest do
 
     test "fails on validation errors" do
       user = insert(:user)
-      github_repo = insert(:github_repo)
+      project = insert(:project)
+      github_repo = insert(:github_repo, project: project)
       github_issue = insert(:github_issue, github_repo: github_repo)
       # body will trigger validation error
       github_comment = insert(:github_comment, github_issue: github_issue, body: nil)
-
-      project = insert(:project)
-      insert(:project_github_repo, github_repo: github_repo, project: project)
 
       task = insert(:task, project: project, user: user, github_issue: github_issue, github_repo: github_repo)
 

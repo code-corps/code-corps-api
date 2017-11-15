@@ -13,8 +13,7 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
 
   defp setup_repo(github_repo_id) do
     project = insert(:project)
-    github_repo = insert(:github_repo, github_id: github_repo_id)
-    insert(:project_github_repo, github_repo: github_repo, project: project)
+    insert(:github_repo, github_id: github_repo_id, project: project)
     insert(:task_list, project: project, done: true)
     insert(:task_list, project: project, inbox: true)
     insert(:task_list, project: project, pull_requests: true)

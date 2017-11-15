@@ -6,7 +6,7 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task.Changeset do
 
   alias CodeCorps.{
     GithubIssue,
-    ProjectGithubRepo,
+    GithubRepo,
     Repo,
     Services.MarkdownRendererService,
     Task,
@@ -23,25 +23,25 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task.Changeset do
 
   The changeset can be used to create or update a `Task`
   """
-  @spec build_changeset(Task.t, GithubIssue.t, ProjectGithubRepo.t, User.t) :: Changeset.t
+  @spec build_changeset(Task.t, GithubIssue.t, GithubRepo.t, User.t) :: Changeset.t
   def build_changeset(
     %Task{id: task_id} = task,
     %GithubIssue{} = github_issue,
-    %ProjectGithubRepo{} = project_github_repo,
+    %GithubRepo{} = github_repo,
     %User{} = user) do
 
     case is_nil(task_id) do
-      true -> create_changeset(task, github_issue, project_github_repo, user)
-      false -> update_changeset(task, github_issue, project_github_repo)
+      true -> create_changeset(task, github_issue, github_repo, user)
+      false -> update_changeset(task, github_issue, github_repo)
     end
   end
 
   @create_attrs ~w(created_at markdown modified_at status title)a
-  @spec create_changeset(Task.t, GithubIssue.t, ProjectGithubRepo.t, User.t) :: Changeset.t
+  @spec create_changeset(Task.t, GithubIssue.t, GithubRepo.t, User.t) :: Changeset.t
   defp create_changeset(
     %Task{} = task,
     %GithubIssue{id: github_issue_id} = github_issue,
-    %ProjectGithubRepo{project_id: project_id, github_repo_id: github_repo_id},
+    %GithubRepo{id: github_repo_id, project_id: project_id},
     %User{id: user_id}) do
 
     task
@@ -64,11 +64,11 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task.Changeset do
   end
 
   @update_attrs ~w(markdown modified_at status title)a
-  @spec update_changeset(Task.t, GithubIssue.t, ProjectGithubRepo.t) :: Changeset.t
+  @spec update_changeset(Task.t, GithubIssue.t, GithubRepo.t) :: Changeset.t
   defp update_changeset(
     %Task{} = task,
     %GithubIssue{} = github_issue,
-    %ProjectGithubRepo{project_id: project_id}) do
+    %GithubRepo{project_id: project_id}) do
     task
     |> Changeset.cast(github_issue |> IssueAdapter.to_task, @update_attrs)
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)

@@ -37,16 +37,22 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilder do
       user_id: installation.user_id
     }
   end
-  defp traits(%CodeCorps.ProjectGithubRepo{} = record) do
-    record = record |> Repo.preload([:project, :github_repo])
+  defp traits(%CodeCorps.GithubRepo{} = record) do
+    project_title =
+      record
+      |> Repo.preload([:project])
+      |> Map.get(:project)
+      |> (&(&1 || %{})).()
+      |> Map.get(:title, "")
+
     %{
-      project: record.project.title,
-      project_id: record.project_id,
-      github_repo_id: record.github_repo_id,
-      github_repo_github_account_login: record.github_repo.github_account_login,
-      github_repo_github_account_type: record.github_repo.github_account_type,
-      github_repo_github_id: record.github_repo.github_id,
-      github_repo_name: record.github_repo.name
+      id: record.id,
+      github_account_login: record.github_account_login,
+      github_account_type: record.github_account_type,
+      github_id: record.github_id,
+      github_repo_name: record.name,
+      project: project_title,
+      project_id: record.project_id
     }
   end
   defp traits(%CodeCorps.ProjectSkill{} = record) do
