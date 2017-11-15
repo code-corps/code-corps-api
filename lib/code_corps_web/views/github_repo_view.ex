@@ -9,4 +9,5 @@ defmodule CodeCorpsWeb.GithubRepoView do
   :syncing_pull_requests_count, :sync_state, :updated_at]
 
   has_one :github_app_installation, type: "github-app-installation", field: :github_app_installation_id
+  has_one :project, type: "project", field: :project_id
 end

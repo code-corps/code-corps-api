@@ -87,8 +87,6 @@ defmodule CodeCorpsWeb.StripeConnectAccountView do
   def bank_account_routing_number(%{stripe_external_account: nil}, _conn), do: nil
   def bank_account_routing_number(%{stripe_external_account: %{routing_number: routing_number}}, _conn), do: routing_number
 
-  # TODO: Extract the 4 status mappings into a module
-
   # recipient_status mapping
 
   def recipient_status(stripe_connect_account, _conn) do

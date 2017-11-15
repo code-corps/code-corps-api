@@ -8,17 +8,11 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositoriesTest do
   alias CodeCorps.{
     GithubRepo,
     GitHub.Event.InstallationRepositories,
-    ProjectGithubRepo,
     Repo
   }
 
   describe "handle/1" do
     @payload load_event_fixture("installation_repositories_added")
-
-    test "marks event as errored if invalid action" do
-      payload = @payload |> Map.put("action", "foo")
-      assert {:error, :unexpected_action} == InstallationRepositories.handle(payload)
-    end
 
     test "marks event as errored if invalid payload" do
       payload = @payload |> Map.delete("action")
@@ -118,21 +112,19 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositoriesTest do
   describe "handle/1 for InstallationRepositories::removed" do
     @payload load_event_fixture("installation_repositories_removed")
 
-    test "deletes github repos and associated project github repos" do
+    test "deletes github repos" do
       %{
         "installation" => %{"id" => installation_github_id},
         "repositories_removed" => [repo_1_payload, repo_2_payload]
       } = @payload
 
       %{project: project} = installation = insert(:github_app_installation, github_id: installation_github_id)
-      github_repo_1 = insert(:github_repo, github_app_installation: installation, github_id: repo_1_payload["id"])
-      insert(:project_github_repo, project: project, github_repo: github_repo_1)
+      insert(:github_repo, github_app_installation: installation, github_id: repo_1_payload["id"], project: project)
       insert(:github_repo, github_app_installation: installation, github_id: repo_2_payload["id"])
 
       {:ok, [%GithubRepo{}, %GithubRepo{}]} = InstallationRepositories.handle(@payload)
 
       assert Repo.aggregate(GithubRepo, :count, :id) == 0
-      assert Repo.aggregate(ProjectGithubRepo, :count, :id) == 0
     end
 
     test "skips deleting if nothing to delete" do
@@ -142,13 +134,11 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositoriesTest do
       } = @payload
 
       %{project: project} = installation = insert(:github_app_installation, github_id: installation_github_id)
-      github_repo_1 = insert(:github_repo, github_app_installation: installation, github_id: repo_1_payload["id"])
-      insert(:project_github_repo, project: project, github_repo: github_repo_1)
+      insert(:github_repo, github_app_installation: installation, github_id: repo_1_payload["id"], project: project)
 
       {:ok, [%GithubRepo{}]} = InstallationRepositories.handle(@payload)
 
       assert Repo.aggregate(GithubRepo, :count, :id) == 0
-      assert Repo.aggregate(ProjectGithubRepo, :count, :id) == 0
     end
 
     test "marks event as errored if invalid instalation payload" do

@@ -71,12 +71,12 @@ defmodule CodeCorpsWeb.Router do
     post "/oauth/github", UserController, :github_oauth
     resources "/github-app-installations", GithubAppInstallationController, only: [:create]
     resources "/github-events", GithubEventController, only: [:index, :show]
+    resources "/github-repos", GithubRepoController, only: [:update]
     resources "/organization-github-app-installations", OrganizationGithubAppInstallationController, only: [:create, :delete]
     resources "/organizations", OrganizationController, only: [:create, :update]
     resources "/organization-invites", OrganizationInviteController, only: [:create, :update]
     resources "/previews", PreviewController, only: [:create]
     resources "/project-categories", ProjectCategoryController, only: [:create, :delete]
-    resources "/project-github-repos", ProjectGithubRepoController, only: [:create, :delete]
     resources "/project-skills", ProjectSkillController, only: [:create, :delete]
     resources "/project-users", ProjectUserController, only: [:create, :update, :delete]
     resources "/projects", ProjectController, only: [:create, :update]
@@ -116,7 +116,6 @@ defmodule CodeCorpsWeb.Router do
     resources "/organization-invites", OrganizationInviteController, only: [:index, :show]
     post "/password/forgot", PasswordController, :forgot_password
     resources "/project-categories", ProjectCategoryController, only: [:index, :show]
-    resources "/project-github-repos", ProjectGithubRepoController, only: [:index, :show]
     resources "/project-skills", ProjectSkillController, only: [:index, :show]
     resources "/project-users", ProjectUserController, only: [:index, :show]
     resources "/projects", ProjectController, only: [:index, :show] do

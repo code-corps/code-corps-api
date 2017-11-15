@@ -36,12 +36,16 @@ defmodule CodeCorps.GitHub.Adapters.Utils.BodyDecorator do
   end
 
   @spec remove_code_corps_header(map) :: map
-  def remove_code_corps_header(%{"body" => body} = attrs) when is_binary(body) do
-    clean_body = case body |> String.split(@separator) do
-      ["Posted by" <> _rest | tail] -> tail |> Enum.join |> String.trim_leading
-      _ -> body
-    end
-    attrs |> Map.put("body", clean_body)
+  def remove_code_corps_header(%{body: _} = attrs) do
+    attrs |> Map.update(:body, nil, &clean_body/1)
   end
-  def remove_code_corps_header(%{} = attrs), do: attrs
+
+  @spec clean_body(String.t | nil) :: String.t | nil
+  defp clean_body("Posted by " <> @separator <> _rest = body) do
+    body
+    |> String.split(@separator)
+    |> Enum.drop(1) |> Enum.join
+    |> String.trim_leading
+  end
+  defp clean_body(body), do: body
 end

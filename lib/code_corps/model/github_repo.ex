@@ -1,6 +1,8 @@
 defmodule CodeCorps.GithubRepo do
   use CodeCorps.Model
 
+  alias Ecto.Changeset
+
   @type t :: %__MODULE__{}
 
   schema "github_repos" do
@@ -16,9 +18,9 @@ defmodule CodeCorps.GithubRepo do
     field :syncing_pull_requests_count, :integer, default: 0
 
     belongs_to :github_app_installation, CodeCorps.GithubAppInstallation
+    belongs_to :project, CodeCorps.Project
     has_many :github_comments, CodeCorps.GithubComment
     has_many :github_issues, CodeCorps.GithubIssue
-    has_many :project_github_repos, CodeCorps.ProjectGithubRepo
 
     timestamps()
   end
@@ -31,7 +33,7 @@ defmodule CodeCorps.GithubRepo do
     |> cast(params, [
       :github_account_id, :github_account_avatar_url, :github_account_login,
       :github_account_type, :github_app_installation_id, :github_id, :name,
-      :sync_state, :syncing_comments_count, :syncing_issues_count,
+      :project_id, :sync_state, :syncing_comments_count, :syncing_issues_count,
       :syncing_pull_requests_count
     ])
     |> validate_required([
@@ -39,6 +41,15 @@ defmodule CodeCorps.GithubRepo do
       :github_account_type, :github_id, :name
     ])
     |> assoc_constraint(:github_app_installation)
+    |> assoc_constraint(:project)
+  end
+
+  def update_changeset(struct, params \\ {}) do
+    struct
+    |> cast(params, [:project_id])
+    |> assoc_constraint(:project)
+    |> maybe_reset_sync_state()
+    |> validate_inclusion(:sync_state, sync_states())
   end
 
   def update_sync_changeset(struct, params) do
@@ -56,7 +67,17 @@ defmodule CodeCorps.GithubRepo do
       syncing_github_issues errored_syncing_github_issues
       fetching_comments errored_fetching_comments
       syncing_github_comments errored_syncing_github_comments
-      receiving_webhooks
+      syncing_users errored_syncing_users
+      syncing_tasks errored_syncing_tasks
+      syncing_comments errored_syncing_comments
+      synced
     }
+  end
+
+  defp maybe_reset_sync_state(changeset) do
+    case changeset |> Changeset.get_field(:project_id) do
+      nil -> changeset |> Changeset.put_change(:sync_state, "unsynced")
+      _ -> changeset
+    end
   end
 end

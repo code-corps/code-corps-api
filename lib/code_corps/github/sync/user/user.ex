@@ -12,18 +12,15 @@ defmodule CodeCorps.GitHub.Sync.User.User do
     GithubRepo,
     GithubUser,
     GitHub.Utils.ResultAggregator,
-    ProjectGithubRepo,
     Repo,
     User
   }
 
-  def sync_project_github_repo(%ProjectGithubRepo{github_repo: %GithubRepo{} = _} = project_github_repo) do
-    %ProjectGithubRepo{
-      github_repo: %GithubRepo{
-        github_comments: github_comments,
-        github_issues: github_issues
-      }
-    } = project_github_repo
+  def sync_github_repo(%GithubRepo{} = github_repo) do
+    %GithubRepo{
+      github_comments: github_comments,
+      github_issues: github_issues
+    } = github_repo
 
     comment_users = find_users_for_comments(github_comments)
     issue_users = find_users_for_issues(github_issues)

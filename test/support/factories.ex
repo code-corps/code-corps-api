@@ -41,7 +41,7 @@ defmodule CodeCorps.Factories do
 
   def github_comment_factory do
     %CodeCorps.GithubComment{
-      body: "I love elixir!",
+      body: sequence(:body, &"I love elixir with GithubComment #{&1}"),
       github_created_at: DateTime.utc_now,
       github_id: sequence(:id, (fn number -> number end)),
       github_updated_at: DateTime.utc_now,
@@ -86,7 +86,8 @@ defmodule CodeCorps.Factories do
     %CodeCorps.GithubRepo{
       github_account_login: sequence(:github_account_login, &"owner_#{&1}"),
       github_app_installation: build(:github_app_installation),
-      name: sequence(:name, &"repo_#{&1}")
+      name: sequence(:name, &"repo_#{&1}"),
+      project: build(:project)
     }
   end
 
@@ -176,13 +177,6 @@ defmodule CodeCorps.Factories do
     %CodeCorps.ProjectCategory{
       project: build(:project),
       category: build(:category)
-    }
-  end
-
-  def project_github_repo_factory do
-    %CodeCorps.ProjectGithubRepo{
-      project: build(:project),
-      github_repo: build(:github_repo)
     }
   end
 

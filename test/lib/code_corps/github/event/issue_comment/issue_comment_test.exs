@@ -15,14 +15,6 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
     User
   }
 
-  describe "handle/1" do
-    @payload load_event_fixture("issue_comment_created") |> Map.put("action", "foo")
-
-    test "returns error if action of the event is wrong" do
-      assert {:error, :unexpected_action} == IssueComment.handle(@payload)
-    end
-  end
-
   for action <- ["created", "edited"] do
     describe "handle/1 for IssueComment::#{action}" do
       @payload load_event_fixture("issue_comment_#{action}")
@@ -30,13 +22,12 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
       test "creates or updates associated records" do
         %{"repository" => %{"id" => repo_github_id}} = @payload
 
-        github_repo = insert(:github_repo, github_id: repo_github_id)
-        %{project: project} = insert(:project_github_repo, github_repo: github_repo)
+        project = insert(:project)
+        insert(:github_repo, github_id: repo_github_id, project: project)
         insert(:task_list, project: project, inbox: true)
 
-        {:ok, comments} = IssueComment.handle(@payload)
+        {:ok, %Comment{}} = IssueComment.handle(@payload)
 
-        assert Enum.count(comments) == 1
         assert Repo.aggregate(Comment, :count, :id) == 1
         assert Repo.aggregate(GithubComment, :count, :id) == 1
         assert Repo.aggregate(GithubIssue, :count, :id) == 1

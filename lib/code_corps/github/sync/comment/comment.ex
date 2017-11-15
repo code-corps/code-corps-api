@@ -1,49 +1,39 @@
 defmodule CodeCorps.GitHub.Sync.Comment do
-  alias CodeCorps.{
-    GitHub,
-    GithubComment,
-    GithubIssue
-  }
-  alias GitHub.Sync.Comment.Comment, as: CommentCommentSyncer
-  alias GitHub.Sync.Comment.GithubComment, as: CommentGithubCommentSyncer
-  alias GitHub.Sync.User.RecordLinker, as: UserRecordLinker
+  alias CodeCorps.GitHub.Sync
   alias Ecto.Multi
 
   @doc ~S"""
-  Syncs a GitHub comment API payload with our data.
+  Creates an `Ecto.Multi` intended to process a GitHub issue comment related API
+  payload.
 
-  Expects a `CodeCorps.GithubIssue` record and a list of `CodeCorps.Task`
-  records passed in with the changes.
+  Expects a partial transaction outcome with `:github_issue` and :task keys.
 
-  The process is as follows:
+  Returns an `Ecto.Multi` with the follwing steps
 
-  - create a `CodeCorps.GithubComment` related to the `CodeCorps.GithubIssue`
-  - match the comment payload with a `CodeCorps.User` using
-    `CodeCorps.GitHub.Sync.User.RecordLinker`
-  - for each `CodeCorps.Task`:
-    - create or update `CodeCorps.Comment` for the `CodeCorps.Task`
+  - create or update a `CodeCorps.GithubComment` from the
+    provided `CodeCorps.GithubIssue` and API payload
+  - match the `CodeCorps.GithubComment` with a new or existing `CodeCorps.User`
+  - create or update a `CodeCorps.Comment` using the created
+    `CodeCorps.GithubComment`, related to the matched `CodeCorps.User` and the
+    provided `CodeCorps.Task`
   """
   @spec sync(map, map) :: Multi.t
-  def sync(%{github_issue: github_issue, tasks: tasks}, payload) do
+  def sync(%{github_issue: github_issue, task: task}, %{} = payload) do
     Multi.new
-    |> Multi.run(:github_comment, fn _ -> sync_github_comment(github_issue, payload) end)
-    |> Multi.run(:comment_user, fn %{github_comment: github_comment} -> UserRecordLinker.link_to(github_comment, payload) end)
-    |> Multi.run(:comments, fn %{github_comment: github_comment, comment_user: user} -> CommentCommentSyncer.sync_all(tasks, github_comment, user, payload) end)
+    |> Multi.run(:github_comment, fn _ -> Sync.Comment.GithubComment.create_or_update_comment(github_issue, payload) end)
+    |> Multi.run(:comment_user, fn %{github_comment: github_comment} -> Sync.User.RecordLinker.link_to(github_comment, payload) end)
+    |> Multi.run(:comment, fn %{github_comment: github_comment, comment_user: user} -> Sync.Comment.Comment.sync(task, github_comment, user) end)
   end
 
-  @doc """
-  When provided a GitHub API payload, it deletes each `Comment` associated to
-  the specified `IssueComment` and then deletes the `GithubComment`.
+  @doc ~S"""
+  Creates an  `Ecto.Multi` intended to delete a `CodeCorps.GithubComment`
+  specified by `github_id`, as well as 0 to 1 `CodeCorps.Comment` records
+  associated to `CodeCorps.GithubComment`
   """
-  @spec delete(map, map) :: Multi.t
-  def delete(_, %{"id" => github_id}) do
+  @spec delete(map) :: Multi.t
+  def delete(%{"id" => github_id}) do
     Multi.new
-    |> Multi.run(:deleted_comments, fn _ -> CommentCommentSyncer.delete_all(github_id) end)
-    |> Multi.run(:deleted_github_comment, fn _ -> CommentGithubCommentSyncer.delete(github_id) end)
-  end
-
-  @spec sync_github_comment(GithubIssue.t, map) :: {:ok, GithubComment.t} | {:error, Ecto.Changeset.t}
-  defp sync_github_comment(github_issue, attrs) do
-    CommentGithubCommentSyncer.create_or_update_comment(github_issue, attrs)
+    |> Multi.run(:deleted_comments, fn _ -> Sync.Comment.Comment.delete(github_id) end)
+    |> Multi.run(:deleted_github_comment, fn _ -> Sync.Comment.GithubComment.delete(github_id) end)
   end
 end

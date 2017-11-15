@@ -2,9 +2,14 @@ defmodule CodeCorpsWeb.GithubEventController do
   @moduledoc false
   use CodeCorpsWeb, :controller
 
-  alias CodeCorps.{GithubEvent, Helpers.Query, Repo, User}
-  alias CodeCorps.GitHub.Webhook.{
-    EventSupport, Processor
+  alias CodeCorps.{
+    GithubEvent,
+    GitHub.Webhook.Handler,
+    GitHub.Webhook.EventSupport,
+    Helpers.Query,
+    Processor,
+    Repo,
+    User
   }
 
   action_fallback CodeCorpsWeb.FallbackController
@@ -36,23 +41,31 @@ defmodule CodeCorpsWeb.GithubEventController do
     end
   end
 
-  def create(conn, event_payload) do
-    event_type = conn |> get_event_type()
+  @spec create(Conn.t, map) :: Conn.t
+  def create(%Conn{} = conn, %{} = payload) do
+    type = conn |> get_event_type
+    delivery_id = conn |> get_delivery_id()
+    action = payload |> Map.get("action", "")
 
-    case event_type |> EventSupport.status do
+    case type |> EventSupport.status(action) do
       :supported ->
-        Processor.process_async(event_type, conn |> get_delivery_id, event_payload)
+        Processor.process(fn -> Handler.handle_supported(type, delivery_id, payload) end)
         conn |> send_resp(200, "")
       :unsupported ->
+        Processor.process(fn -> Handler.handle_unsupported(type, delivery_id, payload) end)
+        conn |> send_resp(200, "")
+      :ignored ->
         conn |> send_resp(202, "")
     end
   end
 
-  defp get_event_type(conn) do
+  @spec get_event_type(Conn.t) :: String.t
+  defp get_event_type(%Conn{} = conn) do
     conn |> get_req_header("x-github-event") |> List.first
   end
 
-  defp get_delivery_id(conn) do
+  @spec get_delivery_id(Conn.t) :: String.t
+  defp get_delivery_id(%Conn{} = conn) do
     conn |> get_req_header("x-github-delivery") |> List.first
   end
 

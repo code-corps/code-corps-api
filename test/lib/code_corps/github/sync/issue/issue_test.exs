@@ -7,7 +7,6 @@ defmodule CodeCorps.GitHub.Sync.IssueTest do
 
   alias CodeCorps.{
     GitHub.Sync.Issue,
-    Project,
     Repo,
     Task,
     User
@@ -16,7 +15,7 @@ defmodule CodeCorps.GitHub.Sync.IssueTest do
   describe "sync/2" do
     @payload load_event_fixture("issues_opened")
 
-    test "with unmatched user, creates user, creates task for each project associated to github repo" do
+    test "with unmatched user, creates user, creates task for project associated to github repo" do
       %{
         "issue" => %{
           "body" => markdown, "title" => title, "number" => number,
@@ -25,45 +24,32 @@ defmodule CodeCorps.GitHub.Sync.IssueTest do
         "repository" => %{"id" => repo_github_id}
       } = @payload
 
-      github_repo = insert(:github_repo, github_id: repo_github_id)
-
-      project_github_repos = insert_list(3, :project_github_repo, github_repo: github_repo)
-
-      project_ids =
-        project_github_repos
-        |> Enum.map(&Map.get(&1, :project))
-        |> Enum.map(&Map.get(&1, :id))
-
-      project_ids |> Enum.each(fn project_id ->
-        project = Project |> Repo.get_by(id: project_id)
-        insert(:task_list, project: project, inbox: true)
-      end)
+      project = insert(:project)
+      github_repo = insert(:github_repo, github_id: repo_github_id, project: project)
+      insert(:task_list, project: project, inbox: true)
 
       changes = %{repo: github_repo}
 
-      {:ok, %{tasks: tasks}} = Issue.sync(changes, issue) |> Repo.transaction
+      {:ok, %{task: task}} = Issue.sync(changes, issue) |> Repo.transaction
 
-      assert Enum.count(tasks) == 3
-      assert Repo.aggregate(Task, :count, :id) == 3
+      assert Repo.aggregate(Task, :count, :id) == 1
 
       user = Repo.get_by(User, github_id: user_github_id)
       assert user
 
-      tasks |> Enum.each(fn task ->
-        task = task |> Repo.preload(:github_issue)
-        assert task.user_id == user.id
-        assert task.github_issue_id
-        assert task.github_repo_id == github_repo.id
-        assert task.project_id in project_ids
-        assert task.markdown == markdown
-        assert task.title == title
-        assert task.github_issue.number == number
-        assert task.status == "open"
-        assert task.order
-      end)
+      task = task |> Repo.preload(:github_issue)
+      assert task.user_id == user.id
+      assert task.github_issue_id
+      assert task.github_repo_id == github_repo.id
+      assert task.project_id == project.id
+      assert task.markdown == markdown
+      assert task.title == title
+      assert task.github_issue.number == number
+      assert task.status == "open"
+      assert task.order
     end
 
-    test "with matched user, creates or updates task for each project associated to github repo" do
+    test "with matched user, creates or updates task for project associated to github repo" do
       %{
         "issue" => %{"id" => issue_github_id, "body" => markdown, "title" => title, "number" => number, "user" => %{"id" => user_github_id}} = issue,
         "repository" => %{"id" => repo_github_id}
@@ -71,44 +57,31 @@ defmodule CodeCorps.GitHub.Sync.IssueTest do
 
       user = insert(:user, github_id: user_github_id)
 
-      github_repo = insert(:github_repo, github_id: repo_github_id)
+      project = insert(:project)
+      github_repo = insert(:github_repo, github_id: repo_github_id, project: project)
       github_issue = insert(:github_issue, github_id: issue_github_id, number: number, github_repo: github_repo)
 
-      [%{project: project} | _rest] = project_github_repos = insert_list(3, :project_github_repo, github_repo: github_repo)
+      insert(:task_list, project: project, inbox: true)
 
-      project_ids =
-        project_github_repos
-        |> Enum.map(&Map.get(&1, :project))
-        |> Enum.map(&Map.get(&1, :id))
-
-      project_ids |> Enum.each(fn project_id ->
-        project = Project |> Repo.get_by(id: project_id)
-        insert(:task_list, project: project, inbox: true)
-      end)
-
-      %{id: existing_task_id} =
-        insert(:task, project: project, user: user, github_repo: github_repo, github_issue: github_issue)
+      existing_task = insert(:task, project: project, user: user, github_repo: github_repo, github_issue: github_issue)
 
       changes = %{repo: github_repo}
 
-      {:ok, %{tasks: tasks}} = Issue.sync(changes, issue) |> Repo.transaction
+      {:ok, %{task: task}} = Issue.sync(changes, issue) |> Repo.transaction
 
-      assert Enum.count(tasks) == 3
-      assert Repo.aggregate(Task, :count, :id) == 3
+      assert Repo.aggregate(Task, :count, :id) == 1
 
-      tasks |> Enum.each(fn task ->
-        task = task |> Repo.preload(:github_issue)
-        assert task.github_issue_id == github_issue.id
-        assert task.github_repo_id == github_repo.id
-        assert task.project_id in project_ids
-        assert task.markdown == markdown
-        assert task.title == title
-        assert task.github_issue.number == number
-        assert task.status == "open"
-        assert task.order
-      end)
+      task = task |> Repo.preload(:github_issue)
+      assert task.github_issue_id == github_issue.id
+      assert task.github_repo_id == github_repo.id
+      assert task.project_id == project.id
+      assert task.markdown == markdown
+      assert task.title == title
+      assert task.github_issue.number == number
+      assert task.status == "open"
+      assert task.order
 
-      assert existing_task_id in (tasks |> Enum.map(&Map.get(&1, :id)))
+      assert existing_task.id == task.id
     end
 
     test "for a new pull request, updates relevant records" do
@@ -119,48 +92,36 @@ defmodule CodeCorps.GitHub.Sync.IssueTest do
 
       user = insert(:user, github_id: user_github_id)
 
-      github_repo = insert(:github_repo, github_id: repo_github_id)
+      project = insert(:project)
+      github_repo = insert(:github_repo, github_id: repo_github_id, project: project)
       github_issue = insert(:github_issue, github_id: issue_github_id, number: number, github_repo: github_repo)
 
-      [%{project: project} | _rest] = project_github_repos = insert_list(3, :project_github_repo, github_repo: github_repo)
+      task_list = insert(:task_list, project: project, pull_requests: true)
 
-      project_ids =
-        project_github_repos
-        |> Enum.map(&Map.get(&1, :project))
-        |> Enum.map(&Map.get(&1, :id))
-
-      project_ids |> Enum.each(fn project_id ->
-        project = Project |> Repo.get_by(id: project_id)
-        insert(:task_list, project: project, pull_requests: true)
-      end)
-
-      %{id: existing_task_id} =
-        insert(:task, project: project, user: user, github_repo: github_repo, github_issue: github_issue)
+      existing_task = insert(:task, project: project, user: user, github_repo: github_repo, github_issue: github_issue)
 
       # Fake syncing of pull request
       github_pull_request = insert(:github_pull_request, github_repo: github_repo)
 
       changes = %{repo: github_repo, github_pull_request: github_pull_request}
 
-      {:ok, %{tasks: tasks}} = Issue.sync(changes, issue) |> Repo.transaction
+      {:ok, %{task: task}} = Issue.sync(changes, issue) |> Repo.transaction
 
-      assert Enum.count(tasks) == 3
-      assert Repo.aggregate(Task, :count, :id) == 3
+      assert Repo.aggregate(Task, :count, :id) == 1
 
-      tasks |> Enum.each(fn task ->
-        task = task |> Repo.preload(github_issue: :github_pull_request)
-        assert task.github_issue_id == github_issue.id
-        assert task.github_issue.github_pull_request.id == github_pull_request.id
-        assert task.github_repo_id == github_repo.id
-        assert task.project_id in project_ids
-        assert task.markdown == markdown
-        assert task.title == title
-        assert task.github_issue.number == number
-        assert task.status == "open"
-        assert task.order
-      end)
+      task = task |> Repo.preload(github_issue: :github_pull_request)
+      assert task.github_issue_id == github_issue.id
+      assert task.github_issue.github_pull_request.id == github_pull_request.id
+      assert task.github_repo_id == github_repo.id
+      assert task.project_id == project.id
+      assert task.markdown == markdown
+      assert task.title == title
+      assert task.github_issue.number == number
+      assert task.status == "open"
+      assert task.order
+      assert task.task_list_id == task_list.id
 
-      assert existing_task_id in (tasks |> Enum.map(&Map.get(&1, :id)))
+      assert existing_task.id == task.id
     end
   end
 end

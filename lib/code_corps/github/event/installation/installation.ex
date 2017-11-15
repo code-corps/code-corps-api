@@ -16,15 +16,13 @@ defmodule CodeCorps.GitHub.Event.Installation do
   alias Ecto.{Changeset, Multi}
 
   @type outcome :: {:ok, GithubAppInstallation.t} |
-                    {:error, :not_yet_implemented} |
-                    {:error, :unexpected_action} |
-                    {:error, :unexpected_payload} |
-                    {:error, :validation_error_on_syncing_installation} |
-                    {:error, :multiple_unprocessed_installations_found} |
-                    {:error, :github_api_error_on_syncing_repos} |
-                    {:error, :validation_error_on_deleting_removed_repos} |
-                    {:error, :validation_error_on_syncing_existing_repos} |
-                    {:error, :validation_error_on_marking_installation_processed}
+                   {:error, :unexpected_payload} |
+                   {:error, :validation_error_on_syncing_installation} |
+                   {:error, :multiple_unprocessed_installations_found} |
+                   {:error, :github_api_error_on_syncing_repos} |
+                   {:error, :validation_error_on_deleting_removed_repos} |
+                   {:error, :validation_error_on_syncing_existing_repos} |
+                   {:error, :validation_error_on_marking_installation_processed}
 
   @doc """
   Handles the "Installation" GitHub Webhook event.
@@ -51,7 +49,6 @@ defmodule CodeCorps.GitHub.Event.Installation do
   def handle(payload) do
     Multi.new
     |> Multi.run(:payload, fn _ -> payload |> validate_payload() end)
-    |> Multi.run(:action, fn _ -> payload |> validate_action() end)
     |> Multi.run(:user, fn _ -> payload |> find_user() end)
     |> Multi.run(:installation, fn %{user: user} -> install_for_user(user, payload) end)
     |> Multi.merge(&process_repos/1)
@@ -84,8 +81,6 @@ defmodule CodeCorps.GitHub.Event.Installation do
   @spec marshall_result(tuple) :: tuple
   defp marshall_result({:ok, %{processed_installation: installation}}), do: {:ok, installation}
   defp marshall_result({:error, :payload, :invalid, _steps}), do: {:error, :unexpected_payload}
-  defp marshall_result({:error, :action, :unexpected_action, _steps}), do: {:error, :unexpected_action}
-  defp marshall_result({:error, :action, :not_yet_implemented, _steps}), do: {:error, :not_yet_implemented}
   defp marshall_result({:error, :user, :unexpected_user_payload, _steps}), do: {:error, :unexpected_payload}
   defp marshall_result({:error, :installation, :unexpected_installation_payload, _steps}), do: {:error, :unexpected_payload}
   defp marshall_result({:error, :installation, %Changeset{}, _steps}), do: {:error, :validation_error_on_syncing_installation}
@@ -103,11 +98,4 @@ defmodule CodeCorps.GitHub.Event.Installation do
       false -> {:error, :invalid}
     end
   end
-
-  @spec validate_action(map) :: {:ok, :implemented} |
-                                {:error, :not_yet_implemented} |
-                                {:error, :unexpected_action}
-  defp validate_action(%{"action" => "created"}), do: {:ok, :implemented}
-  defp validate_action(%{"action" => "deleted"}), do: {:error, :not_yet_implemented}
-  defp validate_action(%{}), do: {:error, :unexpected_action}
 end

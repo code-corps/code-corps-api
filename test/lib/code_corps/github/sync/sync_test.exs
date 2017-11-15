@@ -44,13 +44,13 @@ defmodule CodeCorps.GitHub.SyncTest do
         }
       } = @payload
 
-      github_repo = insert(:github_repo, github_id: repo_github_id)
-      %{project: project} = insert(:project_github_repo, github_repo: github_repo)
+      project = insert(:project)
+      github_repo = insert(:github_repo, github_id: repo_github_id, project: project)
       insert(:task_list, project: project, done: true)
       insert(:task_list, project: project, inbox: true)
       insert(:task_list, project: project, pull_requests: true)
 
-      {:ok, [comment]} = Sync.issue_comment_event(@payload)
+      {:ok, comment} = Sync.issue_comment_event(@payload)
 
       assert Repo.aggregate(GithubComment, :count, :id) == 1
       assert Repo.aggregate(GithubIssue, :count, :id) == 1
@@ -91,20 +91,20 @@ defmodule CodeCorps.GitHub.SyncTest do
     end
   end
 
-  describe "sync_project_github_repo/1" do
+  describe "sync_repo/1" do
     test "syncs and resyncs with the project repo" do
       owner = "baxterthehacker"
       repo = "public-repo"
       github_app_installation = insert(:github_app_installation, github_account_login: owner)
-      github_repo = insert(:github_repo, github_app_installation: github_app_installation, name: repo, github_account_id: 6752317, github_account_avatar_url: "https://avatars3.githubusercontent.com/u/6752317?v=4", github_account_type: "User", github_id: 35129377)
-      %{project: project} = project_github_repo = insert(:project_github_repo, github_repo: github_repo)
+      project = insert(:project)
+      github_repo = insert(:github_repo, github_app_installation: github_app_installation, name: repo, github_account_id: 6752317, github_account_avatar_url: "https://avatars3.githubusercontent.com/u/6752317?v=4", github_account_type: "User", github_id: 35129377, project: project)
       insert(:task_list, project: project, done: true)
       insert(:task_list, project: project, inbox: true)
       insert(:task_list, project: project, pull_requests: true)
 
       # Sync a first time
 
-      Sync.sync_project_github_repo(project_github_repo)
+      Sync.sync_repo(github_repo)
 
       repo = Repo.one(GithubRepo)
 
@@ -122,7 +122,7 @@ defmodule CodeCorps.GitHub.SyncTest do
 
       # Sync a second time – should run without trouble
 
-      Sync.sync_project_github_repo(project_github_repo)
+      Sync.sync_repo(github_repo)
 
       repo = Repo.one(GithubRepo)
 
@@ -141,10 +141,10 @@ defmodule CodeCorps.GitHub.SyncTest do
 
     @tag acceptance: true
     test "syncs with the project repo with the real API" do
-      project_github_repo = setup_coderly_project_repo()
+      github_repo = setup_coderly_repo()
 
       with_real_api do
-        Sync.sync_project_github_repo(project_github_repo)
+          Sync.sync_repo(github_repo)
       end
 
       repo = Repo.one(GithubRepo)

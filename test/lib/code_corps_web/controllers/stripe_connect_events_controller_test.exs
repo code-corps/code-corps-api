@@ -22,10 +22,6 @@ defmodule CodeCorpsWeb.StripeConnectEventsControllerTest do
 
   # TODO: The following two can be merged into one and actual environment matching behavior
   # can be added to the EnvironmentFilter test module
-  #
-  # TODO: Can also probably move the supervisor stuff to the webhook processor module test
-  # (the group of tests which will eventually test async behavior)
-
   test "returns 400, does nothing if event is livemode and env is not :prod", %{conn: conn} do
     Application.put_env(:code_corps, :stripe_env, :other)
 

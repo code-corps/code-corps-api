@@ -2,8 +2,9 @@ defmodule CodeCorpsWeb.GithubRepoViewTest do
   use CodeCorpsWeb.ViewCase
 
   test "renders all attributes and relationships properly" do
+    project = insert(:project)
     github_app_installation = insert(:github_app_installation)
-    github_repo = insert(:github_repo, github_app_installation: github_app_installation)
+    github_repo = insert(:github_repo, github_app_installation: github_app_installation, project: project)
 
     rendered_json = render(CodeCorpsWeb.GithubRepoView, "show.json-api", data: github_repo)
 
@@ -28,6 +29,9 @@ defmodule CodeCorpsWeb.GithubRepoViewTest do
         "relationships" => %{
           "github-app-installation" => %{
             "data" => %{"id" => github_app_installation.id |> Integer.to_string, "type" => "github-app-installation"}
+          },
+          "project" => %{
+            "data" => %{"id" => project.id |> Integer.to_string, "type" => "project"}
           }
         }
       },
