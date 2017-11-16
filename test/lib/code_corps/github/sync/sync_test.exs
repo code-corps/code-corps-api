@@ -144,7 +144,7 @@ defmodule CodeCorps.GitHub.SyncTest do
       github_repo = setup_coderly_repo()
 
       with_real_api do
-          Sync.sync_repo(github_repo)
+        Sync.sync_repo(github_repo)
       end
 
       repo = Repo.one(GithubRepo)

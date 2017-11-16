@@ -82,6 +82,8 @@ config :sentry,
   included_environments: ~w(prod staging)a,
   use_error_logger: true
 
+config :code_corps, :sentry, CodeCorps.Sentry.Async
+
 config :code_corps, :processor, CodeCorps.Processor.Async
 
 # Import environment specific config. This must remain at the bottom
