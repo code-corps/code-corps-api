@@ -14,13 +14,13 @@ defmodule CodeCorpsWeb.GithubEventViewTest do
         "type" => "github-event",
         "attributes" => %{
           "action" => github_event.action,
-          "data" => github_event.data,
           "event-type" => github_event.type,
           "error" => github_event.error,
           "failure-reason" => github_event.failure_reason,
           "github-delivery-id" => github_event.github_delivery_id,
           "inserted-at" => github_event.inserted_at,
           "payload" => github_event.payload,
+          "record-data" => github_event.data,
           "status" => github_event.status,
           "updated-at" => github_event.updated_at
         }
