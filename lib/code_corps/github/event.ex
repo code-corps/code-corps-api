@@ -7,6 +7,16 @@ defmodule CodeCorps.GitHub.Event do
   alias CodeCorps.{GithubEvent, Repo}
   alias Ecto.Changeset
 
+  defmodule GitHubEventError do
+    defexception [:reason]
+
+    def exception(reason),
+      do: %__MODULE__{reason: reason}
+
+    def message(%__MODULE__{reason: reason}),
+      do: reason
+  end
+
   @type error :: atom | Changeset.t
 
   @doc ~S"""
@@ -33,11 +43,24 @@ defmodule CodeCorps.GitHub.Event do
     |> Changeset.change(%{status: "processed"})
     |> Repo.update()
   end
-  def stop_processing({:error, reason}, %GithubEvent{} = event) do
-    changes = %{status: "errored", failure_reason: reason |> Atom.to_string}
+  def stop_processing({:error, reason, error}, %GithubEvent{} = event) do
+    %GitHubEventError{reason: error}
+    |> CodeCorps.Sentry.capture_exception([stacktrace: System.stacktrace()])
+
+    changes = %{
+      status: "errored",
+      data: error |> format_data_if_exists(),
+      error: error |> Kernel.inspect(pretty: true),
+      failure_reason: reason |> Atom.to_string()
+    }
 
     event
     |> Changeset.change(changes)
     |> Repo.update()
   end
+
+  defp format_data_if_exists(%Ecto.Changeset{data: data}) do
+    data |> Kernel.inspect(pretty: true)
+  end
+  defp format_data_if_exists(_error), do: nil
 end

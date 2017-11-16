@@ -20,7 +20,7 @@ defmodule CodeCorps.GitHub.Sync do
   @type outcome :: {:ok, list(Comment.t)}
                  | {:ok, GithubPullRequest.t}
                  | {:ok, list(CodeCorps.Task.t)}
-                 | {:error, :repo_not_found}
+                 | {:error, :repo_not_found, %{}}
                  | {:error, :fetching_issue}
                  | {:error, :fetching_pull_request}
                  | {:error, :multiple_issue_users_match}
@@ -232,18 +232,17 @@ defmodule CodeCorps.GitHub.Sync do
   defp marshall_result({:ok, %{github_pull_request: _, github_issue: _}} = result), do: result
   defp marshall_result({:ok, %{github_pull_request: pull_request}}), do: {:ok, pull_request}
   defp marshall_result({:ok, %{task: task}}), do: {:ok, task}
-  defp marshall_result({:error, :repo, :unmatched_project, _steps}), do: {:ok, []}
-  defp marshall_result({:error, :repo, :unmatched_repository, _steps}), do: {:error, :repo_not_found}
-  defp marshall_result({:error, :fetch_issue, _, _steps}), do: {:error, :fetching_issue}
-  defp marshall_result({:error, :fetch_pull_request, _, _steps}), do: {:error, :fetching_pull_request}
-  defp marshall_result({:error, :github_pull_request, %Ecto.Changeset{}, _steps}), do: {:error, :validating_github_pull_request}
-  defp marshall_result({:error, :github_issue, %Ecto.Changeset{}, _steps}), do: {:error, :validating_github_issue}
-  defp marshall_result({:error, :github_comment, %Ecto.Changeset{}, _steps}), do: {:error, :validating_github_comment}
-  defp marshall_result({:error, :comment_user, %Ecto.Changeset{}, _steps}), do: {:error, :validating_user}
-  defp marshall_result({:error, :comment_user, :multiple_users, _steps}), do: {:error, :multiple_comment_users_match}
-  defp marshall_result({:error, :issue_user, %Ecto.Changeset{}, _steps}), do: {:error, :validating_user}
-  defp marshall_result({:error, :issue_user, :multiple_users, _steps}), do: {:error, :multiple_issue_users_match}
-  defp marshall_result({:error, :comment, {_comments, _errors}, _steps}), do: {:error, :validating_comment}
-  defp marshall_result({:error, :task, %Ecto.Changeset{}, _steps}), do: {:error, :validating_task}
-  defp marshall_result({:error, _errored_step, _error_response, _steps}), do: {:error, :unexpected_transaction_outcome}
+  defp marshall_result({:error, :repo, :unmatched_repository, _steps}), do: {:error, :repo_not_found, %{}}
+  defp marshall_result({:error, :fetch_issue, _, _steps}), do: {:error, :fetching_issue, %{}}
+  defp marshall_result({:error, :fetch_pull_request, _, _steps}), do: {:error, :fetching_pull_request, %{}}
+  defp marshall_result({:error, :github_pull_request, %Ecto.Changeset{} = changeset, _steps}), do: {:error, :validating_github_pull_request, changeset}
+  defp marshall_result({:error, :github_issue, %Ecto.Changeset{} = changeset, _steps}), do: {:error, :validating_github_issue, changeset}
+  defp marshall_result({:error, :github_comment, %Ecto.Changeset{} = changeset, _steps}), do: {:error, :validating_github_comment, changeset}
+  defp marshall_result({:error, :comment_user, %Ecto.Changeset{} = changeset, _steps}), do: {:error, :validating_user, changeset}
+  defp marshall_result({:error, :comment_user, :multiple_users, _steps}), do: {:error, :multiple_comment_users_match, %{}}
+  defp marshall_result({:error, :issue_user, %Ecto.Changeset{} = changeset, _steps}), do: {:error, :validating_user, changeset}
+  defp marshall_result({:error, :issue_user, :multiple_users, _steps}), do: {:error, :multiple_issue_users_match, %{}}
+  defp marshall_result({:error, :comment, %Ecto.Changeset{} = changeset, _steps}), do: {:error, :validating_comment, changeset}
+  defp marshall_result({:error, :task, %Ecto.Changeset{} = changeset, _steps}), do: {:error, :validating_task, changeset}
+  defp marshall_result({:error, _errored_step, error_response, _steps}), do: {:error, :unexpected_transaction_outcome, error_response}
 end

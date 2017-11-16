@@ -25,7 +25,7 @@ defmodule CodeCorps.GitHub.EventTest do
 
     test "marks event errored, with failure_reason, if resulting tuple starts with :error" do
       event = insert(:github_event, status: "processing")
-      {:ok, %GithubEvent{} = updated_event} = Event.stop_processing({:error, :bar}, event)
+      {:ok, %GithubEvent{} = updated_event} = Event.stop_processing({:error, :bar, %{}}, event)
       assert updated_event.status == "errored"
       assert updated_event.failure_reason == "bar"
     end

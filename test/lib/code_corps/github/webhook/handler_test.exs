@@ -4,11 +4,13 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
   use CodeCorps.DbAccessCase
 
   import CodeCorps.GitHub.TestHelpers
+  import CodeCorps.TestEnvironmentHelper
 
   alias CodeCorps.{
     GithubEvent,
     GitHub.Webhook.Handler,
-    Repo
+    Repo,
+    Task
   }
 
   defp setup_repo(github_repo_id) do
@@ -237,6 +239,50 @@ defmodule CodeCorps.GitHub.Webhook.HandlerTest do
       assert event.payload == payload
       assert event.status == "processed"
       assert event.type == "pull_request"
+    end
+  end
+
+  describe "handle_supported/3 when there are errors" do
+    test "serializes error output" do
+      %{"repository" => %{"id" => github_repo_id}}
+        = opened_payload = load_event_fixture("issues_opened")
+
+      setup_repo(github_repo_id)
+
+      {:ok, %GithubEvent{}} = Handler.handle_supported("issues", "abc-123", opened_payload)
+
+      edited_payload = load_event_fixture("issues_edited")
+
+      edited_payload =
+        edited_payload
+        |> put_in(["issue", "updated_at"], "2006-05-05T23:40:28Z")
+
+      task = Repo.one(Task)
+      changeset = Task.update_changeset(task, %{title: "New title", updated_from: "codecorps"})
+       Repo.update!(changeset)
+
+      bypass = Bypass.open
+      Bypass.expect bypass, fn conn ->
+        {:ok, body, conn} = Plug.Conn.read_body(conn)
+        assert body =~ "GitHubEventError"
+        assert body =~ "CodeCorps"
+        assert conn.request_path == "/api/1/store/"
+        assert conn.method == "POST"
+        Plug.Conn.resp(conn, 200, ~s<{"id": "340"}>)
+      end
+
+      modify_env(:sentry, environment_name: :prod)
+      modify_env(:sentry, dsn: "http://public:secret@localhost:#{bypass.port}/1")
+
+      {:ok, %GithubEvent{} = event} = Handler.handle_supported("issues", "abc-456", edited_payload)
+
+      assert event.action == "edited"
+      assert event.github_delivery_id == "abc-456"
+      assert event.data == Repo.one(Task) |> Kernel.inspect(pretty: true)
+      assert event.error # This is difficult to test, so just assert presence
+      assert event.payload == edited_payload
+      assert event.status == "errored"
+      assert event.type == "issues"
     end
   end
 

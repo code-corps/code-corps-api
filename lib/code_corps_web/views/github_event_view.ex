@@ -4,8 +4,8 @@ defmodule CodeCorpsWeb.GithubEventView do
   use JaSerializer.PhoenixView
 
   attributes [
-    :action, :event_type, :failure_reason, :github_delivery_id, :inserted_at,
-    :payload, :status, :updated_at
+    :action, :data, :event_type, :error, :failure_reason, :github_delivery_id,
+    :inserted_at, :payload, :status, :updated_at
   ]
 
   def event_type(github_event, _conn) do
