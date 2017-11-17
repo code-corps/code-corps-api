@@ -114,4 +114,33 @@ defmodule CodeCorpsWeb.GithubEventControllerTest do
       refute Repo.get_by(GithubEvent, github_delivery_id: "foo")
     end
   end
+
+  describe "update" do
+    @valid_attrs %{retry: true}
+
+    @tag authenticated: :admin
+    test "updates when the status was errored", %{conn: conn} do
+      payload = load_event_fixture("pull_request_opened")
+      github_event = insert(:github_event, action: "opened", github_delivery_id: "foo", payload: payload, status: "errored", type: "pull_request")
+
+      assert conn |> request_update(github_event, @valid_attrs) |> json_response(200)
+    end
+
+    @tag authenticated: :admin
+    test "does not update for any other status", %{conn: conn} do
+      payload = load_event_fixture("pull_request_opened")
+      github_event = insert(:github_event, action: "opened", payload: payload, status: "processed", type: "pull_request")
+
+      assert conn |> request_update(github_event, @valid_attrs) |> json_response(422)
+    end
+
+    test "renders 401 when unauthenticated", %{conn: conn} do
+      assert conn |> request_update |> json_response(401)
+    end
+
+    @tag :authenticated
+    test "renders 403 when unauthorized", %{conn: conn} do
+      assert conn |> request_update |> json_response(403)
+    end
+  end
 end
