@@ -6,4 +6,7 @@ defmodule CodeCorps.Policy.GithubEvent do
 
   def show?(%User{admin: true}), do: true
   def show?(%User{admin: false}), do: false
+
+  def update?(%User{admin: true}), do: true
+  def update?(%User{admin: false}), do: false
 end

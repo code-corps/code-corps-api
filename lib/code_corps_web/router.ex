@@ -70,7 +70,7 @@ defmodule CodeCorpsWeb.Router do
     resources "/donation-goals", DonationGoalController, only: [:create, :update, :delete]
     post "/oauth/github", UserController, :github_oauth
     resources "/github-app-installations", GithubAppInstallationController, only: [:create]
-    resources "/github-events", GithubEventController, only: [:index, :show]
+    resources "/github-events", GithubEventController, only: [:index, :show, :update]
     resources "/github-repos", GithubRepoController, only: [:update]
     resources "/organization-github-app-installations", OrganizationGithubAppInstallationController, only: [:create, :delete]
     resources "/organizations", OrganizationController, only: [:create, :update]
