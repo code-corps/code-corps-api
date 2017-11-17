@@ -25,7 +25,7 @@ defmodule CodeCorps.GitHub.Webhook.Handler do
   """
   @spec handle_supported(String.t, String.t, map) :: {:ok, GithubEvent.t}
   def handle_supported(type, id, %{} = payload) do
-    with {:ok, %GithubEvent{} = event} <- type |> build_params(id, "unprocessed", payload) |> create_event() do
+    with {:ok, %GithubEvent{} = event} <- find_or_create_event(type, id, payload, "unprocessed") do
       payload |> apply_handler(type) |> Event.stop_processing(event)
     end
   end
@@ -41,7 +41,7 @@ defmodule CodeCorps.GitHub.Webhook.Handler do
   """
   @spec handle_unsupported(String.t, String.t, map) :: {:ok, GithubEvent.t}
   def handle_unsupported(type, id, %{} = payload) do
-    type |> build_params(id, "unsupported", payload) |> create_event()
+    find_or_create_event(type, id, payload, "unsupported")
   end
 
   @spec build_params(String.t, String.t, String.t, map) :: map
@@ -53,6 +53,14 @@ defmodule CodeCorps.GitHub.Webhook.Handler do
       status: status,
       type: type
     }
+  end
+
+  @spec find_or_create_event(String.t, String.t, map, String.t) :: {:ok, GithubEvent.t}
+  defp find_or_create_event(type, id, payload, status) do
+    case GithubEvent |> Repo.get_by(github_delivery_id: id) do
+      nil -> type |> build_params(id, status, payload) |> create_event()
+      %GithubEvent{} = github_event -> {:ok, github_event}
+    end
   end
 
   @spec create_event(map) :: {:ok, GithubEvent.t}
