@@ -9,6 +9,7 @@ defmodule CodeCorpsWeb.PasswordController do
   """
   def forgot_password(conn, %{"email" => email}) do
     ForgotPasswordService.forgot_password(email)
+    conn = Guardian.Plug.sign_out(conn, :default)
     conn |> put_status(:ok) |> render("show.json", email: email)
   end
 
