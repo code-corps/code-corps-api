@@ -43,6 +43,7 @@ defmodule CodeCorps.Policy do
   # GithubEvent
   defp can?(%User{} = current_user, :index, %GithubEvent{}, %{}), do: Policy.GithubEvent.index?(current_user)
   defp can?(%User{} = current_user, :show, %GithubEvent{}, %{}), do: Policy.GithubEvent.show?(current_user)
+  defp can?(%User{} = current_user, :update, %GithubEvent{}, %{}), do: Policy.GithubEvent.update?(current_user)
 
   # GithubRepo
   defp can?(%User{} = current_user, :update, %GithubRepo{} = github_repo, %{} = params), do: Policy.GithubRepo.update?(current_user, github_repo, params)
