@@ -121,7 +121,7 @@ defmodule CodeCorpsWeb.GithubEventControllerTest do
     @tag authenticated: :admin
     test "updates when the status was errored", %{conn: conn} do
       payload = load_event_fixture("pull_request_opened")
-      github_event = insert(:github_event, action: "opened", payload: payload, status: "errored", type: "pull_request")
+      github_event = insert(:github_event, action: "opened", github_delivery_id: "foo", payload: payload, status: "errored", type: "pull_request")
 
       assert conn |> request_update(github_event, @valid_attrs) |> json_response(200)
     end
