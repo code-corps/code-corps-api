@@ -6,7 +6,7 @@ defmodule CodeCorpsWeb.PasswordControllerTest do
 
   alias CodeCorps.AuthToken
 
-  test "creates and renders resource when email is valid", %{conn: conn} do
+  test "Unauthenticated - creates and renders resource when email is valid", %{conn: conn} do
     user = insert(:user)
     attrs = %{"email" => user.email}
     conn = post conn, password_path(conn, :forgot_password), attrs
@@ -16,6 +16,21 @@ defmodule CodeCorpsWeb.PasswordControllerTest do
 
     %AuthToken{value: token} = Repo.get_by(AuthToken, user_id: user.id)
     assert_delivered_email CodeCorps.Emails.ForgotPasswordEmail.create(user, token)
+  end
+
+  @tag :authenticated
+  test "Authenticated - creates and renders resource when email is valid and removes session", %{conn: conn} do
+    user = insert(:user)
+    attrs = %{"email" => user.email}
+    conn = post conn, password_path(conn, :forgot_password), attrs
+    response = json_response(conn, 200)
+
+    assert response == %{ "email" => user.email }
+
+    %AuthToken{value: token} = Repo.get_by(AuthToken, user_id: user.id)
+    assert_delivered_email CodeCorps.Emails.ForgotPasswordEmail.create(user, token)
+
+    refute Guardian.Plug.authenticated?(conn)
   end
 
   test "does not create resource and renders 200 when email is invalid", %{conn: conn} do
