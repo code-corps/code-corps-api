@@ -35,10 +35,9 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
     with {:ok, %Project{} = project} <- get_project_with_preloads(project_id),
          {:ok, %Project{}} <- ProjectSubscribable.validate(project),
          {:ok, %User{} = user} <- get_user_with_preloads(user_id),
-         {:ok, %User{}} <- UserCanSubscribe.validate(user)
+         {:ok, %User{}} <- UserCanSubscribe.validate(user),
+         {:ok, %StripeConnectSubscription{} = subscription} <- do_find_or_create(project, user, attributes)
     do
-      {:ok, %StripeConnectSubscription{} = subscription} = do_find_or_create(project, user, attributes)
-
       ProjectService.update_project_totals(project)
       DonationGoalsService.update_project_goals(project)
 
