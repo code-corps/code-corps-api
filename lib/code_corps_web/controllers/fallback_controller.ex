@@ -40,7 +40,7 @@ defmodule CodeCorpsWeb.FallbackController do
     Logger.info message
     conn
     |> put_status(500)
-    |> render(CodeCorpsWeb.ErrorView, "500.json", message: "An unknown error occurred with Stripe's API.")
+    |> render(CodeCorpsWeb.ErrorView, "500.json", message: message)
   end
   def call(%Conn{} = conn, {:error, %CodeCorps.GitHub.APIError{message: message}}) do
     Logger.info message
