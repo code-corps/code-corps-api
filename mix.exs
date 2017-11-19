@@ -28,7 +28,7 @@ defmodule CodeCorps.Mixfile do
   def application do
     [
       mod: {CodeCorps, []},
-      extra_applications: [:scout_apm, :timex, :tzdata]
+      extra_applications: [:sentry, :logger, :scout_apm, :timex, :tzdata]
     ]
   end
 
