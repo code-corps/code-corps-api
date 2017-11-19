@@ -38,13 +38,8 @@ defmodule CodeCorps.GitHub.Sync.Issue do
 
   defp do_sync_multi({github_repo, github_pull_request}, payload) do
     Multi.new
-    |> Multi.run(:github_issue, fn _ -> link_issue({github_repo, github_pull_request}, payload) end)
+    |> Multi.run(:github_issue, fn _ -> IssueGithubIssueSyncer.create_or_update_issue({github_repo, github_pull_request}, payload) end)
     |> Multi.run(:issue_user, fn %{github_issue: github_issue} -> UserRecordLinker.link_to(github_issue, payload) end)
     |> Multi.run(:task, fn %{github_issue: github_issue, issue_user: user} -> github_issue |> IssueTaskSyncer.sync_github_issue(user) end)
-  end
-
-  @spec link_issue({GithubRepo.t, GithubPullRequest.t}, map) :: {:ok, GithubIssue.t} | {:error, Ecto.Changeset.t}
-  defp link_issue({github_repo, github_pull_request}, attrs) do
-    IssueGithubIssueSyncer.create_or_update_issue({github_repo, github_pull_request}, attrs)
   end
 end
