@@ -79,8 +79,8 @@ config :stripity_stripe,
 
 config :sentry,
   dsn: System.get_env("SENTRY_DSN"),
-  included_environments: ~w(prod staging)a,
-  use_error_logger: true
+  enable_source_code_context: true,
+  included_environments: ~w(prod staging)a
 
 config :code_corps, :sentry, CodeCorps.Sentry.Async
 
