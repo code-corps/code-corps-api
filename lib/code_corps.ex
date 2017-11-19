@@ -26,6 +26,11 @@ defmodule CodeCorps do
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: CodeCorps.Supervisor]
+
+    if !(Sentry.Logger in :gen_event.which_handlers(:error_logger)) do
+      :ok = :error_logger.add_report_handler(Sentry.Logger)
+    end
+
     Supervisor.start_link(children, opts)
   end
 
