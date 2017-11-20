@@ -67,6 +67,13 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def github_issue_assignee_factory do
+    %CodeCorps.GithubIssueAssignee{
+      github_issue: build(:github_issue),
+      github_user: build(:github_user)
+    }
+  end
+
   def github_pull_request_factory do
     %CodeCorps.GithubPullRequest{
       body: "Here's a change!",
