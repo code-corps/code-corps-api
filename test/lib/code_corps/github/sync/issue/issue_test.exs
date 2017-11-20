@@ -20,7 +20,7 @@ defmodule CodeCorps.GitHub.Sync.IssueTest do
         "issue" => %{
           "body" => markdown, "title" => title, "number" => number,
           "user" => %{"id" => user_github_id}
-        } = issue,
+        } = issue_payload,
         "repository" => %{"id" => repo_github_id}
       } = @payload
 
@@ -28,9 +28,8 @@ defmodule CodeCorps.GitHub.Sync.IssueTest do
       github_repo = insert(:github_repo, github_id: repo_github_id, project: project)
       insert(:task_list, project: project, inbox: true)
 
-      changes = %{repo: github_repo}
-
-      {:ok, %{task: task}} = Issue.sync(changes, issue) |> Repo.transaction
+      {:ok, %{task: task}} =
+        issue_payload |> Issue.sync(github_repo) |> Repo.transaction
 
       assert Repo.aggregate(Task, :count, :id) == 1
 
@@ -51,7 +50,13 @@ defmodule CodeCorps.GitHub.Sync.IssueTest do
 
     test "with matched user, creates or updates task for project associated to github repo" do
       %{
-        "issue" => %{"id" => issue_github_id, "body" => markdown, "title" => title, "number" => number, "user" => %{"id" => user_github_id}} = issue,
+        "issue" => %{
+          "id" => issue_github_id,
+          "body" => markdown,
+          "title" => title,
+          "number" => number,
+          "user" => %{"id" => user_github_id}
+        } = issue_payload,
         "repository" => %{"id" => repo_github_id}
       } = @payload
 
@@ -65,9 +70,8 @@ defmodule CodeCorps.GitHub.Sync.IssueTest do
 
       existing_task = insert(:task, project: project, user: user, github_repo: github_repo, github_issue: github_issue)
 
-      changes = %{repo: github_repo}
-
-      {:ok, %{task: task}} = Issue.sync(changes, issue) |> Repo.transaction
+      {:ok, %{task: task}} =
+        issue_payload |> Issue.sync(github_repo) |> Repo.transaction
 
       assert Repo.aggregate(Task, :count, :id) == 1
 
@@ -86,7 +90,13 @@ defmodule CodeCorps.GitHub.Sync.IssueTest do
 
     test "for a new pull request, updates relevant records" do
       %{
-        "issue" => %{"id" => issue_github_id, "body" => markdown, "title" => title, "number" => number, "user" => %{"id" => user_github_id}} = issue,
+        "issue" => %{
+          "id" => issue_github_id,
+          "body" => markdown,
+          "title" => title,
+          "number" => number,
+          "user" => %{"id" => user_github_id}
+        } = issue_payload,
         "repository" => %{"id" => repo_github_id}
       } = @payload
 
@@ -103,9 +113,8 @@ defmodule CodeCorps.GitHub.Sync.IssueTest do
       # Fake syncing of pull request
       github_pull_request = insert(:github_pull_request, github_repo: github_repo)
 
-      changes = %{repo: github_repo, github_pull_request: github_pull_request}
-
-      {:ok, %{task: task}} = Issue.sync(changes, issue) |> Repo.transaction
+      {:ok, %{task: task}} =
+        issue_payload |> Issue.sync(github_repo, github_pull_request) |> Repo.transaction
 
       assert Repo.aggregate(Task, :count, :id) == 1
 

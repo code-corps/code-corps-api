@@ -38,21 +38,4 @@ defmodule CodeCorps.GithubIssue do
     |> validate_required([:comments_url, :events_url, :github_created_at, :github_id, :github_updated_at, :html_url, :labels_url, :locked, :number, :state, :title, :url])
     |> unique_constraint(:github_id)
   end
-
-  def create_changeset(struct, params) do
-    struct
-    |> changeset(params)
-    |> cast(params, [:github_pull_request_id, :github_repo_id, :github_user_id])
-    |> assoc_constraint(:github_pull_request)
-    |> assoc_constraint(:github_repo)
-    |> assoc_constraint(:github_user)
-  end
-
-  def update_changeset(struct, params) do
-    struct
-    |> changeset(params)
-    |> cast(params, [:github_pull_request_id, :github_user_id])
-    |> assoc_constraint(:github_pull_request)
-    |> assoc_constraint(:github_user)
-  end
 end
