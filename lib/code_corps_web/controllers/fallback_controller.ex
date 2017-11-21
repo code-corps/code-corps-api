@@ -36,7 +36,7 @@ defmodule CodeCorpsWeb.FallbackController do
     |> put_status(500)
     |> render(CodeCorpsWeb.ErrorView, "500.json", message: "An unknown error occurred with GitHub's API.")
   end
-  def call(%Conn{} = conn, {:error, %Stripe.APIErrorResponse{message: message}}) do
+  def call(%Conn{} = conn, {:error, %Stripe.Error{message: message}}) do
     Logger.info message
     conn
     |> put_status(500)

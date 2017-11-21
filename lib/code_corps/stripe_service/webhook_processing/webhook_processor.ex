@@ -37,13 +37,13 @@ defmodule CodeCorps.StripeService.WebhookProcessing.WebhookProcessor do
 
   """
   def process(%{"id" => id} = event_params, handler) do
-    with user_id <- event_params |> Map.get("user_id"),
-         {:ok, %Stripe.Event{} = api_event} <- retrieve_event_from_api(id, user_id)
+    with account <- event_params |> Map.get("account"),
+         {:ok, %Stripe.Event{} = api_event} <- retrieve_event_from_api(id, account)
     do
-      EventHandler.handle(api_event, handler, user_id)
+      EventHandler.handle(api_event, handler, account)
     end
   end
 
   defp retrieve_event_from_api(id, nil), do: @api.Event.retrieve(id)
-  defp retrieve_event_from_api(id, user_id), do: @api.Event.retrieve(id, connect_account: user_id)
+  defp retrieve_event_from_api(id, account), do: @api.Event.retrieve(id, connect_account: account)
 end

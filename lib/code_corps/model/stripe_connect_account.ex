@@ -16,9 +16,7 @@ defmodule CodeCorps.StripeConnectAccount do
     field :details_submitted, :boolean
     field :display_name, :string
     field :email, :string
-
     field :external_account, :string
-
     field :legal_entity_address_city, :string
     field :legal_entity_address_country, :string
     field :legal_entity_address_line1, :string
@@ -49,30 +47,25 @@ defmodule CodeCorps.StripeConnectAccount do
     field :legal_entity_ssn_last_4, :string, virtual: true
     field :legal_entity_ssn_last_4_provided, :boolean, default: false
     field :legal_entity_type, :string
-
     field :legal_entity_verification_details, :string
     field :legal_entity_verification_details_code, :string
     field :legal_entity_verification_document, :string
     field :legal_entity_verification_status, :string
-
     field :id_from_stripe, :string, null: false
-
-    field :managed, :boolean, default: true
-
+    field :payouts_enabled, :boolean
     field :support_email, :string
     field :support_phone, :string
     field :support_url, :string
-
     field :tos_acceptance_date, :integer
     field :tos_acceptance_ip, :string
     field :tos_acceptance_user_agent, :string
-    field :transfers_enabled, :boolean
-
+    field :type, :string, default: "custom", null: false
     field :verification_disabled_reason, :string
     field :verification_due_by, :integer
     field :verification_fields_needed, {:array, :string}, default: []
 
     belongs_to :organization, CodeCorps.Organization
+
     has_one :stripe_external_account, CodeCorps.StripeExternalAccount
 
     timestamps()
@@ -122,14 +115,14 @@ defmodule CodeCorps.StripeConnectAccount do
     :legal_entity_verification_details_code,
     :legal_entity_verification_document,
     :legal_entity_verification_status,
-    :managed,
+    :payouts_enabled,
     :support_email,
     :support_phone,
     :support_url,
     :tos_acceptance_date,
     :tos_acceptance_ip,
     :tos_acceptance_user_agent,
-    :transfers_enabled,
+    :type,
     :verification_disabled_reason,
     :verification_due_by,
     :verification_fields_needed
@@ -137,12 +130,11 @@ defmodule CodeCorps.StripeConnectAccount do
 
   def create_changeset(struct, params \\ %{}) do
     valid_params = Enum.concat(@insert_params, @stripe_params)
-    changeset = struct
+
+    struct
     |> cast(params, valid_params)
     |> validate_required([:id_from_stripe, :organization_id, :tos_acceptance_date])
     |> assoc_constraint(:organization)
-
-    changeset
   end
 
   def webhook_update_changeset(struct, params \\ %{}) do

@@ -26,7 +26,7 @@ defmodule CodeCorpsWeb.StripeConnectAccountController do
   def create(%Conn{} = conn, params) do
     params =
       params
-      |> Map.put("managed", true)
+      |> Map.put("type", "custom")
       |> Map.put("tos_acceptance_ip", conn |> ConnUtils.extract_ip)
       |> Map.put("tos_acceptance_user_agent", conn |> ConnUtils.extract_user_agent)
     with %User{} = current_user <- conn |> Guardian.Plug.current_resource,

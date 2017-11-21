@@ -97,7 +97,6 @@
       "status": "unverified"
     }
   },
-  "managed": true,
   "metadata": null,
   "product_description": "Some product description.",
   "statement_descriptor": null,
@@ -114,7 +113,8 @@
     "interval": "daily"
   },
   "transfer_statement_descriptor": null,
-  "transfers_enabled": false,
+  "payouts_enabled": false,
+  "type": "custom",
   "verification": {
     "disabled_reason": "fields_needed",
     "due_by": null,

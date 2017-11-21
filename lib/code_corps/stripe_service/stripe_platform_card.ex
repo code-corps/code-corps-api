@@ -21,7 +21,7 @@ defmodule CodeCorps.StripeService.StripePlatformCardService do
 
   def create(%{"stripe_token" => stripe_token, "user_id" => user_id} = attributes) do
     with %StripePlatformCustomer{} = customer <- StripePlatformCustomer |> CodeCorps.Repo.get_by(user_id: user_id),
-         {:ok, %Stripe.Card{} = card} <- @api.Card.create(:customer, customer.id_from_stripe, stripe_token),
+         {:ok, %Stripe.Card{} = card} <- @api.Card.create(%{customer: customer.id_from_stripe, source: stripe_token}),
          {:ok, params} <- StripePlatformCardAdapter.to_params(card, attributes)
     do
       %StripePlatformCard{} |> StripePlatformCard.create_changeset(params) |> Repo.insert
@@ -33,7 +33,7 @@ defmodule CodeCorps.StripeService.StripePlatformCardService do
 
   def update_from_stripe(card_id) do
     with %StripePlatformCard{} = record <- Repo.get_by(StripePlatformCard, id_from_stripe: card_id),
-         {:ok, %Stripe.Card{} = stripe_card} <- @api.Card.retrieve(:customer, record.customer_id_from_stripe, card_id),
+         {:ok, %Stripe.Card{} = stripe_card} <- @api.Card.retrieve(card_id, %{customer: record.customer_id_from_stripe}),
          {:ok, params} <- StripePlatformCardAdapter.to_params(stripe_card, %{})
     do
       perform_update(record, params)

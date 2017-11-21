@@ -4,7 +4,7 @@ defmodule CodeCorps.StripeTesting.ExternalAccount do
   end
 
   defp bank_account(id) do
-    %Stripe.ExternalAccount{
+    %Stripe.BankAccount{
       id: id,
       object: "bank_account",
       account: "acct_1032D82eZvKYlo2C",

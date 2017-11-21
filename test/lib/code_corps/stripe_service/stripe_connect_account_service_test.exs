@@ -19,7 +19,7 @@ defmodule CodeCorps.StripeService.StripeConnectAccountServiceTest do
 
       assert connect_account.country == "US"
       assert connect_account.organization_id == organization.id
-      assert connect_account.managed == true
+      assert connect_account.type == "custom"
       assert connect_account.tos_acceptance_date == 123456
     end
   end

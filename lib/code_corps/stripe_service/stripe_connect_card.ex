@@ -35,9 +35,9 @@ defmodule CodeCorps.StripeService.StripeConnectCardService do
       |> create_non_stripe_attributes(connect_account)
 
     with {:ok, %Stripe.Token{} = connect_token} <-
-           @api.Token.create_on_connect_account(platform_customer_id, platform_card_id, connect_account: connect_account_id),
+           @api.Token.create(%{customer: platform_customer_id, card: platform_card_id}, connect_account: connect_account_id),
          {:ok, %Stripe.Card{} = connect_card} <-
-           @api.Card.create(:customer, connect_customer_id, connect_token.id, connect_account: connect_account_id),
+           @api.Card.create(%{customer: connect_customer_id, source: connect_token.id}, connect_account: connect_account_id),
          {:ok, params} <-
            StripeConnectCardAdapter.to_params(connect_card, attributes)
     do
@@ -64,11 +64,13 @@ defmodule CodeCorps.StripeService.StripeConnectCardService do
   end
 
   defp update_on_stripe(%StripeConnectCard{} = record, attributes) do
+    params =
+      attributes
+      |> Map.put(:customer, record.stripe_platform_card.customer_id_from_stripe)
+
     @api.Card.update(
-      :customer,
-      record.stripe_platform_card.customer_id_from_stripe,
       record.id_from_stripe,
-      attributes,
+      params,
       connect_account: record.stripe_connect_account.id_from_stripe)
   end
 end

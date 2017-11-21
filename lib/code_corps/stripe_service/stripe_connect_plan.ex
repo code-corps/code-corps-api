@@ -17,7 +17,7 @@ defmodule CodeCorps.StripeService.StripeConnectPlanService do
   """
   @spec create(map) :: {:ok, StripeConnectPlan.t} |
                        {:error, Ecto.Changeset.t} |
-                       {:error, Stripe.APIErrorResponse.t} |
+                       {:error, Stripe.Error.t} |
                        {:error, :project_not_ready} |
                        {:error, :not_found}
   def create(%{"project_id" => project_id} = attributes) do

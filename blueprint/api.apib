@@ -2744,13 +2744,13 @@ This endpoint allows you to check whether a username is valid (by running a vali
 
 Code Corps responds to [Stripe webhooks](https://stripe.com/docs/webhooks).
 
-Since Code Corps is a platform, we have two separate webhook endpoints for dealing with both Stripe Connect (the managed accounts) and the platform (shared data across customers).
+Since Code Corps is a platform, we have two separate webhook endpoints for dealing with both Stripe Connect (the custom accounts) and the platform (shared data across customers).
 
 ## Stripe Connect Webhook [/webhooks/stripe/connect]
 
-Handles Stripe Connect events for managed accounts for projects on the Code Corps platform.
+Handles Stripe Connect events for custom accounts for projects on the Code Corps platform.
 
-This endpoint provides information about the actual payments and subscriptions that occur on the managed accounts.
+This endpoint provides information about the actual payments and subscriptions that occur on the custom accounts.
 
 ### Stripe Connect Webhook [POST]
 
@@ -2772,7 +2772,7 @@ This endpoint provides information about the actual payments and subscriptions t
 
 Handles Stripe events for the Code Corps platform itself.
 
-The platform stores Stripe customers and cards so they can be reused across different projects, and fan out updates to all the managed Stripe accounts.
+The platform stores Stripe customers and cards so they can be reused across different projects, and fan out updates to all the managed custom Stripe accounts.
 
 ### Stripe Platform Webhook [POST]
 
@@ -3169,7 +3169,7 @@ The platform stores Stripe customers and cards so they can be reused across diff
 
 ## Project Attributes (object)
 + approved: `true` (boolean) - Has the project been approved by Code Corps?
-+ `can-activate-donations`: `true` (boolean) - Can the project turn on donations? True only if the project has at least one Donation Goal and the Organization has a Stripe Connect Account where `charges-enabled` is `true` and `transfers-enabled` is `true`.
++ `can-activate-donations`: `true` (boolean) - Can the project turn on donations? True only if the project has at least one Donation Goal and the Organization has a Stripe Connect Account where `charges-enabled` is `true` and `payouts-enabled` is `true`.
 + `cloudinary-public-id`: `pp0md2banaw7k6oa1ew9` (string)
 + description: 'Help build and fund public software projects for social good.' (string) - A short plain text description for the project
 + `icon-large-url`: ``//res.cloudinary.com/dlfnmtoq1/image/upload/c_fill,h_500,w_500/pp0md2banaw7k6oa1ew9` (string) - A url pointing to a large icon for the project
@@ -3448,16 +3448,16 @@ The platform stores Stripe customers and cards so they can be reused across diff
 + `charges-enabled`: false (boolean) - Whether or not the account can create live charges
 + country: `US` (string)
 + `default-currency`: `usd` (string)
-+ `details-submitted`: false (boolean) - Whether or not account details have been submitted yet. Standalone accounts cannot receive transfers before this is true.
++ `details-submitted`: false (boolean) - Whether or not account details have been submitted yet. Standalone accounts cannot receive payouts before this is true.
 + `display-name`: `Stripe.com` (string) - The display name for this account. This is used on the Stripe dashboard to help differentiate between accounts.
 + email: `site@stripe.com` (string) - The primary user’s email address
 + `id-from-stripe`: `acct_1032D82eZvKYlo2C` (string)
 + `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
-+ managed: false (boolean) - Whether or not the account is managed by your platform.
 + `support-email`: null (string) - A publicly shareable email address that can be reached for support for this account
 + `support-phone`: null (string) - The publicly visible support phone number for the business
 + `support-url`: null (string) - A publicly shareable URL that can be reached for support for this account
-+ `transfers-enabled`: false (boolean) - Whether or not Stripe will send automatic transfers for this account. This is only false when Stripe is waiting for additional information from the account holder.
++ `payouts-enabled`: false (boolean) - Whether or not Stripe will send automatic payouts for this account. This is only false when Stripe is waiting for additional information from the account holder.
++ type: `custom` (string) - The account type, as specified by Stripe. Can be `standard`, `express`, or `custom`. CodeCorps only deals with custom accounts.
 + `updated-at`: `2014-07-07T18:01:26.000Z` (string)
 
 ## Stripe Connect Account Resource (object)
