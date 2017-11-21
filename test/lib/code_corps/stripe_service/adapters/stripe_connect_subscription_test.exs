@@ -31,7 +31,6 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectSubscriptionTest do
       trial_period_days: nil
     },
     quantity: 1000,
-    source: nil,
     start: date,
     status: "active",
     tax_percent: nil,

@@ -40,7 +40,7 @@ defmodule CodeCorps.StripeService.StripePlatformCustomerService do
 
   - `{:ok, %CodeCorps.StriePlatformCustomer{}, %Stripe.Customer{}}` if everything was updated
   - `{:error, %Ecto.Changeset{}}` -if there was a validation issue while updating the local record
-  - `{:error, %Stripe.APIErrorResponse{}}` - if there was a problem with updating the API record
+  - `{:error, %Stripe.Error{}}` - if there was a problem with updating the API record
   - `{:error, :unhandled}` -if something unexpected went wrong
   """
   def update(%StripePlatformCustomer{id_from_stripe: id_from_stripe} = customer, attributes) do
@@ -63,7 +63,7 @@ defmodule CodeCorps.StripeService.StripePlatformCustomerService do
   - `{:ok, %CodeCorps.StripePlatformCustomer{}}` if the local record was updated
   - `{:error, :not_found}` - If there was no record witht he specified Stripe ID
   - `{:error, %Ecto.Changeset{}}` -if there was a validation issue while updating the local record
-  - `{:error, %Stripe.APIErrorResponse{}}` - if there was a problem with retrieving the API record
+  - `{:error, %Stripe.Error{}}` - if there was a problem with retrieving the API record
   - `{:error, :unhandled}` -if something unexpected went wrong
   """
   def update_from_stripe(id_from_stripe) do

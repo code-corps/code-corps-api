@@ -5,7 +5,7 @@ defmodule CodeCorps.StripeService.StripeConnectExternalAccountServiceTest do
 
   describe "create" do
     test "creates a StripeExternalAccount" do
-      api_external_account = %Stripe.ExternalAccount{id: "bnk_123"}
+      api_external_account = %Stripe.BankAccount{id: "bnk_123"}
       local_connect_account = insert(:stripe_connect_account)
 
       {:ok, %CodeCorps.StripeExternalAccount{} = external_account} =

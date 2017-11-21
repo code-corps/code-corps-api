@@ -1,5 +1,5 @@
 defmodule CodeCorps.StripeTesting.Card do
-  def create(:customer, stripe_id, _stripe_token, _opts \\ []) do
+  def create(%{customer: stripe_id, source: _stripe_token}, _opts \\ []) do
     {:ok, do_create(stripe_id)}
   end
 
@@ -29,11 +29,11 @@ defmodule CodeCorps.StripeTesting.Card do
     }
   end
 
-  def retrieve(:customer, owner_id, stripe_id, _opts \\ []) do
-    {:ok, do_retrieve(owner_id, stripe_id)}
+  def retrieve(stripe_id, %{customer: customer_id}, _opts \\ []) do
+    {:ok, do_retrieve(stripe_id, customer_id)}
   end
 
-  defp do_retrieve(owner_id, stripe_id) do
+  defp do_retrieve(stripe_id, customer_id) do
     %Stripe.Card{
       id: stripe_id,
       address_city: nil,
@@ -46,7 +46,7 @@ defmodule CodeCorps.StripeTesting.Card do
       address_zip_check: nil,
       brand: "Visa",
       country: "US",
-      customer: owner_id,
+      customer: customer_id,
       cvc_check: "unchecked",
       dynamic_last4: nil,
       exp_month: 12,
@@ -59,11 +59,11 @@ defmodule CodeCorps.StripeTesting.Card do
     }
   end
 
-  def update(:customer, owner_id, stripe_id, attributes, _opts \\ []) do
-    {:ok, do_update(owner_id, stripe_id, attributes)}
+  def update(stripe_id, %{customer: _customer_id} = attributes, _opts \\ []) do
+    {:ok, do_update(stripe_id, attributes)}
   end
 
-  defp do_update(owner_id, stripe_id, %{name: name, exp_month: exp_month, exp_year: exp_year}) do
+  defp do_update(stripe_id, %{customer: customer_id, name: name, exp_month: exp_month, exp_year: exp_year}) do
     %Stripe.Card{
       id: stripe_id,
       address_city: nil,
@@ -76,7 +76,7 @@ defmodule CodeCorps.StripeTesting.Card do
       address_zip_check: nil,
       brand: "Visa",
       country: "US",
-      customer: owner_id,
+      customer: customer_id,
       cvc_check: "unchecked",
       dynamic_last4: nil,
       exp_month: exp_month,

@@ -7,11 +7,11 @@ defmodule CodeCorps.StripeService.Validators.ProjectCanEnableDonationsTest do
   alias CodeCorps.StripeService.Validators.ProjectCanEnableDonations
 
   describe "validate" do
-    test "succeeds when project has donation_goals and organization where charges and transfers are enabled" do
+    test "succeeds when project has donation_goals and organization where charges and payouts are enabled" do
       organization = insert(:organization)
       project = insert(:project, organization: organization)
       insert(:donation_goal, project: project)
-      insert(:stripe_connect_account, organization: organization, charges_enabled: true, transfers_enabled: true)
+      insert(:stripe_connect_account, organization: organization, charges_enabled: true, payouts_enabled: true)
 
       project =
         Project

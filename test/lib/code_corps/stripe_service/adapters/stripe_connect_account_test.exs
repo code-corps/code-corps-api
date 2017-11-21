@@ -4,9 +4,11 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTest do
   alias CodeCorps.StripeService.Adapters.StripeConnectAccountAdapter
 
   defp test_account() do
-    # If a `Stripe.Account` has multiple `Stripe.ExternalAccount` records, we want
-    # the adapter to deal with that by only taking one, so we load the appropriate fixture
-    CodeCorps.StripeTesting.Helpers.load_fixture("account_with_multiple_external_accounts")
+    # If a `Stripe.Account` has multiple `Stripe.ExternalAccount` records, we
+    # want the adapter to deal with that by only taking one, so we load the
+    # appropriate fixture
+    "account_with_multiple_external_accounts"
+    |> CodeCorps.StripeTesting.Account.load_fixture
   end
 
   @local_map %{
@@ -67,17 +69,17 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTest do
     "legal_entity_verification_document" => "fil_12345",
     "legal_entity_verification_status" => "unverified",
 
-    "managed" => true,
+    "payouts_enabled" => false,
 
     "support_email" => nil,
     "support_phone" => "1234567890",
     "support_url" => nil,
 
-    "transfers_enabled" => false,
-
     "tos_acceptance_date" => nil,
     "tos_acceptance_ip" => nil,
     "tos_acceptance_user_agent" => nil,
+
+    "type" => "custom",
 
     "verification_disabled_reason" => "fields_needed",
     "verification_due_by" => nil,
@@ -118,9 +120,9 @@ defmodule CodeCorps.StripeService.Adapters.StripeConnectAccountTest do
         display_name: "Code Corps",
         email: "someone@mail.com",
         id: "account_with_multiple_external_accounts",
-        managed: true,
         support_phone: "1234567890",
-        transfers_enabled: false,
+        payouts_enabled: false,
+        type: "custom",
         legal_entity: %{
           business_name: "Some Company Inc.",
           business_tax_id_provided: false,

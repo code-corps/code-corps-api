@@ -1,5 +1,7 @@
 defmodule CodeCorps.StripeTesting.Account do
-  import CodeCorps.StripeTesting.Helpers
+  alias CodeCorps.StripeTesting.Helpers
+
+  @extra_keys ~w(business_logo business_primary_color support_url transfer_schedule transfer_statement_descriptor)
 
   def create(attributes) do
     {:ok, create_stripe_record(attributes)}
@@ -17,51 +19,22 @@ defmodule CodeCorps.StripeTesting.Account do
     {:ok, create_stripe_record(attributes |> Map.merge(%{id: id}))}
   end
 
+  def load_fixture(id) do
+    id
+    |> Helpers.load_raw_fixture
+    |> Map.drop(@extra_keys)
+    |> Stripe.Converter.convert_result
+  end
+
   defp create_stripe_record(attributes) do
     transformed_attributes =
       attributes
       |> CodeCorps.MapUtils.keys_to_string
-      |> Map.merge(account_fixture())
-      |> add_nestings
+      |> Map.merge("account" |> Helpers.load_raw_fixture)
+      |> add_external_account
+      |> Map.drop(@extra_keys)
 
-
-    Stripe.Converter.stripe_map_to_struct(transformed_attributes)
-  end
-
-  defp account_fixture do
-    %{
-      "business_name" => "Code Corps PBC",
-      "business_primary_color" => nil,
-      "business_url" => "codecorps.org",
-      "charges_enabled" => true,
-      "country" => "US",
-      "default_currency" => "usd",
-      "details_submitted" => true,
-      "display_name" => "Code Corps Customer",
-      "email" => "volunteers@codecorps.org",
-      "external_accounts" => %{
-        "object" => "list",
-        "data" => [],
-        "has_more" => false,
-        "total_count" => 0,
-        "url" => "/v1/accounts/acct_123/external_accounts"
-      },
-      "id" => "acct_123",
-      "object" => "account",
-      "managed" => true,
-      "metadata" => %{},
-      "statement_descriptor" => "CODECORPS.ORG",
-      "support_email" => nil,
-      "support_phone" => "1234567890",
-      "support_url" => nil,
-      "timezone" => "America/Los_Angeles",
-      "transfers_enabled" => true
-    }
-  end
-
-  defp add_nestings(map) do
-    map
-    |> add_external_account
+    Stripe.Converter.convert_result(transformed_attributes)
   end
 
   defp add_external_account(%{"id" => account_id, "external_account" => external_account_id} = map) do
@@ -73,7 +46,9 @@ defmodule CodeCorps.StripeTesting.Account do
       "url" => "/v1/accounts/#{account_id}/external_accounts"
     }
 
-    Map.put(map, "external_accounts", external_accounts_map)
+    map
+    |> Map.put("external_accounts", external_accounts_map)
+    |> Map.drop(["external_account"])
   end
   defp add_external_account(%{"id" => account_id} = map) do
     external_accounts_map = %{

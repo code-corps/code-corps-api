@@ -35,7 +35,7 @@ defmodule CodeCorps.StripeService.StripeConnectAccountService do
   using attributes sent by the client
   """
   def update(%StripeConnectAccount{id_from_stripe: id_from_stripe} = local_account, %{} = attributes) do
-    with {:ok, from_params} <- StripeConnectAccountAdapter.from_params(attributes),
+    with {:ok, from_params} <- StripeConnectAccountAdapter.from_params_update(attributes),
          {:ok, %Stripe.Account{} = api_account} <- @api.Account.update(id_from_stripe, from_params)
     do
       update_local_account(local_account, api_account, attributes)
@@ -81,7 +81,7 @@ defmodule CodeCorps.StripeService.StripeConnectAccountService do
     end
   end
 
-  # goes through all Stripe.ExternalAccount objects within the retrieved Stripe.Account object,
+  # goes through all Stripe.BankAccount objects within the retrieved Stripe.Account object,
   # then either retrieves or creates a StripeExternalAccount object for each of them
   defp process_external_accounts(_, %Stripe.Account{external_accounts: %{data: []}}), do: {:ok, []}
   defp process_external_accounts(
@@ -100,9 +100,9 @@ defmodule CodeCorps.StripeService.StripeConnectAccountService do
   end
 
   # retrieves or creates a StripeExternalAccount object associated to the provided
-  # Stripe.ExternalAccount and StripeConnectAccount objects
+  # Stripe.BankAccount and StripeConnectAccount objects
   # returns {:ok, list_of_created_external_account_records}
-  defp find_or_create_external_account(%Stripe.ExternalAccount{} = api_external_account, connect_account) do
+  defp find_or_create_external_account(%Stripe.BankAccount{} = api_external_account, connect_account) do
     case Repo.get_by(StripeExternalAccount, id_from_stripe: api_external_account.id) do
       nil -> StripeConnectExternalAccountService.create(api_external_account, connect_account)
       %StripeExternalAccount{} = local_external_account -> {:ok, local_external_account}

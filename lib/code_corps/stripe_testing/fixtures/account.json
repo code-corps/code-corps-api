@@ -1,0 +1,28 @@
+{
+  "business_name": "Code Corps PBC",
+  "business_primary_color": null,
+  "business_url": "codecorps.org",
+  "charges_enabled": true,
+  "country": "US",
+  "default_currency": "usd",
+  "details_submitted": true,
+  "display_name": "Code Corps Customer",
+  "email": "volunteers@codecorps.org",
+  "external_accounts": {
+    "object": "list",
+    "data": [],
+    "has_more": false,
+    "total_count": 0,
+    "url": "/v1/accounts/acct_123/external_accounts"
+  },
+  "id": "acct_123",
+  "object": "account",
+  "metadata": {},
+  "statement_descriptor": "CODECORPS.ORG",
+  "support_email": null,
+  "support_phone": "1234567890",
+  "support_url": null,
+  "timezone": "America/Los_Angeles",
+  "type": "custom",
+  "payouts_enabled": true
+}
