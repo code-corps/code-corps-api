@@ -92,17 +92,31 @@ defmodule CodeCorps.GitHub.SyncTest do
   end
 
   describe "sync_repo/1" do
-    test "syncs and resyncs with the project repo" do
-      owner = "baxterthehacker"
-      repo = "public-repo"
-      github_app_installation = insert(:github_app_installation, github_account_login: owner)
+    defp setup_test_repo do
       project = insert(:project)
-      github_repo = insert(:github_repo, github_app_installation: github_app_installation, name: repo, github_account_id: 6752317, github_account_avatar_url: "https://avatars3.githubusercontent.com/u/6752317?v=4", github_account_type: "User", github_id: 35129377, project: project)
       insert(:task_list, project: project, done: true)
       insert(:task_list, project: project, inbox: true)
       insert(:task_list, project: project, pull_requests: true)
 
-      # Sync a first time
+      owner = "baxterthehacker"
+      repo = "public-repo"
+      github_app_installation = insert(:github_app_installation, github_account_login: owner)
+
+      insert(
+        :github_repo,
+        github_app_installation: github_app_installation,
+        name: repo,
+        github_account_id: 6_752_317,
+        github_account_avatar_url: "https://avatars3.githubusercontent.com/u/6752317?v=4",
+        github_account_type: "User",
+        github_id: 35_129_377,
+        project: project)
+    end
+
+    test "syncs and resyncs with the project repo" do
+      github_repo = setup_test_repo()
+
+      # Sync the first time
 
       Sync.sync_repo(github_repo)
 
@@ -137,6 +151,24 @@ defmodule CodeCorps.GitHub.SyncTest do
       assert Repo.aggregate(Comment, :count, :id) == 12
       assert Repo.aggregate(Task, :count, :id) == 8
       assert Repo.aggregate(User, :count, :id) == 13
+    end
+
+    # coupled to fixtures. depends on
+    # - fixtures/github/endpoints/issues.json on having at least 4 issues
+    #   linked to pull requests
+    # - fixtures/github/endpoints/pulls.json having payloads for those 4 pull
+    #   requests (matched by "number")
+    test "matches github issue with github pull request correctly" do
+      {:ok, github_repo} = setup_test_repo() |> Sync.sync_repo
+
+      %GithubRepo{github_issues: github_issues} =
+        GithubRepo |> Repo.get(github_repo.id) |> Repo.preload(:github_issues)
+
+      linked_issues =
+        github_issues
+        |> Enum.reject(fn i -> is_nil(i.github_pull_request_id) end)
+
+      assert linked_issues |> Enum.count == 4
     end
 
     @tag acceptance: true
