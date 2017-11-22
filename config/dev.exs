@@ -1,4 +1,5 @@
 use Mix.Config
+require Logger
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
@@ -26,8 +27,7 @@ config :code_corps, CodeCorpsWeb.Endpoint,
   ]
 
 # Do not include metadata nor timestamps in development logs
-config :logger,
-  :console, format: "[$level] $message\n"
+config :logger, :console, format: "[$level] $message\n"
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
@@ -54,11 +54,9 @@ config :code_corps, :analytics, CodeCorps.Analytics.InMemoryAPI
 config :code_corps, :stripe, Stripe
 config :code_corps, :stripe_env, :dev
 
-config :sentry,
-  environment_name: Mix.env || :dev
+config :sentry, environment_name: Mix.env() || :dev
 
-config :code_corps, CodeCorps.Mailer,
-  adapter: Bamboo.LocalAdapter
+config :code_corps, CodeCorps.Mailer, adapter: Bamboo.LocalAdapter
 
 config :code_corps,
   postmark_forgot_password_template: "123",
@@ -69,7 +67,7 @@ config :code_corps,
 # If the dev environment has no CLOUDEX_API_KEY set, we want the app
 # to still run, with cloudex in test API mode
 if System.get_env("CLOUDEX_API_KEY") == nil do
-  IO.puts("NOTE: No Cloudex configuration found. Cloudex is running in test mode.")
+  Logger.info("NOTE: No Cloudex configuration found. Cloudex is running in test mode.")
   config :code_corps, :cloudex, CloudexTest
   config :cloudex, api_key: "test_key", secret: "test_secret", cloud_name: "test_cloud_name"
 end

@@ -4,16 +4,73 @@ defmodule CodeCorps.Policy.ProjectUserTest do
   import CodeCorps.Policy.ProjectUser, only: [create?: 2, update?: 3, delete?: 2]
 
   describe "create?/2" do
-    test "returns true when user is creating their own membership" do
+    test "when user is creating their own pending membership" do
       user = insert(:user)
+      project = insert(:project)
 
-      assert create?(user, %{"user_id" => user.id})
+      params = %{"project_id" => project.id, "user_id" => user.id, "role" => "pending"}
+      assert create?(user, params)
     end
 
-    test "returns false for normal user, creating someone else's membership" do
+    test "when user is creating any other membership" do
       user = insert(:user)
+      project = insert(:project)
 
-      refute create?(user, %{"user_id" => "someone_else"})
+      params = %{"project_id" => project.id, "user_id" => user.id, "role" => "contributor"}
+      refute create?(user, params)
+    end
+
+    test "when normal user is creating someone else's membership" do
+      user = insert(:user)
+      project = insert(:project)
+
+      params = %{"project_id" => project.id, "user_id" => "someone_else"}
+      refute create?(user, params)
+    end
+
+    test "when pending user is creating someone else's membership" do
+      pending = insert(:user)
+      project = insert(:project)
+      insert(:project_user, role: "pending", user: pending, project: project)
+
+      params = %{"project_id" => project.id, "user_id" => "someone_else"}
+      refute create?(pending, params)
+    end
+
+    test "when contributor is creating someone else's membership" do
+      contributor = insert(:user)
+      project = insert(:project)
+      insert(:project_user, role: "contributor", user: contributor, project: project)
+
+      params = %{"project_id" => project.id, "user_id" => "someone_else"}
+      refute create?(contributor, params)
+    end
+
+    test "when user is admin and role is contributor" do
+      admin = insert(:user)
+      project = insert(:project)
+      insert(:project_user, role: "admin", user: admin, project: project)
+
+      params = %{"project_id" => project.id, "user_id" => "someone_else", "role" => "contributor"}
+      assert create?(admin, params)
+    end
+
+    test "when user is admin and role is admin" do
+      admin = insert(:user)
+      project = insert(:project)
+      insert(:project_user, role: "admin", user: admin, project: project)
+
+      params = %{"project_id" => project.id, "user_id" => "someone_else", "role" => "admin"}
+      refute create?(admin, params)
+    end
+
+    test "when user is owner" do
+      owner = insert(:user)
+      project = insert(:project)
+      insert(:project_user, role: "owner", user: owner, project: project)
+
+      params = %{"project_id" => project.id, "user_id" => "someone_else", "role" => "owner"}
+      assert create?(owner, params)
     end
   end
 
