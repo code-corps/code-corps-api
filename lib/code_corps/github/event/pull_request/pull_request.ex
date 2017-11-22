@@ -13,8 +13,6 @@ defmodule CodeCorps.GitHub.Event.PullRequest do
   }
   alias GitHub.Sync
 
-  @type outcome :: Sync.outcome | {:error, :unexpected_payload}
-
   @doc ~S"""
   Handles the "PullRequest" GitHub webhook
 
@@ -24,7 +22,8 @@ defmodule CodeCorps.GitHub.Event.PullRequest do
   - validate the action is properly supported
   - sync the pull request using `CodeCorps.GitHub.Sync.PullRequest`
   """
-  @spec handle(map) :: outcome
+  @impl CodeCorps.GitHub.Event.Handler
+  @spec handle(map) :: {:ok, any} | {:error, atom}
   def handle(payload) do
     with {:ok, :valid} <- validate_payload(payload) do
       Sync.pull_request_event(payload)
@@ -33,12 +32,12 @@ defmodule CodeCorps.GitHub.Event.PullRequest do
     end
   end
 
-  @spec validate_payload(map) :: {:ok, :valid}
-                               | {:error, :unexpected_payload}
+  @spec validate_payload(map) :: {:ok, :valid} | {:error, :unexpected_payload}
   defp validate_payload(%{} = payload) do
-    case payload |> Validator.valid? do
-      true -> {:ok, :valid}
-      false -> {:error, :unexpected_payload}
+    if Validator.valid?(payload) do
+      {:ok, :valid}
+    else
+      {:error, :unexpected_payload}
     end
   end
 end

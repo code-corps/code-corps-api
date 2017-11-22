@@ -1,6 +1,7 @@
 defmodule CodeCorps.GitHub.Event.IssueComment do
   @moduledoc ~S"""
   In charge of handling a GitHub Webhook payload for the IssueComment event type
+
   [https://developer.github.com/v3/activity/events/types/#issuecommentevent](https://developer.github.com/v3/activity/events/types/#issuecommentevent)
   """
 
@@ -12,8 +13,6 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
   }
   alias GitHub.Sync
 
-  @type outcome :: Sync.outcome | {:error, :unexpected_payload}
-
   @doc ~S"""
   Handles the "IssueComment" GitHub webhook
 
@@ -23,7 +22,8 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
   - validate the action is properly supported
   - sync the comment using `CodeCorps.GitHub.Sync.Comment`
   """
-  @spec handle(map) :: outcome
+  @impl CodeCorps.GitHub.Event.Handler
+  @spec handle(map) :: {:ok, any} | {:error, atom}
   def handle(payload) do
     with {:ok, :valid} <- validate_payload(payload) do
       Sync.issue_comment_event(payload)
@@ -34,9 +34,10 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
 
   @spec validate_payload(map) :: {:ok, :valid} | {:error, :unexpected_payload}
   defp validate_payload(%{} = payload) do
-    case payload |> Validator.valid? do
-      true -> {:ok, :valid}
-      false -> {:error, :unexpected_payload}
+    if Validator.valid?(payload) do
+      {:ok, :valid}
+    else
+      {:error, :unexpected_payload}
     end
   end
 end

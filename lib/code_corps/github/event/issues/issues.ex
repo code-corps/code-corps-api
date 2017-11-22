@@ -13,8 +13,6 @@ defmodule CodeCorps.GitHub.Event.Issues do
   }
   alias GitHub.Sync
 
-  @type outcome :: Sync.outcome | {:ok, :ignored} | {:error, :unexpected_payload}
-
   @doc ~S"""
   Handles the "Issues" GitHub webhook
 
@@ -24,7 +22,8 @@ defmodule CodeCorps.GitHub.Event.Issues do
   - validate the action is properly supported
   - sync the issue using `CodeCorps.GitHub.Sync.Issue`
   """
-  @spec handle(map) :: outcome
+  @impl CodeCorps.GitHub.Event.Handler
+  @spec handle(map) :: {:ok, any} | {:error, atom}
   def handle(payload) do
     with {:ok, :valid} <- validate_payload(payload) do
       Sync.issue_event(payload)
@@ -33,12 +32,12 @@ defmodule CodeCorps.GitHub.Event.Issues do
     end
   end
 
-  @spec validate_payload(map) :: {:ok, :valid}
-                               | {:error, :unexpected_payload}
+  @spec validate_payload(map) :: {:ok, :valid} | {:error, :unexpected_payload}
   defp validate_payload(%{} = payload) do
-    case payload |> Validator.valid? do
-      true -> {:ok, :valid}
-      false -> {:error, :unexpected_payload}
+    if Validator.valid?(payload) do
+      {:ok, :valid}
+    else
+      {:error, :unexpected_payload}
     end
   end
 end
