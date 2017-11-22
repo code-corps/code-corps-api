@@ -6,12 +6,12 @@ defmodule CodeCorps.GitHub.Sync do
 
   alias CodeCorps.{
     Comment,
-    GitHub,
+    GitHub.API,
+    GitHub.Sync,
+    GitHub.Sync.Utils.RepoFinder,
     GitHub.Utils.ResultAggregator,
     GithubPullRequest,
     GithubRepo,
-    GitHub.Sync,
-    GitHub.Sync.Utils.RepoFinder,
     Repo
   }
 
@@ -37,7 +37,7 @@ defmodule CodeCorps.GitHub.Sync do
   Syncs a GitHub Issues event.
 
   - Finds the `CodeCorps.GithubRepo`
-  - Syncs the issue portion of the event with `GitHub.Sync.Issue`
+  - Syncs the issue portion of the event with `Sync.Issue`
 
   [https://developer.github.com/v3/activity/events/types/#issuesevent](https://developer.github.com/v3/activity/events/types/#issuesevent)
   """
@@ -45,7 +45,7 @@ defmodule CodeCorps.GitHub.Sync do
   def issue_event(%{"issue" => issue_payload} = payload) do
     Multi.new
     |> Multi.run(:repo, fn _ -> RepoFinder.find_repo(payload) end)
-    |> Multi.merge(GitHub.Sync.Issue, :sync, [issue_payload])
+    |> Multi.merge(fn %{repo: github_repo} -> issue_payload |> Sync.Issue.sync(github_repo) end)
     |> Repo.transaction()
     |> marshall_result()
   end
@@ -54,45 +54,49 @@ defmodule CodeCorps.GitHub.Sync do
   Syncs a GitHub IssueComment event.
 
   - For the deleted action
-    - Deletes the related comment records with `GitHub.Sync.Comment`
+    - Deletes the related comment records with `Sync.Comment`
   - For any other action
     - Finds the `CodeCorps.GithubRepo`
     - If it's a pull request, it fetches the pull request from the GitHub API
-      and syncs it with `GitHub.Sync.PullRequest`
-    - Syncs the issue portion of the event with `GitHub.Sync.Issue`
-    - Syncs the comment portion of the event with `GitHub.Sync.Comment`
+      and syncs it with `Sync.PullRequest`
+    - Syncs the issue portion of the event with `Sync.Issue`
+    - Syncs the comment portion of the event with `Sync.Comment`
 
   [https://developer.github.com/v3/activity/events/types/#issuecommentevent](https://developer.github.com/v3/activity/events/types/#issuecommentevent)
   """
   @spec issue_comment_event(map) :: outcome
   def issue_comment_event(%{"action" => "deleted", "comment" => comment_payload}) do
     Multi.new
-    |> Multi.merge(fn _ -> GitHub.Sync.Comment.delete(comment_payload) end)
+    |> Multi.merge(fn _ -> Sync.Comment.delete(comment_payload) end)
     |> Repo.transaction()
     |> marshall_result()
   end
   def issue_comment_event(%{
-    "issue" => %{"pull_request" => %{"url" => pull_request_url}} = issue,
-    "comment" => comment} = payload) do
+    "issue" => %{"pull_request" => %{"url" => pull_request_url}} = issue_payload,
+    "comment" => comment_payload} = payload) do
 
     # Pull Request
     Multi.new
     |> Multi.run(:repo, fn _ -> RepoFinder.find_repo(payload) end)
     |> Multi.run(:fetch_pull_request, fn %{repo: github_repo} ->
-      GitHub.API.PullRequest.from_url(pull_request_url, github_repo)
+      API.PullRequest.from_url(pull_request_url, github_repo)
     end)
-    |> Multi.merge(GitHub.Sync.PullRequest, :sync, [payload])
-    |> Multi.merge(GitHub.Sync.Issue, :sync, [issue])
-    |> Multi.merge(GitHub.Sync.Comment, :sync, [comment])
+    |> Multi.merge(Sync.PullRequest, :sync, [payload])
+    |> Multi.merge(fn %{repo: github_repo, github_pull_request: github_pull_request} ->
+      issue_payload |> Sync.Issue.sync(github_repo, github_pull_request)
+    end)
+    |> Multi.merge(Sync.Comment, :sync, [comment_payload])
     |> Repo.transaction()
     |> marshall_result()
   end
-  def issue_comment_event(%{"issue" => issue, "comment" => comment} = payload) do
+  def issue_comment_event(%{"issue" => issue_payload, "comment" => comment_payload} = payload) do
     # Issue
     Multi.new
     |> Multi.run(:repo, fn _ -> RepoFinder.find_repo(payload) end)
-    |> Multi.merge(GitHub.Sync.Issue, :sync, [issue])
-    |> Multi.merge(GitHub.Sync.Comment, :sync, [comment])
+    |> Multi.merge(fn %{repo: github_repo} ->
+      issue_payload |> Sync.Issue.sync(github_repo)
+    end)
+    |> Multi.merge(Sync.Comment, :sync, [comment_payload])
     |> Repo.transaction()
     |> marshall_result()
   end
@@ -102,8 +106,8 @@ defmodule CodeCorps.GitHub.Sync do
 
   - Finds the `CodeCorps.GithubRepo`
   - Fetches the issue from the GitHub API
-  - Syncs the pull request portion of the event with `GitHub.Sync.PullRequest`
-  - Syncs the issue portion of the event with `GitHub.Sync.Issue`, using the
+  - Syncs the pull request portion of the event with `Sync.PullRequest`
+  - Syncs the issue portion of the event with `Sync.Issue`, using the
     changes passed in from the issue fetching and the pull request syncing
 
   [https://developer.github.com/v3/activity/events/types/#pullrequestevent](https://developer.github.com/v3/activity/events/types/#pullrequestevent)
@@ -112,11 +116,11 @@ defmodule CodeCorps.GitHub.Sync do
   def pull_request_event(%{"pull_request" => %{"issue_url" => issue_url} = pull_request} = payload) do
     Multi.new
     |> Multi.run(:repo, fn _ -> RepoFinder.find_repo(payload) end)
-    |> Multi.run(:fetch_issue, fn %{repo: github_repo} ->
-      GitHub.API.Issue.from_url(issue_url, github_repo)
+    |> Multi.run(:fetch_issue, fn %{repo: github_repo} -> API.Issue.from_url(issue_url, github_repo) end)
+    |> Multi.merge(Sync.PullRequest, :sync, [pull_request])
+    |> Multi.merge(fn %{fetch_issue: payload, repo: github_repo, github_pull_request: github_pull_request} ->
+      payload |> Sync.Issue.sync(github_repo, github_pull_request)
     end)
-    |> Multi.merge(GitHub.Sync.PullRequest, :sync, [pull_request])
-    |> Multi.merge(GitHub.Sync.Issue, :sync, [payload])
     |> Repo.transaction()
     |> marshall_result()
   end
@@ -125,35 +129,11 @@ defmodule CodeCorps.GitHub.Sync do
   defp sync_step({:ok, _} = result, _step), do: result
   defp sync_step({:error, _ = error}, _step), do: {:error, error}
 
-  @spec mark_repo(GithubRepo.t, String.t, Keyword.t) :: {:ok, GithubRepo.t} | {:error, Changeset.t}
-  defp mark_repo(%GithubRepo{} = repo, sync_state, opts \\ []) do
-    params = build_sync_params(sync_state, opts)
+  @spec mark_repo(GithubRepo.t, String.t, map) :: {:ok, GithubRepo.t} | {:error, Changeset.t}
+  defp mark_repo(%GithubRepo{} = repo, sync_state, params \\ %{}) do
     repo
-    |> GithubRepo.update_sync_changeset(params)
+    |> GithubRepo.update_sync_changeset(params |> Map.put(:sync_state, sync_state))
     |> Repo.update
-  end
-
-  @count_fields [
-    :syncing_comments_count,
-    :syncing_issues_count,
-    :syncing_pull_requests_count
-  ]
-
-  # Fetches the optional fields (like counter cache fields) for tracking the
-  # sync state.
-  @spec build_sync_params(String.t, Keyword.t) :: map
-  defp build_sync_params(sync_state, opts) do
-    Enum.reduce @count_fields, %{sync_state: sync_state}, fn field, acc ->
-      put_sync_opt(opts, field, acc)
-    end
-  end
-
-  @spec put_sync_opt(Keyword.t, String.t, map) :: map
-  defp put_sync_opt(opts, key, map) do
-    case Keyword.get(opts, key) do
-      nil -> map
-      count -> map |> Map.put(key, count)
-    end
   end
 
   @doc ~S"""
@@ -182,18 +162,19 @@ defmodule CodeCorps.GitHub.Sync do
   def sync_repo(%GithubRepo{} = repo) do
     repo = preload_github_repo(repo)
     with {:ok, repo} <- repo |> mark_repo("fetching_pull_requests"),
-         {:ok, pr_payloads} <- repo |> GitHub.API.Repository.pulls |> sync_step(:fetch_pull_requests),
-         {:ok, repo} <- repo |> mark_repo("syncing_github_pull_requests", [syncing_pull_requests_count: pr_payloads |> Enum.count]),
-         {:ok, _pull_requests} <- pr_payloads |> Enum.map(&Sync.PullRequest.GithubPullRequest.create_or_update_pull_request(repo, &1)) |> ResultAggregator.aggregate |> sync_step(:sync_pull_requests),
+         {:ok, pr_payloads} <- repo |> API.Repository.pulls |> sync_step(:fetch_pull_requests),
+         {:ok, repo} <- repo |> mark_repo("syncing_github_pull_requests", %{syncing_pull_requests_count: pr_payloads |> Enum.count}),
+         {:ok, pull_requests} <- pr_payloads |> Enum.map(&Sync.PullRequest.GithubPullRequest.create_or_update_pull_request(repo, &1)) |> ResultAggregator.aggregate |> sync_step(:sync_pull_requests),
          {:ok, repo} <- repo |> mark_repo("fetching_issues"),
-         {:ok, issue_payloads} <- repo |> GitHub.API.Repository.issues |> sync_step(:fetch_issues),
-         {:ok, repo} <- repo |> mark_repo("syncing_github_issues", [syncing_issues_count: issue_payloads |> Enum.count]),
-         {:ok, _issues} <- issue_payloads |> Enum.map(&Sync.Issue.GithubIssue.create_or_update_issue(repo, &1)) |> ResultAggregator.aggregate |> sync_step(:sync_issues),
+         {:ok, issue_payloads} <- repo |> API.Repository.issues |> sync_step(:fetch_issues),
+         {:ok, repo} <- repo |> mark_repo("syncing_github_issues", %{syncing_issues_count: issue_payloads |> Enum.count}),
+         paired_issues <- issue_payloads |> pair_issues_payloads_with_prs(pull_requests),
+         {:ok, _issues} <- paired_issues |> Enum.map(fn {issue_payload, pr} -> issue_payload |> Sync.Issue.GithubIssue.create_or_update_issue(repo, pr) end) |> ResultAggregator.aggregate |> sync_step(:sync_issues),
          {:ok, repo} <- repo |> mark_repo("fetching_comments"),
-         {:ok, comment_payloads} <- repo |> GitHub.API.Repository.issue_comments |> sync_step(:fetch_comments),
-         {:ok, repo} <- repo |> mark_repo("syncing_github_comments", [syncing_comments_count: comment_payloads |> Enum.count]),
+         {:ok, comment_payloads} <- repo |> API.Repository.issue_comments |> sync_step(:fetch_comments),
+         {:ok, repo} <- repo |> mark_repo("syncing_github_comments", %{syncing_comments_count: comment_payloads |> Enum.count}),
          {:ok, _comments} <- comment_payloads |> Enum.map(&Sync.Comment.GithubComment.create_or_update_comment(repo, &1)) |> ResultAggregator.aggregate |> sync_step(:sync_comments),
-         repo <- Repo.get(GithubRepo, repo.id) |> preload_github_repo(),
+         repo <- GithubRepo |> Repo.get(repo.id) |> preload_github_repo(),
          {:ok, repo} <- repo |> mark_repo("syncing_users"),
          {:ok, _users} <- repo |> Sync.User.User.sync_github_repo() |> sync_step(:sync_users),
          {:ok, repo} <- repo |> mark_repo("syncing_tasks"),
@@ -214,6 +195,16 @@ defmodule CodeCorps.GitHub.Sync do
       {:error, :sync_tasks} -> repo |> mark_repo("errored_syncing_tasks")
       {:error, :sync_comments} -> repo |> mark_repo("errored_syncing_comments")
     end
+  end
+
+  @spec pair_issues_payloads_with_prs(list, list) :: list(tuple)
+  defp pair_issues_payloads_with_prs(issue_payloads, pull_requests) do
+    issue_payloads |> Enum.map(fn %{"number" => number} = issue_payload ->
+      matching_pr =
+        pull_requests
+        |> Enum.find(nil, fn pr -> pr |> Map.get(:number) == number end)
+      {issue_payload, matching_pr}
+    end)
   end
 
   defp preload_github_repo(%GithubRepo{} = github_repo) do

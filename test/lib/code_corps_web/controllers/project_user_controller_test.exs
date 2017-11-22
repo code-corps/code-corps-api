@@ -29,6 +29,7 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
   describe "show" do
     test "shows chosen resource", %{conn: conn} do
       record = insert(:project_user)
+
       conn
       |> request_show(record)
       |> json_response(200)
@@ -44,11 +45,12 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
     @tag :authenticated
     test "creates and renders resource when data is valid", %{conn: conn, current_user: user} do
       project = insert(:project)
-      attrs = @attrs |> Map.merge(%{project: project, user: user})
+      attrs = %{role: "pending", project: project, user: user}
 
       assert conn |> request_create(attrs) |> json_response(201)
 
       user_id = user.id
+
       tracking_properties = %{
         project: project.title,
         project_id: project.id
@@ -58,11 +60,14 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
     end
 
     @tag :authenticated
-    test "does not create resource and renders 422 when data is invalid", %{conn: conn, current_user: user} do
-      # only way to trigger a validation error is to provide a non-existant organization
+    test "does not create resource and renders 422 when data is invalid", %{
+      conn: conn,
+      current_user: user
+    } do
+      # only way to trigger a validation error is to provide a non-existent project
       # anything else will fail on authorization level
       project = build(:project)
-      attrs = @attrs |> Map.merge(%{project: project, user: user})
+      attrs = %{role: "pending", project: project, user: user}
       assert conn |> request_create(attrs) |> json_response(422)
     end
 
@@ -78,7 +83,10 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
 
   describe "update" do
     @tag :authenticated
-    test "updates and renders resource when data is valid", %{conn: conn, current_user: current_user} do
+    test "updates and renders resource when data is valid", %{
+      conn: conn,
+      current_user: current_user
+    } do
       project = insert(:project)
       record = insert(:project_user, project: project, role: "pending")
       insert(:project_user, project: project, user: current_user, role: "owner")
@@ -86,6 +94,7 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
       assert conn |> request_update(record, @attrs) |> json_response(200)
 
       user_id = current_user.id
+
       tracking_properties = %{
         project: project.title,
         project_id: project.id
@@ -99,7 +108,7 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
         |> CodeCorps.Repo.preload([:project, :user])
         |> CodeCorps.Emails.ProjectUserAcceptanceEmail.create()
 
-      assert_delivered_email email
+      assert_delivered_email(email)
     end
 
     test "doesn't update and renders 401 when unauthenticated", %{conn: conn} do

@@ -115,11 +115,11 @@ defmodule CodeCorpsWeb.ProjectViewTest do
     assert rendered_json == expected_json
   end
 
-  test "renders can-activate-donations true when project has donations, no plan, transfers are enabled" do
+  test "renders can-activate-donations true when project has donations, no plan, payouts are enabled" do
     organization = insert(:organization)
     project = insert(:project, organization: organization)
     insert(:donation_goal, project: project)
-    insert(:stripe_connect_account, organization: organization, charges_enabled: true, transfers_enabled: true)
+    insert(:stripe_connect_account, organization: organization, charges_enabled: true, payouts_enabled: true)
 
     conn = Phoenix.ConnTest.build_conn()
     project = CodeCorpsWeb.ProjectController.preload(project)

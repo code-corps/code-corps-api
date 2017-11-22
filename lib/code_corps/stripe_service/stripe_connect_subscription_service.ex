@@ -26,7 +26,7 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
   """
   @spec find_or_create(map) :: {:ok, StripeConnectSubscription.t} |
                                {:error, Ecto.Changeset.t} |
-                               {:error, Stripe.APIErrorResponse.t} |
+                               {:error, Stripe.Error.t} |
                                {:error, :project_not_found} |
                                {:error, :project_not_ready} |
                                {:error, :user_not_found} |
@@ -52,7 +52,7 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
   a `Stripe.Subscription` record and using that data as update parameters
   """
   @spec update_from_stripe(String.t, String.t) :: {:ok, StripeConnectSubscription.t} |
-                                                  {:error, Stripe.APIErrorResponse.t} |
+                                                  {:error, Stripe.Error.t} |
                                                   {:error, :not_found}
   def update_from_stripe(stripe_id, connect_customer_id) do
     with {:ok, %StripeConnectAccount{} = connect_account} <- retrieve_connect_account(connect_customer_id),

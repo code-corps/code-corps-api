@@ -4,7 +4,7 @@ defmodule CodeCorps.Policy.GithubRepo do
   """
   import CodeCorps.Policy.Helpers, only: [get_project: 1, administered_by?: 2]
 
-  alias CodeCorps.{GithubAppInstallation, GithubRepo, User}
+  alias CodeCorps.{GithubRepo, User}
 
   def update?(%User{} = user, %GithubRepo{project_id: nil}, %{"project_id" => _} = params) do
     params |> get_project |> administered_by?(user)

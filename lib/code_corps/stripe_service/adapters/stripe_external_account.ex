@@ -9,7 +9,7 @@ defmodule CodeCorps.StripeService.Adapters.StripeExternalAccountAdapter do
     :routing_number, :status
   ]
 
-  def to_params(%Stripe.ExternalAccount{} = external_account, %StripeConnectAccount{} = connect_account) do
+  def to_params(%Stripe.BankAccount{} = external_account, %StripeConnectAccount{} = connect_account) do
     params =
       external_account
       |> Map.from_struct
