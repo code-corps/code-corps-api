@@ -37,7 +37,7 @@ defmodule CodeCorpsWeb.ProjectController do
     with %Project{} = project <- Project.Query.find(params),
          %User{} = current_user <- conn |> Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:update, project),
-         {:ok, %Project{} = project} <- project |> Project.changeset(params) |> Repo.update,
+         {:ok, %Project{} = project} <- project |> Project.update_changeset(params) |> Repo.update,
          project <- preload(project)
     do
       conn |> render("show.json-api", data: project)
@@ -45,7 +45,8 @@ defmodule CodeCorpsWeb.ProjectController do
   end
 
   @preloads [
-    :donation_goals, :github_repos, [organization: :stripe_connect_account],
+    :categories, :donation_goals, :github_repos,
+    [organization: :stripe_connect_account],
     :project_categories, :project_skills, :project_users, :stripe_connect_plan,
     :task_lists, :tasks
   ]
