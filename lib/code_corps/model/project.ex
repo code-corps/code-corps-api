@@ -29,8 +29,6 @@ defmodule CodeCorps.Project do
     field :title, :string
     field :total_monthly_donated, :integer, default: 0
     field :website, :string
-    field :github_repo, :string
-    field :github_owner, :string
 
     belongs_to :organization, CodeCorps.Organization
 
@@ -53,7 +51,9 @@ defmodule CodeCorps.Project do
 
   def changeset(struct, params) do
     struct
-    |> cast(params, [:title, :description, :long_description_markdown, :cloudinary_public_id, :default_color])
+    |> cast(params, [:title, :description, :long_description_markdown, :cloudinary_public_id, :default_color, :website])
+    |> prefix_url(:website)
+    |> validate_format(:website, CodeCorps.Helpers.URL.valid_format())
     |> validate_required(:title)
     |> generate_slug(:title, :slug)
     |> validate_slug(:slug)
@@ -83,9 +83,6 @@ defmodule CodeCorps.Project do
   def update_changeset(struct, params) do
     struct
     |> changeset(params)
-    |> cast(params, [:website])
-    |> prefix_url(:website)
-    |> validate_format(:website, CodeCorps.Helpers.URL.valid_format())
   end
 
   def update_total_changeset(struct, params) do

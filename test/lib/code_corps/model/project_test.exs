@@ -43,6 +43,42 @@ defmodule CodeCorps.ProjectTest do
       {_, changeset} = Repo.insert(changeset)
       assert_error_message(changeset, :slug, "has already been taken")
     end
+
+    test "requires :website to be in proper format" do
+      project = %Project{}
+      attrs = %{website: "bad <> website"}
+
+      changeset = Project.changeset(project, attrs)
+
+      assert_error_message(changeset, :website, "has invalid format")
+    end
+
+    test "doesn't require :website to be part of the changes" do
+      project = %Project{}
+      attrs = %{}
+
+      changeset = Project.changeset(project, attrs)
+
+      refute Keyword.has_key?(changeset.errors, :website)
+    end
+
+    test "prefixes website with 'http://' if there is no prefix" do
+      project = %Project{website: "https://first.com"}
+      attrs = %{website: "example.com"}
+
+      changeset = Project.changeset(project, attrs)
+
+      assert changeset.changes.website == "http://example.com"
+    end
+
+    test "doesn't make a change to the url when there is no param for it" do
+      project = %Project{website: "https://first.com"}
+      attrs = %{}
+
+      changeset = Project.changeset(project, attrs)
+
+      refute Map.has_key?(changeset.changes, :website)
+    end
   end
 
   describe "create_changeset/3" do
@@ -91,42 +127,6 @@ defmodule CodeCorps.ProjectTest do
     test "rejects setting of organization id" do
       changeset = Project.update_changeset(%Project{}, %{organization_id: 1})
       assert :error == changeset |> fetch_change(:organization_id)
-    end
-
-    test "requires :website to be in proper format" do
-      project = %Project{}
-      attrs = %{website: "bad <> website"}
-
-      changeset = Project.update_changeset(project, attrs)
-
-      assert_error_message(changeset, :website, "has invalid format")
-    end
-
-    test "doesn't require :website to be part of the changes" do
-      project = %Project{}
-      attrs = %{}
-
-      changeset = Project.update_changeset(project, attrs)
-
-      refute Keyword.has_key?(changeset.errors, :website)
-    end
-
-    test "prefixes website with 'http://' if there is no prefix" do
-      project = %Project{website: "https://first.com"}
-      attrs = %{website: "example.com"}
-
-      changeset = Project.update_changeset(project, attrs)
-
-      assert changeset.changes.website == "http://example.com"
-    end
-
-    test "doesn't make a change to the url when there is no param for it" do
-      project = %Project{website: "https://first.com"}
-      attrs = %{}
-
-      changeset = Project.update_changeset(project, attrs)
-
-      refute Map.has_key?(changeset.changes, :website)
     end
   end
 end
