@@ -51,6 +51,11 @@ defmodule CodeCorpsWeb.UserViewTest do
           "website" => user.website
         },
         "relationships" => %{
+          "categories" => %{
+            "data" => [
+              %{"id" => user_category.category_id |> Integer.to_string, "type" => "category"}
+            ]
+          },
           "github-app-installations" => %{
             "data" => [
               %{"id" => github_app_installation.id |> Integer.to_string, "type" => "github-app-installation"}

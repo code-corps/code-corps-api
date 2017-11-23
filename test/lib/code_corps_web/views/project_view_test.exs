@@ -41,6 +41,11 @@ defmodule CodeCorpsWeb.ProjectViewTest do
         },
         "id" => project.id |> Integer.to_string,
         "relationships" => %{
+          "categories" => %{
+            "data" => [
+              %{"id" => project_category.category_id |> Integer.to_string, "type" => "category"}
+            ]
+          },
           "donation-goals" => %{"data" => [
             %{
               "id" => donation_goal.id |> Integer.to_string,

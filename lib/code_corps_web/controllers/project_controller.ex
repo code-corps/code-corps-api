@@ -45,7 +45,8 @@ defmodule CodeCorpsWeb.ProjectController do
   end
 
   @preloads [
-    :donation_goals, :github_repos, [organization: :stripe_connect_account],
+    :categories, :donation_goals, :github_repos,
+    [organization: :stripe_connect_account],
     :project_categories, :project_skills, :project_users, :stripe_connect_plan,
     :task_lists, :tasks
   ]
