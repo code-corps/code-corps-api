@@ -17,6 +17,7 @@ defmodule CodeCorpsWeb.ProjectView do
   has_one :organization, type: "organization", field: :organization_id
   has_one :stripe_connect_plan, serializer: CodeCorpsWeb.StripeConnectPlanView
 
+  has_many :categories, serializer: CodeCorpsWeb.CategoryView, identifiers: :always
   has_many :donation_goals, serializer: CodeCorpsWeb.DonationGoalView, identifiers: :always
   has_many :github_repos, serializer: CodeCorpsWeb.GithubRepoView, identifiers: :always
   has_many :project_categories, serializer: CodeCorpsWeb.ProjectCategoryView, identifiers: :always
