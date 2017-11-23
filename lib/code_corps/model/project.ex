@@ -101,7 +101,7 @@ defmodule CodeCorps.Project do
     end
   end
 
-  @spec get_organization(integer | nil) :: CodeCorps.Organization.t :: nil
+  @spec get_organization(integer | nil) :: CodeCorps.Organization.t | nil
   defp get_organization(nil), do: nil
   defp get_organization(id), do: CodeCorps.Repo.get(CodeCorps.Organization, id)
 end
