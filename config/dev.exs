@@ -62,6 +62,7 @@ config :code_corps,
   postmark_forgot_password_template: "123",
   postmark_organization_invite_email_template: "123",
   postmark_project_acceptance_template: "123",
+  postmark_project_request_template: "123",
   postmark_receipt_template: "123"
 
 # If the dev environment has no CLOUDEX_API_KEY set, we want the app

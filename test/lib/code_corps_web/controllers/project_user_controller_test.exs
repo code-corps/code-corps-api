@@ -45,6 +45,7 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
     @tag :authenticated
     test "creates and renders resource when data is valid", %{conn: conn, current_user: user} do
       project = insert(:project)
+      insert(:project_user, project: project, role: "owner")
       attrs = %{role: "pending", project: project, user: user}
 
       assert conn |> request_create(attrs) |> json_response(201)
@@ -57,6 +58,14 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
       }
 
       assert_received {:track, ^user_id, "Requested Project Membership", ^tracking_properties}
+
+      email =
+        CodeCorps.ProjectUser
+        |> CodeCorps.Repo.get_by(role: "pending")
+        |> CodeCorps.Repo.preload([:project, :user])
+        |> CodeCorps.Emails.ProjectUserRequestEmail.create()
+
+      assert_delivered_email(email)
     end
 
     @tag :authenticated
