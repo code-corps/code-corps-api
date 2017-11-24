@@ -4,7 +4,7 @@ defmodule CodeCorps.Emails.ProjectUserAcceptanceEmailTest do
 
   alias CodeCorps.Emails.ProjectUserAcceptanceEmail
 
-  test "receipt email works" do
+  test "acceptance email works" do
     %{project: project, user: user} = project_user = insert(:project_user)
 
     email = ProjectUserAcceptanceEmail.create(project_user)
