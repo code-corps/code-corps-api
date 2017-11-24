@@ -44,7 +44,7 @@ defmodule CodeCorps.GithubRepo do
     |> assoc_constraint(:project)
   end
 
-  def update_changeset(struct, params \\ {}) do
+  def update_changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:project_id])
     |> assoc_constraint(:project)

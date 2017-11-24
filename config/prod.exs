@@ -63,6 +63,7 @@ config :code_corps,
   postmark_forgot_password_template: "1989483",
   postmark_organization_invite_email_template: "3441863",
   postmark_project_acceptance_template: "1447041",
+  postmark_project_request_template: "4017262",
   postmark_receipt_template: "1255222"
 
 # ## SSL Support

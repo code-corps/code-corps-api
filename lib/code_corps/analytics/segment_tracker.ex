@@ -11,7 +11,7 @@ defmodule CodeCorps.Analytics.SegmentTracker do
   @api Application.get_env(:code_corps, :analytics)
 
   @doc """
-  Calls `identify` in the configured API module.
+  Calls `identify` in the configured API module.
   """
   @spec identify(CodeCorps.User.t) :: any
   def identify(%CodeCorps.User{} = user) do
@@ -19,9 +19,9 @@ defmodule CodeCorps.Analytics.SegmentTracker do
   end
 
   @doc """
-  Calls `track` in the configured API module.
+  Calls `track` in the configured API module.
   """
-  @spec track(integer, atom | String.t, struct) :: any
+  @spec track(String.t, atom | String.t, struct) :: any
   def track(user_id, action, data) when is_atom(action) do
     event = SegmentEventNameBuilder.build(action, data)
     traits = SegmentTraitsBuilder.build(data)
