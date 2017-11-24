@@ -5,19 +5,11 @@ defmodule CodeCorps.Services.UserService do
   When operations happen on `CodeCorps.User`, we need to make sure changes
   are propagated to related records, ex., `CodeCorps.StripePlatformCustomer` and
   `CodeCorps.StripeConnectCustomer`
-
   """
 
   alias CodeCorps.{Repo, StripeConnectCustomer, StripePlatformCustomer, User}
   alias CodeCorps.StripeService.{StripeConnectCustomerService, StripePlatformCustomerService}
   alias Ecto.{Changeset, Multi}
-
-  # Prevents warning for calling `Repo.transaction(multi)`.
-  # The warning was caused with how the function is internally
-  # implemented, so there's no way around it
-  # As we update Ecto, we should check if this is still necessary.
-  # Last check was Ecto 2.1.3
-  @dialyzer :no_opaque
 
   @doc """
   Updates a `CodeCorps.User` record and, if necessary, associated
@@ -26,13 +18,12 @@ defmodule CodeCorps.Services.UserService do
   These related records inherit the email field from the user,
   so they need to be kept in sync, both locally, and on the Stripe platform.
 
-  Returns one of
-  * `{:ok, %CodeCorps.User{}, nil, nil}`
-  * `{:ok, %CodeCorps.User{}, %CodeCorps.StripePlatformCustomer{}, nil}`
-  * `{:ok, %CodeCorps.User{}, %CodeCorps.StripePlatformCustomer{}, %CodeCorps.StripeConnectCustomer{}}`
-  * `{:error, %Ecto.Changeset{}}`
-  * `{:error, :unhandled}`
-
+  Returns one of:
+  - `{:ok, %CodeCorps.User{}, nil, nil}`
+  - `{:ok, %CodeCorps.User{}, %CodeCorps.StripePlatformCustomer{}, nil}`
+  - `{:ok, %CodeCorps.User{}, %CodeCorps.StripePlatformCustomer{}, %CodeCorps.StripeConnectCustomer{}}`
+  - `{:error, %Ecto.Changeset{}}`
+  - `{:error, :unhandled}`
   """
   def update(%User{} = user, attributes) do
     changeset = user |> User.update_changeset(attributes)
