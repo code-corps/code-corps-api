@@ -7,15 +7,18 @@ defmodule CodeCorps.Comment.Service do
   alias CodeCorps.{
     Comment,
     GitHub,
+    GitHub.Sync,
     GithubComment,
     GithubIssue,
     Task,
     Repo
   }
-  alias CodeCorps.GitHub.Sync.Comment.GithubComment, as: GithubCommentSyncer
   alias Ecto.{Changeset, Multi}
 
   require Logger
+
+  @type record_result ::
+          {:ok, Comment.t} | {:error, Changeset.t} | {:error, GitHub.api_error_struct()}
 
   # :user, :github_issue and :github_repo are required for connecting to github
   # :project and :organization are required in order to add a header to the
@@ -42,11 +45,13 @@ defmodule CodeCorps.Comment.Service do
   """
   @spec create(map) :: {:ok, Comment.t} | {:error, Changeset.t}
   def create(%{} = attributes) do
-    Multi.new
+    Multi.new()
     |> Multi.insert(:comment, %Comment{} |> Comment.create_changeset(attributes))
-    |> Multi.run(:preload, fn %{comment: %Comment{} = comment} -> {:ok, comment |> Repo.preload(@preloads)} end)
-    |> Multi.run(:github, (fn %{preload: %Comment{} = comment} -> comment |> create_on_github() end))
-    |> Repo.transaction
+    |> Multi.run(:preload, fn %{comment: %Comment{} = comment} ->
+         {:ok, comment |> Repo.preload(@preloads)}
+       end)
+    |> Multi.run(:github, fn %{preload: %Comment{} = comment} -> comment |> create_on_github() end)
+    |> Repo.transaction()
     |> marshall_result
   end
 
@@ -55,10 +60,13 @@ defmodule CodeCorps.Comment.Service do
   """
   @spec update(Comment.t, map) :: {:ok, Comment.t} | {:error, Changeset.t}
   def update(%Comment{} = comment, %{} = attributes) do
-    Multi.new
+    Multi.new()
     |> Multi.update(:comment, comment |> Comment.update_changeset(attributes))
-    |> Multi.run(:github, (fn %{comment: %Comment{} = comment} -> comment |> update_on_github() end))
-    |> Repo.transaction
+    |> Multi.run(:preload, fn %{comment: %Comment{} = comment} ->
+         {:ok, comment |> Repo.preload(@preloads)}
+       end)
+    |> Multi.run(:github, fn %{preload: %Comment{} = comment} -> comment |> update_on_github() end)
+    |> Repo.transaction()
     |> marshall_result()
   end
 
@@ -66,19 +74,20 @@ defmodule CodeCorps.Comment.Service do
   defp marshall_result({:ok, %{github: %Comment{} = comment}}), do: {:ok, comment}
   defp marshall_result({:error, :comment, %Changeset{} = changeset, _steps}), do: {:error, changeset}
   defp marshall_result({:error, :github, result, _steps}) do
-    Logger.info "An error occurred when creating/updating the comment with the GitHub API"
-    Logger.info "#{inspect result}"
+    Logger.info("An error occurred when creating/updating the comment with the GitHub API")
+    Logger.info("#{inspect(result)}")
     {:error, :github}
   end
 
-  @spec create_on_github(Comment.t) :: {:ok, Comment.t} :: {:error, GitHub.api_error_struct}
+  @spec create_on_github(Comment.t) :: record_result
   defp create_on_github(%Comment{task: %Task{github_issue_id: nil}} = comment), do: {:ok, comment}
   defp create_on_github(%Comment{task: %Task{github_issue: github_issue}} = comment) do
-    with {:ok, payload} <- comment |> GitHub.API.Comment.create,
-         {:ok, %GithubComment{} = github_comment} <- GithubCommentSyncer.create_or_update_comment(github_issue, payload)do
-      comment |> link_with_github_changeset(github_comment) |> Repo.update
+    with {:ok, payload} <- comment |> GitHub.API.Comment.create(),
+         {:ok, %GithubComment{} = github_comment} <-
+           Sync.Comment.GithubComment.create_or_update_comment(github_issue, payload) do
+      comment |> link_with_github_changeset(github_comment) |> Repo.update()
     else
-      {:error, github_error} -> {:error, github_error}
+      {:error, error} -> {:error, error}
     end
   end
 
@@ -87,16 +96,17 @@ defmodule CodeCorps.Comment.Service do
     comment |> Changeset.change(%{github_comment: github_comment})
   end
 
-  @spec update_on_github(Comment.t) :: {:ok, Comment.t} :: {:error, GitHub.api_error_struct}
+  @spec update_on_github(Comment.t) :: record_result
   defp update_on_github(%Comment{github_comment_id: nil} = comment), do: {:ok, comment}
-  defp update_on_github(%Comment{} = comment) do
-    with %Comment{task: %Task{github_issue: %GithubIssue{} = github_issue}} = comment <- comment |> Repo.preload(@preloads),
-         {:ok, payload} <- comment |> GitHub.API.Comment.update,
-         {:ok, %GithubComment{}} <- GithubCommentSyncer.create_or_update_comment(github_issue, payload) do
-
+  defp update_on_github(
+         %Comment{task: %Task{github_issue: %GithubIssue{} = github_issue}} = comment
+       ) do
+    with {:ok, payload} <- comment |> GitHub.API.Comment.update(),
+         {:ok, %GithubComment{}} <-
+           Sync.Comment.GithubComment.create_or_update_comment(github_issue, payload) do
       {:ok, comment}
     else
-      {:error, github_error} -> {:error, github_error}
+      {:error, error} -> {:error, error}
     end
   end
 end

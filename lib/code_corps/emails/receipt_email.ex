@@ -7,7 +7,7 @@ defmodule CodeCorps.Emails.ReceiptEmail do
 
   @spec create(StripeConnectCharge.t, Stripe.Invoice.t) :: Bamboo.Email.t
   def create(%StripeConnectCharge{} = charge, %Stripe.Invoice{} = invoice) do
-    with %StripeConnectCharge{} = charge <- preload(charge),
+    with %StripeConnectCharge{} = charge <- Repo.preload(charge, :user),
          %Project{} = project <- get_project(invoice.subscription),
          {:ok, %DonationGoal{} = current_donation_goal} <- get_current_donation_goal(project),
          template_model <- build_model(charge, project, current_donation_goal)
@@ -20,9 +20,6 @@ defmodule CodeCorps.Emails.ReceiptEmail do
       other -> other
     end
   end
-
-  @spec preload(Project.t) :: Project.t
-  defp preload(%StripeConnectCharge{} = charge), do: Repo.preload(charge, :user)
 
   @spec get_project(String.t) :: Project.t | {:error, :subscription_not_found}
   defp get_project(subscription_id_from_stripe) do
@@ -79,7 +76,7 @@ defmodule CodeCorps.Emails.ReceiptEmail do
     "https://d3pgew4wbk2vb1.cloudfront.net/emails/images/emoji-1f64c-1f3ff@2x.png"
   ]
 
-  @spec format_amount(float) :: String.t
+  @spec format_amount(integer) :: binary
   defp format_amount(amount) do
     amount |> Money.new(:USD) |> Money.to_string()
   end
