@@ -123,6 +123,7 @@ defmodule CodeCorps.Accounts do
     |> Repo.update()
   end
 
+  @spec upload_github_photo_async(User.t) :: User.t | Processor.result
   defp upload_github_photo_async(%User{cloudinary_public_id: nil} = user) do
     Processor.process(fn -> upload_github_photo(user) end)
   end
