@@ -54,7 +54,7 @@ defmodule CodeCorps.Mixfile do
       {:cowboy, "~> 1.0"},
       {:benchfella, "~> 0.3.0", only: :dev},
       {:bypass, "~> 0.8.1", only: :test},
-      {:cloudex, "~> 0.2.2"},
+      {:cloudex, "~> 1.0"},
       {:comeonin, "~> 3.2"},
       {:corsica, "~> 1.0"}, # CORS
       {:credo, "~> 0.8", only: [:dev, :test]}, # Code style suggestions

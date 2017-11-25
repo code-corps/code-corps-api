@@ -130,7 +130,7 @@ defmodule CodeCorps.Accounts do
   defp upload_github_photo_async(%User{} = user), do: user
 
   defp upload_github_photo(%User{github_avatar_url: github_avatar_url} = user) do
-    [ok: %Cloudex.UploadedImage{public_id: cloudinary_public_id}] =
+    {:ok, %Cloudex.UploadedImage{public_id: cloudinary_public_id}} =
       github_avatar_url
       |> CodeCorps.Cloudex.Uploader.upload()
 
