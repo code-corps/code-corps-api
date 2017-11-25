@@ -31,7 +31,7 @@ defmodule CodeCorpsWeb.GithubRepoController do
   @spec update(Conn.t, map) :: Conn.t
   def update(%Conn{} = conn, %{"id" => id} = params) do
     with %GithubRepo{} = github_repo <- GithubRepo |> Repo.get(id),
-      %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+      %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
       {:ok, :authorized} <- current_user |> Policy.authorize(:update, github_repo, params),
       {:ok, %GithubRepo{} = github_repo} <- github_repo |> GithubRepo.update_changeset(params) |> Repo.update()
     do

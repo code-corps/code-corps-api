@@ -23,7 +23,7 @@ defmodule CodeCorpsWeb.ProjectController do
 
   @spec create(Plug.Conn.t, map) :: Conn.t
   def create(%Conn{} = conn, %{} = params) do
-    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+    with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %Project{}, params),
          {:ok, %Project{} = project} <- %Project{} |> Project.create_changeset(params) |> Repo.insert,
          project <- preload(project)
@@ -35,7 +35,7 @@ defmodule CodeCorpsWeb.ProjectController do
   @spec update(Conn.t, map) :: Conn.t
   def update(%Conn{} = conn, %{} = params) do
     with %Project{} = project <- Project.Query.find(params),
-         %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+         %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:update, project),
          {:ok, %Project{} = project} <- project |> Project.update_changeset(params) |> Repo.update,
          project <- preload(project)

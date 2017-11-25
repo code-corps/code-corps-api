@@ -26,7 +26,7 @@ defmodule CodeCorpsWeb.ProjectUserController do
 
   @spec create(Plug.Conn.t, map) :: Conn.t
   def create(%Conn{} = conn, %{} = params) do
-    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+    with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %ProjectUser{}, params),
          {:ok, %ProjectUser{} = project_user} <- %ProjectUser{} |> ProjectUser.create_changeset(params) |> Repo.insert,
          _ <- maybe_send_create_email(project_user)
@@ -38,7 +38,7 @@ defmodule CodeCorpsWeb.ProjectUserController do
   @spec update(Conn.t, map) :: Conn.t
   def update(%Conn{} = conn, %{"id" => id} = params) do
     with %ProjectUser{} = project_user <- ProjectUser |> Repo.get(id),
-         %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+         %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:update, project_user, params),
          {:ok, %ProjectUser{} = updated_project_user} <- project_user |> ProjectUser.update_changeset(params) |> Repo.update,
          _ <- maybe_send_update_email(updated_project_user, project_user)
@@ -50,7 +50,7 @@ defmodule CodeCorpsWeb.ProjectUserController do
   @spec delete(Conn.t, map) :: Conn.t
   def delete(%Conn{} = conn, %{"id" => id} = _params) do
     with %ProjectUser{} = project_user <- ProjectUser |> Repo.get(id),
-         %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+         %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:delete, project_user),
          {:ok, %ProjectUser{} = _project_user} <- project_user |> Repo.delete
     do

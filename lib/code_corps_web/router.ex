@@ -17,12 +17,11 @@ defmodule CodeCorpsWeb.Router do
   end
 
   pipeline :bearer_auth do
-    plug Guardian.Plug.VerifyHeader, realm: "Bearer"
-    plug Guardian.Plug.LoadResource
+    plug CodeCorps.Auth.BearerAuthPipeline
   end
 
   pipeline :ensure_auth do
-    plug Guardian.Plug.EnsureAuthenticated
+    plug CodeCorps.Auth.EnsureAuthPipeline
   end
 
   pipeline :current_user do

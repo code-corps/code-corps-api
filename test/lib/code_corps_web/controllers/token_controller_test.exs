@@ -78,8 +78,8 @@ defmodule CodeCorpsWeb.TokenControllerTest do
 
   describe "refresh" do
     test "refreshes JWT and returns JWT and user ID when data is valid", %{conn: conn} do
-      user = build(:user, %{password: "password"}) |> set_password("password") |> insert
-      {:ok, token, _claims} = user |> Guardian.encode_and_sign(:token)
+      user = build(:user, %{password: "password"}) |> set_password("password") |> insert()
+      {:ok, token, _claims} = user |> CodeCorps.Guardian.encode_and_sign()
 
       conn = post conn, token_path(conn, :refresh), %{token: token}
 
@@ -89,8 +89,9 @@ defmodule CodeCorpsWeb.TokenControllerTest do
     end
 
     test "does not authenticate and renders errors when the token is expired", %{conn: conn} do
-      user = build(:user, %{password: "password"}) |> set_password("password") |> insert
-      {:ok, token, _claims} = user |> Guardian.encode_and_sign(:token, %{ "exp" => Guardian.Utils.timestamp - 10})
+      user = build(:user, %{password: "password"}) |> set_password("password") |> insert()
+      claims = %{ "exp" => Guardian.timestamp - 10}
+      {:ok, token, _claims} = user |> CodeCorps.Guardian.encode_and_sign(claims)
 
       conn = post conn, token_path(conn, :refresh), %{token: token}
 

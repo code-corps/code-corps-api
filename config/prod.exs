@@ -36,7 +36,7 @@ config :code_corps, allowed_origins: [
   "https://www.codecorps.org"
 ]
 
-config :guardian, Guardian,
+config :code_corps, CodeCorps.Guardian,
   secret_key: System.get_env("GUARDIAN_SECRET_KEY")
 
 # Timber logging

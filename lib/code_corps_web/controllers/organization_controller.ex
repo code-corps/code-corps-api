@@ -28,7 +28,7 @@ defmodule CodeCorpsWeb.OrganizationController do
 
   @spec create(Plug.Conn.t, map) :: Conn.t
   def create(%Conn{} = conn, %{} = params) do
-    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+    with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %Organization{}, params),
          {:ok, %Organization{} = organization} <- %Organization{} |> Organization.create_changeset(params) |> Repo.insert,
          organization <- preload(organization)
@@ -40,7 +40,7 @@ defmodule CodeCorpsWeb.OrganizationController do
   @spec update(Conn.t, map) :: Conn.t
   def update(%Conn{} = conn, %{"id" => id} = params) do
     with %Organization{} = organization <- Organization |> Repo.get(id),
-      %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+      %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
       {:ok, :authorized} <- current_user |> Policy.authorize(:update, organization),
       {:ok, %Organization{} = organization} <- organization |> Organization.changeset(params) |> Repo.update,
       organization <- preload(organization)

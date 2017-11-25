@@ -18,7 +18,7 @@ defmodule CodeCorpsWeb.GithubEventController do
 
   @spec index(Conn.t, map) :: Conn.t
   def index(%Conn{} = conn, %{} = params) do
-    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+    with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:index, %GithubEvent{}, params)
     do
       github_events =
@@ -33,7 +33,7 @@ defmodule CodeCorpsWeb.GithubEventController do
 
   @spec show(Conn.t, map) :: Conn.t
   def show(%Conn{} = conn, %{"id" => id} = params) do
-    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+    with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          %GithubEvent{} = github_event <- GithubEvent |> Repo.get(id),
          {:ok, :authorized} <- current_user |> Policy.authorize(:show, github_event, params)
     do
@@ -54,7 +54,7 @@ defmodule CodeCorpsWeb.GithubEventController do
   @spec update(Conn.t, map) :: Conn.t
   def update(%Conn{} = conn, %{"id" => id} = params) do
     with %GithubEvent{} = github_event <- GithubEvent |> Repo.get(id),
-      %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+      %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
       {:ok, :authorized} <- current_user |> Policy.authorize(:update, github_event, params),
       changeset <- github_event |> GithubEvent.update_changeset(params),
       {:ok, updated_github_event} <- changeset |> retry_event()

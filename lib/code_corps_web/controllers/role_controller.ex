@@ -23,7 +23,7 @@ defmodule CodeCorpsWeb.RoleController do
 
   @spec create(Plug.Conn.t, map) :: Conn.t
   def create(%Conn{} = conn, %{} = params) do
-    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+    with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %Role{}, params),
          {:ok, %Role{} = role} <- %Role{} |> Role.changeset(params) |> Repo.insert,
          role = preload(role)

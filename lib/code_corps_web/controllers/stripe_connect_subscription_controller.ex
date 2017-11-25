@@ -11,7 +11,7 @@ defmodule CodeCorpsWeb.StripeConnectSubscriptionController do
 
   @spec show(Conn.t, map) :: Conn.t
   def show(%Conn{} = conn, %{"id" => id} = params) do
-    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+    with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          %StripeConnectSubscription{} = subscription <- StripeConnectSubscription |> Repo.get(id),
          {:ok, :authorized} <- current_user |> Policy.authorize(:show, subscription, params)
     do
@@ -22,7 +22,7 @@ defmodule CodeCorpsWeb.StripeConnectSubscriptionController do
 
   @spec create(Plug.Conn.t, map) :: Conn.t
   def create(%Conn{} = conn, %{} = params) do
-    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+    with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %StripeConnectSubscription{}, params),
          {:ok, %StripeConnectSubscription{} = subscription} <- StripeConnectSubscriptionService.find_or_create(params),
          subscription <- preload(subscription)
