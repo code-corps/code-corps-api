@@ -18,7 +18,7 @@ defmodule CodeCorps.GitHub.Sync.Issue.GithubIssue do
 
   alias Ecto.Changeset
 
-  @typep linking_result :: {:ok, GithubIssue.t} | {:error, Changeset.t}
+  @type result :: {:ok, GithubIssue.t} | {:error, Changeset.t}
 
   @doc ~S"""
   Creates or updates a `CodeCorps.GithubIssue` from a github issue API payload.
@@ -29,16 +29,16 @@ defmodule CodeCorps.GitHub.Sync.Issue.GithubIssue do
   The created record is also associated with a matched `CodeCorps.GithubUser`, which is
   created if necessary.
   """
-  @spec create_or_update_issue(map, GithubRepo.t, GithubPullRequest.t | nil) :: linking_result
+  @spec create_or_update_issue(map, GithubRepo.t, GithubPullRequest.t | nil) :: result
   def create_or_update_issue(%{} = payload, %GithubRepo{} = github_repo, github_pull_request \\ nil) do
     with {:ok, %GithubUser{} = github_user} <- Sync.User.GithubUser.create_or_update_github_user(payload) do
       payload
       |> find_or_init()
-      |> GithubIssue.changeset(payload |> Adapters.Issue.to_issue)
+      |> GithubIssue.changeset(payload |> Adapters.Issue.to_issue())
       |> Changeset.put_assoc(:github_user, github_user)
       |> Changeset.put_assoc(:github_repo, github_repo)
       |> Changeset.put_assoc(:github_pull_request, github_pull_request)
-      |> Repo.insert_or_update
+      |> Repo.insert_or_update()
     else
       {:error, error} -> {:error, error}
     end
