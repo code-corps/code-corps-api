@@ -22,7 +22,7 @@ defmodule CodeCorpsWeb.CategoryController do
 
   @spec create(Conn.t, map) :: Conn.t
   def create(%Conn{} = conn, %{} = params) do
-    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+    with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
       {:ok, :authorized} <- current_user |> Policy.authorize(:create, %Category{}, params),
       {:ok, %Category{} = category} <- %Category{} |> Category.create_changeset(params) |> Repo.insert,
       category <- preload(category)
@@ -34,7 +34,7 @@ defmodule CodeCorpsWeb.CategoryController do
   @spec update(Conn.t, map) :: Conn.t
   def update(%Conn{} = conn, %{"id" => id} = params) do
     with %Category{} = category <- Category |> Repo.get(id),
-      %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+      %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
       {:ok, :authorized} <- current_user |> Policy.authorize(:update, category),
       {:ok, %Category{} = category} <- category |> Category.changeset(params) |> Repo.update,
       category <- preload(category)

@@ -30,7 +30,7 @@ defmodule CodeCorpsWeb.PasswordControllerTest do
     %AuthToken{value: token} = Repo.get_by(AuthToken, user_id: user.id)
     assert_delivered_email CodeCorps.Emails.ForgotPasswordEmail.create(user, token)
 
-    refute Guardian.Plug.authenticated?(conn)
+    refute CodeCorps.Guardian.Plug.authenticated?(conn)
   end
 
   test "does not create resource and renders 200 when email is invalid", %{conn: conn} do

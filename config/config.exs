@@ -31,12 +31,11 @@ config :mime, :types, %{
   "application/vnd.api+json" => ["json-api"]
 }
 
-config :guardian, Guardian,
+config :code_corps, CodeCorps.Guardian,
   issuer: "CodeCorps",
   ttl: { 30, :days },
   verify_issuer: true, # optional
-  secret_key: System.get_env("GUARDIAN_SECRET_KEY"),
-  serializer: CodeCorpsWeb.GuardianSerializer
+  secret_key: System.get_env("GUARDIAN_SECRET_KEY")
 
 # Configures ex_aws with credentials
 config :ex_aws, :code_corps,

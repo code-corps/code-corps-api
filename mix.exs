@@ -64,7 +64,7 @@ defmodule CodeCorps.Mixfile do
       {:excoveralls, "~> 0.7", only: :test}, # Test coverage
       {:ex_doc, "~> 0.17", only: [:dev, :test]},
       {:ex_machina, "~> 2.0", only: :test}, # test factories
-      {:guardian, "~> 0.14"}, # Authentication (JWT)
+      {:guardian, "~> 1.0"}, # Authentication (JWT)
       {:hackney, ">= 1.4.4"},
       {:httpoison, "~> 0.13"},
       {:inch_ex, "~> 0.5", only: [:dev, :test]}, # Inch CI
@@ -220,7 +220,6 @@ defmodule CodeCorps.Mixfile do
         CodeCorpsWeb.Endpoint,
         CodeCorpsWeb.ErrorHelpers,
         CodeCorpsWeb.Gettext,
-        CodeCorpsWeb.GuardianSerializer,
         CodeCorpsWeb.Router,
         CodeCorpsWeb.Router.Helpers,
         CodeCorpsWeb.UserSocket

@@ -1,13 +1,9 @@
 defmodule CodeCorpsWeb.Plug.CurrentUserTest do
-
   use CodeCorpsWeb.ConnCase
 
   test "sets conn.assigns[:current_user] if user is authenticated" do
     user = build(:user, first_name: "John");
-    conn = Guardian.Plug.set_current_resource(
-      build_conn(),
-      user
-    )
+    conn = CodeCorps.Guardian.Plug.put_current_resource(build_conn(), user)
     result_conn = CodeCorpsWeb.Plug.CurrentUser.call(conn, [])
     assert result_conn.assigns[:current_user] == user
   end
@@ -16,5 +12,6 @@ defmodule CodeCorpsWeb.Plug.CurrentUserTest do
     conn = build_conn()
     result_conn = CodeCorpsWeb.Plug.CurrentUser.call(conn, [])
     assert result_conn == conn
+    refute result_conn.assigns[:current_user]
   end
 end

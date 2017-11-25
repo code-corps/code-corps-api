@@ -4,13 +4,15 @@ defmodule CodeCorpsWeb.PasswordController do
 
   alias CodeCorps.{Services.ForgotPasswordService}
 
-  @doc"""
-  forgot_password should take an email and generate an AuthToken model and send an email
+  @doc """
+  Generates a `CodeCorps.AuthToken` model to verify against and sends an email.
   """
   def forgot_password(conn, %{"email" => email}) do
     ForgotPasswordService.forgot_password(email)
-    conn = Guardian.Plug.sign_out(conn, :default)
-    conn |> put_status(:ok) |> render("show.json", email: email)
-  end
 
+    conn
+    |> CodeCorps.Guardian.Plug.sign_out()
+    |> put_status(:ok)
+    |> render("show.json", email: email)
+  end
 end

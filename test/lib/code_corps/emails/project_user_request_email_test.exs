@@ -12,7 +12,9 @@ defmodule CodeCorps.Emails.ProjectUserRequestEmailTest do
 
     email = ProjectUserRequestEmail.create(project_user)
     assert email.from == "Code Corps<team@codecorps.org>"
-    assert email.to == [owner1.email, owner2.email]
+    assert Enum.count(email.to) == 2
+    assert Enum.member?(email.to, owner1.email)
+    assert Enum.member?(email.to, owner2.email)
 
     template_model = email.private.template_model
 
