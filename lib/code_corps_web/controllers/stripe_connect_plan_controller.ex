@@ -30,7 +30,7 @@ defmodule CodeCorpsWeb.StripeConnectPlanController do
   defp handle_create_result({:error, :project_not_ready}, conn) do
     conn
     |> put_status(422)
-    |> render(CodeCorpsWeb.ErrorView, "422.json-api")
+    |> render(CodeCorpsWeb.ErrorView, "422.json-api", %{})
   end
   defp handle_create_result(other, _conn), do: other
 end

@@ -63,7 +63,7 @@ defmodule CodeCorps.StripeConnectSubscription do
     :quantity, :stripe_connect_plan_id, :user_id
   ]
 
-  @spec create_changeset(CodeCorps.StripeConnectPlan.t, map) :: Ecto.Changeset.t
+  @spec create_changeset(CodeCorps.StripeConnectSubscription.t, map) :: Ecto.Changeset.t
   def create_changeset(struct, params \\ %{}) do
     struct
     |> cast(params, @permitted_params)
@@ -75,7 +75,7 @@ defmodule CodeCorps.StripeConnectSubscription do
 
   @update_params [:cancelled_at, :current_period_end, :current_period_start, :ended_at, :quantity, :start, :status]
 
-  @spec webhook_update_changeset(CodeCorps.StripeConnectPlan.t, map) :: Ecto.Changeset.t
+  @spec webhook_update_changeset(CodeCorps.StripeConnectSubscription.t, map) :: Ecto.Changeset.t
   def webhook_update_changeset(struct, params \\ %{}) do
     struct
     |> cast(params, @update_params)

@@ -6,7 +6,7 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
 
   alias CodeCorps.{
     Project, Repo, StripeConnectCustomer, StripeConnectAccount,
-    StripeConnectPlan, StripeConnectSubscription, User
+    StripeConnectCard, StripeConnectPlan, StripeConnectSubscription, User
   }
   alias CodeCorps.Services.{DonationGoalsService, ProjectService}
   alias CodeCorps.StripeService.{StripeConnectCardService, StripeConnectCustomerService}
@@ -93,7 +93,7 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
          {:ok, connect_customer} <- StripeConnectCustomerService.find_or_create(platform_customer, connect_account, user),
          {:ok, connect_card} <- StripeConnectCardService.find_or_create(platform_card, connect_customer, platform_customer, connect_account),
          create_attributes <- api_create_attributes(connect_card, connect_customer, plan, attributes),
-         {:ok, subscription} <- @api.Subscription.create(create_attributes, connect_account: connect_account.id_from_stripe),
+         {:ok, %Stripe.Subscription{} = subscription} <- @api.Subscription.create(create_attributes, connect_account: connect_account.id_from_stripe),
          insert_attributes <- local_insert_attributes(attributes, plan),
          {:ok, params} <- StripeConnectSubscriptionAdapter.to_params(subscription, insert_attributes),
          {:ok, %StripeConnectSubscription{} = stripe_connect_subscription} <- insert_subscription(params)
@@ -123,18 +123,24 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
     end
   end
 
+  @spec insert_subscription(map) :: {:ok, StripeConnectSubscription.t} | {:error, Ecto.Changeset.t}
   defp insert_subscription(params) do
     %StripeConnectSubscription{}
     |> StripeConnectSubscription.create_changeset(params)
-    |> Repo.insert
+    |> Repo.insert()
   end
 
+  @spec api_create_attributes(StripeConnectCard.t, StripeConnectCustomer.t, StripeConnectPlan.t, map) :: map
   defp api_create_attributes(card, customer, plan, %{"quantity" => quantity}) do
     %{
       application_fee_percent: 5,
       customer: customer.id_from_stripe,
-      plan: plan.id_from_stripe,
-      quantity: quantity,
+      items: [
+        %{
+          plan: plan.id_from_stripe,
+          quantity: quantity
+        }
+      ],
       source: card.id_from_stripe
     }
   end
@@ -166,6 +172,6 @@ defmodule CodeCorps.StripeService.StripeConnectSubscriptionService do
   defp update_subscription(%StripeConnectSubscription{} = record, params) do
     record
     |> StripeConnectSubscription.webhook_update_changeset(params)
-    |> Repo.update
+    |> Repo.update()
   end
 end

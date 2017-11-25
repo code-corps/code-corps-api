@@ -9,33 +9,25 @@ defmodule CodeCorps.StripeService.Events.ConnectChargeSucceeded do
   @api Application.get_env(:code_corps, :stripe)
 
   def handle(%{data: %{object: %{id: id_from_stripe}}, user_id: connect_account_id_from_stripe}) do
-    with {:ok, charge} <- create_charge(id_from_stripe, connect_account_id_from_stripe) do
-      charge |> track_created
+    with {:ok, %StripeConnectCharge{} = charge} <- StripeConnectChargeService.create(id_from_stripe, connect_account_id_from_stripe) do
+      charge |> track_created()
 
       charge
       |> try_create_receipt(connect_account_id_from_stripe)
-      |> maybe_send_receipt
+      |> maybe_send_receipt()
     else
       failure -> failure
     end
   end
 
-  defp create_charge(id_from_stripe, account_id_from_stripe) do
-    StripeConnectChargeService.create(id_from_stripe, account_id_from_stripe)
-  end
-
   defp try_create_receipt(%StripeConnectCharge{invoice_id_from_stripe: invoice_id} = charge, account_id) do
-    with {:ok, %Stripe.Invoice{} = invoice} <- retrieve_invoice(invoice_id, account_id),
+    with {:ok, %Stripe.Invoice{} = invoice} <- @api.Invoice.retrieve(invoice_id, connect_account: account_id),
          %Bamboo.Email{} = receipt <- Emails.ReceiptEmail.create(charge, invoice)
     do
       {:ok, charge, receipt}
     else
       failure -> failure
     end
-  end
-
-  defp retrieve_invoice(invoice_id, account_id) do
-    @api.Invoice.retrieve(invoice_id, connect_account: account_id)
   end
 
   defp maybe_send_receipt({:ok, charge, receipt}) do
