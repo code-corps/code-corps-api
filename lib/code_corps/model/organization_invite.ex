@@ -5,6 +5,8 @@ defmodule CodeCorps.OrganizationInvite do
 
   use CodeCorps.Model
 
+  @type t :: %__MODULE__{}
+
   schema "organization_invites" do
     field :code, :string
     field :email, :string

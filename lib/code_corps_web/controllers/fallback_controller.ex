@@ -29,12 +29,12 @@ defmodule CodeCorpsWeb.FallbackController do
   def call(%Conn{} = conn, {:error, :expired}) do
     conn
     |> put_status(:not_found)
-    |> render(CodeCorpsWeb.ErrorView, "404.json")
+    |> render(CodeCorpsWeb.ErrorView, "404.json", %{})
   end
   def call(%Conn{} = conn, nil) do
     conn
     |> put_status(:not_found)
-    |> render(CodeCorpsWeb.ErrorView, "404.json")
+    |> render(CodeCorpsWeb.ErrorView, "404.json", %{})
   end
   def call(%Conn{} = conn, {:error, :github}) do
     conn

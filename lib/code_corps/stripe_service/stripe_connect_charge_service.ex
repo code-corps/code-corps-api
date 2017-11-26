@@ -6,7 +6,7 @@ defmodule CodeCorps.StripeService.StripeConnectChargeService do
 
   @api Application.get_env(:code_corps, :stripe)
 
-  @spec create(String.t, String.t) :: Ecto.Changeset.t
+  @spec create(String.t, String.t) :: {:ok, StripeConnectCharge.t} | {:error, Ecto.Changeset.t}
   def create(id_from_stripe, connect_account_id_from_stripe) do
     with {:ok, %StripeConnectAccount{} = stripe_connect_account} <- get_connect_account(connect_account_id_from_stripe),
          {:ok, %Stripe.Charge{} = api_charge} <- @api.Charge.retrieve(id_from_stripe, connect_account: connect_account_id_from_stripe),
@@ -14,7 +14,7 @@ defmodule CodeCorps.StripeService.StripeConnectChargeService do
     do
       %StripeConnectCharge{}
       |> StripeConnectCharge.create_changeset(params)
-      |> Repo.insert
+      |> Repo.insert()
     end
   end
 

@@ -13,7 +13,7 @@ defmodule CodeCorps.Mixfile do
      elixir: "~> 1.5.2",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
-     dialyzer: [plt_add_deps: :transitive],
+     dialyzer: [plt_add_apps: [:kernel, :stdlib], plt_add_deps: :transitive],
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      aliases: aliases(),

@@ -83,7 +83,7 @@ defmodule CodeCorps.Services.UserService do
     end
   end
 
-  @spec do_update_connect_customers(%StripePlatformCustomer{}, map) :: [%StripeConnectCustomer{}]
+  @spec do_update_connect_customers(StripePlatformCustomer.t, map) :: [{:ok, StripeConnectCustomer.t}] | [{:error, Stripe.Error.t}]
   defp do_update_connect_customers(stripe_platform_customer, attributes) do
     stripe_platform_customer
     |> Repo.preload([stripe_connect_customers: :stripe_connect_account])
@@ -91,7 +91,7 @@ defmodule CodeCorps.Services.UserService do
     |> Enum.map(&do_update_connect_customer(&1, attributes))
   end
 
-  @spec do_update_connect_customer(%StripeConnectCustomer{}, map) :: [%StripeConnectCustomer{}]
+  @spec do_update_connect_customer(StripeConnectCustomer.t, map) :: {:ok, StripeConnectCustomer.t} | {:error, Stripe.Error.t}
   defp do_update_connect_customer(%StripeConnectCustomer{} = stripe_connect_customer, attributes) do
     StripeConnectCustomerService.update(stripe_connect_customer, attributes)
   end

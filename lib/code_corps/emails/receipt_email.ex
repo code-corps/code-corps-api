@@ -30,7 +30,7 @@ defmodule CodeCorps.Emails.ReceiptEmail do
     end
   end
 
-  @spec get_subscription(String.t) :: Subscription.t | nil
+  @spec get_subscription(String.t) :: StripeConnectSubscription.t | nil
   defp get_subscription(subscription_id_from_stripe) do
     StripeConnectSubscription
     |> Repo.get_by(id_from_stripe: subscription_id_from_stripe)
