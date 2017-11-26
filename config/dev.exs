@@ -65,6 +65,9 @@ config :code_corps,
   postmark_project_request_template: "123",
   postmark_receipt_template: "123"
 
+# Configure elasticsearch
+config :code_corps, :elasticsearch_url, "http://0.0.0.0:9200"
+
 # If the dev environment has no CLOUDEX_API_KEY set, we want the app
 # to still run, with cloudex in test API mode
 if System.get_env("CLOUDEX_API_KEY") == nil do
