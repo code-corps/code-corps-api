@@ -24,7 +24,7 @@ defmodule CodeCorpsWeb.ProjectCategoryController do
 
   @spec create(Plug.Conn.t, map) :: Conn.t
   def create(%Conn{} = conn, %{} = params) do
-    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+    with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %ProjectCategory{}, params),
          {:ok, %ProjectCategory{} = project_category} <- %ProjectCategory{} |> ProjectCategory.create_changeset(params) |> Repo.insert do
       conn |> put_status(:created) |> render("show.json-api", data: project_category)
@@ -34,7 +34,7 @@ defmodule CodeCorpsWeb.ProjectCategoryController do
   @spec delete(Conn.t, map) :: Conn.t
   def delete(%Conn{} = conn, %{"id" => id} = _params) do
     with %ProjectCategory{} = project_category <- ProjectCategory |> Repo.get(id),
-      %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+      %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
       {:ok, :authorized} <- current_user |> Policy.authorize(:delete, project_category),
       {:ok, %ProjectCategory{} = _project_category} <- project_category |> Repo.delete
     do

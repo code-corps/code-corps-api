@@ -25,12 +25,12 @@ defmodule CodeCorps.StripeService.StripeConnectPlanService do
          {:ok, %Project{}} <- ProjectCanEnableDonations.validate(project),
          %{} = create_attributes <- get_create_attributes(project_id),
          connect_account_id <- project.organization.stripe_connect_account.id_from_stripe,
-         {:ok, plan} <- @api.Plan.create(create_attributes, connect_account: connect_account_id),
+         {:ok, %Stripe.Plan{} = plan} <- @api.Plan.create(create_attributes, connect_account: connect_account_id),
          {:ok, params} <- StripeConnectPlanAdapter.to_params(plan, attributes)
     do
       %StripeConnectPlan{}
       |> StripeConnectPlan.create_changeset(params)
-      |> Repo.insert
+      |> Repo.insert()
     else
       failure -> failure
     end

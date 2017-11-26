@@ -26,10 +26,15 @@ defmodule CodeCorpsWeb.FallbackController do
     |> put_status(403)
     |> render(CodeCorpsWeb.TokenView, "403.json", message: "You are not authorized to perform this action.")
   end
+  def call(%Conn{} = conn, {:error, :expired}) do
+    conn
+    |> put_status(:not_found)
+    |> render(CodeCorpsWeb.ErrorView, "404.json", %{})
+  end
   def call(%Conn{} = conn, nil) do
     conn
     |> put_status(:not_found)
-    |> render(CodeCorpsWeb.ErrorView, "404.json")
+    |> render(CodeCorpsWeb.ErrorView, "404.json", %{})
   end
   def call(%Conn{} = conn, {:error, :github}) do
     conn

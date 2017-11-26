@@ -23,7 +23,7 @@ defmodule CodeCorpsWeb.OrganizationGithubAppInstallationController do
 
   @spec create(Plug.Conn.t, map) :: Conn.t
   def create(%Conn{} = conn, %{} = params) do
-    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+    with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %OrganizationGithubAppInstallation{}, params),
          {:ok, %OrganizationGithubAppInstallation{} = organization_installation} <- %OrganizationGithubAppInstallation{} |> OrganizationGithubAppInstallation.create_changeset(params) |> Repo.insert do
       conn |> put_status(:created) |> render("show.json-api", data: organization_installation)
@@ -33,7 +33,7 @@ defmodule CodeCorpsWeb.OrganizationGithubAppInstallationController do
   @spec delete(Plug.Conn.t, map) :: Conn.t
   def delete(%Conn{} = conn, %{"id" => id} = params) do
     with %OrganizationGithubAppInstallation{} = organization_github_installation <- OrganizationGithubAppInstallation |> Repo.get(id),
-         %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+         %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:delete, organization_github_installation, params),
          {:ok, _organization_github_installation} <-
            organization_github_installation

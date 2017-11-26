@@ -10,9 +10,9 @@ defmodule CodeCorps.AuthenticationTestHelpers do
   end
 
   def authenticate(conn, user) do
-    {:ok, jwt, _} = Guardian.encode_and_sign(user)
+    {:ok, token, _} = user |> CodeCorps.Guardian.encode_and_sign()
 
     conn
-    |> put_req_header("authorization", "Bearer #{jwt}")
+    |> put_req_header("authorization", "Bearer #{token}")
   end
 end

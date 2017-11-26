@@ -29,7 +29,7 @@ defmodule CodeCorpsWeb.DonationGoalController do
 
   @spec create(Plug.Conn.t, map) :: Conn.t
   def create(%Conn{} = conn, %{} = params) do
-    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+    with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %DonationGoal{}, params),
          {:ok, %DonationGoal{} = donation_goal} <- DonationGoalsService.create(params),
          donation_goal <- preload(donation_goal)
@@ -41,7 +41,7 @@ defmodule CodeCorpsWeb.DonationGoalController do
   @spec delete(Conn.t, map) :: Conn.t
   def delete(%Conn{} = conn, %{"id" => id} = _params) do
     with %DonationGoal{} = donation_goal <- DonationGoal |> Repo.get(id),
-      %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+      %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
       {:ok, :authorized} <- current_user |> Policy.authorize(:delete, donation_goal),
       {:ok, %DonationGoal{} = _donation_goal} <- donation_goal |> Repo.delete
     do
@@ -52,7 +52,7 @@ defmodule CodeCorpsWeb.DonationGoalController do
   @spec update(Conn.t, map) :: Conn.t
   def update(%Conn{} = conn, %{"id" => id} = params) do
     with %DonationGoal{} = donation_goal <- DonationGoal |> Repo.get(id),
-      %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+      %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
       {:ok, :authorized} <- current_user |> Policy.authorize(:update, donation_goal),
       {:ok, %DonationGoal{} = updated_donation_goal} <- donation_goal |> DonationGoalsService.update(params),
       updated_donation_goal <- preload(updated_donation_goal)

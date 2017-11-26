@@ -3,10 +3,25 @@ defmodule CodeCorps.Task.Service do
   Handles special CRUD operations for `CodeCorps.Task`.
   """
 
-  alias CodeCorps.{GitHub, GithubIssue, Repo, Task}
+  alias CodeCorps.{GitHub, GitHub.Sync, GithubIssue, Repo, Task}
   alias Ecto.{Changeset, Multi}
 
   require Logger
+
+  # :user, :github_issue and :github_repo are required for connecting to github
+  # :project and :organization are required in order to add a header to the
+  # github issue body when the user themselves are not connected to github, but
+  # the task is
+  #
+  # Right now, all of these preloads are loaded at once. If there are
+  # performance issues, we can split them up according the the information
+  # provided here.
+  @preloads [
+    :github_issue,
+    [github_repo: :github_app_installation],
+    [project: :organization],
+    :user
+  ]
 
   @doc ~S"""
   Performs all actions involved in creating a task on a project
@@ -15,7 +30,10 @@ defmodule CodeCorps.Task.Service do
   def create(%{} = attributes) do
     Multi.new
     |> Multi.insert(:task, %Task{} |> Task.create_changeset(attributes))
-    |> Multi.run(:github, (fn %{task: %Task{} = task} -> task |> create_on_github() end))
+    |> Multi.run(:preload, fn %{task: %Task{} = task} ->
+         {:ok, task |> Repo.preload(@preloads)}
+       end)
+    |> Multi.run(:github, (fn %{preload: %Task{} = task} -> task |> create_on_github() end))
     |> Repo.transaction
     |> marshall_result()
   end
@@ -24,7 +42,10 @@ defmodule CodeCorps.Task.Service do
   def update(%Task{} = task, %{} = attributes) do
     Multi.new
     |> Multi.update(:task, task |> Task.update_changeset(attributes))
-    |> Multi.run(:github, (fn %{task: %Task{} = task} -> task |> update_on_github() end))
+    |> Multi.run(:preload, fn %{task: %Task{} = task} ->
+         {:ok, task |> Repo.preload(@preloads)}
+       end)
+    |> Multi.run(:github, (fn %{preload: %Task{} = task} -> task |> update_on_github() end))
     |> Repo.transaction
     |> marshall_result()
   end
@@ -39,25 +60,16 @@ defmodule CodeCorps.Task.Service do
     {:error, :github}
   end
 
-  # :user, :github_issue and :github_repo are required for connecting to github
-  # :project and :organization are required in order to add a header to the
-  # github issue body when the user themselves are not connected to github, but
-  # the task is
-  #
-  # Right now, all of these preloads are loaded at once. If there are
-  # performance issues, we can split them up according the the information
-  # provided here.
-  @preloads [:github_issue, [github_repo: :github_app_installation], :user, [project: :organization]]
-
-  @spec create_on_github(Task.t) :: {:ok, Task.t} :: {:error, GitHub.api_error_struct}
+  @spec create_on_github(Task.t) :: {:ok, Task.t} | {:error, Changeset.t} | {:error, GitHub.api_error_struct}
   defp create_on_github(%Task{github_repo_id: nil} = task) do
     # Don't create: no GitHub repo was selected
     {:ok, task}
   end
-  defp create_on_github(%Task{github_repo: _} = task) do
-    with %Task{github_repo: github_repo} = task <- task |> Repo.preload(@preloads),
-         {:ok, payload} <- GitHub.API.Issue.create(task),
-         {:ok, %GithubIssue{} = github_issue} <- payload |> GitHub.Sync.Issue.GithubIssue.create_or_update_issue(github_repo) do
+  defp create_on_github(%Task{github_repo: github_repo} = task) do
+    with {:ok, payload} <- GitHub.API.Issue.create(task),
+         {:ok, %GithubIssue{} = github_issue} <-
+           payload
+           |> Sync.Issue.GithubIssue.create_or_update_issue(github_repo) do
       task |> link_with_github_changeset(github_issue) |> Repo.update
     else
       {:error, error} -> {:error, error}
@@ -69,16 +81,17 @@ defmodule CodeCorps.Task.Service do
     task |> Changeset.change(%{github_issue: github_issue})
   end
 
-  @spec update_on_github(Task.t) :: {:ok, Task.t} :: {:error, GitHub.api_error_struct}
+  @spec update_on_github(Task.t) :: {:ok, Task.t} | {:error, Changeset.t} | {:error, GitHub.api_error_struct}
   defp update_on_github(%Task{github_repo_id: nil, github_issue_id: nil} = task), do: {:ok, task}
   defp update_on_github(%Task{github_repo_id: _, github_issue_id: nil} = task), do: task |> create_on_github()
-  defp update_on_github(%Task{github_repo_id: _} = task) do
-    with %Task{github_repo: github_repo} = task <- task |> Repo.preload(@preloads),
-         {:ok, payload} <- GitHub.API.Issue.update(task),
-         {:ok, %GithubIssue{}} <- payload |> GitHub.Sync.Issue.GithubIssue.create_or_update_issue(github_repo) do
+  defp update_on_github(%Task{github_repo: github_repo} = task) do
+    with {:ok, payload} <- GitHub.API.Issue.update(task),
+         {:ok, %GithubIssue{}} <-
+           payload
+           |> Sync.Issue.GithubIssue.create_or_update_issue(github_repo) do
       {:ok, Task |> Repo.get(task.id)}
     else
-      {:error, github_error} -> {:error, github_error}
+      {:error, error} -> {:error, error}
     end
   end
 end

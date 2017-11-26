@@ -2,14 +2,13 @@ defmodule CodeCorpsWeb.TokenController do
   @moduledoc false
   use CodeCorpsWeb, :controller
   import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
-  alias CodeCorpsWeb.GuardianSerializer
   alias CodeCorps.Repo
   alias CodeCorps.User
 
   def create(conn, params = %{"username" => _, "password" => _}) do
     case login_by_email_and_pass(params) do
       {:ok, user} ->
-        {:ok, token, _claims} = user |> Guardian.encode_and_sign(:token)
+        {:ok, token, _claims} = user |> CodeCorps.Guardian.encode_and_sign()
 
         conn
         |> Plug.Conn.assign(:current_user, user)
@@ -27,9 +26,9 @@ defmodule CodeCorpsWeb.TokenController do
   end
 
   def refresh(conn, %{"token" => current_token}) do
-    with {:ok, claims} <- Guardian.decode_and_verify(current_token),
-         {:ok, new_token, new_claims} <- Guardian.refresh!(current_token, claims, %{ttl: {30, :days}}),
-         {:ok, user} <- GuardianSerializer.from_token(new_claims["sub"]) do
+    with {:ok, _claims} <- CodeCorps.Guardian.decode_and_verify(current_token),
+         {:ok, _, {new_token, new_claims}} <- CodeCorps.Guardian.refresh(current_token),
+         {:ok, user} <- CodeCorps.Guardian.resource_from_claims(new_claims) do
             conn
             |> Plug.Conn.assign(:current_user, user)
             |> put_status(:created)

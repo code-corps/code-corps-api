@@ -45,7 +45,7 @@ defmodule CodeCorpsWeb.UserController do
   @spec update(Conn.t, map) :: Conn.t
   def update(%Conn{} = conn, %{"id" => id} = params) do
     with %User{} = user <- User |> Repo.get(id),
-         %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+         %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:update, user),
          {:ok, user, _, _} <- user |> UserService.update(params),
          user <- preload(user)

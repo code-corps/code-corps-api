@@ -30,7 +30,7 @@ defmodule CodeCorpsWeb.TaskController do
 
   @spec create(Conn.t, map) :: Conn.t
   def create(%Conn{} = conn, %{} = params) do
-    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+    with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %Task{}, params),
          {:ok, %Task{} = task} <- params |> Task.Service.create,
          task <- preload(task)
@@ -45,7 +45,7 @@ defmodule CodeCorpsWeb.TaskController do
   @spec update(Conn.t, map) :: Conn.t
   def update(%Conn{} = conn, %{} = params) do
     with %Task{} = task <- Task.Query.find(params),
-         %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+         %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:update, task),
          {:ok, %Task{} = updated_task} <- task |> Task.Service.update(params),
          updated_task <- preload(updated_task)

@@ -24,7 +24,7 @@ defmodule CodeCorpsWeb.UserSkillController do
 
   @spec create(Conn.t, map) :: Conn.t
   def create(%Conn{} = conn, %{} = params) do
-    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+    with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
       {:ok, :authorized} <- current_user |> Policy.authorize(:create, %UserSkill{}, params),
       {:ok, %UserSkill{} = user_skill} <- %UserSkill{} |> UserSkill.create_changeset(params) |> Repo.insert
     do
@@ -35,7 +35,7 @@ defmodule CodeCorpsWeb.UserSkillController do
   @spec delete(Conn.t, map) :: Conn.t
   def delete(%Conn{} = conn, %{"id" => id} = _params) do
     with %UserSkill{} = user_skill <- UserSkill |> Repo.get(id),
-      %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+      %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
       {:ok, :authorized} <- current_user |> Policy.authorize(:delete, user_skill),
       {:ok, %UserSkill{} = _user_skill} <- user_skill |> Repo.delete
     do

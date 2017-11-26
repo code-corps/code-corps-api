@@ -27,7 +27,7 @@ config :comeonin, :pbkdf2_rounds, 1
 # CORS allowed origins
 config :code_corps, allowed_origins: ["http://localhost:4200"]
 
-config :guardian, Guardian,
+config :code_corps, CodeCorps.Guardian,
   secret_key: "e62fb6e2746f6b1bf8b5b735ba816c2eae1d5d76e64f18f3fc647e308b0c159e"
 
 config :code_corps, :analytics, CodeCorps.Analytics.TestAPI

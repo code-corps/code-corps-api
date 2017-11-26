@@ -127,7 +127,7 @@ defmodule CodeCorps.GitHub.Sync do
 
   @spec sync_step(tuple, atom) :: tuple
   defp sync_step({:ok, _} = result, _step), do: result
-  defp sync_step({:error, _ = error}, _step), do: {:error, error}
+  defp sync_step({:error, _}, step), do: {:error, step}
 
   @spec mark_repo(GithubRepo.t, String.t, map) :: {:ok, GithubRepo.t} | {:error, Changeset.t}
   defp mark_repo(%GithubRepo{} = repo, sync_state, params \\ %{}) do
@@ -158,7 +158,7 @@ defmodule CodeCorps.GitHub.Sync do
   - Creates or updates `Comment` records, and relates them to any related
     `GithubComment` and `User` records created previously
   """
-  @spec sync_repo(GithubRepo.t) :: {:ok, GithubRepo.t}
+  @spec sync_repo(GithubRepo.t) :: {:ok, GithubRepo.t} | {:error, Changeset.t}
   def sync_repo(%GithubRepo{} = repo) do
     repo = preload_github_repo(repo)
     with {:ok, repo} <- repo |> mark_repo("fetching_pull_requests"),
@@ -185,6 +185,7 @@ defmodule CodeCorps.GitHub.Sync do
     do
       {:ok, repo}
     else
+      {:error, %Changeset{} = changeset} -> {:error, changeset}
       {:error, :fetch_pull_requests} -> repo |> mark_repo("errored_fetching_pull_requests")
       {:error, :sync_pull_requests} -> repo |> mark_repo("errored_syncing_pull_requests")
       {:error, :fetch_issues} -> repo |> mark_repo("errored_fetching_issues")

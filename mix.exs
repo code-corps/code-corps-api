@@ -13,7 +13,7 @@ defmodule CodeCorps.Mixfile do
      elixir: "~> 1.5.2",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
-     dialyzer: [plt_add_deps: :transitive],
+     dialyzer: [ignore_warnings: "dialyzer.ignore-warnings", plt_add_apps: [:kernel, :stdlib], plt_add_deps: :transitive],
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      aliases: aliases(),
@@ -49,26 +49,26 @@ defmodule CodeCorps.Mixfile do
       {:phoenix_ecto, "~> 3.3.0"},
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 2.10.3"},
-      {:phoenix_live_reload, "~> 1.0.8", only: :dev},
-      {:gettext, "~> 0.12"},
+      {:phoenix_live_reload, "~> 1.1", only: :dev},
+      {:gettext, "~> 0.13"},
       {:cowboy, "~> 1.0"},
       {:benchfella, "~> 0.3.0", only: :dev},
       {:bypass, "~> 0.8.1", only: :test},
-      {:cloudex, "~> 0.2.2"},
-      {:comeonin, "~> 3.1"},
+      {:cloudex, "~> 1.0"},
+      {:comeonin, "~> 3.2"},
       {:corsica, "~> 1.0"}, # CORS
       {:credo, "~> 0.8", only: [:dev, :test]}, # Code style suggestions
       {:earmark, "~> 1.2"}, # Markdown rendering
       {:ecto_ordered, "0.2.0-beta1"},
-      {:ex_aws, "~> 1.0"}, # Amazon AWS
+      {:ex_aws, "~> 1.1"}, # Amazon AWS
       {:excoveralls, "~> 0.7", only: :test}, # Test coverage
       {:ex_doc, "~> 0.17", only: [:dev, :test]},
       {:ex_machina, "~> 2.0", only: :test}, # test factories
-      {:guardian, "~> 0.14.5"}, # Authentication (JWT)
+      {:guardian, "~> 1.0"}, # Authentication (JWT)
       {:hackney, ">= 1.4.4"},
       {:httpoison, "~> 0.13"},
       {:inch_ex, "~> 0.5", only: [:dev, :test]}, # Inch CI
-      {:inflex, "~> 1.8.1"},
+      {:inflex, "~> 1.9"},
       {:ja_serializer, "~> 0.12"}, # JSON API
       {:joken, "~> 1.5"}, # JWT encoding
       {:money, "~> 1.2.1"},
@@ -220,7 +220,6 @@ defmodule CodeCorps.Mixfile do
         CodeCorpsWeb.Endpoint,
         CodeCorpsWeb.ErrorHelpers,
         CodeCorpsWeb.Gettext,
-        CodeCorpsWeb.GuardianSerializer,
         CodeCorpsWeb.Router,
         CodeCorpsWeb.Router.Helpers,
         CodeCorpsWeb.UserSocket
