@@ -37,7 +37,7 @@ defmodule CodeCorpsWeb.SkillController do
   @elasticsearch_type "title"
   @elasticsearch_url  Application.get_env(:code_corps, :elasticsearch_url)
 
-  def search(_conn, params) do
+  def search(_conn, %{query: query}) do
     CodeCorps.ElasticSearchHelper.search(@elasticsearch_url, @elasticsearch_index, @elasticsearch_type, query)
   end
 
