@@ -37,11 +37,19 @@ defmodule CodeCorps.GitHub.Sync.Issue.GithubIssue do
       |> GithubIssue.changeset(payload |> Adapters.Issue.to_issue())
       |> Changeset.put_assoc(:github_user, github_user)
       |> Changeset.put_assoc(:github_repo, github_repo)
-      |> Changeset.put_assoc(:github_pull_request, github_pull_request)
+      |> maybe_put_github_pull_request(github_pull_request)
       |> Repo.insert_or_update()
     else
       {:error, error} -> {:error, error}
     end
+  end
+
+  @spec maybe_put_github_pull_request(Changeset.t, GithubPullRequest.t | nil) :: Changeset.t
+  defp maybe_put_github_pull_request(%Changeset{} = changeset, %GithubPullRequest{} = github_pull_request) do
+    changeset |> Changeset.put_assoc(:github_pull_request, github_pull_request)
+  end
+  defp maybe_put_github_pull_request(%Changeset{} = changeset, nil) do
+    changeset
   end
 
   @spec find_or_init(map) :: GithubIssue.t
