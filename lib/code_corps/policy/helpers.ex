@@ -6,6 +6,7 @@ defmodule CodeCorps.Policy.Helpers do
 
   alias CodeCorps.{
     Organization,
+    OrganizationInvite,
     ProjectUser,
     Project,
     ProjectUser,
@@ -65,6 +66,15 @@ defmodule CodeCorps.Policy.Helpers do
     do: Organization |> Repo.get(id)
 
   def get_organization(_), do: nil
+
+  @doc """
+  Retrieves an organiation invite from a struct, containing a `code` field
+  Returns `CodeCorps.OrganizationInvite` or nil
+  """
+  @spec get_organization_invite(struct) :: OrganizationInvite.t() | nil
+  def get_organization_invite(%{"code" => code}),
+    do: OrganizationInvite |> Repo.get_by(code: code, fulfilled: false)
+  def get_organization_invite(%{}), do: nil
 
   @doc """
   Retrieves a project record, from a model struct, or an `Ecto.Changeset`
