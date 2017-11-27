@@ -101,9 +101,20 @@ defmodule CodeCorpsWeb.GithubEventControllerTest do
     test "responds with 200 for an unsupported event", %{conn: conn} do
       path = conn |> github_events_path(:create)
       payload = load_event_fixture("pull_request_synchronize")
+      insert(:github_repo, github_id: payload["repository"]["id"])
       assert conn |> for_event("pull_request", "foo") |> post(path, payload) |> response(200)
 
       assert Repo.get_by(GithubEvent, github_delivery_id: "foo")
+    end
+
+    @tag :github_webhook
+    test "responds with 202 for a supported event but no project_id", %{conn: conn} do
+      path = conn |> github_events_path(:create)
+      payload = load_event_fixture("pull_request_synchronize")
+      insert(:github_repo, github_id: payload["repository"]["id"], project: nil)
+      assert conn |> for_event("pull_request", "foo") |> post(path, payload) |> response(202)
+
+      refute Repo.get_by(GithubEvent, github_delivery_id: "foo")
     end
 
     @tag :github_webhook

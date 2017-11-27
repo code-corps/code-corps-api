@@ -1,9 +1,11 @@
 defmodule CodeCorpsWeb.GithubEventController do
   @moduledoc false
   use CodeCorpsWeb, :controller
+  import Ecto.Query, only: [from: 2]
 
   alias CodeCorps.{
     GithubEvent,
+    GithubRepo,
     GitHub.Webhook.Handler,
     GitHub.Webhook.EventSupport,
     Helpers.Query,
@@ -43,13 +45,28 @@ defmodule CodeCorpsWeb.GithubEventController do
 
   @spec create(Conn.t, map) :: Conn.t
   def create(%Conn{} = conn, %{} = payload) do
-    type = conn |> get_event_type
-    delivery_id = conn |> get_delivery_id()
+    type = conn |> event_type()
+    delivery_id = conn |> delivery_id()
     action = payload |> Map.get("action", "")
-    event_support = type |> EventSupport.status(action)
-    event_support |> process_event(type, delivery_id, payload)
+    event_support =
+      if should_process?(payload) do
+        process_status = type |> EventSupport.status(action)
+        process_status |> process_event(type, delivery_id, payload)
+        process_status
+      else
+        :ignored
+      end
     conn |> respond_to_webhook(event_support)
   end
+
+  @spec should_process?(map) :: boolean
+  defp should_process?(%{"repository" => %{"id" => repository_id}}) do
+    query = from repo in GithubRepo,
+      where: repo.github_id == ^repository_id,
+      where: not(is_nil(repo.project_id))
+    Repo.one(query) != nil
+  end
+  defp should_process?(_), do: true
 
   @spec update(Conn.t, map) :: Conn.t
   def update(%Conn{} = conn, %{"id" => id} = params) do
@@ -63,13 +80,13 @@ defmodule CodeCorpsWeb.GithubEventController do
     end
   end
 
-  @spec get_event_type(Conn.t) :: String.t
-  defp get_event_type(%Conn{} = conn) do
+  @spec event_type(Conn.t) :: String.t
+  defp event_type(%Conn{} = conn) do
     conn |> get_req_header("x-github-event") |> List.first
   end
 
-  @spec get_delivery_id(Conn.t) :: String.t
-  defp get_delivery_id(%Conn{} = conn) do
+  @spec delivery_id(Conn.t) :: String.t
+  defp delivery_id(%Conn{} = conn) do
     conn |> get_req_header("x-github-delivery") |> List.first
   end
 
