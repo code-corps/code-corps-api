@@ -1,4 +1,4 @@
-defmodule CodeCorps.AccountsTest do
+defmodule CodeCorps.SkillsTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
