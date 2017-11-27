@@ -23,10 +23,12 @@ defmodule CodeCorps.Task.Service do
     :user
   ]
 
+  @type result :: {:ok, Task.t} | {:error, Changeset.t} | {:error, :github} | {:error, :task_not_found}
+
   @doc ~S"""
   Performs all actions involved in creating a task on a project
   """
-  @spec create(map) :: {:ok, Task.t} | {:error, Changeset.t} | {:error, :github}
+  @spec create(map) :: result
   def create(%{} = attributes) do
     Multi.new
     |> Multi.insert(:task, %Task{} |> Task.create_changeset(attributes))
@@ -38,7 +40,7 @@ defmodule CodeCorps.Task.Service do
     |> marshall_result()
   end
 
-  @spec update(Task.t, map) :: {:ok, Task.t} | {:error, Changeset.t} | {:error, :github}
+  @spec update(Task.t, map) :: result
   def update(%Task{} = task, %{} = attributes) do
     Multi.new
     |> Multi.update(:task, task |> Task.update_changeset(attributes))
@@ -46,14 +48,15 @@ defmodule CodeCorps.Task.Service do
          {:ok, task |> Repo.preload(@preloads)}
        end)
     |> Multi.run(:github, (fn %{preload: %Task{} = task} -> task |> update_on_github() end))
-    |> Repo.transaction
+    |> Repo.transaction()
     |> marshall_result()
   end
 
-  @spec marshall_result(tuple) :: {:ok, Task.t} | {:error, Changeset.t} | {:error, :github}
+  @spec marshall_result(tuple) :: result
   defp marshall_result({:ok, %{github: %Task{} = task}}), do: {:ok, task}
   defp marshall_result({:ok, %{task: %Task{} = task}}), do: {:ok, task}
   defp marshall_result({:error, :task, %Changeset{} = changeset, _steps}), do: {:error, changeset}
+  defp marshall_result({:error, :github, {:error, :task_not_found}, _steps}), do: {:error, :task_not_found}
   defp marshall_result({:error, :github, result, _steps}) do
     Logger.info "An error occurred when creating/updating the task with the GitHub API"
     Logger.info "#{inspect result}"
@@ -70,7 +73,7 @@ defmodule CodeCorps.Task.Service do
          {:ok, %GithubIssue{} = github_issue} <-
            payload
            |> Sync.Issue.GithubIssue.create_or_update_issue(github_repo) do
-      task |> link_with_github_changeset(github_issue) |> Repo.update
+      task |> link_with_github_changeset(github_issue) |> Repo.update()
     else
       {:error, error} -> {:error, error}
     end
@@ -81,16 +84,16 @@ defmodule CodeCorps.Task.Service do
     task |> Changeset.change(%{github_issue: github_issue})
   end
 
-  @spec update_on_github(Task.t) :: {:ok, Task.t} | {:error, Changeset.t} | {:error, GitHub.api_error_struct}
+  @spec update_on_github(Task.t) :: {:ok, Task.t} | {:error, Changeset.t} | {:error, GitHub.api_error_struct} | {:error, :task_not_found}
   defp update_on_github(%Task{github_repo_id: nil, github_issue_id: nil} = task), do: {:ok, task}
   defp update_on_github(%Task{github_repo_id: _, github_issue_id: nil} = task), do: task |> create_on_github()
   defp update_on_github(%Task{github_repo: github_repo} = task) do
     with {:ok, payload} <- GitHub.API.Issue.update(task),
-         {:ok, %GithubIssue{}} <-
-           payload
-           |> Sync.Issue.GithubIssue.create_or_update_issue(github_repo) do
-      {:ok, Task |> Repo.get(task.id)}
+         {:ok, %GithubIssue{}} <- payload |> Sync.Issue.GithubIssue.create_or_update_issue(github_repo),
+         %Task{} = task <- Repo.get(Task, task.id) do
+      {:ok, task}
     else
+      nil -> {:error, :task_not_found}
       {:error, error} -> {:error, error}
     end
   end
