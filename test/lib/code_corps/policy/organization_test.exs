@@ -9,24 +9,25 @@ defmodule CodeCorps.Policy.OrganizationTest do
       assert create?(user, %{})
     end
 
-    test "returns true when there is correct code" do
+    test "returns true when the code is correct" do
       user = build(:user, admin: false)
       organization_invite = insert(:organization_invite)
-      params = %{"code" => organization_invite.code}
+      params = %{"invite_code" => organization_invite.code}
       assert create?(user, params)
     end
 
     test "returns false when code is incorrect" do
       user = build(:user, admin: false)
       insert(:organization_invite)
-      params = %{"code" => "incorrect"}
+      params = %{"invite_code" => "incorrect"}
       refute create?(user, params)
     end
 
-    test "returns false when code is correct but OrganizationInvite is fulfilled" do
+    test "returns false when code is correct but is associated with an organization" do
       user = build(:user, admin: false)
-      organization_invite = insert(:organization_invite, fulfilled: true)
-      params = %{"code" => organization_invite.code}
+      organization = insert(:organization);
+      organization_invite = build(:organization_invite, organization: organization)
+      params = %{"invite_code" => organization_invite.code}
       refute create?(user, params)
     end
   end

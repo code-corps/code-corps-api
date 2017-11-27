@@ -96,10 +96,18 @@ msgstr ""
 msgid "must be equal to %{number}"
 msgstr ""
 
-#: lib/code_corps/accounts/changesets.ex:50
+#: lib/code_corps/accounts/changesets.ex:71
 msgid "account is already connected to someone else"
 msgstr ""
 
-#: lib/code_corps_web/views/changeset_view.ex:63
+#: lib/code_corps_web/views/changeset_view.ex:65
 msgid "Github"
 msgstr "GitHub"
+
+#: lib/code_corps_web/views/changeset_view.ex:66
+msgid "Slug"
+msgstr "Vanity URL"
+
+#: lib/code_corps_web/views/changeset_view.ex:64
+msgid "Cloudinary public"
+msgstr "Image"

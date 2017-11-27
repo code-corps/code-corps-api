@@ -4,7 +4,8 @@ defmodule CodeCorpsWeb.OrganizationInviteViewTest do
   use CodeCorpsWeb.ViewCase
 
   test "renders all attributes and relationships properly" do
-    organization_invite = insert(:organization_invite)
+    organization = insert(:organization)
+    organization_invite = insert(:organization_invite, organization: organization)
 
     rendered_json = render(CodeCorpsWeb.OrganizationInviteView, "show.json-api", data: organization_invite)
 
@@ -14,10 +15,17 @@ defmodule CodeCorpsWeb.OrganizationInviteViewTest do
         "type" => "organization-invite",
         "attributes" => %{
           "email" => organization_invite.email,
-          "fulfilled" => organization_invite.fulfilled,
           "inserted-at" => organization_invite.inserted_at,
           "organization-name" => organization_invite.organization_name,
           "updated-at" => organization_invite.updated_at
+        },
+        "relationships" => %{
+          "organization" => %{
+            "data" => %{
+              "id" => organization.id |> Integer.to_string,
+              "type" => "organization"
+            }
+          }
         }
       },
       "jsonapi" => %{
