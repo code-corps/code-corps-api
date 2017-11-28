@@ -4,6 +4,7 @@ defmodule CodeCorps.GitHub.SyncTest do
   use CodeCorps.DbAccessCase
 
   import CodeCorps.GitHub.TestHelpers
+  import Ecto.Query, only: [where: 3]
 
   alias CodeCorps.{
     Comment,
@@ -193,14 +194,18 @@ defmodule CodeCorps.GitHub.SyncTest do
       assert Repo.aggregate(Task, :count, :id) == 3
       assert Repo.aggregate(User, :count, :id) == 2
 
-      %TaskList{tasks: done_tasks} =
-        TaskList |> Repo.get_by(done: true) |> Repo.preload(:tasks)
+      # Tasks closed more than 30 days ago
+      archived_tasks =
+        Task
+        |> where([object], is_nil(object.task_list_id))
+        |> Repo.all()
+
       %TaskList{tasks: inbox_tasks} =
         TaskList |> Repo.get_by(inbox: true) |> Repo.preload(:tasks)
       %TaskList{tasks: pull_requests_tasks} =
         TaskList |> Repo.get_by(pull_requests: true) |> Repo.preload(:tasks)
 
-      assert Enum.count(done_tasks) == 1
+      assert Enum.count(archived_tasks) == 1
       assert Enum.count(inbox_tasks) == 1
       assert Enum.count(pull_requests_tasks) == 1
     end
