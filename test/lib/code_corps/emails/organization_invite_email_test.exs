@@ -15,7 +15,7 @@ defmodule CodeCorps.Emails.OrganizationInviteEmailTest do
       params =
         %{code: invite.code, organization_name: invite.organization_name}
         |> URI.encode_query
-      invite_url = "#{WebClient.url()}/invites/organization?#{params}"
+      invite_url = "#{WebClient.url()}/organizations/new?#{params}"
 
       assert template_model == %{
         invite_url: invite_url,

@@ -24,7 +24,7 @@ defmodule CodeCorps.Emails.OrganizationInviteEmail do
   defp invite_url(code, organization_name) do
     query_params = set_params(code, organization_name)
     WebClient.url()
-    |> URI.merge("/invites/organization" <> "?" <> query_params)
+    |> URI.merge("/organizations/new" <> "?" <> query_params)
     |> URI.to_string
   end
 
