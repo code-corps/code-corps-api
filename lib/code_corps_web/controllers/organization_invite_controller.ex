@@ -4,13 +4,15 @@ defmodule CodeCorpsWeb.OrganizationInviteController do
 
   alias CodeCorps.{Emails, Helpers.Query, Mailer, OrganizationInvite, User}
 
+  import Ecto.Query
+
   action_fallback CodeCorpsWeb.FallbackController
   plug CodeCorpsWeb.Plug.DataToAttributes
   plug CodeCorpsWeb.Plug.IdsToIntegers
 
   @spec index(Conn.t, map) :: Conn.t
   def index(%Conn{} = conn, %{} = params) do
-    with organization_invites <- OrganizationInvite |> Query.id_filter(params) |> Repo.all do
+    with organization_invites <- OrganizationInvite |> Query.id_filter(params) |> Query.optional_filters(params, ~w(code)a) |> Repo.all do
       conn |> render("index.json-api", data: organization_invites)
     end
   end
