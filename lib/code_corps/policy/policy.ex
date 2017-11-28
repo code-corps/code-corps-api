@@ -50,7 +50,7 @@ defmodule CodeCorps.Policy do
 
   # Organization
   defp can?(%User{} = current_user, :create, %Organization{}, %{} = params), do: Policy.Organization.create?(current_user, params)
-  defp can?(%User{} = current_user, :update, %Organization{} = organization, %{}), do: Policy.Organization.update?(current_user, organization)
+  defp can?(%User{} = current_user, :update, %Organization{} = organization, %{} = params), do: Policy.Organization.update?(current_user, organization, params)
 
   # OrganizationGithubAppInstallation
   defp can?(%User{} = current_user, :create, %OrganizationGithubAppInstallation{}, %{} = params), do: Policy.OrganizationGithubAppInstallation.create?(current_user, params)

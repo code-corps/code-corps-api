@@ -1,7 +1,7 @@
 defmodule CodeCorps.Policy.OrganizationTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.Policy.Organization, only: [create?: 2, update?: 2]
+  import CodeCorps.Policy.Organization, only: [create?: 2, update?: 3]
 
   describe "create" do
     test "returns true when user is an admin" do
@@ -36,19 +36,31 @@ defmodule CodeCorps.Policy.OrganizationTest do
     test "returns true when user is an admin" do
       user = insert(:user, admin: true)
       organization = insert(:organization)
-      assert update?(user, organization)
+      assert update?(user, organization, %{})
+    end
+
+    test "returns false when user is approving as the admin" do
+      user = insert(:user, admin: true)
+      organization = build(:organization, owner_id: user.id)
+      assert update?(user, organization, %{"approved" => "true"})
+    end
+
+    test "returns false when user is approving as the organization owner" do
+      user = insert(:user)
+      organization = build(:organization, owner_id: user.id)
+      assert update?(user, organization, %{"approved" => "true"})
     end
 
     test "returns true when user is the organization owner" do
       user = insert(:user)
       organization = build(:organization, owner_id: user.id)
-      assert update?(user, organization)
+      assert update?(user, organization, %{})
     end
 
     test "returns false when user is not the organization owner" do
       user = insert(:user)
       organization = build(:organization)
-      refute update?(user, organization)
+      refute update?(user, organization, %{})
     end
   end
 end

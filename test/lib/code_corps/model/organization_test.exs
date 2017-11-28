@@ -63,4 +63,24 @@ defmodule CodeCorps.OrganizationTest do
       assert changeset |> get_field(:slug) == "custom-slug"
     end
   end
+
+  describe "update_changeset" do
+    @valid_struct %Organization{
+      description: "Building a better future.",
+      name: "Code Corps"
+    }
+    @valid_attrs %{
+      approved: true
+    }
+
+    test "with valid struct and attributes" do
+      changeset = Organization.update_changeset(@valid_struct, @valid_attrs)
+      assert changeset.valid?
+    end
+
+    test "with invalid struct" do
+      changeset = Organization.update_changeset(%Organization{}, %{})
+      refute changeset.valid?
+    end
+  end
 end

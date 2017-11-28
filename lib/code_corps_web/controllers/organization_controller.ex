@@ -42,7 +42,7 @@ defmodule CodeCorpsWeb.OrganizationController do
     with %Organization{} = organization <- Organization |> Repo.get(id),
       %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
       {:ok, :authorized} <- current_user |> Policy.authorize(:update, organization),
-      {:ok, %Organization{} = organization} <- organization |> Organization.changeset(params) |> Repo.update,
+      {:ok, %Organization{} = organization} <- organization |> Organization.update_changeset(params) |> Repo.update,
       organization <- preload(organization)
     do
         conn |> render("show.json-api", data: organization)
