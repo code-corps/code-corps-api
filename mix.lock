@@ -6,7 +6,7 @@
   "bunt": {:hex, :bunt, "0.2.0", "951c6e801e8b1d2cbe58ebbd3e616a869061ddadcc4863d0a2182541acae9a38", [:mix], []},
   "bypass": {:hex, :bypass, "0.8.1", "16d409e05530ece4a72fabcf021a3e5c7e15dcc77f911423196a0c551f2a15ca", [:mix], [{:cowboy, "~> 1.0", [hex: :cowboy, optional: false]}, {:plug, "~> 1.0", [hex: :plug, optional: false]}]},
   "certifi": {:hex, :certifi, "2.0.0", "a0c0e475107135f76b8c1d5bc7efb33cd3815cb3cf3dea7aefdd174dabead064", [:rebar3], []},
-  "cloudex": {:hex, :cloudex, "1.0.0", "944886f408fd18d4a460cc93c22ee1790aca552599b76b92ad5d8374cf005820", [:mix], [{:httpoison, "~> 0.13.0", [hex: :httpoison, optional: false]}, {:poison, "~> 3.1.0", [hex: :poison, optional: false]}, {:timex, "~> 3.1.7", [hex: :timex, optional: false]}, {:tzdata, "~> 0.5.11", [hex: :tzdata, optional: false]}]},
+  "cloudex": {:hex, :cloudex, "1.0.1", "51ae96126ef17abb732692ef7bbd8a9c5b26fc01c4a893c42baa219ff9ac562c", [:mix], [{:httpoison, "~> 0.13.0", [hex: :httpoison, repo: "hexpm", optional: false]}, {:poison, "~> 3.1.0", [hex: :poison, repo: "hexpm", optional: false]}, {:timex, "~> 3.1.7", [hex: :timex, repo: "hexpm", optional: false]}, {:tzdata, "~> 0.5.11", [hex: :tzdata, repo: "hexpm", optional: false]}], "hexpm"},
   "combine": {:hex, :combine, "0.10.0", "eff8224eeb56498a2af13011d142c5e7997a80c8f5b97c499f84c841032e429f", [:mix], []},
   "comeonin": {:hex, :comeonin, "3.2.0", "cb10995a22aed6812667efb3856f548818c85d85394d8132bc116fbd6995c1ef", [:make, :mix], [{:elixir_make, "~> 0.4", [hex: :elixir_make, optional: false]}]},
   "connection": {:hex, :connection, "1.0.4", "a1cae72211f0eef17705aaededacac3eb30e6625b04a6117c1b2db6ace7d5976", [], []},

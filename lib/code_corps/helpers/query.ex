@@ -74,12 +74,12 @@ defmodule CodeCorps.Helpers.Query do
   For each key in the list, the params map has a value for that key,
   the query condition for that `{key, value}` is applied to the queriable.
   """
-  @spec optional_filters(Queryable.t, map, list) :: Queryable.t
+  @spec optional_filters(Ecto.Queryable.t, map, list) :: Ecto.Queryable.t
   def optional_filters(query, %{} = params, [key | other_keys]) do
     case params |> Map.get(key |> Atom.to_string) do
       nil -> query |> optional_filters(params, other_keys)
       value -> query |> where([o], field(o, ^key) == ^value)
     end
   end
-  def optional_filters(query, %{} = params , []), do: query
+  def optional_filters(query, %{} = _params, []), do: query
 end
