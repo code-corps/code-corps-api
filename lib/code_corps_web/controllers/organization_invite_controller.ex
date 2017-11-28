@@ -4,8 +4,6 @@ defmodule CodeCorpsWeb.OrganizationInviteController do
 
   alias CodeCorps.{Emails, Helpers.Query, Mailer, OrganizationInvite, User}
 
-  import Ecto.Query
-
   action_fallback CodeCorpsWeb.FallbackController
   plug CodeCorpsWeb.Plug.DataToAttributes
   plug CodeCorpsWeb.Plug.IdsToIntegers
