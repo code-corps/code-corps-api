@@ -9,9 +9,10 @@ defmodule CodeCorps.Project do
   import CodeCorps.Helpers.Slug
   import CodeCorps.Helpers.URL, only: [prefix_url: 2]
   import CodeCorps.Validators.SlugValidator
+  import Ecto.Query, only: [where: 3]
 
+  alias CodeCorps.{Category, Repo, Skill, TaskList}
   alias CodeCorps.Services.MarkdownRendererService
-  alias CodeCorps.TaskList
 
   alias Ecto.Changeset
 
@@ -42,9 +43,10 @@ defmodule CodeCorps.Project do
     has_many :task_lists, CodeCorps.TaskList
     has_many :tasks, CodeCorps.Task
 
-    has_many :categories, through: [:project_categories, :category]
-    has_many :skills, through: [:project_skills, :skill]
     has_many :stripe_connect_subscriptions, through: [:stripe_connect_plan, :stripe_connect_subscriptions]
+
+    many_to_many :categories, CodeCorps.Category, join_through: CodeCorps.ProjectCategory
+    many_to_many :skills, CodeCorps.Skill, join_through: CodeCorps.ProjectSkill
 
     timestamps()
   end
@@ -54,7 +56,7 @@ defmodule CodeCorps.Project do
     |> cast(params, [:title, :description, :long_description_markdown, :cloudinary_public_id, :default_color, :website])
     |> prefix_url(:website)
     |> validate_format(:website, CodeCorps.Helpers.URL.valid_format())
-    |> validate_required(:title)
+    |> validate_required([:title])
     |> generate_slug(:title, :slug)
     |> validate_slug(:slug)
     |> unique_constraint(:slug, name: :index_projects_on_slug)
@@ -71,10 +73,43 @@ defmodule CodeCorps.Project do
     struct
     |> changeset(params)
     |> cast(params, [:organization_id])
+    |> validate_required([:cloudinary_public_id, :description])
+    |> associate_categories(params)
+    |> validate_length(:categories, min: 1)
+    |> associate_skills(params)
+    |> validate_length(:skills, min: 1)
     |> put_assoc(:task_lists, TaskList.default_task_lists())
     |> put_member_assoc()
     |> generate_icon_color(:default_color)
     |> assoc_constraint(:organization)
+  end
+
+  defp associate_categories(changeset, %{"categories_ids" => ids}) when is_list(ids) when length(ids) > 0 do
+    categories = ids |> Enum.map(&String.to_integer/1) |> find_categories()
+    changeset |> put_assoc(:categories, categories)
+  end
+  defp associate_categories(changeset, _) do
+    changeset |> put_assoc(:categories, [])
+  end
+
+  defp find_categories(ids) do
+    Category
+    |> where([object], object.id in ^ids)
+    |> Repo.all()
+  end
+
+  defp associate_skills(changeset, %{"skills_ids" => ids}) when is_list(ids) when length(ids) > 0 do
+    skills = ids |> Enum.map(&String.to_integer/1) |> find_skills()
+    changeset |> put_assoc(:skills, skills)
+  end
+  defp associate_skills(changeset, _) do
+    changeset |> put_assoc(:skills, [])
+  end
+
+  defp find_skills(ids) do
+    Skill
+    |> where([object], object.id in ^ids)
+    |> Repo.all()
   end
 
   @doc """
