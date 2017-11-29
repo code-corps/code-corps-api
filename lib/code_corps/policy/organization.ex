@@ -26,9 +26,10 @@ defmodule CodeCorps.Policy.Organization do
   Returns a boolean indicating if the specified user is allowed to update the
   specified organization.
   """
-  @spec update?(User.t, Organization.t) :: boolean
-  def update?(%User{admin: true}, %Organization{}), do: true
-  def update?(%User{} = user, %Organization{} = organization), do: organization |> owned_by?(user)
+  @spec update?(User.t, Organization.t, map) :: boolean
+  def update?(%User{admin: true}, %Organization{}, %{}), do: true
+  def update?(%User{}, %Organization{}, %{"approved" => true}), do: false
+  def update?(%User{} = user, %Organization{} = organization, %{}), do: organization |> owned_by?(user)
 
   @spec get_invite(String.t) :: OrganizationInvite.t | nil
   defp get_invite(code) do

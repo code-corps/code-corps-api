@@ -61,6 +61,13 @@ defmodule CodeCorps.Organization do
     |> put_change(:approved, false)
   end
 
+  @spec update_changeset(struct, map) :: Changeset.t
+  def update_changeset(struct, params \\ %{}) do
+    struct
+    |> changeset(params)
+    |> cast(params, [:approved])
+  end
+
   defp maybe_generate_slug(%Changeset{changes: %{slug: _}} = changeset) do
     changeset
   end
