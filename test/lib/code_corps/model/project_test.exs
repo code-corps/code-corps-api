@@ -3,14 +3,14 @@ defmodule CodeCorps.ProjectTest do
 
   import CodeCorps.Project
 
-  alias CodeCorps.{Project, ProjectUser, Repo}
+  alias CodeCorps.{Projects, Project, ProjectUser, Repo}
 
   describe "changeset" do
     @valid_attrs %{title: "A title"}
     @invalid_attrs %{}
 
     test "with valid attributes" do
-      changeset = Project.changeset(%Project{}, @valid_attrs)
+      changeset = Projects.change_project(%Project{title: "A title"})
       assert changeset.valid?
     end
 
