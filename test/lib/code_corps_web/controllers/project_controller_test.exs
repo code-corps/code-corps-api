@@ -3,7 +3,11 @@ defmodule CodeCorpsWeb.ProjectControllerTest do
 
   use CodeCorpsWeb.ApiCase, resource_name: :project
 
-  @valid_attrs %{title: "Valid project"}
+  @valid_attrs %{
+    cloudinary_public_id: "foo123",
+    description: "Valid description",
+    title: "Valid project"
+  }
   @invalid_attrs %{title: ""}
 
   describe "index" do
@@ -83,8 +87,17 @@ defmodule CodeCorpsWeb.ProjectControllerTest do
   describe "create" do
     @tag :authenticated
     test "creates and renders resource when attributes are valid", %{conn: conn, current_user: current_user} do
+      category = insert(:category)
       organization = insert(:organization, owner: current_user)
-      attrs = @valid_attrs |> Map.merge(%{organization: organization})
+      skill = insert(:skill)
+
+      params = %{
+        categories: [category],
+        organization: organization,
+        skills: [skill]
+      }
+
+      attrs = @valid_attrs |> Map.merge(params)
       response = conn |> request_create(attrs)
       assert %{assigns: %{data: %{task_lists: [_inbox, _backlog, _in_progress, _done]}}} = response
       assert response |> json_response(201)

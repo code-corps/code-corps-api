@@ -83,8 +83,17 @@ defmodule CodeCorps.ProjectTest do
 
   describe "create_changeset/3" do
     test "with valid attributes" do
+      category = insert(:category)
+      skill = insert(:skill)
       organization = insert(:organization)
-      attrs = %{title: "A title", organization_id: organization.id}
+      attrs = %{
+        "categories_ids" => [category.id |> Integer.to_string()],
+        "cloudinary_public_id" => "foo123",
+        "description" => "Description",
+        "skills_ids" => [skill.id |> Integer.to_string()],
+        "title" => "A title",
+        "organization_id" => organization.id
+      }
       changeset = create_changeset(%Project{}, attrs)
       assert changeset.valid?
     end
@@ -95,7 +104,16 @@ defmodule CodeCorps.ProjectTest do
     end
 
     test "casts :organization_id and ensures organization exists" do
-      attrs = %{title: "A title", organization_id: -1}
+      category = insert(:category)
+      skill = insert(:skill)
+      attrs = %{
+        "categories_ids" => [category.id |> Integer.to_string()],
+        "cloudinary_public_id" => "foo123",
+        "description" => "Description",
+        "skills_ids" => [skill.id |> Integer.to_string()],
+        "title" => "A title",
+        "organization_id" => -1
+      }
       changeset = create_changeset(%Project{}, attrs)
 
       assert {:error, failed_insert_changeset} = changeset |> Repo.insert()
@@ -105,8 +123,17 @@ defmodule CodeCorps.ProjectTest do
     end
 
     test "casts and inserts proper associated records" do
+      category = insert(:category)
+      skill = insert(:skill)
       organization = insert(:organization)
-      attrs = %{title: "A title", organization_id: organization.id}
+      attrs = %{
+        "categories_ids" => [category.id |> Integer.to_string()],
+        "cloudinary_public_id" => "foo123",
+        "description" => "Description",
+        "skills_ids" => [skill.id |> Integer.to_string()],
+        "title" => "A title",
+        "organization_id" => organization.id
+      }
       changeset = Project.create_changeset(%Project{}, attrs)
 
       {_, project} = Repo.insert(changeset)
