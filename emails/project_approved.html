@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>{{project_title}} is approved!</title>
+    <!--
+    Make sure you copy the styles from styles.css into the email template in Postmark before saving there.
+
+    <style type="text/css" rel="stylesheet" media="all">
+    </style>
+    -->
+    <link rel="stylesheet" type="text/css" href="styles.css" media="screen" />
+  </head>
+  <body>
+    <span class="preheader">Head over to the app to get started.</span>
+    <table class="email-wrapper" width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td align="center">
+          <table class="email-content" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td class="email-masthead" width="100%" cellpadding="0" cellspacing="0">
+                <table class="email-masthead_inner" align="center" width="570" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td>
+                      <a href="https://www.codecorps.org">
+                        <img src="https://d3pgew4wbk2vb1.cloudfront.net/emails/images/logo-small@2x.png" class="email-masthead_logo" />
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <!-- Email Body -->
+            <tr>
+              <td class="email-body" width="100%" cellpadding="0" cellspacing="0">
+                <table class="email-body_inner" align="center" width="570" cellpadding="0" cellspacing="0">
+                  <!-- Body content -->
+                  <tr>
+                    <td class="content-cell">
+                      <table width="100%" cellpadding="0" cellspacing="0">
+                        <tr>
+                          <td>
+                            <p class="center">
+                              <img src="https://d3pgew4wbk2vb1.cloudfront.net/emails/images/party@2x.png" width="100" height="100" />
+                            </p>
+                            <p>
+                              Hi {{project_title}} team,
+                            </p>
+                            <p>
+                              Congratulations, your project was just approved!
+                            </p>
+                            <p>
+                              You can head over to <a href="{{project_url}}">your project</a> now to see it live and are free to share your project link:
+                            </p>
+                            <p>
+                              <a href="{{project_url}}">{{project_url}}</a>
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                      <table class="body-signature">
+                        <tr>
+                          <td>
+                            <p>
+                              Cheers,
+                              <br><strong>The Code Corps Team</strong>
+                            </p>
+                            <p class="center small">
+                              Questions? Feedback?
+                              <br>Visit our <strong><a href="https://help.codecorps.org">Help Center</a></strong> or just reply to this email.</p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <table class="email-footer" align="center" width="570" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td class="content-cell" align="center">
+                      <p class="sub align-center">
+                        Code Corps PBC
+                        <br>4166 Wilson Ave #1
+                        <br>San Diego, CA 92104
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

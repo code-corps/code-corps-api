@@ -55,6 +55,19 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilder do
       project_id: record.project_id
     }
   end
+  defp traits(%CodeCorps.Project{} = record) do
+    record = record |> Repo.preload([:organization])
+    %{
+      id: record.id,
+      approval_requested: record.approval_requested,
+      approved: record.approved,
+      description: record.description,
+      slug: record.slug,
+      title: record.title,
+      total_monthly_donated: record.total_monthly_donated,
+      website: record.website
+    }
+  end
   defp traits(%CodeCorps.ProjectSkill{} = record) do
     record = record |> Repo.preload([:project, :skill])
     %{

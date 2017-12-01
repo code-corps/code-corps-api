@@ -2,6 +2,9 @@ defmodule CodeCorpsWeb.ProjectControllerTest do
   @moduledoc false
 
   use CodeCorpsWeb.ApiCase, resource_name: :project
+  use Bamboo.Test
+
+  alias CodeCorps.{Analytics.SegmentTraitsBuilder, Emails, Project, Repo}
 
   @valid_attrs %{
     cloudinary_public_id: "foo123",
@@ -103,6 +106,10 @@ defmodule CodeCorpsWeb.ProjectControllerTest do
       response = conn |> request_create(attrs)
       assert %{assigns: %{data: %{task_lists: [_inbox, _backlog, _in_progress, _done]}}} = response
       assert response |> json_response(201)
+
+      user_id = current_user.id
+      traits = Project |> Repo.one() |> SegmentTraitsBuilder.build
+      assert_received {:track, ^user_id, "Created Project", ^traits}
     end
 
     @tag :authenticated
@@ -127,9 +134,51 @@ defmodule CodeCorpsWeb.ProjectControllerTest do
   describe "update" do
     @tag :authenticated
     test "updates and renders resource when attributes are valid", %{conn: conn, current_user: current_user} do
-      project = insert(:project)
+      project = insert(:project, approval_requested: false)
       insert(:project_user, project: project, user: current_user, role: "owner")
-      assert conn |> request_update(project, @valid_attrs) |> json_response(200)
+      insert(:user, admin: true)
+      attrs = @valid_attrs |> Map.merge(%{approval_requested: true})
+
+      assert conn |> request_update(project, attrs) |> json_response(200)
+
+      project =
+        Project
+        |> Repo.get_by(approved: true)
+        |> Repo.preload([:organization])
+
+      email =
+        project
+        |> Emails.ProjectApprovalRequestEmail.create()
+
+      assert_delivered_email(email)
+
+      user_id = current_user.id
+      traits = project |> SegmentTraitsBuilder.build
+      assert_received {:track, ^user_id, "Requested Project Approval", ^traits}
+    end
+
+    @tag authenticated: :admin
+    test "sends the approved email when approved", %{conn: conn, current_user: current_user} do
+      project = insert(:project, approved: false)
+      insert(:project_user, project: project, role: "owner")
+      attrs = @valid_attrs |> Map.merge(%{approved: true})
+
+      assert conn |> request_update(project, attrs) |> json_response(200)
+
+      project =
+        Project
+        |> Repo.get_by(approved: true)
+        |> Repo.preload([:organization])
+
+      email =
+        project
+        |> Emails.ProjectApprovedEmail.create()
+
+      assert_delivered_email(email)
+
+      user_id = current_user.id
+      traits = project |> SegmentTraitsBuilder.build
+      assert_received {:track, ^user_id, "Approved Project", ^traits}
     end
 
     @tag :authenticated

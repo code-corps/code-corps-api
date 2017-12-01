@@ -1,43 +1,39 @@
-defmodule CodeCorps.Emails.ProjectUserRequestEmail do
+defmodule CodeCorps.Emails.ProjectApprovedEmail do
   import Bamboo.Email, only: [to: 2]
   import Bamboo.PostmarkHelper
   import Ecto.Query
 
   alias CodeCorps.{Project, ProjectUser, Repo, User, WebClient}
   alias CodeCorps.Emails.BaseEmail
-  alias CodeCorps.Presenters.ImagePresenter
 
-  @spec create(ProjectUser.t) :: Bamboo.Email.t
-  def create(%ProjectUser{project: project, user: user}) do
+  @spec create(Project.t) :: Bamboo.Email.t
+  def create(%Project{} = project) do
     BaseEmail.create
     |> to(project |> get_owners_emails())
-    |> template(template_id(), build_model(project, user))
+    |> template(template_id(), build_model(project))
   end
 
-  @spec build_model(Project.t, User.t) :: map
-  defp build_model(%Project{} = project, %User{} = user) do
+  @spec build_model(Project.t) :: map
+  defp build_model(%Project{} = project) do
     %{
-      contributors_url: project |> preload() |> url(),
-      project_logo_url: ImagePresenter.large(project),
       project_title: project.title,
-      subject: "#{user.first_name} wants to join #{project.title}",
-      user_first_name: user.first_name,
-      user_image_url: ImagePresenter.large(user)
+      project_url: project |> preload() |> project_url(),
+      subject: "#{project.title} is approved!"
     }
   end
 
   @spec preload(Project.t) :: Project.t
   defp preload(%Project{} = project), do: project |> Repo.preload(:organization)
 
-  @spec url(Project.t) :: String.t
-  defp url(project) do
+  @spec project_url(Project.t) :: String.t
+  defp project_url(project) do
     WebClient.url()
-    |> URI.merge(project.organization.slug <> "/" <> project.slug <> "/settings/contributors")
-    |> URI.to_string
+    |> URI.merge(project.organization.slug <> "/" <> project.slug)
+    |> URI.to_string()
   end
 
   @spec template_id :: String.t
-  defp template_id, do: Application.get_env(:code_corps, :postmark_project_user_request_template)
+  defp template_id, do: Application.get_env(:code_corps, :postmark_project_approved_template)
 
   @spec get_owners_emails(Project.t) :: list(String.t)
   defp get_owners_emails(%Project{} = project) do

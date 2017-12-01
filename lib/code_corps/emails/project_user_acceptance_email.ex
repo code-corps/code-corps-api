@@ -36,5 +36,5 @@ defmodule CodeCorps.Emails.ProjectUserAcceptanceEmail do
   end
 
   @spec template_id :: String.t
-  defp template_id, do: Application.get_env(:code_corps, :postmark_project_acceptance_template)
+  defp template_id, do: Application.get_env(:code_corps, :postmark_project_user_acceptance_template)
 end
