@@ -19,7 +19,8 @@ defmodule CodeCorps.Project do
   @type t :: %__MODULE__{}
 
   schema "projects" do
-    field :approved, :boolean
+    field :approval_requested, :boolean, default: false
+    field :approved, :boolean, default: false
     field :cloudinary_public_id
     field :default_color
     field :description, :string
@@ -53,7 +54,7 @@ defmodule CodeCorps.Project do
 
   def changeset(struct, params) do
     struct
-    |> cast(params, [:title, :description, :long_description_markdown, :cloudinary_public_id, :default_color, :website])
+    |> cast(params, [:approval_requested, :cloudinary_public_id, :default_color, :description, :long_description_markdown, :title, :website])
     |> prefix_url(:website)
     |> validate_format(:website, CodeCorps.Helpers.URL.valid_format())
     |> validate_required([:title])
@@ -118,6 +119,7 @@ defmodule CodeCorps.Project do
   def update_changeset(struct, params) do
     struct
     |> changeset(params)
+    |> cast(params, [:approved])
   end
 
   def update_total_changeset(struct, params) do

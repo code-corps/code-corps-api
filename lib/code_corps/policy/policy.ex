@@ -66,7 +66,7 @@ defmodule CodeCorps.Policy do
 
   # Project
   defp can?(%User{} = current_user, :create, %Project{}, %{} = params), do: Policy.Project.create?(current_user, params)
-  defp can?(%User{} = current_user, :update, %Project{} = project, %{}), do: Policy.Project.update?(current_user, project)
+  defp can?(%User{} = current_user, :update, %Project{} = project, params = %{}), do: Policy.Project.update?(current_user, project, params)
 
   # ProjectCategory
   defp can?(%User{} = current_user, :create, %ProjectCategory{}, %{} = params), do: Policy.ProjectCategory.create?(current_user, params)

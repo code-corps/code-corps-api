@@ -7,11 +7,23 @@ defmodule CodeCorpsWeb.ProjectView do
   use JaSerializer.PhoenixView
 
   attributes [
-  	:approved, :can_activate_donations, :cloudinary_public_id,
-    :description, :donations_active, :icon_thumb_url,
-    :icon_large_url, :inserted_at, :long_description_body,
-    :long_description_markdown, :should_link_externally, :slug, :title,
-    :total_monthly_donated, :updated_at, :website
+  	:approval_requested,
+    :approved,
+    :can_activate_donations,
+    :cloudinary_public_id,
+    :description,
+    :donations_active,
+    :icon_thumb_url,
+    :icon_large_url,
+    :inserted_at,
+    :long_description_body,
+    :long_description_markdown,
+    :should_link_externally,
+    :slug,
+    :title,
+    :total_monthly_donated,
+    :updated_at,
+    :website
   ]
 
   has_one :organization, type: "organization", field: :organization_id
