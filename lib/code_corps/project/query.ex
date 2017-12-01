@@ -3,12 +3,11 @@ defmodule CodeCorps.Project.Query do
   Contains queries for retrieving projects
   """
   alias CodeCorps.{
+    Helpers.Query,
     Project,
     SluggedRoute,
     Repo
   }
-
-  import Ecto.Query
 
   @doc ~S"""
   Returns a list of `Project` records based on the provided filter.
@@ -16,7 +15,7 @@ defmodule CodeCorps.Project.Query do
   If the filter contains a `slug` key, returns all projects for the specified
   `Organization.`
 
-  If the filter does not contain a `slug` key, returns all `approved` projects.
+  If the filter does not contain a `slug` key, filters by optional params.
   """
   @spec list(map) :: list(Project.t)
   def list(%{"slug" => slug}) do
@@ -26,10 +25,10 @@ defmodule CodeCorps.Project.Query do
     |> Map.get(:organization)
     |> Map.get(:projects)
   end
-  def list(%{}) do
+  def list(%{} = params) do
     Project
-    |> where(approved: true)
-    |> Repo.all
+    |> Query.optional_filters(params, ~w(approved)a)
+    |> Repo.all()
   end
 
   @doc ~S"""
