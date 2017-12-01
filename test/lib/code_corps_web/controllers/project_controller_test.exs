@@ -11,13 +11,15 @@ defmodule CodeCorpsWeb.ProjectControllerTest do
   @invalid_attrs %{title: ""}
 
   describe "index" do
-    test "lists all approved entries on index", %{conn: conn} do
+    test "filters on index", %{conn: conn} do
       [project_1, project_2] = insert_pair(:project, approved: true)
       project_3 = insert(:project, approved: false)
 
+      path = "/projects?approved=true"
+
       returned_ids =
         conn
-        |> request_index
+        |> get(path)
         |> json_response(200)
         |> ids_from_response
 
