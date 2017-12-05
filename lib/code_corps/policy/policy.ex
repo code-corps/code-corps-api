@@ -3,7 +3,7 @@ defmodule CodeCorps.Policy do
   Handles authorization for various API actions performed on objects in the database.
   """
 
-  alias CodeCorps.{Category, Comment, DonationGoal, GithubAppInstallation, GithubEvent, GithubRepo, Organization, OrganizationInvite, OrganizationGithubAppInstallation, Preview, Project, ProjectCategory, ProjectSkill, ProjectUser, Role, RoleSkill, Skill, StripeConnectAccount, StripeConnectPlan, StripeConnectSubscription, StripePlatformCard, StripePlatformCustomer, Task, TaskSkill, User, UserCategory, UserRole, UserSkill, UserTask}
+  alias CodeCorps.{Category, Comment, DonationGoal, GithubAppInstallation, GithubEvent, GithubRepo, Message, Organization, OrganizationInvite, OrganizationGithubAppInstallation, Preview, Project, ProjectCategory, ProjectSkill, ProjectUser, Role, RoleSkill, Skill, StripeConnectAccount, StripeConnectPlan, StripeConnectSubscription, StripePlatformCard, StripePlatformCustomer, Task, TaskSkill, User, UserCategory, UserRole, UserSkill, UserTask}
 
   alias CodeCorps.Policy
 
@@ -21,6 +21,13 @@ defmodule CodeCorps.Policy do
       false -> {:error, :not_authorized}
     end
   end
+
+  @doc ~S"""
+  Scopes a queryable so it's only able to return those records the specified
+  user is authorized to view.
+  """
+  @spec scope(module, User.t) :: Ecto.Queryable.t
+  def scope(Message, %User{} = current_user), do: Message |> Policy.Message.scope(current_user)
 
   @spec can?(User.t, atom, struct, map) :: boolean
 
@@ -41,12 +48,16 @@ defmodule CodeCorps.Policy do
   defp can?(%User{} = current_user, :create, %GithubAppInstallation{}, %{} = params), do: Policy.GithubAppInstallation.create?(current_user, params)
 
   # GithubEvent
-  defp can?(%User{} = current_user, :index, %GithubEvent{}, %{}), do: Policy.GithubEvent.index?(current_user)
   defp can?(%User{} = current_user, :show, %GithubEvent{}, %{}), do: Policy.GithubEvent.show?(current_user)
+  defp can?(%User{} = current_user, :index, %GithubEvent{}, %{}), do: Policy.GithubEvent.index?(current_user)
   defp can?(%User{} = current_user, :update, %GithubEvent{}, %{}), do: Policy.GithubEvent.update?(current_user)
 
   # GithubRepo
   defp can?(%User{} = current_user, :update, %GithubRepo{} = github_repo, %{} = params), do: Policy.GithubRepo.update?(current_user, github_repo, params)
+
+  # Message
+  defp can?(%User{} = current_user, :show, %Message{} = message, %{}), do: Policy.Message.show?(current_user, message)
+  defp can?(%User{} = current_user, :create, %Message{}, %{} = params), do: Policy.Message.create?(current_user, params)
 
   # Organization
   defp can?(%User{} = current_user, :create, %Organization{}, %{} = params), do: Policy.Organization.create?(current_user, params)

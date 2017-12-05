@@ -104,6 +104,15 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def message_factory do
+    %CodeCorps.Message{
+      body: sequence(:body, &"Subject #{&1}"),
+      initiated_by: "admin",
+      subject: sequence(:subject, &"Subject #{&1}"),
+      author: build(:user),
+      project: build(:project)
+    }
+  end
 
   def organization_factory do
     %CodeCorps.Organization{
