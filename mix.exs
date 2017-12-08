@@ -71,6 +71,7 @@ defmodule CodeCorps.Mixfile do
       {:inflex, "~> 1.9"},
       {:ja_serializer, "~> 0.12"}, # JSON API
       {:joken, "~> 1.5"}, # JWT encoding
+      {:mix_test_watch, "~> 0.5", only: :dev, runtime: false},
       {:money, "~> 1.2.1"},
       {:poison, "~> 3.0", override: true},
       {:scout_apm, "~> 0.0"},

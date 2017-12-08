@@ -2,7 +2,7 @@ defmodule CodeCorpsWeb.OrganizationController do
   @moduledoc false
   use CodeCorpsWeb, :controller
 
-  alias CodeCorps.{Helpers.Query, Organization, User}
+  alias CodeCorps.{Helpers.Query, Organization, Organizations, User}
 
   action_fallback CodeCorpsWeb.FallbackController
   plug CodeCorpsWeb.Plug.DataToAttributes
@@ -30,7 +30,7 @@ defmodule CodeCorpsWeb.OrganizationController do
   def create(%Conn{} = conn, %{} = params) do
     with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %Organization{}, params),
-         {:ok, %Organization{} = organization} <- %Organization{} |> Organization.create_changeset(params) |> Repo.insert,
+         {:ok, %Organization{} = organization} <- Organizations.create(params),
          organization <- preload(organization)
     do
       conn |> put_status(:created) |> render("show.json-api", data: organization)
@@ -42,7 +42,7 @@ defmodule CodeCorpsWeb.OrganizationController do
     with %Organization{} = organization <- Organization |> Repo.get(id),
       %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
       {:ok, :authorized} <- current_user |> Policy.authorize(:update, organization),
-      {:ok, %Organization{} = organization} <- organization |> Organization.changeset(params) |> Repo.update,
+      {:ok, %Organization{} = organization} <- organization |> Organization.update_changeset(params) |> Repo.update,
       organization <- preload(organization)
     do
         conn |> render("show.json-api", data: organization)

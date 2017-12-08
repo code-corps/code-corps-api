@@ -49,8 +49,8 @@ defmodule CodeCorps.Policy do
   defp can?(%User{} = current_user, :update, %GithubRepo{} = github_repo, %{} = params), do: Policy.GithubRepo.update?(current_user, github_repo, params)
 
   # Organization
-  defp can?(%User{} = current_user, :create, %Organization{}, %{}), do: Policy.Organization.create?(current_user)
-  defp can?(%User{} = current_user, :update, %Organization{} = organization, %{}), do: Policy.Organization.update?(current_user, organization)
+  defp can?(%User{} = current_user, :create, %Organization{}, %{} = params), do: Policy.Organization.create?(current_user, params)
+  defp can?(%User{} = current_user, :update, %Organization{} = organization, %{} = params), do: Policy.Organization.update?(current_user, organization, params)
 
   # OrganizationGithubAppInstallation
   defp can?(%User{} = current_user, :create, %OrganizationGithubAppInstallation{}, %{} = params), do: Policy.OrganizationGithubAppInstallation.create?(current_user, params)
@@ -66,7 +66,7 @@ defmodule CodeCorps.Policy do
 
   # Project
   defp can?(%User{} = current_user, :create, %Project{}, %{} = params), do: Policy.Project.create?(current_user, params)
-  defp can?(%User{} = current_user, :update, %Project{} = project, %{}), do: Policy.Project.update?(current_user, project)
+  defp can?(%User{} = current_user, :update, %Project{} = project, params = %{}), do: Policy.Project.update?(current_user, project, params)
 
   # ProjectCategory
   defp can?(%User{} = current_user, :create, %ProjectCategory{}, %{} = params), do: Policy.ProjectCategory.create?(current_user, params)

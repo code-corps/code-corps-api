@@ -19,6 +19,7 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilderTest do
       assert :github_app_installation |> insert |> SegmentTraitsBuilder.build
       assert :github_repo |> insert |> SegmentTraitsBuilder.build
 
+      assert :project |> insert |> SegmentTraitsBuilder.build
       assert :project_skill |> insert |> SegmentTraitsBuilder.build
       assert :project_user |> insert |> SegmentTraitsBuilder.build
 

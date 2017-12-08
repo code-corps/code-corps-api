@@ -18,6 +18,7 @@ defmodule CodeCorpsWeb.OrganizationViewTest do
     expected_json = %{
       "data" => %{
         "attributes" => %{
+          "approved" => organization.approved,
           "cloudinary-public-id" => nil,
           "description" => organization.description,
           "icon-large-url" => "#{host}/icons/organization_default_large_blue.png",

@@ -21,7 +21,7 @@ defmodule CodeCorpsWeb.ChangesetViewTest do
         %{
           detail: "User can't be blank",
           source: %{
-            pointer: "data/attributes/user_id"
+            pointer: "data/attributes/user-id"
           },
           status: "422",
           title: "can't be blank"

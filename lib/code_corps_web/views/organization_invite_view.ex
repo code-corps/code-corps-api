@@ -4,6 +4,8 @@ defmodule CodeCorpsWeb.OrganizationInviteView do
   use JaSerializer.PhoenixView
 
   attributes [
-    :email, :fulfilled, :inserted_at, :organization_name, :updated_at
+    :email, :inserted_at, :organization_name, :updated_at
   ]
+
+  has_one :organization, type: "organization", field: :organization_id
 end

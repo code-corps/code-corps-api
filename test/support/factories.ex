@@ -118,7 +118,6 @@ defmodule CodeCorps.Factories do
     %CodeCorps.OrganizationInvite{
       code: sequence(:code, &"n43crhiqR-#{&1}"),
       email: sequence(:email, &"email_#{&1}@mail.com"),
-      fulfilled: false,
       organization_name: sequence(:organization_name, &"organization-#{&1}")
     }
   end

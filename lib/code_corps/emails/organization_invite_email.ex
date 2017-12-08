@@ -24,7 +24,7 @@ defmodule CodeCorps.Emails.OrganizationInviteEmail do
   defp invite_url(code, organization_name) do
     query_params = set_params(code, organization_name)
     WebClient.url()
-    |> URI.merge("/invites/organization" <> "?" <> query_params)
+    |> URI.merge("/organizations/new" <> "?" <> query_params)
     |> URI.to_string
   end
 
@@ -35,5 +35,5 @@ defmodule CodeCorps.Emails.OrganizationInviteEmail do
   end
 
   @spec template_id :: String.t
-  defp template_id, do: Application.get_env(:code_corps, :organization_invite_email_template)
+  defp template_id, do: Application.get_env(:code_corps, :postmark_organization_invite_email_template)
 end

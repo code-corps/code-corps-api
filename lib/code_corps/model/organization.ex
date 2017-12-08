@@ -10,19 +10,22 @@ defmodule CodeCorps.Organization do
   import CodeCorps.Validators.SlugValidator
 
   alias CodeCorps.SluggedRoute
+  alias Ecto.Changeset
 
   @type t :: %__MODULE__{}
 
   schema "organizations" do
+    field :approved, :boolean
     field :cloudinary_public_id
     field :default_color
     field :description, :string
+    field :invite_code, :string, virtual: true
     field :name, :string
     field :slug, :string
-    field :approved, :boolean
 
     belongs_to :owner, CodeCorps.User
 
+    has_one :organization_invite, CodeCorps.OrganizationInvite
     has_one :slugged_route, CodeCorps.SluggedRoute
     has_one :stripe_connect_account, CodeCorps.StripeConnectAccount
 
@@ -37,8 +40,8 @@ defmodule CodeCorps.Organization do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:name, :description, :slug, :cloudinary_public_id, :default_color])
-    |> validate_required([:name, :description])
+    |> cast(params, [:cloudinary_public_id, :description, :default_color, :name, :slug])
+    |> validate_required([:description, :name])
   end
 
   @doc """
@@ -47,16 +50,32 @@ defmodule CodeCorps.Organization do
   def create_changeset(struct, params) do
     struct
     |> changeset(params)
-    |> cast(params, [:owner_id])
-    |> generate_slug(:name, :slug)
-    |> validate_required([:description, :owner_id, :slug])
+    |> cast(params, [:invite_code, :owner_id])
+    |> maybe_generate_slug()
+    |> validate_required([:cloudinary_public_id, :description, :owner_id, :slug])
     |> assoc_constraint(:owner)
     |> validate_slug(:slug)
+    |> unique_constraint(:slug, name: :organizations_lower_slug_index)
     |> put_slugged_route()
     |> generate_icon_color(:default_color)
+    |> put_change(:approved, false)
   end
 
-  defp put_slugged_route(changeset) do
+  @spec update_changeset(struct, map) :: Changeset.t
+  def update_changeset(struct, params \\ %{}) do
+    struct
+    |> changeset(params)
+    |> cast(params, [:approved])
+  end
+
+  defp maybe_generate_slug(%Changeset{changes: %{slug: _}} = changeset) do
+    changeset
+  end
+  defp maybe_generate_slug(%Changeset{} = changeset) do
+    changeset |> generate_slug(:name, :slug)
+  end
+
+  defp put_slugged_route(%Changeset{} = changeset) do
     case changeset do
       %Ecto.Changeset{valid?: true, changes: %{slug: slug}} ->
         slugged_route_changeset = SluggedRoute.create_changeset(%SluggedRoute{}, %{slug: slug})

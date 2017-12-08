@@ -507,13 +507,11 @@ Note that a Github Repo relates 1:1 to a Github App Installation, since only a s
 
 This endpoint is for Creating, Updating, returning Organization Invites on Code Corps.
 
-`fulfilled` field may only change from false to true.
-
 ##Organization Invites [/organization-invites]
 
 ### Create an organization invite [POST]
 
-Admin creates new organization invites which contains `email` and `title`. A `code` is automatically generated on creation and `fulfilled` is set to false.
+Admin creates new organization invites which contains `email` and `title`. A `code` is automatically generated on creation.
 
 On successful creation an email is sent to the given `email` address.
 
@@ -614,7 +612,7 @@ On successful creation an email is sent to the given `email` address.
 
 This endpoint retrieves Organizations on Code Corps. Organizations usually have one or more Projects.
 
-Until the Code Corps platform is open to new organizations, only admin users can create new organizations.
+A valid `invite_code` parameter is required to create an Organization. Without this parameter, only admin users are allowed to create new organizations.
 
 ## Organizations [/organizations]
 
@@ -626,6 +624,7 @@ Until the Code Corps platform is open to new organizations, only admin users can
 
             Accept: application/vnd.api+json
             Authorization: Bearer <token>
+    + Attributes (Organization Create Request)
 
 + Response 201 (application/vnd.api+json; charset=utf-8)
 
@@ -3035,9 +3034,22 @@ The platform stores Stripe customers and cards so they can be reused across diff
 + `icon-large-url`: `//res.cloudinary.com/dlfnmtoq1/image/upload/c_fill,h_500,w_500/pp0md2banaw7k6oa1ew9`
 + `icon-thumb-url`: `//res.cloudinary.com/dlfnmtoq1/image/upload/c_fill,h_100,w_100/pp0md2banaw7k6oa1ew9`
 + `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
++ `invite-code`: `valid-invite-code` (string)
 + name: `Code Corps`
-+ slug: `code_corps`
++ slug: `code-corps`
 + `updated-at`: `2016-07-08T03:03:51.967Z` (string)
+
+## Organization Create Request (object)
++ type: `organization` (string, required)
++ attributes
+    + `cloudinary-public-id`: `pp0md2banaw7k6oa1ew9` (string, required)
+    + description: `Build a better future.` (string, required)
+    + `invite-code`: `valid-invite-code` (string)
+    + name: `Code Corps` (string, required)
+    + slug: `code-corps` (string)
++ relationships
+    + owner
+        + data(User Resource Identifier)
 
 ## Organization Resource (object)
 + include Organization Resource Identifier
@@ -3069,7 +3081,6 @@ The platform stores Stripe customers and cards so they can be reused across diff
 + email: `head@corecorps.com` (string)
 + `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
 + `updated-at`: `2016-07-08T03:03:51.967Z` (string)
-+ fulfilled: `false` (boolean)
 
 ## Organization Invite Resource (object)
 + include Organization Invite Resource Identifier

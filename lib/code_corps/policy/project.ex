@@ -9,6 +9,8 @@ defmodule CodeCorps.Policy.Project do
     params |> get_organization() |> owned_by?(user)
   end
 
-  @spec update?(User.t, Project.t) :: boolean
-  def update?(%User{} = user, %Project{} = project), do: project |> administered_by?(user)
+  @spec update?(User.t, Project.t, map) :: boolean
+  def update?(%User{admin: true}, %Project{}, %{}), do: true
+  def update?(%User{}, %Project{}, %{"approved" => true}), do: false
+  def update?(%User{} = user, %Project{} = project, _), do: project |> administered_by?(user)
 end
