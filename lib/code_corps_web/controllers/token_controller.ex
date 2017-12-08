@@ -2,7 +2,6 @@ defmodule CodeCorpsWeb.TokenController do
   @moduledoc false
   use CodeCorpsWeb, :controller
   import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
-  alias CodeCorpsWeb.Plug.SetTimberUserContext
   alias CodeCorps.Repo
   alias CodeCorps.User
 
@@ -32,7 +31,6 @@ defmodule CodeCorpsWeb.TokenController do
          {:ok, user} <- CodeCorps.Guardian.resource_from_claims(new_claims) do
             conn
             |> Plug.Conn.assign(:current_user, user)
-            |> SetTimberUserContext.add_context(user)
             |> put_status(:created)
             |> render("show.json", token: new_token, user_id: user.id)
     else
