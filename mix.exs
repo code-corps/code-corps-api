@@ -232,7 +232,8 @@ defmodule CodeCorps.Mixfile do
         CodeCorpsWeb.Plug.DataToAttributes,
         CodeCorpsWeb.Plug.IdsToIntegers,
         CodeCorpsWeb.Plug.Segment,
-        CodeCorpsWeb.Plug.SetSentryUserContext
+        CodeCorpsWeb.Plug.SetSentryUserContext,
+        CodeCorpsWeb.Plug.SetTimberUserContext
       ],
 
       "Miscellaneous": [
