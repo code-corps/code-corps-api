@@ -7,7 +7,7 @@ defmodule CodeCorps.UserTest do
   @invalid_attrs %{}
 
   describe "full_name/1" do
-    test "returns full name correclty" do
+    test "returns full name correctly" do
       names = [
         {"Josh", "Smith", "Josh Smith"},
         {"Josh", nil,     "Josh"},
