@@ -69,6 +69,15 @@ defmodule CodeCorps.User do
   end
 
   @doc """
+  Returns full name of the given user.
+  """
+  def full_name(%__MODULE__{first_name: first_name, last_name: last_name}) do
+    [first_name, last_name]
+    |> Enum.map_join(" ", &to_string/1)
+    |> String.trim()
+  end
+
+  @doc """
   Builds a changeset based on the `struct` and `params`.
   """
   def changeset(struct, params \\ %{}) do
