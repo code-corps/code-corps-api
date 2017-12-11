@@ -16,8 +16,9 @@ defmodule CodeCorpsWeb.Plug.SetTimberUserContext do
 
   @impl false
   def add_context(conn, %User{} = user) do
-    %Timber.Contexts.UserContext{id: user.id, email: user.email, name: User.full_name(user)}
-    |> Timber.add_context()
+    %Timber.Contexts.UserContext{
+      id: user.id, email: user.email, name: User.full_name(user)
+    } |> Timber.add_context()
 
     conn
   end
