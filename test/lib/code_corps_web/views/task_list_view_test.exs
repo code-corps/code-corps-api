@@ -10,8 +10,8 @@ defmodule CodeCorpsWeb.TaskListViewTest do
     rendered_json =  render(CodeCorpsWeb.TaskListView, "show.json-api", %{data: task_list, conn: %Plug.Conn{}, params: task_list.id})
 
     expected_json = %{
-      "data" => %{
-        "attributes" => %{
+      :data => %{
+        attributes: %{
           "done" => task_list.done,
           "inbox" => task_list.inbox,
           "name" => task_list.name,
@@ -20,26 +20,25 @@ defmodule CodeCorpsWeb.TaskListViewTest do
           "inserted-at" => task_list.inserted_at,
           "updated-at" => task_list.updated_at,
         },
-        "id" => task_list.id |> Integer.to_string,
-        "relationships" => %{
+        id: task_list.id |> Integer.to_string,
+        relationships: %{
           "project" => %{
-            "data" => %{
-              "id" => task_list.project_id |> Integer.to_string,
-              "type" => "project"
+            :data => %{
+              id: task_list.project_id |> Integer.to_string,
+              type: "project"
             }
           },
           "tasks" => %{
-            "data" => [%{
-              "id" => task.id |> Integer.to_string,
-              "type" => "task"
+            :data => [%{
+              id: task.id |> Integer.to_string,
+              type: "task"
             }]
           }
         },
-        "type" => "task-list",
+        type: "task-list",
       },
-      "jsonapi" => %{
-        "version" => "1.0"
-      }
+      :included => [],
+      :links => %{}
     }
 
     assert rendered_json == expected_json
