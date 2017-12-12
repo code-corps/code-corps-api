@@ -1,6 +1,7 @@
 defmodule CodeCorpsWeb.TaskListViewTest do
   use CodeCorpsWeb.ViewCase
 
+  @tag :wip
   test "renders all attributes and relationships properly" do
     project = insert(:project)
     task_list = insert(:task_list, order: 1000, project: project)

@@ -15,7 +15,7 @@ defmodule CodeCorpsWeb.TaskListView do
 
   def fields, do: [:done, :inbox, :name, :order, :pull_requests, :inserted_at, :updated_at]
 
-  def relationships do
-    [project: ProjectView, tasks: TaskView]
-  end
+  # def relationships do
+  #   [project: ProjectView, tasks: TaskView]
+  # end
 end

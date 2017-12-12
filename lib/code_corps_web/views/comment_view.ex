@@ -2,7 +2,6 @@ defmodule CodeCorpsWeb.CommentView do
   @moduledoc false
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
-  use JSONAPI.View, type: "comment"
 
   attributes [
     :body, :created_at, :created_from, :inserted_at, :markdown, :modified_at,
