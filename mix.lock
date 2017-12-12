@@ -38,7 +38,7 @@
   "ja_serializer": {:hex, :ja_serializer, "0.12.0", "ba4ec5fc7afa6daba815b5cb2b9bd0de410554ac4f0ed54e954d39decb353ca4", [:mix], [{:inflex, "~> 1.4", [hex: :inflex, repo: "hexpm", optional: false]}, {:plug, "> 1.0.0", [hex: :plug, repo: "hexpm", optional: false]}, {:poison, ">= 1.4.0", [hex: :poison, repo: "hexpm", optional: false]}, {:scrivener, "~> 1.2 or ~> 2.0", [hex: :scrivener, repo: "hexpm", optional: true]}], "hexpm"},
   "joken": {:hex, :joken, "1.5.0", "42a0953e80bd933fc98a0874e156771f78bf0e92abe6c3a9c22feb6da28efb0b", [:mix], [{:jose, "~> 1.8", [hex: :jose, repo: "hexpm", optional: false]}, {:plug, "~> 1.0", [hex: :plug, repo: "hexpm", optional: true]}, {:poison, "~> 1.5 or ~> 2.0 or ~> 3.0", [hex: :poison, repo: "hexpm", optional: true]}], "hexpm"},
   "jose": {:hex, :jose, "1.8.4", "7946d1e5c03a76ac9ef42a6e6a20001d35987afd68c2107bcd8f01a84e75aa73", [:mix, :rebar3], [{:base64url, "~> 0.0.1", [hex: :base64url, repo: "hexpm", optional: false]}], "hexpm"},
-  "jsonapi": {:git, "https://github.com/jeregrine/jsonapi.git", "6b0b24c7f7beb4a9ed17ae33c91866546ccdb420", []},
+  "jsonapi": {:hex, :jsonapi, "0.6.0", "eb52caf7627902bb3a979a67a9b20dfc478fc6a2d45bec5368ebb253f62931a6", [:mix], [{:plug, "~> 1.0", [hex: :plug, repo: "hexpm", optional: false]}], "hexpm"},
   "jsx": {:hex, :jsx, "2.8.3", "a05252d381885240744d955fbe3cf810504eb2567164824e19303ea59eef62cf", [:mix, :rebar3], [], "hexpm"},
   "metrics": {:hex, :metrics, "1.0.1", "25f094dea2cda98213cecc3aeff09e940299d950904393b2a29d191c346a8486", [:rebar3], [], "hexpm"},
   "mime": {:hex, :mime, "1.1.0", "01c1d6f4083d8aa5c7b8c246ade95139620ef8effb009edde934e0ec3b28090a", [:mix], [], "hexpm"},
