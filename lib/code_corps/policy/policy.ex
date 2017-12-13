@@ -3,7 +3,7 @@ defmodule CodeCorps.Policy do
   Handles authorization for various API actions performed on objects in the database.
   """
 
-  alias CodeCorps.{Category, Comment, DonationGoal, GithubAppInstallation, GithubEvent, GithubRepo, Message, Organization, OrganizationInvite, OrganizationGithubAppInstallation, Preview, Project, ProjectCategory, ProjectSkill, ProjectUser, Role, RoleSkill, Skill, StripeConnectAccount, StripeConnectPlan, StripeConnectSubscription, StripePlatformCard, StripePlatformCustomer, Task, TaskSkill, User, UserCategory, UserRole, UserSkill, UserTask}
+  alias CodeCorps.{Category, Comment, Conversation, DonationGoal, GithubAppInstallation, GithubEvent, GithubRepo, Message, Organization, OrganizationInvite, OrganizationGithubAppInstallation, Preview, Project, ProjectCategory, ProjectSkill, ProjectUser, Role, RoleSkill, Skill, StripeConnectAccount, StripeConnectPlan, StripeConnectSubscription, StripePlatformCard, StripePlatformCustomer, Task, TaskSkill, User, UserCategory, UserRole, UserSkill, UserTask}
 
   alias CodeCorps.Policy
 
@@ -28,6 +28,7 @@ defmodule CodeCorps.Policy do
   """
   @spec scope(module, User.t) :: Ecto.Queryable.t
   def scope(Message, %User{} = current_user), do: Message |> Policy.Message.scope(current_user)
+  def scope(Conversation, %User{} = current_user), do: Conversation |> Policy.Conversation.scope(current_user)
 
   @spec can?(User.t, atom, struct, map) :: boolean
 
