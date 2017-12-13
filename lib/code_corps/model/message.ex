@@ -25,6 +25,8 @@ defmodule CodeCorps.Message do
     belongs_to :author, CodeCorps.User
     belongs_to :project, CodeCorps.Project
 
+    has_many :conversations, CodeCorps.Conversation
+
     timestamps()
   end
 
