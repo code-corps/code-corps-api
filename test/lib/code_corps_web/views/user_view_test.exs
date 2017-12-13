@@ -15,6 +15,7 @@ defmodule CodeCorpsWeb.UserViewTest do
     user_category = insert(:user_category, user: user)
     user_role = insert(:user_role, user: user)
     user_skill = insert(:user_skill, user: user)
+    organization = insert(:organization, owner: user)
     project_user = insert(:project_user, user: user)
 
     host = Application.get_env(:code_corps, :asset_host)
@@ -59,6 +60,11 @@ defmodule CodeCorpsWeb.UserViewTest do
           "github-app-installations" => %{
             "data" => [
               %{"id" => github_app_installation.id |> Integer.to_string, "type" => "github-app-installation"}
+            ]
+          },
+          "organizations" => %{
+            "data" => [
+              %{"id" => organization.id |> Integer.to_string, "type" => "organization"}
             ]
           },
           "project-users" => %{
