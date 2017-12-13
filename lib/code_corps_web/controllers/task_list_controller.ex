@@ -19,13 +19,13 @@ defmodule CodeCorpsWeb.TaskListController do
       |> Repo.all()
       |> preload()
 
-    conn |> render(TaskListView, "index.json-api", %{data: task_lists, conn: conn})
+    conn |> render(TaskListView, "index.json", %{data: task_lists, conn: conn})
   end
 
   @spec show(Conn.t, map) :: Conn.t
   def show(%Conn{} = conn, %{"id" => id}) do
     with %TaskList{} = task_list <- TaskList |> Repo.get(id) |> preload() do
-      conn |> render(TaskListView, "show.json-api", %{data: task_list, conn: conn, params: id})
+      conn |> render(TaskListView, "show.json", %{data: task_list, conn: conn, params: id})
     end
   end
 
