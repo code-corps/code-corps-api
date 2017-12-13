@@ -12,8 +12,6 @@ defmodule CodeCorpsWeb.ProjectViewTest do
     project_skill = insert(:project_skill, project: project, skill: skill)
     project_user = insert(:project_user, project: project)
     stripe_connect_plan = insert(:stripe_connect_plan, project: project)
-    task_list = insert(:task_list, project: project)
-    task = insert(:task, task_list: task_list, project: project)
 
     host = Application.get_env(:code_corps, :asset_host)
 
@@ -102,22 +100,6 @@ defmodule CodeCorpsWeb.ProjectViewTest do
               "id" => stripe_connect_plan.id |> Integer.to_string,
               "type" => "stripe-connect-plan"
             }
-          },
-          "task-lists" => %{
-            "data" => [
-              %{
-                "id" => task_list.id |> Integer.to_string,
-                "type" => "task-list"
-              }
-            ]
-          },
-          "tasks" => %{
-            "data" => [
-              %{
-                "id" => task.id |> Integer.to_string,
-                "type" => "task"
-              }
-            ]
           }
         },
         "type" => "project",

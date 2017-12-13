@@ -1,7 +1,6 @@
 defmodule CodeCorpsWeb.TaskListViewTest do
   use CodeCorpsWeb.ViewCase
 
-  @tag :wip
   test "renders all attributes and relationships properly" do
     project = insert(:project)
     task_list = insert(:task_list, order: 1000, project: project)
@@ -38,7 +37,48 @@ defmodule CodeCorpsWeb.TaskListViewTest do
         },
         type: "task-list",
       },
-      :included => [],
+      :included => [
+        %{
+          attributes: %{
+            "approval-requested" => false, 
+            "approved" => project.approved,
+            "cloudinary-public-id" => nil, 
+            "description" => project.description, 
+            "inserted-at" => project.inserted_at,
+            "long-description-body" => project.long_description_body, 
+            "long-description-markdown" => project.long_description_markdown,
+            "should-link-externally" => false, 
+            "slug" => project.slug,
+            "title" => project.title,
+            "total-monthly-donated" => 0, 
+            "updated-at" => project.updated_at,
+            "website" => project.website
+          }, 
+          id: project.id |> Integer.to_string,
+          relationships: %{}, 
+          type: "project"
+          }, 
+          %{
+            attributes: %{
+              "archived" => false, 
+              "body" => nil, 
+              "created-at" => task.created_at,
+              "created-from" => task.created_from,
+              "inserted-at" => task.inserted_at,
+              "markdown" => "A test task", 
+              "modified-at" => task.modified_at,
+              "modified-from" => task.modified_from,
+              "number" => task.number,
+              "order" => task.order,
+              "status" => task.status,
+              "title" => task.title,
+              "updated-at" => task.updated_at
+            }, 
+            id: task.id |> Integer.to_string,
+            relationships: %{}, 
+            type: "task"
+          }
+      ],
       :links => %{}
     }
 

@@ -3,11 +3,11 @@ defmodule CodeCorpsWeb.TaskListView do
   use CodeCorpsWeb, :view
   use JSONAPI.View, type: "task-list"
 
-  alias CodeCorpsWeb.{ProjectView, TaskView}
+  alias CodeCorpsWeb.{ProjectJsonapiView, TaskJsonapiView}
 
   def fields, do: [:done, :inbox, :name, :order, :pull_requests, :inserted_at, :updated_at]
 
   def relationships do
-    [project: ProjectView, tasks: TaskView]
+    [project: {ProjectJsonapiView, :include}, tasks: {TaskJsonapiView, :include}]
   end
 end

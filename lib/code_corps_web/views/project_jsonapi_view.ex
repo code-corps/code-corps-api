@@ -1,12 +1,12 @@
-defmodule CodeCorpsWeb.ProjectView do
+defmodule CodeCorpsWeb.ProjectJsonapiView do
   @moduledoc false
   alias CodeCorps.StripeService.Validators.ProjectCanEnableDonations
   alias CodeCorps.Presenters.ImagePresenter
 
+  use JSONAPI.View, type: "project"
   use CodeCorpsWeb, :view
-  use JaSerializer.PhoenixView
 
-  attributes [
+  def fields, do: [
   	:approval_requested,
     :approved,
     :can_activate_donations,
@@ -25,17 +25,6 @@ defmodule CodeCorpsWeb.ProjectView do
     :updated_at,
     :website
   ]
-
-  has_one :organization, type: "organization", field: :organization_id
-  has_one :stripe_connect_plan, serializer: CodeCorpsWeb.StripeConnectPlanView
-
-  has_many :categories, serializer: CodeCorpsWeb.CategoryView, identifiers: :always
-  has_many :donation_goals, serializer: CodeCorpsWeb.DonationGoalView, identifiers: :always
-  has_many :github_repos, serializer: CodeCorpsWeb.GithubRepoView, identifiers: :always
-  has_many :project_categories, serializer: CodeCorpsWeb.ProjectCategoryView, identifiers: :always
-  has_many :project_skills, serializer: CodeCorpsWeb.ProjectSkillView, identifiers: :always
-  has_many :project_users, serializer: CodeCorpsWeb.ProjectUserView, identifiers: :always
-  has_many :skills, serializer: CodeCorpsWeb.SkillView, identifiers: :always
 
   def can_activate_donations(project, _conn) do
     case ProjectCanEnableDonations.validate(project) do
