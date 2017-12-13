@@ -76,6 +76,7 @@ defmodule CodeCorpsWeb.Router do
     resources "/github-app-installations", GithubAppInstallationController, only: [:create]
     resources "/github-events", GithubEventController, only: [:index, :show, :update]
     resources "/github-repos", GithubRepoController, only: [:update]
+    resources "/messages", MessageController, only: [:index, :show, :create]
     resources "/organization-github-app-installations", OrganizationGithubAppInstallationController, only: [:create, :delete]
     resources "/organizations", OrganizationController, only: [:create, :update]
     resources "/organization-invites", OrganizationInviteController, only: [:create, :update]
