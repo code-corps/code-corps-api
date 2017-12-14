@@ -16,8 +16,8 @@ defmodule CodeCorps.Conversation do
   @type t :: %__MODULE__{}
 
   schema "conversations" do
-    field :status, :string, null: false, default: "open"
     field :read_at, :utc_datetime, null: true
+    field :status, :string, null: false, default: "open"
 
     belongs_to :message, CodeCorps.Message
     belongs_to :user, CodeCorps.User

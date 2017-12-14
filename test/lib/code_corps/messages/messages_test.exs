@@ -5,13 +5,13 @@ defmodule CodeCorps.MessagesTest do
 
   import Ecto.Query, only: [where: 2]
 
-  alias CodeCorps.{Message, Messages}
+  alias CodeCorps.{Conversation, Message, Messages}
+
+  defp get_and_sort_ids(records) do
+    records |> Enum.map(&Map.get(&1, :id)) |> Enum.sort
+  end
 
   describe "list" do
-    defp get_and_sort_ids(records) do
-      records |> Enum.map(&Map.get(&1, :id)) |> Enum.sort
-    end
-
     test "returns all records by default" do
       insert_list(3, :message)
       assert Message |> Messages.list(%{}) |> Enum.count == 3
@@ -119,6 +119,167 @@ defmodule CodeCorps.MessagesTest do
       refute message_p1_a2.id in result_ids
       refute message_p2_a1.id in result_ids
       refute message_p2_a2.id in result_ids
+    end
+  end
+
+  describe "list_conversations/2" do
+    test "returns all records by default" do
+      insert_list(3, :conversation)
+      assert Conversation |> Messages.list_conversations(%{}) |> Enum.count == 3
+    end
+
+    test "can filter by project" do
+      [%{project: project_1} = message_1, %{project: project_2} = message_2] =
+        insert_pair(:message)
+
+      conversation_1 = insert(:conversation, message: message_1)
+      conversation_2 = insert(:conversation, message: message_2)
+
+      result_ids =
+        Conversation
+        |> Messages.list_conversations(%{"project_id" => project_1.id})
+        |> get_and_sort_ids()
+
+      assert result_ids |> Enum.count == 1
+      assert conversation_1.id in result_ids
+      refute conversation_2.id in result_ids
+
+      result_ids =
+        Conversation
+        |> Messages.list_conversations(%{"project_id" => project_2.id})
+        |> get_and_sort_ids()
+
+      assert result_ids |> Enum.count == 1
+      refute conversation_1.id in result_ids
+      assert conversation_2.id in result_ids
+    end
+
+    test "can filter by status" do
+      message_started_by_admin = insert(:message, initiated_by: "admin")
+      message_started_by_user = insert(:message, initiated_by: "user")
+
+      conversation_started_by_admin_without_reply =
+        insert(:conversation, message: message_started_by_admin)
+      conversation_started_by_admin_with_reply =
+        insert(:conversation, message: message_started_by_admin)
+      insert(
+        :conversation_part,
+        conversation: conversation_started_by_admin_with_reply
+      )
+
+      conversation_started_by_user_without_reply =
+        insert(:conversation, message: message_started_by_user)
+      conversation_started_by_user_with_reply =
+        insert(:conversation, message: message_started_by_user)
+      insert(
+        :conversation_part,
+        conversation: conversation_started_by_user_with_reply
+      )
+
+      result_ids =
+        Conversation
+        |> Messages.list_conversations(%{"status" => "active"})
+        |> get_and_sort_ids()
+
+      refute conversation_started_by_admin_without_reply.id in result_ids
+      assert conversation_started_by_admin_with_reply.id in result_ids
+      assert conversation_started_by_user_without_reply.id in result_ids
+      assert conversation_started_by_user_with_reply.id in result_ids
+
+      result_ids =
+        Conversation
+        |> Messages.list_conversations(%{"status" => "any"})
+        |> get_and_sort_ids()
+
+      assert conversation_started_by_admin_without_reply.id in result_ids
+      assert conversation_started_by_admin_with_reply.id in result_ids
+      assert conversation_started_by_user_without_reply.id in result_ids
+      assert conversation_started_by_user_with_reply.id in result_ids
+    end
+
+    test "builds upon the provided scope" do
+      [project_1, project_2] = insert_pair(:project)
+      [user_1, user_2] = insert_pair(:user)
+
+      message_p1 = insert(:message, project: project_1)
+      message_p2 = insert(:message, project: project_2)
+
+      conversation_u1_p1 =
+        insert(:conversation, user: user_1, message: message_p1)
+      conversation_u1_p2 =
+        insert(:conversation, user: user_1, message: message_p2)
+      conversation_u2_p1 =
+        insert(:conversation, user: user_2, message: message_p1)
+      conversation_u2_p2 =
+        insert(:conversation, user: user_2, message: message_p2)
+
+      params = %{"project_id" => project_1.id}
+      result_ids =
+        Conversation
+        |> where(user_id: ^user_1.id)
+        |> Messages.list_conversations(params)
+        |> get_and_sort_ids()
+
+      assert conversation_u1_p1.id in result_ids
+      refute conversation_u1_p2.id in result_ids
+      refute conversation_u2_p1.id in result_ids
+      refute conversation_u2_p2.id in result_ids
+    end
+
+    test "supports multiple filters at once" do
+      ## we create two messages started by admin, each on a different project
+      %{project: project_1} = message_1_started_by_admin =
+        insert(:message, initiated_by: "admin")
+      %{project: project_2} = message_2_started_by_admin =
+        insert(:message, initiated_by: "admin")
+
+      # we create one conversation without a reply, to test the "status" filter
+
+      conversation_started_by_admin_without_reply =
+        insert(:conversation, message: message_1_started_by_admin)
+
+      # we create two conversations with replies, on on each message
+      # since the messages are on different projects, this allows us to
+      # test the project filter
+
+      conversation_started_by_admin_with_reply =
+        insert(:conversation, message: message_1_started_by_admin)
+      insert(
+        :conversation_part,
+        conversation: conversation_started_by_admin_with_reply
+      )
+      other_conversation_started_by_admin_with_reply =
+        insert(:conversation, message: message_2_started_by_admin)
+      insert(
+        :conversation_part,
+        conversation: other_conversation_started_by_admin_with_reply
+      )
+
+      params = %{"status" => "active", "project_id" => project_1.id}
+      result_ids =
+        Conversation
+        |> Messages.list_conversations(params)
+        |> get_and_sort_ids()
+
+      # this means the status filter worked, because the first conv. belongs to
+      # the message with the correct project
+      refute conversation_started_by_admin_without_reply.id in result_ids
+      # this conversation is active and belongs to the message with the
+      # correct project
+      assert conversation_started_by_admin_with_reply.id in result_ids
+      # this conversation is active, but belongs to a message with a different
+      # project
+      refute other_conversation_started_by_admin_with_reply.id in result_ids
+
+      params = %{"status" => "active", "project_id" => project_2.id}
+      result_ids =
+        Conversation
+        |> Messages.list_conversations(params)
+        |> get_and_sort_ids()
+
+      refute conversation_started_by_admin_without_reply.id in result_ids
+      refute conversation_started_by_admin_with_reply.id in result_ids
+      assert other_conversation_started_by_admin_with_reply.id in result_ids
     end
   end
 end
