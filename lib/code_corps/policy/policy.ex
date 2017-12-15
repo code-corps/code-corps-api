@@ -3,9 +3,41 @@ defmodule CodeCorps.Policy do
   Handles authorization for various API actions performed on objects in the database.
   """
 
-  alias CodeCorps.{Category, Comment, Conversation, DonationGoal, GithubAppInstallation, GithubEvent, GithubRepo, Message, Organization, OrganizationInvite, OrganizationGithubAppInstallation, Preview, Project, ProjectCategory, ProjectSkill, ProjectUser, Role, RoleSkill, Skill, StripeConnectAccount, StripeConnectPlan, StripeConnectSubscription, StripePlatformCard, StripePlatformCustomer, Task, TaskSkill, User, UserCategory, UserRole, UserSkill, UserTask}
-
-  alias CodeCorps.Policy
+  alias CodeCorps.{
+    Category,
+    Comment,
+    Conversation,
+    ConversationPart,
+    DonationGoal,
+    GithubAppInstallation,
+    GithubEvent,
+    GithubRepo,
+    Message,
+    Organization,
+    OrganizationInvite,
+    OrganizationGithubAppInstallation,
+    Policy,
+    Preview,
+    Project,
+    ProjectCategory,
+    ProjectSkill,
+    ProjectUser,
+    Role,
+    RoleSkill,
+    Skill,
+    StripeConnectAccount,
+    StripeConnectPlan,
+    StripeConnectSubscription,
+    StripePlatformCard,
+    StripePlatformCustomer,
+    Task,
+    TaskSkill,
+    User,
+    UserCategory,
+    UserRole,
+    UserSkill,
+    UserTask
+  }
 
   @doc ~S"""
   Determines if the specified user can perform the specified action on the
@@ -29,6 +61,7 @@ defmodule CodeCorps.Policy do
   @spec scope(module, User.t) :: Ecto.Queryable.t
   def scope(Message, %User{} = current_user), do: Message |> Policy.Message.scope(current_user)
   def scope(Conversation, %User{} = current_user), do: Conversation |> Policy.Conversation.scope(current_user)
+  def scope(ConversationPart, %User{} = current_user), do: ConversationPart |> Policy.ConversationPart.scope(current_user)
 
   @spec can?(User.t, atom, struct, map) :: boolean
 
@@ -42,6 +75,10 @@ defmodule CodeCorps.Policy do
 
   # Conversation
   defp can?(%User{} = current_user, :show, %Conversation{} = conversation, %{}), do: Policy.Conversation.show?(current_user, conversation)
+
+  # ConversationPart
+  defp can?(%User{} = current_user, :create, %ConversationPart{}, %{} = params), do: Policy.ConversationPart.create?(current_user, params)
+  defp can?(%User{} = current_user, :show, %ConversationPart{} = conversation_part, %{}), do: Policy.ConversationPart.show?(current_user, conversation_part)
 
   # DonationGoal
   defp can?(%User{} = current_user, :create, %DonationGoal{}, %{} = params), do: Policy.DonationGoal.create?(current_user, params)
