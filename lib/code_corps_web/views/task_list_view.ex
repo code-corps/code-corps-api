@@ -1,11 +1,13 @@
 defmodule CodeCorpsWeb.TaskListView do
   @moduledoc false
   use CodeCorpsWeb, :view
-  use JaSerializer.PhoenixView
+  use JSONAPI.View, type: "task-list"
 
-  attributes [:done, :inbox, :name, :order, :pull_requests, :inserted_at, :updated_at]
+  alias CodeCorpsWeb.{ProjectJsonapiView, TaskJsonapiView}
 
-  has_one :project, type: "project", field: :project_id
+  def fields, do: [:done, :inbox, :name, :order, :pull_requests, :inserted_at, :updated_at]
 
-  has_many :tasks, serializer: CodeCorpsWeb.TaskView, identifiers: :always
+  def relationships do
+    [project: {ProjectJsonapiView, :include}, tasks: {TaskJsonapiView, :include}]
+  end
 end
