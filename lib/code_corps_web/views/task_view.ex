@@ -37,3 +37,16 @@ defmodule CodeCorpsWeb.TaskView do
     status
   end
 end
+
+defmodule CodeCorpsWeb.TaskIncludedView do
+  @moduledoc false
+  use CodeCorpsWeb, :view
+  use JaSerializer.PhoenixView
+
+  def type, do: "task"
+
+  attributes [
+    :archived, :body, :created_at, :created_from, :inserted_at, :markdown, 
+    :modified_at, :modified_from, :number, :order, :status, :title, :updated_at
+  ]
+end
