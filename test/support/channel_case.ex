@@ -20,11 +20,12 @@ defmodule CodeCorpsWeb.ChannelCase do
       # Import conveniences for testing with channels
       use Phoenix.ChannelTest
 
-      alias CodeCorps.Repo
-      import Ecto
-      import Ecto.Changeset
+      import CodeCorps.Factories
+      import CodeCorpsWeb.ChannelCase
+
       import Ecto.Query
 
+      alias CodeCorps.Repo
 
       # The default endpoint for testing
       @endpoint CodeCorpsWeb.Endpoint

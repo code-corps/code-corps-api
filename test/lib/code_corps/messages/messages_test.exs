@@ -2,10 +2,12 @@ defmodule CodeCorps.MessagesTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
+  use Phoenix.ChannelTest
 
   import Ecto.Query, only: [where: 2]
 
   alias CodeCorps.{Conversation, ConversationPart, Message, Messages}
+  alias Ecto.Changeset
 
   defp get_and_sort_ids(records) do
     records |> Enum.map(&Map.get(&1, :id)) |> Enum.sort
@@ -325,6 +327,133 @@ defmodule CodeCorps.MessagesTest do
       assert conversation_part.author_id == user.id
       assert conversation_part.body == "Test body"
       assert conversation_part.conversation_id == conversation.id
+    end
+
+    test "broadcasts event on phoenix channel" do
+      conversation = insert(:conversation)
+      user = insert(:user)
+      attrs = %{
+        author_id: user.id,
+        body: "Test body",
+        conversation_id: conversation.id
+      }
+
+      CodeCorpsWeb.Endpoint.subscribe("conversation:#{conversation.id}")
+      {:ok, %ConversationPart{id: id}} = Messages.add_part(attrs)
+      assert_broadcast("new:conversation-part", %{id: ^id})
+      CodeCorpsWeb.Endpoint.unsubscribe("conversation:#{conversation.id}")
+    end
+  end
+
+  describe "create/1" do
+    test "creates a message" do
+      %{project: project, user: user} = insert(:project_user, role: "admin")
+      params = %{
+        author_id: user.id,
+        body: "Foo",
+        initiated_by: "admin",
+        project_id: project.id,
+        subject: "Bar"
+      }
+
+      {:ok, %Message{} = message} = params |> Messages.create
+
+      assert message |> Map.take(params |> Map.keys) == params
+    end
+
+    test "creates a conversation if attributes are provided" do
+      %{project: project, user: user} = insert(:project_user, role: "admin")
+      recipient = insert(:user)
+      params = %{
+        author_id: user.id,
+        body: "Foo",
+        conversations: [%{user_id: recipient.id}],
+        initiated_by: "admin",
+        project_id: project.id,
+        subject: "Bar"
+      }
+
+      {:ok, %Message{} = message} = params |> Messages.create
+
+      assert message |> Map.take(params |> Map.delete(:conversations) |> Map.keys) == params |> Map.delete(:conversations)
+      assert Conversation |> Repo.get_by(message_id: message.id, status: "open", user_id: recipient.id)
+    end
+
+    test "requires author_id, body, initiated_by, project_id" do
+      {:error, %Changeset{} = changeset} = %{} |> Messages.create
+
+      assert changeset.errors[:author_id]
+      assert changeset.errors[:body]
+      assert changeset.errors[:initiated_by]
+      assert changeset.errors[:project_id]
+    end
+
+    test "requires subject if initiated by admin" do
+      {:error, %Changeset{} = changeset} =
+         %{initiated_by: "admin"} |> Messages.create
+
+      assert changeset.errors[:subject]
+    end
+
+    test "allows blank subject if initiated by user" do
+      {:error, %Changeset{} = changeset} =
+         %{initiated_by: "user"} |> Messages.create
+
+      refute changeset.errors[:subject]
+    end
+
+    test "fails on project validation if id invalid" do
+      user = insert(:user)
+      params = %{
+        author_id: user.id,
+        body: "Foo",
+        initiated_by: "admin",
+        project_id: 1,
+        subject: "Bar"
+      }
+
+      {:error, %Changeset{} = changeset} = params |> Messages.create
+
+      assert changeset.errors[:project]
+    end
+
+    test "fails on user validation if id invalid" do
+      project = insert(:project)
+      params = %{
+        author_id: -1,
+        body: "Foo",
+        initiated_by: "admin",
+        project_id: project.id,
+        subject: "Bar"
+      }
+
+      {:error, %Changeset{} = changeset} = params |> Messages.create
+
+      assert changeset.errors[:author]
+    end
+
+    test "requires conversation user_id" do
+      params = %{conversations: [%{}]}
+      {:error, %Changeset{} = changeset} = params |> Messages.create
+      conversation_changeset = changeset.changes.conversations |> List.first
+
+      assert conversation_changeset.errors[:user_id]
+    end
+
+    test "fails on conversation user validation if id invalid" do
+      %{project: project, user: user} = insert(:project_user, role: "admin")
+      params = %{
+        author_id: user.id,
+        body: "Foo",
+        conversations: [%{user_id: -1}],
+        initiated_by: "admin",
+        project_id: project.id,
+        subject: "Bar"
+      }
+
+      {:error, %Changeset{} = changeset} = params |> Messages.create
+      conversation_changeset = changeset.changes.conversations |> List.first
+      assert conversation_changeset.errors[:user]
     end
   end
 end

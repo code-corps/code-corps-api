@@ -67,6 +67,11 @@ defmodule CodeCorps.Messages do
   def create(%{} = params) do
     %Message{}
     |> Message.changeset(params)
+    |> Changeset.cast(params, [:author_id, :project_id])
+    |> Changeset.validate_required([:author_id, :project_id])
+    |> Changeset.assoc_constraint(:author)
+    |> Changeset.assoc_constraint(:project)
+    |> Changeset.cast_assoc(:conversations, with: &Messages.Conversations.create_changeset/2)
     |> Repo.insert()
   end
 

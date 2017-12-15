@@ -43,7 +43,7 @@ config :code_corps, CodeCorps.Repo,
   pool_size: 10
 
 # CORS allowed origins
-config :code_corps, allowed_origins: ["http://localhost:4200"]
+config :code_corps, allowed_origins: ["http://localhost:4200", "chrome-extension://pfdhoblngboilpfeibdedpjgfnlcodoo"]
 
 config :code_corps, CodeCorps.Guardian,
   secret_key: "e62fb6e2746f6b1bf8b5b735ba816c2eae1d5d76e64f18f3fc647e308b0c159e"
