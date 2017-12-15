@@ -40,28 +40,22 @@ defmodule CodeCorps.User do
     field :username, :string
     field :website, :string
 
+    has_one :github_app_installation, CodeCorps.GithubAppInstallation
     has_one :slugged_route, SluggedRoute
 
     has_many :github_app_installations, CodeCorps.GithubAppInstallation
-
+    has_many :organizations, CodeCorps.Organization, foreign_key: :owner_id
     has_many :project_users, CodeCorps.ProjectUser
-
     has_many :stripe_connect_customers, CodeCorps.StripeConnectCustomer
     has_many :stripe_connect_subscriptions, CodeCorps.StripeConnectSubscription
-
     has_one :stripe_platform_card, CodeCorps.StripePlatformCard
     has_one :stripe_platform_customer, CodeCorps.StripePlatformCustomer
-
     has_many :user_categories, CodeCorps.UserCategory
     has_many :categories, through: [:user_categories, :category]
-
     has_many :user_roles, CodeCorps.UserRole
     has_many :roles, through: [:user_roles, :role]
-
     has_many :user_skills, CodeCorps.UserSkill
     has_many :skills, through: [:user_skills, :skill]
-
-    has_one :github_app_installation, CodeCorps.GithubAppInstallation
 
     belongs_to :github_user, CodeCorps.GithubUser
 

@@ -19,6 +19,7 @@ defmodule CodeCorpsWeb.UserView do
 
   has_many :categories, serializer: CodeCorpsWeb.CategoryView, identifiers: :always
   has_many :github_app_installations, serializer: CodeCorpsWeb.GithubAppInstallationView, identifiers: :always
+  has_many :organizations, serializer: CodeCorpsWeb.OrganizationView, identifiers: :always
   has_many :project_users, serializer: CodeCorpsWeb.ProjectUserView, identifiers: :always
   has_many :stripe_connect_subscriptions, serializer: CodeCorpsWeb.StripeConnectSubscriptionView, identifiers: :always
   has_many :user_categories, serializer: CodeCorpsWeb.UserCategoryView, identifiers: :always
