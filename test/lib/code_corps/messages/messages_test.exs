@@ -5,7 +5,7 @@ defmodule CodeCorps.MessagesTest do
 
   import Ecto.Query, only: [where: 2]
 
-  alias CodeCorps.{Conversation, Message, Messages}
+  alias CodeCorps.{Conversation, ConversationPart, Message, Messages}
 
   defp get_and_sort_ids(records) do
     records |> Enum.map(&Map.get(&1, :id)) |> Enum.sort
@@ -283,6 +283,13 @@ defmodule CodeCorps.MessagesTest do
     end
   end
 
+  describe "list_parts/2" do
+    test "returns all records by default" do
+      insert_list(3, :conversation_part)
+      assert ConversationPart |> Messages.list_parts(%{}) |> Enum.count == 3
+    end
+  end
+
   describe "get_conversation/1" do
     test "gets a single conversation" do
       conversation = insert(:conversation)
@@ -290,6 +297,34 @@ defmodule CodeCorps.MessagesTest do
       result = Messages.get_conversation(conversation.id)
 
       assert result.id == conversation.id
+    end
+  end
+
+  describe "get_part/1" do
+    test "gets a single part" do
+      conversation_part = insert(:conversation_part)
+
+      result = Messages.get_part(conversation_part.id)
+
+      assert result.id == conversation_part.id
+    end
+  end
+
+  describe "add_part/1" do
+    test "creates a conversation part" do
+      conversation = insert(:conversation)
+      user = insert(:user)
+      attrs = %{
+        author_id: user.id,
+        body: "Test body",
+        conversation_id: conversation.id
+      }
+
+      {:ok, %ConversationPart{} = conversation_part} = Messages.add_part(attrs)
+
+      assert conversation_part.author_id == user.id
+      assert conversation_part.body == "Test body"
+      assert conversation_part.conversation_id == conversation.id
     end
   end
 end

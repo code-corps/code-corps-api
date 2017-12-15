@@ -3,7 +3,14 @@ defmodule CodeCorps.Messages do
   Main context for work with the Messaging feature.
   """
 
-  alias CodeCorps.{Conversation, Helpers.Query, Message, Messages, Repo}
+  alias CodeCorps.{
+    Conversation,
+    ConversationPart,
+    Helpers.Query,
+    Message,
+    Messages,
+    Repo
+  }
   alias Ecto.{Changeset, Queryable}
 
   @doc ~S"""
@@ -30,11 +37,27 @@ defmodule CodeCorps.Messages do
   end
 
   @doc ~S"""
+  Lists pre-scoped `CodeCorps.ConversationPart` records filtered by parameters
+  """
+  @spec list_parts(Queryable.t, map) :: list(Conversation.t)
+  def list_parts(scope, %{} = _params) do
+    scope |> Repo.all()
+  end
+
+  @doc ~S"""
   Gets a `CodeCorps.Conversation` record
   """
   @spec get_conversation(integer) :: Conversation.t
   def get_conversation(id) do
     Conversation |> Repo.get(id)
+  end
+
+  @doc ~S"""
+  Gets a `CodeCorps.ConversationPart` record
+  """
+  @spec get_part(integer) :: Conversation.t
+  def get_part(id) do
+    ConversationPart |> Repo.get(id)
   end
 
   @doc ~S"""
@@ -46,4 +69,7 @@ defmodule CodeCorps.Messages do
     |> Message.changeset(params)
     |> Repo.insert()
   end
+
+  @spec add_part(map) :: {:ok, ConversationPart.t} | {:error, Changeset.t}
+  def add_part(map), do: Messages.ConversationParts.create(map)
 end

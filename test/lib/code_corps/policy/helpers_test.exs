@@ -105,6 +105,28 @@ defmodule CodeCorps.Policy.HelpersTest do
     end
   end
 
+  describe "get_conversation/1" do
+    test "should return conversation of a map" do
+      conversation = insert(:conversation)
+      result = Helpers.get_conversation(%{"conversation_id" => conversation.id})
+      assert result.id == conversation.id
+    end
+
+    test "should return conversation of a ConversationPart" do
+      conversation = insert(:conversation)
+      conversation_part = insert(:conversation_part, conversation: conversation)
+      result = Helpers.get_conversation(conversation_part)
+      assert result.id == conversation.id
+    end
+
+    test "should return conversation of a Changeset" do
+      conversation = insert(:conversation)
+      changeset = %Changeset{changes: %{conversation_id: conversation.id}}
+      result = Helpers.get_conversation(changeset)
+      assert result.id == conversation.id
+    end
+  end
+
   describe "get_organization/1" do
     test "return organization if the organization_id is defined on the struct" do
       organization = insert(:organization)

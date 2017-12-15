@@ -72,6 +72,7 @@ defmodule CodeCorpsWeb.Router do
     resources "/categories", CategoryController, only: [:create, :update]
     resources "/comments", CommentController, only: [:create, :update]
     resources "/conversations", ConversationController, only: [:index, :show]
+    resources "/conversation-parts", ConversationPartController, only: [:index, :show, :create]
     resources "/donation-goals", DonationGoalController, only: [:create, :update, :delete]
     post "/oauth/github", UserController, :github_oauth
     resources "/github-app-installations", GithubAppInstallationController, only: [:create]
