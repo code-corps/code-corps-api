@@ -40,6 +40,9 @@ defmodule CodeCorps.Policy do
   defp can?(%User{} = current_user, :create, %Comment{}, %{} = params), do: Policy.Comment.create?(current_user, params)
   defp can?(%User{} = current_user, :update, %Comment{} = comment, %{}), do: Policy.Comment.update?(current_user, comment)
 
+  # Conversation
+  defp can?(%User{} = current_user, :show, %Conversation{} = conversation, %{}), do: Policy.Conversation.show?(current_user, conversation)
+
   # DonationGoal
   defp can?(%User{} = current_user, :create, %DonationGoal{}, %{} = params), do: Policy.DonationGoal.create?(current_user, params)
   defp can?(%User{} = current_user, :update, %DonationGoal{} = donation_goal, %{}), do: Policy.DonationGoal.update?(current_user, donation_goal)

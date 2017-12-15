@@ -282,4 +282,14 @@ defmodule CodeCorps.MessagesTest do
       assert other_conversation_started_by_admin_with_reply.id in result_ids
     end
   end
+
+  describe "get_conversation/1" do
+    test "gets a single conversation" do
+      conversation = insert(:conversation)
+
+      result = Messages.get_conversation(conversation.id)
+
+      assert result.id == conversation.id
+    end
+  end
 end

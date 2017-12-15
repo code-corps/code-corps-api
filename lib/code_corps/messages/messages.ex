@@ -30,6 +30,14 @@ defmodule CodeCorps.Messages do
   end
 
   @doc ~S"""
+  Gets a `CodeCorps.Conversation` record
+  """
+  @spec get_conversation(integer) :: Conversation.t
+  def get_conversation(id) do
+    Conversation |> Repo.get(id)
+  end
+
+  @doc ~S"""
   Creates a `CodeCorps.Message` from a set of parameters.
   """
   @spec create(map) :: {:ok, Message.t} | {:error, Changeset.t}

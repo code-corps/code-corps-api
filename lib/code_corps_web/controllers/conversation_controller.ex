@@ -19,4 +19,13 @@ defmodule CodeCorpsWeb.ConversationController do
       conn |> render("index.json-api", data: conversations)
     end
   end
+
+  @spec show(Conn.t, map) :: Conn.t
+  def show(%Conn{} = conn, %{"id" => id}) do
+    with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
+      %Conversation{} = conversation <- Messages.get_conversation(id),
+      {:ok, :authorized} <- current_user |> Policy.authorize(:show, conversation, %{}) do
+      conn |> render("show.json-api", data: conversation)
+    end
+  end
 end

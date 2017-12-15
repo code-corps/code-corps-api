@@ -30,4 +30,27 @@ defmodule CodeCorpsWeb.ConversationControllerTest do
       |> assert_ids_from_response([conversation_1.id, conversation_2.id])
     end
   end
+
+  describe "show" do
+    @tag :authenticated
+    test "shows chosen resource", %{conn: conn, current_user: user} do
+      conversation = insert(:conversation, user: user)
+
+      conn
+      |> request_show(conversation)
+      |> json_response(200)
+      |> assert_id_from_response(conversation.id)
+    end
+
+    test "renders 401 when unauthenticated", %{conn: conn} do
+      conversation = insert(:conversation)
+      assert conn |> request_show(conversation) |> json_response(401)
+    end
+
+    @tag :authenticated
+    test "renders 403 when unauthorized", %{conn: conn} do
+      conversation = insert(:conversation)
+      assert conn |> request_show(conversation) |> json_response(403)
+    end
+  end
 end

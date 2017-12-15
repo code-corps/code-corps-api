@@ -54,7 +54,6 @@ defmodule CodeCorps.Policy.HelpersTest do
   end
 
   describe "administered_by?/2" do
-
     test "returns false if given invalid arguments" do
       refute Helpers.administered_by?(nil, 2)
     end
@@ -81,7 +80,6 @@ defmodule CodeCorps.Policy.HelpersTest do
   end
 
   describe "contributed_by?/2" do
-
     test "returns false if given invalid arguments" do
       refute Helpers.contributed_by?(nil, 2)
     end
@@ -133,6 +131,27 @@ defmodule CodeCorps.Policy.HelpersTest do
     end
   end
 
+  describe "get_message/1" do
+    test "should return message of a map" do
+      message = insert(:message)
+      result = Helpers.get_message(%{"message_id" => message.id})
+      assert result.id == message.id
+    end
+
+    test "should return message of a Conversation" do
+      message = insert(:message)
+      conversation = insert(:conversation, message: message)
+      result = Helpers.get_message(conversation)
+      assert result.id == message.id
+    end
+
+    test "should return message of a Changeset" do
+      message = insert(:message)
+      changeset = %Changeset{changes: %{message_id: message.id}}
+      result = Helpers.get_message(changeset)
+      assert result.id == message.id
+    end
+  end
 
   describe "get_project/1" do
     test "return project if the project_id is defined on the struct" do
@@ -219,5 +238,4 @@ defmodule CodeCorps.Policy.HelpersTest do
       refute Helpers.task_authored_by?(task, other_user)
     end
   end
-
 end
