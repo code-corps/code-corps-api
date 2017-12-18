@@ -10,17 +10,21 @@ defmodule CodeCorps.Messages.ConversationParts do
     ConversationPart,
     Repo
   }
+  alias CodeCorpsWeb.ConversationChannel
 
   @spec create(map) :: ConversationPart.t | Ecto.Changeset.t
   def create(attrs) do
-    %ConversationPart{} |> create_changeset(attrs) |> Repo.insert()
+    with {:ok, %ConversationPart{} = conversation_part} <- %ConversationPart{} |> create_changeset(attrs) |> Repo.insert() do
+      ConversationChannel.broadcast_new_conversation_part(conversation_part)
+      {:ok, conversation_part}
+    end
   end
 
   @doc false
   @spec create_changeset(ConversationPart.t, map) :: Ecto.Changeset.t
   def create_changeset(%ConversationPart{} = conversation_part, attrs) do
     conversation_part
-    |> cast(attrs, [:author_id, :body, :conversation_id, :read_at])
+    |> cast(attrs, [:author_id, :body, :conversation_id])
     |> validate_required([:author_id, :body, :conversation_id])
     |> assoc_constraint(:author)
     |> assoc_constraint(:conversation)

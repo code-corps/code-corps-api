@@ -2,7 +2,7 @@ defmodule CodeCorpsWeb.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "room:*", CodeCorps.RoomChannel
+  channel "conversation:*", CodeCorpsWeb.ConversationChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket,
@@ -20,8 +20,13 @@ defmodule CodeCorpsWeb.UserSocket do
   #
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
-  def connect(_params, socket) do
-    {:ok, socket}
+  def connect(%{"token" => token}, socket) do
+    with {:ok, claims} <- CodeCorps.Guardian.decode_and_verify(token),
+         {:ok, user} <- CodeCorps.Guardian.resource_from_claims(claims) do
+      {:ok, assign(socket, :current_user, user)}
+    else
+      _ -> {:ok, socket}
+    end
   end
 
   # Socket id's are topics that allow you to identify all sockets for a given user:

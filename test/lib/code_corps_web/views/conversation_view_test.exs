@@ -1,11 +1,18 @@
 defmodule CodeCorpsWeb.ConversationViewTest do
   use CodeCorpsWeb.ViewCase
 
+  alias CodeCorps.Repo
+
   test "renders all attributes and relationships properly" do
     conversation = insert(:conversation)
+    conversation_part = insert(:conversation_part, conversation: conversation)
 
     rendered_json =
-      render(CodeCorpsWeb.ConversationView, "show.json-api", data: conversation)
+      CodeCorpsWeb.ConversationView
+      |> render(
+        "show.json-api",
+        data: conversation |> Repo.preload(:conversation_parts)
+      )
 
     expected_json = %{
       "data" => %{
@@ -18,16 +25,24 @@ defmodule CodeCorpsWeb.ConversationViewTest do
           "updated-at" => conversation.updated_at
         },
         "relationships" => %{
-          "user" => %{
-            "data" => %{
-              "id" => conversation.user_id |> Integer.to_string,
-              "type" => "user"
-            }
+          "conversation-parts" => %{
+            "data" => [
+              %{
+                "id" => conversation_part.id |> Integer.to_string,
+                "type" => "conversation-part"
+              }
+            ]
           },
           "message" => %{
             "data" => %{
               "id" => conversation.message_id |> Integer.to_string,
               "type" => "message"
+            }
+          },
+          "user" => %{
+            "data" => %{
+              "id" => conversation.user_id |> Integer.to_string,
+              "type" => "user"
             }
           }
         }
