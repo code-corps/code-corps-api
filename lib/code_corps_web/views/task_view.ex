@@ -46,7 +46,12 @@ defmodule CodeCorpsWeb.TaskIncludedView do
   def type, do: "task"
 
   attributes [
-    :archived, :body, :created_at, :created_from, :inserted_at, :markdown, 
-    :modified_at, :modified_from, :number, :order, :status, :title, :updated_at
+    :archived, :body, :created_at, :created_from, :has_github_pull_request, :inserted_at, 
+    :markdown, :modified_at, :modified_from, :number, :order, :status, :title, :updated_at
   ]
+
+  def has_github_pull_request(%{
+    github_pull_request: %CodeCorps.GithubPullRequest{}
+  }), do: true
+  def has_github_pull_request(%{github_pull_request: nil}), do: false
 end

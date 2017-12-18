@@ -46,6 +46,7 @@ defmodule CodeCorpsWeb.TaskListViewTest do
           "body" => task.body, 
           "created-at" => task.created_at, 
           "created-from" => task.created_from, 
+          "has-github-pull-request" => false,
           "inserted-at" => task.inserted_at, 
           "markdown" => task.markdown, 
           "modified-at" => task.modified_at, 
