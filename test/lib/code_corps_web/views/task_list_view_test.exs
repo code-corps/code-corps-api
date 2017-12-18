@@ -2,7 +2,7 @@ defmodule CodeCorpsWeb.TaskListViewTest do
   use CodeCorpsWeb.ViewCase
 
   test "renders all attributes and relationships properly" do
-    user = insert(:user, default_color: "blue")
+    user = insert(:user, first_name: "First", last_name: "Last", default_color: "blue")
     host = Application.get_env(:code_corps, :asset_host)
     project = insert(:project)
     task_list = insert(:task_list, order: 1000, project: project)
@@ -88,13 +88,13 @@ defmodule CodeCorpsWeb.TaskListViewTest do
           "biography" => user.biography,
           "cloudinary-public-id" => nil,
           "email" => "",
-          "first-name" => "First0",
+          "first-name" => user.first_name,
           "github-avatar-url" => nil,
           "github-id" => nil,
           "github-username" => nil,
           "inserted-at" => user.inserted_at,
-          "last-name" => nil,
-          "name" => "First0",
+          "last-name" => user.last_name,
+          "name" => "First Last",
           "photo-large-url" => "#{host}/icons/user_default_large_blue.png",
           "photo-thumb-url" => "#{host}/icons/user_default_thumb_blue.png",
           "sign-up-context" => "default",
