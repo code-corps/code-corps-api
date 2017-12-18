@@ -50,6 +50,12 @@ defmodule CodeCorpsWeb.TaskIncludedView do
     :markdown, :modified_at, :modified_from, :number, :order, :status, :title, :updated_at
   ]
 
+  has_one :github_issue, type: "github-issue", field: :github_issue_id, include: true
+  has_one :github_pull_request, serializer: CodeCorpsWeb.GithubPullRequestView, include: true
+  has_one :github_repo, type: "github-repo", field: :github_repo_id
+  has_one :user, serializer: CodeCorpsWeb.UserIncludedView, include: true
+  has_one :user_task, serializer: CodeCorpsWeb.UserTaskView, include: true
+
   def has_github_pull_request(%{
     github_pull_request: %CodeCorps.GithubPullRequest{}
   }), do: true

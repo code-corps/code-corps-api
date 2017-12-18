@@ -28,7 +28,7 @@ defmodule CodeCorpsWeb.TaskListController do
     end
   end
 
-  @preloads [tasks: [:github_pull_request]]
+  @preloads [tasks: [:github_pull_request, :github_issue, :github_repo, :user_task, :user]]
 
   def preload(data) do
     Repo.preload(data, @preloads)

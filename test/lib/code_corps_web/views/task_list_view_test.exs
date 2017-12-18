@@ -2,9 +2,11 @@ defmodule CodeCorpsWeb.TaskListViewTest do
   use CodeCorpsWeb.ViewCase
 
   test "renders all attributes and relationships properly" do
+    user = insert(:user, default_color: "blue")
+    host = Application.get_env(:code_corps, :asset_host)
     project = insert(:project)
     task_list = insert(:task_list, order: 1000, project: project)
-    task = insert(:task, order: 1000, task_list: task_list)
+    task = insert(:task, order: 1000, task_list: task_list, user: user)
 
     task_list = CodeCorpsWeb.TaskListController.preload(task_list)
     rendered_json =  render(CodeCorpsWeb.TaskListView, "show.json-api", data: task_list)
@@ -57,8 +59,54 @@ defmodule CodeCorpsWeb.TaskListViewTest do
           "title" => task.title, 
           "updated-at" => task.updated_at
         },
+        "relationships" => %{
+          "github-issue" => %{
+            "data" => nil
+          },
+          "github-repo" => %{
+            "data" => nil
+          },
+          "user-task" => %{
+            "data" => nil
+          },
+          "user" => %{
+            "data" => %{
+              "id" => task.user.id |> Integer.to_string,
+              "type" => "user"
+            }
+          },
+          "github-pull-request" => %{
+            "data" => nil
+          },
+        },
         "id" => task.id |> Integer.to_string, 
         "type" => "task"
+      },
+      %{
+        "attributes" => %{
+          "admin" => false,
+          "biography" => user.biography,
+          "cloudinary-public-id" => nil,
+          "email" => "",
+          "first-name" => "First0",
+          "github-avatar-url" => nil,
+          "github-id" => nil,
+          "github-username" => nil,
+          "inserted-at" => user.inserted_at,
+          "last-name" => nil,
+          "name" => "First0",
+          "photo-large-url" => "#{host}/icons/user_default_large_blue.png",
+          "photo-thumb-url" => "#{host}/icons/user_default_thumb_blue.png",
+          "sign-up-context" => "default",
+          "state" => "signed_up",
+          "state-transition" => nil,
+          "twitter" => user.twitter,
+          "username" => user.username,
+          "updated-at" => user.updated_at,
+          "website" => user.website
+        },
+        "id" => user.id |> Integer.to_string, 
+        "type" => "user"
       }]
     }
 
