@@ -62,6 +62,25 @@ defmodule CodeCorpsWeb.UserControllerTest do
       |> assert_ids_from_response([user_1.id, user_2.id, user_3.id])
     end
 
+    test "returns search result on project filter", %{conn: conn} do
+      user_1 = insert(:user)
+      user_2 = insert(:user)
+
+      project = insert(:project)
+
+      insert(:project_user, user: user_1, project: project)
+      insert(:project_user, user: user_2, project: project)
+      insert(:project_user)
+
+      params = %{"project_id" => project.id}
+      path = conn |> user_path(:index, params)
+
+      conn
+      |> get(path)
+      |> json_response(200)
+      |> assert_ids_from_response([user_1.id, user_2.id])
+    end
+
     test "limit filter limits results on index", %{conn: conn} do
       insert_list(6, :user)
 
