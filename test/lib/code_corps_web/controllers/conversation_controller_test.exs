@@ -29,6 +29,18 @@ defmodule CodeCorpsWeb.ConversationControllerTest do
       |> json_response(200)
       |> assert_ids_from_response([conversation_1.id, conversation_2.id])
     end
+
+    @tag authenticated: :admin
+    test "lists all entries by status", %{conn: conn} do
+      insert_pair(:conversation)
+      user = insert(:user)
+      conversation_other = insert(:conversation, user: user)
+
+      conn
+      |> get("conversations?user_id=#{user.id}")
+      |> json_response(200)
+      |> assert_ids_from_response([conversation_other.id])
+    end
   end
 
   describe "show" do

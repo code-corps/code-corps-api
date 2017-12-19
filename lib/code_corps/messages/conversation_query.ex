@@ -20,6 +20,17 @@ defmodule CodeCorps.Messages.ConversationQuery do
   end
   def project_filter(queryable, %{}), do: queryable
 
+  @doc ~S"""
+  Narrows down a `CodeCorps.Conversation` query by `user_id`, if specified in a
+  params map
+  """
+  @spec user_filter(Queryable.t, map) :: Queryable.t
+  def user_filter(queryable, %{"user_id" => user_id}) do
+    queryable
+    |> where([c], c.user_id == ^user_id)
+  end
+  def user_filter(queryable, %{}), do: queryable
+
 
   @doc ~S"""
   Narrows down a `CodeCorps.Conversation` query to return only those records
