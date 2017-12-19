@@ -9,6 +9,7 @@ defmodule CodeCorps.GitHub.SyncTest do
   alias CodeCorps.{
     Comment,
     GitHub.Sync,
+    GithubAppInstallation,
     GithubComment,
     GithubIssue,
     GithubPullRequest,
@@ -20,7 +21,89 @@ defmodule CodeCorps.GitHub.SyncTest do
     User
   }
 
-  describe "issue_comment_event/1" do
+  describe "installation_repositories_event/1 added" do
+
+    @payload load_event_fixture("installation_repositories_added")
+
+    test "syncs_correctly when adding" do
+      %{"installation" => %{
+        "id" => installation_id
+        },
+        "repositories_added" => added_repos,
+        "sender" => %{"id" => _user_id}
+      } = @payload
+
+      project = insert(:project)
+      user =  insert(:user)
+
+      insert(:github_app_installation, github_id: installation_id, project: project, user: user)
+
+      {:ok, _repos} = Sync.installation_repositories_event(@payload)
+
+      repo_ids = Enum.map(added_repos, &Map.get(&1, "id"))
+
+      for repo <- Repo.all(GithubRepo) do
+        assert repo.github_id in repo_ids
+      end
+
+      assert Repo.aggregate(GithubRepo, :count, :id) == 2
+      assert Repo.aggregate(GithubAppInstallation, :count, :id) == 1
+    end
+
+    test "can fail when installation not found" do
+      assert {:error, :unmatched_installation, %{}} == @payload |> Sync.installation_repositories_event()
+    end
+
+    test "fails with validation errors when syncing repos" do
+      %{"installation" => %{
+        "id" => installation_id
+        },
+        "repositories_added" => repos,
+        "sender" => %{"id" => _user_id}
+      } = @payload
+
+      project = insert(:project)
+      user =  insert(:user)
+      insert(:github_app_installation, github_id: installation_id, project: project, user: user)
+
+
+      corrupt_repos = Enum.map(repos, &(Map.put(&1,"name", "")))
+
+      corrupted_payload = Map.put(@payload, "repositories_added", corrupt_repos)
+
+      assert {:error, :validation_error_on_syncing_repos, %{}} == corrupted_payload |> Sync.installation_repositories_event()
+    end
+  end
+
+  describe "installation_repositories_event/1 removed" do
+    @payload load_event_fixture("installation_repositories_removed")
+
+    test "syncs_correctly when removing" do
+      %{"installation" => %{
+        "id" => installation_id
+        },
+        "repositories_removed" => removed_repos
+        } = @payload
+
+      project = insert(:project)
+      user =  insert(:user)
+      installation = insert(:github_app_installation, github_id: installation_id, project: project, user: user)
+
+      for repo <- removed_repos do
+        insert(:github_repo, github_id: repo["id"], github_app_installation: installation)
+      end
+
+      assert Repo.aggregate(GithubRepo, :count, :id) == 2
+      assert Repo.aggregate(GithubAppInstallation, :count, :id) == 1
+
+
+      {:ok, _repos} = Sync.installation_repositories_event(@payload)
+
+      assert Repo.aggregate(GithubRepo, :count, :id) == 0
+    end
+  end
+
+  describe "issue_comment_event/1 on comment created for pull request" do
     @payload load_event_fixture("issue_comment_created_on_pull_request")
 
     test "syncs the pull request, issue, comment, and user" do

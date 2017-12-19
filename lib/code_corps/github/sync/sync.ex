@@ -341,7 +341,7 @@ defmodule CodeCorps.GitHub.Sync do
   - For the "added" action
     -
 
-  [https://developer.github.com/v3/activity/events/types/#issuecommentevent](https://developer.github.com/v3/activity/events/types/#issuecommentevent)
+  [https://developer.github.com/v3/activity/events/types/#installationrepositoriesevent](https://developer.github.com/v3/activity/events/types/#installationrepositoriesevent)
   """
   @spec installation_repositories_event(map) ::
     installation_repositories_event_outcome()
