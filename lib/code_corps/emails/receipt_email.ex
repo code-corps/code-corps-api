@@ -3,9 +3,15 @@ defmodule CodeCorps.Emails.ReceiptEmail do
   import Bamboo.PostmarkHelper
 
   alias CodeCorps.Emails.BaseEmail
-  alias CodeCorps.{DonationGoal, Project, Repo, StripeConnectCharge, StripeConnectSubscription, WebClient}
+  alias CodeCorps.{DonationGoal, Project, Repo, StripeConnectCharge, StripeConnectSubscription, WebClient, User}
 
-  @spec create(StripeConnectCharge.t, Stripe.Invoice.t) :: Bamboo.Email.t
+  @spec get_name(User.t) :: String.t
+  def get_name(%User{ first_name: nil }), do: "there"
+
+  @spec get_name(User.t) :: String.t
+  def get_name(%User{ first_name: name}), do: name
+
+   @spec create(StripeConnectCharge.t, Stripe.Invoice.t) :: Bamboo.Email.t
   def create(%StripeConnectCharge{} = charge, %Stripe.Invoice{} = invoice) do
     with %StripeConnectCharge{} = charge <- Repo.preload(charge, :user),
          %Project{} = project <- get_project(invoice.subscription),
@@ -55,7 +61,7 @@ defmodule CodeCorps.Emails.ReceiptEmail do
       project_title: project.title,
       project_url: project |> url(),
       subject: project |> build_subject_line(),
-      user_first_name: charge.user.first_name
+      name: get_name(charge.user)
     }
   end
 
