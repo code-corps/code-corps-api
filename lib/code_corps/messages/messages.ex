@@ -20,8 +20,6 @@ defmodule CodeCorps.Messages do
   def list(scope, %{} = params) do
     scope
     |> Query.id_filter(params)
-    |> Messages.Query.author_filter(params)
-    |> Messages.Query.project_filter(params)
     |> Repo.all()
   end
 
