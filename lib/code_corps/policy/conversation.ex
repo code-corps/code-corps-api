@@ -41,4 +41,10 @@ defmodule CodeCorps.Policy.Conversation do
     conversation |> get_message() |> get_project() |> administered_by?(user)
   end
   def show?(_, _), do: false
+
+  def update?(%User{admin: true}, _conversation), do: true
+  def update?(%User{} = user, %Conversation{} = conversation) do
+    conversation |> get_message() |> get_project() |> administered_by?(user)
+  end
+  def update?(_, _), do: false
 end

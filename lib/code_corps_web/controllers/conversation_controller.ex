@@ -29,6 +29,18 @@ defmodule CodeCorpsWeb.ConversationController do
     end
   end
 
+  @spec update(Conn.t, map) :: Conn.t
+  def update(%Conn{} = conn, %{"id" => id} = params) do
+    with %Conversation{} = conversation <- Messages.get_conversation(id) |> preload(),
+         %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
+         {:ok, :authorized} <- current_user |> Policy.authorize(:update, conversation),
+         {:ok, %Conversation{} = updated_conversation} <- conversation |> Messages.update_conversation(params)
+      do
+
+      conn |> render("show.json-api", data: updated_conversation)
+    end
+  end
+
   @preloads [:conversation_parts, :message, :user]
 
   def preload(data) do
