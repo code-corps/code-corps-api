@@ -53,6 +53,10 @@ defmodule CodeCorps.Messages do
     Conversation |> Repo.get(id)
   end
 
+  def update_conversation(conversation, params) do
+    conversation |> Conversation.update_changeset(params) |> Repo.update
+  end
+
   @doc ~S"""
   Gets a `CodeCorps.ConversationPart` record
   """

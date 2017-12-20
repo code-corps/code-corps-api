@@ -26,4 +26,14 @@ defmodule CodeCorps.Conversation do
 
     timestamps()
   end
+
+  def update_changeset(struct, %{"status" => status} = params) do
+    struct
+    |> cast(params, [:status])
+    |> validate_inclusion(:status, statuses())
+  end
+
+  defp statuses do
+    ~w{ open closed }
+  end
 end
