@@ -3,10 +3,11 @@ defmodule CodeCorps.MessagesTest do
 
   use CodeCorps.DbAccessCase
   use Phoenix.ChannelTest
+  use Bamboo.Test
 
   import Ecto.Query, only: [where: 2]
 
-  alias CodeCorps.{Conversation, ConversationPart, Message, Messages}
+  alias CodeCorps.{Conversation, ConversationPart, Emails, Message, Messages}
   alias Ecto.Changeset
 
   defp get_and_sort_ids(records) do
@@ -324,6 +325,10 @@ defmodule CodeCorps.MessagesTest do
 
       {:ok, %ConversationPart{} = conversation_part} = Messages.add_part(attrs)
 
+      conversation_part =
+        conversation_part
+        |> Repo.preload([:author, conversation: [message: [[project: :organization]]]])
+
       assert conversation_part.author_id == user.id
       assert conversation_part.body == "Test body"
       assert conversation_part.conversation_id == conversation.id
@@ -342,6 +347,50 @@ defmodule CodeCorps.MessagesTest do
       {:ok, %ConversationPart{id: id}} = Messages.add_part(attrs)
       assert_broadcast("new:conversation-part", %{id: ^id})
       CodeCorpsWeb.Endpoint.unsubscribe("conversation:#{conversation.id}")
+    end
+
+    test "when replied by project admin, sends appropriate email to other participants" do
+      part_author = insert(:user)
+      %{author: message_author} = message = insert(:message)
+      %{user: target_user} = conversation = insert(:conversation, message: message)
+      %{author: other_participant} = insert(:conversation_part, conversation: conversation)
+
+      attrs = %{
+        author_id: part_author.id,
+        body: "Test body",
+        conversation_id: conversation.id
+      }
+
+      {:ok, %ConversationPart{} = part} = Messages.add_part(attrs)
+
+      part = part |> Repo.preload([:author, conversation: [message: [[project: :organization]]]])
+
+      refute_delivered_email Emails.ReplyToConversationEmail.create(part, part_author)
+      assert_delivered_email Emails.ReplyToConversationEmail.create(part, target_user)
+      assert_delivered_email Emails.ReplyToConversationEmail.create(part, message_author)
+      assert_delivered_email Emails.ReplyToConversationEmail.create(part, other_participant)
+    end
+
+    test "when replied by conversation user, sends appropriate email to other participants" do
+      part_author = insert(:user)
+      %{author: message_author} = message = insert(:message)
+      %{user: target_user} = conversation = insert(:conversation, message: message)
+      %{author: other_participant} = insert(:conversation_part, conversation: conversation)
+
+      attrs = %{
+        author_id: part_author.id,
+        body: "Test body",
+        conversation_id: conversation.id
+      }
+
+      {:ok, %ConversationPart{} = part} = Messages.add_part(attrs)
+
+      part = part |> Repo.preload([:author, conversation: [message: [[project: :organization]]]])
+
+      refute_delivered_email Emails.ReplyToConversationEmail.create(part, part_author)
+      assert_delivered_email Emails.ReplyToConversationEmail.create(part, target_user)
+      assert_delivered_email Emails.ReplyToConversationEmail.create(part, message_author)
+      assert_delivered_email Emails.ReplyToConversationEmail.create(part, other_participant)
     end
   end
 
@@ -454,6 +503,27 @@ defmodule CodeCorps.MessagesTest do
       {:error, %Changeset{} = changeset} = params |> Messages.create
       conversation_changeset = changeset.changes.conversations |> List.first
       assert conversation_changeset.errors[:user]
+    end
+
+    test "when initiated by admin, sends email to each conversation user" do
+      %{project: project, user: user} = insert(:project_user, role: "admin")
+      [recipient_1, recipient_2] = insert_pair(:user)
+
+      params = %{
+        author_id: user.id,
+        body: "Foo",
+        conversations: [%{user_id: recipient_1.id}, %{user_id: recipient_2.id}],
+        initiated_by: "admin",
+        project_id: project.id,
+        subject: "Bar"
+      }
+
+      {:ok, %Message{} = message} = params |> Messages.create
+      %{conversations: [conversation_1, conversation_2]} = message =
+        message |> Repo.preload([:project, [conversations: :user]])
+
+      assert_delivered_email Emails.MessageInitiatedByProjectEmail.create(message, conversation_1)
+      assert_delivered_email Emails.MessageInitiatedByProjectEmail.create(message, conversation_2)
     end
   end
 end

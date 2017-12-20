@@ -70,16 +70,32 @@ defmodule CodeCorps.Messages do
   """
   @spec create(map) :: {:ok, Message.t} | {:error, Changeset.t}
   def create(%{} = params) do
-    %Message{}
+    with {:ok, %Message{} = message} <- %Message{} |> create_changeset(params) |> Repo.insert() do
+      message |> Messages.Emails.notify_message_targets()
+      {:ok, message}
+    else
+      {:error, %Changeset{} = changeset} -> {:error, changeset}
+    end
+  end
+
+  @spec create_changeset(Message.t, map) :: Changeset.t
+  defp create_changeset(%Message{} = message, %{} = params) do
+    message
     |> Message.changeset(params)
     |> Changeset.cast(params, [:author_id, :project_id])
     |> Changeset.validate_required([:author_id, :project_id])
     |> Changeset.assoc_constraint(:author)
     |> Changeset.assoc_constraint(:project)
     |> Changeset.cast_assoc(:conversations, with: &Messages.Conversations.create_changeset/2)
-    |> Repo.insert()
   end
 
   @spec add_part(map) :: {:ok, ConversationPart.t} | {:error, Changeset.t}
-  def add_part(map), do: Messages.ConversationParts.create(map)
+  def add_part(%{} = params) do
+    with {:ok, %ConversationPart{} = conversation_part} <- params |> Messages.ConversationParts.create do
+      conversation_part |> Messages.Emails.notify_of_new_reply()
+      {:ok, conversation_part}
+    else
+      {:error, %Changeset{} = changeset} -> {:error, changeset}
+    end
+  end
 end

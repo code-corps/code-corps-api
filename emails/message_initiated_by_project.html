@@ -3,7 +3,7 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>{{user_first_name}} wants to join {{project_title}}</title>
+    <title>You have a new message from {{project_title}}.</title>
     <!--
     Make sure you copy the styles from styles.css into the email template in Postmark before saving there.
 
@@ -13,7 +13,7 @@
     <link rel="stylesheet" type="text/css" href="styles.css" media="screen" />
   </head>
   <body>
-    <span class="preheader">Head over to the app to process their request.</span>
+    <span class="preheader">You have a new message from {{project_title}}.</span>
     <table class="email-wrapper" width="100%" cellpadding="0" cellspacing="0">
       <tr>
         <td align="center">
@@ -38,35 +38,15 @@
                   <!-- Body content -->
                   <tr>
                     <td class="content-cell">
-                      <table class="donation" width="100%" cellpadding="0" cellspacing="0">
+                      <table width="100%" cellpadding="0" cellspacing="0">
                         <tr>
                           <td>
-                            <ul class="joined_images center">
-                              <li class="photo">
-                                <img src="{{project_logo_url}}" width="70" height="70" />
-                              </li>
-                              <li class="icon">
-                                <img src="https://d3pgew4wbk2vb1.cloudfront.net/emails/images/requested-email@2x.png" width="25" height="70" />
-                              </li>
-                              <li class="photo">
-                                <img src="{{user_image_url}}" width="70" height="70" />
-                              </li>
-                            </ul>
-                            <p>
-                              Hi {{project_title}} team,
+                            <p class="center">
+                              <img src="https://d3pgew4wbk2vb1.cloudfront.net/emails/images/message@2x.png" width="100" height="100" />
                             </p>
-                            <p class="project-membership--requested">
-                              <strong>{{user_first_name}}</strong> just requested to join {{project_title}}.
-                            </p>
-                            <p>
-                              You can head over to <a href="{{contributors_url}}">your project's contributors page</a> to process their request.
-                            </p>
-                            <p>
-                              Take a look at the skills they bring and think about how you can integrate them into your project.
-                            </p>
-                            <p>
-                              We also recommend reading GitHub's guides for <a href="https://opensource.guide/building-community/#setting-your-project-up-for-success">how to build a welcoming open source community</a>.
-                            </p>
+                            <p>Hi {{name}},</p>
+                            <p>You have a new message from {{project_title}}.</p>
+                            <p><a class="button" href="{{conversation_url}}">See your message</a></p>
                           </td>
                         </tr>
                       </table>
@@ -74,7 +54,7 @@
                         <tr>
                           <td>
                             <p>
-                              Cheers,
+                              Thanks!
                               <br><strong>The Code Corps Team</strong>
                             </p>
                           </td>
