@@ -88,6 +88,21 @@ defmodule CodeCorps.Validators.SlugValidatorTest do
     refute changeset.valid?
   end
 
+  test "reserves all api routes" do
+    CodeCorpsWeb.Router.__routes__
+    |> Enum.map(&Map.get(&1, :path))
+    |> Enum.map(&String.split(&1, "/"))
+    |> List.flatten
+    |> Enum.reject(fn fragment -> fragment == "" end)
+    |> Enum.reject(fn fragment -> fragment |> String.at(0) == ":" end)
+    |> Enum.uniq
+    |> Enum.sort
+    |> Enum.each(fn reserved ->
+      changeset = process_slug(reserved)
+      refute changeset.valid?, "#{reserved} should not be allowed as a slug"
+    end)
+  end
+
   defp process_slug(slug) do
     slug
     |> cast_slug
