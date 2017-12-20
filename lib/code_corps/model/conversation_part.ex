@@ -19,6 +19,7 @@ defmodule CodeCorps.ConversationPart do
   schema "conversation_parts" do
     field :body, :string, null: false
     field :read_at, :utc_datetime, null: true
+    field :part_type, :string, default: "comment"
 
     belongs_to :author, CodeCorps.User
     belongs_to :conversation, CodeCorps.Conversation
