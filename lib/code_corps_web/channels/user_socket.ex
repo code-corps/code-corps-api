@@ -6,7 +6,8 @@ defmodule CodeCorpsWeb.UserSocket do
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket,
-    timeout: 45_000
+    timeout: 45_000,
+    check_origin: Application.get_env(:code_corps, :allowed_origins)
   # transport :longpoll, Phoenix.Transports.LongPoll
 
   # Socket params are passed from the client and can
