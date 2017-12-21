@@ -19,7 +19,7 @@ defmodule CodeCorps.Emails.ProjectUserRequestEmailTest do
     template_model = email.private.template_model
 
     assert template_model == %{
-      contributors_url: "http://localhost:4200/#{project.organization.slug}/#{project.slug}/settings/contributors",
+      contributors_url: "http://localhost:4200/#{project.organization.slug}/#{project.slug}/people",
       project_title: project.title,
       project_logo_url: "#{Application.get_env(:code_corps, :asset_host)}/icons/project_default_large_.png",
       user_image_url: "#{Application.get_env(:code_corps, :asset_host)}/icons/user_default_large_.png",
