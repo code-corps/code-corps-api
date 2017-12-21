@@ -5,11 +5,12 @@ defmodule CodeCorps.JsonAPIHelpers do
   """
 
   @spec build_json_payload(map) :: map
-  def build_json_payload(attrs = %{}) do
+  def build_json_payload(attrs = %{}, type \\ nil) do
     %{
       "data" => %{
         "attributes" => attrs |> build_attributes(),
-        "relationships" => attrs |> build_relationships()
+        "relationships" => attrs |> build_relationships(),
+        "type" => type
       }
     }
   end

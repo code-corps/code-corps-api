@@ -81,8 +81,8 @@ defmodule CodeCorpsWeb.UserController do
   end
 
   @preloads [
-    :categories, :github_app_installations, :project_users, :slugged_route,
-    :stripe_connect_subscriptions, :stripe_platform_card,
+    :categories, :github_app_installations, :organizations, :project_users,
+    :slugged_route, :stripe_connect_subscriptions, :stripe_platform_card,
     :stripe_platform_customer, :user_categories, :user_roles, :user_skills
   ]
 

@@ -23,6 +23,24 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def conversation_factory do
+    %CodeCorps.Conversation{
+      status: "open",
+      read_at: nil,
+      message: build(:message),
+      user: build(:user)
+    }
+  end
+
+  def conversation_part_factory do
+    %CodeCorps.ConversationPart{
+      body: sequence(:body, &"Reply to conversation #{&1}"),
+      read_at: nil,
+      author: build(:user),
+      conversation: build(:conversation)
+    }
+  end
+
   def donation_goal_factory do
     %CodeCorps.DonationGoal{
       amount: 100,
@@ -104,6 +122,15 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def message_factory do
+    %CodeCorps.Message{
+      body: sequence(:body, &"Subject #{&1}"),
+      initiated_by: "admin",
+      subject: sequence(:subject, &"Subject #{&1}"),
+      author: build(:user),
+      project: build(:project)
+    }
+  end
 
   def organization_factory do
     %CodeCorps.Organization{

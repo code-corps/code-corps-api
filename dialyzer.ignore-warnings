@@ -1,5 +1,5 @@
 :0: Unknown type 'Elixir.Access':get/2
-lib/code_corps/guardian.ex:26: The call 'Elixir.Timber':add_context(#{'__struct__':='Elixir.Timber.Contexts.UserContext', 'email':=_, 'id':=_, 'name':=_}) will never return since it differs in the 1st argument from the success typing arguments: (maybe_improper_list())
+lib/code_corps_web/plugs/set_timber_user_context.ex:21: The call 'Elixir.Timber':add_context(#{'__struct__':='Elixir.Timber.Contexts.UserContext', 'email':=_, 'id':=_, 'name':=binary()}) will never return since it differs in the 1st argument from the success typing arguments: (maybe_improper_list())
 lib/code_corps/services/markdown_renderer_service.ex:29: Function convert_into_html/1 has no local return
 lib/code_corps/services/markdown_renderer_service.ex:35: Function put_into/3 will never be called
 lib/code_corps_web/endpoint.ex:1: The call 'Elixir.Timber.Integrations.PhoenixInstrumenter':phoenix_channel_receive('start',compile@1::map(),runtime@1::map()) will never return since it differs in the 1st and 3rd argument from the success typing arguments: ('stop',any(),'ok')

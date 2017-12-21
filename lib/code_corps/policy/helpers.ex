@@ -5,6 +5,9 @@ defmodule CodeCorps.Policy.Helpers do
   """
 
   alias CodeCorps.{
+    Conversation,
+    ConversationPart,
+    Message,
     Organization,
     ProjectUser,
     Project,
@@ -97,6 +100,22 @@ defmodule CodeCorps.Policy.Helpers do
   @spec owner?(String.t()) :: boolean
   defp owner?("owner"), do: true
   defp owner?(_), do: false
+
+  @doc """
+  Retrieves conversation from associated record
+  """
+  @spec get_conversation(Changeset.t() | ConversationPart.t() | map) :: Message.t()
+  def get_conversation(%ConversationPart{conversation_id: conversation_id}), do: Repo.get(Conversation, conversation_id)
+  def get_conversation(%{"conversation_id" => conversation_id}), do: Repo.get(Conversation, conversation_id)
+  def get_conversation(%Changeset{changes: %{conversation_id: conversation_id}}), do: Repo.get(Conversation, conversation_id)
+
+  @doc """
+  Retrieves message from associated record
+  """
+  @spec get_message(Changeset.t() | Conversation.t() | map) :: Message.t()
+  def get_message(%Conversation{message_id: message_id}), do: Repo.get(Message, message_id)
+  def get_message(%{"message_id" => message_id}), do: Repo.get(Message, message_id)
+  def get_message(%Changeset{changes: %{message_id: message_id}}), do: Repo.get(Message, message_id)
 
   @doc """
   Retrieves task from associated record

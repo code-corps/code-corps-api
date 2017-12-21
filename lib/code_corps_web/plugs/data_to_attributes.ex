@@ -1,9 +1,11 @@
 defmodule CodeCorpsWeb.Plug.DataToAttributes do
   @moduledoc ~S"""
-  Converts params in the JSON api "data" format into flat params convient for
+  Converts params in the JSON api format into flat params convient for
   changeset casting.
 
-  This is done using `JaSerializer.Params.to_attributes/1`
+  For base parameters, this is done using `JaSerializer.Params.to_attributes/1`
+
+  For included records, this is done using custom code.
   """
 
   alias Plug.Conn
@@ -12,13 +14,38 @@ defmodule CodeCorpsWeb.Plug.DataToAttributes do
   def init(opts), do: opts
 
   @spec call(Conn.t, Keyword.t) :: Plug.Conn.t
-  def call(%Conn{params: %{"data" => data} = params} = conn, _opts) do
+  def call(%Conn{params: %{} = params} = conn, opts \\ []) do
     attributes =
       params
       |> Map.delete("data")
-      |> Map.merge(data |> JaSerializer.Params.to_attributes)
+      |> Map.delete("included")
+      |> Map.merge(params |> parse_data())
+      |> Map.merge(params |> parse_included(opts))
 
     conn |> Map.put(:params, attributes)
   end
-  def call(%Conn{} = conn, _opts), do: conn
+
+  @spec parse_data(map) :: map
+  defp parse_data(%{"data" => data}), do: data |> JaSerializer.Params.to_attributes
+  defp parse_data(%{}), do: %{}
+
+  @spec parse_included(map, Keyword.t) :: map
+  defp parse_included(%{"included" => included}, opts) do
+    included |> Enum.reduce(%{}, fn (%{"data" => %{"type" => type}} = params, parsed) ->
+      attributes = params |> parse_data()
+
+      if opts |> Keyword.get(:includes_many, []) |> Enum.member?(type) do
+        # this is an explicitly specified has_many,
+        # update existing data by adding new record
+        pluralized_type = type |> Inflex.pluralize
+        parsed |> Map.update(pluralized_type, [attributes], fn data ->
+          data ++ [attributes]
+        end)
+      else
+        # this is a belongs to, put a new submap into payload
+        parsed |> Map.put(type, attributes)
+      end
+    end)
+  end
+  defp parse_included(%{}, _opts), do: %{}
 end

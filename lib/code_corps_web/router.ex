@@ -26,6 +26,7 @@ defmodule CodeCorpsWeb.Router do
 
   pipeline :current_user do
     plug CodeCorpsWeb.Plug.CurrentUser
+    plug CodeCorpsWeb.Plug.SetTimberUserContext
     plug CodeCorpsWeb.Plug.SetSentryUserContext
     plug CodeCorpsWeb.Plug.AnalyticsIdentify
   end
@@ -70,11 +71,14 @@ defmodule CodeCorpsWeb.Router do
 
     resources "/categories", CategoryController, only: [:create, :update]
     resources "/comments", CommentController, only: [:create, :update]
+    resources "/conversations", ConversationController, only: [:index, :show, :update]
+    resources "/conversation-parts", ConversationPartController, only: [:index, :show, :create]
     resources "/donation-goals", DonationGoalController, only: [:create, :update, :delete]
     post "/oauth/github", UserController, :github_oauth
     resources "/github-app-installations", GithubAppInstallationController, only: [:create]
     resources "/github-events", GithubEventController, only: [:index, :show, :update]
     resources "/github-repos", GithubRepoController, only: [:update]
+    resources "/messages", MessageController, only: [:index, :show, :create]
     resources "/organization-github-app-installations", OrganizationGithubAppInstallationController, only: [:create, :delete]
     resources "/organizations", OrganizationController, only: [:create, :update]
     resources "/organization-invites", OrganizationInviteController, only: [:create, :update]
