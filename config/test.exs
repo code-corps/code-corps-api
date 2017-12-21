@@ -57,6 +57,9 @@ config :code_corps,
 config :sentry,
   environment_name: Mix.env || :test
 
+config :code_corps,
+  sparkpost: CodeCorps.SparkPostTesting.SuccessAPI
+
 config :code_corps, :sentry, CodeCorps.Sentry.Sync
 
 config :code_corps, :processor, CodeCorps.Processor.Sync

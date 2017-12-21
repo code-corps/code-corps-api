@@ -14,8 +14,7 @@ config :code_corps, CodeCorpsWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "eMl0+Byu0Zv7q48thBu23ChBVFO1+sdLqoMI8yZoxEviF1K3C5uIohbDfvM9felL",
   render_errors: [view: CodeCorpsWeb.ErrorView, accepts: ~w(html json json-api)],
-  pubsub: [name: CodeCorps.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: CodeCorps.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -72,6 +71,9 @@ config :code_corps,
   github_app_client_secret: System.get_env("GITHUB_APP_CLIENT_SECRET"),
   github_app_pem: pem
 
+config :code_corps,
+  sparkpost: CodeCorps.SparkPost.ExtendedAPI
+
 config :stripity_stripe,
   api_key: System.get_env("STRIPE_SECRET_KEY"),
   connect_client_id: System.get_env("STRIPE_PLATFORM_CLIENT_ID")
@@ -80,6 +82,9 @@ config :sentry,
   dsn: System.get_env("SENTRY_DSN"),
   enable_source_code_context: true,
   included_environments: ~w(prod staging)a
+
+config :sparkpost,
+  api_key: System.get_env("SPARKPOST_API_KEY")
 
 config :code_corps, :sentry, CodeCorps.Sentry.Async
 

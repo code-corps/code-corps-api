@@ -78,6 +78,7 @@ defmodule CodeCorps.Mixfile do
       {:scrivener_ecto, "~> 1.2"}, # DB query pagination
       {:segment, "~> 0.1"}, # Segment analytics
       {:sentry, "~> 6.0"}, # Sentry error tracking
+      {:sparkpost, "~> 0.5"},
       {:stripity_stripe, git: "https://github.com/code-corps/stripity_stripe.git", branch: "2.0-beta"}, # Stripe
       {:sweet_xml, "~> 0.5"},
       {:timber, "~> 2.0"}, # Logging
