@@ -2,7 +2,7 @@ defmodule CodeCorpsWeb.ProjectUserController do
   @moduledoc false
   use CodeCorpsWeb, :controller
 
-  alias CodeCorps.{Emails, Helpers.Query, Mailer, ProjectUser, User}
+  alias CodeCorps.{Emails, Helpers.Query, Mailer, ProjectUser, SparkPost, User}
 
   action_fallback CodeCorpsWeb.FallbackController
   plug CodeCorpsWeb.Plug.DataToAttributes
@@ -85,7 +85,6 @@ defmodule CodeCorpsWeb.ProjectUserController do
   defp send_acceptance_email(project_user) do
     project_user
     |> Repo.preload(@preloads)
-    |> Emails.ProjectUserAcceptanceEmail.create()
-    |> Mailer.deliver_now()
+    |> SparkPost.send_project_user_acceptance_email()
   end
 end

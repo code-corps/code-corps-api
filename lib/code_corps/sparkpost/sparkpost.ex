@@ -9,6 +9,7 @@ defmodule CodeCorps.SparkPost do
   defdelegate send_organization_invite_email(invite), to: Emails
   defdelegate send_project_approval_request_email(project), to: Emails
   defdelegate send_project_approved_email(project), to: Emails
+  defdelegate send_project_user_acceptance_email(project_user), to: Emails
   defdelegate send_receipt_email(charge, invoice), to: Emails
   defdelegate send_reply_to_conversation_email(part, user), to: Emails
 end

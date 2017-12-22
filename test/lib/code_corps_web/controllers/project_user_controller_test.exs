@@ -119,9 +119,9 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
         CodeCorps.ProjectUser
         |> CodeCorps.Repo.get_by(role: "contributor")
         |> CodeCorps.Repo.preload([:project, :user])
-        |> CodeCorps.Emails.ProjectUserAcceptanceEmail.create()
+        |> CodeCorps.SparkPost.Emails.ProjectUserAcceptance.build()
 
-      assert_delivered_email(email)
+      assert_received ^email
     end
 
     test "doesn't update and renders 401 when unauthenticated", %{conn: conn} do
