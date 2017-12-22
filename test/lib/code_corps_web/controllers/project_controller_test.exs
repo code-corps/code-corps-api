@@ -2,9 +2,10 @@ defmodule CodeCorpsWeb.ProjectControllerTest do
   @moduledoc false
 
   use CodeCorpsWeb.ApiCase, resource_name: :project
-  use Bamboo.Test
 
-  alias CodeCorps.{Analytics.SegmentTraitsBuilder, Emails, Project, Repo}
+  alias CodeCorps.{
+    Analytics.SegmentTraitsBuilder, SparkPost.Emails, Project, Repo
+  }
 
   @valid_attrs %{
     cloudinary_public_id: "foo123",
@@ -148,7 +149,7 @@ defmodule CodeCorpsWeb.ProjectControllerTest do
 
       email =
         project
-        |> CodeCorps.SparkPost.Emails.ProjectApprovalRequest.build()
+        |> Emails.ProjectApprovalRequest.build()
 
       assert_received ^email
 
@@ -172,9 +173,9 @@ defmodule CodeCorpsWeb.ProjectControllerTest do
 
       email =
         project
-        |> Emails.ProjectApprovedEmail.create()
+        |> Emails.ProjectApproved.build()
 
-      assert_delivered_email(email)
+      assert_received ^email
 
       user_id = current_user.id
       traits = project |> SegmentTraitsBuilder.build

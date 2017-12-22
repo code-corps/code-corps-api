@@ -6,7 +6,7 @@ defmodule CodeCorps.Projects do
   import CodeCorpsWeb.ProjectController, only: [preload: 1]
 
   alias CodeCorps.{
-    Analytics.SegmentTracker, Emails, Mailer, Project, Repo, SparkPost, User
+    Analytics.SegmentTracker, Project, Repo, SparkPost, User
   }
   alias Ecto.Changeset
 
@@ -100,7 +100,6 @@ defmodule CodeCorps.Projects do
   defp send_approved_email(project) do
     project
     |> preload()
-    |> Emails.ProjectApprovedEmail.create()
-    |> Mailer.deliver_now()
+    |> SparkPost.send_project_approved_email()
   end
 end
