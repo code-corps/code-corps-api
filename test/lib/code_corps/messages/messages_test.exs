@@ -14,6 +14,12 @@ defmodule CodeCorps.MessagesTest do
     records |> Enum.map(&Map.get(&1, :id)) |> Enum.sort
   end
 
+  defp json_map(attrs) do
+    attrs
+    |> Poison.encode!
+    |> Poison.decode!
+  end
+
   describe "list" do
     test "returns all records by default" do
       insert_list(3, :message)
@@ -249,7 +255,7 @@ defmodule CodeCorps.MessagesTest do
 
   describe "add_part/1" do
     test "creates a conversation part" do
-      conversation = insert(:conversation)
+      conversation = insert(:conversation, updated_at: Timex.now |> Timex.shift(minutes: -5))
       user = insert(:user)
       attrs = %{
         author_id: user.id,
@@ -257,7 +263,7 @@ defmodule CodeCorps.MessagesTest do
         conversation_id: conversation.id
       }
 
-      {:ok, %ConversationPart{} = conversation_part} = Messages.add_part(attrs)
+      {:ok, %ConversationPart{} = conversation_part} = Messages.add_part(attrs |> json_map())
 
       conversation_part =
         conversation_part
@@ -266,6 +272,7 @@ defmodule CodeCorps.MessagesTest do
       assert conversation_part.author_id == user.id
       assert conversation_part.body == "Test body"
       assert conversation_part.conversation_id == conversation.id
+      assert conversation_part.updated_at == conversation_part.conversation.updated_at
     end
 
     test "broadcasts event on phoenix channel" do
@@ -278,7 +285,7 @@ defmodule CodeCorps.MessagesTest do
       }
 
       CodeCorpsWeb.Endpoint.subscribe("conversation:#{conversation.id}")
-      {:ok, %ConversationPart{id: id}} = Messages.add_part(attrs)
+      {:ok, %ConversationPart{id: id}} = Messages.add_part(attrs |> json_map())
       assert_broadcast("new:conversation-part", %{id: ^id})
       CodeCorpsWeb.Endpoint.unsubscribe("conversation:#{conversation.id}")
     end
@@ -295,7 +302,7 @@ defmodule CodeCorps.MessagesTest do
         conversation_id: conversation.id
       }
 
-      {:ok, %ConversationPart{} = part} = Messages.add_part(attrs)
+      {:ok, %ConversationPart{} = part} = Messages.add_part(attrs |> json_map())
 
       part = part |> Repo.preload([:author, conversation: [message: [[project: :organization]]]])
 
@@ -317,7 +324,7 @@ defmodule CodeCorps.MessagesTest do
         conversation_id: conversation.id
       }
 
-      {:ok, %ConversationPart{} = part} = Messages.add_part(attrs)
+      {:ok, %ConversationPart{} = part} = Messages.add_part(attrs |> json_map())
 
       part = part |> Repo.preload([:author, conversation: [message: [[project: :organization]]]])
 
