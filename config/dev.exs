@@ -56,19 +56,6 @@ config :code_corps, :stripe_env, :dev
 
 config :sentry, environment_name: Mix.env() || :dev
 
-config :code_corps, CodeCorps.Mailer, adapter: Bamboo.LocalAdapter
-
-config :code_corps,
-  postmark_forgot_password_template: "123",
-  postmark_message_initiated_by_project_template: "123",
-  postmark_organization_invite_email_template: "123",
-  postmark_project_approval_request_template: "123",
-  postmark_project_approved_template: "123",
-  postmark_project_user_acceptance_template: "123",
-  postmark_project_user_request_template: "123",
-  postmark_receipt_template: "123",
-  postmark_reply_to_conversation_template: "123"
-
 # If the dev environment has no CLOUDEX_API_KEY set, we want the app
 # to still run, with cloudex in test API mode
 if System.get_env("CLOUDEX_API_KEY") == nil do

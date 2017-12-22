@@ -1,6 +1,5 @@
 defmodule CodeCorpsWeb.OrganizationInviteControllerTest do
   use CodeCorpsWeb.ApiCase, resource_name: :organization_invite
-  use Bamboo.Test
 
   @valid_attrs %{email: "code@corps.com", organization_name: "Code Corps"}
   @invalid_attrs %{email: "code", organization_name: ""}
@@ -38,11 +37,10 @@ defmodule CodeCorpsWeb.OrganizationInviteControllerTest do
 
       organization_invite_email =
         CodeCorps.OrganizationInvite
-        |> first()
         |> Repo.one()
-        |> CodeCorps.Emails.OrganizationInviteEmail.create()
+        |> CodeCorps.Emails.Transmissions.OrganizationInvite.build()
 
-      assert_delivered_email organization_invite_email
+      assert_received ^organization_invite_email
     end
 
     @tag authenticated: :admin

@@ -3,11 +3,14 @@ defmodule CodeCorps.MessagesTest do
 
   use CodeCorps.DbAccessCase
   use Phoenix.ChannelTest
-  use Bamboo.Test
 
   import Ecto.Query, only: [where: 2]
 
-  alias CodeCorps.{Conversation, ConversationPart, Emails, Message, Messages}
+  alias CodeCorps.{
+    Conversation, ConversationPart, Message, Messages,
+    Emails.Transmissions.MessageInitiatedByProject,
+    Emails.Transmissions.ReplyToConversation
+  }
   alias Ecto.Changeset
 
   defp get_and_sort_ids(records) do
@@ -299,10 +302,14 @@ defmodule CodeCorps.MessagesTest do
 
       part = part |> Repo.preload([:author, conversation: [message: [[project: :organization]]]])
 
-      refute_delivered_email Emails.ReplyToConversationEmail.create(part, part_author)
-      assert_delivered_email Emails.ReplyToConversationEmail.create(part, target_user)
-      assert_delivered_email Emails.ReplyToConversationEmail.create(part, message_author)
-      assert_delivered_email Emails.ReplyToConversationEmail.create(part, other_participant)
+      part_author_email = ReplyToConversation.build(part, part_author)
+      target_user_email = ReplyToConversation.build(part, target_user)
+      message_author_email = ReplyToConversation.build(part, message_author)
+      other_participant_email = ReplyToConversation.build(part, other_participant)
+      refute_received ^part_author_email
+      assert_received ^target_user_email
+      assert_received ^message_author_email
+      assert_received ^other_participant_email
     end
 
     test "when replied by conversation user, sends appropriate email to other participants" do
@@ -321,10 +328,14 @@ defmodule CodeCorps.MessagesTest do
 
       part = part |> Repo.preload([:author, conversation: [message: [[project: :organization]]]])
 
-      refute_delivered_email Emails.ReplyToConversationEmail.create(part, part_author)
-      assert_delivered_email Emails.ReplyToConversationEmail.create(part, target_user)
-      assert_delivered_email Emails.ReplyToConversationEmail.create(part, message_author)
-      assert_delivered_email Emails.ReplyToConversationEmail.create(part, other_participant)
+      part_author_email = ReplyToConversation.build(part, part_author)
+      target_user_email = ReplyToConversation.build(part, target_user)
+      message_author_email = ReplyToConversation.build(part, message_author)
+      other_participant_email = ReplyToConversation.build(part, other_participant)
+      refute_received ^part_author_email
+      assert_received ^target_user_email
+      assert_received ^message_author_email
+      assert_received ^other_participant_email
     end
   end
 
@@ -456,8 +467,10 @@ defmodule CodeCorps.MessagesTest do
       %{conversations: [conversation_1, conversation_2]} = message =
         message |> Repo.preload([:project, [conversations: :user]])
 
-      assert_delivered_email Emails.MessageInitiatedByProjectEmail.create(message, conversation_1)
-      assert_delivered_email Emails.MessageInitiatedByProjectEmail.create(message, conversation_2)
+      email_1 = MessageInitiatedByProject.build(message, conversation_1)
+      assert_received ^email_1
+      email_2 = MessageInitiatedByProject.build(message, conversation_2)
+      assert_received ^email_2
     end
   end
 end

@@ -2,7 +2,7 @@ defmodule CodeCorpsWeb.ProjectUserController do
   @moduledoc false
   use CodeCorpsWeb, :controller
 
-  alias CodeCorps.{Emails, Helpers.Query, Mailer, ProjectUser, User}
+  alias CodeCorps.{Emails, Helpers.Query, ProjectUser, User}
 
   action_fallback CodeCorpsWeb.FallbackController
   plug CodeCorpsWeb.Plug.DataToAttributes
@@ -58,21 +58,20 @@ defmodule CodeCorpsWeb.ProjectUserController do
     end
   end
 
-  @spec maybe_send_create_email(ProjectUser.t) :: Bamboo.Email.t | nil
+  @spec maybe_send_create_email(ProjectUser.t) :: tuple | nil
   defp maybe_send_create_email(%ProjectUser{role: "pending"} = project_user) do
     send_request_email(project_user)
   end
   defp maybe_send_create_email(_), do: nil
 
-  @spec send_request_email(ProjectUser.t) :: Bamboo.Email.t
+  @spec send_request_email(ProjectUser.t) :: tuple
   defp send_request_email(project_user) do
     project_user
     |> Repo.preload(@preloads)
-    |> Emails.ProjectUserRequestEmail.create()
-    |> Mailer.deliver_now()
+    |> Emails.send_project_user_request_email
   end
 
-  @spec maybe_send_update_email(ProjectUser.t, ProjectUser.t) :: Bamboo.Email.t | nil
+  @spec maybe_send_update_email(ProjectUser.t, ProjectUser.t) :: tuple | nil
   defp maybe_send_update_email(%ProjectUser{role: updated_role} = project_user, %ProjectUser{role: previous_role}) do
     case {updated_role, previous_role} do
       {"contributor", "pending"} ->
@@ -81,11 +80,10 @@ defmodule CodeCorpsWeb.ProjectUserController do
     end
   end
 
-  @spec send_acceptance_email(ProjectUser.t) :: Bamboo.Email.t
+  @spec send_acceptance_email(ProjectUser.t) :: tuple
   defp send_acceptance_email(project_user) do
     project_user
     |> Repo.preload(@preloads)
-    |> Emails.ProjectUserAcceptanceEmail.create()
-    |> Mailer.deliver_now()
+    |> Emails.send_project_user_acceptance_email()
   end
 end

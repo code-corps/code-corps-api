@@ -1,8 +1,9 @@
 defmodule CodeCorpsWeb.ProjectUserControllerTest do
   use CodeCorpsWeb.ApiCase, resource_name: :project_user
-  use Bamboo.Test
 
   @attrs %{role: "contributor"}
+
+  alias CodeCorps.{ProjectUser, Repo, Emails.Transmissions}
 
   describe "index" do
     test "lists all resources", %{conn: conn} do
@@ -62,12 +63,12 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
       assert_received {:track, ^user_id, "Requested Project Membership", ^tracking_properties}
 
       email =
-        CodeCorps.ProjectUser
-        |> CodeCorps.Repo.get_by(role: "pending")
-        |> CodeCorps.Repo.preload([:project, :user])
-        |> CodeCorps.Emails.ProjectUserRequestEmail.create()
+        ProjectUser
+        |> Repo.get_by(role: "pending")
+        |> Repo.preload([:project, :user])
+        |> Transmissions.ProjectUserRequest.build()
 
-      assert_delivered_email(email)
+      assert_received ^email
     end
 
     @tag :authenticated
@@ -116,12 +117,12 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
       assert_received {:track, ^user_id, "Approved Project Membership", ^tracking_properties}
 
       email =
-        CodeCorps.ProjectUser
-        |> CodeCorps.Repo.get_by(role: "contributor")
-        |> CodeCorps.Repo.preload([:project, :user])
-        |> CodeCorps.Emails.ProjectUserAcceptanceEmail.create()
+        ProjectUser
+        |> Repo.get_by(role: "contributor")
+        |> Repo.preload([:project, :user])
+        |> Transmissions.ProjectUserAcceptance.build()
 
-      assert_delivered_email(email)
+      assert_received ^email
     end
 
     test "doesn't update and renders 401 when unauthenticated", %{conn: conn} do

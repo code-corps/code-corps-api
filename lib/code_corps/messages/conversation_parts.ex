@@ -12,12 +12,15 @@ defmodule CodeCorps.Messages.ConversationParts do
     Repo
   }
   alias CodeCorpsWeb.ConversationChannel
+  alias Ecto.Changeset
 
-  @spec create(map) :: ConversationPart.t | Ecto.Changeset.t
+  @spec create(map) :: {:ok, ConversationPart.t} | {:error, Changeset.t}
   def create(attrs) do
     with {:ok, %ConversationPart{} = conversation_part} <- %ConversationPart{} |> create_changeset(attrs) |> Repo.insert() do
       ConversationChannel.broadcast_new_conversation_part(conversation_part)
       {:ok, conversation_part}
+    else
+      {:error, %Changeset{} = changeset} -> {:error, changeset}
     end
   end
 

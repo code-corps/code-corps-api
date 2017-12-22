@@ -41,8 +41,6 @@ defmodule CodeCorps.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:bamboo, "~> 0.7"}, # emails
-      {:bamboo_postmark, "~> 0.4.1"}, # postmark adapter for emails
       {:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false},
       {:phoenix, "~> 1.3"},
       {:phoenix_pubsub, "~> 1.0.2"},
@@ -78,6 +76,7 @@ defmodule CodeCorps.Mixfile do
       {:scrivener_ecto, "~> 1.2"}, # DB query pagination
       {:segment, "~> 0.1"}, # Segment analytics
       {:sentry, "~> 6.0"}, # Sentry error tracking
+      {:sparkpost, "~> 0.5"},
       {:stripity_stripe, git: "https://github.com/code-corps/stripity_stripe.git", branch: "2.0-beta"}, # Stripe
       {:sweet_xml, "~> 0.5"},
       {:timber, "~> 2.0"}, # Logging
@@ -208,12 +207,16 @@ defmodule CodeCorps.Mixfile do
       ],
 
       "Emails": [
-        CodeCorps.Mailer,
-        CodeCorps.Emails.BaseEmail,
-        CodeCorps.Emails.ForgotPasswordEmail,
-        CodeCorps.Emails.OrganizationInviteEmail,
-        CodeCorps.Emails.ProjectUserAcceptanceEmail,
-        CodeCorps.Emails.ReceiptEmail
+        CodeCorps.Emails.Transmissions,
+        CodeCorps.Emails.Transmissions.ForgotPassword,
+        CodeCorps.Emails.Transmissions.MessageInitiatedByProject,
+        CodeCorps.Emails.Transmissions.OrganizationInvite,
+        CodeCorps.Emails.Transmissions.ProjectApprovalRequest,
+        CodeCorps.Emails.Transmissions.ProjectApproved,
+        CodeCorps.Emails.Transmissions.ProjectUserAcceptance,
+        CodeCorps.Emails.Transmissions.ProjectUserRequest,
+        CodeCorps.Emails.Transmissions.Receipt,
+        CodeCorps.Emails.Transmissions.ReplyToConversation
       ],
 
       "Web": [

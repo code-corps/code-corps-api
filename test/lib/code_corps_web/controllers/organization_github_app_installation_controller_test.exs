@@ -1,6 +1,5 @@
 defmodule CodeCorpsWeb.OrganizationGithubAppInstallationControllerTest do
   use CodeCorpsWeb.ApiCase, resource_name: :organization_github_app_installation
-  use Bamboo.Test
 
   @attrs %{role: "contributor"}
 

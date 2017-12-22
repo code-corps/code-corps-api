@@ -3,41 +3,37 @@ defmodule CodeCorps.StripeService.Events.ConnectChargeSucceeded do
   Performs everything required to handle a charge.succeeded webhook
   on Stripe Connect
   """
-  alias CodeCorps.StripeService.StripeConnectChargeService
-  alias CodeCorps.{Emails, Mailer, StripeConnectCharge}
+
+  alias SparkPost.Transmission
+  alias CodeCorps.{
+    Emails,
+    StripeService.StripeConnectChargeService,
+    StripeConnectCharge
+  }
 
   @api Application.get_env(:code_corps, :stripe)
 
   def handle(%{data: %{object: %{id: id_from_stripe}}, user_id: connect_account_id_from_stripe}) do
     with {:ok, %StripeConnectCharge{} = charge} <- StripeConnectChargeService.create(id_from_stripe, connect_account_id_from_stripe) do
       charge |> track_created()
-
-      charge
-      |> try_create_receipt(connect_account_id_from_stripe)
-      |> maybe_send_receipt()
+      charge |> try_send_receipt(connect_account_id_from_stripe)
     else
       failure -> failure
     end
   end
-
-  defp try_create_receipt(%StripeConnectCharge{invoice_id_from_stripe: invoice_id} = charge, account_id) do
-    with {:ok, %Stripe.Invoice{} = invoice} <- @api.Invoice.retrieve(invoice_id, connect_account: account_id),
-         %Bamboo.Email{} = receipt <- Emails.ReceiptEmail.create(charge, invoice)
-    do
-      {:ok, charge, receipt}
-    else
-      failure -> failure
-    end
-  end
-
-  defp maybe_send_receipt({:ok, charge, receipt}) do
-    with %Bamboo.Email{} = email <- receipt |> Mailer.deliver_now do
-      {:ok, charge, email}
-    end
-  end
-  defp maybe_send_receipt(other), do: other
 
   defp track_created(%StripeConnectCharge{user_id: user_id} = charge) do
     CodeCorps.Analytics.SegmentTracker.track(user_id, :create, charge)
   end
+
+  defp try_send_receipt(%StripeConnectCharge{invoice_id_from_stripe: invoice_id} = charge, account_id) do
+    with {:ok, %Stripe.Invoice{} = invoice} <- @api.Invoice.retrieve(invoice_id, connect_account: account_id),
+         {:ok, %Transmission.Response{} = response} <- charge |> Emails.send_receipt_email(invoice)
+    do
+      {:ok, charge, response}
+    else
+      failure -> failure
+    end
+  end
+
 end

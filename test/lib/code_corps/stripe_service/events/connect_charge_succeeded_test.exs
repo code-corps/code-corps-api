@@ -3,8 +3,6 @@ defmodule CodeCorps.StripeService.Events.ConnectChargeSucceededTest do
 
   use CodeCorps.StripeCase
 
-  use Bamboo.Test
-
   alias CodeCorps.{
     Project, Repo, StripeConnectCharge, StripeTesting
   }
@@ -29,17 +27,14 @@ defmodule CodeCorps.StripeService.Events.ConnectChargeSucceededTest do
       user_id: account.id_from_stripe
     }
 
-    Bamboo.SentEmail.start_link()
-
     assert {
       :ok,
       %StripeConnectCharge{} = charge,
-      %Bamboo.Email{} = email
+      %SparkPost.Transmission.Response{}
     } = ConnectChargeSucceeded.handle(event)
 
     # assert email was sent
-
-    assert_delivered_email email
+    assert_received %SparkPost.Transmission{content: %{template_id: "receipt"}}
 
     # assert event was tracked by Segment
 

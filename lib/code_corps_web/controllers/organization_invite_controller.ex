@@ -2,7 +2,7 @@ defmodule CodeCorpsWeb.OrganizationInviteController do
   @moduledoc false
   use CodeCorpsWeb, :controller
 
-  alias CodeCorps.{Emails, Helpers.Query, Mailer, OrganizationInvite, User}
+  alias CodeCorps.{Emails, Helpers.Query, OrganizationInvite, User}
 
   action_fallback CodeCorpsWeb.FallbackController
   plug CodeCorpsWeb.Plug.DataToAttributes
@@ -28,7 +28,7 @@ defmodule CodeCorpsWeb.OrganizationInviteController do
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %OrganizationInvite{}, params),
          {:ok, %OrganizationInvite{} = organization_invite} <- %OrganizationInvite{} |> OrganizationInvite.create_changeset(params) |> Repo.insert do
 
-      send_email(organization_invite)
+      organization_invite |> Emails.send_organization_invite_email
 
       conn
       |> put_status(:created)
@@ -44,11 +44,5 @@ defmodule CodeCorpsWeb.OrganizationInviteController do
          {:ok, %OrganizationInvite{} = organization_invite} <- organization_invite |> OrganizationInvite.changeset(params) |> Repo.update do
       conn |> render("show.json-api", data: organization_invite)
     end
-  end
-
-  defp send_email(organization_invite) do
-    organization_invite
-    |> Emails.OrganizationInviteEmail.create()
-    |> Mailer.deliver_later()
   end
 end

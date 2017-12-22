@@ -6,7 +6,7 @@ defmodule CodeCorps.Projects do
   import CodeCorpsWeb.ProjectController, only: [preload: 1]
 
   alias CodeCorps.{
-    Analytics.SegmentTracker, Emails, Mailer, Project, Repo, User
+    Analytics.SegmentTracker, Emails, Project, Repo, User
   }
   alias Ecto.Changeset
 
@@ -81,12 +81,11 @@ defmodule CodeCorps.Projects do
   end
   defp maybe_send_approval_request_email(%Project{}, %Project{}), do: :nothing
 
-  @spec send_approval_request_email(Project.t) :: Bamboo.Email.t
+  @spec send_approval_request_email(Project.t) :: tuple
   defp send_approval_request_email(project) do
     project
     |> preload()
-    |> Emails.ProjectApprovalRequestEmail.create()
-    |> Mailer.deliver_now()
+    |> Emails.send_project_approval_request_email()
   end
 
   @spec maybe_send_approved_email(Project.t, Project.t) :: any
@@ -97,11 +96,10 @@ defmodule CodeCorps.Projects do
   end
   defp maybe_send_approved_email(%Project{}, %Project{}), do: :nothing
 
-  @spec send_approved_email(Project.t) :: Bamboo.Email.t
+  @spec send_approved_email(Project.t) :: tuple
   defp send_approved_email(project) do
     project
     |> preload()
-    |> Emails.ProjectApprovedEmail.create()
-    |> Mailer.deliver_now()
+    |> Emails.send_project_approved_email()
   end
 end

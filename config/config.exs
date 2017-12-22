@@ -14,8 +14,7 @@ config :code_corps, CodeCorpsWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "eMl0+Byu0Zv7q48thBu23ChBVFO1+sdLqoMI8yZoxEviF1K3C5uIohbDfvM9felL",
   render_errors: [view: CodeCorpsWeb.ErrorView, accepts: ~w(html json json-api)],
-  pubsub: [name: CodeCorps.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: CodeCorps.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -30,6 +29,17 @@ config :phoenix, :format_encoders,
 config :mime, :types, %{
   "application/vnd.api+json" => ["json-api"]
 }
+
+config :code_corps,
+  sparkpost_forgot_password_template: System.get_env("SPARKPOST_FORGOT_PASSWORD_TEMPLATE") || "forgot-password",
+  sparkpost_message_initiated_by_project_template: System.get_env("SPARKPOST_MESSAGE_INITIATED_BY_PROJECT_TEMPLATE") || "message-initiated-by-project",
+  sparkpost_organization_invite_template: System.get_env("SPARKPOST_ORGANIZATION_INVITE_TEMPLATE") || "organization-invite",
+  sparkpost_project_approval_request_template: System.get_env("SPARKPOST_PROJECT_APPROVAL_REQUEST_TEMPLATE") || "project-approval-request",
+  sparkpost_project_approved_template: System.get_env("SPARKPOST_PROJECT_APPROVED_TEMPLATE") || "project-approved",
+  sparkpost_project_user_acceptance_template: System.get_env("SPARKPOST_PROJECT_USER_ACCEPTANCE_TEMPLATE") || "project-user-acceptance",
+  sparkpost_project_user_request_template: System.get_env("SPARKPOST_PROJECT_USER_REQUEST_TEMPLATE") || "project-user-request",
+  sparkpost_receipt_template: System.get_env("SPARKPOST_RECEIPT_TEMPLATE") || "receipt",
+  sparkpost_reply_to_conversation_template: System.get_env("SPARKPOST_REPLY_TO_CONVERSATION_TEMPLATE") || "reply-to-conversation"
 
 config :code_corps, CodeCorps.Guardian,
   issuer: "CodeCorps",
@@ -72,6 +82,9 @@ config :code_corps,
   github_app_client_secret: System.get_env("GITHUB_APP_CLIENT_SECRET"),
   github_app_pem: pem
 
+config :code_corps,
+  sparkpost: CodeCorps.Emails.ExtendedAPI
+
 config :stripity_stripe,
   api_key: System.get_env("STRIPE_SECRET_KEY"),
   connect_client_id: System.get_env("STRIPE_PLATFORM_CLIENT_ID")
@@ -80,6 +93,9 @@ config :sentry,
   dsn: System.get_env("SENTRY_DSN"),
   enable_source_code_context: true,
   included_environments: ~w(prod staging)a
+
+config :sparkpost,
+  api_key: System.get_env("SPARKPOST_API_KEY")
 
 config :code_corps, :sentry, CodeCorps.Sentry.Async
 
