@@ -6,5 +6,6 @@ defmodule CodeCorps.SparkPost do
 
   defdelegate send_forgot_password_email(user, token), to: Emails
   defdelegate send_message_initiated_by_project_email(message, conversation), to: Emails
+  defdelegate send_organization_invite_email(invite), to: Emails
   defdelegate send_receipt_email(charge, invoice), to: Emails
 end
