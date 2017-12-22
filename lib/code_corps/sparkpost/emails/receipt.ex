@@ -27,7 +27,7 @@ defmodule CodeCorps.SparkPost.Emails.Receipt do
          {:ok, %DonationGoal{} = current_donation_goal} <- project |> get_current_donation_goal()
     do
       %Transmission{
-        content: %Content.TemplateRef{template_id: "receipt"},
+        content: %Content.TemplateRef{template_id: template_id()},
         options: %Transmission.Options{inline_css: true},
         recipients: [user |> Recipient.build],
         substitution_data: %{
@@ -83,4 +83,12 @@ defmodule CodeCorps.SparkPost.Emails.Receipt do
   @spec get_name(User.t) :: String.t
   defp get_name(%User{first_name: nil}), do: "there"
   defp get_name(%User{first_name: name}), do: name
+
+  @doc ~S"""
+  Returns configured template ID for this email
+  """
+  @spec template_id :: String.t
+  def template_id do
+    Application.get_env(:code_corps, :sparkpost_receipt_template)
+  end
 end

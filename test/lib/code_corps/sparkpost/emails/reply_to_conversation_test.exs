@@ -3,6 +3,10 @@ defmodule CodeCorps.SparkPost.Emails.ReplyToConversationTest do
 
   alias CodeCorps.{SparkPost.Emails.ReplyToConversation, WebClient}
 
+  test "has a template_id assigned" do
+    assert ReplyToConversation.template_id
+  end
+
   describe "build/1" do
     test "provides substitution data for all keys used by template" do
       message = insert(:message)
@@ -22,7 +26,7 @@ defmodule CodeCorps.SparkPost.Emails.ReplyToConversationTest do
         ReplyToConversation.build(conversation_part, user)
 
       expected_keys =
-        "reply-to-conversation"
+        ReplyToConversation.template_id
         |> CodeCorps.SparkPostHelpers.get_keys_used_by_template
       assert data |> Map.keys == expected_keys
     end

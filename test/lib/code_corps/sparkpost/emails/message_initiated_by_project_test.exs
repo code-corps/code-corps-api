@@ -3,6 +3,10 @@ defmodule CodeCorps.SparkPost.Emails.MessageInitiatedByProjectTest do
 
   alias CodeCorps.SparkPost.Emails.MessageInitiatedByProject
 
+  test "has a template_id assigned" do
+    assert MessageInitiatedByProject.template_id
+  end
+
   describe "build/2" do
     test "provides substitution data for all keys used by template" do
       %{message: message} = conversation =
@@ -13,7 +17,7 @@ defmodule CodeCorps.SparkPost.Emails.MessageInitiatedByProjectTest do
         MessageInitiatedByProject.build(message, conversation)
 
       expected_keys =
-        "message-initiated-by-project"
+        MessageInitiatedByProject.template_id
         |> CodeCorps.SparkPostHelpers.get_keys_used_by_template
       assert data |> Map.keys == expected_keys
     end

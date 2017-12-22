@@ -5,7 +5,7 @@ defmodule CodeCorps.SparkPost.Emails.OrganizationInvite do
   @spec build(OrganizationInvite.t) :: %Transmission{}
   def build(%OrganizationInvite{} = invite) do
     %Transmission{
-      content: %Content.TemplateRef{template_id: "organization-invite"},
+      content: %Content.TemplateRef{template_id: template_id()},
       options: %Transmission.Options{inline_css: true},
       recipients: [invite |> Recipient.build],
       substitution_data: %{
@@ -30,5 +30,13 @@ defmodule CodeCorps.SparkPost.Emails.OrganizationInvite do
   defp set_params(code, organization_name) do
     %{code: code, organization_name: organization_name}
     |> URI.encode_query
+  end
+
+  @doc ~S"""
+  Returns configured template ID for this email
+  """
+  @spec template_id :: String.t
+  def template_id do
+    Application.get_env(:code_corps, :sparkpost_organization_invite_template)
   end
 end

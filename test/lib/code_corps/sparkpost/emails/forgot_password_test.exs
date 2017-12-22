@@ -3,13 +3,19 @@ defmodule CodeCorps.SparkPost.Emails.ForgotPasswordTest do
 
   alias CodeCorps.{SparkPost.Emails.ForgotPassword, WebClient}
 
+  test "has a template_id assigned" do
+    assert ForgotPassword.template_id
+  end
+
   describe "build/2" do
     test "provides substitution data for all keys used by template" do
       user = insert(:user)
       token = "foo"
       %{substitution_data: data} = ForgotPassword.build(user, token)
 
-      expected_keys = "forgot-password" |> CodeCorps.SparkPostHelpers.get_keys_used_by_template
+      expected_keys =
+        ForgotPassword.template_id
+        |> CodeCorps.SparkPostHelpers.get_keys_used_by_template
       assert data |> Map.keys == expected_keys
     end
 

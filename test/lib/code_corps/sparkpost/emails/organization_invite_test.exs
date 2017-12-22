@@ -3,6 +3,10 @@ defmodule CodeCorps.SparkPost.Emails.OrganizationInviteTest do
 
   alias CodeCorps.{SparkPost.Emails.OrganizationInvite, WebClient}
 
+  test "has a template_id assigned" do
+    assert OrganizationInvite.template_id
+  end
+
   describe "build/1" do
     test "provides substitution data for all keys used by template" do
       invite = insert(:organization_invite)
@@ -10,7 +14,7 @@ defmodule CodeCorps.SparkPost.Emails.OrganizationInviteTest do
       %{substitution_data: data} = OrganizationInvite.build(invite)
 
       expected_keys =
-        "organization-invite"
+        OrganizationInvite.template_id
         |> CodeCorps.SparkPostHelpers.get_keys_used_by_template
       assert data |> Map.keys == expected_keys
     end

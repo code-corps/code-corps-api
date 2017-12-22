@@ -14,7 +14,7 @@ defmodule CodeCorps.SparkPost.Emails.ProjectUserAcceptance do
   @spec build(ProjectUser.t) :: %Transmission{}
   def build(%ProjectUser{project: %Project{} = project, user: %User{} = user}) do
     %Transmission{
-      content: %Content.TemplateRef{template_id: "project-user-acceptance"},
+      content: %Content.TemplateRef{template_id: template_id()},
       options: %Transmission.Options{inline_css: true},
       recipients: [user |> Recipient.build],
       substitution_data: %{
@@ -38,5 +38,13 @@ defmodule CodeCorps.SparkPost.Emails.ProjectUserAcceptance do
     WebClient.url()
     |> URI.merge(project.organization.slug <> "/" <> project.slug)
     |> URI.to_string
+  end
+
+  @doc ~S"""
+  Returns configured template ID for this email
+  """
+  @spec template_id :: String.t
+  def template_id do
+    Application.get_env(:code_corps, :sparkpost_project_user_acceptance_template)
   end
 end

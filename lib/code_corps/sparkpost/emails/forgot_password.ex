@@ -6,7 +6,7 @@ defmodule CodeCorps.SparkPost.Emails.ForgotPassword do
   @spec build(User.t, String.t) :: %Transmission{}
   def build(%User{} = user, token) do
     %Transmission{
-      content: %Content.TemplateRef{template_id: "forgot-password"},
+      content: %Content.TemplateRef{template_id: template_id()},
       options: %Transmission.Options{inline_css: true},
       recipients: [user |> Recipient.build],
       substitution_data: %{
@@ -23,5 +23,13 @@ defmodule CodeCorps.SparkPost.Emails.ForgotPassword do
     WebClient.url()
     |> URI.merge("password/reset?token=#{token}")
     |> URI.to_string
+  end
+
+  @doc ~S"""
+  Returns configured template ID for this email
+  """
+  @spec template_id :: String.t
+  def template_id do
+    Application.get_env(:code_corps, :sparkpost_forgot_password_template)
   end
 end

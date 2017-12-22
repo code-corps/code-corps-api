@@ -15,7 +15,7 @@ defmodule CodeCorps.SparkPost.Emails.MessageInitiatedByProject do
     %Conversation{user: %User{} = user} = conversation) do
 
     %Transmission{
-      content: %Content.TemplateRef{template_id: "message-initiated-by-project"},
+      content: %Content.TemplateRef{template_id: template_id()},
       options: %Transmission.Options{inline_css: true},
       recipients: [user |> Recipient.build],
       substitution_data: %{
@@ -34,5 +34,13 @@ defmodule CodeCorps.SparkPost.Emails.MessageInitiatedByProject do
     WebClient.url()
     |> URI.merge("conversations/#{id}")
     |> URI.to_string
+  end
+
+  @doc ~S"""
+  Returns configured template ID for this email
+  """
+  @spec template_id :: String.t
+  def template_id do
+    Application.get_env(:code_corps, :sparkpost_message_initiated_by_project_template)
   end
 end

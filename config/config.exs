@@ -30,6 +30,17 @@ config :mime, :types, %{
   "application/vnd.api+json" => ["json-api"]
 }
 
+config :code_corps,
+  sparkpost_forgot_password_template: System.get_env("SPARKPOST_FORGOT_PASSWORD_TEMPLATE") || "forgot-password",
+  sparkpost_message_initiated_by_project_template: System.get_env("SPARKPOST_MESSAGE_INITIATED_BY_PROJECT_TEMPLATE") || "message-initiated-by-project",
+  sparkpost_organization_invite_template: System.get_env("SPARKPOST_ORGANIZATION_INVITE_TEMPLATE") || "organization-invite",
+  sparkpost_project_approval_request_template: System.get_env("SPARKPOST_PROJECT_APPROVAL_REQUEST_TEMPLATE") || "project-approval-request",
+  sparkpost_project_approved_template: System.get_env("SPARKPOST_PROJECT_APPROVED_TEMPLATE") || "project-approved",
+  sparkpost_project_user_acceptance_template: System.get_env("SPARKPOST_PROJECT_USER_ACCEPTANCE_TEMPLATE") || "project-user-acceptance",
+  sparkpost_project_user_request_template: System.get_env("SPARKPOST_PROJECT_USER_REQUEST_TEMPLATE") || "project-user-request",
+  sparkpost_receipt_template: System.get_env("SPARKPOST_RECEIPT_TEMPLATE") || "receipt",
+  sparkpost_reply_to_conversation_template: System.get_env("SPARKPOST_REPLY_TO_CONVERSATION_TEMPLATE") || "reply-to-conversation"
+
 config :code_corps, CodeCorps.Guardian,
   issuer: "CodeCorps",
   ttl: { 30, :days },

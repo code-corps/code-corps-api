@@ -24,7 +24,7 @@ defmodule CodeCorps.SparkPost.Emails.ReplyToConversation do
     %User{} = user) do
 
     %Transmission{
-      content: %Content.TemplateRef{template_id: "reply-to-conversation"},
+      content: %Content.TemplateRef{template_id: template_id()},
       options: %Transmission.Options{inline_css: true},
       recipients: [user |> Recipient.build],
       substitution_data: %{
@@ -52,4 +52,12 @@ defmodule CodeCorps.SparkPost.Emails.ReplyToConversation do
   @spec get_name(User.t) :: String.t
   defp get_name(%User{first_name: nil}), do: "there"
   defp get_name(%User{first_name: name}), do: name
+
+  @doc ~S"""
+  Returns configured template ID for this email
+  """
+  @spec template_id :: String.t
+  def template_id do
+    Application.get_env(:code_corps, :sparkpost_reply_to_conversation_template)
+  end
 end

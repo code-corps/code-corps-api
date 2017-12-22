@@ -3,6 +3,10 @@ defmodule CodeCorps.SparkPost.Emails.ProjectApprovedTest do
 
   alias CodeCorps.SparkPost.Emails.ProjectApproved
 
+  test "has a template_id assigned" do
+    assert ProjectApproved.template_id
+  end
+
   describe "build/1" do
     test "provides substitution data for all keys used by template" do
       project = insert(:project)
@@ -10,7 +14,7 @@ defmodule CodeCorps.SparkPost.Emails.ProjectApprovedTest do
       %{substitution_data: data} = ProjectApproved.build(project)
 
       expected_keys =
-        "project-approved"
+        ProjectApproved.template_id
         |> CodeCorps.SparkPostHelpers.get_keys_used_by_template
       assert data |> Map.keys == expected_keys
     end

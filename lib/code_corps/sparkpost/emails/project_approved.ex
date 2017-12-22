@@ -9,7 +9,7 @@ defmodule CodeCorps.SparkPost.Emails.ProjectApproved do
   @spec build(Project.t) :: %Transmission{}
   def build(%Project{} = project) do
     %Transmission{
-      content: %Content.TemplateRef{template_id: "project-approval-request"},
+      content: %Content.TemplateRef{template_id: template_id()},
       options: %Transmission.Options{inline_css: true},
       recipients: project |> get_owners() |> Enum.map(&Recipient.build/1),
       substitution_data: %{
@@ -40,5 +40,13 @@ defmodule CodeCorps.SparkPost.Emails.ProjectApproved do
       where: pu.role == "owner"
 
     query |> Repo.all()
+  end
+
+  @doc ~S"""
+  Returns configured template ID for this email
+  """
+  @spec template_id :: String.t
+  def template_id do
+    Application.get_env(:code_corps, :sparkpost_project_approved_template)
   end
 end
