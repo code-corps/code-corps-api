@@ -3,7 +3,6 @@ defmodule CodeCorps.MessagesTest do
 
   use CodeCorps.DbAccessCase
   use Phoenix.ChannelTest
-  use Bamboo.Test
 
   import Ecto.Query, only: [where: 2]
 

@@ -39,20 +39,6 @@ config :logger, level: :info
 config :code_corps, :stripe, Stripe
 config :code_corps, :stripe_env, :remote_dev
 
-config :code_corps, CodeCorps.Mailer,
-  adapter: Bamboo.LocalAdapter
-
-config :code_corps,
-  postmark_forgot_password_template: "123",
-  postmark_message_initiated_by_project_template: "123",
-  postmark_organization_invite_email_template: "123",
-  postmark_project_approval_request_template: "123",
-  postmark_project_approved_template: "123",
-  postmark_project_user_acceptance_template: "123",
-  postmark_project_user_request_template: "123",
-  postmark_receipt_template: "123",
-  postmark_reply_to_conversation_template: "123"
-
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key

@@ -2,7 +2,6 @@ defmodule CodeCorpsWeb.PasswordControllerTest do
   @moduledoc false
 
   use CodeCorpsWeb.ApiCase, resource_name: :password
-  use Bamboo.Test
 
   alias CodeCorps.AuthToken
 

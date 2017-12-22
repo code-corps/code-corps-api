@@ -64,19 +64,5 @@ config :code_corps, :sentry, CodeCorps.Sentry.Sync
 
 config :code_corps, :processor, CodeCorps.Processor.Sync
 
-config :code_corps, CodeCorps.Mailer,
-  adapter: Bamboo.TestAdapter
-
-config :code_corps,
-  postmark_forgot_password_template: "123",
-  postmark_message_initiated_by_project_template: "123",
-  postmark_organization_invite_email_template: "123",
-  postmark_project_approval_request_template: "123",
-  postmark_project_approved_template: "123",
-  postmark_project_user_acceptance_template: "123",
-  postmark_project_user_request_template: "123",
-  postmark_receipt_template: "123",
-  postmark_reply_to_conversation_template: "123"
-
 config :code_corps, :cloudex, CloudexTest
 config :cloudex, api_key: "test_key", secret: "test_secret", cloud_name: "test_cloud_name"

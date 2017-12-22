@@ -41,8 +41,6 @@ defmodule CodeCorps.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:bamboo, "~> 0.7"}, # emails
-      {:bamboo_postmark, "~> 0.4.1"}, # postmark adapter for emails
       {:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false},
       {:phoenix, "~> 1.3"},
       {:phoenix_pubsub, "~> 1.0.2"},
@@ -209,12 +207,16 @@ defmodule CodeCorps.Mixfile do
       ],
 
       "Emails": [
-        CodeCorps.Mailer,
-        CodeCorps.Emails.BaseEmail,
-        CodeCorps.Emails.ForgotPasswordEmail,
-        CodeCorps.Emails.OrganizationInviteEmail,
-        CodeCorps.Emails.ProjectUserAcceptanceEmail,
-        CodeCorps.Emails.ReceiptEmail
+        CodeCorps.SparkPost.Emails,
+        CodeCorps.SparkPost.Emails.ForgotPassword,
+        CodeCorps.SparkPost.Emails.MessageInitiatedByProject,
+        CodeCorps.SparkPost.Emails.OrganizationInvite,
+        CodeCorps.SparkPost.Emails.ProjectApprovalRequest,
+        CodeCorps.SparkPost.Emails.ProjectApproved,
+        CodeCorps.SparkPost.Emails.ProjectUserAcceptance,
+        CodeCorps.SparkPost.Emails.ProjectUserRequest,
+        CodeCorps.SparkPost.Emails.Receipt,
+        CodeCorps.SparkPost.Emails.ReplyToConversation
       ],
 
       "Web": [

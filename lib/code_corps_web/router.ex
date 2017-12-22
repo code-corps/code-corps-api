@@ -49,10 +49,6 @@ defmodule CodeCorpsWeb.Router do
     get "/", PageController, :index
   end
 
-  if Mix.env == :dev do
-    forward "/sent_emails", Bamboo.EmailPreviewPlug
-  end
-
   scope "/", CodeCorpsWeb, host: "api." do
     pipe_through [:stripe_webhooks]
 

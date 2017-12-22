@@ -96,7 +96,7 @@ defmodule CodeCorps.Projects do
   end
   defp maybe_send_approved_email(%Project{}, %Project{}), do: :nothing
 
-  @spec send_approved_email(Project.t) :: Bamboo.Email.t
+  @spec send_approved_email(Project.t) :: tuple
   defp send_approved_email(project) do
     project
     |> preload()
