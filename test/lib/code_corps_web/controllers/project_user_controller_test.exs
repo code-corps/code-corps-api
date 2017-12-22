@@ -1,8 +1,9 @@
 defmodule CodeCorpsWeb.ProjectUserControllerTest do
   use CodeCorpsWeb.ApiCase, resource_name: :project_user
-  use Bamboo.Test
 
   @attrs %{role: "contributor"}
+
+  alias CodeCorps.{ProjectUser, Repo, SparkPost.Emails}
 
   describe "index" do
     test "lists all resources", %{conn: conn} do
@@ -62,12 +63,12 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
       assert_received {:track, ^user_id, "Requested Project Membership", ^tracking_properties}
 
       email =
-        CodeCorps.ProjectUser
-        |> CodeCorps.Repo.get_by(role: "pending")
-        |> CodeCorps.Repo.preload([:project, :user])
-        |> CodeCorps.Emails.ProjectUserRequestEmail.create()
+        ProjectUser
+        |> Repo.get_by(role: "pending")
+        |> Repo.preload([:project, :user])
+        |> Emails.ProjectUserRequest.build()
 
-      assert_delivered_email(email)
+      assert_received ^email
     end
 
     @tag :authenticated
@@ -116,10 +117,10 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
       assert_received {:track, ^user_id, "Approved Project Membership", ^tracking_properties}
 
       email =
-        CodeCorps.ProjectUser
-        |> CodeCorps.Repo.get_by(role: "contributor")
-        |> CodeCorps.Repo.preload([:project, :user])
-        |> CodeCorps.SparkPost.Emails.ProjectUserAcceptance.build()
+        ProjectUser
+        |> Repo.get_by(role: "contributor")
+        |> Repo.preload([:project, :user])
+        |> Emails.ProjectUserAcceptance.build()
 
       assert_received ^email
     end

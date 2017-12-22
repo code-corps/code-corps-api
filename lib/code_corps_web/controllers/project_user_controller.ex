@@ -2,7 +2,7 @@ defmodule CodeCorpsWeb.ProjectUserController do
   @moduledoc false
   use CodeCorpsWeb, :controller
 
-  alias CodeCorps.{Emails, Helpers.Query, Mailer, ProjectUser, SparkPost, User}
+  alias CodeCorps.{Helpers.Query, ProjectUser, SparkPost, User}
 
   action_fallback CodeCorpsWeb.FallbackController
   plug CodeCorpsWeb.Plug.DataToAttributes
@@ -68,8 +68,7 @@ defmodule CodeCorpsWeb.ProjectUserController do
   defp send_request_email(project_user) do
     project_user
     |> Repo.preload(@preloads)
-    |> Emails.ProjectUserRequestEmail.create()
-    |> Mailer.deliver_now()
+    |> SparkPost.send_project_user_request_email
   end
 
   @spec maybe_send_update_email(ProjectUser.t, ProjectUser.t) :: Bamboo.Email.t | nil
