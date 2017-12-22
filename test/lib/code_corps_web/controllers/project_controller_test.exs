@@ -148,9 +148,9 @@ defmodule CodeCorpsWeb.ProjectControllerTest do
 
       email =
         project
-        |> Emails.ProjectApprovalRequestEmail.create()
+        |> CodeCorps.SparkPost.Emails.ProjectApprovalRequest.build()
 
-      assert_delivered_email(email)
+      assert_received ^email
 
       user_id = current_user.id
       traits = project |> SegmentTraitsBuilder.build

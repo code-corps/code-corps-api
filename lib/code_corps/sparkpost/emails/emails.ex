@@ -15,6 +15,10 @@ defmodule CodeCorps.SparkPost.Emails do
     invite |> Emails.OrganizationInvite.build |> API.send_transmission
   end
 
+  def send_project_approval_request_email(project) do
+    project |> Emails.ProjectApprovalRequest.build |> API.send_transmission
+  end
+
   def send_receipt_email(charge, invoice) do
     case charge |> Emails.Receipt.build(invoice) do
       %SparkPost.Transmission{} = transmission ->
