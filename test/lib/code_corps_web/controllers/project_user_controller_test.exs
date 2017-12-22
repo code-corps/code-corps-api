@@ -54,7 +54,9 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
 
       tracking_properties = %{
         project: project.title,
-        project_id: project.id
+        project_id: project.id,
+        member: user.username,
+        member_id: user.id
       }
 
       assert_received {:track, ^user_id, "Requested Project Membership", ^tracking_properties}
@@ -106,7 +108,9 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
 
       tracking_properties = %{
         project: project.title,
-        project_id: project.id
+        project_id: project.id,
+        member: record.user.username,
+        member_id: record.user.id
       }
 
       assert_received {:track, ^user_id, "Approved Project Membership", ^tracking_properties}

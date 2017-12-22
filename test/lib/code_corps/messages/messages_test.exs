@@ -115,7 +115,7 @@ defmodule CodeCorps.MessagesTest do
 
       result_ids =
         Conversation
-        |> Messages.list_conversations(%{"status" => "active"})
+        |> Messages.list_conversations(%{"active" => true})
         |> get_and_sort_ids()
 
       refute conversation_started_by_admin_without_reply.id in result_ids
@@ -125,7 +125,7 @@ defmodule CodeCorps.MessagesTest do
 
       result_ids =
         Conversation
-        |> Messages.list_conversations(%{"status" => "any"})
+        |> Messages.list_conversations(%{"status" => "open"})
         |> get_and_sort_ids()
 
       assert conversation_started_by_admin_without_reply.id in result_ids
@@ -192,7 +192,7 @@ defmodule CodeCorps.MessagesTest do
         conversation: other_conversation_started_by_admin_with_reply
       )
 
-      params = %{"status" => "active", "project_id" => project_1.id}
+      params = %{"active" => true, "project_id" => project_1.id}
       result_ids =
         Conversation
         |> Messages.list_conversations(params)
@@ -208,7 +208,7 @@ defmodule CodeCorps.MessagesTest do
       # project
       refute other_conversation_started_by_admin_with_reply.id in result_ids
 
-      params = %{"status" => "active", "project_id" => project_2.id}
+      params = %{"active" => true, "project_id" => project_2.id}
       result_ids =
         Conversation
         |> Messages.list_conversations(params)

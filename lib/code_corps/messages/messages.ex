@@ -30,6 +30,7 @@ defmodule CodeCorps.Messages do
   def list_conversations(scope, %{} = params) do
     scope
     |> Messages.ConversationQuery.project_filter(params)
+    |> Messages.ConversationQuery.active_filter(params)
     |> Messages.ConversationQuery.status_filter(params)
     |> Messages.ConversationQuery.user_filter(params)
     |> Repo.all()

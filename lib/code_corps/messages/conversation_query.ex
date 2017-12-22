@@ -33,16 +33,16 @@ defmodule CodeCorps.Messages.ConversationQuery do
 
 
   @doc ~S"""
-  Narrows down a `CodeCorps.Conversation` query to return only those records
-  considered to have a specific status.
+  Filters `CodeCorps.Conversation` record queries to return only those
+  considered to be active.
 
-  The status of `active` means that only those records are included which either
-  - belong to a `CodeCorps.Message` initiated by user
-  - belong to a `CodeCorps.Message` initiated by admin, with at least a single
-    reply in the form of a `CodeCorps.ConversationPart`
+  Active conversations belong either:
+  - to a `CodeCorps.Message` initiated by user
+  - to a `CodeCorps.Message` initiated by an admin, with at least a single
+    conversation part
   """
-  @spec status_filter(Queryable.t, map) :: Queryable.t
-  def status_filter(queryable, %{"status" => "active"}) do
+  @spec active_filter(Queryable.t, map) :: Queryable.t
+  def active_filter(queryable, %{"active" => true}) do
     prefiltered_ids = queryable |> select([c], c.id) |> Repo.all
 
     Conversation
@@ -53,5 +53,15 @@ defmodule CodeCorps.Messages.ConversationQuery do
     |> having([_c, m, _cp], m.initiated_by == "user")
     |> or_having([c, m, cp], m.initiated_by == "admin" and count(cp.id) > 0)
   end
-  def status_filter(query, %{}), do: query
+  def active_filter(query, %{}), do: query
+
+  @doc ~S"""
+  Filters `CodeCorps.Conversation` record queries by their status.
+  """
+  @spec status_filter(Queryable.t, map) :: Queryable.t
+  def status_filter(queryable, %{"status" => status}) do
+    queryable
+    |> where([c], c.status == ^status)
+  end
+  def status_filter(query, _), do: query
 end
