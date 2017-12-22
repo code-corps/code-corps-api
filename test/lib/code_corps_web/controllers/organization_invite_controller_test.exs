@@ -38,7 +38,7 @@ defmodule CodeCorpsWeb.OrganizationInviteControllerTest do
       organization_invite_email =
         CodeCorps.OrganizationInvite
         |> Repo.one()
-        |> CodeCorps.SparkPost.Emails.OrganizationInvite.build()
+        |> CodeCorps.Emails.Transmissions.OrganizationInvite.build()
 
       assert_received ^organization_invite_email
     end

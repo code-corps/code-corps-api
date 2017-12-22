@@ -8,8 +8,8 @@ defmodule CodeCorps.MessagesTest do
 
   alias CodeCorps.{
     Conversation, ConversationPart, Message, Messages,
-    SparkPost.Emails.MessageInitiatedByProject,
-    SparkPost.Emails.ReplyToConversation
+    Emails.Transmissions.MessageInitiatedByProject,
+    Emails.Transmissions.ReplyToConversation
   }
   alias Ecto.Changeset
 

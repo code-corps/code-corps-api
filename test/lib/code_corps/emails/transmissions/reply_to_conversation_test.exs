@@ -1,7 +1,7 @@
-defmodule CodeCorps.SparkPost.Emails.ReplyToConversationTest do
+defmodule CodeCorps.Emails.Transmissions.ReplyToConversationTest do
   use CodeCorps.DbAccessCase
 
-  alias CodeCorps.{SparkPost.Emails.ReplyToConversation, WebClient}
+  alias CodeCorps.{Emails.Transmissions.ReplyToConversation, WebClient}
 
   test "has a template_id assigned" do
     assert ReplyToConversation.template_id

@@ -207,16 +207,16 @@ defmodule CodeCorps.Mixfile do
       ],
 
       "Emails": [
-        CodeCorps.SparkPost.Emails,
-        CodeCorps.SparkPost.Emails.ForgotPassword,
-        CodeCorps.SparkPost.Emails.MessageInitiatedByProject,
-        CodeCorps.SparkPost.Emails.OrganizationInvite,
-        CodeCorps.SparkPost.Emails.ProjectApprovalRequest,
-        CodeCorps.SparkPost.Emails.ProjectApproved,
-        CodeCorps.SparkPost.Emails.ProjectUserAcceptance,
-        CodeCorps.SparkPost.Emails.ProjectUserRequest,
-        CodeCorps.SparkPost.Emails.Receipt,
-        CodeCorps.SparkPost.Emails.ReplyToConversation
+        CodeCorps.Emails.Transmissions,
+        CodeCorps.Emails.Transmissions.ForgotPassword,
+        CodeCorps.Emails.Transmissions.MessageInitiatedByProject,
+        CodeCorps.Emails.Transmissions.OrganizationInvite,
+        CodeCorps.Emails.Transmissions.ProjectApprovalRequest,
+        CodeCorps.Emails.Transmissions.ProjectApproved,
+        CodeCorps.Emails.Transmissions.ProjectUserAcceptance,
+        CodeCorps.Emails.Transmissions.ProjectUserRequest,
+        CodeCorps.Emails.Transmissions.Receipt,
+        CodeCorps.Emails.Transmissions.ReplyToConversation
       ],
 
       "Web": [

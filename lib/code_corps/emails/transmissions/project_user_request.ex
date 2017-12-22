@@ -1,29 +1,30 @@
-defmodule CodeCorps.SparkPost.Emails.ProjectUserAcceptance do
-  alias SparkPost.{Content, Transmission}
+defmodule CodeCorps.Emails.Transmissions.ProjectUserRequest do
+  import Ecto.Query
 
+  alias SparkPost.{Content, Transmission}
   alias CodeCorps.{
     Presenters.ImagePresenter,
     Project,
     ProjectUser,
     Repo,
-    SparkPost.Emails.Recipient,
+    Emails.Recipient,
     User,
     WebClient
   }
 
   @spec build(ProjectUser.t) :: %Transmission{}
-  def build(%ProjectUser{project: %Project{} = project, user: %User{} = user}) do
+  def build(%ProjectUser{project: project, user: user}) do
     %Transmission{
       content: %Content.TemplateRef{template_id: template_id()},
       options: %Transmission.Options{inline_css: true},
-      recipients: [user |> Recipient.build],
+      recipients: project |> get_owners() |> Enum.map(&Recipient.build/1),
       substitution_data: %{
+        contributors_url: project |> preload() |> url(),
         from_name: "Code Corps",
         from_email: "team@codecorps.org",
         project_logo_url: ImagePresenter.large(project),
         project_title: project.title,
-        project_url: project |> preload() |> url(),
-        subject: "#{project.title} just added you as a contributor",
+        subject: "#{user.first_name} wants to join #{project.title}",
         user_first_name: user.first_name,
         user_image_url: ImagePresenter.large(user)
       }
@@ -36,8 +37,18 @@ defmodule CodeCorps.SparkPost.Emails.ProjectUserAcceptance do
   @spec url(Project.t) :: String.t
   defp url(project) do
     WebClient.url()
-    |> URI.merge(project.organization.slug <> "/" <> project.slug)
+    |> URI.merge(project.organization.slug <> "/" <> project.slug <> "/people")
     |> URI.to_string
+  end
+
+  @spec get_owners(Project.t) :: list(User.t)
+  defp get_owners(%Project{id: project_id}) do
+    query = from u in User,
+      join: pu in ProjectUser, on: u.id == pu.user_id,
+      where: pu.project_id == ^project_id,
+      where: pu.role == "owner"
+
+    query |> Repo.all()
   end
 
   @doc ~S"""
@@ -45,6 +56,6 @@ defmodule CodeCorps.SparkPost.Emails.ProjectUserAcceptance do
   """
   @spec template_id :: String.t
   def template_id do
-    Application.get_env(:code_corps, :sparkpost_project_user_acceptance_template)
+    Application.get_env(:code_corps, :sparkpost_project_user_request_template)
   end
 end

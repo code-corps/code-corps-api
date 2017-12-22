@@ -2,7 +2,7 @@ defmodule CodeCorpsWeb.ProjectUserController do
   @moduledoc false
   use CodeCorpsWeb, :controller
 
-  alias CodeCorps.{Helpers.Query, ProjectUser, SparkPost, User}
+  alias CodeCorps.{Emails, Helpers.Query, ProjectUser, User}
 
   action_fallback CodeCorpsWeb.FallbackController
   plug CodeCorpsWeb.Plug.DataToAttributes
@@ -68,7 +68,7 @@ defmodule CodeCorpsWeb.ProjectUserController do
   defp send_request_email(project_user) do
     project_user
     |> Repo.preload(@preloads)
-    |> SparkPost.send_project_user_request_email
+    |> Emails.send_project_user_request_email
   end
 
   @spec maybe_send_update_email(ProjectUser.t, ProjectUser.t) :: tuple | nil
@@ -84,6 +84,6 @@ defmodule CodeCorpsWeb.ProjectUserController do
   defp send_acceptance_email(project_user) do
     project_user
     |> Repo.preload(@preloads)
-    |> SparkPost.send_project_user_acceptance_email()
+    |> Emails.send_project_user_acceptance_email()
   end
 end

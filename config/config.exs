@@ -83,7 +83,7 @@ config :code_corps,
   github_app_pem: pem
 
 config :code_corps,
-  sparkpost: CodeCorps.SparkPost.ExtendedAPI
+  sparkpost: CodeCorps.Emails.ExtendedAPI
 
 config :stripity_stripe,
   api_key: System.get_env("STRIPE_SECRET_KEY"),

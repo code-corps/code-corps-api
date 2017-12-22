@@ -8,7 +8,7 @@ defmodule Mix.Tasks.Templates.Update do
   require Logger
 
   def run(_) do
-    CodeCorps.SparkPost.update_templates()
+    CodeCorps.Emails.update_templates()
     |> Enum.each(&log_result(&1))
   end
 

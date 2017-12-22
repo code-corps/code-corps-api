@@ -1,6 +1,6 @@
-defmodule CodeCorps.SparkPost.Emails.OrganizationInvite do
+defmodule CodeCorps.Emails.Transmissions.OrganizationInvite do
   alias SparkPost.{Content, Transmission}
-  alias CodeCorps.{OrganizationInvite, SparkPost.Emails.Recipient, WebClient}
+  alias CodeCorps.{OrganizationInvite, Emails.Recipient, WebClient}
 
   @spec build(OrganizationInvite.t) :: %Transmission{}
   def build(%OrganizationInvite{} = invite) do

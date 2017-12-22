@@ -1,4 +1,4 @@
-defmodule CodeCorps.SparkPost.Tasks do
+defmodule CodeCorps.Emails.Tasks do
   @moduledoc ~S"""
   Subcontext holding all commonly performed Tasks related to SparkPost
   """
@@ -15,7 +15,7 @@ defmodule CodeCorps.SparkPost.Tasks do
     "reply-to-conversation"
   ]
 
-  alias CodeCorps.SparkPost.API
+  alias CodeCorps.Emails.API
 
   @doc ~S"""
   Builds a stream, which, when evaluated, makes API requests to create all

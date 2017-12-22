@@ -1,4 +1,4 @@
-defmodule CodeCorps.SparkPost.Emails.Recipient do
+defmodule CodeCorps.Emails.Recipient do
   @moduledoc ~S"""
   In charge of adapting `CodeCorps.User` data into SparkPost recipient data.
   """

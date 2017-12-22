@@ -1,7 +1,7 @@
-defmodule CodeCorps.SparkPost.Emails.MessageInitiatedByProjectTest do
+defmodule CodeCorps.Emails.Transmissions.MessageInitiatedByProjectTest do
   use CodeCorps.DbAccessCase
 
-  alias CodeCorps.SparkPost.Emails.MessageInitiatedByProject
+  alias CodeCorps.Emails.Transmissions.MessageInitiatedByProject
 
   test "has a template_id assigned" do
     assert MessageInitiatedByProject.template_id

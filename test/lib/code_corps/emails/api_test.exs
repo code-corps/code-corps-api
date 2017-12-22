@@ -1,9 +1,9 @@
-defmodule CodeCorps.SparkPost.APITest do
+defmodule CodeCorps.Emails.APITest do
   @moduledoc false
 
   use ExUnit.Case, async: false
 
-  alias CodeCorps.SparkPost.API
+  alias CodeCorps.Emails.API
 
   describe "create_template/3" do
     test "works" do

@@ -1,7 +1,7 @@
-defmodule CodeCorps.SparkPost.Emails.ProjectUserAcceptanceTest do
+defmodule CodeCorps.Emails.Transmissions.ProjectUserAcceptanceTest do
   use CodeCorps.DbAccessCase
 
-  alias CodeCorps.SparkPost.Emails.ProjectUserAcceptance
+  alias CodeCorps.Emails.Transmissions.ProjectUserAcceptance
 
   test "has a template_id assigned" do
     assert ProjectUserAcceptance.template_id

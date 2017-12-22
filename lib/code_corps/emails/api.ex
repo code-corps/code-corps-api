@@ -1,4 +1,4 @@
-defmodule CodeCorps.SparkPost.API do
+defmodule CodeCorps.Emails.API do
   @moduledoc ~S"""
   A wrapper for the SparkPost API.
 

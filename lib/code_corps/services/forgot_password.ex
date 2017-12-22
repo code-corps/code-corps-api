@@ -1,7 +1,7 @@
 defmodule CodeCorps.Services.ForgotPasswordService do
   # credo:disable-for-this-file Credo.Check.Refactor.PipeChainStart
 
-  alias CodeCorps.{AuthToken, Repo, SparkPost, User}
+  alias CodeCorps.{AuthToken, Emails, Repo, User}
 
   @doc"""
   Generates an AuthToken model and sends to the provided email.
@@ -10,7 +10,7 @@ defmodule CodeCorps.Services.ForgotPasswordService do
     with %User{} = user <- Repo.get_by(User, email: email),
       {:ok, %AuthToken{value: token}} <- AuthToken.changeset(%AuthToken{}, user) |> Repo.insert
     do
-      user |> SparkPost.send_forgot_password_email(token)
+      user |> Emails.send_forgot_password_email(token)
     else
       nil -> nil
     end

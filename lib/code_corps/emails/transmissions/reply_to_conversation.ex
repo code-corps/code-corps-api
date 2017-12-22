@@ -1,4 +1,4 @@
-defmodule CodeCorps.SparkPost.Emails.ReplyToConversation do
+defmodule CodeCorps.Emails.Transmissions.ReplyToConversation do
   alias SparkPost.{Content, Transmission}
   alias CodeCorps.{
     Conversation,
@@ -6,7 +6,7 @@ defmodule CodeCorps.SparkPost.Emails.ReplyToConversation do
     Message,
     Organization,
     Project,
-    SparkPost.Emails.Recipient,
+    Emails.Recipient,
     User,
     WebClient
   }

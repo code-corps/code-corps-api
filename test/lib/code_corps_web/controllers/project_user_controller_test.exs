@@ -3,7 +3,7 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
 
   @attrs %{role: "contributor"}
 
-  alias CodeCorps.{ProjectUser, Repo, SparkPost.Emails}
+  alias CodeCorps.{ProjectUser, Repo, Emails.Transmissions}
 
   describe "index" do
     test "lists all resources", %{conn: conn} do
@@ -66,7 +66,7 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
         ProjectUser
         |> Repo.get_by(role: "pending")
         |> Repo.preload([:project, :user])
-        |> Emails.ProjectUserRequest.build()
+        |> Transmissions.ProjectUserRequest.build()
 
       assert_received ^email
     end
@@ -120,7 +120,7 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
         ProjectUser
         |> Repo.get_by(role: "contributor")
         |> Repo.preload([:project, :user])
-        |> Emails.ProjectUserAcceptance.build()
+        |> Transmissions.ProjectUserAcceptance.build()
 
       assert_received ^email
     end

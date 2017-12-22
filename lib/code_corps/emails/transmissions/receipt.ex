@@ -1,11 +1,11 @@
-defmodule CodeCorps.SparkPost.Emails.Receipt do
+defmodule CodeCorps.Emails.Transmissions.Receipt do
 
   alias SparkPost.{Content, Transmission}
   alias CodeCorps.{
     DonationGoal,
     Project,
     Repo,
-    SparkPost.Emails.Recipient,
+    Emails.Recipient,
     StripeConnectCharge,
     StripeConnectSubscription,
     User,

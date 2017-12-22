@@ -8,7 +8,7 @@ defmodule Mix.Tasks.Templates.Create do
   require Logger
 
   def run(_) do
-    CodeCorps.SparkPost.create_templates()
+    CodeCorps.Emails.create_templates()
     |> Enum.each(&log_result(&1))
   end
 

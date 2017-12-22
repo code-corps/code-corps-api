@@ -14,7 +14,7 @@ defmodule CodeCorpsWeb.PasswordControllerTest do
     assert response == %{ "email" => user.email }
 
     %AuthToken{value: token} = Repo.get_by(AuthToken, user_id: user.id)
-    expected_email = CodeCorps.SparkPost.Emails.ForgotPassword.build(user, token)
+    expected_email = CodeCorps.Emails.Transmissions.ForgotPassword.build(user, token)
     assert_received ^expected_email
   end
 
@@ -28,7 +28,7 @@ defmodule CodeCorpsWeb.PasswordControllerTest do
     assert response == %{ "email" => user.email }
 
     %AuthToken{value: token} = Repo.get_by(AuthToken, user_id: user.id)
-    expected_email = CodeCorps.SparkPost.Emails.ForgotPassword.build(user, token)
+    expected_email = CodeCorps.Emails.Transmissions.ForgotPassword.build(user, token)
     assert_received ^expected_email
 
     refute CodeCorps.Guardian.Plug.authenticated?(conn)

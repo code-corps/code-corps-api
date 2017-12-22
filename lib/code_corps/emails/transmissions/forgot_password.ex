@@ -1,7 +1,7 @@
-defmodule CodeCorps.SparkPost.Emails.ForgotPassword do
+defmodule CodeCorps.Emails.Transmissions.ForgotPassword do
 
   alias SparkPost.{Content, Transmission}
-  alias CodeCorps.{SparkPost.Emails.Recipient, User, WebClient}
+  alias CodeCorps.{Emails.Recipient, User, WebClient}
 
   @spec build(User.t, String.t) :: %Transmission{}
   def build(%User{} = user, token) do

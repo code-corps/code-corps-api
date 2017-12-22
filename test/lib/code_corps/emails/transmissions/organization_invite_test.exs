@@ -1,7 +1,7 @@
-defmodule CodeCorps.SparkPost.Emails.OrganizationInviteTest do
+defmodule CodeCorps.Emails.Transmissions.OrganizationInviteTest do
   use CodeCorps.DbAccessCase
 
-  alias CodeCorps.{SparkPost.Emails.OrganizationInvite, WebClient}
+  alias CodeCorps.{Emails.Transmissions.OrganizationInvite, WebClient}
 
   test "has a template_id assigned" do
     assert OrganizationInvite.template_id

@@ -1,4 +1,4 @@
-defmodule CodeCorps.SparkPost.ExtendedAPI do
+defmodule CodeCorps.Emails.ExtendedAPI do
   @moduledoc """
   Serves as an extension of the SparkPost API provided by the elixir-sparkpost
   library, for features the external package does not support yet

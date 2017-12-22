@@ -1,7 +1,7 @@
-defmodule CodeCorps.SparkPost.Emails.ForgotPasswordTest do
+defmodule CodeCorps.Emails.Transmissions.ForgotPasswordTest do
   use CodeCorps.DbAccessCase
 
-  alias CodeCorps.{SparkPost.Emails.ForgotPassword, WebClient}
+  alias CodeCorps.{Emails.Transmissions.ForgotPassword, WebClient}
 
   test "has a template_id assigned" do
     assert ForgotPassword.template_id

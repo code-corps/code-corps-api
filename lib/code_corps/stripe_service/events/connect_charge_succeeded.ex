@@ -6,7 +6,7 @@ defmodule CodeCorps.StripeService.Events.ConnectChargeSucceeded do
 
   alias SparkPost.Transmission
   alias CodeCorps.{
-    SparkPost,
+    Emails,
     StripeService.StripeConnectChargeService,
     StripeConnectCharge
   }
@@ -28,7 +28,7 @@ defmodule CodeCorps.StripeService.Events.ConnectChargeSucceeded do
 
   defp try_send_receipt(%StripeConnectCharge{invoice_id_from_stripe: invoice_id} = charge, account_id) do
     with {:ok, %Stripe.Invoice{} = invoice} <- @api.Invoice.retrieve(invoice_id, connect_account: account_id),
-         {:ok, %Transmission.Response{} = response} <- charge |> SparkPost.send_receipt_email(invoice)
+         {:ok, %Transmission.Response{} = response} <- charge |> Emails.send_receipt_email(invoice)
     do
       {:ok, charge, response}
     else

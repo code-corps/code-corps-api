@@ -1,9 +1,14 @@
-defmodule CodeCorps.SparkPost.Emails.ProjectApproved do
-  import Ecto.Query
+defmodule CodeCorps.Emails.Transmissions.ProjectApprovalRequest do
+  import Ecto.Query, only: [where: 3]
 
   alias SparkPost.{Content, Transmission}
   alias CodeCorps.{
-    Project, ProjectUser, Repo, SparkPost.Emails.Recipient, User, WebClient
+    Presenters.ImagePresenter,
+    Project,
+    Repo,
+    Emails.Recipient,
+    User,
+    WebClient
   }
 
   @spec build(Project.t) :: %Transmission{}
@@ -11,19 +16,29 @@ defmodule CodeCorps.SparkPost.Emails.ProjectApproved do
     %Transmission{
       content: %Content.TemplateRef{template_id: template_id()},
       options: %Transmission.Options{inline_css: true},
-      recipients: project |> get_owners() |> Enum.map(&Recipient.build/1),
+      recipients: get_site_admins() |> Enum.map(&Recipient.build/1),
       substitution_data: %{
+        admin_project_show_url: project |> admin_url(),
         from_name: "Code Corps",
         from_email: "team@codecorps.org",
+        project_description: project.description,
+        project_logo_url: ImagePresenter.large(project),
         project_title: project.title,
         project_url: project |> preload() |> project_url(),
-        subject: "#{project.title} is approved!"
+        subject: "#{project.title} is asking to be approved"
       }
     }
   end
 
   @spec preload(Project.t) :: Project.t
   defp preload(%Project{} = project), do: project |> Repo.preload(:organization)
+
+  @spec admin_url(Project.t) :: String.t
+  defp admin_url(project) do
+    WebClient.url()
+    |> URI.merge("/admin/projects/" <> Integer.to_string(project.id))
+    |> URI.to_string()
+  end
 
   @spec project_url(Project.t) :: String.t
   defp project_url(project) do
@@ -32,14 +47,11 @@ defmodule CodeCorps.SparkPost.Emails.ProjectApproved do
     |> URI.to_string()
   end
 
-  @spec get_owners(Project.t) :: list(User.t)
-  defp get_owners(%Project{id: project_id}) do
-    query = from u in User,
-      join: pu in ProjectUser, on: u.id == pu.user_id,
-      where: pu.project_id == ^project_id,
-      where: pu.role == "owner"
-
-    query |> Repo.all()
+  @spec get_site_admins() :: list(User.t)
+  defp get_site_admins() do
+    User
+    |> where([object], object.admin == true)
+    |> Repo.all()
   end
 
   @doc ~S"""
@@ -47,6 +59,6 @@ defmodule CodeCorps.SparkPost.Emails.ProjectApproved do
   """
   @spec template_id :: String.t
   def template_id do
-    Application.get_env(:code_corps, :sparkpost_project_approved_template)
+    Application.get_env(:code_corps, :sparkpost_project_approval_request_template)
   end
 end

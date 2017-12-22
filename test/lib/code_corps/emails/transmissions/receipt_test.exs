@@ -1,7 +1,7 @@
-defmodule CodeCorps.SparkPost.Emails.ReceiptTest do
+defmodule CodeCorps.Emails.Transmissions.ReceiptTest do
   use CodeCorps.DbAccessCase
 
-  alias CodeCorps.SparkPost.Emails.Receipt
+  alias CodeCorps.Emails.Transmissions.Receipt
 
   describe "build/2" do
     test "provides substitution data for all keys used by template" do

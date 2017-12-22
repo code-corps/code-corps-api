@@ -1,10 +1,10 @@
-defmodule CodeCorps.SparkPost.Emails.MessageInitiatedByProject do
+defmodule CodeCorps.Emails.Transmissions.MessageInitiatedByProject do
   alias SparkPost.{Content, Transmission}
   alias CodeCorps.{
     Conversation,
     Message,
     Project,
-    SparkPost.Emails.Recipient,
+    Emails.Recipient,
     User,
     WebClient
   }

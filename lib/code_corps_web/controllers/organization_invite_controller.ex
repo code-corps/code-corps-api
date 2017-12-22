@@ -2,7 +2,7 @@ defmodule CodeCorpsWeb.OrganizationInviteController do
   @moduledoc false
   use CodeCorpsWeb, :controller
 
-  alias CodeCorps.{Helpers.Query, OrganizationInvite, SparkPost, User}
+  alias CodeCorps.{Emails, Helpers.Query, OrganizationInvite, User}
 
   action_fallback CodeCorpsWeb.FallbackController
   plug CodeCorpsWeb.Plug.DataToAttributes
@@ -28,7 +28,7 @@ defmodule CodeCorpsWeb.OrganizationInviteController do
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %OrganizationInvite{}, params),
          {:ok, %OrganizationInvite{} = organization_invite} <- %OrganizationInvite{} |> OrganizationInvite.create_changeset(params) |> Repo.insert do
 
-      organization_invite |> SparkPost.send_organization_invite_email
+      organization_invite |> Emails.send_organization_invite_email
 
       conn
       |> put_status(:created)

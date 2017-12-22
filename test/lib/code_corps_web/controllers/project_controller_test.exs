@@ -4,7 +4,7 @@ defmodule CodeCorpsWeb.ProjectControllerTest do
   use CodeCorpsWeb.ApiCase, resource_name: :project
 
   alias CodeCorps.{
-    Analytics.SegmentTraitsBuilder, SparkPost.Emails, Project, Repo
+    Analytics.SegmentTraitsBuilder, Emails.Transmissions, Project, Repo
   }
 
   @valid_attrs %{
@@ -149,7 +149,7 @@ defmodule CodeCorpsWeb.ProjectControllerTest do
 
       email =
         project
-        |> Emails.ProjectApprovalRequest.build()
+        |> Transmissions.ProjectApprovalRequest.build()
 
       assert_received ^email
 
@@ -173,7 +173,7 @@ defmodule CodeCorpsWeb.ProjectControllerTest do
 
       email =
         project
-        |> Emails.ProjectApproved.build()
+        |> Transmissions.ProjectApproved.build()
 
       assert_received ^email
 
