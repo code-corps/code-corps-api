@@ -26,7 +26,7 @@ defmodule CodeCorps.Emails.Transmissions.ProjectUserRequestTest do
       %{user: owner_1} = insert(:project_user, project: project, role: "owner")
       %{user: owner_2} = insert(:project_user, project: project, role: "owner")
 
-      %{substitution_data: data, recipients: [recipient_1, recipient_2]} =
+      %{substitution_data: data, recipients: recipients} =
         ProjectUserRequest.build(project_user)
 
       assert data.from_name == "Code Corps"
@@ -39,10 +39,8 @@ defmodule CodeCorps.Emails.Transmissions.ProjectUserRequestTest do
       assert data.user_first_name == requesting_user.first_name
       assert data.subject == "#{requesting_user.first_name} wants to join #{project.title}"
 
-      assert recipient_1.address.email == owner_1.email
-      assert recipient_1.address.name == owner_1.first_name
-      assert recipient_2.address.email == owner_2.email
-      assert recipient_2.address.name == owner_2.first_name
+      assert %{address: %{email: owner_1.email, name: owner_1.first_name}} in recipients
+      assert %{address: %{email: owner_2.email, name: owner_2.first_name}} in recipients
     end
   end
 end
