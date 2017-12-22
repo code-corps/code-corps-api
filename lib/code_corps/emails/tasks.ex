@@ -3,16 +3,18 @@ defmodule CodeCorps.Emails.Tasks do
   Subcontext holding all commonly performed Tasks related to SparkPost
   """
 
-  @templates [
-    "forgot-password",
-    "message-initiated-by-project",
-    "organization-invite",
-    "project-approval-request",
-    "project-approved",
-    "project-user-acceptance",
-    "project-user-request",
-    "receipt",
-    "reply-to-conversation"
+  alias CodeCorps.Emails.Transmissions
+
+  @template_modules [
+    Transmissions.ForgotPassword,
+    Transmissions.MessageInitiatedByProject,
+    Transmissions.OrganizationInvite,
+    Transmissions.ProjectApprovalRequest,
+    Transmissions.ProjectApproved,
+    Transmissions.ProjectUserRequest,
+    Transmissions.ProjectUserAcceptance,
+    Transmissions.Receipt,
+    Transmissions.ReplyToConversation
   ]
 
   alias CodeCorps.Emails.API
@@ -23,7 +25,8 @@ defmodule CodeCorps.Emails.Tasks do
   """
   @spec create_templates :: Enumerable.t()
   def create_templates do
-    @templates
+    @template_modules
+    |> Enum.map(fn module -> module.template_id end)
     |> Enum.map(fn id ->  {id, id |> build_payload} end)
     |> Enum.map(fn {id, payload} -> {id, payload |> Map.put(:id, id)} end)
     |> Stream.map(fn {id, payload} -> {id, payload |> API.create_template()} end)
@@ -37,7 +40,8 @@ defmodule CodeCorps.Emails.Tasks do
   """
   @spec create_templates :: Enumerable.t()
   def update_templates do
-    @templates
+    @template_modules
+    |> Enum.map(fn module -> module.template_id end)
     |> Enum.map(fn id -> {id, id |> build_payload} end)
     |> Stream.map(fn {id, payload} -> {id, id |> API.update_template(payload, [], @default_params)} end)
   end
