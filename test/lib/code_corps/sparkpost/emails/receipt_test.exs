@@ -92,8 +92,8 @@ defmodule CodeCorps.SparkPost.Emails.ReceiptTest do
       assert data.from_email == "team@codecorps.org"
       assert data.high_five_image_url
 
-      assert recipient.email == "jimmy@mail.com"
-      assert recipient.name == "Jimmy"
+      assert recipient.address.email == "jimmy@mail.com"
+      assert recipient.address.name == "Jimmy"
     end
   end
 end

@@ -1,15 +1,16 @@
 defmodule CodeCorps.SparkPost.Emails.Receipt do
 
+  alias SparkPost.{Content, Transmission}
   alias CodeCorps.{
     DonationGoal,
     Project,
     Repo,
+    SparkPost.Emails.Recipient,
     StripeConnectCharge,
     StripeConnectSubscription,
     User,
     WebClient
   }
-  alias SparkPost.{Content, Transmission}
 
   @high_five_image_urls [
     "https://d3pgew4wbk2vb1.cloudfront.net/emails/images/emoji-1f64c-1f3fb@2x.png",
@@ -28,7 +29,7 @@ defmodule CodeCorps.SparkPost.Emails.Receipt do
       %Transmission{
         content: %Content.TemplateRef{template_id: "receipt"},
         options: %Transmission.Options{inline_css: true},
-        recipients: [%{name: user.first_name, email: user.email}],
+        recipients: [user |> Recipient.build],
         substitution_data: %{
           charge_amount: charge.amount |> Money.new(:USD) |> Money.to_string(),
           charge_statement_descriptor: charge.statement_descriptor,

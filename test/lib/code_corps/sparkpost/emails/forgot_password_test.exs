@@ -24,8 +24,8 @@ defmodule CodeCorps.SparkPost.Emails.ForgotPasswordTest do
       assert data.from_email == "team@codecorps.org"
       assert data.link == "#{WebClient.url()}/password/reset?token=#{token}"
 
-      assert recipient.email == user.email
-      assert recipient.name == user.first_name
+      assert recipient.address.email == user.email
+      assert recipient.address.name == user.first_name
     end
   end
 end
