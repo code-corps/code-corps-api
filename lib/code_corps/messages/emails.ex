@@ -7,7 +7,8 @@ defmodule CodeCorps.Messages.Emails do
     Emails,
     Mailer,
     Message,
-    Repo
+    Repo,
+    SparkPost
   }
 
   @message_preloads [:project, [conversations: :user]]
@@ -24,8 +25,7 @@ defmodule CodeCorps.Messages.Emails do
 
     message
     |> Map.get(:conversations)
-    |> Enum.map(&Emails.MessageInitiatedByProjectEmail.create(message, &1))
-    |> Enum.each(&Mailer.deliver_now/1)
+    |> Enum.each(&SparkPost.send_message_initiated_by_project_email(message, &1))
   end
 
   @part_preloads [

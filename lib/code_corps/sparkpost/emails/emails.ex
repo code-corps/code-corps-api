@@ -5,6 +5,12 @@ defmodule CodeCorps.SparkPost.Emails do
     user |> Emails.ForgotPassword.build(token) |> API.send_transmission
   end
 
+  def send_message_initiated_by_project_email(message, conversation) do
+    message
+    |> Emails.MessageInitiatedByProject.build(conversation)
+    |> API.send_transmission
+  end
+
   def send_receipt_email(charge, invoice) do
     case charge |> Emails.Receipt.build(invoice) do
       %SparkPost.Transmission{} = transmission ->

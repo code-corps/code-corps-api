@@ -7,7 +7,10 @@ defmodule CodeCorps.MessagesTest do
 
   import Ecto.Query, only: [where: 2]
 
-  alias CodeCorps.{Conversation, ConversationPart, Emails, Message, Messages}
+  alias CodeCorps.{
+    Conversation, ConversationPart, Emails, Message, Messages,
+    SparkPost.Emails.MessageInitiatedByProject
+  }
   alias Ecto.Changeset
 
   defp get_and_sort_ids(records) do
@@ -456,8 +459,10 @@ defmodule CodeCorps.MessagesTest do
       %{conversations: [conversation_1, conversation_2]} = message =
         message |> Repo.preload([:project, [conversations: :user]])
 
-      assert_delivered_email Emails.MessageInitiatedByProjectEmail.create(message, conversation_1)
-      assert_delivered_email Emails.MessageInitiatedByProjectEmail.create(message, conversation_2)
+      email_1 = MessageInitiatedByProject.build(message, conversation_1)
+      assert_received ^email_1
+      email_2 = MessageInitiatedByProject.build(message, conversation_2)
+      assert_received ^email_2
     end
   end
 end
