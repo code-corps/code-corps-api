@@ -8,8 +8,9 @@ defmodule CodeCorps.MessagesTest do
   import Ecto.Query, only: [where: 2]
 
   alias CodeCorps.{
-    Conversation, ConversationPart, Emails, Message, Messages,
-    SparkPost.Emails.MessageInitiatedByProject
+    Conversation, ConversationPart, Message, Messages,
+    SparkPost.Emails.MessageInitiatedByProject,
+    SparkPost.Emails.ReplyToConversation
   }
   alias Ecto.Changeset
 
@@ -302,10 +303,14 @@ defmodule CodeCorps.MessagesTest do
 
       part = part |> Repo.preload([:author, conversation: [message: [[project: :organization]]]])
 
-      refute_delivered_email Emails.ReplyToConversationEmail.create(part, part_author)
-      assert_delivered_email Emails.ReplyToConversationEmail.create(part, target_user)
-      assert_delivered_email Emails.ReplyToConversationEmail.create(part, message_author)
-      assert_delivered_email Emails.ReplyToConversationEmail.create(part, other_participant)
+      part_author_email = ReplyToConversation.build(part, part_author)
+      target_user_email = ReplyToConversation.build(part, target_user)
+      message_author_email = ReplyToConversation.build(part, message_author)
+      other_participant_email = ReplyToConversation.build(part, other_participant)
+      refute_received ^part_author_email
+      assert_received ^target_user_email
+      assert_received ^message_author_email
+      assert_received ^other_participant_email
     end
 
     test "when replied by conversation user, sends appropriate email to other participants" do
@@ -324,10 +329,14 @@ defmodule CodeCorps.MessagesTest do
 
       part = part |> Repo.preload([:author, conversation: [message: [[project: :organization]]]])
 
-      refute_delivered_email Emails.ReplyToConversationEmail.create(part, part_author)
-      assert_delivered_email Emails.ReplyToConversationEmail.create(part, target_user)
-      assert_delivered_email Emails.ReplyToConversationEmail.create(part, message_author)
-      assert_delivered_email Emails.ReplyToConversationEmail.create(part, other_participant)
+      part_author_email = ReplyToConversation.build(part, part_author)
+      target_user_email = ReplyToConversation.build(part, target_user)
+      message_author_email = ReplyToConversation.build(part, message_author)
+      other_participant_email = ReplyToConversation.build(part, other_participant)
+      refute_received ^part_author_email
+      assert_received ^target_user_email
+      assert_received ^message_author_email
+      assert_received ^other_participant_email
     end
   end
 

@@ -4,8 +4,6 @@ defmodule CodeCorps.Messages.Emails do
   """
   alias CodeCorps.{
     ConversationPart,
-    Emails,
-    Mailer,
     Message,
     Repo,
     SparkPost
@@ -54,8 +52,7 @@ defmodule CodeCorps.Messages.Emails do
   defp send_reply_to_conversation_emails(%ConversationPart{} = part) do
     part
     |> get_conversation_participants()
-    |> Enum.map(&Emails.ReplyToConversationEmail.create(part, &1))
-    |> Enum.each(&Mailer.deliver_now/1)
+    |> Enum.each(&SparkPost.send_reply_to_conversation_email(part, &1))
   end
 
   @spec get_conversation_participants(ConversationPart.t) :: list(User.t)

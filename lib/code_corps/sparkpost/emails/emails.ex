@@ -22,4 +22,8 @@ defmodule CodeCorps.SparkPost.Emails do
       build_failure -> build_failure
     end
   end
+
+  def send_reply_to_conversation_email(part, user) do
+    part |> Emails.ReplyToConversation.build(user) |> API.send_transmission
+  end
 end
