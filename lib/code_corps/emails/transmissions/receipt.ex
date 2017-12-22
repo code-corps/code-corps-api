@@ -20,7 +20,7 @@ defmodule CodeCorps.Emails.Transmissions.Receipt do
     "https://d3pgew4wbk2vb1.cloudfront.net/emails/images/emoji-1f64c-1f3ff@2x.png"
   ]
 
-  @spec build(StripeConnectCharge.t, Stripe.Invoice.t) :: %Transmission{}
+  @spec build(StripeConnectCharge.t, Stripe.Invoice.t) :: %Transmission{} | {:error, atom}
   def build(%StripeConnectCharge{} = charge, %Stripe.Invoice{} = invoice) do
     with %StripeConnectCharge{user: %User{} = user} = charge <- Repo.preload(charge, :user),
          %Project{} = project <- invoice.subscription |> get_project(),
@@ -45,7 +45,9 @@ defmodule CodeCorps.Emails.Transmissions.Receipt do
       }
     else
       nil -> {:error, :project_not_found}
-      other -> other
+      {:error, :donation_goal_not_found} -> {:error, :donation_goal_not_found}
+      {:error, :subscription_not_found} -> {:error, :subscription_not_found}
+      %StripeConnectCharge{user: nil} -> {:error, :charge_not_associated_to_user}
     end
   end
 

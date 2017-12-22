@@ -39,18 +39,16 @@ defmodule CodeCorps.Policy.ConversationPart do
   @spec authorize(User.t, ConversationPart.t | map) :: boolean
   defp authorize(%User{} = user, attrs) do
     %Conversation{} = conversation = attrs |> get_conversation()
-    is_target? = conversation |> conversation_target?(user)
 
-    is_admin? =
-      conversation
-      |> get_message()
-      |> get_project()
-      |> administered_by?(user)
-
-    is_target? or is_admin?
+    cond do
+      conversation |> conversation_target?(user) -> true
+      conversation |> get_message() |> get_project() |> administered_by?(user) -> true
+      true -> false
+    end
   end
 
-  defp conversation_target?(%Conversation{user_id: target_id}, %User{id: user_id}) do
-    target_id == user_id
-  end
+  @spec conversation_target?(Conversation.t, User.t) :: boolean
+  defp conversation_target?(%Conversation{user_id: target_id}, %User{id: user_id})
+    when target_id == user_id, do: true
+  defp conversation_target?(%Conversation{}, %User{}), do: false
 end

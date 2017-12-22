@@ -6,7 +6,8 @@ defmodule CodeCorps.Messages.Emails do
     ConversationPart,
     Emails,
     Message,
-    Repo
+    Repo,
+    User
   }
 
   @message_preloads [:project, [conversations: :user]]
@@ -44,8 +45,9 @@ defmodule CodeCorps.Messages.Emails do
   """
   @spec notify_of_new_reply(ConversationPart.t) :: :ok
   def notify_of_new_reply(%ConversationPart{} = part) do
-    part = part |> Repo.preload(@part_preloads)
-    part |> send_reply_to_conversation_emails()
+    part
+    |> Repo.preload(@part_preloads)
+    |> send_reply_to_conversation_emails()
   end
 
   @spec send_reply_to_conversation_emails(ConversationPart.t) :: :ok

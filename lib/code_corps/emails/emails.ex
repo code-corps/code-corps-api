@@ -44,7 +44,7 @@ defmodule CodeCorps.Emails do
     case charge |> Transmissions.Receipt.build(invoice) do
       %SparkPost.Transmission{} = transmission ->
         transmission |> API.send_transmission
-      build_failure -> build_failure
+      {:error, reason} -> {:error, reason}
     end
   end
 

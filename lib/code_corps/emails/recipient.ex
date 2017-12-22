@@ -1,6 +1,6 @@
 defmodule CodeCorps.Emails.Recipient do
   @moduledoc ~S"""
-  In charge of adapting `CodeCorps.User` data into SparkPost recipient data.
+  In charge of adapting CodeCorps data into SparkPost recipient data.
   """
 
   alias CodeCorps.{OrganizationInvite, User}

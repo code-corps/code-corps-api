@@ -9,7 +9,7 @@ defmodule CodeCorps.Emails.Transmissions.MessageInitiatedByProject do
     WebClient
   }
 
-  @spec build(User.t, String.t) :: %Transmission{}
+  @spec build(Message.t, Conversation.t) :: %Transmission{}
   def build(
     %Message{project: %Project{} = project},
     %Conversation{user: %User{} = user} = conversation) do
