@@ -47,7 +47,7 @@ defmodule CodeCorps.Messages do
   @doc ~S"""
   Gets a `CodeCorps.Conversation` record
   """
-  @spec get_conversation(integer) :: Conversation.t
+  @spec get_conversation(integer) :: Conversation.t | nil
   def get_conversation(id) do
     Conversation |> Repo.get(id)
   end
@@ -59,7 +59,7 @@ defmodule CodeCorps.Messages do
   @doc ~S"""
   Gets a `CodeCorps.ConversationPart` record
   """
-  @spec get_part(integer) :: Conversation.t
+  @spec get_part(integer) :: ConversationPart.t | nil
   def get_part(id) do
     ConversationPart |> Repo.get(id)
   end
