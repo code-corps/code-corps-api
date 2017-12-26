@@ -31,6 +31,8 @@ defmodule CodeCorps.Project do
     field :title, :string
     field :total_monthly_donated, :integer, default: 0
     field :website, :string
+    field :open_conversations_count, :integer, default: 0
+    field :closed_conversations_count, :integer, default: 0
 
     belongs_to :organization, CodeCorps.Organization
 
