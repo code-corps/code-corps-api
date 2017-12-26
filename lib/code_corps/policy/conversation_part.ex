@@ -24,6 +24,7 @@ defmodule CodeCorps.Policy.ConversationPart do
     queryable
     |> where(author_id: ^id)
     |> or_where([cp], cp.conversation_id in ^scoped_conversation_ids)
+    |> where(part_type: "comment")
   end
 
   def create?(%User{} = user, %{"conversation_id" => _} = params) do
