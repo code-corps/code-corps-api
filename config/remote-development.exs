@@ -28,7 +28,7 @@ config :code_corps, CodeCorps.Repo,
 # CORS allowed origins
 config :code_corps, allowed_origins: "*"
 
-config :guardian, Guardian,
+config :code_corps, CodeCorps.Guardian,
   secret_key: System.get_env("GUARDIAN_SECRET_KEY")
 
 # Do not print debug messages in production
@@ -44,9 +44,14 @@ config :code_corps, CodeCorps.Mailer,
 
 config :code_corps,
   postmark_forgot_password_template: "123",
-  postmark_project_acceptance_template: "123",
-  postmark_project_request_template: "123",
-  postmark_receipt_template: "123"
+  postmark_message_initiated_by_project_template: "123",
+  postmark_organization_invite_email_template: "123",
+  postmark_project_approval_request_template: "123",
+  postmark_project_approved_template: "123",
+  postmark_project_user_acceptance_template: "123",
+  postmark_project_user_request_template: "123",
+  postmark_receipt_template: "123",
+  postmark_reply_to_conversation_template: "123"
 
 # ## SSL Support
 #

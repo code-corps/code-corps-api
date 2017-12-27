@@ -1,6 +1,6 @@
 alias CodeCorps.{
   Category, Organization, ProjectUser, Project, ProjectCategory, ProjectSkill,
-  Repo, Role, Skill, Task, User, UserCategory, UserRole, UserSkill
+  Repo, Role, Skill, Task, User, UserCategory, UserRole, UserSkill,
 }
 
 users = [
@@ -56,15 +56,55 @@ organizations = [
   }
 ]
 
-case Repo.all(Organization) do
-  [] ->
-    organizations
-    |> Enum.each(fn params ->
+defmodule SeedChangeset do
+  @moduledoc false
+
+  alias CodeCorps.{
+    TaskList,
+    Organization,
+    SluggedRoute,
+    Helpers.Slug,
+    Helpers.RandomIconColor,
+    Services.MarkdownRendererService
+  }
+  alias Ecto.Changeset
+
+  def organization(%{} = params) do
+    changeset =
       %Organization{}
-      |> Organization.create_changeset(params)
-      |> Repo.insert!()
-    end)
-  _ -> IO.puts "Organizations detected, aborting organization seed."
+      |> Changeset.cast(params, [:name, :description, :owner_id])
+      |> Changeset.assoc_constraint(:owner)
+      |> Changeset.put_change(:approved, true)
+      |> Slug.generate_slug(:name, :slug)
+      |> RandomIconColor.generate_icon_color(:slugged_route_changeset)
+
+    slug = changeset |> Changeset.get_field(:slug)
+    slugged_route_changeset =
+      %SluggedRoute{} |> SluggedRoute.create_changeset(%{slug: slug})
+
+    changeset
+    |> Changeset.put_assoc(:slugged_route, slugged_route_changeset)
+  end
+
+  def project(%{} = params) do
+    %Project{}
+    |> Changeset.cast(params, [:description, :long_description_markdown, :title, :organization_id])
+    |> MarkdownRendererService.render_markdown_to_html(:long_description_markdown, :long_description_body)
+    |> Changeset.put_assoc(:task_lists, TaskList.default_task_lists())
+    |> Changeset.assoc_constraint(:organization)
+    |> RandomIconColor.generate_icon_color(:default_color)
+    |> Slug.generate_slug(:title, :slug)
+    |> Ecto.Changeset.put_change(:approved, true)
+  end
+end
+
+case Repo.aggregate(Organization, :count, :id) do
+  0 ->
+    organizations
+    |> Enum.map(&SeedChangeset.organization/1)
+    |> Enum.each(&Repo.insert!/1)
+  _more_than_0 ->
+    IO.puts "Organizations detected, aborting organization seed."
 end
 
 projects = [
@@ -82,16 +122,13 @@ projects = [
   }
 ]
 
-case Repo.all(Project) do
-  [] ->
+case Repo.aggregate(Project, :count, :id) do
+  0 ->
     projects
-    |> Enum.each(fn params ->
-      %Project{}
-      |> Project.create_changeset(params)
-      |> Ecto.Changeset.put_change(:approved, true)
-      |> Repo.insert!()
-    end)
-  _ -> IO.puts "Projects detected, aborting project seed."
+    |> Enum.map(&SeedChangeset.project/1)
+    |> Enum.each(&Repo.insert!/1)
+  _more_than_0 ->
+    IO.puts "Projects detected, aborting project seed."
 end
 
 project_users = [

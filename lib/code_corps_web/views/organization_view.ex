@@ -5,7 +5,7 @@ defmodule CodeCorpsWeb.OrganizationView do
   use JaSerializer.PhoenixView
 
   attributes [
-    :cloudinary_public_id, :description, :icon_thumb_url,
+    :approved, :cloudinary_public_id, :description, :icon_thumb_url,
     :icon_large_url, :name, :slug, :inserted_at, :updated_at
   ]
 

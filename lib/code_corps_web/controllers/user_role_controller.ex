@@ -24,7 +24,7 @@ defmodule CodeCorpsWeb.UserRoleController do
 
   @spec create(Plug.Conn.t, map) :: Conn.t
   def create(%Conn{} = conn, %{} = params) do
-    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+    with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %UserRole{}, params),
          {:ok, %UserRole{} = user_role} <- %UserRole{} |> UserRole.create_changeset(params) |> Repo.insert do
       conn |> put_status(:created) |> render("show.json-api", data: user_role)
@@ -34,7 +34,7 @@ defmodule CodeCorpsWeb.UserRoleController do
   @spec delete(Conn.t, map) :: Conn.t
   def delete(%Conn{} = conn, %{"id" => id} = _params) do
     with %UserRole{} = user_role <- UserRole |> Repo.get(id),
-      %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+      %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
       {:ok, :authorized} <- current_user |> Policy.authorize(:delete, user_role),
       {:ok, %UserRole{} = _user_role} <- user_role |> Repo.delete
     do

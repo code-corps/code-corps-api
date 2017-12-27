@@ -3,12 +3,13 @@ defmodule CodeCorpsWeb.ProjectViewTest do
 
   test "renders all attributes and relationships properly" do
     organization = insert(:organization)
-    project = insert(:project, organization: organization, total_monthly_donated: 5000, default_color: "blue", approved: true)
+    project = insert(:project, organization: organization, total_monthly_donated: 5000, default_color: "blue", approval_requested: true, approved: true)
 
     donation_goal = insert(:donation_goal, project: project)
     project_category = insert(:project_category, project: project)
     github_repo = insert(:github_repo, project: project)
-    project_skill = insert(:project_skill, project: project)
+    skill = insert(:skill)
+    project_skill = insert(:project_skill, project: project, skill: skill)
     project_user = insert(:project_user, project: project)
     stripe_connect_plan = insert(:stripe_connect_plan, project: project)
     task_list = insert(:task_list, project: project)
@@ -22,6 +23,7 @@ defmodule CodeCorpsWeb.ProjectViewTest do
     expected_json = %{
       "data" => %{
         "attributes" => %{
+          "approval-requested" => true,
           "approved" => true,
           "can-activate-donations" => false,
           "cloudinary-public-id" => nil,
@@ -85,6 +87,14 @@ defmodule CodeCorpsWeb.ProjectViewTest do
           "project-users" => %{
             "data" => [
               %{"id" => project_user.id |> Integer.to_string, "type" => "project-user"}
+            ]
+          },
+          "skills" => %{
+            "data" => [
+              %{
+                "id" => skill.id |> Integer.to_string,
+                "type" => "skill"
+              }
             ]
           },
           "stripe-connect-plan" => %{

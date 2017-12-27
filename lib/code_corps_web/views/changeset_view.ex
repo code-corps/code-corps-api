@@ -32,7 +32,7 @@ defmodule CodeCorpsWeb.ChangesetView do
   defp format_attribute_errors(errors, attribute) do
     errors
     |> Map.get(attribute)
-    |> Enum.map(fn(message) -> create_error(attribute, message) end)
+    |> Enum.map(&create_error(attribute, &1))
   end
 
   def create_error(attribute, message) do
@@ -40,7 +40,7 @@ defmodule CodeCorpsWeb.ChangesetView do
       detail: format_detail(attribute, message),
       title: message,
       source: %{
-        pointer: "data/attributes/#{attribute}"
+        pointer: "data/attributes/#{Utils.format_key(attribute)}"
       },
       status: "422"
     }
@@ -61,6 +61,8 @@ defmodule CodeCorpsWeb.ChangesetView do
     "#{attribute |> Utils.humanize |> translate_attribute} #{message}"
   end
 
+  defp translate_attribute("Cloudinary public"), do: dgettext("errors", "Cloudinary public")
   defp translate_attribute("Github"), do: dgettext("errors", "Github")
+  defp translate_attribute("Slug"), do: dgettext("errors", "Slug")
   defp translate_attribute(attribute), do: attribute
 end

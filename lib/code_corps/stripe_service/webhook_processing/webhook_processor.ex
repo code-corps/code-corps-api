@@ -17,6 +17,7 @@ defmodule CodeCorps.StripeService.WebhookProcessing.WebhookProcessor do
 
   Returns `{:ok, pid}`
   """
+  @spec process_async(map, module) :: Processor.result
   def process_async(event_params, handler) do
     Processor.process(fn -> process(event_params, handler) end)
   end

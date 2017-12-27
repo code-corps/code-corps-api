@@ -1,5 +1,4 @@
 defmodule CodeCorps.Cloudex.CloudinaryUrl do
-
   @cloudex Application.get_env(:code_corps, :cloudex)
 
   def for(nil, _options, version, default_color, type) do
@@ -17,5 +16,4 @@ defmodule CodeCorps.Cloudex.CloudinaryUrl do
 
   defp add_https(base_url) when is_list(base_url) and length(base_url) > 0, do: "https://" <> List.last(base_url)
   defp add_https(url), do: url
-
 end

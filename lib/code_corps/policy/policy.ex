@@ -3,9 +3,41 @@ defmodule CodeCorps.Policy do
   Handles authorization for various API actions performed on objects in the database.
   """
 
-  alias CodeCorps.{Category, Comment, DonationGoal, GithubAppInstallation, GithubEvent, GithubRepo, Organization, OrganizationInvite, OrganizationGithubAppInstallation, Preview, Project, ProjectCategory, ProjectSkill, ProjectUser, Role, RoleSkill, Skill, StripeConnectAccount, StripeConnectPlan, StripeConnectSubscription, StripePlatformCard, StripePlatformCustomer, Task, TaskSkill, User, UserCategory, UserRole, UserSkill, UserTask}
-
-  alias CodeCorps.Policy
+  alias CodeCorps.{
+    Category,
+    Comment,
+    Conversation,
+    ConversationPart,
+    DonationGoal,
+    GithubAppInstallation,
+    GithubEvent,
+    GithubRepo,
+    Message,
+    Organization,
+    OrganizationInvite,
+    OrganizationGithubAppInstallation,
+    Policy,
+    Preview,
+    Project,
+    ProjectCategory,
+    ProjectSkill,
+    ProjectUser,
+    Role,
+    RoleSkill,
+    Skill,
+    StripeConnectAccount,
+    StripeConnectPlan,
+    StripeConnectSubscription,
+    StripePlatformCard,
+    StripePlatformCustomer,
+    Task,
+    TaskSkill,
+    User,
+    UserCategory,
+    UserRole,
+    UserSkill,
+    UserTask
+  }
 
   @doc ~S"""
   Determines if the specified user can perform the specified action on the
@@ -22,6 +54,15 @@ defmodule CodeCorps.Policy do
     end
   end
 
+  @doc ~S"""
+  Scopes a queryable so it's only able to return those records the specified
+  user is authorized to view.
+  """
+  @spec scope(module, User.t) :: Ecto.Queryable.t
+  def scope(Message, %User{} = current_user), do: Message |> Policy.Message.scope(current_user)
+  def scope(Conversation, %User{} = current_user), do: Conversation |> Policy.Conversation.scope(current_user)
+  def scope(ConversationPart, %User{} = current_user), do: ConversationPart |> Policy.ConversationPart.scope(current_user)
+
   @spec can?(User.t, atom, struct, map) :: boolean
 
   # Category
@@ -32,6 +73,14 @@ defmodule CodeCorps.Policy do
   defp can?(%User{} = current_user, :create, %Comment{}, %{} = params), do: Policy.Comment.create?(current_user, params)
   defp can?(%User{} = current_user, :update, %Comment{} = comment, %{}), do: Policy.Comment.update?(current_user, comment)
 
+  # Conversation
+  defp can?(%User{} = current_user, :show, %Conversation{} = conversation, %{}), do: Policy.Conversation.show?(current_user, conversation)
+  defp can?(%User{} = current_user, :update, %Conversation{} = conversation, %{}), do: Policy.Conversation.update?(current_user, conversation)
+
+  # ConversationPart
+  defp can?(%User{} = current_user, :create, %ConversationPart{}, %{} = params), do: Policy.ConversationPart.create?(current_user, params)
+  defp can?(%User{} = current_user, :show, %ConversationPart{} = conversation_part, %{}), do: Policy.ConversationPart.show?(current_user, conversation_part)
+
   # DonationGoal
   defp can?(%User{} = current_user, :create, %DonationGoal{}, %{} = params), do: Policy.DonationGoal.create?(current_user, params)
   defp can?(%User{} = current_user, :update, %DonationGoal{} = donation_goal, %{}), do: Policy.DonationGoal.update?(current_user, donation_goal)
@@ -41,16 +90,20 @@ defmodule CodeCorps.Policy do
   defp can?(%User{} = current_user, :create, %GithubAppInstallation{}, %{} = params), do: Policy.GithubAppInstallation.create?(current_user, params)
 
   # GithubEvent
-  defp can?(%User{} = current_user, :index, %GithubEvent{}, %{}), do: Policy.GithubEvent.index?(current_user)
   defp can?(%User{} = current_user, :show, %GithubEvent{}, %{}), do: Policy.GithubEvent.show?(current_user)
+  defp can?(%User{} = current_user, :index, %GithubEvent{}, %{}), do: Policy.GithubEvent.index?(current_user)
   defp can?(%User{} = current_user, :update, %GithubEvent{}, %{}), do: Policy.GithubEvent.update?(current_user)
 
   # GithubRepo
   defp can?(%User{} = current_user, :update, %GithubRepo{} = github_repo, %{} = params), do: Policy.GithubRepo.update?(current_user, github_repo, params)
 
+  # Message
+  defp can?(%User{} = current_user, :show, %Message{} = message, %{}), do: Policy.Message.show?(current_user, message)
+  defp can?(%User{} = current_user, :create, %Message{}, %{} = params), do: Policy.Message.create?(current_user, params)
+
   # Organization
-  defp can?(%User{} = current_user, :create, %Organization{}, %{}), do: Policy.Organization.create?(current_user)
-  defp can?(%User{} = current_user, :update, %Organization{} = organization, %{}), do: Policy.Organization.update?(current_user, organization)
+  defp can?(%User{} = current_user, :create, %Organization{}, %{} = params), do: Policy.Organization.create?(current_user, params)
+  defp can?(%User{} = current_user, :update, %Organization{} = organization, %{} = params), do: Policy.Organization.update?(current_user, organization, params)
 
   # OrganizationGithubAppInstallation
   defp can?(%User{} = current_user, :create, %OrganizationGithubAppInstallation{}, %{} = params), do: Policy.OrganizationGithubAppInstallation.create?(current_user, params)
@@ -66,7 +119,7 @@ defmodule CodeCorps.Policy do
 
   # Project
   defp can?(%User{} = current_user, :create, %Project{}, %{} = params), do: Policy.Project.create?(current_user, params)
-  defp can?(%User{} = current_user, :update, %Project{} = project, %{}), do: Policy.Project.update?(current_user, project)
+  defp can?(%User{} = current_user, :update, %Project{} = project, params = %{}), do: Policy.Project.update?(current_user, project, params)
 
   # ProjectCategory
   defp can?(%User{} = current_user, :create, %ProjectCategory{}, %{} = params), do: Policy.ProjectCategory.create?(current_user, params)

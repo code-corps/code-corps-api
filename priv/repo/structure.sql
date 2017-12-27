@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.5.10
+-- Dumped from database version 10.1
 -- Dumped by pg_dump version 10.1
 
 SET statement_timeout = 0;
@@ -153,6 +153,75 @@ CREATE SEQUENCE comments_id_seq
 --
 
 ALTER SEQUENCE comments_id_seq OWNED BY comments.id;
+
+
+--
+-- Name: conversation_parts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE conversation_parts (
+    id bigint NOT NULL,
+    body text NOT NULL,
+    read_at timestamp without time zone,
+    author_id bigint,
+    conversation_id bigint,
+    inserted_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    part_type character varying(255) DEFAULT 'comment'::character varying
+);
+
+
+--
+-- Name: conversation_parts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE conversation_parts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: conversation_parts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE conversation_parts_id_seq OWNED BY conversation_parts.id;
+
+
+--
+-- Name: conversations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE conversations (
+    id bigint NOT NULL,
+    status character varying(255) DEFAULT 'open'::character varying NOT NULL,
+    read_at timestamp without time zone,
+    message_id bigint,
+    user_id bigint,
+    inserted_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: conversations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE conversations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: conversations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE conversations_id_seq OWNED BY conversations.id;
 
 
 --
@@ -527,6 +596,41 @@ ALTER SEQUENCE github_users_id_seq OWNED BY github_users.id;
 
 
 --
+-- Name: messages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE messages (
+    id bigint NOT NULL,
+    body text,
+    initiated_by character varying(255),
+    subject text,
+    author_id bigint,
+    project_id bigint,
+    inserted_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: messages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE messages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE messages_id_seq OWNED BY messages.id;
+
+
+--
 -- Name: organization_github_app_installations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -567,9 +671,9 @@ CREATE TABLE organization_invites (
     code character varying(255) NOT NULL,
     email character varying(255) NOT NULL,
     organization_name character varying(255) NOT NULL,
-    fulfilled boolean DEFAULT false NOT NULL,
     inserted_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    organization_id bigint
 );
 
 
@@ -779,6 +883,7 @@ CREATE TABLE projects (
     default_color character varying(255),
     website character varying(255),
     should_link_externally boolean DEFAULT false,
+    approval_requested boolean DEFAULT false,
     CONSTRAINT set_long_description_markdown_if_approved CHECK (((long_description_markdown IS NOT NULL) OR (approved = false)))
 );
 
@@ -1791,6 +1896,20 @@ ALTER TABLE ONLY comments ALTER COLUMN id SET DEFAULT nextval('comments_id_seq':
 
 
 --
+-- Name: conversation_parts id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY conversation_parts ALTER COLUMN id SET DEFAULT nextval('conversation_parts_id_seq'::regclass);
+
+
+--
+-- Name: conversations id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY conversations ALTER COLUMN id SET DEFAULT nextval('conversations_id_seq'::regclass);
+
+
+--
 -- Name: donation_goals id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1851,6 +1970,13 @@ ALTER TABLE ONLY github_repos ALTER COLUMN id SET DEFAULT nextval('github_repos_
 --
 
 ALTER TABLE ONLY github_users ALTER COLUMN id SET DEFAULT nextval('github_users_id_seq'::regclass);
+
+
+--
+-- Name: messages id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY messages ALTER COLUMN id SET DEFAULT nextval('messages_id_seq'::regclass);
 
 
 --
@@ -2102,6 +2228,22 @@ ALTER TABLE ONLY comments
 
 
 --
+-- Name: conversation_parts conversation_parts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY conversation_parts
+    ADD CONSTRAINT conversation_parts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: conversations conversations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY conversations
+    ADD CONSTRAINT conversations_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: donation_goals donation_goals_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2171,6 +2313,14 @@ ALTER TABLE ONLY github_repos
 
 ALTER TABLE ONLY github_users
     ADD CONSTRAINT github_users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: messages messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY messages
+    ADD CONSTRAINT messages_pkey PRIMARY KEY (id);
 
 
 --
@@ -2425,6 +2575,41 @@ CREATE INDEX comments_user_id_index ON comments USING btree (user_id);
 
 
 --
+-- Name: conversation_parts_author_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX conversation_parts_author_id_index ON conversation_parts USING btree (author_id);
+
+
+--
+-- Name: conversation_parts_conversation_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX conversation_parts_conversation_id_index ON conversation_parts USING btree (conversation_id);
+
+
+--
+-- Name: conversations_message_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX conversations_message_id_index ON conversations USING btree (message_id);
+
+
+--
+-- Name: conversations_status_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX conversations_status_index ON conversations USING btree (status);
+
+
+--
+-- Name: conversations_user_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX conversations_user_id_index ON conversations USING btree (user_id);
+
+
+--
 -- Name: donation_goals_current_unique_to_project; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2642,6 +2827,27 @@ CREATE UNIQUE INDEX index_skills_on_title ON skills USING btree (lower((title)::
 
 
 --
+-- Name: messages_author_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX messages_author_id_index ON messages USING btree (author_id);
+
+
+--
+-- Name: messages_initiated_by_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX messages_initiated_by_index ON messages USING btree (initiated_by);
+
+
+--
+-- Name: messages_project_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX messages_project_id_index ON messages USING btree (project_id);
+
+
+--
 -- Name: organization_github_app_installations_github_app_installation_i; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2667,6 +2873,13 @@ CREATE UNIQUE INDEX organization_invites_code_index ON organization_invites USIN
 --
 
 CREATE INDEX organization_invites_email_index ON organization_invites USING btree (email);
+
+
+--
+-- Name: organization_invites_organization_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX organization_invites_organization_id_index ON organization_invites USING btree (organization_id);
 
 
 --
@@ -2758,6 +2971,13 @@ CREATE INDEX project_users_user_id_index ON project_users USING btree (user_id);
 --
 
 CREATE UNIQUE INDEX project_users_user_id_project_id_index ON project_users USING btree (user_id, project_id);
+
+
+--
+-- Name: projects_approval_requested_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX projects_approval_requested_index ON projects USING btree (approval_requested);
 
 
 --
@@ -3360,6 +3580,38 @@ ALTER TABLE ONLY comments
 
 
 --
+-- Name: conversation_parts conversation_parts_author_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY conversation_parts
+    ADD CONSTRAINT conversation_parts_author_id_fkey FOREIGN KEY (author_id) REFERENCES users(id);
+
+
+--
+-- Name: conversation_parts conversation_parts_conversation_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY conversation_parts
+    ADD CONSTRAINT conversation_parts_conversation_id_fkey FOREIGN KEY (conversation_id) REFERENCES conversations(id);
+
+
+--
+-- Name: conversations conversations_message_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY conversations
+    ADD CONSTRAINT conversations_message_id_fkey FOREIGN KEY (message_id) REFERENCES messages(id);
+
+
+--
+-- Name: conversations conversations_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY conversations
+    ADD CONSTRAINT conversations_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
 -- Name: donation_goals donation_goals_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3480,6 +3732,22 @@ ALTER TABLE ONLY github_repos
 
 
 --
+-- Name: messages messages_author_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY messages
+    ADD CONSTRAINT messages_author_id_fkey FOREIGN KEY (author_id) REFERENCES users(id);
+
+
+--
+-- Name: messages messages_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY messages
+    ADD CONSTRAINT messages_project_id_fkey FOREIGN KEY (project_id) REFERENCES projects(id);
+
+
+--
 -- Name: organization_github_app_installations organization_github_app_installations_github_app_installation_i; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3493,6 +3761,14 @@ ALTER TABLE ONLY organization_github_app_installations
 
 ALTER TABLE ONLY organization_github_app_installations
     ADD CONSTRAINT organization_github_app_installations_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES organizations(id);
+
+
+--
+-- Name: organization_invites organization_invites_organization_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY organization_invites
+    ADD CONSTRAINT organization_invites_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES organizations(id);
 
 
 --
@@ -3883,5 +4159,5 @@ ALTER TABLE ONLY users
 -- PostgreSQL database dump complete
 --
 
-INSERT INTO "schema_migrations" (version) VALUES (20160723215749), (20160804000000), (20160804001111), (20160805132301), (20160805203929), (20160808143454), (20160809214736), (20160810124357), (20160815125009), (20160815143002), (20160816020347), (20160816034021), (20160817220118), (20160818000944), (20160818132546), (20160820113856), (20160820164905), (20160822002438), (20160822004056), (20160822011624), (20160822020401), (20160822044612), (20160830081224), (20160830224802), (20160911233738), (20160912002705), (20160912145957), (20160918003206), (20160928232404), (20161003185918), (20161019090945), (20161019110737), (20161020144622), (20161021131026), (20161031001615), (20161121005339), (20161121014050), (20161121043941), (20161121045709), (20161122015942), (20161123081114), (20161123150943), (20161124085742), (20161125200620), (20161126045705), (20161127054559), (20161205024856), (20161207112519), (20161209192504), (20161212005641), (20161214005935), (20161215052051), (20161216051447), (20161218005913), (20161219160401), (20161219163909), (20161220141753), (20161221085759), (20161226213600), (20161231063614), (20170102130055), (20170102181053), (20170104113708), (20170104212623), (20170104235423), (20170106013143), (20170115035159), (20170115230549), (20170121014100), (20170131234029), (20170201014901), (20170201025454), (20170201035458), (20170201183258), (20170220032224), (20170224233516), (20170226050552), (20170228085250), (20170308214128), (20170308220713), (20170308222552), (20170313130611), (20170318032449), (20170318082740), (20170324194827), (20170424215355), (20170501225441), (20170505224222), (20170526095401), (20170602000208), (20170622205732), (20170626231059), (20170628092119), (20170628213609), (20170629183404), (20170630140136), (20170706132431), (20170707213648), (20170711122252), (20170717092127), (20170725060612), (20170727052644), (20170731130121), (20170814131722), (20170913114958), (20170921014405), (20170925214512), (20170925230419), (20170926134646), (20170927100300), (20170928234412), (20171003134956), (20171003225853), (20171006063358), (20171006161407), (20171012215106), (20171012221231), (20171016125229), (20171016125516), (20171016223356), (20171016235656), (20171017235433), (20171019191035), (20171025184225), (20171026010933), (20171027061833), (20171028011642), (20171028173508), (20171030182857), (20171031232023), (20171031234356), (20171101023309), (20171104013543), (20171106045740), (20171106050209), (20171106103153), (20171106200036), (20171109231538), (20171110001134), (20171114010851), (20171114033357), (20171114225214), (20171114225713), (20171114232534), (20171115201624), (20171115225358), (20171119004204), (20171121075226), (20171121144138), (20171123065902);
+INSERT INTO "schema_migrations" (version) VALUES (20160723215749), (20160804000000), (20160804001111), (20160805132301), (20160805203929), (20160808143454), (20160809214736), (20160810124357), (20160815125009), (20160815143002), (20160816020347), (20160816034021), (20160817220118), (20160818000944), (20160818132546), (20160820113856), (20160820164905), (20160822002438), (20160822004056), (20160822011624), (20160822020401), (20160822044612), (20160830081224), (20160830224802), (20160911233738), (20160912002705), (20160912145957), (20160918003206), (20160928232404), (20161003185918), (20161019090945), (20161019110737), (20161020144622), (20161021131026), (20161031001615), (20161121005339), (20161121014050), (20161121043941), (20161121045709), (20161122015942), (20161123081114), (20161123150943), (20161124085742), (20161125200620), (20161126045705), (20161127054559), (20161205024856), (20161207112519), (20161209192504), (20161212005641), (20161214005935), (20161215052051), (20161216051447), (20161218005913), (20161219160401), (20161219163909), (20161220141753), (20161221085759), (20161226213600), (20161231063614), (20170102130055), (20170102181053), (20170104113708), (20170104212623), (20170104235423), (20170106013143), (20170115035159), (20170115230549), (20170121014100), (20170131234029), (20170201014901), (20170201025454), (20170201035458), (20170201183258), (20170220032224), (20170224233516), (20170226050552), (20170228085250), (20170308214128), (20170308220713), (20170308222552), (20170313130611), (20170318032449), (20170318082740), (20170324194827), (20170424215355), (20170501225441), (20170505224222), (20170526095401), (20170602000208), (20170622205732), (20170626231059), (20170628092119), (20170628213609), (20170629183404), (20170630140136), (20170706132431), (20170707213648), (20170711122252), (20170717092127), (20170725060612), (20170727052644), (20170731130121), (20170814131722), (20170913114958), (20170921014405), (20170925214512), (20170925230419), (20170926134646), (20170927100300), (20170928234412), (20171003134956), (20171003225853), (20171006063358), (20171006161407), (20171012215106), (20171012221231), (20171016125229), (20171016125516), (20171016223356), (20171016235656), (20171017235433), (20171019191035), (20171025184225), (20171026010933), (20171027061833), (20171028011642), (20171028173508), (20171030182857), (20171031232023), (20171031234356), (20171101023309), (20171104013543), (20171106045740), (20171106050209), (20171106103153), (20171106200036), (20171109231538), (20171110001134), (20171114010851), (20171114033357), (20171114225214), (20171114225713), (20171114232534), (20171115201624), (20171115225358), (20171119004204), (20171121075226), (20171121144138), (20171123065902), (20171127215847), (20171201073818), (20171205161052), (20171213062707), (20171220154922);
 

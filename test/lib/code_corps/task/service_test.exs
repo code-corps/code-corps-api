@@ -5,13 +5,15 @@ defmodule CodeCorps.Task.ServiceTest do
 
   import CodeCorps.GitHub.TestHelpers
 
-  alias CodeCorps.Task
+  alias CodeCorps.{GithubIssue, Repo, Task}
 
   @base_attrs %{
     "title" => "Test task",
     "markdown" => "A test task",
     "status" => "open"
   }
+
+  @issue_payload load_endpoint_fixture("issue")
 
   defp valid_attrs() do
     project = insert(:project)
@@ -106,7 +108,7 @@ defmodule CodeCorps.Task.ServiceTest do
       assert updated_task.id == task.id
       assert updated_task.title == @update_attrs["title"]
       assert updated_task.markdown == @update_attrs["markdown"]
-      assert updated_task.body != task.body
+      refute updated_task.body == task.body
       refute task.github_issue_id
       refute task.github_repo_id
 
@@ -159,11 +161,38 @@ defmodule CodeCorps.Task.ServiceTest do
       assert updated_task.id == task.id
       assert updated_task.title == @update_attrs["title"]
       assert updated_task.markdown == @update_attrs["markdown"]
-      assert updated_task.body != task.body
+      refute updated_task.body == task.body
       assert updated_task.github_issue_id
       assert updated_task.github_repo_id
 
       assert_received({:patch, "https://api.github.com/repos/foo/bar/issues/5", _body, _headers, _options})
+    end
+
+    test "propagates changes to github if task is synced to github pull request" do
+      %{
+        "id" => issue_github_id,
+        "number" => number
+      } = @issue_payload
+
+      github_repo = insert(:github_repo, github_account_login: "octocat", name: "Hello-World")
+      github_pull_request = insert(:github_pull_request)
+      github_issue = insert(:github_issue, github_id: issue_github_id, number: number, github_pull_request: github_pull_request, github_repo: github_repo)
+      task = insert(:task, github_repo: github_repo, github_issue: github_issue)
+
+      {:ok, updated_task} = task |> Task.Service.update(@update_attrs)
+
+      assert_received({:patch, "https://api.github.com/repos/octocat/Hello-World/issues/1347", _body, _headers, _options})
+
+      assert updated_task.id == task.id
+      assert updated_task.title == @update_attrs["title"]
+      assert updated_task.markdown == @update_attrs["markdown"]
+      refute updated_task.body == task.body
+      assert updated_task.github_issue_id == github_issue.id
+      assert updated_task.github_repo_id == github_repo.id
+
+      updated_github_issue = Repo.one(GithubIssue)
+
+      assert updated_github_issue.github_pull_request_id == github_pull_request.id
     end
 
     test "reports {:error, :github}, makes no changes at all if there is a github api error" do

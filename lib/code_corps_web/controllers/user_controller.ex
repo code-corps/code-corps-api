@@ -7,7 +7,8 @@ defmodule CodeCorpsWeb.UserController do
     GitHub,
     Helpers.Query,
     Services.UserService,
-    User
+    User,
+    Accounts
   }
 
   action_fallback CodeCorpsWeb.FallbackController
@@ -20,6 +21,7 @@ defmodule CodeCorpsWeb.UserController do
       |> Query.id_filter(params)
       |> Query.limit_filter(params)
       |> Query.user_filter(params)
+      |> Accounts.Users.project_filter(params)
       |> Repo.all()
       |> preload()
 
@@ -45,7 +47,7 @@ defmodule CodeCorpsWeb.UserController do
   @spec update(Conn.t, map) :: Conn.t
   def update(%Conn{} = conn, %{"id" => id} = params) do
     with %User{} = user <- User |> Repo.get(id),
-         %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+         %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:update, user),
          {:ok, user, _, _} <- user |> UserService.update(params),
          user <- preload(user)
@@ -81,8 +83,8 @@ defmodule CodeCorpsWeb.UserController do
   end
 
   @preloads [
-    :categories, :github_app_installations, :project_users, :slugged_route,
-    :stripe_connect_subscriptions, :stripe_platform_card,
+    :categories, :github_app_installations, :organizations, :project_users,
+    :slugged_route, :stripe_connect_subscriptions, :stripe_platform_card,
     :stripe_platform_customer, :user_categories, :user_roles, :user_skills
   ]
 

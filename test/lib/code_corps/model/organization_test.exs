@@ -19,7 +19,12 @@ defmodule CodeCorps.OrganizationTest do
   end
 
   describe "create_changeset" do
-    @valid_attrs %{owner_id: 1, description: "Building a better future.", name: "Code Corps"}
+    @valid_attrs %{
+      cloudinary_public_id: "foo",
+      description: "Building a better future.",
+      name: "Code Corps",
+      owner_id: 1
+    }
     @invalid_attrs %{}
 
     test "with valid attributes" do
@@ -40,6 +45,42 @@ defmodule CodeCorps.OrganizationTest do
 
       assert result == :error
       changeset |> assert_error_message(:owner, "does not exist")
+    end
+
+    test "sets approved to false" do
+      changeset = Organization.create_changeset(%Organization{}, @valid_attrs)
+      assert changeset |> get_field(:approved) == false
+    end
+
+    test "generates slug if none provided" do
+      changeset = Organization.create_changeset(%Organization{}, @valid_attrs)
+      assert changeset |> get_field(:slug) == "code-corps"
+    end
+
+    test "leaves out slug generation if slug is provided" do
+      attrs = @valid_attrs |> Map.put(:slug, "custom-slug")
+      changeset = Organization.create_changeset(%Organization{}, attrs)
+      assert changeset |> get_field(:slug) == "custom-slug"
+    end
+  end
+
+  describe "update_changeset" do
+    @valid_struct %Organization{
+      description: "Building a better future.",
+      name: "Code Corps"
+    }
+    @valid_attrs %{
+      approved: true
+    }
+
+    test "with valid struct and attributes" do
+      changeset = Organization.update_changeset(@valid_struct, @valid_attrs)
+      assert changeset.valid?
+    end
+
+    test "with invalid struct" do
+      changeset = Organization.update_changeset(%Organization{}, %{})
+      refute changeset.valid?
     end
   end
 end

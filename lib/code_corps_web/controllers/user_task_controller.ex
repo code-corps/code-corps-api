@@ -28,7 +28,7 @@ defmodule CodeCorpsWeb.UserTaskController do
 
   @spec create(Conn.t, map) :: Conn.t
   def create(%Conn{} = conn, %{} = params) do
-    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+    with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
       {:ok, :authorized} <- current_user |> Policy.authorize(:create, %UserTask{}, params),
       {:ok, %UserTask{} = user_task} <- %UserTask{} |> UserTask.create_changeset(params) |> Repo.insert
     do
@@ -41,7 +41,7 @@ defmodule CodeCorpsWeb.UserTaskController do
   @spec update(Conn.t, map) :: Conn.t
   def update(%Conn{} = conn, %{"id" => id} = params) do
     with %UserTask{} = user_task <- UserTask |> Repo.get(id),
-      %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+      %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
       {:ok, :authorized} <- current_user |> Policy.authorize(:update, user_task),
       {:ok, %UserTask{} = user_task} <- user_task |> UserTask.update_changeset(params) |> Repo.update
     do
@@ -54,7 +54,7 @@ defmodule CodeCorpsWeb.UserTaskController do
   @spec delete(Conn.t, map) :: Conn.t
   def delete(%Conn{} = conn, %{"id" => id} = _params) do
     with %UserTask{} = user_task <- UserTask |> Repo.get(id),
-      %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+      %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
       {:ok, :authorized} <- current_user |> Policy.authorize(:delete, user_task),
       {:ok, %UserTask{} = _user_task} <- user_task |> Repo.delete
     do

@@ -32,12 +32,12 @@ defmodule CodeCorps.Emails.ProjectUserRequestEmail do
   @spec url(Project.t) :: String.t
   defp url(project) do
     WebClient.url()
-    |> URI.merge(project.organization.slug <> "/" <> project.slug <> "/settings/contributors")
+    |> URI.merge(project.organization.slug <> "/" <> project.slug <> "/people")
     |> URI.to_string
   end
 
   @spec template_id :: String.t
-  defp template_id, do: Application.get_env(:code_corps, :postmark_project_request_template)
+  defp template_id, do: Application.get_env(:code_corps, :postmark_project_user_request_template)
 
   @spec get_owners_emails(Project.t) :: list(String.t)
   defp get_owners_emails(%Project{} = project) do

@@ -24,7 +24,7 @@ defmodule CodeCorpsWeb.UserCategoryController do
 
   @spec create(Conn.t, map) :: Conn.t
   def create(%Conn{} = conn, %{} = params) do
-    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+    with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
       {:ok, :authorized} <- current_user |> Policy.authorize(:create, %UserCategory{}, params),
       {:ok, %UserCategory{} = user_category} <- %UserCategory{} |> UserCategory.create_changeset(params) |> Repo.insert
     do
@@ -35,7 +35,7 @@ defmodule CodeCorpsWeb.UserCategoryController do
   @spec delete(Conn.t, map) :: Conn.t
   def delete(%Conn{} = conn, %{"id" => id} = _params) do
     with %UserCategory{} = user_category <- UserCategory |> Repo.get(id),
-      %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+      %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
       {:ok, :authorized} <- current_user |> Policy.authorize(:delete, user_category),
       {:ok, %UserCategory{} = _user_category} <- user_category |> Repo.delete
     do

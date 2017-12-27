@@ -15,13 +15,6 @@ defmodule CodeCorps.Services.DonationGoalsService do
   alias CodeCorps.{DonationGoal, Project, Repo}
   alias Ecto.Multi
 
-  # Prevents warning for calling `Repo.transaction(multi)`.
-  # The warning was caused with how the function is internally
-  # implemented, so there's no way around it
-  # As we update Ecto, we should check if this is still necessary.
-  # Last check was Ecto 2.1.3
-  @dialyzer :no_opaque
-
   @doc """
   Creates the `CodeCorps.DonationGoal` by wrapping the following in a
   transaction:

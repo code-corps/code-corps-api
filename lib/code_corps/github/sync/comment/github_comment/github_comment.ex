@@ -15,11 +15,9 @@ defmodule CodeCorps.GitHub.Sync.Comment.GithubComment do
     GithubUser,
     Repo
   }
-
   alias Ecto.Changeset
-  alias Sync.User.GithubUser, as: GithubUserSyncer
 
-  @typep linking_result :: {:ok, GithubComment.t} | {:error, Changeset.t}
+  @type result :: {:ok, GithubComment.t} | {:error, Changeset.t}
 
   @doc ~S"""
   Finds or creates a `CodeCorps.GithubComment` using the data in a GitHub
@@ -34,7 +32,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.GithubComment do
   `CodeCorps.GitHub.Adapters.Comment.to_github_comment/1` is used to adapt the
   payload data.
   """
-  @spec create_or_update_comment(GithubIssue.t, map) :: linking_result
+  @spec create_or_update_comment(GithubIssue.t, map) :: result
   def create_or_update_comment(%GithubIssue{} = github_issue, %{} = %{"id" => github_comment_id} = attrs) do
     params = to_params(attrs, github_issue)
     case Repo.get_by(GithubComment, github_id: github_comment_id) do
@@ -50,11 +48,10 @@ defmodule CodeCorps.GitHub.Sync.Comment.GithubComment do
   The comment is matched with an existing GithubIssue record using the
   `issue_url` property of the payload.
   """
-  @spec create_or_update_comment(GithubRepo.t, map) :: linking_result
+  @spec create_or_update_comment(GithubRepo.t, map) :: result
   def create_or_update_comment(%GithubRepo{} = github_repo, %{"id" => _, "issue_url" => _} = attrs) do
-    with {:ok, %GithubUser{} = github_user} <- GithubUserSyncer.create_or_update_github_user(attrs),
-         {:ok, %GithubComment{} = github_comment} <- do_create_or_update_comment(github_repo, attrs, github_user)
-    do
+    with {:ok, %GithubUser{} = github_user} <- Sync.User.GithubUser.create_or_update_github_user(attrs),
+         {:ok, %GithubComment{} = github_comment} <- do_create_or_update_comment(github_repo, attrs, github_user) do
       {:ok, github_comment}
     else
       {:error, error} -> {:error, error}
@@ -62,7 +59,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.GithubComment do
   end
 
   defp do_create_or_update_comment(
-  %GithubRepo{} = github_repo,
+    %GithubRepo{} = github_repo,
     %{"id" => github_id, "issue_url" => issue_url} = attrs,
     %GithubUser{} = github_user) do
 
@@ -100,14 +97,14 @@ defmodule CodeCorps.GitHub.Sync.Comment.GithubComment do
     end
   end
 
-  @spec create_comment(map) :: linking_result
+  @spec create_comment(map) :: result
   defp create_comment(params) do
     %GithubComment{}
     |> GithubComment.create_changeset(params)
     |> Repo.insert
   end
 
-  @spec update_comment(GithubComment.t, map) :: linking_result
+  @spec update_comment(GithubComment.t, map) :: result
   defp update_comment(%GithubComment{} = github_comment, %{} = params) do
     github_comment
     |> GithubComment.update_changeset(params)

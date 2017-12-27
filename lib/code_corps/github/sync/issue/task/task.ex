@@ -11,15 +11,15 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task do
   }
   alias Ecto.Changeset
 
-  @type outcome :: {:ok, list(Task.t)} |
-                   {:error, {list(Task.t), list(Changeset.t)}}
+  @type outcome :: {:ok, list(Task.t)}
+                 | {:error, {list(Task.t), list(Changeset.t)}}
 
   @doc """
   When provided a `CodeCorps.GithubIssue` and a `CodeCorps.User`, for the
   `CodeCorps.Project` associated to that `CodeCorps.GithubRepo`, it creates or
   updates a `CodeCorps.Task`.
   """
-  @spec sync_github_issue(GithubIssue.t, User.t) :: {:ok, Task.t}
+  @spec sync_github_issue(GithubIssue.t, User.t) :: {:ok, Task.t} | {:error, Changeset.t}
   def sync_github_issue(%GithubIssue{} = github_issue, %User{} = user) do
     %GithubIssue{
       github_repo: %GithubRepo{} = github_repo

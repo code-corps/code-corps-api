@@ -13,7 +13,7 @@ defmodule CodeCorpsWeb.StripeConnectAccountController do
 
   @spec show(Conn.t, map) :: Conn.t
   def show(%Conn{} = conn, %{"id" => id} = params) do
-    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+    with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          %StripeConnectAccount{} = account <- StripeConnectAccount |> Repo.get(id),
          {:ok, :authorized} <- current_user |> Policy.authorize(:show, account, params)
     do
@@ -29,7 +29,7 @@ defmodule CodeCorpsWeb.StripeConnectAccountController do
       |> Map.put("type", "custom")
       |> Map.put("tos_acceptance_ip", conn |> ConnUtils.extract_ip)
       |> Map.put("tos_acceptance_user_agent", conn |> ConnUtils.extract_user_agent)
-    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+    with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %StripeConnectAccount{}, params),
          {:ok, %StripeConnectAccount{} = account} <- StripeConnectAccountService.create(params),
          account <- preload(account)
@@ -41,7 +41,7 @@ defmodule CodeCorpsWeb.StripeConnectAccountController do
   @spec update(Conn.t, map) :: Conn.t
   def update(%Conn{} = conn, %{"id" => id} = params) do
     with %StripeConnectAccount{} = account <- StripeConnectAccount |> Repo.get(id),
-         %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+         %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:update, account, params),
          {:ok, %StripeConnectAccount{} = updated_account} <- account |> StripeConnectAccountService.update(params),
          updated_account <- preload(updated_account)

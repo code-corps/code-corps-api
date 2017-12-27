@@ -18,9 +18,9 @@ defmodule CodeCorps.GitHub.Sync.User.RecordLinker do
     User
   }
 
-  @typep linking_result :: {:ok, User.t} |
-                           {:error, Ecto.Changeset.t} |
-                           {:error, :multiple_users}
+  @type result :: {:ok, User.t} |
+                  {:error, Ecto.Changeset.t} |
+                  {:error, :multiple_users}
 
   @doc ~S"""
   Finds or creates a user using information in the resource and the GitHub API
@@ -38,7 +38,7 @@ defmodule CodeCorps.GitHub.Sync.User.RecordLinker do
     - If there are multiple matching users, this is an unexpected scenario and
       should error out.
   """
-  @spec link_to(GithubComment.t | GithubIssue.t, map) :: linking_result
+  @spec link_to(GithubComment.t | GithubIssue.t, map) :: result
   def link_to(%GithubComment{} = comment, %{"user" => user}), do: do_link_to(comment, user)
   def link_to(%GithubIssue{} = issue, %{"user" => user}), do: do_link_to(issue, user)
 
@@ -65,7 +65,7 @@ defmodule CodeCorps.GitHub.Sync.User.RecordLinker do
     query |> Repo.all
   end
 
-  @spec marshall_response(list, map) :: linking_result
+  @spec marshall_response(list, map) :: result
   defp marshall_response([%User{} = single_user], %{}), do: {:ok, single_user}
   defp marshall_response([], %{} = user_attrs) do
     user_attrs |> find_or_create_disassociated_user()

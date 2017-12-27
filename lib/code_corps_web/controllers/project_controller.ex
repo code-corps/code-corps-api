@@ -2,7 +2,7 @@ defmodule CodeCorpsWeb.ProjectController do
   @moduledoc false
   use CodeCorpsWeb, :controller
 
-  alias CodeCorps.{Project, User}
+  alias CodeCorps.{Project, Projects, User}
 
   action_fallback CodeCorpsWeb.FallbackController
   plug CodeCorpsWeb.Plug.DataToAttributes
@@ -23,10 +23,9 @@ defmodule CodeCorpsWeb.ProjectController do
 
   @spec create(Plug.Conn.t, map) :: Conn.t
   def create(%Conn{} = conn, %{} = params) do
-    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+    with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %Project{}, params),
-         {:ok, %Project{} = project} <- %Project{} |> Project.create_changeset(params) |> Repo.insert,
-         project <- preload(project)
+         {:ok, %Project{} = project} <- params |> Projects.create(current_user)
     do
       conn |> put_status(:created) |> render("show.json-api", data: project)
     end
@@ -35,19 +34,18 @@ defmodule CodeCorpsWeb.ProjectController do
   @spec update(Conn.t, map) :: Conn.t
   def update(%Conn{} = conn, %{} = params) do
     with %Project{} = project <- Project.Query.find(params),
-         %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+         %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:update, project),
-         {:ok, %Project{} = project} <- project |> Project.update_changeset(params) |> Repo.update,
-         project <- preload(project)
+         {:ok, %Project{} = updated_project} <- project |> Projects.update(params, current_user)
     do
-      conn |> render("show.json-api", data: project)
+      conn |> render("show.json-api", data: updated_project)
     end
   end
 
   @preloads [
     :categories, :donation_goals, :github_repos,
-    [organization: :stripe_connect_account],
-    :project_categories, :project_skills, :project_users, :stripe_connect_plan,
+    [organization: :stripe_connect_account], :project_categories,
+    :project_skills, :project_users, :skills, :stripe_connect_plan,
     :task_lists, :tasks
   ]
 

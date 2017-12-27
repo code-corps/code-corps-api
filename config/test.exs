@@ -27,7 +27,7 @@ config :comeonin, :pbkdf2_rounds, 1
 # CORS allowed origins
 config :code_corps, allowed_origins: ["http://localhost:4200"]
 
-config :guardian, Guardian,
+config :code_corps, CodeCorps.Guardian,
   secret_key: "e62fb6e2746f6b1bf8b5b735ba816c2eae1d5d76e64f18f3fc647e308b0c159e"
 
 config :code_corps, :analytics, CodeCorps.Analytics.TestAPI
@@ -66,9 +66,14 @@ config :code_corps, CodeCorps.Mailer,
 
 config :code_corps,
   postmark_forgot_password_template: "123",
-  postmark_project_acceptance_template: "123",
-  postmark_project_request_template: "123",
-  postmark_receipt_template: "123"
+  postmark_message_initiated_by_project_template: "123",
+  postmark_organization_invite_email_template: "123",
+  postmark_project_approval_request_template: "123",
+  postmark_project_approved_template: "123",
+  postmark_project_user_acceptance_template: "123",
+  postmark_project_user_request_template: "123",
+  postmark_receipt_template: "123",
+  postmark_reply_to_conversation_template: "123"
 
 config :code_corps, :cloudex, CloudexTest
 config :cloudex, api_key: "test_key", secret: "test_secret", cloud_name: "test_cloud_name"

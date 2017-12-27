@@ -53,6 +53,20 @@ defmodule CodeCorpsWeb.SkillControllerTest do
       returned_skills_length = json["data"] |> length
       assert returned_skills_length == 5
     end
+
+    test "lists popular skills", %{conn: conn} do
+      [skill_1, skill_2] = insert_pair(:skill)
+      insert(:user_skill, skill: skill_1)
+      insert_list(2, :user_skill, skill: skill_2)
+
+      params = %{"popular" => "true"}
+      path = conn |> skill_path(:index, params)
+
+      conn
+      |> get(path)
+      |> json_response(200)
+      |> assert_ids_from_response([skill_2.id, skill_1.id])
+    end
   end
 
   describe "show" do

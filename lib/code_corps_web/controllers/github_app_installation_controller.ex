@@ -30,7 +30,7 @@ defmodule CodeCorpsWeb.GithubAppInstallationController do
 
   @spec create(Plug.Conn.t, map) :: Conn.t
   def create(%Conn{} = conn, %{} = params) do
-    with %User{} = current_user <- conn |> Guardian.Plug.current_resource,
+    with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %GithubAppInstallation{}, params),
          {:ok, %GithubAppInstallation{} = installation} <- %GithubAppInstallation{} |> GithubAppInstallation.create_changeset(params) |> Repo.insert,
          installation <- preload(installation)
