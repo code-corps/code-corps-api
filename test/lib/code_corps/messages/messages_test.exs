@@ -3,52 +3,27 @@ defmodule CodeCorps.MessagesTest do
 
   use CodeCorps.DbAccessCase
   use Phoenix.ChannelTest
+  use Bamboo.Test
 
   import Ecto.Query, only: [where: 2]
 
-  alias CodeCorps.{Conversation, ConversationPart, Message, Messages}
+  alias CodeCorps.{Conversation, ConversationPart, Emails, Message, Messages}
   alias Ecto.Changeset
 
   defp get_and_sort_ids(records) do
     records |> Enum.map(&Map.get(&1, :id)) |> Enum.sort
   end
 
+  defp json_map(attrs) do
+    attrs
+    |> Poison.encode!
+    |> Poison.decode!
+  end
+
   describe "list" do
     test "returns all records by default" do
       insert_list(3, :message)
       assert Message |> Messages.list(%{}) |> Enum.count == 3
-    end
-
-    test "can filter by project" do
-      [project_1, project_2] = insert_pair(:project)
-      messages_from_project_1 = insert_pair(:message, project: project_1)
-      message_from_project_2 = insert(:message, project: project_2)
-
-      results = Message |> Messages.list(%{"project_id" => project_1.id})
-      assert results |> Enum.count == 2
-      assert results |> get_and_sort_ids() ==
-        messages_from_project_1 |> get_and_sort_ids()
-
-      results = Message |> Messages.list(%{"project_id" => project_2.id})
-      assert results |> Enum.count == 1
-      assert results |> get_and_sort_ids() ==
-        [message_from_project_2.id]
-    end
-
-    test "can filter by author" do
-      [author_1, author_2] = insert_pair(:user)
-      messages_from_author_1 = insert_pair(:message, author: author_1)
-      message_from_author_2 = insert(:message, author: author_2)
-
-      results = Message |> Messages.list(%{"author_id" => author_1.id})
-      assert results |> Enum.count == 2
-      assert results |> get_and_sort_ids() ==
-        messages_from_author_1 |> get_and_sort_ids()
-
-      results = Message |> Messages.list(%{"author_id" => author_2.id})
-      assert results |> Enum.count == 1
-      assert results |> get_and_sort_ids() ==
-        [message_from_author_2.id]
     end
 
     test "can filter by list of ids" do
@@ -67,40 +42,6 @@ defmodule CodeCorps.MessagesTest do
         [message_2] |> get_and_sort_ids()
     end
 
-    test "can apply multiple filters at once" do
-      [project_1, project_2] = insert_pair(:project)
-      [author_1, author_2] = insert_pair(:user)
-
-      message_p1_a1 = insert(:message, project: project_1, author: author_1)
-      message_p1_a2 = insert(:message, project: project_1, author: author_2)
-      message_p2_a1 = insert(:message, project: project_2, author: author_1)
-      message_p2_a2 = insert(:message, project: project_2, author: author_2)
-
-      params = %{"project_id" => project_1.id, "author_id" => author_1.id}
-      results = Message |> Messages.list(params)
-      assert results |> get_and_sort_ids() == [message_p1_a1.id]
-
-      params = %{"project_id" => project_1.id, "author_id" => author_2.id}
-      results = Message |> Messages.list(params)
-      assert results |> get_and_sort_ids() == [message_p1_a2.id]
-
-      params = %{"project_id" => project_2.id, "author_id" => author_1.id}
-      results = Message |> Messages.list(params)
-      assert results |> get_and_sort_ids() == [message_p2_a1.id]
-
-      params = %{"project_id" => project_2.id, "author_id" => author_2.id}
-      results = Message |> Messages.list(params)
-      assert results |> get_and_sort_ids() == [message_p2_a2.id]
-
-      params = %{
-        "filter" => %{"id" => "#{message_p1_a1.id},#{message_p2_a1.id}"},
-        "project_id" => project_1.id
-      }
-      results = Message |> Messages.list(params)
-
-      assert results |> get_and_sort_ids() == [message_p1_a1.id]
-    end
-
     test "builds upon the provided scope" do
       [%{id: project_1_id} = project_1, project_2] = insert_pair(:project)
       [author_1, author_2] = insert_pair(:user)
@@ -110,7 +51,7 @@ defmodule CodeCorps.MessagesTest do
       message_p2_a1 = insert(:message, project: project_2, author: author_1)
       message_p2_a2 = insert(:message, project: project_2, author: author_2)
 
-      params = %{"author_id" => author_1.id}
+      params = %{"filter" => %{"id" => "#{message_p1_a1.id}"}}
       result_ids =
         Message
         |> where(project_id: ^project_1_id)
@@ -180,7 +121,7 @@ defmodule CodeCorps.MessagesTest do
 
       result_ids =
         Conversation
-        |> Messages.list_conversations(%{"status" => "active"})
+        |> Messages.list_conversations(%{"active" => true})
         |> get_and_sort_ids()
 
       refute conversation_started_by_admin_without_reply.id in result_ids
@@ -190,7 +131,7 @@ defmodule CodeCorps.MessagesTest do
 
       result_ids =
         Conversation
-        |> Messages.list_conversations(%{"status" => "any"})
+        |> Messages.list_conversations(%{"status" => "open"})
         |> get_and_sort_ids()
 
       assert conversation_started_by_admin_without_reply.id in result_ids
@@ -257,7 +198,7 @@ defmodule CodeCorps.MessagesTest do
         conversation: other_conversation_started_by_admin_with_reply
       )
 
-      params = %{"status" => "active", "project_id" => project_1.id}
+      params = %{"active" => true, "project_id" => project_1.id}
       result_ids =
         Conversation
         |> Messages.list_conversations(params)
@@ -273,7 +214,7 @@ defmodule CodeCorps.MessagesTest do
       # project
       refute other_conversation_started_by_admin_with_reply.id in result_ids
 
-      params = %{"status" => "active", "project_id" => project_2.id}
+      params = %{"active" => true, "project_id" => project_2.id}
       result_ids =
         Conversation
         |> Messages.list_conversations(params)
@@ -314,7 +255,7 @@ defmodule CodeCorps.MessagesTest do
 
   describe "add_part/1" do
     test "creates a conversation part" do
-      conversation = insert(:conversation)
+      conversation = insert(:conversation, updated_at: Timex.now |> Timex.shift(minutes: -5))
       user = insert(:user)
       attrs = %{
         author_id: user.id,
@@ -322,11 +263,16 @@ defmodule CodeCorps.MessagesTest do
         conversation_id: conversation.id
       }
 
-      {:ok, %ConversationPart{} = conversation_part} = Messages.add_part(attrs)
+      {:ok, %ConversationPart{} = conversation_part} = Messages.add_part(attrs |> json_map())
+
+      conversation_part =
+        conversation_part
+        |> Repo.preload([:author, conversation: [message: [[project: :organization]]]])
 
       assert conversation_part.author_id == user.id
       assert conversation_part.body == "Test body"
       assert conversation_part.conversation_id == conversation.id
+      assert conversation_part.updated_at == conversation_part.conversation.updated_at
     end
 
     test "broadcasts event on phoenix channel" do
@@ -339,9 +285,53 @@ defmodule CodeCorps.MessagesTest do
       }
 
       CodeCorpsWeb.Endpoint.subscribe("conversation:#{conversation.id}")
-      {:ok, %ConversationPart{id: id}} = Messages.add_part(attrs)
+      {:ok, %ConversationPart{id: id}} = Messages.add_part(attrs |> json_map())
       assert_broadcast("new:conversation-part", %{id: ^id})
       CodeCorpsWeb.Endpoint.unsubscribe("conversation:#{conversation.id}")
+    end
+
+    test "when replied by project admin, sends appropriate email to other participants" do
+      part_author = insert(:user)
+      %{author: message_author} = message = insert(:message)
+      %{user: target_user} = conversation = insert(:conversation, message: message)
+      %{author: other_participant} = insert(:conversation_part, conversation: conversation)
+
+      attrs = %{
+        author_id: part_author.id,
+        body: "Test body",
+        conversation_id: conversation.id
+      }
+
+      {:ok, %ConversationPart{} = part} = Messages.add_part(attrs |> json_map())
+
+      part = part |> Repo.preload([:author, conversation: [message: [[project: :organization]]]])
+
+      refute_delivered_email Emails.ReplyToConversationEmail.create(part, part_author)
+      assert_delivered_email Emails.ReplyToConversationEmail.create(part, target_user)
+      assert_delivered_email Emails.ReplyToConversationEmail.create(part, message_author)
+      assert_delivered_email Emails.ReplyToConversationEmail.create(part, other_participant)
+    end
+
+    test "when replied by conversation user, sends appropriate email to other participants" do
+      part_author = insert(:user)
+      %{author: message_author} = message = insert(:message)
+      %{user: target_user} = conversation = insert(:conversation, message: message)
+      %{author: other_participant} = insert(:conversation_part, conversation: conversation)
+
+      attrs = %{
+        author_id: part_author.id,
+        body: "Test body",
+        conversation_id: conversation.id
+      }
+
+      {:ok, %ConversationPart{} = part} = Messages.add_part(attrs |> json_map())
+
+      part = part |> Repo.preload([:author, conversation: [message: [[project: :organization]]]])
+
+      refute_delivered_email Emails.ReplyToConversationEmail.create(part, part_author)
+      assert_delivered_email Emails.ReplyToConversationEmail.create(part, target_user)
+      assert_delivered_email Emails.ReplyToConversationEmail.create(part, message_author)
+      assert_delivered_email Emails.ReplyToConversationEmail.create(part, other_participant)
     end
   end
 
@@ -454,6 +444,27 @@ defmodule CodeCorps.MessagesTest do
       {:error, %Changeset{} = changeset} = params |> Messages.create
       conversation_changeset = changeset.changes.conversations |> List.first
       assert conversation_changeset.errors[:user]
+    end
+
+    test "when initiated by admin, sends email to each conversation user" do
+      %{project: project, user: user} = insert(:project_user, role: "admin")
+      [recipient_1, recipient_2] = insert_pair(:user)
+
+      params = %{
+        author_id: user.id,
+        body: "Foo",
+        conversations: [%{user_id: recipient_1.id}, %{user_id: recipient_2.id}],
+        initiated_by: "admin",
+        project_id: project.id,
+        subject: "Bar"
+      }
+
+      {:ok, %Message{} = message} = params |> Messages.create
+      %{conversations: [conversation_1, conversation_2]} = message =
+        message |> Repo.preload([:project, [conversations: :user]])
+
+      assert_delivered_email Emails.MessageInitiatedByProjectEmail.create(message, conversation_1)
+      assert_delivered_email Emails.MessageInitiatedByProjectEmail.create(message, conversation_2)
     end
   end
 end

@@ -75,6 +75,7 @@ defmodule CodeCorps.Policy do
 
   # Conversation
   defp can?(%User{} = current_user, :show, %Conversation{} = conversation, %{}), do: Policy.Conversation.show?(current_user, conversation)
+  defp can?(%User{} = current_user, :update, %Conversation{} = conversation, %{}), do: Policy.Conversation.update?(current_user, conversation)
 
   # ConversationPart
   defp can?(%User{} = current_user, :create, %ConversationPart{}, %{} = params), do: Policy.ConversationPart.create?(current_user, params)

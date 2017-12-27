@@ -36,6 +36,10 @@ This file places environment variables on separate lines, prepended with `export
 >
 > Your `dev.exs` has some sane defaults of `postgres`, `postgres`, and `localhost`, respectively.
 
+> You might want to add `GITHUB_TEST_APP_PEM` to your .env in order test suit to pass locally
+> 1. Generate rsa private key (or get one from here http://phpseclib.sourceforge.net/rsa/examples.html)
+> 2. base64 encode this key (f.e. in `iex> Base.encode64(your_private_rsa_key`))
+
 Now, you can source the `.env`:
 
 ```shell

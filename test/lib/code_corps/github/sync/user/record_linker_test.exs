@@ -12,6 +12,12 @@ defmodule CodeCorps.Sync.User.RecordLinkerTest do
   }
   alias CodeCorps.GitHub.Adapters.User, as: UserAdapter
 
+  def remove_nils(payload) do
+    payload
+    |> Enum.reject(fn {_, v} -> is_nil(v) end)
+    |> Map.new()
+  end
+
   describe "link_to/2 for comments" do
     @payload load_event_fixture("issue_comment_created")
     @bot_payload load_event_fixture("issue_comment_created_by_bot")
@@ -43,7 +49,7 @@ defmodule CodeCorps.Sync.User.RecordLinkerTest do
 
     test "finds user by github id if none is found by comment association" do
       %{"comment" => %{"id" => github_id} = comment} = @payload
-      attributes = UserAdapter.to_user(@user_payload)
+      attributes = @user_payload |> UserAdapter.to_user() |> remove_nils()
       preinserted_user = insert(:user, attributes)
       github_comment = insert(:github_comment, github_id: github_id)
 
@@ -58,7 +64,7 @@ defmodule CodeCorps.Sync.User.RecordLinkerTest do
       github_comment = insert(:github_comment, github_id: github_id)
       {:ok, %User{} = returned_user} = RecordLinker.link_to(github_comment, comment)
 
-      created_attributes = UserAdapter.to_user(@user_payload)
+      created_attributes = @user_payload |> UserAdapter.to_user() |> remove_nils()
       created_user = Repo.get_by(User, created_attributes)
       assert created_user.id == returned_user.id
     end
@@ -86,7 +92,7 @@ defmodule CodeCorps.Sync.User.RecordLinkerTest do
       github_comment = insert(:github_comment, github_id: github_id)
       {:ok, %User{} = returned_user} = RecordLinker.link_to(github_comment, comment)
 
-      created_attributes = UserAdapter.to_user(@bot_user_payload)
+      created_attributes = @bot_user_payload |> UserAdapter.to_user() |> remove_nils()
       created_user = Repo.get_by(User, created_attributes)
       assert created_user.id == returned_user.id
     end
@@ -142,7 +148,7 @@ defmodule CodeCorps.Sync.User.RecordLinkerTest do
 
     test "returns user by github id if no user by task association found" do
       %{"issue" => %{"number" => number} = issue} = @payload
-      attributes = UserAdapter.to_user(@user_payload)
+      attributes = @user_payload |> UserAdapter.to_user() |> remove_nils()
       preinserted_user = insert(:user, attributes)
       github_issue = insert(:github_issue, number: number)
 
@@ -157,7 +163,7 @@ defmodule CodeCorps.Sync.User.RecordLinkerTest do
       github_issue = insert(:github_issue, number: number)
       {:ok, %User{} = returned_user} = RecordLinker.link_to(github_issue, issue)
 
-      created_attributes = UserAdapter.to_user(@user_payload)
+      created_attributes = @user_payload |> UserAdapter.to_user() |> remove_nils()
       created_user = Repo.get_by(User, created_attributes)
       assert created_user.id == returned_user.id
     end
@@ -191,7 +197,7 @@ defmodule CodeCorps.Sync.User.RecordLinkerTest do
       github_issue = insert(:github_issue, number: number)
       {:ok, %User{} = returned_user} = RecordLinker.link_to(github_issue, issue)
 
-      created_attributes = UserAdapter.to_user(@bot_user_payload)
+      created_attributes =  @bot_user_payload |> UserAdapter.to_user() |> remove_nils()
       created_user = Repo.get_by(User, created_attributes)
       assert created_user.id == returned_user.id
     end

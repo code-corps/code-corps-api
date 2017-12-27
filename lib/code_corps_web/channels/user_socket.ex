@@ -6,7 +6,8 @@ defmodule CodeCorpsWeb.UserSocket do
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket,
-    timeout: 45_000
+    timeout: 45_000,
+    check_origin: Application.get_env(:code_corps, :allowed_origins)
   # transport :longpoll, Phoenix.Transports.LongPoll
 
   # Socket params are passed from the client and can
@@ -27,6 +28,9 @@ defmodule CodeCorpsWeb.UserSocket do
     else
       _ -> {:ok, socket}
     end
+  end
+  def connect(_params, socket) do
+    {:ok, socket}
   end
 
   # Socket id's are topics that allow you to identify all sockets for a given user:

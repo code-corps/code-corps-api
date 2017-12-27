@@ -14,8 +14,14 @@ defmodule CodeCorps.Accounts.Changesets do
   """
   @spec create_from_github_changeset(struct, map) :: Changeset.t
   def create_from_github_changeset(struct, %{} = params) do
+    params =
+      params
+      |> Adapters.User.to_user()
+      |> Enum.reject(fn {_, v} -> is_nil(v) end)
+      |> Map.new()
+
     struct
-    |> Changeset.change(params |> Adapters.User.to_user())
+    |> Changeset.change(params)
     |> Changeset.put_change(:sign_up_context, "github")
     |> Changeset.validate_inclusion(:type, ["bot", "user"])
     |> RandomIconColor.generate_icon_color(:default_color)
