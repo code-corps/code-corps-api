@@ -45,7 +45,7 @@
                               <img src="{{high_five_image_url}}" width="100" height="100" />
                             </p>
                             <p class="donation_text center">
-                              <strong>{{user_first_name}}</strong>, thanks for your monthly donation to <a href="{{project_url}}">{{project_title}}</a>.
+                              Hey {{name}}, thanks for your monthly donation to <a href="{{project_url}}">{{project_title}}</a>.
                             </p>
                             <tr>
                               <td class="donation_goal">
@@ -55,10 +55,10 @@
                                 <p class="donation_goal_footer">
                                   {{project_current_donation_goal_description}}
                                 </p>
-                              <td>
+                              </td>
                             </tr>
-                          </tr>
-                        </td>
+                          </td>
+                        </tr>
                       </table>
                       <table class="purchase" width="100%" cellpadding="0" cellspacing="0">
                         <tr>
@@ -74,7 +74,7 @@
                               </tr>
                               <tr>
                                 <td width="80%" class="charge_item">Monthly Donation to {{project_title}}</td>
-                                <td class="align-right" width="20%" class="charge_item">{{charge_amount}}</td>
+                                <td class="align-right charge_item" width="20%">{{charge_amount}}</td>
                               </tr>
                               <tr>
                                 <td width="80%" class="charge_footer" valign="middle">
@@ -91,9 +91,6 @@
                       <table class="body-signature">
                         <tr>
                           <td>
-                            <p class="center small">
-                              Questions? Feedback?
-                              <br>Visit our <strong><a href="https://intercom.help/code-corps">Help Center</a></strong> or just reply to this email.</p>
                             <p class="center">
                               Thanks again!
                               <br><strong>The Code Corps Team</strong>
@@ -118,9 +115,18 @@
               <td>
                 <table class="email-footer" align="center" width="570" cellpadding="0" cellspacing="0">
                   <tr>
-                    <td class="content-cell" align="center">
-                      <p class="sub align-center">
-                        Code Corps PBC
+                    <td class="email-footer__cell" align="center">
+                      <p class="align-center">
+                        Questions? Feedback? Visit our <strong><a href="https://help.codecorps.org">Help Center</a></strong> or just reply to this email.
+                      </p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="email-footer__cell" align="center">
+                      <p class="align-center">
+                        Send us 🐌 mail!
+                        <br>
+                        <br>Code Corps PBC
                         <br>4166 Wilson Ave #1
                         <br>San Diego, CA 92104
                       </p>

@@ -2,11 +2,12 @@ defmodule CodeCorpsWeb.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "room:*", CodeCorps.RoomChannel
+  channel "conversation:*", CodeCorpsWeb.ConversationChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket,
-    timeout: 45_000
+    timeout: 45_000,
+    check_origin: Application.get_env(:code_corps, :allowed_origins)
   # transport :longpoll, Phoenix.Transports.LongPoll
 
   # Socket params are passed from the client and can
@@ -20,6 +21,14 @@ defmodule CodeCorpsWeb.UserSocket do
   #
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
+  def connect(%{"token" => token}, socket) do
+    with {:ok, claims} <- CodeCorps.Guardian.decode_and_verify(token),
+         {:ok, user} <- CodeCorps.Guardian.resource_from_claims(claims) do
+      {:ok, assign(socket, :current_user, user)}
+    else
+      _ -> {:ok, socket}
+    end
+  end
   def connect(_params, socket) do
     {:ok, socket}
   end

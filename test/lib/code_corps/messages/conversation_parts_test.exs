@@ -13,9 +13,45 @@ defmodule CodeCorps.Messages.ConversationPartsTest do
 
   describe "create_changeset/2" do
     test "with valid attributes" do
+      user_id = insert(:user, id: 1).id
+      insert(:conversation, id: 1)
       attrs = @valid_attrs |> Map.merge(%{author_id: 1, conversation_id: 1})
+      {:ok, conversation} = ConversationParts.create_changeset(%ConversationPart{}, attrs) |> Repo.insert
+      assert conversation.body == "Test body."
+      assert conversation.part_type == "comment"
+      assert conversation.author_id == user_id
+    end
+
+    test "validates part_type inclusion: note" do
+      insert(:user, id: 1)
+      insert(:conversation, id: 1)
+      attrs = @valid_attrs |> Map.merge(%{author_id: 1, conversation_id: 1, part_type: "note"})
+      changeset = ConversationParts.create_changeset(%ConversationPart{}, attrs) 
+      assert changeset.valid?
+      assert changeset.changes.part_type == "note"
+    end
+
+    test "validates part_type inclusion: reopened" do
+      attrs = @valid_attrs |> Map.merge(%{author_id: 1, conversation_id: 1, part_type: "reopened"})
       changeset = ConversationParts.create_changeset(%ConversationPart{}, attrs)
       assert changeset.valid?
+      assert changeset.changes.part_type == "reopened"
+    end
+
+    test "validates part_type inclusion: closed" do
+      attrs = @valid_attrs |> Map.merge(%{author_id: 1, conversation_id: 1, part_type: "closed"})
+      changeset = ConversationParts.create_changeset(%ConversationPart{}, attrs)
+      assert changeset.valid?
+      assert changeset.changes.part_type == "closed"
+    end
+
+    test "validates part_type inclusion: wat" do
+      insert(:user, id: 1)
+      insert(:conversation, id: 1)
+      attrs = @valid_attrs |> Map.merge(%{author_id: 1, conversation_id: 1, part_type: "wat"})
+      changeset = ConversationParts.create_changeset(%ConversationPart{}, attrs)
+      refute changeset.valid?
+      assert_error_message(changeset, :part_type, "is invalid")
     end
 
     test "requires author_id" do

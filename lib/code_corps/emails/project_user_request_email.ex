@@ -32,7 +32,7 @@ defmodule CodeCorps.Emails.ProjectUserRequestEmail do
   @spec url(Project.t) :: String.t
   defp url(project) do
     WebClient.url()
-    |> URI.merge(project.organization.slug <> "/" <> project.slug <> "/settings/contributors")
+    |> URI.merge(project.organization.slug <> "/" <> project.slug <> "/people")
     |> URI.to_string
   end
 

@@ -7,4 +7,6 @@ defmodule CodeCorpsWeb.MessageView do
 
   has_one :author, type: "user", field: :author_id
   has_one :project, type: "project", field: :project_id
+
+  has_many :conversations, serializer: CodeCorpsWeb.ConversationView, identifiers: :always
 end

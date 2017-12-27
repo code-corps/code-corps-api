@@ -78,10 +78,12 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilder do
     }
   end
   defp traits(%CodeCorps.ProjectUser{} = record) do
-    record = record |> Repo.preload(:project)
+    record = record |> Repo.preload([:project, :user])
     %{
       project: record.project.title,
-      project_id: record.project_id
+      project_id: record.project_id,
+      member: record.user.username,
+      member_id: record.user.id
     }
   end
   defp traits(%CodeCorps.StripeConnectAccount{} = account) do

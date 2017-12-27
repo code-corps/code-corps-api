@@ -1,7 +1,7 @@
 defmodule CodeCorps.Policy.ConversationTest do
   use CodeCorps.PolicyCase
 
-  import CodeCorps.Policy.Conversation, only: [scope: 2, show?: 2]
+  import CodeCorps.Policy.Conversation, only: [scope: 2, show?: 2, update?: 2]
 
   alias CodeCorps.{Conversation, Repo}
 
@@ -111,6 +111,48 @@ defmodule CodeCorps.Policy.ConversationTest do
       conversation = insert(:conversation, message: message)
 
       assert show?(user, conversation)
+    end
+  end
+
+  describe "update?" do
+    test "returns true when user is admin" do
+      user = insert(:user, admin: true)
+      message = insert(:message)
+      conversation = insert(:conversation, message: message, user: user)
+
+      assert update?(user, conversation)
+    end
+
+    test "returns false when user is a pending project member" do
+      %{project: project, user: user} = insert(:project_user, role: "pending")
+      message = insert(:message, project: project)
+      conversation = insert(:conversation, message: message)
+
+      refute update?(user, conversation)
+    end
+
+    test "returns false when user is a project contributor" do
+      %{project: project, user: user} = insert(:project_user, role: "contributor")
+      message = insert(:message, project: project)
+      conversation = insert(:conversation, message: message)
+
+      refute update?(user, conversation)
+    end
+
+    test "returns true when user is a project admin" do
+      %{project: project, user: user} = insert(:project_user, role: "admin")
+      message = insert(:message, project: project)
+      conversation = insert(:conversation, message: message)
+
+      assert update?(user, conversation)
+    end
+
+    test "returns true when user is project owner" do
+      %{project: project, user: user} = insert(:project_user, role: "owner")
+      message = insert(:message, project: project)
+      conversation = insert(:conversation, message: message)
+
+      assert update?(user, conversation)
     end
   end
 end

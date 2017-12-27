@@ -1,6 +1,8 @@
 defmodule CodeCorpsWeb.MessageControllerTest do
   use CodeCorpsWeb.ApiCase, resource_name: :message
 
+  alias CodeCorps.{Conversation, Message, Repo}
+
   @valid_attrs %{
     body: "Test body.",
     initiated_by: "admin",
@@ -67,6 +69,34 @@ defmodule CodeCorpsWeb.MessageControllerTest do
       attrs = @valid_attrs |> Map.merge(%{author_id: user.id, project_id: project.id})
 
       assert conn |> request_create(attrs) |> json_response(201)
+
+      assert Repo.get_by(Message, project_id: project.id, author_id: user.id)
+    end
+
+    @tag :authenticated
+    test "creates child conversation if attributes for it are provided", %{conn: conn, current_user: user} do
+      project = insert(:project)
+      insert(:project_user, project: project, user: user, role: "owner")
+
+      recipient = insert(:user)
+
+      conversation_payload =
+        %{user_id: recipient.id}
+        |> CodeCorps.JsonAPIHelpers.build_json_payload("conversation")
+
+      payload =
+        @valid_attrs
+        |> Map.merge(%{author_id: user.id, project_id: project.id})
+        |> CodeCorps.JsonAPIHelpers.build_json_payload
+        |> Map.put("included", [conversation_payload])
+
+      path = conn |> message_path(:create)
+      assert conn |> post(path, payload) |> json_response(201)
+
+      message = Repo.get_by(Message, project_id: project.id, author_id: user.id)
+      assert message
+
+      assert Repo.get_by(Conversation, user_id: recipient.id, message_id: message.id)
     end
 
     @tag :authenticated
@@ -79,15 +109,18 @@ defmodule CodeCorpsWeb.MessageControllerTest do
       attrs = @invalid_attrs |> Map.merge(%{author_id: user.id, project_id: project.id})
 
       assert conn |> request_create(attrs) |> json_response(422)
+      refute Repo.one(Message)
     end
 
     test "does not create resource and renders 401 when not authenticated", %{conn: conn} do
       assert conn |> request_create |> json_response(401)
+      refute Repo.one(Message)
     end
 
     @tag :authenticated
     test "renders 403 when not authorized", %{conn: conn} do
       assert conn |> request_create |> json_response(403)
+      refute Repo.one(Message)
     end
 
     @tag :authenticated
