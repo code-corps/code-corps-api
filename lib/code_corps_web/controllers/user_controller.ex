@@ -7,7 +7,8 @@ defmodule CodeCorpsWeb.UserController do
     GitHub,
     Helpers.Query,
     Services.UserService,
-    User
+    User,
+    Accounts
   }
 
   action_fallback CodeCorpsWeb.FallbackController
@@ -20,6 +21,7 @@ defmodule CodeCorpsWeb.UserController do
       |> Query.id_filter(params)
       |> Query.limit_filter(params)
       |> Query.user_filter(params)
+      |> Accounts.Users.project_filter(params)
       |> Repo.all()
       |> preload()
 
