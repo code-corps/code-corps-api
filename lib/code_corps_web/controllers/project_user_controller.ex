@@ -43,7 +43,7 @@ defmodule CodeCorpsWeb.ProjectUserController do
          {:ok, %ProjectUser{} = updated_project_user} <- project_user |> ProjectUser.update_changeset(params) |> Repo.update,
          _ <- maybe_send_update_email(updated_project_user, project_user)
     do
-      conn |> render("show.json-api", data: project_user)
+      conn |> render("show.json-api", data: updated_project_user)
     end
   end
 
