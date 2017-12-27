@@ -18,6 +18,16 @@ defmodule CodeCorps.Accounts.ChangesetsTest do
       changeset = Changesets.create_from_github_changeset(%User{}, %{})
       assert changeset.changes.default_color
     end
+
+    test "ensures nil values are omitted" do
+      params = %{"email" => nil, "github_avatar_url" => nil, "type" => "bot"}
+
+      changeset = Changesets.create_from_github_changeset(%User{}, params)
+
+      refute changeset.changes[:email]
+      refute changeset.changes[:github_avatar_url]
+    end
+
   end
 
   describe "update_from_github_oauth_changeset/2" do
