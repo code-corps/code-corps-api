@@ -2,8 +2,6 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
   use CodeCorpsWeb.ApiCase, resource_name: :project_user
   use Bamboo.Test
 
-  @attrs %{role: "contributor"}
-
   describe "index" do
     test "lists all resources", %{conn: conn} do
       [record_1, record_2] = insert_pair(:project_user)
@@ -102,7 +100,10 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
       record = insert(:project_user, project: project, role: "pending")
       insert(:project_user, project: project, user: current_user, role: "owner")
 
-      assert conn |> request_update(record, @attrs) |> json_response(200)
+      params = %{role: "contributor"}
+      json = conn |> request_update(record, params) |> json_response(200)
+
+      assert json["data"]["attributes"]["role"] == "contributor"
 
       user_id = current_user.id
 

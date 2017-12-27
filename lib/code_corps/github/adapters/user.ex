@@ -21,17 +21,12 @@ defmodule CodeCorps.GitHub.Adapters.User do
   Converts a Github user payload into a map of attributes suitable for creating
   or updating a `CodeCorps.User`
 
-  Any `nil` values are removed. For example, we don't want to delete an
-  existing email just because it's `nil` in the payload.
-
   The `type` gets transformed to match our expected values for user type.
   """
   @spec to_user(map) :: map
   def to_user(%{} = payload) do
     payload
     |> CodeCorps.Adapter.MapTransformer.transform(@user_mapping)
-    |> Enum.reject(fn {_, v} -> is_nil(v) end)
-    |> Map.new
     |> transform_type
   end
 

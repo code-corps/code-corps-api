@@ -10,7 +10,7 @@ dependencies:
   pre:
     - ./bin/circle_pre_build.sh
     - mix deps.compile
-    - mix compile
+    - mix compile --warnings-as-errors
 test:
   override:
     - |
