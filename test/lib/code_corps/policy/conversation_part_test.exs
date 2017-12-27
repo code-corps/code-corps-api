@@ -71,6 +71,8 @@ defmodule CodeCorps.Policy.ConversationPartTest do
         insert(:conversation_part, conversation: conversation_when_owner)
       part_in_some_other_conversation =
         insert(:conversation_part, conversation: some_other_conversation)
+      part_closed =
+        insert(:conversation_part, conversation: conversation_when_target, part_type: "closed")
 
       result_ids =
         ConversationPart
@@ -84,6 +86,7 @@ defmodule CodeCorps.Policy.ConversationPartTest do
       assert part_in_administered_project.id in result_ids
       assert part_in_owned_project.id in result_ids
       refute part_in_some_other_conversation.id in result_ids
+      refute part_closed.id in result_ids
     end
   end
 
