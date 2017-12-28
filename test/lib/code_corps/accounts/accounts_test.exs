@@ -244,7 +244,7 @@ defmodule CodeCorps.AccountsTest do
       %{id: project_id} = project = insert(:project)
       %{email: email} = user = insert(:user)
 
-      project_user = insert(:project_user, user: user, project: project)
+      insert(:project_user, user: user, project: project)
 
       {:error, changeset} =
         %{email: email}
@@ -258,17 +258,28 @@ defmodule CodeCorps.AccountsTest do
   end
 
   describe "claim_invite/1" do
+    @valid_user_params %{
+      "email" => "test@user.com",
+      "password" => "somepassword",
+      "username" => "testuser"
+    }
     test "creates user" do
       invite = insert(:user_invite, invitee: nil, project: nil)
 
-      {:ok, %User{} = user} = invite |> Accounts.claim_invite
+      {:ok, %User{} = user} =
+        @valid_user_params
+        |> Map.put("invite_id", invite.id)
+        |> Accounts.claim_invite
       assert Repo.get(User, user.id)
     end
 
     test "associates invite with user" do
       invite = insert(:user_invite, invitee: nil, project: nil)
 
-      {:ok, %User{} = user} = invite |> Accounts.claim_invite
+      {:ok, %User{} = user} =
+        @valid_user_params
+        |> Map.put("invite_id", invite.id)
+        |> Accounts.claim_invite
       assert Repo.one(UserInvite).invitee_id == user.id
     end
 
@@ -276,8 +287,18 @@ defmodule CodeCorps.AccountsTest do
       project = insert(:project)
       invite = insert(:user_invite, invitee: nil, project: project)
 
-      {:ok, %User{} = user} = invite |> Accounts.claim_invite
+      {:ok, %User{} = user} =
+        @valid_user_params
+        |> Map.put("invite_id", invite.id)
+        |> Accounts.claim_invite
       assert Repo.get_by(ProjectUser, user_id: user.id, project_id: project.id)
+    end
+
+    test "returns :invite_not_found if bad id provided" do
+      assert {:error, :invite_not_found} =
+        @valid_user_params
+        |> Map.put("invite_id", -1)
+        |> Accounts.claim_invite
     end
   end
 end

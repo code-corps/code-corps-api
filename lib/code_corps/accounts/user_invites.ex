@@ -41,22 +41,33 @@ defmodule CodeCorps.Accounts.UserInvites do
     end
   end
 
-  @spec claim_invite(UserInvite.t) :: {:ok, User.t}
-  def claim_invite(%UserInvite{} = user_invite) do
+  @spec claim_invite(map) :: {:ok, User.t}
+  def claim_invite(%{} = params) do
     Multi.new
-    |> Multi.run(:user, fn %{} -> user_invite |> claim_user() end)
-    |> Multi.run(:project_user, fn %{user: user} -> user |> join_project(user_invite) end)
-    |> Multi.run(:user_invite, fn %{user: user} -> user_invite |> associate_invitee(user) end)
+    |> Multi.run(:load_invite, fn %{} -> params |> load_invite() end)
+    |> Multi.run(:user, fn %{} -> params |> claim_new_user() end)
+    |> Multi.run(:project_user, fn %{user: user, load_invite: user_invite} ->
+      user |> join_project(user_invite)
+    end)
+    |> Multi.run(:user_invite, fn %{user: user, load_invite: user_invite} ->
+      user_invite |> associate_invitee(user)
+    end)
     |> Repo.transaction
-    |> normalize_success()
+    |> marshall_response()
   end
 
-  @spec claim_user(UserInvite.t) :: {:ok, User.t}
-  defp claim_user(%UserInvite{email: email, name: name}) do
-    case User |> Repo.get_by(email: email) do
-      %User{} = user -> {:ok, user}
-      nil -> %User{} |> Changeset.change(%{email: email, name: name}) |> Repo.insert
+  @spec load_invite(map) :: {:ok, UserInvite.t} | {:error, :not_found}
+  defp load_invite(%{"invite_id" => invite_id}) do
+    case UserInvite |> Repo.get(invite_id) |> Repo.preload([:invitee, :project]) do
+      nil -> {:error, :not_found}
+      %UserInvite{} = invite -> {:ok, invite}
     end
+  end
+  defp load_invite(%{}), do: {:error, :not_found}
+
+  @spec claim_new_user(map) :: {:ok, User.t}
+  defp claim_new_user(%{} = params) do
+    %User{} |> User.registration_changeset(params) |> Repo.insert
   end
 
   @spec join_project(User.t, UserInvite.t) :: {:ok, ProjectUser.t} | {:error, Changeset.t}
@@ -82,7 +93,8 @@ defmodule CodeCorps.Accounts.UserInvites do
     |> Repo.update
   end
 
-  @spec normalize_success(tuple) :: tuple
-  defp normalize_success({:ok, %{user: user}}), do: {:ok, user |> Repo.preload(:project_users)}
-  defp normalize_success(other_tuple), do: other_tuple
+  @spec marshall_response(tuple) :: tuple
+  defp marshall_response({:ok, %{user: user}}), do: {:ok, user |> Repo.preload(:project_users)}
+  defp marshall_response({:error, :load_invite, :not_found, _}), do: {:error, :invite_not_found}
+  defp marshall_response(other_tuple), do: other_tuple
 end
