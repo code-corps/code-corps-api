@@ -6,6 +6,7 @@ defmodule CodeCorps.Accounts do
   """
 
   alias CodeCorps.{
+    Accounts,
     Accounts.Changesets,
     Comment,
     GitHub.Adapters,
@@ -14,6 +15,7 @@ defmodule CodeCorps.Accounts do
     Processor,
     Task,
     User,
+    UserInvite,
     Repo
   }
   alias Ecto.{Changeset, Multi}
@@ -184,4 +186,7 @@ defmodule CodeCorps.Accounts do
     |> Repo.update_all(updates, update_options)
     |> (fn {_count, comments} -> {:ok, comments} end).()
   end
+
+  @spec create_invite(map) :: {:ok, UserInvite.t} | {:error, Changeset.t}
+  defdelegate create_invite(params), to: Accounts.UserInvites
 end
