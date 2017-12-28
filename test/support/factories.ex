@@ -370,6 +370,14 @@ defmodule CodeCorps.Factories do
     }
   end
 
+  def user_invite_factory do
+    %CodeCorps.UserInvite{
+      inviter: build(:user),
+      name: sequence(:name, &"Name#{&1}"),
+      email: sequence(:email, &"email-#{&1}@example.com")
+    }
+  end
+
   def user_skill_factory do
     %CodeCorps.UserSkill{
       user: build(:user),

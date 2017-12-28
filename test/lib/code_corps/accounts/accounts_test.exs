@@ -4,7 +4,7 @@ defmodule CodeCorps.AccountsTest do
   use CodeCorps.DbAccessCase
 
   alias CodeCorps.{
-    Accounts, Comment, Task, GitHub.TestHelpers, User, UserInvite
+    Accounts, Comment, ProjectUser, Task, GitHub.TestHelpers, User, UserInvite
   }
   alias Ecto.Changeset
 
@@ -237,6 +237,47 @@ defmodule CodeCorps.AccountsTest do
 
       refute changeset.valid?
       assert changeset.errors[:project]
+    end
+
+    test "throws error if user is already member of project" do
+      %{id: inviter_id} = insert(:user)
+      %{id: project_id} = project = insert(:project)
+      %{email: email} = user = insert(:user)
+
+      project_user = insert(:project_user, user: user, project: project)
+
+      {:error, changeset} =
+        %{email: email}
+        |> Map.put(:inviter_id, inviter_id)
+        |> Map.put(:project_id, project_id)
+        |> Accounts.create_invite
+
+      refute changeset.valid?
+      assert changeset.errors[:email]
+    end
+  end
+
+  describe "claim_invite/1" do
+    test "creates user" do
+      invite = insert(:user_invite, invitee: nil, project: nil)
+
+      {:ok, %User{} = user} = invite |> Accounts.claim_invite
+      assert Repo.get(User, user.id)
+    end
+
+    test "associates invite with user" do
+      invite = insert(:user_invite, invitee: nil, project: nil)
+
+      {:ok, %User{} = user} = invite |> Accounts.claim_invite
+      assert Repo.one(UserInvite).invitee_id == user.id
+    end
+
+    test "creates project membership if project provided" do
+      project = insert(:project)
+      invite = insert(:user_invite, invitee: nil, project: project)
+
+      {:ok, %User{} = user} = invite |> Accounts.claim_invite
+      assert Repo.get_by(ProjectUser, user_id: user.id, project_id: project.id)
     end
   end
 end

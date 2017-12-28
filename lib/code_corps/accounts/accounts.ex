@@ -189,4 +189,7 @@ defmodule CodeCorps.Accounts do
 
   @spec create_invite(map) :: {:ok, UserInvite.t} | {:error, Changeset.t}
   defdelegate create_invite(params), to: Accounts.UserInvites
+
+  @spec claim_invite(UserInvite.t) :: {:ok, User.t}
+  defdelegate claim_invite(user_invite), to: Accounts.UserInvites
 end
