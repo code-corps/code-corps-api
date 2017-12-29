@@ -225,8 +225,8 @@ defmodule CodeCorps.GitHub.Sync do
   defp marshall_result({:ok, %{github_pull_request: pull_request}}), do: {:ok, pull_request}
   defp marshall_result({:ok, %{task: task}}), do: {:ok, task}
   defp marshall_result({:error, :repo, :unmatched_repository, _steps}), do: {:error, :repo_not_found, %{}}
-  defp marshall_result({:error, :fetch_issue, _, _steps}), do: {:error, :fetching_issue, %{}}
-  defp marshall_result({:error, :fetch_pull_request, _, _steps}), do: {:error, :fetching_pull_request, %{}}
+  defp marshall_result({:error, :fetch_issue, error, _steps}), do: {:error, :fetching_issue, error}
+  defp marshall_result({:error, :fetch_pull_request, error, _steps}), do: {:error, :fetching_pull_request, error}
   defp marshall_result({:error, :github_pull_request, %Ecto.Changeset{} = changeset, _steps}), do: {:error, :validating_github_pull_request, changeset}
   defp marshall_result({:error, :github_issue, %Ecto.Changeset{} = changeset, _steps}), do: {:error, :validating_github_issue, changeset}
   defp marshall_result({:error, :github_comment, %Ecto.Changeset{} = changeset, _steps}), do: {:error, :validating_github_comment, changeset}
