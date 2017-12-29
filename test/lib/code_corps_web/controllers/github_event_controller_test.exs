@@ -54,6 +54,21 @@ defmodule CodeCorpsWeb.GithubEventControllerTest do
       |> assert_ids_from_response([github_event_1.id, github_event_2.id])
     end
 
+    @tag authenticated: :admin
+    test "filters resources on index with query params", %{conn: conn} do
+      expected_event = insert(:github_event, action: "opened", status: "processed", type: "issues")
+      insert(:github_event, action: "created")
+      insert(:github_event, status: "unprocessed")
+      insert(:github_event, type: "installation")
+
+      path = "github-events/?action=opened&status=processed&type=issues"
+
+      conn
+      |> get(path)
+      |> json_response(200)
+      |> assert_ids_from_response([expected_event.id])
+    end
+
     test "renders 401 when unauthenticated", %{conn: conn} do
       assert conn |> request_index() |> json_response(401)
     end
