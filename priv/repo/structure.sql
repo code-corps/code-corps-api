@@ -1735,7 +1735,7 @@ CREATE TABLE user_invites (
     id bigint NOT NULL,
     email character varying(255) NOT NULL,
     name character varying(255),
-    role character varying(255) DEFAULT 'contributor'::character varying,
+    role character varying(255),
     inviter_id bigint,
     invitee_id bigint,
     project_id bigint,

@@ -189,17 +189,6 @@ defmodule CodeCorps.AccountsTest do
       assert user_invite.role == "admin"
     end
 
-    test "defaults role to 'contributor'"  do
-      %{id: inviter_id} = insert(:user)
-
-      {:ok, %UserInvite{} = user_invite} =
-        @base_attrs
-        |> Map.put(:inviter_id, inviter_id)
-        |> Accounts.create_invite
-
-      assert user_invite.role == "contributor"
-    end
-
     test "does not allow invalid roles" do
       %{id: inviter_id} = insert(:user)
 
@@ -285,13 +274,13 @@ defmodule CodeCorps.AccountsTest do
 
     test "creates project membership if project provided" do
       project = insert(:project)
-      invite = insert(:user_invite, invitee: nil, project: project)
+      invite = insert(:user_invite, invitee: nil, project: project, role: "admin")
 
       {:ok, %User{} = user} =
         @valid_user_params
         |> Map.put("invite_id", invite.id)
         |> Accounts.claim_invite
-      assert Repo.get_by(ProjectUser, user_id: user.id, project_id: project.id)
+      assert Repo.get_by(ProjectUser, user_id: user.id, project_id: project.id, role: "admin")
     end
 
     test "returns :invite_not_found if bad id provided" do

@@ -5,7 +5,7 @@ defmodule CodeCorps.UserInvite do
 
   schema "user_invites" do
     field :email, :string, null: false
-    field :role, :string, default: "contributor"
+    field :role, :string
     field :name, :string
 
     belongs_to :project, CodeCorps.Project
