@@ -18,6 +18,7 @@ defmodule CodeCorps.GitHub.Event do
   end
 
   @type error :: atom | Changeset.t
+  @type result :: {:ok, any} | {:error, atom, any}
 
   @doc ~S"""
   Sets record status to "processing", marking it as being processed at this
@@ -37,7 +38,7 @@ defmodule CodeCorps.GitHub.Event do
   tuple should always be either `:ok`, or `:error`. Any number of elements in
   the tuple is suported.
   """
-  @spec stop_processing(tuple, GithubEvent.t) :: {:ok, GithubEvent.t}
+  @spec stop_processing(result, GithubEvent.t) :: {:ok, GithubEvent.t}
   def stop_processing({:ok, _data}, %GithubEvent{} = event) do
     event
     |> Changeset.change(%{status: "processed"})
