@@ -1,4 +1,4 @@
-defmodule Admin.GithubEventQuery do
+defmodule CodeCorps.Admin.GithubEventQuery do
   @moduledoc ~S"""
   Holds helpers to query `CodeCorps.GithubEvent` records using a map of params.
   """

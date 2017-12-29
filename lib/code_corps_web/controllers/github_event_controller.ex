@@ -4,6 +4,7 @@ defmodule CodeCorpsWeb.GithubEventController do
   import Ecto.Query, only: [from: 2]
 
   alias CodeCorps.{
+    Admin,
     GithubEvent,
     GithubRepo,
     GitHub.Webhook.Handler,
