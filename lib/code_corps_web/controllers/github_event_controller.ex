@@ -26,6 +26,7 @@ defmodule CodeCorpsWeb.GithubEventController do
       github_events =
         GithubEvent
         |> Query.id_filter(params)
+        |> Admin.GithubEventQuery.status_filter(params)
         |> Ecto.Query.order_by([desc: :inserted_at])
         |> paginate(params)
 
