@@ -1,4 +1,8 @@
 defmodule CodeCorps.Accounts.UserInvites do
+  @moduledoc ~S"""
+  Subcontext for managing of `UserInvite` records
+  """
+
   alias CodeCorps.{Project, ProjectUser, Repo, User, UserInvite}
   alias Ecto.{Changeset, Multi}
 
@@ -13,6 +17,7 @@ defmodule CodeCorps.Accounts.UserInvites do
     |> Changeset.assoc_constraint(:inviter)
     |> Changeset.assoc_constraint(:project)
     |> ensure_email_not_owned_by_member()
+    |> ensure_role_and_project()
     |> Repo.insert()
   end
 
@@ -42,6 +47,29 @@ defmodule CodeCorps.Accounts.UserInvites do
         else
           changeset
         end
+    end
+  end
+
+  @spec ensure_role_and_project(Changeset.t()) :: Changeset.t()
+  defp ensure_role_and_project(%Changeset{} = changeset) do
+    changes = [
+      changeset |> Changeset.get_field(:role),
+      changeset |> Changeset.get_field(:project_id)
+    ]
+
+    case changes do
+      [nil, nil] ->
+        changeset
+
+      [nil, _project_id] ->
+        changeset |> Changeset.add_error(:role, "Needs to be specified for a project invite")
+
+      [_role, nil] ->
+        changeset
+        |> Changeset.add_error(:project_id, "Needs to be specified for a project invite")
+
+      [_role, _project_id] ->
+        changeset
     end
   end
 

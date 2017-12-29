@@ -4,16 +4,23 @@ defmodule CodeCorps.AccountsTest do
   use CodeCorps.DbAccessCase
 
   alias CodeCorps.{
-    Accounts, Comment, ProjectUser, Task, GitHub.TestHelpers, User, UserInvite
+    Accounts,
+    Comment,
+    ProjectUser,
+    Task,
+    GitHub.TestHelpers,
+    User,
+    UserInvite
   }
+
   alias Ecto.Changeset
 
   describe "create_from_github/1" do
     test "creates proper user from provided payload" do
       {:ok, %User{} = user} =
         "user"
-        |> TestHelpers.load_endpoint_fixture
-        |> Accounts.create_from_github
+        |> TestHelpers.load_endpoint_fixture()
+        |> Accounts.create_from_github()
 
       assert user.id
       assert user.default_color
@@ -29,7 +36,7 @@ defmodule CodeCorps.AccountsTest do
 
       {:error, %Changeset{} = changeset} =
         payload
-        |> Accounts.create_from_github
+        |> Accounts.create_from_github()
 
       assert changeset.errors[:email] == {"has already been taken", []}
     end
@@ -42,7 +49,7 @@ defmodule CodeCorps.AccountsTest do
 
       {:error, %Changeset{} = changeset} =
         payload
-        |> Accounts.create_from_github
+        |> Accounts.create_from_github()
 
       assert changeset.errors[:github_id] == {"account is already connected to someone else", []}
     end
@@ -50,8 +57,8 @@ defmodule CodeCorps.AccountsTest do
     test "uploads photo from GitHub avatar" do
       {:ok, %User{} = user} =
         "user"
-        |> TestHelpers.load_endpoint_fixture
-        |> Accounts.create_from_github
+        |> TestHelpers.load_endpoint_fixture()
+        |> Accounts.create_from_github()
 
       user = Repo.get(User, user.id)
       assert user.cloudinary_public_id
@@ -132,7 +139,7 @@ defmodule CodeCorps.AccountsTest do
       {:ok, %UserInvite{} = user_invite} =
         @base_attrs
         |> Map.put(:inviter_id, inviter_id)
-        |> Accounts.create_invite
+        |> Accounts.create_invite()
 
       assert Repo.one(UserInvite).id == user_invite.id
     end
@@ -141,7 +148,7 @@ defmodule CodeCorps.AccountsTest do
       {:error, changeset} =
         @base_attrs
         |> Map.delete(:email)
-        |> Accounts.create_invite
+        |> Accounts.create_invite()
 
       refute changeset.valid?
       assert changeset.errors[:email]
@@ -150,7 +157,7 @@ defmodule CodeCorps.AccountsTest do
     test "requires valid inviter id" do
       {:error, changeset} =
         @base_attrs
-        |> Accounts.create_invite
+        |> Accounts.create_invite()
 
       refute changeset.valid?
       assert changeset.errors[:inviter_id]
@@ -158,7 +165,7 @@ defmodule CodeCorps.AccountsTest do
       {:error, changeset} =
         @base_attrs
         |> Map.put(:inviter_id, -1)
-        |> Accounts.create_invite
+        |> Accounts.create_invite()
 
       refute changeset.valid?
       refute changeset.errors[:inviter_id]
@@ -172,47 +179,39 @@ defmodule CodeCorps.AccountsTest do
         @base_attrs
         |> Map.put(:inviter_id, inviter_id)
         |> Map.put(:name, "John")
-        |> Accounts.create_invite
+        |> Accounts.create_invite()
 
       assert user_invite.name == "John"
     end
 
-    test "allows specifying role"  do
-      %{id: inviter_id} = insert(:user)
-
-      {:ok, %UserInvite{} = user_invite} =
-        @base_attrs
-        |> Map.put(:inviter_id, inviter_id)
-        |> Map.put(:role, "admin")
-        |> Accounts.create_invite
-
-      assert user_invite.role == "admin"
-    end
-
-    test "does not allow invalid roles" do
-      %{id: inviter_id} = insert(:user)
-
-      {:error, changeset} =
-        @base_attrs
-        |> Map.put(:inviter_id, inviter_id)
-        |> Map.put(:role, "foo")
-        |> Accounts.create_invite
-
-      refute changeset.valid?
-      assert changeset.errors[:role]
-    end
-
-    test "associates with project if id provided" do
+    test "creates a user invite for a project" do
       %{id: inviter_id} = insert(:user)
       %{id: project_id} = insert(:project)
 
       {:ok, %UserInvite{} = user_invite} =
         @base_attrs
         |> Map.put(:inviter_id, inviter_id)
+        |> Map.put(:role, "admin")
         |> Map.put(:project_id, project_id)
-        |> Accounts.create_invite
+        |> Accounts.create_invite()
 
+      assert user_invite.role == "admin"
       assert user_invite.project_id == project_id
+    end
+
+    test "does not allow invalid roles" do
+      %{id: inviter_id} = insert(:user)
+      %{id: project_id} = insert(:project)
+
+      {:error, changeset} =
+        @base_attrs
+        |> Map.put(:inviter_id, inviter_id)
+        |> Map.put(:role, "foo")
+        |> Map.put(:project_id, project_id)
+        |> Accounts.create_invite()
+
+      refute changeset.valid?
+      assert changeset.errors[:role]
     end
 
     test "requires valid project id" do
@@ -222,13 +221,41 @@ defmodule CodeCorps.AccountsTest do
         @base_attrs
         |> Map.put(:inviter_id, inviter_id)
         |> Map.put(:project_id, -1)
-        |> Accounts.create_invite
+        |> Map.put(:role, "contributor")
+        |> Accounts.create_invite()
 
       refute changeset.valid?
       assert changeset.errors[:project]
     end
 
-    test "throws error if user is already member of project" do
+    test "requires role if project is specified" do
+      %{id: inviter_id} = insert(:user)
+      %{id: project_id} = insert(:project)
+
+      {:error, changeset} =
+        @base_attrs
+        |> Map.put(:inviter_id, inviter_id)
+        |> Map.put(:project_id, project_id)
+        |> Accounts.create_invite()
+
+      refute changeset.valid?
+      assert changeset.errors[:role]
+    end
+
+    test "requires project_id if role is specified" do
+      %{id: inviter_id} = insert(:user)
+
+      {:error, changeset} =
+        @base_attrs
+        |> Map.put(:inviter_id, inviter_id)
+        |> Map.put(:role, "contributor")
+        |> Accounts.create_invite()
+
+      refute changeset.valid?
+      assert changeset.errors[:project_id]
+    end
+
+    test "requires user not to be member of project" do
       %{id: inviter_id} = insert(:user)
       %{id: project_id} = project = insert(:project)
       %{email: email} = user = insert(:user)
@@ -239,7 +266,7 @@ defmodule CodeCorps.AccountsTest do
         %{email: email}
         |> Map.put(:inviter_id, inviter_id)
         |> Map.put(:project_id, project_id)
-        |> Accounts.create_invite
+        |> Accounts.create_invite()
 
       refute changeset.valid?
       assert changeset.errors[:email]
@@ -258,7 +285,8 @@ defmodule CodeCorps.AccountsTest do
       {:ok, %User{} = user} =
         @valid_user_params
         |> Map.put("invite_id", invite.id)
-        |> Accounts.claim_invite
+        |> Accounts.claim_invite()
+
       assert Repo.get(User, user.id)
     end
 
@@ -268,7 +296,8 @@ defmodule CodeCorps.AccountsTest do
       {:ok, %User{} = user} =
         @valid_user_params
         |> Map.put("invite_id", invite.id)
-        |> Accounts.claim_invite
+        |> Accounts.claim_invite()
+
       assert Repo.one(UserInvite).invitee_id == user.id
     end
 
@@ -279,7 +308,8 @@ defmodule CodeCorps.AccountsTest do
       {:ok, %User{} = user} =
         @valid_user_params
         |> Map.put("invite_id", invite.id)
-        |> Accounts.claim_invite
+        |> Accounts.claim_invite()
+
       assert Repo.get_by(ProjectUser, user_id: user.id, project_id: project.id, role: "admin")
     end
 
@@ -287,7 +317,7 @@ defmodule CodeCorps.AccountsTest do
       assert {:error, :invite_not_found} =
         @valid_user_params
         |> Map.put("invite_id", -1)
-        |> Accounts.claim_invite
+        |> Accounts.claim_invite()
     end
   end
 end
