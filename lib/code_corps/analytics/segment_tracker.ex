@@ -11,6 +11,14 @@ defmodule CodeCorps.Analytics.SegmentTracker do
   @api Application.get_env(:code_corps, :analytics)
 
   @doc """
+  Calls `alias` in the configured API module.
+  """
+  @spec alias(String.t, String.t) :: any
+  def alias(user_id, previous_id) do
+    @api.alias(user_id, previous_id)
+  end
+
+  @doc """
   Calls `identify` in the configured API module.
   """
   @spec identify(CodeCorps.User.t) :: any

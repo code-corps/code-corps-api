@@ -40,6 +40,7 @@ defmodule CodeCorpsWeb.UserController do
     with {:ok, %User{} = user} <- %User{} |> User.registration_changeset(params) |> Repo.insert(),
          user <- preload(user)
     do
+      maybe_alias(user, params)
       conn |> put_status(:created) |> render("show.json-api", data: user)
     end
   end
@@ -91,4 +92,10 @@ defmodule CodeCorpsWeb.UserController do
   def preload(data) do
     Repo.preload(data, @preloads)
   end
+
+  @spec maybe_alias(User.t, map) :: any
+  defp maybe_alias(%User{id: id}, %{"previous_id" => previous_id}) do
+    Analytics.SegmentTracker.alias(id, previous_id)
+  end
+  defp maybe_alias(_user, _params), do: nil
 end
