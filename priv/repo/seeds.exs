@@ -60,12 +60,12 @@ defmodule SeedChangeset do
   @moduledoc false
 
   alias CodeCorps.{
-    TaskList,
-    Organization,
-    SluggedRoute,
-    Helpers.Slug,
     Helpers.RandomIconColor,
-    Services.MarkdownRendererService
+    Helpers.Slug,
+    Organization,
+    Services.MarkdownRendererService,
+    SluggedRoute,
+    TaskList
   }
   alias Ecto.Changeset
 
@@ -76,7 +76,7 @@ defmodule SeedChangeset do
       |> Changeset.assoc_constraint(:owner)
       |> Changeset.put_change(:approved, true)
       |> Slug.generate_slug(:name, :slug)
-      |> RandomIconColor.generate_icon_color(:slugged_route_changeset)
+      |> RandomIconColor.generate_icon_color(:default_color)
 
     slug = changeset |> Changeset.get_field(:slug)
     slugged_route_changeset =
