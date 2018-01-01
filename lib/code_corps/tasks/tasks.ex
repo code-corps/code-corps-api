@@ -1,4 +1,4 @@
-defmodule CodeCorps.Task.Service do
+defmodule CodeCorps.Tasks do
   @moduledoc """
   Handles special CRUD operations for `CodeCorps.Task`.
   """
@@ -28,8 +28,8 @@ defmodule CodeCorps.Task.Service do
   @doc ~S"""
   Performs all actions involved in creating a task on a project
   """
-  @spec create(map) :: result
-  def create(%{} = attributes) do
+  @spec create_task(map) :: result
+  def create_task(%{} = attributes) do
     Multi.new
     |> Multi.insert(:task, %Task{} |> Task.create_changeset(attributes))
     |> Multi.run(:preload, fn %{task: %Task{} = task} ->
@@ -40,8 +40,8 @@ defmodule CodeCorps.Task.Service do
     |> marshall_result()
   end
 
-  @spec update(Task.t, map) :: result
-  def update(%Task{} = task, %{} = attributes) do
+  @spec update_task(Task.t, map) :: result
+  def update_task(%Task{} = task, %{} = attributes) do
     Multi.new
     |> Multi.update(:task, task |> Task.update_changeset(attributes))
     |> Multi.run(:preload, fn %{task: %Task{} = task} ->
