@@ -141,10 +141,10 @@ defmodule CodeCorps.Mixfile do
         CodeCorps.StripeInvoice,
         CodeCorps.StripePlatformCard,
         CodeCorps.StripePlatformCustomer,
-        CodeCorps.Task,
-        CodeCorps.Task.Query,
         CodeCorps.TaskList,
         CodeCorps.TaskSkill,
+        CodeCorps.Tasks,
+        CodeCorps.Tasks.Query,
         CodeCorps.Transition.UserState,
         CodeCorps.User,
         CodeCorps.UserCategory,
@@ -162,7 +162,7 @@ defmodule CodeCorps.Mixfile do
         CodeCorps.Services.MarkdownRendererService,
         CodeCorps.Services.ProjectService,
         CodeCorps.Services.UserService,
-        CodeCorps.Task.Service
+        CodeCorps.Tasks
       ],
 
       "Policies": [

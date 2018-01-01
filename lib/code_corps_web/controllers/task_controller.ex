@@ -2,7 +2,7 @@ defmodule CodeCorpsWeb.TaskController do
   @moduledoc false
   use CodeCorpsWeb, :controller
 
-  alias CodeCorps.{Analytics.SegmentTracker, Task, Policy, User}
+  alias CodeCorps.{Analytics.SegmentTracker, Policy, Task, Tasks, User}
 
   import ScoutApm.Tracing
 
@@ -12,7 +12,7 @@ defmodule CodeCorpsWeb.TaskController do
 
   @spec index(Conn.t, map) :: Conn.t
   def index(%Conn{} = conn, %{} = params) do
-    tasks = Task.Query.list(params)
+    tasks = Tasks.Query.list(params)
     tasks = preload(tasks)
     timing("JaSerializer", "render") do
       conn |> render("index.json-api", data: tasks)
@@ -21,7 +21,7 @@ defmodule CodeCorpsWeb.TaskController do
 
   @spec show(Conn.t, map) :: Conn.t
   def show(%Conn{} = conn, %{} = params) do
-    with %Task{} = task <- Task.Query.find(params),
+    with %Task{} = task <- Tasks.Query.find(params),
          task <- preload(task)
     do
       conn |> render("show.json-api", data: task)
@@ -32,7 +32,7 @@ defmodule CodeCorpsWeb.TaskController do
   def create(%Conn{} = conn, %{} = params) do
     with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:create, %Task{}, params),
-         {:ok, %Task{} = task} <- params |> Task.Service.create,
+         {:ok, %Task{} = task} <- params |> Tasks.create_task,
          task <- preload(task)
       do
       current_user |> track_created(task)
@@ -44,10 +44,10 @@ defmodule CodeCorpsWeb.TaskController do
 
   @spec update(Conn.t, map) :: Conn.t
   def update(%Conn{} = conn, %{} = params) do
-    with %Task{} = task <- Task.Query.find(params),
+    with %Task{} = task <- Tasks.Query.find(params),
          %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
          {:ok, :authorized} <- current_user |> Policy.authorize(:update, task),
-         {:ok, %Task{} = updated_task} <- task |> Task.Service.update(params),
+         {:ok, %Task{} = updated_task} <- task |> Tasks.update_task(params),
          updated_task <- preload(updated_task)
       do
 

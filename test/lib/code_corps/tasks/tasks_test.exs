@@ -1,11 +1,11 @@
-defmodule CodeCorps.Task.ServiceTest do
+defmodule CodeCorps.TasksTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
 
   import CodeCorps.GitHub.TestHelpers
 
-  alias CodeCorps.{GithubIssue, Repo, Task}
+  alias CodeCorps.{GithubIssue, Repo, Task, Tasks}
 
   @base_attrs %{
     "title" => "Test task",
@@ -26,9 +26,9 @@ defmodule CodeCorps.Task.ServiceTest do
     |> Map.put("user_id", user.id)
   end
 
-  describe "create/2" do
+  describe "create_task/2" do
     test "creates task" do
-      {:ok, task} = valid_attrs() |> Task.Service.create
+      {:ok, task} = valid_attrs() |> Tasks.create_task
 
       assert task.title == @base_attrs["title"]
       assert task.markdown == @base_attrs["markdown"]
@@ -41,12 +41,12 @@ defmodule CodeCorps.Task.ServiceTest do
     end
 
     test "sets modified_from to 'code_corps'" do
-      {:ok, task} = valid_attrs() |> Task.Service.create
+      {:ok, task} = valid_attrs() |> Tasks.create_task
       assert task.modified_from == "code_corps"
     end
 
     test "returns errored changeset if attributes are invalid" do
-      {:error, changeset} = Task.Service.create(@base_attrs)
+      {:error, changeset} = Tasks.create_task(@base_attrs)
       refute changeset.valid?
       refute Repo.one(Task)
 
@@ -65,7 +65,7 @@ defmodule CodeCorps.Task.ServiceTest do
       {:ok, task} =
         attrs
         |> Map.put("github_repo_id", github_repo.id)
-        |> Task.Service.create
+        |> Tasks.create_task
 
       assert task.title == @base_attrs["title"]
       assert task.markdown == @base_attrs["markdown"]
@@ -90,7 +90,7 @@ defmodule CodeCorps.Task.ServiceTest do
         assert {:error, :github} ==
           attrs
           |> Map.put("github_repo_id", github_repo.id)
-          |> Task.Service.create
+          |> Tasks.create_task
       end
 
       refute Repo.one(Task)
@@ -98,12 +98,12 @@ defmodule CodeCorps.Task.ServiceTest do
     end
   end
 
-  describe "update/2" do
+  describe "update_task/2" do
     @update_attrs %{"title" => "foo", "markdown" => "bar", "status" => "closed"}
 
     test "updates task" do
       task = insert(:task)
-      {:ok, updated_task} = task |> Task.Service.update(@update_attrs)
+      {:ok, updated_task} = task |> Tasks.update_task(@update_attrs)
 
       assert updated_task.id == task.id
       assert updated_task.title == @update_attrs["title"]
@@ -117,14 +117,14 @@ defmodule CodeCorps.Task.ServiceTest do
 
     test "sets modified_from to 'code_corps'" do
       task = insert(:task, modified_from: "github")
-      {:ok, updated_task} = task |> Task.Service.update(@update_attrs)
+      {:ok, updated_task} = task |> Tasks.update_task(@update_attrs)
 
       assert updated_task.modified_from == "code_corps"
     end
 
     test "returns {:error, changeset} if there are validation errors" do
       task = insert(:task)
-      {:error, changeset} = task |> Task.Service.update(%{"title" => nil})
+      {:error, changeset} = task |> Tasks.update_task(%{"title" => nil})
 
       refute changeset.valid?
 
@@ -140,7 +140,7 @@ defmodule CodeCorps.Task.ServiceTest do
 
       attrs = @update_attrs |> Map.put("github_repo_id", github_repo.id)
 
-      {:ok, updated_task} = task |> Task.Service.update(attrs)
+      {:ok, updated_task} = task |> Tasks.update_task(attrs)
 
       assert updated_task.github_issue_id
       assert updated_task.github_repo_id == github_repo.id
@@ -156,7 +156,7 @@ defmodule CodeCorps.Task.ServiceTest do
       github_issue = insert(:github_issue, number: 5)
       task = insert(:task, github_repo: github_repo, github_issue: github_issue)
 
-      {:ok, updated_task} = task |> Task.Service.update(@update_attrs)
+      {:ok, updated_task} = task |> Tasks.update_task(@update_attrs)
 
       assert updated_task.id == task.id
       assert updated_task.title == @update_attrs["title"]
@@ -179,7 +179,7 @@ defmodule CodeCorps.Task.ServiceTest do
       github_issue = insert(:github_issue, github_id: issue_github_id, number: number, github_pull_request: github_pull_request, github_repo: github_repo)
       task = insert(:task, github_repo: github_repo, github_issue: github_issue)
 
-      {:ok, updated_task} = task |> Task.Service.update(@update_attrs)
+      {:ok, updated_task} = task |> Tasks.update_task(@update_attrs)
 
       assert_received({:patch, "https://api.github.com/repos/octocat/Hello-World/issues/1347", _body, _headers, _options})
 
@@ -204,7 +204,7 @@ defmodule CodeCorps.Task.ServiceTest do
       task = insert(:task, github_repo: github_repo, github_issue: github_issue)
 
       with_mock_api(CodeCorps.GitHub.FailureAPI) do
-        assert {:error, :github} == task |> Task.Service.update(@update_attrs)
+        assert {:error, :github} == task |> Tasks.update_task(@update_attrs)
       end
 
       updated_task = Repo.one(Task)

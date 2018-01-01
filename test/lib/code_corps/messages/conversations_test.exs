@@ -1,6 +1,8 @@
 defmodule CodeCorps.Messages.ConversationsTest do
   @moduledoc false
 
+  import DateTime, only: [compare: 2]
+
   use CodeCorps.DbAccessCase
 
   alias CodeCorps.{
@@ -9,10 +11,10 @@ defmodule CodeCorps.Messages.ConversationsTest do
 
   describe "part_added_changeset/1" do
     test "sets the updated_at to the current time" do
-      old_updated_at = Timex.now |> Timex.shift(days: -5)
+      old_updated_at = DateTime.utc_now() |> Timex.shift(days: -5)
       conversation = %Conversation{updated_at: old_updated_at}
       changeset = conversation |> Messages.Conversations.part_added_changeset()
-      assert changeset.changes[:updated_at] > old_updated_at
+      assert compare(old_updated_at, changeset.changes[:updated_at]) == :lt
     end
 
     test "sets status to open" do
