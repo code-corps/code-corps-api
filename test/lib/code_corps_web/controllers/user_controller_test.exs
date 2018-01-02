@@ -5,7 +5,7 @@ defmodule CodeCorpsWeb.UserControllerTest do
 
   import CodeCorps.GitHub.TestHelpers
 
-  alias CodeCorps.{User, Repo}
+  alias CodeCorps.{User, UserInvite, ProjectUser, Repo}
 
   @valid_attrs %{
     email: "test@user.com",
@@ -146,6 +146,45 @@ defmodule CodeCorpsWeb.UserControllerTest do
       }
 
       assert conn |> json_response(422)
+    end
+
+    test "supports claiming a user invite if specified by an id parameter", %{conn: conn} do
+      %{id: invite_id, email: email} = insert(:user_invite)
+      attrs =
+        @valid_attrs
+        |> Map.merge(%{email: email, invite_id: invite_id, password: "password"})
+
+      path = conn |> user_path(:create)
+      json = conn |> post(path, attrs) |> json_response(201)
+
+      created_user = Repo.get_by(User, email: email)
+      assert created_user
+      json |> assert_id_from_response(created_user.id)
+
+      updated_invite = Repo.get(UserInvite, invite_id)
+      assert updated_invite.invitee_id == created_user.id
+    end
+
+    test "supports claiming a user invite to a project if specified by an id parameter", %{conn: conn} do
+      project = insert(:project)
+      %{id: invite_id, email: email} = invite = insert(:user_invite, role: "contributor", project: project)
+      attrs =
+        @valid_attrs
+        |> Map.merge(%{email: email, invite_id: invite_id, password: "password"})
+
+      path = conn |> user_path(:create)
+      json = conn |> post(path, attrs) |> json_response(201)
+
+      created_user = Repo.get_by(User, email: email)
+      assert created_user
+      json |> assert_id_from_response(created_user.id)
+
+      updated_invite = Repo.get(UserInvite, invite_id)
+      assert updated_invite.invitee_id == created_user.id
+
+      membership = Repo.get_by(ProjectUser, user_id: created_user.id)
+      assert membership.project_id == invite.project_id
+      assert membership.role == invite.role
     end
   end
 
