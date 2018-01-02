@@ -15,6 +15,72 @@ defmodule CodeCorps.AccountsTest do
 
   alias Ecto.Changeset
 
+  describe "create/1" do
+    @valid_user_params %{
+      "email" => "test@user.com",
+      "password" => "somepassword",
+      "username" => "testuser"
+    }
+
+    test "creates user" do
+      {:ok, %User{} = user} =
+        @valid_user_params
+        |> Accounts.create()
+
+      assert Repo.get(User, user.id)
+    end
+
+    test "returns changeset if validation errors" do
+      {:error, %Changeset{} = changeset} =
+        @valid_user_params
+        |> Map.delete("email")
+        |> Accounts.create()
+
+      refute changeset.valid?
+    end
+
+    test "claims invite if id providedf" do
+      invite = insert(:user_invite, invitee: nil, project: nil)
+
+      {:ok, %User{} = user} =
+        @valid_user_params
+        |> Map.put("invite_id", invite.id)
+        |> Accounts.create()
+
+      assert Repo.get(User, user.id)
+    end
+
+    test "associates invite with user" do
+      invite = insert(:user_invite, invitee: nil, project: nil)
+
+      {:ok, %User{} = user} =
+        @valid_user_params
+        |> Map.put("invite_id", invite.id)
+        |> Accounts.create()
+
+      assert Repo.one(UserInvite).invitee_id == user.id
+    end
+
+    test "creates project membership if project provided with invite" do
+      project = insert(:project)
+      invite = insert(:user_invite, invitee: nil, project: project, role: "admin")
+
+      {:ok, %User{} = user} =
+        @valid_user_params
+        |> Map.put("invite_id", invite.id)
+        |> Accounts.create()
+
+      assert Repo.get_by(ProjectUser, user_id: user.id, project_id: project.id, role: "admin")
+    end
+
+    test "returns :invite_not_found if bad invite id provided" do
+      assert {:error, :invite_not_found} =
+        @valid_user_params
+        |> Map.put("invite_id", -1)
+        |> Accounts.create()
+    end
+  end
+
   describe "create_from_github/1" do
     test "creates proper user from provided payload" do
       {:ok, %User{} = user} =
@@ -266,55 +332,6 @@ defmodule CodeCorps.AccountsTest do
 
       refute changeset.valid?
       assert changeset.errors[:email]
-    end
-  end
-
-  describe "claim_invite/1" do
-    @valid_user_params %{
-      "email" => "test@user.com",
-      "password" => "somepassword",
-      "username" => "testuser"
-    }
-
-    test "creates user" do
-      invite = insert(:user_invite, invitee: nil, project: nil)
-
-      {:ok, %User{} = user} =
-        @valid_user_params
-        |> Map.put("invite_id", invite.id)
-        |> Accounts.claim_invite()
-
-      assert Repo.get(User, user.id)
-    end
-
-    test "associates invite with user" do
-      invite = insert(:user_invite, invitee: nil, project: nil)
-
-      {:ok, %User{} = user} =
-        @valid_user_params
-        |> Map.put("invite_id", invite.id)
-        |> Accounts.claim_invite()
-
-      assert Repo.one(UserInvite).invitee_id == user.id
-    end
-
-    test "creates project membership if project provided" do
-      project = insert(:project)
-      invite = insert(:user_invite, invitee: nil, project: project, role: "admin")
-
-      {:ok, %User{} = user} =
-        @valid_user_params
-        |> Map.put("invite_id", invite.id)
-        |> Accounts.claim_invite()
-
-      assert Repo.get_by(ProjectUser, user_id: user.id, project_id: project.id, role: "admin")
-    end
-
-    test "returns :invite_not_found if bad id provided" do
-      assert {:error, :invite_not_found} =
-        @valid_user_params
-        |> Map.put("invite_id", -1)
-        |> Accounts.claim_invite()
     end
   end
 end

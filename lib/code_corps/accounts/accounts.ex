@@ -23,6 +23,21 @@ defmodule CodeCorps.Accounts do
   import Ecto.Query
 
   @doc ~S"""
+  Creates a `CodeCorps.User` account when such a request is made from the client
+  application.
+
+  If an `invite_id` attribute is provided in the request, treats the process as
+  claiming the specified invite.
+  """
+  @spec create(map) :: {:ok, User.t} | {:error, Changeset.t} | {:error, :invite_not_found}
+  def create(%{"invite_id" => _} = params) do
+    params |> Accounts.UserInvites.claim_invite()
+  end
+  def create(%{} = params) do
+    %User{} |> User.registration_changeset(params) |> Repo.insert()
+  end
+
+  @doc ~S"""
   Creates a user record using attributes from a GitHub payload.
   """
   @spec create_from_github(map) :: {:ok, User.t} | {:error, Changeset.t}
@@ -189,7 +204,4 @@ defmodule CodeCorps.Accounts do
 
   @spec create_invite(map) :: {:ok, UserInvite.t} | {:error, Changeset.t}
   defdelegate create_invite(params), to: Accounts.UserInvites
-
-  @spec claim_invite(map) :: {:ok, User.t}
-  defdelegate claim_invite(map), to: Accounts.UserInvites
 end

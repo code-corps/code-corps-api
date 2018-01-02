@@ -36,18 +36,11 @@ defmodule CodeCorpsWeb.UserController do
   end
 
   @spec create(Conn.t, map) :: Conn.t
-  def create(%Conn{} = conn, %{"invite_id" => _} = params) do
-    with {:ok, %User{} = user} <- Accounts.claim_invite(params),
-         user <- preload(user)
-    do
-      conn |> put_status(:created) |> render("show.json-api", data: user)
-    end
-  end
   def create(%Conn{} = conn, %{} = params) do
-    with {:ok, %User{} = user} <- %User{} |> User.registration_changeset(params) |> Repo.insert(),
-         user <- preload(user)
-    do
-      conn |> put_status(:created) |> render("show.json-api", data: user)
+    with {:ok, %User{} = user} <- params |> Accounts.create() do
+      conn
+      |> put_status(:created)
+      |> render("show.json-api", data: user |> preload())
     end
   end
 
