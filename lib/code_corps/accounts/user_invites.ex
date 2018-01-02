@@ -6,8 +6,6 @@ defmodule CodeCorps.Accounts.UserInvites do
   alias CodeCorps.{Project, ProjectUser, Repo, User, UserInvite}
   alias Ecto.{Changeset, Multi}
 
-  import Ecto.Query
-
   @spec create_invite(map) :: {:ok, UserInvite.t()} | {:error, Changeset.t()}
   def create_invite(%{} = params) do
     %UserInvite{}
@@ -16,39 +14,22 @@ defmodule CodeCorps.Accounts.UserInvites do
     |> Changeset.validate_inclusion(:role, ProjectUser.roles())
     |> Changeset.assoc_constraint(:inviter)
     |> Changeset.assoc_constraint(:project)
-    |> ensure_email_not_owned_by_member()
+    |> ensure_email_not_owned_by_user()
     |> ensure_role_and_project()
     |> Repo.insert()
   end
 
-  @spec ensure_email_not_owned_by_member(Changeset.t()) :: Changeset.t()
-  defp ensure_email_not_owned_by_member(%Changeset{} = changeset) do
-    email = changeset |> Changeset.get_change(:email)
-    project_id = changeset |> Changeset.get_change(:project_id)
-
-    case [email, project_id] do
-      [nil, _] ->
-        changeset
-
-      [_, nil] ->
-        changeset
-
-      [email, project_id] ->
-        count =
-          ProjectUser
-          |> where(project_id: ^project_id)
-          |> join(:inner, [pu], u in User, pu.user_id == u.id)
-          |> where([_pu, u], u.email == ^email)
-          |> select([pu, _U], count(pu.id))
-          |> Repo.one()
-
-        if count > 0 do
-          changeset |> Changeset.add_error(:email, "Already associated with a project member")
-        else
-          changeset
-        end
+  @spec ensure_email_not_owned_by_user(Changeset.t()) :: Changeset.t()
+  defp ensure_email_not_owned_by_user(%Changeset{changes: %{email: email}} = changeset)
+       when not is_nil(email) do
+    if User |> Repo.get_by(email: email) do
+      changeset |> Changeset.add_error(:email, "Already associated with a user")
+    else
+      changeset
     end
   end
+
+  defp ensure_email_not_owned_by_user(%Changeset{} = changeset), do: changeset
 
   @spec ensure_role_and_project(Changeset.t()) :: Changeset.t()
   defp ensure_role_and_project(%Changeset{} = changeset) do

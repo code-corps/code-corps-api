@@ -255,17 +255,13 @@ defmodule CodeCorps.AccountsTest do
       assert changeset.errors[:project_id]
     end
 
-    test "requires user not to be member of project" do
+    test "requires user not to be registered with email" do
       %{id: inviter_id} = insert(:user)
-      %{id: project_id} = project = insert(:project)
-      %{email: email} = user = insert(:user)
-
-      insert(:project_user, user: user, project: project)
+      %{email: email} = insert(:user)
 
       {:error, changeset} =
         %{email: email}
         |> Map.put(:inviter_id, inviter_id)
-        |> Map.put(:project_id, project_id)
         |> Accounts.create_invite()
 
       refute changeset.valid?
@@ -279,6 +275,7 @@ defmodule CodeCorps.AccountsTest do
       "password" => "somepassword",
       "username" => "testuser"
     }
+
     test "creates user" do
       invite = insert(:user_invite, invitee: nil, project: nil)
 
