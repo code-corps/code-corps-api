@@ -42,7 +42,7 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilder do
       record
       |> Repo.preload([:project])
       |> Map.get(:project)
-      |> (&(&1 || %{})).()
+      |> blank_map_if_nil()
       |> Map.get(:title, "")
 
     %{
@@ -206,12 +206,12 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilder do
     user_invite = user_invite |> Repo.preload([:project, :inviter, :invitee])
     %{
       email: user_invite.email,
-      invitee: user_invite |> Map.get(:invitee) |> (&(&1 || %{})).() |> Map.get(:username),
+      invitee: user_invite |> Map.get(:invitee) |> blank_map_if_nil() |> Map.get(:username),
       invitee_id: user_invite.invitee_id,
       inviter: user_invite.inviter.username,
       inviter_id: user_invite.inviter_id,
       name: user_invite.name,
-      project: user_invite |> Map.get(:project)|> (&(&1 || %{})).() |> Map.get(:title),
+      project: user_invite |> Map.get(:project)|> blank_map_if_nil() |> Map.get(:title),
       project_id: user_invite.project_id,
       role: user_invite.role
     }
@@ -239,4 +239,8 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilder do
     }
   end
   defp traits(%{token: _, user_id: _}), do: %{}
+
+  @spec blank_map_if_nil(struct | nil) :: struct | map
+  defp blank_map_if_nil(nil), do: %{}
+  defp blank_map_if_nil(struct), do: struct
 end
