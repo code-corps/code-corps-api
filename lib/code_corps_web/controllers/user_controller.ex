@@ -3,13 +3,12 @@ defmodule CodeCorpsWeb.UserController do
   use CodeCorpsWeb, :controller
 
   alias CodeCorps.{
+    Accounts,
     Analytics,
     GitHub,
     Helpers.Query,
     Services.UserService,
-    User,
-    UserInvite,
-    Accounts
+    User
   }
 
   action_fallback(CodeCorpsWeb.FallbackController)
@@ -39,9 +38,11 @@ defmodule CodeCorpsWeb.UserController do
   @spec create(Conn.t(), map) :: Conn.t()
   def create(%Conn{} = conn, %{} = params) do
     with {:ok, %User{} = user} <- params |> Accounts.create() do
-      case user |> Map.get(:claimed_invite) do
-        %UserInvite{} = user_invite ->
-          user.id |> Analytics.SegmentTracker.track("Claimed User Invite", user_invite)
+      case user |> Map.get(:claimed_invites) do
+        user_invites when is_list(user_invites) ->
+          user_invites |> Enum.map(fn invite ->
+            user.id |> Analytics.SegmentTracker.track("Claimed User Invite", invite)
+          end)
 
         _other ->
           nil
