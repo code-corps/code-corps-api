@@ -190,9 +190,7 @@ defmodule CodeCorpsWeb.UserControllerTest do
       assert_received({:track, ^invitee_id, "Claimed User Invite", ^traits})
     end
 
-    test "supports claiming a user invite to a project if specified by an id parameter", %{
-      conn: conn
-    } do
+    test "supports claiming a user invite to a project if specified by an id parameter", %{conn: conn} do
       project = insert(:project)
 
       %{id: invite_id, email: email} =
@@ -215,6 +213,13 @@ defmodule CodeCorpsWeb.UserControllerTest do
       membership = Repo.get_by(ProjectUser, user_id: created_user.id)
       assert membership.project_id == invite.project_id
       assert membership.role == invite.role
+    end
+
+    test "renders a 404 if attempting to claim an nonexistent invite", %{conn: conn} do
+      attrs = @valid_attrs |> Map.merge(%{invite_id: -1, password: "password"})
+
+      path = conn |> user_path(:create)
+      assert conn |> post(path, attrs) |> json_response(404)
     end
   end
 

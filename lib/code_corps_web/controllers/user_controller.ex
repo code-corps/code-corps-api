@@ -38,21 +38,31 @@ defmodule CodeCorpsWeb.UserController do
   @spec create(Conn.t(), map) :: Conn.t()
   def create(%Conn{} = conn, %{} = params) do
     with {:ok, %User{} = user} <- params |> Accounts.create() do
-      case user |> Map.get(:claimed_invites) do
-        user_invites when is_list(user_invites) ->
-          user_invites |> Enum.map(fn invite ->
-            user.id |> Analytics.SegmentTracker.track("Claimed User Invite", invite)
-          end)
-
-        _other ->
-          nil
-      end
+      user |> maybe_track_claimed_invites
 
       conn
       |> put_status(:created)
       |> render("show.json-api", data: user |> preload())
+    else
+      {:error, :invite_not_found} ->
+        conn
+        |> put_status(:not_found)
+        |> render(CodeCorpsWeb.ErrorView, "404.json", %{})
+
+      other ->
+        other
     end
   end
+
+  @spec maybe_track_claimed_invites(User.t()) :: list() | :ok
+  defp maybe_track_claimed_invites(%User{claimed_invites: invites} = user) when is_list(invites) do
+    invites
+    |> Enum.map(fn invite ->
+      user.id |> Analytics.SegmentTracker.track("Claimed User Invite", invite)
+    end)
+  end
+
+  defp maybe_track_claimed_invites(%User{}), do: :ok
 
   @spec update(Conn.t(), map) :: Conn.t()
   def update(%Conn{} = conn, %{"id" => id} = params) do
