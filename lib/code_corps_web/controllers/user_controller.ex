@@ -8,6 +8,7 @@ defmodule CodeCorpsWeb.UserController do
     Helpers.Query,
     Services.UserService,
     User,
+    UserInvite,
     Accounts
   }
 
@@ -38,6 +39,14 @@ defmodule CodeCorpsWeb.UserController do
   @spec create(Conn.t(), map) :: Conn.t()
   def create(%Conn{} = conn, %{} = params) do
     with {:ok, %User{} = user} <- params |> Accounts.create() do
+      case user |> Map.get(:claimed_invite) do
+        %UserInvite{} = user_invite ->
+          user.id |> Analytics.SegmentTracker.track("Claimed User Invite", user_invite)
+
+        _other ->
+          nil
+      end
+
       conn
       |> put_status(:created)
       |> render("show.json-api", data: user |> preload())

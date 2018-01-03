@@ -8,7 +8,6 @@ defmodule CodeCorps.Accounts do
   alias CodeCorps.{
     Accounts,
     Accounts.Changesets,
-    Analytics,
     Comment,
     GitHub.Adapters,
     GithubAppInstallation,
@@ -32,10 +31,7 @@ defmodule CodeCorps.Accounts do
   """
   @spec create(map) :: {:ok, User.t} | {:error, Changeset.t} | {:error, :invite_not_found}
   def create(%{"invite_id" => _} = params) do
-    with {:ok, %User{} = user, %UserInvite{} = user_invite} <- params |> Accounts.UserInvites.claim_invite() do
-      user.id |> Analytics.SegmentTracker.track("Claimed User Invite", user_invite)
-      {:ok, user}
-    end
+    params |> Accounts.UserInvites.claim_invite()
   end
   def create(%{} = params) do
     %User{} |> User.registration_changeset(params) |> Repo.insert()

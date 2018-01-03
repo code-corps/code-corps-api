@@ -40,6 +40,7 @@ defmodule CodeCorps.User do
     field :username, :string
     field :website, :string
 
+    has_one :claimed_invite, CodeCorps.UserInvite, foreign_key: :invitee_id
     has_one :github_app_installation, CodeCorps.GithubAppInstallation
     has_one :slugged_route, SluggedRoute
 
