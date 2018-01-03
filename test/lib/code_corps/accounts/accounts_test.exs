@@ -50,6 +50,22 @@ defmodule CodeCorps.AccountsTest do
       assert Repo.get(User, user.id)
     end
 
+    test "tracks invite claim with segment" do
+      invite = insert(:user_invite, invitee: nil, project: nil)
+
+      {:ok, %User{} = user} =
+        @valid_user_params
+        |> Map.put("invite_id", invite.id)
+        |> Accounts.create()
+
+      %{id: created_user_id} = Repo.get(User, user.id)
+
+      traits =
+        UserInvite |> Repo.get(invite.id) |> CodeCorps.Analytics.SegmentTraitsBuilder.build()
+
+      assert_received({:track, ^created_user_id, "Claimed User Invite", ^traits})
+    end
+
     test "associates invite with user" do
       invite = insert(:user_invite, invitee: nil, project: nil)
 
@@ -74,10 +90,12 @@ defmodule CodeCorps.AccountsTest do
     end
 
     test "returns :invite_not_found if bad invite id provided" do
-      assert {:error, :invite_not_found} =
+      response =
         @valid_user_params
         |> Map.put("invite_id", -1)
         |> Accounts.create()
+
+      assert response == {:error, :invite_not_found}
     end
   end
 

@@ -110,7 +110,7 @@ defmodule CodeCorps.Accounts.UserInvites do
   end
 
   @spec marshall_response(tuple) :: tuple
-  defp marshall_response({:ok, %{user: user}}), do: {:ok, user |> Repo.preload(:project_users)}
+  defp marshall_response({:ok, %{user: user, user_invite: user_invite}}), do: {:ok, user, user_invite}
   defp marshall_response({:error, :load_invite, :not_found, _}), do: {:error, :invite_not_found}
   defp marshall_response(other_tuple), do: other_tuple
 end
