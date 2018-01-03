@@ -52,10 +52,11 @@ defmodule CodeCorps.Mixfile do
       {:phoenix_live_reload, "~> 1.1", only: :dev},
       {:gettext, "~> 0.13"},
       {:cowboy, "~> 1.0"},
+      {:bcrypt_elixir, "~> 1.0"},
       {:benchfella, "~> 0.3.0", only: :dev},
       {:bypass, "~> 0.8.1", only: :test},
       {:cloudex, "~> 1.0"},
-      {:comeonin, "~> 3.2"},
+      {:comeonin, "~> 4.0"},
       {:corsica, "~> 1.0"}, # CORS
       {:credo, "~> 0.8", only: [:dev, :test]}, # Code style suggestions
       {:earmark, "~> 1.2"}, # Markdown rendering
