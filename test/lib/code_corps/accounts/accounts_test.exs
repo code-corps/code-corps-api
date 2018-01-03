@@ -81,6 +81,18 @@ defmodule CodeCorps.AccountsTest do
 
       assert response == {:error, :invite_not_found}
     end
+
+    test "returns changeset if user validation errors on invite claim" do
+      invite = insert(:user_invite, invitee: nil, project: nil)
+      insert(:user, email: @valid_user_params["email"])
+
+      {:error, changeset} =
+        @valid_user_params
+        |> Map.put("invite_id", invite.id)
+        |> Accounts.create()
+
+      refute changeset.valid?
+    end
   end
 
   describe "create_from_github/1" do

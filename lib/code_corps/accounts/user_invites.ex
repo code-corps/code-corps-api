@@ -86,17 +86,12 @@ defmodule CodeCorps.Accounts.UserInvites do
 
   @spec join_project(User.t(), UserInvite.t()) :: {:ok, ProjectUser.t()} | {:error, Changeset.t()}
   defp join_project(%User{} = user, %UserInvite{role: role, project: %Project{} = project}) do
-    case ProjectUser |> Repo.get_by(user_id: user.id, project_id: project.id) do
-      %ProjectUser{} = project_user ->
-        {:ok, project_user}
-
-      nil ->
-        %ProjectUser{}
-        |> Changeset.change(%{role: role})
-        |> Changeset.put_assoc(:project, project)
-        |> Changeset.put_assoc(:user, user)
-        |> Repo.insert()
-    end
+    %ProjectUser{}
+    |> Changeset.change(%{role: role})
+    |> Changeset.put_assoc(:project, project)
+    |> Changeset.put_assoc(:user, user)
+    |> Changeset.unique_constraint(:project, name: :project_users_user_id_project_id_index)
+    |> Repo.insert()
   end
 
   defp join_project(%User{}, %UserInvite{}), do: {:ok, nil}
@@ -114,5 +109,6 @@ defmodule CodeCorps.Accounts.UserInvites do
     {:ok, user |> Map.put(:claimed_invite, user_invite)}
   end
   defp marshall_response({:error, :load_invite, :not_found, _}), do: {:error, :invite_not_found}
+  defp marshall_response({:error, :user, %Changeset{} = changeset, _}), do: {:error, changeset}
   defp marshall_response(other_tuple), do: other_tuple
 end
