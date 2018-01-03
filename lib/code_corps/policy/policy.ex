@@ -34,6 +34,7 @@ defmodule CodeCorps.Policy do
     TaskSkill,
     User,
     UserCategory,
+    UserInvite,
     UserRole,
     UserSkill,
     UserTask
@@ -190,6 +191,9 @@ defmodule CodeCorps.Policy do
   # UserCategory
   defp can?(%User{} = current_user, :create, %UserCategory{}, %{} = params), do: Policy.UserCategory.create?(current_user, params)
   defp can?(%User{} = current_user, :delete, %UserCategory{} = user_category, %{}), do: Policy.UserCategory.delete?(current_user, user_category)
+
+  # UserInvite
+  defp can?(%User{} = current_user, :create, %UserInvite{}, %{} = params), do: Policy.UserInvite.create?(current_user, params)
 
   # UserRole
   defp can?(%User{} = current_user, :create, %UserRole{}, %{} = params), do: Policy.UserRole.create?(current_user, params)
