@@ -98,6 +98,7 @@ defmodule CodeCorpsWeb.Router do
     resources "/task-skills", TaskSkillController, only: [:create, :delete]
     resources "/tasks", TaskController, only: [:create, :update]
     resources "/user-categories", UserCategoryController, only: [:create, :delete]
+    resources "/user-invites", UserInviteController, only: [:create]
     resources "/user-roles", UserRoleController, only: [:create, :delete]
     resources "/user-skills", UserSkillController, only: [:create, :delete]
     resources "/user-tasks", UserTaskController, only: [:create, :update, :delete]

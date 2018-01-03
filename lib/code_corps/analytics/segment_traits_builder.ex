@@ -202,6 +202,20 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilder do
       category_id: user_category.category.id
     }
   end
+  defp traits(%CodeCorps.UserInvite{} = user_invite) do
+    user_invite = user_invite |> Repo.preload([:project, :inviter, :invitee])
+    %{
+      email: user_invite.email,
+      invitee: user_invite |> Map.get(:invitee) |> (&(&1 || %{})).() |> Map.get(:username),
+      invitee_id: user_invite.invitee_id,
+      inviter: user_invite.inviter.username,
+      inviter_id: user_invite.inviter_id,
+      name: user_invite.name,
+      project: user_invite |> Map.get(:project)|> (&(&1 || %{})).() |> Map.get(:title),
+      project_id: user_invite.project_id,
+      role: user_invite.role
+    }
+  end
   defp traits(%CodeCorps.UserRole{} = user_role) do
     user_role = user_role |> Repo.preload(:role)
     %{
