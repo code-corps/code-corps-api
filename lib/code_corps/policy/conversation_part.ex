@@ -1,7 +1,7 @@
 defmodule CodeCorps.Policy.ConversationPart do
   @moduledoc ~S"""
-  Handles `CodeCorps.User` authorization of actions on `CodeCorps.Conversation`
-  records.
+  Handles `CodeCorps.User` authorization of actions on
+  `CodeCorps.ConversationPart` records.
   """
 
   import CodeCorps.Policy.Helpers,
