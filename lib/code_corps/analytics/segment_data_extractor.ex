@@ -23,4 +23,12 @@ defmodule CodeCorps.Analytics.SegmentDataExtractor do
   def get_user_id(%Plug.Conn{assigns: %{current_user: %CodeCorps.User{id: id}}}, _), do: id
   def get_user_id(_, %CodeCorps.User{id: id}), do: id
   def get_user_id(_, %{user_id: user_id}), do: user_id
+
+  @doc """
+  Tries to extract project id from given resource.
+  Returns `nil` if project id can't be extracted.
+  """
+  @spec get_project_id(CodeCorps.ProjectUser.t) :: String.t | nil
+  def get_project_id(%CodeCorps.ProjectUser{project_id: id}), do: "project_#{id}"
+  def get_project_id(_), do: nil
 end
