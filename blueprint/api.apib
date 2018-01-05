@@ -503,6 +503,100 @@ Note that a Github Repo relates 1:1 to a Github App Installation, since only a s
 
     + Attributes (Github Repo Response)
 
+# Group Organization Github App Installations
+
+## Organization Github App Installations [/organization-github-app-installations]
+
+### Create an Organization Github app installation [POST]
+
++ Request
+
+    + Attributes (Organization Github App Installation Create Request)
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 201 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Organization Github App Installation Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
+### Filter by id [GET /organization-github-app-installations{?filter[id]}]
+
++ Request
+
+    + Attributes
+
+        + `filter[id]`: `1,2,3` (string, required) - Comma separated string of `ids` to filter by.
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Organization Github App Installations Response)
+
+### List all organization github app installations [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Organization Github App Installations Response)
+
+## Organization Github App Installation [/organization-github-app-installations/{id}]
+
++ Parameters
+
+    + id (number, required)
+
+### Retrieve an Organization github app installation [GET]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Organization Github App Installation Response)
+
+### Delete an Organization Github App Installation [DELETE]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Authorization: Bearer {token}
+
++ Response 204 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (No Content Response)
+
++ Response 401 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (JSON Web Token Invalid Response)
+
++ Response 403 (application/vnd.api+json; charset=utf-8)
+
+    + Attributes (Forbidden Response)
+
 #Group Organization Invites
 
 This endpoint is for Creating, Updating, returning Organization Invites on Code Corps.
@@ -3075,6 +3169,44 @@ The platform stores Stripe customers and cards so they can be reused across diff
 ## Organizations Response (object)
 + data(array[Organization Resource])
 + include JSON API Version
+
+## Organization Github App Installation Attributes (object)
++ `inserted-at`: `2016-07-08T03:03:51.967Z` (string)
++ `updated-at`: `2016-07-08T03:03:51.967Z` (string)
+
+## Organization Github App Installation Create Request (object)
++ type: `organization-github-app-installation` (string, required)
++ attributes(Organization Github App Installation Attributes)
++ relationships
+    + organization
+        + data(Organization Resource Identifier)
+    + github_app_installation
+        + data(Github App Installation Resource Identifier)
+
+## Organization Github App Installation Resource (object)
++ include Organization Github App Installation Resource Identifier
++ attributes(Organization Github App Installation Attributes)
++ relationships
+    + organization
+        + data(Organization Resource Identifier)
+    + github_app_installation
+        + data(Github App Installation Resource Identifier)
+
+## Organization Github App Installation Resource Identifier (object)
++ id: `1` (string, required)
++ type: `organization-github-app-installation` (string, required)
+
+## Organization Github App Installation Response (object)
++ data(Organization Github App Installation Resource)
++ include JSON API Version
+
+## Organization Github App Installations Response (object)
++ data(array[Organization Github App Installation Resource])
++ include JSON API Version
+
+## Organization Github App Installation Update Request (object)
++ include Organization Github App Installation Resource Identifier
++ attributes(Organization Github App Installation Attributes)
 
 ## Organization Invite Attributes (object)
 + title: `Code Corps` (string)
