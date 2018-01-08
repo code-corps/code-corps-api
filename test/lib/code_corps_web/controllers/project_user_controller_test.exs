@@ -49,6 +49,7 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
       assert conn |> request_create(attrs) |> json_response(201)
 
       user_id = user.id
+      project_id = "project_#{project.id}"
 
       tracking_properties = %{
         project: project.title,
@@ -58,6 +59,7 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
       }
 
       assert_received {:track, ^user_id, "Requested Project Membership", ^tracking_properties}
+      assert_received {:track, ^project_id, "Requested Project Membership", ^tracking_properties}
 
       email =
         CodeCorps.ProjectUser
@@ -106,6 +108,7 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
       assert json["data"]["attributes"]["role"] == "contributor"
 
       user_id = current_user.id
+      project_id = "project_#{project.id}"
 
       tracking_properties = %{
         project: project.title,
@@ -115,6 +118,7 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
       }
 
       assert_received {:track, ^user_id, "Approved Project Membership", ^tracking_properties}
+      assert_received {:track, ^project_id, "Approved Project Membership", ^tracking_properties}
 
       email =
         CodeCorps.ProjectUser
