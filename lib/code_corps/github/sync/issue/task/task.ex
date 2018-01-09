@@ -4,29 +4,30 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task do
     GitHub.Utils.ResultAggregator,
     GithubIssue,
     GithubRepo,
-    GithubUser,
     Task,
     User,
     Repo
   }
   alias Ecto.Changeset
 
-  @type outcome :: {:ok, list(Task.t)}
-                 | {:error, {list(Task.t), list(Changeset.t)}}
+  @type commit_result_aggregate ::
+    {:ok, list(Task.t())} | {:error, {list(Task.t()), list(Changeset.t())}}
+
+  @type commit_result :: {:ok, Task.t()} | {:error, Changeset.t()}
 
   @doc """
   When provided a `CodeCorps.GithubIssue` and a `CodeCorps.User`, for the
   `CodeCorps.Project` associated to that `CodeCorps.GithubRepo`, it creates or
   updates a `CodeCorps.Task`.
   """
-  @spec sync_github_issue(GithubIssue.t, User.t) :: {:ok, Task.t} | {:error, Changeset.t}
+  @spec sync_github_issue(GithubIssue.t(), User.t()) :: commit_result()
   def sync_github_issue(%GithubIssue{} = github_issue, %User{} = user) do
     %GithubIssue{
       github_repo: %GithubRepo{} = github_repo
     } = github_issue |> Repo.preload(:github_repo)
 
     github_issue
-    |> sync(github_repo, user)
+    |> find_or_create_task(github_repo, user)
   end
 
   @doc ~S"""
@@ -37,40 +38,40 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task do
   - Associate the `CodeCorps.Task` record with the `CodeCorps.User` that
     relates to the `CodeCorps.GithubUser` for the `CodeCorps.GithubIssue`
   """
-  @spec sync_github_repo(GithubRepo.t) :: outcome
-  def sync_github_repo(%GithubRepo{} = github_repo) do
-    %GithubRepo{
-      github_issues: github_issues
-    } = github_repo |> Repo.preload([:project, github_issues: [github_user: [:user]]])
+  @spec sync_github_repo(GithubRepo.t()) :: commit_result_aggregate()
+  def sync_github_repo(%GithubRepo{} = repo) do
+    %GithubRepo{github_issues: issues} =
+      repo |> Repo.preload([:project, github_issues: [github_user: [:user]]])
 
-    github_issues
-    |> Enum.map(&find_or_create_task(&1, github_repo))
-    |> ResultAggregator.aggregate
+    issues
+    |> Enum.map(fn issue ->
+      {issue, issue |> Map.get(:github_user) |> Map.get(:user)}
+    end)
+    |> Enum.map(fn {issue, user} -> find_or_create_task(issue, repo, user) end)
+    |> ResultAggregator.aggregate()
   end
 
+  @spec find_or_create_task(GithubIssue.t(), GithubRepo.t(), User.t()) :: commit_result
   defp find_or_create_task(
-    %GithubIssue{github_user: %GithubUser{user: %User{} = user}} = github_issue,
-    %GithubRepo{} = github_repo) do
+    %GithubIssue{} = issue,
+    %GithubRepo{} = repo,
+    %User{} = user) do
 
-    sync(github_issue, github_repo, user)
-  end
+    case find_task(repo, issue) do
+      nil ->
+        issue
+        |> Sync.Issue.Task.Changeset.create_changeset(repo, user)
+        |> Repo.insert()
 
-  @spec sync(GithubIssue.t, GithubRepo.t, User.t) :: {:ok, GithubRepo.t} | {:error, Changeset.t}
-  defp sync(%GithubIssue{} = github_issue, %GithubRepo{} = github_repo, %User{} = user) do
-    github_repo
-    |> find_or_init_task(github_issue)
-    |> Sync.Issue.Task.Changeset.build_changeset(github_issue, github_repo, user)
-    |> Repo.insert_or_update()
-  end
-
-  @spec find_or_init_task(GithubRepo.t, GithubIssue.t) :: Task.t
-  defp find_or_init_task(
-    %GithubRepo{project_id: project_id},
-    %GithubIssue{id: github_issue_id}
-  ) do
-    case Task |> Repo.get_by(github_issue_id: github_issue_id, project_id: project_id) do
-      nil -> %Task{}
-      %Task{} = task -> task
+      %Task{} = task ->
+        task
+        |> Sync.Issue.Task.Changeset.update_changeset(issue, repo)
+        |> Repo.update()
     end
+  end
+
+  @spec find_task(GithubRepo.t(), GithubIssue.t()) :: Task.t() | nil
+  defp find_task(%GithubRepo{id: repo_id}, %GithubIssue{id: issue_id}) do
+    Task |> Repo.get_by(github_issue_id: issue_id, github_repo_id: repo_id)
   end
 end

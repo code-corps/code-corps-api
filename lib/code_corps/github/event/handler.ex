@@ -10,5 +10,5 @@ defmodule CodeCorps.GitHub.Event.Handler do
   successful, or an `:error` tuple, where the second element is an atom, if it
   failed.
   """
-  @callback handle(map) :: {:ok, any} | {:error, atom}
+  @callback handle(map) :: {:ok, any} | {:error, atom} | {:error, atom, any}
 end

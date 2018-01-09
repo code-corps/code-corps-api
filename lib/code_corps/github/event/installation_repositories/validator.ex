@@ -5,10 +5,13 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositories.Validator do
   [https://developer.github.com/v3/activity/events/types/#installationrepositoriesevent](https://developer.github.com/v3/activity/events/types/#installationrepositoriesevent)
   """
 
+  @behaviour CodeCorps.GitHub.Event.Validator
+
   @doc ~S"""
   Returns `true` if all keys required to properly handle an
   InstallationRepositories webhook are present in the provided payload.
   """
+  @impl CodeCorps.GitHub.Event.Validator
   @spec valid?(map) :: boolean
   def valid?(%{
     "action" => _, "installation" => %{"id" => _},

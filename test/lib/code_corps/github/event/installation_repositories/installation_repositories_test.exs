@@ -40,7 +40,10 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositoriesTest do
 
       %{id: installation_id} = insert(:github_app_installation, github_account_avatar_url: installation_account_avatar_url, github_account_id: installation_account_id, github_account_login: installation_account_login, github_account_type: installation_account_type, github_id: installation_github_id)
 
-      {:ok, [%GithubRepo{}, %GithubRepo{}]} = InstallationRepositories.handle(@payload)
+      {:ok, {synced_repos, deleted_repos}} =
+        InstallationRepositories.handle(@payload)
+      assert synced_repos |> Enum.count == 2
+      assert deleted_repos |> Enum.count == 0
 
       github_repo_1 = Repo.get_by(GithubRepo, github_id: repo_1_payload["id"])
       assert github_repo_1
@@ -78,7 +81,11 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositoriesTest do
       installation = insert(:github_app_installation, github_account_avatar_url: installation_account_avatar_url, github_account_id: installation_account_id, github_account_login: installation_account_login, github_account_type: installation_account_type, github_id: installation_github_id)
       preinserted_repo = insert(:github_repo, github_app_installation: installation, github_id: repo_1_payload["id"])
 
-      {:ok, [%GithubRepo{}, %GithubRepo{}]} = InstallationRepositories.handle(@payload)
+      {:ok, {synced_repos, deleted_repos}} =
+        InstallationRepositories.handle(@payload)
+
+      assert synced_repos |> Enum.count == 2
+      assert deleted_repos |> Enum.count == 0
 
       github_repo_1 = Repo.get_by(GithubRepo, github_id: repo_1_payload["id"])
       assert github_repo_1.id == preinserted_repo.id
@@ -105,7 +112,7 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositoriesTest do
     end
 
     test "marks event as errored if no installation" do
-      assert {:error, :unmatched_installation} == InstallationRepositories.handle(@payload)
+      assert {:error, :unmatched_installation, %{}} == InstallationRepositories.handle(@payload)
     end
   end
 
@@ -122,7 +129,10 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositoriesTest do
       insert(:github_repo, github_app_installation: installation, github_id: repo_1_payload["id"], project: project)
       insert(:github_repo, github_app_installation: installation, github_id: repo_2_payload["id"])
 
-      {:ok, [%GithubRepo{}, %GithubRepo{}]} = InstallationRepositories.handle(@payload)
+      {:ok, {synced_repos, deleted_repos}} =
+        InstallationRepositories.handle(@payload)
+      assert synced_repos |> Enum.count == 0
+      assert deleted_repos |> Enum.count == 2
 
       assert Repo.aggregate(GithubRepo, :count, :id) == 0
     end
@@ -136,7 +146,10 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositoriesTest do
       %{project: project} = installation = insert(:github_app_installation, github_id: installation_github_id)
       insert(:github_repo, github_app_installation: installation, github_id: repo_1_payload["id"], project: project)
 
-      {:ok, [%GithubRepo{}]} = InstallationRepositories.handle(@payload)
+      {:ok, {synced_repos, deleted_repos}} =
+        InstallationRepositories.handle(@payload)
+      assert synced_repos |> Enum.count == 0
+      assert deleted_repos |> Enum.count == 1
 
       assert Repo.aggregate(GithubRepo, :count, :id) == 0
     end
@@ -155,7 +168,7 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositoriesTest do
     end
 
     test "marks event as errored if no installation" do
-      assert {:error, :unmatched_installation} == InstallationRepositories.handle(@payload)
+      assert {:error, :unmatched_installation, %{}} == InstallationRepositories.handle(@payload)
     end
   end
 end

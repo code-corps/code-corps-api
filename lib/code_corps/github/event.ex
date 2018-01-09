@@ -18,7 +18,7 @@ defmodule CodeCorps.GitHub.Event do
   end
 
   @type error :: atom | Changeset.t
-  @type result :: {:ok, any} | {:error, atom, any}
+  @type result :: {:ok, any} | {:error, atom} | {:error, atom, any}
 
   @doc ~S"""
   Sets record status to "processing", marking it as being processed at this
@@ -43,6 +43,9 @@ defmodule CodeCorps.GitHub.Event do
     event
     |> Changeset.change(%{status: "processed"})
     |> Repo.update()
+  end
+  def stop_processing({:error, reason}, %GithubEvent{} = event) do
+    stop_processing({:error, reason, %{}}, event)
   end
   def stop_processing({:error, reason, error}, %GithubEvent{} = event) do
     %GitHubEventError{reason: error}

@@ -60,14 +60,22 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
   describe "handle/1 for IssueComment::deleted" do
     @payload load_event_fixture("issue_comment_deleted")
 
-    test "deletes all comments with github_id specified in the payload" do
+    test "deletes all comments related to and github comment with github_id specified in the payload" do
       %{"comment" => %{"id" => github_id}} = @payload
       github_repo = insert(:github_repo)
       github_issue = insert(:github_issue, github_repo: github_repo)
       github_comment = insert(:github_comment, github_id: github_id, github_issue: github_issue)
-      insert(:comment, github_comment: github_comment)
+      comment = insert(:comment, github_comment: github_comment)
 
-      {:ok, nil} = IssueComment.handle(@payload)
+      {:ok, results} = IssueComment.handle(@payload)
+      %{
+        deleted_comments: [deleted_comment],
+        deleted_github_comment: deleted_github_comment
+      } = results
+
+
+      assert github_comment.id == deleted_github_comment.id
+      assert comment.id == deleted_comment.id
       assert Repo.aggregate(Comment, :count, :id) == 0
       assert Repo.aggregate(GithubComment, :count, :id) == 0
     end

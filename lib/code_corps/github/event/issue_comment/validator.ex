@@ -5,10 +5,13 @@ defmodule CodeCorps.GitHub.Event.IssueComment.Validator do
   https://developer.github.com/v3/activity/events/types/#issuecommentevent
   """
 
+  @behaviour CodeCorps.GitHub.Event.Validator
+
   @doc ~S"""
   Returns `true` if all keys required to properly handle an Issue webhook are
   present in the provided payload.
   """
+  @impl CodeCorps.GitHub.Event.Validator
   @spec valid?(map) :: boolean
   def valid?(%{
     "action" => _,
