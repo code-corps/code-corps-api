@@ -6,6 +6,7 @@ defmodule CodeCorps.Accounts do
   """
 
   alias CodeCorps.{
+    Accounts,
     Accounts.Changesets,
     Comment,
     GitHub.Adapters,
@@ -14,11 +15,27 @@ defmodule CodeCorps.Accounts do
     Processor,
     Task,
     User,
+    UserInvite,
     Repo
   }
   alias Ecto.{Changeset, Multi}
 
   import Ecto.Query
+
+  @doc ~S"""
+  Creates a `CodeCorps.User` account when such a request is made from the client
+  application.
+
+  If an `invite_id` attribute is provided in the request, treats the process as
+  claiming the specified invite.
+  """
+  @spec create(map) :: {:ok, User.t} | {:error, Changeset.t} | {:error, :invite_not_found}
+  def create(%{"invite_id" => _} = params) do
+    params |> Accounts.UserInvites.claim_invite()
+  end
+  def create(%{} = params) do
+    %User{} |> User.registration_changeset(params) |> Repo.insert()
+  end
 
   @doc ~S"""
   Creates a user record using attributes from a GitHub payload.
@@ -184,4 +201,7 @@ defmodule CodeCorps.Accounts do
     |> Repo.update_all(updates, update_options)
     |> (fn {_count, comments} -> {:ok, comments} end).()
   end
+
+  @spec create_invite(map) :: {:ok, UserInvite.t} | {:error, Changeset.t}
+  defdelegate create_invite(params), to: Accounts.UserInvites
 end

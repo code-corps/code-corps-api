@@ -3,15 +3,104 @@ defmodule CodeCorps.AccountsTest do
 
   use CodeCorps.DbAccessCase
 
-  alias CodeCorps.{Accounts, Comment, Task, User, GitHub.TestHelpers}
+  alias CodeCorps.{
+    Accounts,
+    Comment,
+    ProjectUser,
+    Task,
+    GitHub.TestHelpers,
+    User,
+    UserInvite
+  }
+
   alias Ecto.Changeset
+
+  describe "create/1" do
+    @valid_user_params %{
+      "email" => "test@user.com",
+      "password" => "somepassword",
+      "username" => "testuser"
+    }
+
+    test "creates user" do
+      {:ok, %User{} = user} =
+        @valid_user_params
+        |> Accounts.create()
+
+      assert Repo.get(User, user.id)
+    end
+
+    test "returns changeset if validation errors" do
+      {:error, %Changeset{} = changeset} =
+        @valid_user_params
+        |> Map.delete("email")
+        |> Accounts.create()
+
+      refute changeset.valid?
+    end
+
+    test "claims invite if id providedf" do
+      invite = insert(:user_invite, invitee: nil, project: nil)
+
+      {:ok, %User{} = user} =
+        @valid_user_params
+        |> Map.put("invite_id", invite.id)
+        |> Accounts.create()
+
+      assert Repo.get(User, user.id)
+    end
+
+    test "associates invite with user" do
+      invite = insert(:user_invite, invitee: nil, project: nil)
+
+      {:ok, %User{} = user} =
+        @valid_user_params
+        |> Map.put("invite_id", invite.id)
+        |> Accounts.create()
+
+      assert Repo.one(UserInvite).invitee_id == user.id
+    end
+
+    test "creates project membership if project provided with invite" do
+      project = insert(:project)
+      invite = insert(:user_invite, invitee: nil, project: project, role: "admin")
+
+      {:ok, %User{} = user} =
+        @valid_user_params
+        |> Map.put("invite_id", invite.id)
+        |> Accounts.create()
+
+      assert Repo.get_by(ProjectUser, user_id: user.id, project_id: project.id, role: "admin")
+    end
+
+    test "returns :invite_not_found if bad invite id provided" do
+      response =
+        @valid_user_params
+        |> Map.put("invite_id", -1)
+        |> Accounts.create()
+
+      assert response == {:error, :invite_not_found}
+    end
+
+    test "returns changeset if user validation errors on invite claim" do
+      invite = insert(:user_invite, invitee: nil, project: nil)
+      insert(:user, email: @valid_user_params["email"])
+
+      {:error, changeset} =
+        @valid_user_params
+        |> Map.put("invite_id", invite.id)
+        |> Accounts.create()
+
+      refute changeset.valid?
+    end
+  end
 
   describe "create_from_github/1" do
     test "creates proper user from provided payload" do
       {:ok, %User{} = user} =
         "user"
-        |> TestHelpers.load_endpoint_fixture
-        |> Accounts.create_from_github
+        |> TestHelpers.load_endpoint_fixture()
+        |> Accounts.create_from_github()
 
       assert user.id
       assert user.default_color
@@ -27,7 +116,7 @@ defmodule CodeCorps.AccountsTest do
 
       {:error, %Changeset{} = changeset} =
         payload
-        |> Accounts.create_from_github
+        |> Accounts.create_from_github()
 
       assert changeset.errors[:email] == {"has already been taken", []}
     end
@@ -40,7 +129,7 @@ defmodule CodeCorps.AccountsTest do
 
       {:error, %Changeset{} = changeset} =
         payload
-        |> Accounts.create_from_github
+        |> Accounts.create_from_github()
 
       assert changeset.errors[:github_id] == {"account is already connected to someone else", []}
     end
@@ -48,8 +137,8 @@ defmodule CodeCorps.AccountsTest do
     test "uploads photo from GitHub avatar" do
       {:ok, %User{} = user} =
         "user"
-        |> TestHelpers.load_endpoint_fixture
-        |> Accounts.create_from_github
+        |> TestHelpers.load_endpoint_fixture()
+        |> Accounts.create_from_github()
 
       user = Repo.get(User, user.id)
       assert user.cloudinary_public_id
@@ -118,6 +207,145 @@ defmodule CodeCorps.AccountsTest do
       user = Repo.get(User, user.id)
 
       assert user.cloudinary_public_id
+    end
+  end
+
+  describe "create_invite/1" do
+    @base_attrs %{email: "foo@example.com"}
+
+    test "creates a user invite" do
+      %{id: inviter_id} = insert(:user)
+
+      {:ok, %UserInvite{} = user_invite} =
+        @base_attrs
+        |> Map.put(:inviter_id, inviter_id)
+        |> Accounts.create_invite()
+
+      assert Repo.one(UserInvite).id == user_invite.id
+    end
+
+    test "requires email" do
+      {:error, changeset} =
+        @base_attrs
+        |> Map.delete(:email)
+        |> Accounts.create_invite()
+
+      refute changeset.valid?
+      assert changeset.errors[:email]
+    end
+
+    test "requires valid inviter id" do
+      {:error, changeset} =
+        @base_attrs
+        |> Accounts.create_invite()
+
+      refute changeset.valid?
+      assert changeset.errors[:inviter_id]
+
+      {:error, changeset} =
+        @base_attrs
+        |> Map.put(:inviter_id, -1)
+        |> Accounts.create_invite()
+
+      refute changeset.valid?
+      refute changeset.errors[:inviter_id]
+      assert changeset.errors[:inviter]
+    end
+
+    test "allows specifying name" do
+      %{id: inviter_id} = insert(:user)
+
+      {:ok, %UserInvite{} = user_invite} =
+        @base_attrs
+        |> Map.put(:inviter_id, inviter_id)
+        |> Map.put(:name, "John")
+        |> Accounts.create_invite()
+
+      assert user_invite.name == "John"
+    end
+
+    test "creates a user invite for a project" do
+      %{id: inviter_id} = insert(:user)
+      %{id: project_id} = insert(:project)
+
+      {:ok, %UserInvite{} = user_invite} =
+        @base_attrs
+        |> Map.put(:inviter_id, inviter_id)
+        |> Map.put(:role, "admin")
+        |> Map.put(:project_id, project_id)
+        |> Accounts.create_invite()
+
+      assert user_invite.role == "admin"
+      assert user_invite.project_id == project_id
+    end
+
+    test "does not allow invalid roles" do
+      %{id: inviter_id} = insert(:user)
+      %{id: project_id} = insert(:project)
+
+      {:error, changeset} =
+        @base_attrs
+        |> Map.put(:inviter_id, inviter_id)
+        |> Map.put(:role, "foo")
+        |> Map.put(:project_id, project_id)
+        |> Accounts.create_invite()
+
+      refute changeset.valid?
+      assert changeset.errors[:role]
+    end
+
+    test "requires valid project id" do
+      %{id: inviter_id} = insert(:user)
+
+      {:error, changeset} =
+        @base_attrs
+        |> Map.put(:inviter_id, inviter_id)
+        |> Map.put(:project_id, -1)
+        |> Map.put(:role, "contributor")
+        |> Accounts.create_invite()
+
+      refute changeset.valid?
+      assert changeset.errors[:project]
+    end
+
+    test "requires role if project is specified" do
+      %{id: inviter_id} = insert(:user)
+      %{id: project_id} = insert(:project)
+
+      {:error, changeset} =
+        @base_attrs
+        |> Map.put(:inviter_id, inviter_id)
+        |> Map.put(:project_id, project_id)
+        |> Accounts.create_invite()
+
+      refute changeset.valid?
+      assert changeset.errors[:role]
+    end
+
+    test "requires project_id if role is specified" do
+      %{id: inviter_id} = insert(:user)
+
+      {:error, changeset} =
+        @base_attrs
+        |> Map.put(:inviter_id, inviter_id)
+        |> Map.put(:role, "contributor")
+        |> Accounts.create_invite()
+
+      refute changeset.valid?
+      assert changeset.errors[:project_id]
+    end
+
+    test "requires user not to be registered with email" do
+      %{id: inviter_id} = insert(:user)
+      %{email: email} = insert(:user)
+
+      {:error, changeset} =
+        %{email: email}
+        |> Map.put(:inviter_id, inviter_id)
+        |> Accounts.create_invite()
+
+      refute changeset.valid?
+      assert changeset.errors[:email]
     end
   end
 end

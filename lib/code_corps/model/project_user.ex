@@ -8,14 +8,13 @@ defmodule CodeCorps.ProjectUser do
   @type t :: %__MODULE__{}
 
   schema "project_users" do
-    field :role, :string
+    field(:role, :string)
 
-    belongs_to :project, CodeCorps.Project
-    belongs_to :user, CodeCorps.User
+    belongs_to(:project, CodeCorps.Project)
+    belongs_to(:user, CodeCorps.User)
 
     timestamps()
   end
-
 
   @doc """
   Builds a changeset to create a pending membership
@@ -55,7 +54,11 @@ defmodule CodeCorps.ProjectUser do
     |> validate_inclusion(:role, roles())
   end
 
-  defp roles do
-    ~w{ pending contributor admin owner }
+  @doc ~S"""
+  Returns supported project user role types
+  """
+  @spec roles :: list(String.t())
+  def roles do
+    ~w{pending contributor admin owner}
   end
 end

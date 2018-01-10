@@ -40,6 +40,7 @@ defmodule CodeCorpsWeb.Plug.IdsToIntegers do
   defp convert?("donation_goal_id"), do: true
   defp convert?("github_app_installation_id"), do: true
   defp convert?("github_repo_id"), do: true
+  defp convert?("inviter_id"), do: true
   defp convert?("organization_github_app_installation_id"), do: true
   defp convert?("organization_invite_id"), do: true
   defp convert?("organization_id"), do: true

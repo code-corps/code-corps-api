@@ -5,7 +5,7 @@ defmodule CodeCorpsWeb.UserControllerTest do
 
   import CodeCorps.GitHub.TestHelpers
 
-  alias CodeCorps.{User, Repo}
+  alias CodeCorps.{User, UserInvite, ProjectUser, Repo}
 
   @valid_attrs %{
     email: "test@user.com",
@@ -96,6 +96,7 @@ defmodule CodeCorpsWeb.UserControllerTest do
   describe "show" do
     test "shows chosen resource", %{conn: conn} do
       user = insert(:user)
+
       conn
       |> request_show(user)
       |> json_response(200)
@@ -115,37 +116,110 @@ defmodule CodeCorpsWeb.UserControllerTest do
   describe "create" do
     test "creates and renders resource when data is valid", %{conn: conn} do
       attrs = Map.put(@valid_attrs, :password, "password")
-      conn = post conn, user_path(conn, :create), %{
-        "data" => %{
-          "attributes" => attrs
-        }
-      }
+
+      conn =
+        post(conn, user_path(conn, :create), %{
+          "data" => %{
+            "attributes" => attrs
+          }
+        })
 
       assert conn |> json_response(201)
     end
 
-    test "calls segment tracking after user is created", %{conn: conn} do
-      conn = post conn, user_path(conn, :create), %{
-        "meta" => %{},
-        "data" => %{
-          "type" => "user",
-          "attributes" => Map.put(@valid_attrs, :password, "password"),
-          "relationships" => @relationships
-        }
-      }
-      id = json_response(conn, 201)["data"]["id"] |> String.to_integer
+    test "tracks user creation with segment", %{conn: conn} do
+      conn =
+        post(conn, user_path(conn, :create), %{
+          "meta" => %{},
+          "data" => %{
+            "type" => "user",
+            "attributes" => Map.put(@valid_attrs, :password, "password"),
+            "relationships" => @relationships
+          }
+        })
+
+      id = json_response(conn, 201)["data"]["id"] |> String.to_integer()
       assert_received {:track, ^id, "Signed Up", %{}}
     end
 
     test "does not create resource and renders errors when data is invalid", %{conn: conn} do
       attrs = Map.put(@invalid_attrs, :password, "password")
-      conn = post conn, user_path(conn, :create), %{
-        "data" => %{
-          "attributes" => attrs
-        }
-      }
+
+      conn =
+        post(conn, user_path(conn, :create), %{
+          "data" => %{
+            "attributes" => attrs
+          }
+        })
 
       assert conn |> json_response(422)
+    end
+
+    test "supports claiming a user invite if specified by an id parameter", %{conn: conn} do
+      %{id: invite_id, email: email} = insert(:user_invite)
+
+      attrs =
+        @valid_attrs
+        |> Map.merge(%{email: email, invite_id: invite_id, password: "password"})
+
+      path = conn |> user_path(:create)
+      json = conn |> post(path, attrs) |> json_response(201)
+
+      created_user = Repo.get_by(User, email: email)
+      assert created_user
+      json |> assert_id_from_response(created_user.id)
+
+      updated_invite = Repo.get(UserInvite, invite_id)
+      assert updated_invite.invitee_id == created_user.id
+    end
+
+    test "tracks invite claim with segment", %{conn: conn} do
+      %{id: invite_id, email: email} = invite = insert(:user_invite, invitee: nil, project: nil)
+
+      attrs =
+        @valid_attrs
+        |> Map.merge(%{email: email, invite_id: invite_id, password: "password"})
+
+      path = conn |> user_path(:create)
+      conn |> post(path, attrs)
+
+      %{invitee_id: invitee_id} = invite = UserInvite |> Repo.get(invite.id)
+
+      traits = invite |> CodeCorps.Analytics.SegmentTraitsBuilder.build()
+
+      assert_received({:track, ^invitee_id, "Claimed User Invite", ^traits})
+    end
+
+    test "supports claiming a user invite to a project if specified by an id parameter", %{conn: conn} do
+      project = insert(:project)
+
+      %{id: invite_id, email: email} =
+        invite = insert(:user_invite, role: "contributor", project: project)
+
+      attrs =
+        @valid_attrs
+        |> Map.merge(%{email: email, invite_id: invite_id, password: "password"})
+
+      path = conn |> user_path(:create)
+      json = conn |> post(path, attrs) |> json_response(201)
+
+      created_user = Repo.get_by(User, email: email)
+      assert created_user
+      json |> assert_id_from_response(created_user.id)
+
+      updated_invite = Repo.get(UserInvite, invite_id)
+      assert updated_invite.invitee_id == created_user.id
+
+      membership = Repo.get_by(ProjectUser, user_id: created_user.id)
+      assert membership.project_id == invite.project_id
+      assert membership.role == invite.role
+    end
+
+    test "renders a 404 if attempting to claim an nonexistent invite", %{conn: conn} do
+      attrs = @valid_attrs |> Map.merge(%{invite_id: -1, password: "password"})
+
+      path = conn |> user_path(:create)
+      assert conn |> post(path, attrs) |> json_response(404)
     end
   end
 
@@ -191,7 +265,7 @@ defmodule CodeCorpsWeb.UserControllerTest do
         |> authenticate(user)
         |> put(path, params)
 
-      id = json_response(conn, 200)["data"]["id"] |> String.to_integer
+      id = json_response(conn, 200)["data"]["id"] |> String.to_integer()
       assert_received {:identify, ^id, %{email: "original@mail.com"}}
       assert_received {:track, ^id, "Updated Profile", %{}}
     end
@@ -235,24 +309,27 @@ defmodule CodeCorpsWeb.UserControllerTest do
           "relationships" => @relationships
         }
       }
+
       conn =
         conn
         |> authenticate(user)
         |> put(path, params)
 
-      json =  json_response(conn, 422)
+      json = json_response(conn, 422)
       assert json["errors"] != %{}
     end
 
     test "transitions from one state to the next", %{conn: conn} do
       user = insert(:user)
-      conn = put authenticate(conn, user), user_path(conn, :update, user), %{
-        "data" => %{
-          "type" => "user",
-          "id" => user.id,
-          "attributes" => %{"password" => "password", "state_transition" => "edit_profile"}
-        }
-      }
+
+      conn =
+        put(authenticate(conn, user), user_path(conn, :update, user), %{
+          "data" => %{
+            "type" => "user",
+            "id" => user.id,
+            "attributes" => %{"password" => "password", "state_transition" => "edit_profile"}
+          }
+        })
 
       %{"data" => %{"id" => id}} = json_response(conn, 200)
       user = Repo.get(User, id)
@@ -267,24 +344,32 @@ defmodule CodeCorpsWeb.UserControllerTest do
     @attrs %{"code" => "foo", "state" => "bar"}
 
     @tag :authenticated
-    test "return the user when current user connects successfully", %{conn: conn, current_user: current_user} do
+    test "return the user when current user connects successfully", %{
+      conn: conn,
+      current_user: current_user
+    } do
       path = user_path(conn, :github_oauth)
 
       json = conn |> post(path, @attrs) |> json_response(200)
 
-      assert json["data"]["id"] |> String.to_integer == current_user.id
+      assert json["data"]["id"] |> String.to_integer() == current_user.id
       assert json["data"]["attributes"]["github-id"]
     end
 
     @tag :authenticated
-    test "tracks event on segment when current user connects successfully", %{conn: conn, current_user: %{id: id}} do
+    test "tracks event on segment when current user connects successfully", %{
+      conn: conn,
+      current_user: %{id: id}
+    } do
       path = user_path(conn, :github_oauth)
 
       assert conn |> post(path, @attrs) |> json_response(200)
+
       expected_data =
         User
         |> Repo.get(id)
-        |> CodeCorps.Analytics.SegmentTraitsBuilder.build
+        |> CodeCorps.Analytics.SegmentTraitsBuilder.build()
+
       assert_received {:track, ^id, "Connected to GitHub", ^expected_data}
     end
 
@@ -297,7 +382,7 @@ defmodule CodeCorpsWeb.UserControllerTest do
     test "renders 500 if there's a GitHub API error", %{conn: conn} do
       path = user_path(conn, :github_oauth)
 
-      with_mock_api(CodeCorps.GitHub.FailureAPI) do
+      with_mock_api CodeCorps.GitHub.FailureAPI do
         assert conn |> post(path, @attrs) |> json_response(500)
       end
     end
@@ -305,7 +390,7 @@ defmodule CodeCorpsWeb.UserControllerTest do
 
   describe "email_available" do
     test "returns valid and available when email is valid and available", %{conn: conn} do
-      resp = get conn, user_path(conn, :email_available, %{email: "available@mail.com"})
+      resp = get(conn, user_path(conn, :email_available, %{email: "available@mail.com"}))
       json = json_response(resp, 200)
       assert json["available"]
       assert json["valid"]
@@ -313,14 +398,14 @@ defmodule CodeCorpsWeb.UserControllerTest do
 
     test "returns valid but inavailable when email is valid but taken", %{conn: conn} do
       insert(:user, email: "used@mail.com")
-      resp = get conn, user_path(conn, :email_available, %{email: "used@mail.com"})
+      resp = get(conn, user_path(conn, :email_available, %{email: "used@mail.com"}))
       json = json_response(resp, 200)
       refute json["available"]
       assert json["valid"]
     end
 
     test "returns as available but invalid when email is invalid", %{conn: conn} do
-      resp = get conn, user_path(conn, :email_available, %{email: "not_an_email"})
+      resp = get(conn, user_path(conn, :email_available, %{email: "not_an_email"}))
       json = json_response(resp, 200)
       assert json["available"]
       refute json["valid"]
@@ -329,7 +414,7 @@ defmodule CodeCorpsWeb.UserControllerTest do
 
   describe "username_available" do
     test "returns as valid and available when username is valid and available", %{conn: conn} do
-      resp = get conn, user_path(conn, :username_available, %{username: "available"})
+      resp = get(conn, user_path(conn, :username_available, %{username: "available"}))
       json = json_response(resp, 200)
       assert json["available"]
       assert json["valid"]
@@ -337,14 +422,14 @@ defmodule CodeCorpsWeb.UserControllerTest do
 
     test "returns as valid, but inavailable when username is valid but taken", %{conn: conn} do
       insert(:user, username: "used")
-      resp = get conn, user_path(conn, :username_available, %{username: "used"})
+      resp = get(conn, user_path(conn, :username_available, %{username: "used"}))
       json = json_response(resp, 200)
       refute json["available"]
       assert json["valid"]
     end
 
     test "returns available but invalid when username is invalid", %{conn: conn} do
-      resp = get conn, user_path(conn, :username_available, %{username: ""})
+      resp = get(conn, user_path(conn, :username_available, %{username: ""}))
       json = json_response(resp, 200)
       assert json["available"]
       refute json["valid"]

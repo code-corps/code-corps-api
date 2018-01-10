@@ -43,6 +43,7 @@ defmodule CodeCorps.User do
     has_one :github_app_installation, CodeCorps.GithubAppInstallation
     has_one :slugged_route, SluggedRoute
 
+    has_many :claimed_invites, CodeCorps.UserInvite, foreign_key: :invitee_id
     has_many :github_app_installations, CodeCorps.GithubAppInstallation
     has_many :organizations, CodeCorps.Organization, foreign_key: :owner_id
     has_many :project_users, CodeCorps.ProjectUser

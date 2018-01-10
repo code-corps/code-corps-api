@@ -50,8 +50,8 @@ defmodule CodeCorps.Validators.SlugValidator do
       stripe-platform-customers
       tags tasks task-images task-likes task-lists task-skills
       teams token tokens
-      user-categories user-roles user-skills user-tasks user username_available
-      users
+      user-categories user-invites user-roles user-skills user-tasks user
+      username_available users
       webhooks
     )
 

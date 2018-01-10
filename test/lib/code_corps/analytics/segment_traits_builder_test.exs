@@ -35,6 +35,7 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilderTest do
 
       assert :user |> insert |> SegmentTraitsBuilder.build
       assert :user_category |> insert |> SegmentTraitsBuilder.build
+      assert :user_invite |> insert |> SegmentTraitsBuilder.build
       assert :user_role |> insert |> SegmentTraitsBuilder.build
       assert :user_skill |> insert |> SegmentTraitsBuilder.build
       assert :user_task |> insert |> SegmentTraitsBuilder.build

@@ -13,7 +13,7 @@ defmodule CodeCorps.TestHelpers do
   end
 
   def assert_id_from_response(response, id) do
-    assert String.to_integer(response["data"]["id"]) == id
+    assert (String.to_integer(response["data"]["id"]) == id)
     response
   end
 
