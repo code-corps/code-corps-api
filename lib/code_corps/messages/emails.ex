@@ -7,7 +7,8 @@ defmodule CodeCorps.Messages.Emails do
     Emails,
     Mailer,
     Message,
-    Repo
+    Repo,
+    User
   }
 
   @message_preloads [:project, [conversations: :user]]

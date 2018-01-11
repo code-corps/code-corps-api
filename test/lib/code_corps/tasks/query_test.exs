@@ -1,9 +1,9 @@
-defmodule CodeCorps.Task.QueryTest do
+defmodule CodeCorps.Tasks.QueryTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
 
-  alias CodeCorps.Task
+  alias CodeCorps.Tasks
 
   describe "filter/2" do
     defp get_sorted_ids(tasks) do
@@ -11,11 +11,11 @@ defmodule CodeCorps.Task.QueryTest do
     end
 
     defp list_sorted_ids(params) do
-      params |> Task.Query.list |> get_sorted_ids()
+      params |> Tasks.Query.list |> get_sorted_ids()
     end
 
     defp find_with_query(params) do
-      params |> Task.Query.find
+      params |> Tasks.Query.find
     end
 
     test "filters by project_id" do

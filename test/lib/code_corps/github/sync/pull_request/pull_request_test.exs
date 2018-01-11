@@ -6,48 +6,54 @@ defmodule CodeCorps.GitHub.Sync.PullRequestTest do
   import CodeCorps.GitHub.TestHelpers
 
   alias CodeCorps.{
-    GitHub.Sync.PullRequest,
+    GitHub.Sync,
+    GitHub.Adapters,
+    GithubPullRequest,
     Repo
   }
+  @payload load_event_fixture("pull_request_opened")
 
-  describe "sync/2" do
-    @pull_request_opened_payload load_event_fixture("pull_request_opened")
+  describe "create_or_update_pull_request/1" do
+    test "creates pull request if none exists" do
+      %{"pull_request" => attrs} = @payload
+      github_repo = insert(:github_repo)
+      {:ok, %GithubPullRequest{} = created_pull_request} =
+        Sync.PullRequest.create_or_update_pull_request(attrs, github_repo)
 
-    test "with pull request in payload creates github pull request associated to github repo" do
-      %{
-        "pull_request" => %{
-          "body" => body, "title" => title, "number" => number
-        } = pull_request,
-        "repository" => %{"id" => repo_github_id}
-      } = @pull_request_opened_payload
+      assert Repo.one(GithubPullRequest)
 
-      github_repo = insert(:github_repo, github_id: repo_github_id)
-
-      {:ok, %{github_pull_request: github_pull_request}} =
-        %{repo: github_repo}
-        |> PullRequest.sync(pull_request)
-        |> Repo.transaction
-
-      assert github_pull_request.body == body
-      assert github_pull_request.title == title
-      assert github_pull_request.number == number
-      assert github_pull_request.state == "open"
+      created_attributes =
+        attrs
+        |> Adapters.PullRequest.from_api()
+        |> Map.delete(:closed_at)
+        |> Map.delete(:merge_commit_sha)
+        |> Map.delete(:merged_at)
+      returned_pull_request = Repo.get_by(GithubPullRequest, created_attributes)
+      assert returned_pull_request.id == created_pull_request.id
+      assert returned_pull_request.github_repo_id == github_repo.id
     end
 
-    test "with pull request in changes creates github pull request associated to github repo" do
-      %{
-        "pull_request" => pull_request,
-        "repository" => %{"id" => repo_github_id}
-      } = @pull_request_opened_payload
+    test "updates pull request if it already exists" do
+      %{"pull_request" => %{"id" => pull_request_id} = attrs} = @payload
 
-      github_repo = insert(:github_repo, github_id: repo_github_id)
+      github_repo = insert(:github_repo)
+      pull_request = insert(:github_pull_request, github_id: pull_request_id, github_repo: github_repo)
 
-      {:ok, %{github_pull_request: github_pull_request}} =
-        %{repo: github_repo, fetch_pull_request: pull_request}
-        |> PullRequest.sync(pull_request)
-        |> Repo.transaction
+      {:ok, %GithubPullRequest{} = updated_pull_request} =
+        Sync.PullRequest.create_or_update_pull_request(attrs, github_repo)
 
-      assert github_pull_request.state == "open"
+      assert updated_pull_request.id == pull_request.id
+      assert updated_pull_request.github_repo_id == github_repo.id
+    end
+
+    test "returns changeset if payload is somehow not as expected" do
+      bad_payload = @payload |> put_in(["pull_request", "number"], nil)
+      %{"pull_request" => attrs} = bad_payload
+      github_repo = insert(:github_repo)
+
+      {:error, changeset} =
+        Sync.PullRequest.create_or_update_pull_request(attrs, github_repo)
+      refute changeset.valid?
     end
   end
 end

@@ -141,10 +141,10 @@ defmodule CodeCorps.Mixfile do
         CodeCorps.StripeInvoice,
         CodeCorps.StripePlatformCard,
         CodeCorps.StripePlatformCustomer,
-        CodeCorps.Task,
-        CodeCorps.Task.Query,
         CodeCorps.TaskList,
         CodeCorps.TaskSkill,
+        CodeCorps.Tasks,
+        CodeCorps.Tasks.Query,
         CodeCorps.Transition.UserState,
         CodeCorps.User,
         CodeCorps.UserCategory,
@@ -162,7 +162,7 @@ defmodule CodeCorps.Mixfile do
         CodeCorps.Services.MarkdownRendererService,
         CodeCorps.Services.ProjectService,
         CodeCorps.Services.UserService,
-        CodeCorps.Task.Service
+        CodeCorps.Tasks
       ],
 
       "Policies": [
@@ -265,6 +265,7 @@ defmodule CodeCorps.Mixfile do
         GitHub.Sync.Comment.Comment,
         GitHub.Sync.Comment.Comment.Changeset,
         GitHub.Sync.Comment.GithubComment,
+        GitHub.Sync.Installation.Changeset,
         GitHub.Sync.Issue,
         GitHub.Sync.Issue.GithubIssue,
         GitHub.Sync.Issue.Task,
@@ -283,7 +284,6 @@ defmodule CodeCorps.Mixfile do
         GitHub.Event,
         GitHub.Event.Handler,
         GitHub.Event.Installation,
-        GitHub.Event.Installation.ChangesetBuilder,
         GitHub.Event.Installation.MatchedUser,
         GitHub.Event.Installation.Repos,
         GitHub.Event.Installation.UnmatchedUser,

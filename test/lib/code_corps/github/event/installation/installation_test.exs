@@ -62,14 +62,14 @@ defmodule CodeCorps.GitHub.Event.InstallationTest do
 
     test "returns installation as errored if api error" do
       with_mock_api(BadRepoRequest) do
-        assert {:error, :github_api_error_on_syncing_repos}
-          = Installation.handle(@installation_created)
+        assert {:error, :github_api_error_on_syncing_repos, _error} =
+          Installation.handle(@installation_created)
       end
     end
 
     test "returns installation as errored if error creating repos" do
       with_mock_api(InvalidRepoRequest) do
-        assert {:error, :validation_error_on_syncing_existing_repos} ==
+        assert {:error, :validation_error_on_syncing_existing_repos, {_repos, _changesets}} =
           Installation.handle(@installation_created)
       end
     end

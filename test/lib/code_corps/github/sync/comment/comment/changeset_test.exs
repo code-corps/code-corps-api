@@ -3,37 +3,30 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment.ChangesetTest do
 
   use CodeCorps.DbAccessCase
 
-  import Ecto.Changeset
+  alias CodeCorps.GitHub.Sync
+  alias Ecto.Changeset
 
-  alias CodeCorps.Comment
-  alias CodeCorps.GitHub.Sync.Comment.Comment.Changeset, as: CommentChangeset
-
-  describe "build_changeset/4" do
-    test "assigns proper changes to the comment, when it's new" do
-      comment = %Comment{}
+  describe "create_changeset/3" do
+    test "assigns proper changes to the comment" do
       task = insert(:task)
       user = insert(:user)
       github_comment = insert(:github_comment)
 
-      changeset = CommentChangeset.build_changeset(
-        comment, github_comment, task, user
-      )
+      changeset =
+        github_comment
+        |> Sync.Comment.Comment.Changeset.create_changeset(task, user)
 
+      expected_body =
+        github_comment.body
+        |> Earmark.as_html!(%Earmark.Options{code_class_prefix: "language-"})
 
-      # adapted fields
-      assert get_change(changeset, :created_at) == github_comment.github_created_at
-      assert get_change(changeset, :markdown) == github_comment.body
-      assert get_change(changeset, :modified_at) == github_comment.github_updated_at
+      assert changeset |> Changeset.get_change(:created_at) == github_comment.github_created_at
+      assert changeset |> Changeset.get_change(:markdown) == github_comment.body
+      assert changeset |> Changeset.get_change(:modified_at) == github_comment.github_updated_at
+      assert changeset |> Changeset.get_change(:created_from) == "github"
+      assert changeset |> Changeset.get_change(:modified_from) == "github"
+      assert changeset |> Changeset.get_change(:body) == expected_body
 
-      # manual fields
-      assert get_change(changeset, :created_from) == "github"
-      assert get_change(changeset, :modified_from) == "github"
-
-      # html was rendered
-      assert get_change(changeset, :body) ==
-        Earmark.as_html!(github_comment.body, %Earmark.Options{code_class_prefix: "language-"})
-
-      # relationships are proper
       assert changeset.changes.github_comment.action == :update
       assert changeset.changes.github_comment.data == github_comment
       assert changeset.changes.task.action == :update
@@ -43,33 +36,29 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment.ChangesetTest do
 
       assert changeset.valid?
     end
+  end
 
-    test "assigns proper changes to the comment, when it existed previously" do
+  describe "update_changeset/2" do
+    test "assigns proper changes to the comment" do
       comment = insert(:comment)
-      task = insert(:task)
-      user = insert(:user)
       github_comment = insert(:github_comment)
 
-      changeset = CommentChangeset.build_changeset(
-        comment, github_comment, task, user
-      )
+      changeset =
+        comment
+        |> Sync.Comment.Comment.Changeset.update_changeset(github_comment)
 
-      # adapted fields
-      assert get_change(changeset, :markdown) == github_comment.body
-      assert get_change(changeset, :modified_at) == github_comment.github_updated_at
+      expected_body =
+        github_comment.body
+        |> Earmark.as_html!(%Earmark.Options{code_class_prefix: "language-"})
 
-      # modified from is updated, but created from is unchanged
-      assert get_field(changeset, :created_from) == "code_corps"
-      assert get_change(changeset, :modified_from) == "github"
-
-      # html was rendered
-      assert get_change(changeset, :body) ==
-        Earmark.as_html!(github_comment.body, %Earmark.Options{code_class_prefix: "language-"})
-
-      # relationships are proper
-      refute changeset |> get_change(:task)
-      refute changeset |> get_change(:github_comment)
-      refute changeset |> get_change(:user)
+      assert changeset |> Changeset.get_change(:markdown) == github_comment.body
+      assert changeset |> Changeset.get_change(:modified_at) == github_comment.github_updated_at
+      assert changeset |> Changeset.get_field(:created_from) == "code_corps"
+      assert changeset |> Changeset.get_change(:modified_from) == "github"
+      assert changeset |> Changeset.get_change(:body) == expected_body
+      refute changeset |> Changeset.get_change(:task)
+      refute changeset |> Changeset.get_change(:github_comment)
+      refute changeset |> Changeset.get_change(:user)
 
       assert changeset.valid?
     end
@@ -79,19 +68,19 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment.ChangesetTest do
       github_comment = insert(:github_comment)
 
       modified_at =
-        github_comment.github_updated_at
-        |> Timex.shift(days: 1)
+        github_comment.github_updated_at |> Timex.shift(days: 1)
 
-      comment = insert(:comment, modified_at: modified_at, github_comment: github_comment)
-      task = insert(:task)
-      user = insert(:user)
+      comment =
+        :comment
+        |> insert(modified_at: modified_at, github_comment: github_comment)
 
-      changeset = CommentChangeset.build_changeset(
-        comment, github_comment, task, user
-      )
+      changeset =
+        comment
+        |> Sync.Comment.Comment.Changeset.update_changeset(github_comment)
 
       refute changeset.valid?
-      assert changeset.errors[:modified_at] == {"cannot be before the last recorded time", []}
+      assert changeset.errors[:modified_at] ==
+        {"cannot be before the last recorded time", []}
     end
   end
 end

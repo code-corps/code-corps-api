@@ -19,17 +19,16 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment.Changeset do
   @update_attrs ~w(markdown modified_at)a
 
   @doc ~S"""
-  Constructs a changeset for syncing a task from a GitHub API Comment payload.
-
-  The function detects if the `CodeCorps.Comment` is to be inserted or updated
-  and acts accordingly.
+  Constructs a changeset for creating a `CodeCorps.Comment` when syncing from a
+  GitHub API Comment payload.
   """
-  @spec build_changeset(Comment.t, GithubComment.t, Task.t, User.t) :: Changeset.t
-  def build_changeset(
-    %Comment{id: nil} = comment,
-    %GithubComment{} = github_comment, %Task{} = task, %User{} = user) do
+  @spec create_changeset(GithubComment.t(), Task.t(), User.t()) :: Changeset.t()
+  def create_changeset(
+    %GithubComment{} = github_comment,
+    %Task{} = task,
+    %User{} = user) do
 
-    comment
+    %Comment{}
     |> Changeset.cast(github_comment |> Adapters.Comment.to_comment, @create_attrs)
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
     |> Changeset.put_change(:created_from, "github")
@@ -39,9 +38,15 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment.Changeset do
     |> Changeset.put_change(:user, user)
     |> Changeset.validate_required([:markdown, :body])
   end
-  def build_changeset(
+
+  @doc ~S"""
+  Constructs a changeset for updating a `CodeCorps.Comment` when syncing from a
+  GitHub API Comment payload.
+  """
+  @spec update_changeset(Comment.t(), GithubComment.t()) :: Changeset.t()
+  def update_changeset(
     %Comment{} = comment,
-    %GithubComment{} = github_comment, %Task{}, %User{}) do
+    %GithubComment{} = github_comment) do
 
     comment
     |> Changeset.cast(github_comment |> Adapters.Comment.to_comment, @update_attrs)

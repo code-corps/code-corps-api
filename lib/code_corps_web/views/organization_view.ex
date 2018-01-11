@@ -1,6 +1,6 @@
 defmodule CodeCorpsWeb.OrganizationView do
   @moduledoc false
-  alias CodeCorps.Cloudex.CloudinaryUrl
+  alias CodeCorps.Presenters.ImagePresenter
   use CodeCorpsWeb, :view
   use JaSerializer.PhoenixView
 
@@ -16,11 +16,7 @@ defmodule CodeCorpsWeb.OrganizationView do
   has_many :organization_github_app_installations, serializer: CodeCorpsWeb.OrganizationGithubAppInstallationView, identifiers: :always
   has_many :projects, serializer: CodeCorpsWeb.ProjectView, identifiers: :always
 
-  def icon_large_url(organization, _conn) do
-    CloudinaryUrl.for(organization.cloudinary_public_id, %{crop: "fill", height: 500, width: 500}, "large", organization.default_color, "organization")
-  end
+  def icon_large_url(organization, _conn), do: ImagePresenter.large(organization)
 
-  def icon_thumb_url(organization, _conn) do
-    CloudinaryUrl.for(organization.cloudinary_public_id, %{crop: "fill", height: 100, width: 100}, "thumb", organization.default_color, "organization")
-  end
+  def icon_thumb_url(organization, _conn), do: ImagePresenter.thumbnail(organization)
 end

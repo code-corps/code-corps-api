@@ -1,4 +1,4 @@
-defmodule CodeCorps.Task.Query do
+defmodule CodeCorps.Tasks.Query do
   @moduledoc ~S"""
   Holds queries used to retrieve a list of, or a single `Task` record from the
   database, using a provided map of parameters/filters.
@@ -20,7 +20,7 @@ defmodule CodeCorps.Task.Query do
   """
   @spec list(map) :: list(Project.t)
   def list(%{} = params) do
-    timing("Task.Query", "list") do
+    timing("Tasks.Query", "list") do
       Task
       |> Helpers.Query.id_filter(params)
       |> apply_archived_status(params)
