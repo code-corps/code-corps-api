@@ -1,43 +1,76 @@
 defmodule CodeCorps.GitHub.Sync.PullRequest do
+  @moduledoc ~S"""
+  In charge of finding a pull request to link with a `GithubPullRequest` record
+  when processing a GitHub Pull Request payload.
 
-  alias CodeCorps.{GithubPullRequest, GithubRepo}
-  alias CodeCorps.GitHub.Sync.PullRequest.GithubPullRequest, as: GithubPullRequestSyncer
-  alias Ecto.Multi
+  The only entry point is `create_or_update_pull_request/2`.
+  """
+
+  alias CodeCorps.{
+    GitHub.Adapters,
+    GitHub.Sync,
+    GithubPullRequest,
+    GithubRepo,
+    GithubUser,
+    Repo
+  }
+
+  @typep linking_result :: {:ok, GithubPullRequest.t()} |
+                           {:error, Ecto.Changeset.t()}
 
   @doc ~S"""
-  Syncs a GitHub pull request API payload with our data.
+  Finds or creates a `GithubPullRequest` using the data in a GitHub PullRequest
+  payload.
 
   The process is as follows:
 
-  - match payload with affected `CodeCorps.GithubRepo` record using
-    `CodeCorps.GitHub.Sync.Utils.RepoFinder`
-  - match with `CodeCorps.User` using
-    `CodeCorps.GitHub.Event.PullRequest.UserLinker`
-  - create or update each `CodeCorps.Task` for the `CodeCorps.Project` matching
-    the `CodeCorps.GithubRepo`
-
-  If the sync succeeds, it will return an `:ok` tuple with a list of created or
-  updated tasks.
-
-  If the sync fails, it will return an `:error` tuple, where the second element
-  is the atom indicating a reason.
+  - Search for the pull request in our database with the payload data.
+    - If we return a single `GithubPullRequest`, then the `GithubPullRequest`
+      should be updated.
+    - If there are no matching `GithubPullRequest` records, then a
+      `GithubPullRequest`should be created.
   """
-  @spec sync(map, map) :: Multi.t
-  def sync(%{fetch_pull_request: pull_request} = changes, _payload) do
-    sync_multi(changes, pull_request)
-  end
-  def sync(changes, payload) do
-    sync_multi(changes, payload)
+  @spec create_or_update_pull_request(map, GithubRepo.t()) :: linking_result
+  def create_or_update_pull_request(%{} = payload, %GithubRepo{} = github_repo) do
+    with {:ok, %GithubUser{} = github_user} <- Sync.User.GithubUser.create_or_update_github_user(payload) do
+
+      attrs = to_params(payload, github_repo, github_user)
+
+      case payload |> find_pull_request() do
+        nil -> create_pull_request(attrs)
+
+        %GithubPullRequest{} = pull_request ->
+          update_pull_request(pull_request, attrs)
+      end
+    else
+      {:error, error} -> {:error, error}
+    end
   end
 
-  @spec sync_multi(map, map) :: Multi.t
-  defp sync_multi(%{repo: github_repo}, pull_request) do
-    Multi.new
-    |> Multi.run(:github_pull_request, fn _ -> link_pull_request(github_repo, pull_request) end)
+  @spec find_pull_request(map) :: GithubPullRequest.t() | nil
+  defp find_pull_request(%{"id" => github_id}) do
+    Repo.get_by(GithubPullRequest, github_id: github_id)
   end
 
-  @spec link_pull_request(GithubRepo.t, map) :: {:ok, GithubPullRequest.t} | {:error, Ecto.Changeset.t}
-  defp link_pull_request(github_repo, attrs) do
-    GithubPullRequestSyncer.create_or_update_pull_request(github_repo, attrs)
+  @spec create_pull_request(map) :: linking_result
+  defp create_pull_request(params) do
+    %GithubPullRequest{}
+    |> GithubPullRequest.create_changeset(params)
+    |> Repo.insert
+  end
+
+  @spec update_pull_request(GithubPullRequest.t(), map) :: linking_result
+  defp update_pull_request(%GithubPullRequest{} = github_pull_request, params) do
+    github_pull_request
+    |> GithubPullRequest.update_changeset(params)
+    |> Repo.update()
+  end
+
+  @spec to_params(map, GithubRepo.t(), GithubUser.t()) :: map
+  defp to_params(attrs, %GithubRepo{id: github_repo_id}, %GithubUser{id: github_user_id}) do
+    attrs
+    |> Adapters.PullRequest.from_api()
+    |> Map.put(:github_repo_id, github_repo_id)
+    |> Map.put(:github_user_id, github_user_id)
   end
 end

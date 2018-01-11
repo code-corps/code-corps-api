@@ -40,7 +40,7 @@ defmodule CodeCorps.GitHub.Sync.Issue.GithubIssue do
       |> maybe_put_github_pull_request(github_pull_request)
       |> Repo.insert_or_update()
     else
-      {:error, error} -> {:error, error}
+      {:error, %Changeset{} = changeset} -> {:error, changeset}
     end
   end
 

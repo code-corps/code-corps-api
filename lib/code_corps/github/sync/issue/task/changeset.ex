@@ -4,9 +4,12 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task.Changeset do
   Issues webhook.
   """
 
+  import Ecto.Query
+
   alias CodeCorps.{
     GithubIssue,
     GithubRepo,
+    GitHub.Adapters,
     Repo,
     Services.MarkdownRendererService,
     Task,
@@ -14,105 +17,84 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task.Changeset do
     User,
     Validators.TimeValidator
   }
-  alias CodeCorps.GitHub.Adapters.Issue, as: IssueAdapter
   alias Ecto.Changeset
 
-  @doc ~S"""
-  Constructs a changeset for syncing a `Task` when processing an Issues or
-  IssueComment webhook.
-
-  The changeset can be used to create or update a `Task`
-  """
-  @spec build_changeset(Task.t, GithubIssue.t, GithubRepo.t, User.t) :: Changeset.t
-  def build_changeset(
-    %Task{id: task_id} = task,
-    %GithubIssue{} = github_issue,
-    %GithubRepo{} = github_repo,
-    %User{} = user) do
-
-    case is_nil(task_id) do
-      true -> create_changeset(task, github_issue, github_repo, user)
-      false -> update_changeset(task, github_issue, github_repo)
-    end
-  end
 
   @create_attrs ~w(created_at markdown modified_at status title)a
-  @spec create_changeset(Task.t, GithubIssue.t, GithubRepo.t, User.t) :: Changeset.t
-  defp create_changeset(
-    %Task{} = task,
-    %GithubIssue{id: github_issue_id} = github_issue,
-    %GithubRepo{id: github_repo_id, project_id: project_id},
-    %User{id: user_id}) do
+  @doc """
+  Constructs a changeset for creating a `CodeCorps.Task` when processing an
+  Issues or IssueComment webhook.
+  """
+  @spec create_changeset(GithubIssue.t(), GithubRepo.t(), User.t()) :: Changeset.t()
+  def create_changeset(
+    %GithubIssue{} = github_issue,
+    %GithubRepo{project_id: project_id} = github_repo,
+    %User{} = user) do
 
-    task
-    |> Changeset.cast(github_issue |> IssueAdapter.to_task, @create_attrs)
+    %Task{}
+    |> Changeset.cast(github_issue |> Adapters.Issue.to_task, @create_attrs)
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
     |> Changeset.put_change(:created_from, "github")
     |> Changeset.put_change(:modified_from, "github")
-    |> Changeset.put_change(:github_issue_id, github_issue_id)
-    |> Changeset.put_change(:github_repo_id, github_repo_id)
+    |> Changeset.put_assoc(:github_issue, github_issue)
+    |> Changeset.put_assoc(:github_repo, github_repo)
+    |> Changeset.put_assoc(:user, user)
     |> Changeset.put_change(:project_id, project_id)
-    |> assign_task_list(github_issue, project_id)
-    |> Changeset.put_change(:user_id, user_id)
-    |> Changeset.validate_required([:project_id, :task_list_id, :title, :user_id])
-    |> Changeset.assoc_constraint(:github_issue)
-    |> Changeset.assoc_constraint(:github_repo)
     |> Changeset.assoc_constraint(:project)
-    |> Changeset.assoc_constraint(:user)
+    |> assign_task_list(github_issue, github_repo)
+    |> Changeset.validate_required([:project_id, :task_list_id, :title])
     |> maybe_archive()
     |> Task.handle_archived()
   end
 
   @update_attrs ~w(markdown modified_at status title)a
-  @spec update_changeset(Task.t, GithubIssue.t, GithubRepo.t) :: Changeset.t
-  defp update_changeset(
+  @doc """
+  Constructs a changeset for updating a `CodeCorps.Task` when processing an
+  Issues or IssueComment webhook.
+  """
+  @spec update_changeset(Task.t(), GithubIssue.t(), GithubRepo.t()) :: Changeset.t()
+  def update_changeset(
     %Task{} = task,
     %GithubIssue{} = github_issue,
-    %GithubRepo{project_id: project_id}) do
+    %GithubRepo{} = github_repo) do
+
     task
-    |> Changeset.cast(github_issue |> IssueAdapter.to_task, @update_attrs)
+    |> Changeset.cast(github_issue |> Adapters.Issue.to_task, @update_attrs)
     |> MarkdownRendererService.render_markdown_to_html(:markdown, :body)
     |> Changeset.put_change(:modified_from, "github")
     |> TimeValidator.validate_time_not_before(:modified_at)
-    |> assign_task_list(github_issue, project_id)
-    |> Changeset.validate_required([:project_id, :title, :user_id])
-    |> Changeset.assoc_constraint(:github_repo)
-    |> Changeset.assoc_constraint(:project)
-    |> Changeset.assoc_constraint(:user)
+    |> assign_task_list(github_issue, github_repo)
+    |> Changeset.validate_required([:title])
     |> maybe_archive()
     |> Task.handle_archived()
   end
 
-  @spec assign_task_list(Changeset.t, GithubIssue.t, integer) :: Changeset.t
+  @spec assign_task_list(Changeset.t(), GithubIssue.t(), GithubRepo.t()) :: Changeset.t()
   defp assign_task_list(
-    %Changeset{} = changeset, %GithubIssue{} = github_issue, project_id)
-  do
-    %TaskList{id: task_list_id} =
-      github_issue
-      |> get_task_list_type()
-      |> get_task_list(project_id)
+    %Changeset{} = changeset,
+    %GithubIssue{} = issue,
+    %GithubRepo{project_id: project_id}) do
 
+    list_type = issue |> get_task_list_type()
+
+    %TaskList{id: id} =
+      TaskList
+      |> where(project_id: ^project_id)
+      |> where([t], field(t, ^list_type) == true)
+      |> Repo.one()
+
+    # put_change/2 instead of put_assoc/2 so task list
+    # doesn't have to be preloaded
     changeset
-    |> Changeset.put_change(:task_list_id, task_list_id)
+    |> Changeset.put_change(:task_list_id, id)
     |> Changeset.assoc_constraint(:task_list)
   end
 
-  @spec get_task_list_type(GithubIssue.t) :: atom
+  @spec get_task_list_type(GithubIssue.t()) :: atom
   defp get_task_list_type(%GithubIssue{state: "closed"}), do: :done
-  defp get_task_list_type(%GithubIssue{state: "open", github_pull_request_id: pr_id})
-    when not is_nil(pr_id), do: :pull_requests
+  defp get_task_list_type(%GithubIssue{state: "open", github_pull_request_id: id})
+    when not is_nil(id), do: :pull_requests
   defp get_task_list_type(%GithubIssue{state: "open"}), do: :inbox
-
-  @spec get_task_list(atom, integer) :: TaskList.t
-  defp get_task_list(:done, project_id) do
-    TaskList |> Repo.get_by(project_id: project_id, done: true)
-  end
-  defp get_task_list(:inbox, project_id) do
-    TaskList |> Repo.get_by(project_id: project_id, inbox: true)
-  end
-  defp get_task_list(:pull_requests, project_id) do
-    TaskList |> Repo.get_by(project_id: project_id, pull_requests: true)
-  end
 
   @spec maybe_archive(Changeset.t) :: Changeset.t
   defp maybe_archive(%Changeset{} = changeset) do
