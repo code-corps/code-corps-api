@@ -29,4 +29,12 @@ defmodule CodeCorps.Analytics.SegmentTrackingSupport do
   def includes?(:delete, %CodeCorps.UserSkill{}), do: true
   def includes?(:create, %{token: _, user_id: _}), do: true
   def includes?(_, _), do: false
+
+
+  @doc """
+  Determines whether event id is tracking project.
+  """
+  @spec project_id?(String.t | integer) :: boolean
+  def project_id?(event_id) when is_integer(event_id), do: false
+  def project_id?(event_id), do: String.starts_with?(event_id, "project_")
 end

@@ -58,8 +58,8 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
         member_id: user.id
       }
 
-      assert_received {:track, ^user_id, "Requested Project Membership", ^tracking_properties}
-      assert_received {:track, ^project_id, "Requested Project Membership", ^tracking_properties}
+      assert_received {:track, ^user_id, "Requested Membership (User)", ^tracking_properties}
+      assert_received {:track, ^project_id, "Membership Requested (Project)", ^tracking_properties}
 
       email =
         CodeCorps.ProjectUser
@@ -117,8 +117,8 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
         member_id: record.user.id
       }
 
-      assert_received {:track, ^user_id, "Approved Project Membership", ^tracking_properties}
-      assert_received {:track, ^project_id, "Approved Project Membership", ^tracking_properties}
+      assert_received {:track, ^user_id, "Membership Approved (User)", ^tracking_properties}
+      assert_received {:track, ^project_id, "Approved Membership (Project)", ^tracking_properties}
 
       email =
         CodeCorps.ProjectUser

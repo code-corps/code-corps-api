@@ -3,33 +3,43 @@ defmodule CodeCorps.Analytics.SegmentEventNameBuilder do
   Used for building friendly event names for use in Segment tracking
   """
 
-  @spec build(atom, struct) :: String.t
-  def build(action, record), do: get_event_name(action, record)
+  alias CodeCorps.Analytics.SegmentTrackingSupport
+
+  @spec build(String.t, atom, struct) :: String.t
+  def build(id, action, record), do: get_event_name(id, action, record)
 
   @actions_without_properties [:updated_profile, :signed_in, :signed_out, :signed_up]
 
-  defp get_event_name(action, _) when action in @actions_without_properties do
+  defp get_event_name(_, action, _) when action in @actions_without_properties do
     friendly_action_name(action)
   end
-  defp get_event_name(:update, %CodeCorps.DonationGoal{}) do
+  defp get_event_name(_, :update, %CodeCorps.DonationGoal{}) do
     "Updated Donation Goal"
   end
-  defp get_event_name(:create, %CodeCorps.ProjectUser{}) do
-    "Requested Project Membership"
+  defp get_event_name(id, :create, %CodeCorps.ProjectUser{}) do
+    if SegmentTrackingSupport.project_id?(id) do
+      "Membership Requested (Project)"
+    else
+      "Requested Membership (User)"
+    end
   end
-  defp get_event_name(:update, %CodeCorps.ProjectUser{}) do
-    "Approved Project Membership"
+  defp get_event_name(id, :update, %CodeCorps.ProjectUser{}) do
+    if SegmentTrackingSupport.project_id?(id) do
+      "Approved Membership (Project)"
+    else
+      "Membership Approved (User)"
+    end
   end
-  defp get_event_name(:payment_succeeded, %CodeCorps.StripeInvoice{}) do
+  defp get_event_name(_, :payment_succeeded, %CodeCorps.StripeInvoice{}) do
     "Processed Subscription Payment"
   end
-  defp get_event_name(:create, %CodeCorps.User{}), do: "Signed Up"
-  defp get_event_name(:update, %CodeCorps.User{}), do: "Updated Profile"
-  defp get_event_name(:create, %CodeCorps.UserCategory{}), do: "Added User Category"
-  defp get_event_name(:create, %CodeCorps.UserSkill{}), do: "Added User Skill"
-  defp get_event_name(:create, %CodeCorps.UserRole{}), do: "Added User Role"
-  defp get_event_name(:create, %{token: _, user_id: _}), do: "Signed In"
-  defp get_event_name(action, model) do
+  defp get_event_name(_, :create, %CodeCorps.User{}), do: "Signed Up"
+  defp get_event_name(_, :update, %CodeCorps.User{}), do: "Updated Profile"
+  defp get_event_name(_, :create, %CodeCorps.UserCategory{}), do: "Added User Category"
+  defp get_event_name(_, :create, %CodeCorps.UserSkill{}), do: "Added User Skill"
+  defp get_event_name(_, :create, %CodeCorps.UserRole{}), do: "Added User Role"
+  defp get_event_name(_, :create, %{token: _, user_id: _}), do: "Signed In"
+  defp get_event_name(_, action, model) do
     [friendly_action_name(action), friendly_model_name(model)] |> Enum.join(" ")
   end
 
