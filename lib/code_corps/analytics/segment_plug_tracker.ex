@@ -19,7 +19,6 @@ defmodule CodeCorps.Analytics.SegmentPlugTracker do
     if successful? && SegmentTrackingSupport.includes?(action, resource) do
       user_id = SegmentDataExtractor.get_user_id(conn, resource)
       SegmentTracker.track(user_id, action, resource)
-
       mark_tracked(conn)
     else
       mark_untracked(conn)
