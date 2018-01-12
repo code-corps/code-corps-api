@@ -27,6 +27,4 @@ defmodule CodeCorps.Analytics.SegmentTrackingSupport do
   def includes?(:delete, %CodeCorps.UserSkill{}), do: true
   def includes?(:create, %{token: _, user_id: _}), do: true
   def includes?(_, _), do: false
-
-  def project_id?(id), do: String.starts_with?(id, "project_")
 end
