@@ -7,7 +7,7 @@ defmodule CodeCorps.GitHub.Sync.Issue do
   alias Ecto.Multi
 
   @doc ~S"""
-  Performs sync of a github issue payload related to a repo and a pull request.
+  Performs sync of a GitHub issue payload related to a repo and a pull request.
 
   Performs work identical to `sync/2`, with the adition of associating the
   resulting `CodeCorps.GithubIssue` with the specified `CodeCorps.GithubPullRequest`.

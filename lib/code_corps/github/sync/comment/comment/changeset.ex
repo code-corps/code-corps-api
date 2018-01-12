@@ -16,7 +16,6 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment.Changeset do
   alias Ecto.Changeset
 
   @create_attrs ~w(created_at markdown modified_at)a
-  @update_attrs ~w(markdown modified_at)a
 
   @doc ~S"""
   Constructs a changeset for creating a `CodeCorps.Comment` when syncing from a
@@ -38,6 +37,8 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment.Changeset do
     |> Changeset.put_change(:user, user)
     |> Changeset.validate_required([:markdown, :body])
   end
+
+  @update_attrs ~w(markdown modified_at)a
 
   @doc ~S"""
   Constructs a changeset for updating a `CodeCorps.Comment` when syncing from a

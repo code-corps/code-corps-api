@@ -21,13 +21,13 @@ defmodule CodeCorps.GitHub.Sync.Issue.GithubIssue do
   @type result :: {:ok, GithubIssue.t} | {:error, Changeset.t}
 
   @doc ~S"""
-  Creates or updates a `CodeCorps.GithubIssue` from a github issue API payload.
+  Creates or updates a `CodeCorps.GithubIssue` from a GitHub issue API payload.
 
-  The created record is associated to the provided `CodeCorps.GithubRepo` and, optionaly,
-  to a provided `CodeCorps.GithubPullRequest`.
+  The created record is associated to the provided `CodeCorps.GithubRepo` and,
+  optionally, to a provided `CodeCorps.GithubPullRequest`.
 
-  The created record is also associated with a matched `CodeCorps.GithubUser`, which is
-  created if necessary.
+  The created record is also associated with a matched `CodeCorps.GithubUser`,
+  which is created if necessary.
   """
   @spec create_or_update_issue(map, GithubRepo.t, GithubPullRequest.t | nil) :: result
   def create_or_update_issue(%{} = payload, %GithubRepo{} = github_repo, github_pull_request \\ nil) do

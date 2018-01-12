@@ -67,7 +67,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment do
   `CodeCorps.GithubRepo`.
 
   For each `CodeCorps.GithubComment` record that relates to the
-  `CodeCorps.GithubRepo` for a given`CodeCorps.GithubRepo`:
+  `CodeCorps.GithubRepo` for a given `CodeCorps.GithubRepo`:
 
   - Find the related `CodeCorps.Task` record
   - Create or update the related `CodeCorps.Comment` record
@@ -91,7 +91,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment do
     |> ResultAggregator.aggregate()
   end
 
-  # can this return a nil?
+  # TODO: can this return a nil?
   @spec find_task(GithubComment.t(), GithubRepo.t()) :: Task.t()
   defp find_task(
     %GithubComment{github_issue: %GithubIssue{id: github_issue_id}},

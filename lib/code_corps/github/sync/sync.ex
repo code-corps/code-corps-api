@@ -1,7 +1,9 @@
 defmodule CodeCorps.GitHub.Sync do
   @moduledoc """
-  Syncs events received from the GitHub API and also syncs entire GitHub
-  repositories.
+  GitHub syncing functions for:
+
+  - events received from the GitHub API
+  - entire GitHub repositories
   """
 
   alias CodeCorps.{
@@ -11,28 +13,11 @@ defmodule CodeCorps.GitHub.Sync do
     GitHub.Sync.Utils.Finder,
     GitHub.Utils.ResultAggregator,
     GithubAppInstallation,
-    GithubPullRequest,
     GithubRepo,
     Repo,
     Task
   }
-
   alias Ecto.{Changeset, Multi}
-
-  @type outcome :: {:ok, list(Comment.t())}
-                 | {:ok, GithubPullRequest.t()}
-                 | {:error, :repo_not_found, %{}}
-                 | {:error, :fetching_issue}
-                 | {:error, :fetching_pull_request}
-                 | {:error, :multiple_comment_users_match}
-                 | {:error, :validating_github_pull_request}
-                 | {:error, :validating_github_comment}
-                 | {:error, :validating_user}
-                 | {:error, :validating_task}
-                 | {:error, :validating_comment}
-                 | {:error, :unexpected_transaction_outcome}
-
-
 
   @type issue_event_outcome ::
     {:ok, Task.t()} |
@@ -101,8 +86,6 @@ defmodule CodeCorps.GitHub.Sync do
     issue_comment_outcome() |
     {:error, :fetching_pull_request, struct} |
     {:error, :validating_github_pull_request, Changeset.t()}
-
-
 
   @doc ~S"""
   Syncs a GitHub IssueComment event.
@@ -241,7 +224,7 @@ defmodule CodeCorps.GitHub.Sync do
       {:error, :repo, :unmatched_repository, _steps} ->
         {:error, :repo_not_found, %{}}
 
-      {:error, :github_issue, %Ecto.Changeset{} = changeset, _steps} ->
+      {:error, :github_issue, %Changeset{} = changeset, _steps} ->
         {:error, :validating_github_issue, changeset}
 
       {:error, :issue_user, %Changeset{} = changeset, _steps} ->
@@ -336,10 +319,10 @@ defmodule CodeCorps.GitHub.Sync do
   @doc ~S"""
   Syncs a GitHub InstallationRepositories event.
 
-  - For the "removed" action
-    - Deletes all  `CodeCorps.GithubRepo` records matched with the payload
-  - For the "added" action
-    -
+  - For the "removed" action:
+    - Deletes all `CodeCorps.GithubRepo` records matched with the payload
+  - For the "added" action:
+    - Adds all `CodeCorps.GithubRepo` records matching data from the payload
 
   [https://developer.github.com/v3/activity/events/types/#installationrepositoriesevent](https://developer.github.com/v3/activity/events/types/#installationrepositoriesevent)
   """
@@ -446,7 +429,7 @@ defmodule CodeCorps.GitHub.Sync do
   end
 
   @doc ~S"""
-  Syncs a `GithubRepo` with Code Corps.
+  Syncs a `GithubRepo`.
 
   Fetches and syncs records from the GitHub API for a given repository, marking
   progress of the sync state along the way.
@@ -508,6 +491,14 @@ defmodule CodeCorps.GitHub.Sync do
     end
   end
 
+  @spec mark_repo(GithubRepo.t(), String.t(), map) ::
+    {:ok, GithubRepo.t()} | {:error, Changeset.t()}
+  defp mark_repo(%GithubRepo{} = repo, sync_state, params \\ %{}) do
+    repo
+    |> GithubRepo.update_sync_changeset(params |> Map.put(:sync_state, sync_state))
+    |> Repo.update
+  end
+
   @spec pair_issues_payloads_with_prs(list, list) :: list(tuple)
   defp pair_issues_payloads_with_prs(issue_payloads, pull_requests) do
     issue_payloads |> Enum.map(fn %{"number" => number} = issue_payload ->
@@ -532,12 +523,4 @@ defmodule CodeCorps.GitHub.Sync do
   @spec sync_step(tuple, atom) :: tuple
   defp sync_step({:ok, _} = result, _step), do: result
   defp sync_step({:error, _}, step), do: {:error, step}
-
-  @spec mark_repo(GithubRepo.t(), String.t(), map) ::
-    {:ok, GithubRepo.t()} | {:error, Changeset.t()}
-  defp mark_repo(%GithubRepo{} = repo, sync_state, params \\ %{}) do
-    repo
-    |> GithubRepo.update_sync_changeset(params |> Map.put(:sync_state, sync_state))
-    |> Repo.update
-  end
 end
