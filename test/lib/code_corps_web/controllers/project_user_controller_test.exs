@@ -114,7 +114,9 @@ defmodule CodeCorpsWeb.ProjectUserControllerTest do
         project: project.title,
         project_id: project.id,
         member: record.user.username,
-        member_id: record.user.id
+        member_id: record.user.id,
+        acceptor: current_user.username,
+        acceptor_id: current_user.id
       }
 
       assert_received {:track, ^user_id, "Membership Approved (User)", ^tracking_properties}

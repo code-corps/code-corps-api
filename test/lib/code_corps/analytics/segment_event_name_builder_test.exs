@@ -13,13 +13,6 @@ defmodule CodeCorps.Analytics.SegmentEventNameBuilderTest do
       assert SegmentEventNameBuilder.build("1", :update, build(:comment)) == "Edited Comment"
     end
 
-    test "with project_user" do
-      assert SegmentEventNameBuilder.build("1", :create, build(:project_user)) == "Requested Membership (User)"
-      assert SegmentEventNameBuilder.build("1", :update, build(:project_user)) == "Membership Approved (User)"
-      assert SegmentEventNameBuilder.build("project_1", :create, build(:project_user)) == "Membership Requested (Project)"
-      assert SegmentEventNameBuilder.build("project_2", :update, build(:project_user)) == "Approved Membership (Project)"
-    end
-
     test "with task" do
       assert SegmentEventNameBuilder.build("1", :create, build(:task)) == "Created Task"
       assert SegmentEventNameBuilder.build("1", :update, build(:task)) == "Edited Task"

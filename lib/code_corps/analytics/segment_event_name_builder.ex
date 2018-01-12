@@ -3,8 +3,6 @@ defmodule CodeCorps.Analytics.SegmentEventNameBuilder do
   Used for building friendly event names for use in Segment tracking
   """
 
-  alias CodeCorps.Analytics.SegmentTrackingSupport
-
   @spec build(String.t, atom, struct) :: String.t
   def build(id, action, record), do: get_event_name(id, action, record)
 
@@ -15,20 +13,6 @@ defmodule CodeCorps.Analytics.SegmentEventNameBuilder do
   end
   defp get_event_name(_, :update, %CodeCorps.DonationGoal{}) do
     "Updated Donation Goal"
-  end
-  defp get_event_name(id, :create, %CodeCorps.ProjectUser{}) do
-    if SegmentTrackingSupport.project_id?(id) do
-      "Membership Requested (Project)"
-    else
-      "Requested Membership (User)"
-    end
-  end
-  defp get_event_name(id, :update, %CodeCorps.ProjectUser{}) do
-    if SegmentTrackingSupport.project_id?(id) do
-      "Approved Membership (Project)"
-    else
-      "Membership Approved (User)"
-    end
   end
   defp get_event_name(_, :payment_succeeded, %CodeCorps.StripeInvoice{}) do
     "Processed Subscription Payment"
