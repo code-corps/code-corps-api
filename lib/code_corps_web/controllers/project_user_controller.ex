@@ -117,7 +117,7 @@ defmodule CodeCorpsWeb.ProjectUserController do
     %ProjectUser{} = project_user) do
 
     data = %{
-      current_user: user,
+      acceptor: user,
       project_user: project_user
     }
 

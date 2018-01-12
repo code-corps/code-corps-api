@@ -24,7 +24,7 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilderTest do
       assert :project_user |> insert |> SegmentTraitsBuilder.build
 
       data = %{
-        current_user: insert(:user),
+        acceptor: insert(:user),
         project_user: insert(:project_user)
       }
       assert SegmentTraitsBuilder.build(data) 
