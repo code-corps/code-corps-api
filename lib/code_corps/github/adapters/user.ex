@@ -60,6 +60,7 @@ defmodule CodeCorps.GitHub.Adapters.User do
 
   @spec transform_type(map) :: map
   defp transform_type(%{:type => "Bot"} = map), do: Map.put(map, :type, "bot")
+  defp transform_type(%{:type => "Organization"} = map), do: Map.put(map, :type, "organization")
   defp transform_type(%{:type => "User"} = map), do: Map.put(map, :type, "user")
   defp transform_type(map), do: map
 end
