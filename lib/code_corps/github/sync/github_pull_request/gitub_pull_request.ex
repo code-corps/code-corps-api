@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Sync.PullRequest do
+defmodule CodeCorps.GitHub.Sync.GithubPullRequest do
   @moduledoc ~S"""
   In charge of finding a pull request to link with a `GithubPullRequest` record
   when processing a GitHub Pull Request payload.
@@ -56,7 +56,7 @@ defmodule CodeCorps.GitHub.Sync.PullRequest do
   defp create_pull_request(params) do
     %GithubPullRequest{}
     |> GithubPullRequest.create_changeset(params)
-    |> Repo.insert
+    |> Repo.insert()
   end
 
   @spec update_pull_request(GithubPullRequest.t(), map) :: linking_result

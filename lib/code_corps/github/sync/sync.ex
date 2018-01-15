@@ -139,7 +139,7 @@ defmodule CodeCorps.GitHub.Sync do
       end)
       |> Multi.run(:github_pull_request, fn %{repo: github_repo, fetch_pull_request: pr_payload} ->
         pr_payload
-        |> Sync.PullRequest.create_or_update_pull_request(github_repo)
+        |> Sync.GithubPullRequest.create_or_update_pull_request(github_repo)
       end)
       |> Multi.run(:github_issue, fn %{repo: github_repo, github_pull_request: github_pull_request} ->
         issue_payload
@@ -394,7 +394,7 @@ defmodule CodeCorps.GitHub.Sync do
       end)
       |> Multi.run(:github_pull_request, fn %{repo: github_repo} ->
         pr_payload
-        |> Sync.PullRequest.create_or_update_pull_request(github_repo)
+        |> Sync.GithubPullRequest.create_or_update_pull_request(github_repo)
       end)
       |> Multi.run(:github_issue, fn %{fetch_issue: issue_payload, repo: github_repo, github_pull_request: github_pull_request} ->
         issue_payload
@@ -465,7 +465,7 @@ defmodule CodeCorps.GitHub.Sync do
     with {:ok, repo} <- repo |> mark_repo("fetching_pull_requests"),
          {:ok, pr_payloads} <- repo |> API.Repository.pulls |> sync_step(:fetch_pull_requests),
          {:ok, repo} <- repo |> mark_repo("syncing_github_pull_requests", %{syncing_pull_requests_count: pr_payloads |> Enum.count}),
-         {:ok, pull_requests} <- pr_payloads |> Enum.map(&Sync.PullRequest.create_or_update_pull_request(&1, repo)) |> ResultAggregator.aggregate |> sync_step(:sync_pull_requests),
+         {:ok, pull_requests} <- pr_payloads |> Enum.map(&Sync.GithubPullRequest.create_or_update_pull_request(&1, repo)) |> ResultAggregator.aggregate |> sync_step(:sync_pull_requests),
          {:ok, repo} <- repo |> mark_repo("fetching_issues"),
          {:ok, issue_payloads} <- repo |> API.Repository.issues |> sync_step(:fetch_issues),
          {:ok, repo} <- repo |> mark_repo("syncing_github_issues", %{syncing_issues_count: issue_payloads |> Enum.count}),

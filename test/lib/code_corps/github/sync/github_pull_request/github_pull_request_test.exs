@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Sync.PullRequestTest do
+defmodule CodeCorps.GitHub.Sync.GithubPullRequestTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
@@ -18,7 +18,7 @@ defmodule CodeCorps.GitHub.Sync.PullRequestTest do
       %{"pull_request" => attrs} = @payload
       github_repo = insert(:github_repo)
       {:ok, %GithubPullRequest{} = created_pull_request} =
-        Sync.PullRequest.create_or_update_pull_request(attrs, github_repo)
+        Sync.GithubPullRequest.create_or_update_pull_request(attrs, github_repo)
 
       assert Repo.one(GithubPullRequest)
 
@@ -40,7 +40,7 @@ defmodule CodeCorps.GitHub.Sync.PullRequestTest do
       pull_request = insert(:github_pull_request, github_id: pull_request_id, github_repo: github_repo)
 
       {:ok, %GithubPullRequest{} = updated_pull_request} =
-        Sync.PullRequest.create_or_update_pull_request(attrs, github_repo)
+        Sync.GithubPullRequest.create_or_update_pull_request(attrs, github_repo)
 
       assert updated_pull_request.id == pull_request.id
       assert updated_pull_request.github_repo_id == github_repo.id
@@ -52,7 +52,7 @@ defmodule CodeCorps.GitHub.Sync.PullRequestTest do
       github_repo = insert(:github_repo)
 
       {:error, changeset} =
-        Sync.PullRequest.create_or_update_pull_request(attrs, github_repo)
+        Sync.GithubPullRequest.create_or_update_pull_request(attrs, github_repo)
       refute changeset.valid?
     end
   end
