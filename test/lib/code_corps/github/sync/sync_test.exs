@@ -8,6 +8,7 @@ defmodule CodeCorps.GitHub.SyncTest do
 
   alias CodeCorps.{
     Comment,
+    GitHub.Adapters,
     GitHub.Sync,
     GithubAppInstallation,
     GithubComment,
@@ -20,6 +21,8 @@ defmodule CodeCorps.GitHub.SyncTest do
     TaskList,
     User
   }
+
+  alias Ecto.Changeset
 
   describe "installation_repositories_event/1 added" do
 
@@ -51,7 +54,7 @@ defmodule CodeCorps.GitHub.SyncTest do
     end
 
     test "can fail when installation not found" do
-      assert {:error, :unmatched_installation, %{}} == @payload |> Sync.installation_repositories_event()
+      assert {:error, :unmatched_installation} == @payload |> Sync.installation_repositories_event()
     end
 
     test "fails with validation errors when syncing repos" do
@@ -336,6 +339,72 @@ defmodule CodeCorps.GitHub.SyncTest do
       assert task.order
 
       assert existing_task.id == task.id
+    end
+
+    test "can fail when finding repo" do
+      assert {:error, :repo_not_found} == @payload |> Sync.issue_event()
+    end
+
+    test "can fail on github issue validation" do
+      insert(:github_repo, github_id: @payload["repository"]["id"])
+      assert {:error, :validating_github_issue, %Changeset{} = changeset} =
+        @payload
+        |> Kernel.put_in(["issue", "number"], nil)
+        |> Sync.issue_event()
+
+      refute changeset.valid?
+    end
+
+    test "can fail on github user validation" do
+      insert(:github_repo, github_id: @payload["repository"]["id"])
+      assert {:error, :validating_github_user, %Changeset{} = changeset} =
+        @payload
+        |> Kernel.put_in(["issue", "user", "login"], nil)
+        |> Sync.issue_event()
+
+      refute changeset.valid?
+    end
+
+    test "can fail on user validation" do
+      insert(:github_repo, github_id: @payload["repository"]["id"])
+
+      # setup data to trigger a unique constraint
+      email = "taken@mail.com"
+      insert(:user, email: email)
+      payload = @payload |> Kernel.put_in(["issue", "user", "email"], email)
+
+      assert {:error, :validating_user, %Changeset{} = changeset} =
+        payload |> Sync.issue_event()
+
+      refute changeset.valid?
+    end
+
+    test "can fail if matched by multiple users" do
+      github_repo =
+        insert(:github_repo, github_id: @payload["repository"]["id"])
+
+      attrs =
+        @payload["issue"]
+        |> Adapters.Issue.to_issue()
+        |> Map.put(:github_repo, github_repo)
+
+      github_issue = insert(:github_issue, attrs)
+      # creates a user for each task, which should never happen normally
+      insert_pair(:task, github_issue: github_issue)
+
+      assert {:error, :multiple_issue_users_match} ==
+        @payload |> Sync.issue_event()
+    end
+
+    test "can fail on task validation" do
+      insert(:github_repo, github_id: @payload["repository"]["id"])
+
+      # validation is triggered due to missing task list
+
+      assert {:error, :validating_task, %Changeset{} = changeset} =
+        @payload |> Sync.issue_event()
+
+      refute changeset.valid?
     end
   end
 

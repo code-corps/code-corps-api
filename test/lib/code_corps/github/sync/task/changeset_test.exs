@@ -118,6 +118,21 @@ defmodule CodeCorps.GitHub.Sync.Task.ChangesetTest do
       assert changeset |> Changeset.get_field(:archived) == true
       assert changeset |> Changeset.get_field(:task_list_id) == nil
     end
+
+    test "does not fail and instead returns invalid changeset if no task list matched" do
+      github_issue = insert(
+        :github_issue,
+        github_created_at: DateTime.utc_now |> Timex.shift(minutes: 1),
+        github_updated_at: DateTime.utc_now |> Timex.shift(hours: 1))
+      project = insert(:project)
+      github_repo = insert(:github_repo, project: project)
+      user = insert(:user)
+
+      changeset =
+        github_issue |> Task.Changeset.create_changeset(github_repo, user)
+
+      refute changeset.valid?
+    end
   end
 
   describe "update_changeset/3" do
@@ -247,6 +262,22 @@ defmodule CodeCorps.GitHub.Sync.Task.ChangesetTest do
 
       assert changeset |> Changeset.get_field(:archived) == true
       assert changeset |> Changeset.get_field(:task_list_id) == nil
+    end
+
+    test "does not fail and instead returns invalid changeset if no task list matched" do
+      github_issue = insert(
+        :github_issue,
+        github_created_at: DateTime.utc_now |> Timex.shift(minutes: 1),
+        github_updated_at: DateTime.utc_now |> Timex.shift(hours: 1))
+      project = insert(:project)
+      github_repo = insert(:github_repo, project: project)
+      user = insert(:user)
+      task = insert(:task, project: project, github_issue: github_issue, github_repo: github_repo, user: user, modified_at: DateTime.utc_now)
+
+      changeset =
+        task |> Task.Changeset.update_changeset(github_issue, github_repo)
+
+      refute changeset.valid?
     end
   end
 end

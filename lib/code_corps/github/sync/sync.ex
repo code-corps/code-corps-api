@@ -13,7 +13,9 @@ defmodule CodeCorps.GitHub.Sync do
     GitHub.Sync.Utils.Finder,
     GitHub.Utils.ResultAggregator,
     GithubAppInstallation,
+    GithubIssue,
     GithubRepo,
+    GithubUser,
     Repo,
     Task
   }
@@ -58,8 +60,11 @@ defmodule CodeCorps.GitHub.Sync do
       {:error, :repo, :unmatched_repository, _steps} ->
         {:error, :repo_not_found}
 
-      {:error, :github_issue, %Changeset{} = changeset, _steps} ->
+      {:error, :github_issue, %Changeset{data: %GithubIssue{}} = changeset, _steps} ->
         {:error, :validating_github_issue, changeset}
+
+      {:error, :github_issue, %Changeset{data: %GithubUser{}} = changeset, _steps} ->
+        {:error, :validating_github_user, changeset}
 
       {:error, :issue_user, %Changeset{} = changeset, _steps} ->
         {:error, :validating_user, changeset}

@@ -9,8 +9,11 @@ defmodule CodeCorps.GitHub.Sync.GithubIssueTest do
     GitHub.Adapters,
     GitHub.Sync,
     GithubIssue,
+    GithubUser,
     Repo
   }
+
+  alias Ecto.Changeset
 
   @issue_event_payload load_event_fixture("issues_opened")
 
@@ -80,6 +83,17 @@ defmodule CodeCorps.GitHub.Sync.GithubIssueTest do
       github_repo = insert(:github_repo)
 
       {:error, changeset} = attrs |> Sync.GithubIssue.create_or_update_issue(github_repo)
+      refute changeset.valid?
+    end
+
+    test "returns github user changeset if insert of github user fails" do
+      %{"issue" => attrs} = @issue_event_payload
+      github_repo = insert(:github_repo)
+      assert {:error, %Changeset{data: %GithubUser{}} = changeset} =
+        attrs
+        |> Kernel.put_in(["user", "login"], nil)
+        |> Sync.GithubIssue.create_or_update_issue(github_repo)
+
       refute changeset.valid?
     end
   end

@@ -77,16 +77,19 @@ defmodule CodeCorps.GitHub.Sync.Task.Changeset do
 
     list_type = issue |> get_task_list_type()
 
-    %TaskList{id: id} =
+    task_list_id =
       TaskList
       |> where(project_id: ^project_id)
       |> where([t], field(t, ^list_type) == true)
       |> Repo.one()
+      # ensure code executs if no list find
+      |> (fn list -> (list || %{}) |> Map.get(:id) end).()
 
     # put_change/2 instead of put_assoc/2 so task list
     # doesn't have to be preloaded
+    # id can be nil and will trigger validation in that case
     changeset
-    |> Changeset.put_change(:task_list_id, id)
+    |> Changeset.put_change(:task_list_id, task_list_id)
     |> Changeset.assoc_constraint(:task_list)
   end
 
