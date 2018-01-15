@@ -50,7 +50,7 @@ defmodule CodeCorps.GitHub.Sync.GithubComment do
   """
   @spec create_or_update_comment(GithubRepo.t, map) :: result
   def create_or_update_comment(%GithubRepo{} = github_repo, %{"id" => _, "issue_url" => _} = attrs) do
-    with {:ok, %GithubUser{} = github_user} <- Sync.User.GithubUser.create_or_update_github_user(attrs),
+    with {:ok, %GithubUser{} = github_user} <- Sync.GithubUser.create_or_update_github_user(attrs),
          {:ok, %GithubComment{} = github_comment} <- do_create_or_update_comment(github_repo, attrs, github_user) do
       {:ok, github_comment}
     else

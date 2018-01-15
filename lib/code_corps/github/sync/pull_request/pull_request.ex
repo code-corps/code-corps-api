@@ -32,7 +32,7 @@ defmodule CodeCorps.GitHub.Sync.PullRequest do
   """
   @spec create_or_update_pull_request(map, GithubRepo.t()) :: linking_result
   def create_or_update_pull_request(%{} = payload, %GithubRepo{} = github_repo) do
-    with {:ok, %GithubUser{} = github_user} <- Sync.User.GithubUser.create_or_update_github_user(payload) do
+    with {:ok, %GithubUser{} = github_user} <- Sync.GithubUser.create_or_update_github_user(payload) do
 
       attrs = to_params(payload, github_repo, github_user)
 

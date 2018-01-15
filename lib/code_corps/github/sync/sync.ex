@@ -477,7 +477,7 @@ defmodule CodeCorps.GitHub.Sync do
          {:ok, _comments} <- comment_payloads |> Enum.map(&Sync.GithubComment.create_or_update_comment(repo, &1)) |> ResultAggregator.aggregate |> sync_step(:sync_comments),
          repo <- GithubRepo |> Repo.get(repo.id) |> preload_github_repo(),
          {:ok, repo} <- repo |> mark_repo("syncing_users"),
-         {:ok, _users} <- repo |> Sync.User.User.sync_github_repo() |> sync_step(:sync_users),
+         {:ok, _users} <- repo |> Sync.User.sync_github_repo() |> sync_step(:sync_users),
          {:ok, repo} <- repo |> mark_repo("syncing_tasks"),
          {:ok, _tasks} <- repo |> Sync.Task.sync_github_repo() |> sync_step(:sync_tasks),
          {:ok, repo} <- repo |> mark_repo("syncing_comments"),

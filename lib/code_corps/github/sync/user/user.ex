@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Sync.User.User do
+defmodule CodeCorps.GitHub.Sync.User do
   @moduledoc ~S"""
   In charge of finding or creating a `User` given a `GithubUser`.
   """

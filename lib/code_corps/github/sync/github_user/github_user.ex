@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Sync.User.GithubUser do
+defmodule CodeCorps.GitHub.Sync.GithubUser do
   @moduledoc ~S"""
   In charge of syncing to a `GithubUser` record given a GitHub API payload
   containing the user.

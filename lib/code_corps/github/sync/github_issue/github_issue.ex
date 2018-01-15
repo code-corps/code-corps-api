@@ -31,7 +31,7 @@ defmodule CodeCorps.GitHub.Sync.GithubIssue do
   """
   @spec create_or_update_issue(map, GithubRepo.t, GithubPullRequest.t | nil) :: result
   def create_or_update_issue(%{} = payload, %GithubRepo{} = github_repo, github_pull_request \\ nil) do
-    with {:ok, %GithubUser{} = github_user} <- Sync.User.GithubUser.create_or_update_github_user(payload) do
+    with {:ok, %GithubUser{} = github_user} <- Sync.GithubUser.create_or_update_github_user(payload) do
       payload
       |> find_or_init()
       |> GithubIssue.changeset(payload |> Adapters.Issue.to_issue())
