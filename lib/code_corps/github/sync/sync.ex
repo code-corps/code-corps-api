@@ -43,13 +43,13 @@ defmodule CodeCorps.GitHub.Sync do
       |> Multi.run(:repo, fn _ -> Finder.find_repo(payload) end)
       |> Multi.run(:github_issue, fn %{repo: github_repo} ->
         issue_payload
-        |> Sync.Issue.GithubIssue.create_or_update_issue(github_repo)
+        |> Sync.GithubIssue.create_or_update_issue(github_repo)
       end)
       |> Multi.run(:issue_user, fn %{github_issue: github_issue} ->
         github_issue |> Sync.User.RecordLinker.link_to(issue_payload)
       end)
       |> Multi.run(:task, fn %{github_issue: github_issue, issue_user: user} ->
-        github_issue |> Sync.Issue.Task.sync_github_issue(user)
+        github_issue |> Sync.Task.sync_github_issue(user)
       end)
 
     case multi |> Repo.transaction() do
@@ -143,13 +143,13 @@ defmodule CodeCorps.GitHub.Sync do
       end)
       |> Multi.run(:github_issue, fn %{repo: github_repo, github_pull_request: github_pull_request} ->
         issue_payload
-        |> Sync.Issue.GithubIssue.create_or_update_issue(github_repo, github_pull_request)
+        |> Sync.GithubIssue.create_or_update_issue(github_repo, github_pull_request)
       end)
       |> Multi.run(:issue_user, fn %{github_issue: github_issue} ->
         github_issue |> Sync.User.RecordLinker.link_to(issue_payload)
       end)
       |> Multi.run(:task, fn %{github_issue: github_issue, issue_user: user} ->
-        github_issue |> Sync.Issue.Task.sync_github_issue(user)
+        github_issue |> Sync.Task.sync_github_issue(user)
       end)
       |> Multi.run(:github_comment, fn %{github_issue: github_issue} ->
         github_issue
@@ -207,13 +207,13 @@ defmodule CodeCorps.GitHub.Sync do
       Multi.new
       |> Multi.run(:repo, fn _ -> Finder.find_repo(payload) end)
       |> Multi.run(:github_issue, fn %{repo: github_repo} ->
-        issue_payload |> Sync.Issue.GithubIssue.create_or_update_issue(github_repo)
+        issue_payload |> Sync.GithubIssue.create_or_update_issue(github_repo)
       end)
       |> Multi.run(:issue_user, fn %{github_issue: github_issue} ->
         github_issue |> Sync.User.RecordLinker.link_to(issue_payload)
       end)
       |> Multi.run(:task, fn %{github_issue: github_issue, issue_user: user} ->
-        github_issue |> Sync.Issue.Task.sync_github_issue(user)
+        github_issue |> Sync.Task.sync_github_issue(user)
       end)
       |> Multi.run(:github_comment, fn %{github_issue: github_issue} ->
         github_issue
@@ -398,13 +398,13 @@ defmodule CodeCorps.GitHub.Sync do
       end)
       |> Multi.run(:github_issue, fn %{fetch_issue: issue_payload, repo: github_repo, github_pull_request: github_pull_request} ->
         issue_payload
-        |> Sync.Issue.GithubIssue.create_or_update_issue(github_repo, github_pull_request)
+        |> Sync.GithubIssue.create_or_update_issue(github_repo, github_pull_request)
       end)
       |> Multi.run(:issue_user, fn %{fetch_issue: issue_payload, github_issue: github_issue} ->
         Sync.User.RecordLinker.link_to(github_issue, issue_payload)
       end)
       |> Multi.run(:task, fn %{github_issue: github_issue, issue_user: user} ->
-        github_issue |> Sync.Issue.Task.sync_github_issue(user)
+        github_issue |> Sync.Task.sync_github_issue(user)
       end)
 
     case multi |> Repo.transaction() do
@@ -470,7 +470,7 @@ defmodule CodeCorps.GitHub.Sync do
          {:ok, issue_payloads} <- repo |> API.Repository.issues |> sync_step(:fetch_issues),
          {:ok, repo} <- repo |> mark_repo("syncing_github_issues", %{syncing_issues_count: issue_payloads |> Enum.count}),
          paired_issues <- issue_payloads |> pair_issues_payloads_with_prs(pull_requests),
-         {:ok, _issues} <- paired_issues |> Enum.map(fn {issue_payload, pr} -> issue_payload |> Sync.Issue.GithubIssue.create_or_update_issue(repo, pr) end) |> ResultAggregator.aggregate |> sync_step(:sync_issues),
+         {:ok, _issues} <- paired_issues |> Enum.map(fn {issue_payload, pr} -> issue_payload |> Sync.GithubIssue.create_or_update_issue(repo, pr) end) |> ResultAggregator.aggregate |> sync_step(:sync_issues),
          {:ok, repo} <- repo |> mark_repo("fetching_comments"),
          {:ok, comment_payloads} <- repo |> API.Repository.issue_comments |> sync_step(:fetch_comments),
          {:ok, repo} <- repo |> mark_repo("syncing_github_comments", %{syncing_comments_count: comment_payloads |> Enum.count}),
@@ -479,7 +479,7 @@ defmodule CodeCorps.GitHub.Sync do
          {:ok, repo} <- repo |> mark_repo("syncing_users"),
          {:ok, _users} <- repo |> Sync.User.User.sync_github_repo() |> sync_step(:sync_users),
          {:ok, repo} <- repo |> mark_repo("syncing_tasks"),
-         {:ok, _tasks} <- repo |> Sync.Issue.Task.sync_github_repo() |> sync_step(:sync_tasks),
+         {:ok, _tasks} <- repo |> Sync.Task.sync_github_repo() |> sync_step(:sync_tasks),
          {:ok, repo} <- repo |> mark_repo("syncing_comments"),
          {:ok, _comments} <- repo |> Sync.Comment.sync_github_repo() |> sync_step(:sync_comments),
          {:ok, repo} <- repo |> mark_repo("synced")

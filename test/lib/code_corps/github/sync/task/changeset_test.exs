@@ -1,9 +1,9 @@
-defmodule CodeCorps.GitHub.Sync.Issue.Task.ChangesetTest do
+defmodule CodeCorps.GitHub.Sync.Task.ChangesetTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
 
-  alias CodeCorps.GitHub.Sync.Issue.Task
+  alias CodeCorps.GitHub.Sync.Task
   alias Ecto.Changeset
 
   describe "create_changeset/4" do

@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Sync.Issue.GithubIssue do
+defmodule CodeCorps.GitHub.Sync.GithubIssue do
   @moduledoc ~S"""
   In charge of finding or creating a `CodeCorps.GithubIssue` to link with a
   `CodeCorps.Task` when processing a GitHub Issue payload.

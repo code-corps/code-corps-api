@@ -1,10 +1,9 @@
-defmodule CodeCorps.GitHub.Sync.Issue.TaskTest do
+defmodule CodeCorps.GitHub.Sync.TaskTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
 
-  alias CodeCorps.{Repo, Task}
-  alias CodeCorps.GitHub.Sync.Issue.Task, as: IssueTaskSyncer
+  alias CodeCorps.{GitHub.Sync, Repo, Task}
 
   describe "sync all/3" do
     defp setup_test_data do
@@ -35,7 +34,7 @@ defmodule CodeCorps.GitHub.Sync.Issue.TaskTest do
       existing_task =
         insert(:task, project: project, github_issue: github_issue, github_repo: github_repo, user: user)
 
-      {:ok, task} = github_issue |> IssueTaskSyncer.sync_github_issue(user)
+      {:ok, task} = github_issue |> Sync.Task.sync_github_issue(user)
 
       assert Repo.aggregate(Task, :count, :id) == 1
 
@@ -48,7 +47,7 @@ defmodule CodeCorps.GitHub.Sync.Issue.TaskTest do
 
     test "sets task :modified_from to 'github'" do
       %{github_issue: github_issue, user: user} = setup_test_data()
-      {:ok, task} = github_issue |> IssueTaskSyncer.sync_github_issue(user)
+      {:ok, task} = github_issue |> Sync.Task.sync_github_issue(user)
       assert task.modified_from == "github"
     end
 
@@ -61,7 +60,7 @@ defmodule CodeCorps.GitHub.Sync.Issue.TaskTest do
 
       insert(:task_list, project: project, inbox: true)
 
-      {:error, changeset} = github_issue |> IssueTaskSyncer.sync_github_issue(user)
+      {:error, changeset} = github_issue |> Sync.Task.sync_github_issue(user)
 
       refute changeset.valid?
     end

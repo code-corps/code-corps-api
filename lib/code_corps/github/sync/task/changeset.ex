@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Sync.Issue.Task.Changeset do
+defmodule CodeCorps.GitHub.Sync.Task.Changeset do
   @moduledoc ~S"""
   In charge of building a `Changeset` to update a `Task` with, when handling an
   Issues webhook.

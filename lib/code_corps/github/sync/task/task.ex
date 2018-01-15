@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Sync.Issue.Task do
+defmodule CodeCorps.GitHub.Sync.Task do
   alias CodeCorps.{
     GitHub.Sync,
     GitHub.Utils.ResultAggregator,
@@ -60,12 +60,12 @@ defmodule CodeCorps.GitHub.Sync.Issue.Task do
     case find_task(repo, issue) do
       nil ->
         issue
-        |> Sync.Issue.Task.Changeset.create_changeset(repo, user)
+        |> Sync.Task.Changeset.create_changeset(repo, user)
         |> Repo.insert()
 
       %Task{} = task ->
         task
-        |> Sync.Issue.Task.Changeset.update_changeset(issue, repo)
+        |> Sync.Task.Changeset.update_changeset(issue, repo)
         |> Repo.update()
     end
   end
