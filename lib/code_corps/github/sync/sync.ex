@@ -41,8 +41,16 @@ defmodule CodeCorps.GitHub.Sync do
     multi =
       Multi.new
       |> Multi.run(:repo, fn _ -> Finder.find_repo(payload) end)
-      # steps :github_user, :github_issue, :issue_user, :task
-      |> Multi.merge(fn %{repo: github_repo} -> issue_payload |> Sync.Issue.sync(github_repo) end)
+      |> Multi.run(:github_issue, fn %{repo: github_repo} ->
+        issue_payload
+        |> Sync.Issue.GithubIssue.create_or_update_issue(github_repo)
+      end)
+      |> Multi.run(:issue_user, fn %{github_issue: github_issue} ->
+        github_issue |> Sync.User.RecordLinker.link_to(issue_payload)
+      end)
+      |> Multi.run(:task, fn %{github_issue: github_issue, issue_user: user} ->
+        github_issue |> Sync.Issue.Task.sync_github_issue(user)
+      end)
 
     case multi |> Repo.transaction() do
       {:ok, %{task: task}} -> {:ok, task}

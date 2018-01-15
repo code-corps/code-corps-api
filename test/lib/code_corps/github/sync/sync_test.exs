@@ -103,10 +103,14 @@ defmodule CodeCorps.GitHub.SyncTest do
     end
   end
 
-  describe "issue_comment_event/1 on comment created for pull request" do
-    @payload load_event_fixture("issue_comment_created_on_pull_request")
+  describe "issue_comment_event/1" do
+    @preloads [
+      :user,
+      [task: :user],
+      [github_comment: [github_issue: [:github_pull_request, :github_repo]]]
+    ]
 
-    test "syncs the pull request, issue, comment, and user" do
+    test "syncs correctly when comment created for a pull request" do
       %{
         "issue" => %{
           "body" => issue_body,
@@ -126,7 +130,7 @@ defmodule CodeCorps.GitHub.SyncTest do
         "repository" => %{
           "id" => repo_github_id
         }
-      } = @payload
+      } = payload = load_event_fixture("issue_comment_created_on_pull_request")
 
       project = insert(:project)
       github_repo = insert(:github_repo, github_id: repo_github_id, project: project)
@@ -134,7 +138,7 @@ defmodule CodeCorps.GitHub.SyncTest do
       insert(:task_list, project: project, inbox: true)
       insert(:task_list, project: project, pull_requests: true)
 
-      {:ok, comment} = Sync.issue_comment_event(@payload)
+      {:ok, comment} = Sync.issue_comment_event(payload)
 
       assert Repo.aggregate(GithubComment, :count, :id) == 1
       assert Repo.aggregate(GithubIssue, :count, :id) == 1
@@ -148,30 +152,174 @@ defmodule CodeCorps.GitHub.SyncTest do
       comment_user = Repo.get_by(User, github_id: comment_user_github_id)
       assert comment_user
 
-      comment = comment |> Repo.preload([:user, [task: :user], [github_comment: [github_issue: [:github_pull_request, :github_repo]]]])
+      %{
+        github_comment: %{
+          github_issue: %{
+            github_pull_request: github_pull_request
+          } = github_issue
+        } = github_comment,
+        task: task
+      } = comment = comment |> Repo.preload(@preloads)
 
-      github_comment = comment.github_comment
-      github_issue = github_comment.github_issue
-      github_pull_request = github_issue.github_pull_request
-      task = comment.task
-
-      # Attributes
-      assert comment.markdown == comment_body
-
-      # Relationships (and their attributes)
       assert github_comment.github_id == comment_github_id
+
       assert github_issue.github_id == issue_github_id
       assert github_issue.body == issue_body
       assert github_issue.number == issue_number
+
       assert github_pull_request.number == issue_number
       assert github_pull_request.github_repo_id == github_repo.id
+
       assert task.markdown == issue_body
       assert task.project_id == project.id
       assert task.user.github_id == issue_user_github_id
       assert task.user_id == issue_user.id
+
       assert comment.markdown == comment_body
       assert comment.user_id == comment_user.id
       assert comment.user.github_id == comment_user_github_id
+    end
+
+    test "syncs correctly when comment created for a regular issue" do
+      %{
+        "issue" => %{
+          "body" => issue_body,
+          "id" => issue_github_id,
+          "number" => issue_number,
+          "user" => %{
+            "id" => issue_user_github_id
+          }
+        },
+        "comment" => %{
+          "body" => comment_body,
+          "id" => comment_github_id,
+          "user" => %{
+            "id" => comment_user_github_id
+          }
+        },
+        "repository" => %{
+          "id" => repo_github_id
+        }
+      } = payload = load_event_fixture("issue_comment_created")
+
+      project = insert(:project)
+      insert(:github_repo, github_id: repo_github_id, project: project)
+      insert(:task_list, project: project, done: true)
+      insert(:task_list, project: project, inbox: true)
+
+      {:ok, comment} = Sync.issue_comment_event(payload)
+
+      assert Repo.aggregate(GithubComment, :count, :id) == 1
+      assert Repo.aggregate(GithubIssue, :count, :id) == 1
+      assert Repo.aggregate(GithubPullRequest, :count, :id) == 0
+      assert Repo.aggregate(Comment, :count, :id) == 1
+      assert Repo.aggregate(Task, :count, :id) == 1
+
+      issue_user = Repo.get_by(User, github_id: issue_user_github_id)
+      assert issue_user
+
+      comment_user = Repo.get_by(User, github_id: comment_user_github_id)
+      assert comment_user
+
+      %{
+        github_comment: %{
+          github_issue: %{
+            github_pull_request: github_pull_request
+          } = github_issue
+        } = github_comment,
+        task: task
+      } = comment = comment |> Repo.preload(@preloads)
+
+      assert github_comment.github_id == comment_github_id
+
+      assert github_issue.github_id == issue_github_id
+      assert github_issue.body == issue_body
+      assert github_issue.number == issue_number
+      assert github_pull_request == nil
+
+      assert task.markdown == issue_body
+      assert task.project_id == project.id
+      assert task.user.github_id == issue_user_github_id
+      assert task.user_id == issue_user.id
+
+      assert comment.markdown == comment_body
+      assert comment.user_id == comment_user.id
+      assert comment.user.github_id == comment_user_github_id
+    end
+  end
+
+  describe "issue_event/1" do
+    @payload load_event_fixture("issues_opened")
+
+    test "with unmatched user, creates user, creates task for project associated to github repo" do
+      %{
+        "issue" => %{
+          "body" => markdown, "title" => title, "number" => number,
+          "user" => %{"id" => user_github_id}
+        },
+        "repository" => %{"id" => repo_github_id}
+      } = @payload
+
+      project = insert(:project)
+      github_repo = insert(:github_repo, github_id: repo_github_id, project: project)
+      insert(:task_list, project: project, inbox: true)
+
+      {:ok, %Task{} = task} = @payload |> Sync.issue_event()
+      assert Repo.aggregate(Task, :count, :id) == 1
+
+      user = Repo.get_by(User, github_id: user_github_id)
+      assert user
+
+      task = task |> Repo.preload(:github_issue)
+
+      assert task.user_id == user.id
+      assert task.github_issue_id
+      assert task.github_repo_id == github_repo.id
+      assert task.project_id == project.id
+      assert task.markdown == markdown
+      assert task.title == title
+      assert task.github_issue.number == number
+      assert task.status == "open"
+      assert task.order
+    end
+
+    test "with matched user, creates or updates task for project associated to github repo" do
+      %{
+        "issue" => %{
+          "id" => issue_github_id,
+          "body" => markdown,
+          "title" => title,
+          "number" => number,
+          "user" => %{"id" => user_github_id}
+        } ,
+        "repository" => %{"id" => repo_github_id}
+      } = @payload
+
+      user = insert(:user, github_id: user_github_id)
+
+      project = insert(:project)
+      github_repo = insert(:github_repo, github_id: repo_github_id, project: project)
+      github_issue = insert(:github_issue, github_id: issue_github_id, number: number, github_repo: github_repo)
+
+      insert(:task_list, project: project, inbox: true)
+
+      existing_task = insert(:task, project: project, user: user, github_repo: github_repo, github_issue: github_issue)
+
+      {:ok, %Task{} = task} = @payload |> Sync.issue_event()
+
+      assert Repo.aggregate(Task, :count, :id) == 1
+
+      task = task |> Repo.preload(:github_issue)
+      assert task.github_issue_id == github_issue.id
+      assert task.github_repo_id == github_repo.id
+      assert task.project_id == project.id
+      assert task.markdown == markdown
+      assert task.title == title
+      assert task.github_issue.number == number
+      assert task.status == "open"
+      assert task.order
+
+      assert existing_task.id == task.id
     end
   end
 
