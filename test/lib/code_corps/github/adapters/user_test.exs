@@ -38,8 +38,8 @@ defmodule CodeCorps.GitHub.Adapters.UserTest do
       assert User.to_user(%{"type" => "User"}) == expected_payload("user")
     end
 
-    test "does not map Organization type" do
-      assert User.to_user(%{"type" => "Organization"}) == expected_payload("Organization")
+    test "maps Organization type" do
+      assert User.to_user(%{"type" => "Organization"}) == expected_payload("organization")
     end
   end
 end
