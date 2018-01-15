@@ -289,7 +289,7 @@ defmodule CodeCorps.GitHub.Sync do
     multi =
       Multi.new
       |> Multi.run(:installation, fn _ -> payload |> Sync.Installation.sync() end)
-      |> Multi.run(:repos, fn %{installation: installation} -> installation |> Sync.Repo.sync_installation() end)
+      |> Multi.run(:repos, fn %{installation: installation} -> installation |> Sync.GithubRepo.sync_installation() end)
 
     case multi |> Repo.transaction() do
       {:ok, %{installation: installation, repos: {synced_repos, _deleted_repos}}} ->
@@ -343,7 +343,7 @@ defmodule CodeCorps.GitHub.Sync do
         payload |> Finder.find_installation()
       end)
       |> Multi.run(:repos, fn %{installation: installation} ->
-        installation |> Sync.Repo.sync_installation(payload)
+        installation |> Sync.GithubRepo.sync_installation(payload)
       end)
 
     case multi |> Repo.transaction() do

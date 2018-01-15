@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Sync.RepoTest do
+defmodule CodeCorps.GitHub.Sync.GithubRepoTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
@@ -31,7 +31,7 @@ defmodule CodeCorps.GitHub.Sync.RepoTest do
       _matched_repo = insert(:github_repo, github_app_installation: installation, github_id: matched_repo_github_id)
 
       {:ok, {synced_repos, deleted_repos}} =
-        installation |> Sync.Repo.sync_installation()
+        installation |> Sync.GithubRepo.sync_installation()
 
       assert synced_repos |> Enum.count == 2
       assert deleted_repos |> Enum.count == 1
@@ -76,7 +76,7 @@ defmodule CodeCorps.GitHub.Sync.RepoTest do
 
       with_mock_api(InvalidRepoRequest) do
         {:error, {:sync, {repos, changesets}}} =
-          installation |> Sync.Repo.sync_installation()
+          installation |> Sync.GithubRepo.sync_installation()
 
         assert repos |> Enum.count == 1
         assert changesets |> Enum.count == 1

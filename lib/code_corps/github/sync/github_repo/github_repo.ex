@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Sync.Repo do
+defmodule CodeCorps.GitHub.Sync.GithubRepo do
   import Ecto.Query
 
   alias CodeCorps.{
