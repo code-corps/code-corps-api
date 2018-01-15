@@ -21,10 +21,10 @@ defmodule CodeCorps.GitHub.Sync do
 
   @type issue_event_outcome ::
     {:ok, Task.t()} |
-    {:error, :repo_not_found, map} |
+    {:error, :repo_not_found} |
     {:error, :validating_github_issue, Changeset.t()} |
     {:error, :validating_user, Changeset.t()} |
-    {:error, :multiple_issue_users_match, map} |
+    {:error, :multiple_issue_users_match} |
     {:error, :validating_task, Changeset.t()} |
     {:error, :unexpected_transaction_outcome, any}
 
@@ -56,7 +56,7 @@ defmodule CodeCorps.GitHub.Sync do
       {:ok, %{task: task}} -> {:ok, task}
 
       {:error, :repo, :unmatched_repository, _steps} ->
-        {:error, :repo_not_found, %{}}
+        {:error, :repo_not_found}
 
       {:error, :github_issue, %Changeset{} = changeset, _steps} ->
         {:error, :validating_github_issue, changeset}
@@ -65,7 +65,7 @@ defmodule CodeCorps.GitHub.Sync do
         {:error, :validating_user, changeset}
 
       {:error, :issue_user, :multiple_users, _steps} ->
-        {:error, :multiple_issue_users_match, %{}}
+        {:error, :multiple_issue_users_match}
 
       {:error, :task, %Changeset{} = changeset, _steps} ->
         {:error, :validating_task, changeset}
@@ -79,14 +79,14 @@ defmodule CodeCorps.GitHub.Sync do
 
   @type issue_comment_outcome ::
     {:ok, Comment.t()} |
-    {:error, :repo_not_found, map} |
+    {:error, :repo_not_found} |
     {:error, :validating_github_issue, Changeset.t()} |
     {:error, :validating_user, Changeset.t()} |
-    {:error, :multiple_issue_users_match, map} |
+    {:error, :multiple_issue_users_match} |
     {:error, :validating_task, Changeset.t()} |
     {:error, :validating_github_comment, Changeset.t()} |
     {:error, :validating_user, Changeset.t()} |
-    {:error, :multiple_comment_users_match, map} |
+    {:error, :multiple_comment_users_match} |
     {:error, :validating_comment, Changeset.t()} |
     {:error, :unexpected_transaction_outcome, any}
 
@@ -94,6 +94,11 @@ defmodule CodeCorps.GitHub.Sync do
     issue_comment_outcome() |
     {:error, :fetching_pull_request, struct} |
     {:error, :validating_github_pull_request, Changeset.t()}
+
+  @type issue_comment_event_outcome ::
+    comment_deleted_outcome() |
+    pull_request_comment_outcome() |
+    issue_comment_outcome()
 
   @doc ~S"""
   Syncs a GitHub IssueComment event.
@@ -109,11 +114,7 @@ defmodule CodeCorps.GitHub.Sync do
 
   [https://developer.github.com/v3/activity/events/types/#issuecommentevent](https://developer.github.com/v3/activity/events/types/#issuecommentevent)
   """
-  @spec issue_comment_event(map) ::
-    comment_deleted_outcome() |
-    pull_request_comment_outcome() |
-    issue_comment_outcome()
-
+  @spec issue_comment_event(map) :: issue_comment_event_outcome()
   def issue_comment_event(
     %{"action" => "deleted", "comment" => %{"id" => github_id}}) do
 
@@ -166,7 +167,7 @@ defmodule CodeCorps.GitHub.Sync do
       {:ok, %{comment: %Comment{} = comment}} -> {:ok, comment}
 
       {:error, :repo, :unmatched_repository, _steps} ->
-        {:error, :repo_not_found, %{}}
+        {:error, :repo_not_found}
 
       {:error, :fetch_pull_request, error, _steps} ->
         {:error, :fetching_pull_request, error}
@@ -181,7 +182,7 @@ defmodule CodeCorps.GitHub.Sync do
         {:error, :validating_user, changeset}
 
       {:error, :issue_user, :multiple_users, _steps} ->
-        {:error, :multiple_issue_users_match, %{}}
+        {:error, :multiple_issue_users_match}
 
       {:error, :task, %Changeset{} = changeset, _steps} ->
         {:error, :validating_task, changeset}
@@ -193,7 +194,7 @@ defmodule CodeCorps.GitHub.Sync do
         {:error, :validating_user, changeset}
 
       {:error, :comment_user, :multiple_users, _steps} ->
-        {:error, :multiple_comment_users_match, %{}}
+        {:error, :multiple_comment_users_match}
 
       {:error, :comment, %Changeset{} = changeset, _steps} ->
         {:error, :validating_comment, changeset}
@@ -230,7 +231,7 @@ defmodule CodeCorps.GitHub.Sync do
       {:ok, %{comment: %Comment{} = comment}} -> {:ok, comment}
 
       {:error, :repo, :unmatched_repository, _steps} ->
-        {:error, :repo_not_found, %{}}
+        {:error, :repo_not_found}
 
       {:error, :github_issue, %Changeset{} = changeset, _steps} ->
         {:error, :validating_github_issue, changeset}
@@ -239,7 +240,7 @@ defmodule CodeCorps.GitHub.Sync do
         {:error, :validating_user, changeset}
 
       {:error, :issue_user, :multiple_users, _steps} ->
-        {:error, :multiple_issue_users_match, %{}}
+        {:error, :multiple_issue_users_match}
 
       {:error, :task, %Changeset{} = changeset, _steps} ->
         {:error, :validating_task, changeset}
@@ -251,7 +252,7 @@ defmodule CodeCorps.GitHub.Sync do
         {:error, :validating_user, changeset}
 
       {:error, :comment_user, :multiple_users, _steps} ->
-        {:error, :multiple_comment_users_match, %{}}
+        {:error, :multiple_comment_users_match}
 
       {:error, :comment, %Changeset{} = changeset, _steps} ->
         {:error, :validating_comment, changeset}
@@ -264,12 +265,12 @@ defmodule CodeCorps.GitHub.Sync do
   @type installation_event_outcome() ::
     {:ok, GithubAppInstallation.t()} |
     {:error, :validation_error_on_syncing_installation, Changeset.t()} |
-    {:error, :multiple_unprocessed_installations_found, map} |
+    {:error, :multiple_unprocessed_installations_found} |
     {:error, :github_api_error_on_syncing_repos, struct} |
     {:error, :validation_error_on_deleting_removed_repos, {list, list}} |
     {:error, :validation_error_on_syncing_existing_repos, {list, list}} |
     {:error, :validation_error_on_marking_installation_processed, Changeset.t()} |
-    {:error, :unexpected_transaction_outcome, map}
+    {:error, :unexpected_transaction_outcome, any}
 
   @doc ~S"""
   Handles a GitHub installation event.
@@ -299,7 +300,7 @@ defmodule CodeCorps.GitHub.Sync do
         {:error, :validation_error_on_syncing_installation, changeset}
 
       {:error, :installation, :multiple_unprocessed_installations_found, _steps} ->
-        {:error, :multiple_unprocessed_installations_found, %{}}
+        {:error, :multiple_unprocessed_installations_found}
 
       {:error, :repos, {:api_error, error}, _steps} ->
         {:error, :github_api_error_on_syncing_repos, error}
@@ -313,16 +314,16 @@ defmodule CodeCorps.GitHub.Sync do
       {:error, :repos, {:mark_processed, %Changeset{} = changeset}, _steps} ->
         {:error, :validation_error_on_marking_installation_processed, changeset}
 
-      {:error, _errored_step, _error_response, _steps} ->
-        {:error, :unexpected_transaction_outcome, %{}}
+      {:error, _errored_step, error_response, _steps} ->
+        {:error, :unexpected_transaction_outcome, error_response}
     end
   end
 
   @type installation_repositories_event_outcome ::
     {:ok, list(GithubRepo.t())} |
-    {:error, :unmatched_installation, map} |
+    {:error, :unmatched_installation} |
     {:error, :validation_error_on_syncing_repos, Changeset.t()} |
-    {:error, :unexpected_transaction_outcome, map}
+    {:error, :unexpected_transaction_outcome, any}
 
   @doc ~S"""
   Syncs a GitHub InstallationRepositories event.
@@ -350,7 +351,7 @@ defmodule CodeCorps.GitHub.Sync do
       {:ok, %{repos: repos}} -> {:ok, repos}
 
       {:error, :installation, :unmatched_installation, _steps} ->
-        {:error, :unmatched_installation, %{}}
+        {:error, :unmatched_installation}
 
       {:error, :repos, {_repos, _changesets}, _steps} ->
         {:error, :validation_error_on_syncing_repos, %{}}
@@ -362,14 +363,14 @@ defmodule CodeCorps.GitHub.Sync do
 
   @type pull_request_event_outcome ::
     {:ok, map} |
-    {:error, :repo_not_found, map} |
+    {:error, :repo_not_found} |
     {:error, :fetching_issue, struct} |
     {:error, :validating_github_pull_request, Changeset.t()} |
     {:error, :validating_github_issue, Changeset.t()} |
     {:error, :validating_user, Changeset.t()} |
-    {:error, :multiple_issue_users_match, %{}} |
+    {:error, :multiple_issue_users_match} |
     {:error, :validating_task, Changeset.t()} |
-    {:error, :unexpected_transaction_outcome, map}
+    {:error, :unexpected_transaction_outcome, any}
 
   @doc ~S"""
   Syncs a GitHub PullRequest event.
@@ -411,7 +412,7 @@ defmodule CodeCorps.GitHub.Sync do
       {:ok, %{github_pull_request: _, github_issue: _} = result} -> {:ok, result}
 
       {:error, :repo, :unmatched_repository, _steps} ->
-        {:error, :repo_not_found, %{}}
+        {:error, :repo_not_found}
 
       {:error, :fetch_issue, error, _steps} ->
         {:error, :fetching_issue, error}
@@ -426,7 +427,7 @@ defmodule CodeCorps.GitHub.Sync do
         {:error, :validating_user, changeset}
 
       {:error, :issue_user, :multiple_users, _steps} ->
-        {:error, :multiple_issue_users_match, %{}}
+        {:error, :multiple_issue_users_match}
 
       {:error, :task, %Changeset{} = changeset, _steps} ->
         {:error, :validating_task, changeset}
