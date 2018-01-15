@@ -246,6 +246,22 @@ defmodule CodeCorps.GitHub.SyncTest do
       assert comment.user_id == comment_user.id
       assert comment.user.github_id == comment_user_github_id
     end
+
+    test "syncs correctly when comment deleted" do
+      %{"comment" => %{"id" => github_id}} = payload =
+        load_event_fixture("issue_comment_deleted")
+
+      github_comment = insert(:github_comment, github_id: github_id)
+      comment = insert(:comment, github_comment: github_comment)
+
+      {:ok, %{deleted_comments: [deleted_comment], deleted_github_comment: deleted_github_comment}}
+        = payload |> Sync.issue_comment_event()
+
+      assert deleted_comment.id == comment.id
+      assert deleted_github_comment.id == github_comment.id
+      assert Repo.aggregate(Comment, :count, :id) == 0
+      assert Repo.aggregate(GithubComment, :count, :id) == 0
+    end
   end
 
   describe "issue_event/1" do
