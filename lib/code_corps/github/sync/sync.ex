@@ -267,8 +267,11 @@ defmodule CodeCorps.GitHub.Sync do
       {:error, :task, %Changeset{} = changeset, _steps} ->
         {:error, :validating_task, changeset}
 
-      {:error, :github_comment, %Changeset{} = changeset, _steps} ->
+      {:error, :github_comment, %Changeset{data: %GithubComment{}} = changeset, _steps} ->
         {:error, :validating_github_comment, changeset}
+
+      {:error, :github_comment, %Changeset{data: %GithubUser{}} = changeset, _steps} ->
+        {:error, :validating_github_user_on_github_comment, changeset}
 
       {:error, :comment_user, %Changeset{} = changeset, _steps} ->
         {:error, :validating_comment_user, changeset}
