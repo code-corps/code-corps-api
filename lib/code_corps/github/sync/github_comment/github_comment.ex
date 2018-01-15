@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Sync.Comment.GithubComment do
+defmodule CodeCorps.GitHub.Sync.GithubComment do
   @moduledoc ~S"""
   In charge of finding a `CodeCorps.GithubComment` to link with a
   `CodeCorps.Comment` when processing a GitHub Comment payload.

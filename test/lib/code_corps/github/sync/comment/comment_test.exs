@@ -21,7 +21,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.CommentTest do
         |> Map.update!(:github_updated_at, &Timex.shift(&1, minutes: 1))
 
       {:ok, comment} =
-        task |> Sync.Comment.Comment.sync(github_comment, user)
+        task |> Sync.Comment.sync(github_comment, user)
 
       assert comment.user_id == user.id
       assert comment.markdown == github_comment.body
@@ -47,7 +47,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.CommentTest do
         |> Map.update!(:github_updated_at, &Timex.shift(&1, minutes: 1))
 
       {:ok, comment} =
-        task |> Sync.Comment.Comment.sync(github_comment, user)
+        task |> Sync.Comment.sync(github_comment, user)
 
       assert comment.user_id == user.id
       assert comment.markdown == github_comment.body
@@ -75,7 +75,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.CommentTest do
       %{user: user} = insert(:comment, task: task, github_comment: github_comment)
 
       {:error, changeset} =
-        task |> Sync.Comment.Comment.sync(github_comment, user)
+        task |> Sync.Comment.sync(github_comment, user)
 
       refute changeset.valid?
     end
@@ -91,7 +91,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.CommentTest do
 
       {:ok, deleted_comments} =
         github_comment.github_id
-        |> Sync.Comment.Comment.delete
+        |> Sync.Comment.delete()
 
       assert Enum.count(deleted_comments) == 2
       assert Repo.aggregate(Comment, :count, :id) == 1
@@ -107,7 +107,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.CommentTest do
 
       {:ok, deleted_comments} =
         github_comment.github_id
-        |> Sync.Comment.Comment.delete
+        |> Sync.Comment.delete()
 
       assert Enum.count(deleted_comments) == 0
     end

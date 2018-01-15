@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Sync.Comment.Comment.Changeset do
+defmodule CodeCorps.GitHub.Sync.Comment.Changeset do
   @moduledoc ~S"""
   In charge of building a `Changeset` to update a `Comment` with, when handling
   a GitHub Comment payload.

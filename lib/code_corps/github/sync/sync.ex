@@ -119,8 +119,8 @@ defmodule CodeCorps.GitHub.Sync do
 
     multi =
       Multi.new
-      |> Multi.run(:deleted_comments, fn _ -> Sync.Comment.Comment.delete(github_id) end)
-      |> Multi.run(:deleted_github_comment, fn _ -> Sync.Comment.GithubComment.delete(github_id) end)
+      |> Multi.run(:deleted_comments, fn _ -> Sync.Comment.delete(github_id) end)
+      |> Multi.run(:deleted_github_comment, fn _ -> Sync.GithubComment.delete(github_id) end)
 
     case multi |> Repo.transaction() do
       {:ok, %{deleted_comments: _, deleted_github_comment: _} = result} ->
@@ -153,13 +153,13 @@ defmodule CodeCorps.GitHub.Sync do
       end)
       |> Multi.run(:github_comment, fn %{github_issue: github_issue} ->
         github_issue
-        |> Sync.Comment.GithubComment.create_or_update_comment(comment_payload)
+        |> Sync.GithubComment.create_or_update_comment(comment_payload)
       end)
       |> Multi.run(:comment_user, fn %{github_comment: github_comment} ->
         github_comment |> Sync.User.RecordLinker.link_to(comment_payload)
       end)
       |> Multi.run(:comment, fn %{github_comment: github_comment, comment_user: user, task: task} ->
-        task |> Sync.Comment.Comment.sync(github_comment, user)
+        task |> Sync.Comment.sync(github_comment, user)
       end)
 
     case multi |> Repo.transaction() do
@@ -217,13 +217,13 @@ defmodule CodeCorps.GitHub.Sync do
       end)
       |> Multi.run(:github_comment, fn %{github_issue: github_issue} ->
         github_issue
-        |> Sync.Comment.GithubComment.create_or_update_comment(comment_payload)
+        |> Sync.GithubComment.create_or_update_comment(comment_payload)
       end)
       |> Multi.run(:comment_user, fn %{github_comment: github_comment} ->
         github_comment |> Sync.User.RecordLinker.link_to(comment_payload)
       end)
       |> Multi.run(:comment, fn %{github_comment: github_comment, comment_user: user, task: task} ->
-        task |> Sync.Comment.Comment.sync(github_comment, user)
+        task |> Sync.Comment.sync(github_comment, user)
       end)
 
     case multi |> Repo.transaction() do
@@ -474,14 +474,14 @@ defmodule CodeCorps.GitHub.Sync do
          {:ok, repo} <- repo |> mark_repo("fetching_comments"),
          {:ok, comment_payloads} <- repo |> API.Repository.issue_comments |> sync_step(:fetch_comments),
          {:ok, repo} <- repo |> mark_repo("syncing_github_comments", %{syncing_comments_count: comment_payloads |> Enum.count}),
-         {:ok, _comments} <- comment_payloads |> Enum.map(&Sync.Comment.GithubComment.create_or_update_comment(repo, &1)) |> ResultAggregator.aggregate |> sync_step(:sync_comments),
+         {:ok, _comments} <- comment_payloads |> Enum.map(&Sync.GithubComment.create_or_update_comment(repo, &1)) |> ResultAggregator.aggregate |> sync_step(:sync_comments),
          repo <- GithubRepo |> Repo.get(repo.id) |> preload_github_repo(),
          {:ok, repo} <- repo |> mark_repo("syncing_users"),
          {:ok, _users} <- repo |> Sync.User.User.sync_github_repo() |> sync_step(:sync_users),
          {:ok, repo} <- repo |> mark_repo("syncing_tasks"),
          {:ok, _tasks} <- repo |> Sync.Issue.Task.sync_github_repo() |> sync_step(:sync_tasks),
          {:ok, repo} <- repo |> mark_repo("syncing_comments"),
-         {:ok, _comments} <- repo |> Sync.Comment.Comment.sync_github_repo() |> sync_step(:sync_comments),
+         {:ok, _comments} <- repo |> Sync.Comment.sync_github_repo() |> sync_step(:sync_comments),
          {:ok, repo} <- repo |> mark_repo("synced")
     do
       {:ok, repo}

@@ -7,18 +7,17 @@ defmodule CodeCorps.GitHub.Sync.Comment.GithubCommentTest do
 
   alias CodeCorps.{
     GitHub.Adapters,
+    GitHub.Sync,
     GithubComment,
     Repo
   }
-  alias CodeCorps.GitHub.Sync.Comment.GithubComment, as: GithubCommentSyncer
-
   @payload load_event_fixture("issue_comment_created")
 
   describe "create_or_update_comment/1" do
     test "creates comment if none exists" do
       %{"comment" => attrs} = @payload
       github_issue = insert(:github_issue)
-      {:ok, %GithubComment{} = created_comment} = GithubCommentSyncer.create_or_update_comment(github_issue, attrs)
+      {:ok, %GithubComment{} = created_comment} = Sync.GithubComment.create_or_update_comment(github_issue, attrs)
 
       assert Repo.one(GithubComment)
 
@@ -34,7 +33,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.GithubCommentTest do
       github_issue = insert(:github_issue)
       github_comment = insert(:github_comment, github_id: comment_id, github_issue: github_issue)
 
-      {:ok, %GithubComment{} = updated_comment} = GithubCommentSyncer.create_or_update_comment(github_issue, attrs)
+      {:ok, %GithubComment{} = updated_comment} = Sync.GithubComment.create_or_update_comment(github_issue, attrs)
 
       assert updated_comment.id == github_comment.id
       assert updated_comment.github_issue_id == github_issue.id
@@ -45,7 +44,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.GithubCommentTest do
       %{"comment" => attrs} = bad_payload
       github_issue = insert(:github_issue)
 
-      {:error, changeset} = GithubCommentSyncer.create_or_update_comment(github_issue, attrs)
+      {:error, changeset} = Sync.GithubComment.create_or_update_comment(github_issue, attrs)
       refute changeset.valid?
     end
   end
@@ -56,7 +55,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.GithubCommentTest do
 
       {:ok, deleted_github_comment} =
         github_comment.github_id
-        |> GithubCommentSyncer.delete()
+        |> Sync.GithubComment.delete()
 
       assert Repo.aggregate(GithubComment, :count, :id) == 0
       assert deleted_github_comment.id == github_comment.id
@@ -67,7 +66,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.GithubCommentTest do
 
       {:ok, %GithubComment{} = empty_github_comment} =
         "123"
-        |> GithubCommentSyncer.delete()
+        |> Sync.GithubComment.delete()
 
       refute empty_github_comment.id
     end

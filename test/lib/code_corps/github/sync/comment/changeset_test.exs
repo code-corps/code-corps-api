@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Sync.Comment.Comment.ChangesetTest do
+defmodule CodeCorps.GitHub.Sync.Comment.ChangesetTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
@@ -14,7 +14,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment.ChangesetTest do
 
       changeset =
         github_comment
-        |> Sync.Comment.Comment.Changeset.create_changeset(task, user)
+        |> Sync.Comment.Changeset.create_changeset(task, user)
 
       expected_body =
         github_comment.body
@@ -45,7 +45,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment.ChangesetTest do
 
       changeset =
         comment
-        |> Sync.Comment.Comment.Changeset.update_changeset(github_comment)
+        |> Sync.Comment.Changeset.update_changeset(github_comment)
 
       expected_body =
         github_comment.body
@@ -76,7 +76,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment.ChangesetTest do
 
       changeset =
         comment
-        |> Sync.Comment.Comment.Changeset.update_changeset(github_comment)
+        |> Sync.Comment.Changeset.update_changeset(github_comment)
 
       refute changeset.valid?
       assert changeset.errors[:modified_at] ==

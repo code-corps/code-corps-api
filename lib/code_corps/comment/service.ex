@@ -84,7 +84,7 @@ defmodule CodeCorps.Comment.Service do
   defp create_on_github(%Comment{task: %Task{github_issue: github_issue}} = comment) do
     with {:ok, payload} <- comment |> GitHub.API.Comment.create(),
          {:ok, %GithubComment{} = github_comment} <-
-           Sync.Comment.GithubComment.create_or_update_comment(github_issue, payload) do
+           Sync.GithubComment.create_or_update_comment(github_issue, payload) do
       comment |> link_with_github_changeset(github_comment) |> Repo.update()
     else
       {:error, error} -> {:error, error}
@@ -103,7 +103,7 @@ defmodule CodeCorps.Comment.Service do
        ) do
     with {:ok, payload} <- comment |> GitHub.API.Comment.update(),
          {:ok, %GithubComment{}} <-
-           Sync.Comment.GithubComment.create_or_update_comment(github_issue, payload) do
+           Sync.GithubComment.create_or_update_comment(github_issue, payload) do
       {:ok, comment}
     else
       {:error, error} -> {:error, error}

@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Sync.Comment.Comment do
+defmodule CodeCorps.GitHub.Sync.Comment do
   @moduledoc ~S"""
   In charge of syncing `CodeCorps.Comment` records with a GitHub comment
   payload.
@@ -43,12 +43,12 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment do
     case find_comment(task, github_comment) do
       nil ->
         github_comment
-        |> Sync.Comment.Comment.Changeset.create_changeset(task, user)
+        |> Sync.Comment.Changeset.create_changeset(task, user)
         |> Repo.insert()
 
       %Comment{} = comment ->
         comment
-        |> Sync.Comment.Comment.Changeset.update_changeset(github_comment)
+        |> Sync.Comment.Changeset.update_changeset(github_comment)
         |> Repo.update()
     end
   end
