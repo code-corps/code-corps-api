@@ -107,11 +107,13 @@ defmodule CodeCorps.GitHub.SyncTest do
   end
 
   describe "issue_comment_event/1" do
-    @preloads [
+    @issue_comment_preloads [
       :user,
       [task: :user],
       [github_comment: [github_issue: [:github_pull_request, :github_repo]]]
     ]
+
+    @payload load_event_fixture("issue_comment_created_on_pull_request")
 
     test "syncs correctly when comment created for a pull request" do
       %{
@@ -133,7 +135,7 @@ defmodule CodeCorps.GitHub.SyncTest do
         "repository" => %{
           "id" => repo_github_id
         }
-      } = payload = load_event_fixture("issue_comment_created_on_pull_request")
+      } = @payload
 
       project = insert(:project)
       github_repo = insert(:github_repo, github_id: repo_github_id, project: project)
@@ -141,7 +143,7 @@ defmodule CodeCorps.GitHub.SyncTest do
       insert(:task_list, project: project, inbox: true)
       insert(:task_list, project: project, pull_requests: true)
 
-      {:ok, comment} = Sync.issue_comment_event(payload)
+      {:ok, comment} = Sync.issue_comment_event(@payload)
 
       assert Repo.aggregate(GithubComment, :count, :id) == 1
       assert Repo.aggregate(GithubIssue, :count, :id) == 1
@@ -162,7 +164,7 @@ defmodule CodeCorps.GitHub.SyncTest do
           } = github_issue
         } = github_comment,
         task: task
-      } = comment = comment |> Repo.preload(@preloads)
+      } = comment = comment |> Repo.preload(@issue_comment_preloads)
 
       assert github_comment.github_id == comment_github_id
 
@@ -183,7 +185,215 @@ defmodule CodeCorps.GitHub.SyncTest do
       assert comment.user.github_id == comment_user_github_id
     end
 
-    test "syncs correctly when comment created for a regular issue" do
+    test "can fail when finding repo" do
+      assert {:error, :repo_not_found} == @payload |> Sync.issue_comment_event()
+    end
+
+    test "can fail when fetching pull request" do
+      insert(:github_repo, github_id: @payload["repository"]["id"])
+
+      with_mock_api(CodeCorps.GitHub.FailureAPI) do
+        assert {:error, :fetching_pull_request, %CodeCorps.GitHub.APIError{}} =
+          @payload |> Sync.issue_comment_event()
+      end
+    end
+
+    test "can fail on github pull request validation" do
+      defmodule InvalidPullRequestAPI do
+        @moduledoc false
+
+        def request(:get, "https://api.github.com/repos/baxterthehacker/public-repo/pulls/1", _, _, _) do
+          {:ok, body} =
+            "pull_request"
+            |> load_endpoint_fixture()
+            |> Map.put("number", nil)
+            |> Poison.encode
+          {:ok, %HTTPoison.Response{status_code: 200, body: body}}
+        end
+        def request(method, endpoint, body, headers, options) do
+          CodeCorps.GitHub.SuccessAPI.request(method, endpoint, body, headers, options)
+        end
+      end
+
+      insert(:github_repo, github_id: @payload["repository"]["id"])
+
+      with_mock_api(InvalidPullRequestAPI) do
+        assert {:error, :validating_github_pull_request, %Changeset{} = changeset} =
+          @payload |> Sync.issue_comment_event()
+          refute changeset.valid?
+      end
+    end
+
+    test "can fail on github user validation for github pull request" do
+      defmodule InvalidUserAPI do
+        @moduledoc false
+
+        def request(:get, "https://api.github.com/repos/baxterthehacker/public-repo/pulls/1", _, _, _) do
+          {:ok, body} =
+            "pull_request"
+            |> load_endpoint_fixture()
+            |> Kernel.put_in(["user", "login"], nil)
+            |> Poison.encode
+          {:ok, %HTTPoison.Response{status_code: 200, body: body}}
+        end
+        def request(method, endpoint, body, headers, options) do
+          CodeCorps.GitHub.SuccessAPI.request(method, endpoint, body, headers, options)
+        end
+      end
+
+      insert(:github_repo, github_id: @payload["repository"]["id"])
+
+      with_mock_api(InvalidUserAPI) do
+        assert {
+          :error,
+          :validating_github_user_on_github_pull_request,
+          %Changeset{} = changeset
+        } = @payload |> Sync.issue_comment_event()
+
+        refute changeset.valid?
+      end
+    end
+
+    test "can fail on github issue validation" do
+      insert(:github_repo, github_id: @payload["repository"]["id"])
+      assert {:error, :validating_github_issue, %Changeset{} = changeset} =
+        @payload
+        |> Kernel.put_in(["issue", "number"], nil)
+        |> Sync.issue_comment_event()
+
+      refute changeset.valid?
+    end
+
+    test "can fail on github user validation for github issue" do
+      insert(:github_repo, github_id: @payload["repository"]["id"])
+      assert {
+        :error,
+        :validating_github_user_on_github_issue,
+        %Changeset{} = changeset
+      } =
+        @payload
+        |> Kernel.put_in(["issue", "user", "login"], nil)
+        |> Sync.issue_comment_event()
+
+      refute changeset.valid?
+    end
+
+    test "can fail on task user validation" do
+      insert(:github_repo, github_id: @payload["repository"]["id"])
+
+      # setup data to trigger a unique constraint
+      email = "taken@mail.com"
+      insert(:user, email: email)
+      payload = @payload |> Kernel.put_in(["issue", "user", "email"], email)
+
+      assert {:error, :validating_task_user, %Changeset{} = changeset} =
+        payload |> Sync.issue_comment_event()
+
+      refute changeset.valid?
+    end
+
+    test "can fail if task matched with multiple users" do
+      github_repo =
+        insert(:github_repo, github_id: @payload["repository"]["id"])
+
+      attrs =
+        @payload["issue"]
+        |> Adapters.Issue.to_issue()
+        |> Map.put(:github_repo, github_repo)
+
+      github_issue = insert(:github_issue, attrs)
+      # creates a user for each task, which should never happen normally
+      insert_pair(:task, github_issue: github_issue)
+
+      assert {:error, :multiple_task_users_match} ==
+        @payload |> Sync.issue_comment_event()
+    end
+
+    test "can fail on task validation" do
+      insert(:github_repo, github_id: @payload["repository"]["id"])
+
+      # validation is triggered due to missing task list
+
+      assert {:error, :validating_task, %Changeset{} = changeset} =
+        @payload |> Sync.issue_comment_event()
+
+      refute changeset.valid?
+    end
+
+    test "can fail on github comment validation" do
+      %{project: project} =
+        insert(:github_repo, github_id: @payload["repository"]["id"])
+
+      insert(:task_list, project: project, done: true)
+      insert(:task_list, project: project, pull_requests: true)
+
+      assert {:error, :validating_github_comment, %Changeset{} = changeset} =
+        @payload
+        |> Kernel.put_in(["comment", "url"], nil)
+        |> Sync.issue_comment_event()
+
+      refute changeset.valid?
+    end
+
+    test "can fail on github user validation for github comment" do
+      %{project: project} =
+        insert(:github_repo, github_id: @payload["repository"]["id"])
+
+      insert(:task_list, project: project, done: true)
+      insert(:task_list, project: project, pull_requests: true)
+
+      assert {
+        :error,
+        :validating_github_user_on_github_comment,
+        %Changeset{} = changeset
+      } =
+        @payload
+        |> Kernel.put_in(["comment", "user", "login"], nil)
+        |> Sync.issue_comment_event()
+
+      refute changeset.valid?
+    end
+
+    test "can fail on comment user validation" do
+      %{project: project} =
+        insert(:github_repo, github_id: @payload["repository"]["id"])
+
+      insert(:task_list, project: project, done: true)
+      insert(:task_list, project: project, pull_requests: true)
+
+      # setup data to trigger a unique constraint
+      email = "taken@mail.com"
+      insert(:user, email: email)
+
+      assert {:error, :validating_comment_user, %Changeset{} = changeset} =
+        @payload
+        |> Kernel.put_in(["comment", "user", "email"], email)
+        |> Sync.issue_comment_event()
+
+      refute changeset.valid?
+    end
+
+    test "can fail if commment matched with multiple users" do
+      %{project: project} = github_repo =
+        insert(:github_repo, github_id: @payload["repository"]["id"])
+
+      insert(:task_list, project: project, done: true)
+      insert(:task_list, project: project, pull_requests: true)
+
+      attrs =
+        @payload["comment"]
+        |> Adapters.Comment.to_github_comment()
+        |> Map.put(:github_repo, github_repo)
+
+      github_comment = insert(:github_comment, attrs)
+      # creates a user for each comment, which should never happen normally
+      insert_pair(:comment, github_comment: github_comment)
+
+      assert {:error, :multiple_comment_users_match} ==
+        @payload |> Sync.issue_comment_event()
+    end
+
+    test "syncs correctly when comment created for pull request" do
       %{
         "issue" => %{
           "body" => issue_body,
@@ -231,7 +441,7 @@ defmodule CodeCorps.GitHub.SyncTest do
           } = github_issue
         } = github_comment,
         task: task
-      } = comment = comment |> Repo.preload(@preloads)
+      } = comment = comment |> Repo.preload(@issue_comment_preloads)
 
       assert github_comment.github_id == comment_github_id
 
@@ -250,7 +460,7 @@ defmodule CodeCorps.GitHub.SyncTest do
       assert comment.user.github_id == comment_user_github_id
     end
 
-    test "syncs correctly when comment deleted" do
+    test "syncs correctly on comment deleted" do
       %{"comment" => %{"id" => github_id}} = payload =
         load_event_fixture("issue_comment_deleted")
 
@@ -392,7 +602,7 @@ defmodule CodeCorps.GitHub.SyncTest do
       # creates a user for each task, which should never happen normally
       insert_pair(:task, github_issue: github_issue)
 
-      assert {:error, :multiple_issue_users_match} ==
+      assert {:error, :multiple_task_users_match} ==
         @payload |> Sync.issue_event()
     end
 

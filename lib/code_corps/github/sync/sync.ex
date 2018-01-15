@@ -13,7 +13,9 @@ defmodule CodeCorps.GitHub.Sync do
     GitHub.Sync.Utils.Finder,
     GitHub.Utils.ResultAggregator,
     GithubAppInstallation,
+    GithubComment,
     GithubIssue,
+    GithubPullRequest,
     GithubRepo,
     GithubUser,
     Repo,
@@ -26,7 +28,7 @@ defmodule CodeCorps.GitHub.Sync do
     {:error, :repo_not_found} |
     {:error, :validating_github_issue, Changeset.t()} |
     {:error, :validating_user, Changeset.t()} |
-    {:error, :multiple_issue_users_match} |
+    {:error, :multiple_task_users_match} |
     {:error, :validating_task, Changeset.t()} |
     {:error, :unexpected_transaction_outcome, any}
 
@@ -47,10 +49,10 @@ defmodule CodeCorps.GitHub.Sync do
         issue_payload
         |> Sync.GithubIssue.create_or_update_issue(github_repo)
       end)
-      |> Multi.run(:issue_user, fn %{github_issue: github_issue} ->
+      |> Multi.run(:task_user, fn %{github_issue: github_issue} ->
         github_issue |> Sync.User.RecordLinker.link_to(issue_payload)
       end)
-      |> Multi.run(:task, fn %{github_issue: github_issue, issue_user: user} ->
+      |> Multi.run(:task, fn %{github_issue: github_issue, task_user: user} ->
         github_issue |> Sync.Task.sync_github_issue(user)
       end)
 
@@ -66,11 +68,11 @@ defmodule CodeCorps.GitHub.Sync do
       {:error, :github_issue, %Changeset{data: %GithubUser{}} = changeset, _steps} ->
         {:error, :validating_github_user, changeset}
 
-      {:error, :issue_user, %Changeset{} = changeset, _steps} ->
+      {:error, :task_user, %Changeset{} = changeset, _steps} ->
         {:error, :validating_user, changeset}
 
-      {:error, :issue_user, :multiple_users, _steps} ->
-        {:error, :multiple_issue_users_match}
+      {:error, :task_user, :multiple_users, _steps} ->
+        {:error, :multiple_task_users_match}
 
       {:error, :task, %Changeset{} = changeset, _steps} ->
         {:error, :validating_task, changeset}
@@ -86,11 +88,13 @@ defmodule CodeCorps.GitHub.Sync do
     {:ok, Comment.t()} |
     {:error, :repo_not_found} |
     {:error, :validating_github_issue, Changeset.t()} |
-    {:error, :validating_user, Changeset.t()} |
-    {:error, :multiple_issue_users_match} |
+    {:error, :validating_github_user_on_github_issue, Changeset.t()} |
+    {:error, :validating_task_user, Changeset.t()} |
+    {:error, :multiple_task_users_match} |
     {:error, :validating_task, Changeset.t()} |
     {:error, :validating_github_comment, Changeset.t()} |
-    {:error, :validating_user, Changeset.t()} |
+    {:error, :validating_github_user_on_github_comment, Changeset.t()} |
+    {:error, :validating_comment_user, Changeset.t()} |
     {:error, :multiple_comment_users_match} |
     {:error, :validating_comment, Changeset.t()} |
     {:error, :unexpected_transaction_outcome, any}
@@ -98,7 +102,8 @@ defmodule CodeCorps.GitHub.Sync do
   @type pull_request_comment_outcome ::
     issue_comment_outcome() |
     {:error, :fetching_pull_request, struct} |
-    {:error, :validating_github_pull_request, Changeset.t()}
+    {:error, :validating_github_pull_request, Changeset.t()} |
+    {:error, :validating_github_user_on_github_pull_request, Changeset.t()}
 
   @type issue_comment_event_outcome ::
     comment_deleted_outcome() |
@@ -151,10 +156,10 @@ defmodule CodeCorps.GitHub.Sync do
         issue_payload
         |> Sync.GithubIssue.create_or_update_issue(github_repo, github_pull_request)
       end)
-      |> Multi.run(:issue_user, fn %{github_issue: github_issue} ->
+      |> Multi.run(:task_user, fn %{github_issue: github_issue} ->
         github_issue |> Sync.User.RecordLinker.link_to(issue_payload)
       end)
-      |> Multi.run(:task, fn %{github_issue: github_issue, issue_user: user} ->
+      |> Multi.run(:task, fn %{github_issue: github_issue, task_user: user} ->
         github_issue |> Sync.Task.sync_github_issue(user)
       end)
       |> Multi.run(:github_comment, fn %{github_issue: github_issue} ->
@@ -177,26 +182,35 @@ defmodule CodeCorps.GitHub.Sync do
       {:error, :fetch_pull_request, error, _steps} ->
         {:error, :fetching_pull_request, error}
 
-      {:error, :github_pull_request, %Ecto.Changeset{} = changeset, _steps} ->
+      {:error, :github_pull_request, %Changeset{data: %GithubPullRequest{}} = changeset, _steps} ->
         {:error, :validating_github_pull_request, changeset}
 
-      {:error, :github_issue, %Ecto.Changeset{} = changeset, _steps} ->
+      {:error, :github_pull_request, %Changeset{data: %GithubUser{}} = changeset, _steps} ->
+        {:error, :validating_github_user_on_github_pull_request, changeset}
+
+      {:error, :github_issue, %Changeset{data: %GithubIssue{}} = changeset, _steps} ->
         {:error, :validating_github_issue, changeset}
 
-      {:error, :issue_user, %Changeset{} = changeset, _steps} ->
-        {:error, :validating_user, changeset}
+      {:error, :github_issue, %Changeset{data: %GithubUser{}} = changeset, _steps} ->
+        {:error, :validating_github_user_on_github_issue, changeset}
 
-      {:error, :issue_user, :multiple_users, _steps} ->
-        {:error, :multiple_issue_users_match}
+      {:error, :task_user, %Changeset{} = changeset, _steps} ->
+        {:error, :validating_task_user, changeset}
+
+      {:error, :task_user, :multiple_users, _steps} ->
+        {:error, :multiple_task_users_match}
 
       {:error, :task, %Changeset{} = changeset, _steps} ->
         {:error, :validating_task, changeset}
 
-      {:error, :github_comment, %Changeset{} = changeset, _steps} ->
+      {:error, :github_comment, %Changeset{data: %GithubComment{}} = changeset, _steps} ->
         {:error, :validating_github_comment, changeset}
 
+      {:error, :github_comment, %Changeset{data: %GithubUser{}} = changeset, _steps} ->
+        {:error, :validating_github_user_on_github_comment, changeset}
+
       {:error, :comment_user, %Changeset{} = changeset, _steps} ->
-        {:error, :validating_user, changeset}
+        {:error, :validating_comment_user, changeset}
 
       {:error, :comment_user, :multiple_users, _steps} ->
         {:error, :multiple_comment_users_match}
@@ -215,10 +229,10 @@ defmodule CodeCorps.GitHub.Sync do
       |> Multi.run(:github_issue, fn %{repo: github_repo} ->
         issue_payload |> Sync.GithubIssue.create_or_update_issue(github_repo)
       end)
-      |> Multi.run(:issue_user, fn %{github_issue: github_issue} ->
+      |> Multi.run(:task_user, fn %{github_issue: github_issue} ->
         github_issue |> Sync.User.RecordLinker.link_to(issue_payload)
       end)
-      |> Multi.run(:task, fn %{github_issue: github_issue, issue_user: user} ->
+      |> Multi.run(:task, fn %{github_issue: github_issue, task_user: user} ->
         github_issue |> Sync.Task.sync_github_issue(user)
       end)
       |> Multi.run(:github_comment, fn %{github_issue: github_issue} ->
@@ -238,14 +252,17 @@ defmodule CodeCorps.GitHub.Sync do
       {:error, :repo, :unmatched_repository, _steps} ->
         {:error, :repo_not_found}
 
-      {:error, :github_issue, %Changeset{} = changeset, _steps} ->
+      {:error, :github_issue, %Changeset{data: %GithubIssue{}} = changeset, _steps} ->
         {:error, :validating_github_issue, changeset}
 
-      {:error, :issue_user, %Changeset{} = changeset, _steps} ->
-        {:error, :validating_user, changeset}
+      {:error, :github_issue, %Changeset{data: %GithubUser{}} = changeset, _steps} ->
+        {:error, :validating_github_user_on_github_issue, changeset}
 
-      {:error, :issue_user, :multiple_users, _steps} ->
-        {:error, :multiple_issue_users_match}
+      {:error, :task_user, %Changeset{} = changeset, _steps} ->
+        {:error, :validating_task_user, changeset}
+
+      {:error, :task_user, :multiple_users, _steps} ->
+        {:error, :multiple_task_users_match}
 
       {:error, :task, %Changeset{} = changeset, _steps} ->
         {:error, :validating_task, changeset}
@@ -254,7 +271,7 @@ defmodule CodeCorps.GitHub.Sync do
         {:error, :validating_github_comment, changeset}
 
       {:error, :comment_user, %Changeset{} = changeset, _steps} ->
-        {:error, :validating_user, changeset}
+        {:error, :validating_comment_user, changeset}
 
       {:error, :comment_user, :multiple_users, _steps} ->
         {:error, :multiple_comment_users_match}
