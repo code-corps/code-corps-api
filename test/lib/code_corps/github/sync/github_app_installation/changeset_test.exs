@@ -1,11 +1,11 @@
-defmodule CodeCorps.GitHub.Event.Installation.ChangesetTest do
+defmodule CodeCorps.GitHub.Event.GithubAppInstallation.ChangesetTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
 
   import CodeCorps.GitHub.TestHelpers
   alias CodeCorps.{
-    GitHub.Sync.Installation,
+    GitHub.Sync,
     GithubAppInstallation
   }
   alias Ecto.Changeset
@@ -15,7 +15,8 @@ defmodule CodeCorps.GitHub.Event.Installation.ChangesetTest do
     test "assigns correct changes" do
       payload = load_event_fixture("installation_created")
 
-      changeset = payload |> Installation.Changeset.create_changeset()
+      changeset =
+        payload |> Sync.GithubAppInstallation.Changeset.create_changeset()
 
       assert changeset |> Changeset.get_change(:github_id) == payload["installation"]["id"]
       assert changeset |> Changeset.get_change(:github_account_id) == payload["installation"]["account"]["id"]
@@ -34,7 +35,8 @@ defmodule CodeCorps.GitHub.Event.Installation.ChangesetTest do
       payload = load_event_fixture("installation_created")
       user = insert(:user)
 
-      changeset = payload |> Installation.Changeset.create_changeset(user)
+      changeset =
+        payload |> Sync.GithubAppInstallation.Changeset.create_changeset(user)
 
       assert changeset |> Changeset.get_change(:user) |> Map.get(:data) == user
       assert changeset.valid?
@@ -47,7 +49,8 @@ defmodule CodeCorps.GitHub.Event.Installation.ChangesetTest do
       github_app_installation = %GithubAppInstallation{}
 
       changeset =
-        github_app_installation |> Installation.Changeset.update_changeset(payload)
+        github_app_installation
+        |> Sync.GithubAppInstallation.Changeset.update_changeset(payload)
 
       assert changeset |> Changeset.get_change(:github_id) == payload["installation"]["id"]
       assert changeset |> Changeset.get_change(:github_account_id) == payload["installation"]["account"]["id"]

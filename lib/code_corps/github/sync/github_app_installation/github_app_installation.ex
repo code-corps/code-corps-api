@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Sync.Installation do
+defmodule CodeCorps.GitHub.Sync.GithubAppInstallation do
   import Ecto.Query
 
   alias CodeCorps.{GithubAppInstallation, GitHub.Sync, Repo, User}
@@ -89,14 +89,14 @@ defmodule CodeCorps.GitHub.Sync.Installation do
   @spec create_installation(map, User.t() | nil) :: commit_result()
   defp create_installation(%{} = payload, user \\ nil) do
     payload
-    |> Sync.Installation.Changeset.create_changeset(user)
+    |> Sync.GithubAppInstallation.Changeset.create_changeset(user)
     |> Repo.insert()
   end
 
   @spec update_installation(GithubAppInstallation.t, map) :: commit_result()
   defp update_installation(%GithubAppInstallation{} = installation, %{} = payload) do
     installation
-    |> Sync.Installation.Changeset.update_changeset(payload)
+    |> Sync.GithubAppInstallation.Changeset.update_changeset(payload)
     |> Repo.update()
   end
 end

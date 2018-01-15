@@ -288,7 +288,7 @@ defmodule CodeCorps.GitHub.Sync do
   def installation_event(%{"action" => "created"} = payload) do
     multi =
       Multi.new
-      |> Multi.run(:installation, fn _ -> payload |> Sync.Installation.sync() end)
+      |> Multi.run(:installation, fn _ -> payload |> Sync.GithubAppInstallation.sync() end)
       |> Multi.run(:repos, fn %{installation: installation} -> installation |> Sync.GithubRepo.sync_installation() end)
 
     case multi |> Repo.transaction() do

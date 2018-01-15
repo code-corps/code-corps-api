@@ -1,4 +1,4 @@
-defmodule CodeCorps.GitHub.Sync.Installation.Changeset do
+defmodule CodeCorps.GitHub.Sync.GithubAppInstallation.Changeset do
   @moduledoc ~S"""
   In charge of managing changesets when creating or updating a
   `GithubAppInstallation` in the process of handling an Installation event.
