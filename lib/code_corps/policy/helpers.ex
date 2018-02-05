@@ -104,7 +104,7 @@ defmodule CodeCorps.Policy.Helpers do
   @doc """
   Retrieves conversation from associated record
   """
-  @spec get_conversation(Changeset.t() | ConversationPart.t() | map) :: Message.t()
+  @spec get_conversation(Changeset.t() | ConversationPart.t() | map) :: Conversation.t()
   def get_conversation(%ConversationPart{conversation_id: conversation_id}), do: Repo.get(Conversation, conversation_id)
   def get_conversation(%{"conversation_id" => conversation_id}), do: Repo.get(Conversation, conversation_id)
   def get_conversation(%Changeset{changes: %{conversation_id: conversation_id}}), do: Repo.get(Conversation, conversation_id)
