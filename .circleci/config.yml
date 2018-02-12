@@ -1,0 +1,119 @@
+defaults: &defaults
+  working_directory: ~/code-corps-api
+  docker:
+    - image: circleci/elixir:1.6-node-browsers
+    - image: circleci/postgres:9.4
+      environment:
+        POSTGRES_USER: ubuntu
+    - image: circleci/ruby:2.3
+
+jobs:
+  build:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+          - v1-mix-cache-{{ .Branch }}
+          - v1-mix-cache
+      - restore_cache:
+          keys:
+          - v1-build-cache-{{ .Branch }}
+          - v1-build-cache
+      - run:
+          name: Install PostgreSQL Client (for pg_dump, happening as part of ecto.migrate)
+          command: sudo apt install postgresql-client
+      - run: mix local.hex --force
+      - run: mix local.rebar
+      - run: mix deps.get
+      - run:
+          name: Run test suite and maybe report coverage
+          command: |
+            if [ ${CIRCLE_PR_USERNAME} ]; then
+              MIX_ENV=test mix test;
+            else
+              MIX_ENV=test mix coveralls.circle --include acceptance:true;
+            fi
+      - save_cache:
+          key: v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths: "deps"
+      - save_cache:
+          key: v1-mix-cache-{{ .Branch }}
+          paths: "deps"
+      - save_cache:
+          key: v1-mix-cache
+          paths: "deps"
+      - save_cache:
+          key: v1-build-cache-{{ .Branch }}
+          paths: "_build"
+      - save_cache:
+          key: v1-build-cache
+          paths: "_build"
+  deploy-staging:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: Run Heroku setup script
+          command: bash .circleci/setup-heroku.sh
+      - add_ssh_keys:
+          fingerprints:
+            - "48:a0:87:54:ca:75:32:12:c6:9e:a2:77:a4:7a:08:a4"
+      - run:
+          name: Push to Remote Development
+          command: |
+            git push --force git@heroku.com:code-corps-remote-development.git HEAD:refs/heads/master
+            heroku run "POOL_SIZE=2 mix ecto.migrate" --app code-corps-remote-development
+            heroku restart --app code-corps-remote-development
+      - run:
+          name: Push to Staging
+          command: |
+            git push --force git@heroku.com:code-corps-staging.git HEAD:refs/heads/master
+            heroku run "POOL_SIZE=2 mix ecto.migrate" --app code-corps-staging
+            heroku restart --app code-corps-staging
+      - run:
+          name: Update API Docs
+          command: |
+            gem install apiaryio
+            apiary publish --api-name="codecorpsapidevelop" --path ./blueprint/api.apib
+            ./bin/deploy_docs.sh
+  deploy-production:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: Run Heroku setup script
+          command: bash .circleci/setup-heroku.sh
+      - add_ssh_keys:
+          fingerprints:
+            - "48:a0:87:54:ca:75:32:12:c6:9e:a2:77:a4:7a:08:a4"
+      - run:
+          name: Deploy Master to Heroku Production
+          command: |
+            git push --force git@heroku.com:code-corps.git HEAD:refs/heads/master
+            heroku run "POOL_SIZE=2 mix ecto.migrate" --app code-corps
+            heroku restart --app code-corps
+      - run:
+          name: Update API Docs
+          command: |
+            gem install apiaryio
+            apiary publish --api-name="codecorpsapi" --path ./blueprint/api.apib
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build
+      - deploy-staging:
+          requires:
+            - build
+          filters:
+            branches:
+              only: develop
+      - deploy-production:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
