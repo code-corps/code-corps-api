@@ -1,15 +1,11 @@
-defaults: &defaults
-  working_directory: ~/code-corps-api
-  docker:
-    - image: circleci/elixir:1.6-node-browsers
-    - image: circleci/postgres:9.4
-      environment:
-        POSTGRES_USER: ubuntu
-    - image: circleci/ruby:2.3
-
 jobs:
   build:
-    <<: *defaults
+    working_directory: ~/code-corps-api
+    docker:
+      - image: circleci/elixir:1.6-node-browsers
+      - image: circleci/postgres:9.4
+        environment:
+          POSTGRES_USER: ubuntu
     steps:
       - checkout
       - restore_cache:
@@ -50,8 +46,10 @@ jobs:
       - save_cache:
           key: v1-build-cache
           paths: "_build"
-  deploy-staging:
-    <<: *defaults
+  deploy-remote-development:
+    working_directory: ~/code-corps-api
+    docker:
+      - image: buildpack-deps:trusty
     steps:
       - checkout
       - run:
@@ -66,20 +64,28 @@ jobs:
             git push --force git@heroku.com:code-corps-remote-development.git HEAD:refs/heads/master
             heroku run "POOL_SIZE=2 mix ecto.migrate" --app code-corps-remote-development
             heroku restart --app code-corps-remote-development
+  deploy-staging:
+    working_directory: ~/code-corps-api
+    docker:
+      - image: buildpack-deps:trusty
+    steps:
+      - checkout
+      - run:
+          name: Run Heroku setup script
+          command: bash .circleci/setup-heroku.sh
+      - add_ssh_keys:
+          fingerprints:
+            - "db:3e:d6:de:66:8d:07:55:70:f6:36:0d:e1:11:28:71"
       - run:
           name: Push to Staging
           command: |
             git push --force git@heroku.com:code-corps-staging.git HEAD:refs/heads/master
             heroku run "POOL_SIZE=2 mix ecto.migrate" --app code-corps-staging
             heroku restart --app code-corps-staging
-      - run:
-          name: Update API Docs
-          command: |
-            gem install apiaryio
-            apiary publish --api-name="codecorpsapidevelop" --path ./blueprint/api.apib
-            ./bin/deploy_docs.sh
   deploy-production:
-    <<: *defaults
+    working_directory: ~/code-corps-api
+    docker:
+      - image: buildpack-deps:trusty
     steps:
       - checkout
       - run:
@@ -94,17 +100,86 @@ jobs:
             git push --force git@heroku.com:code-corps.git HEAD:refs/heads/master
             heroku run "POOL_SIZE=2 mix ecto.migrate" --app code-corps
             heroku restart --app code-corps
+  deploy-staging-apiary:
+    working_directory: ~/code-corps-api
+    docker:
+      - image: circleci/ruby:2.4
+    steps:
+      - checkout
       - run:
-          name: Update API Docs
+          name: Install Apiary
+          command: gem install apiaryio
+      - run:
+          name: Deploy API Docs
+          command: apiary publish --api-name="codecorpsapidevelop" --path ./blueprint/api.apib
+  deploy-production-apiary:
+    working_directory: ~/code-corps-api
+    docker:
+      - image: circleci/ruby:2.4
+    steps:
+      - checkout
+      - run:
+          name: Install Apiary
+          command: gem install apiaryio
+      - run:
+          name: Deploy API Docs
+          command: apiary publish --api-name="codecorpsapi" --path ./blueprint/api.apib
+  deploy-exdocs:
+    working_directory: ~/code-corps-api
+    docker:
+      - image: circleci/elixir:1.6
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+          - v1-mix-cache-{{ .Branch }}
+          - v1-mix-cache
+      - restore_cache:
+          keys:
+          - v1-build-cache-{{ .Branch }}
+          - v1-build-cache
+      - run: mix local.hex --force
+      - run: mix local.rebar
+      - run: mix deps.get
+      - add_ssh_keys:
+          fingerprints:
+            - "db:3e:d6:de:66:8d:07:55:70:f6:36:0d:e1:11:28:71"
+      - run:
+          name: Identify as user on GitHub
           command: |
-            gem install apiaryio
-            apiary publish --api-name="codecorpsapi" --path ./blueprint/api.apib
+            git config --global user.email "josh@coderly.com"
+            git config --global user.name "joshsmith"
+      - run:
+          name: Deploy Docs
+          command: ./bin/deploy_docs.sh
+      - save_cache:
+          key: v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths: "deps"
+      - save_cache:
+          key: v1-mix-cache-{{ .Branch }}
+          paths: "deps"
+      - save_cache:
+          key: v1-mix-cache
+          paths: "deps"
+      - save_cache:
+          key: v1-build-cache-{{ .Branch }}
+          paths: "_build"
+      - save_cache:
+          key: v1-build-cache
+          paths: "_build"
 
 workflows:
   version: 2
   build-deploy:
     jobs:
       - build
+      - deploy-remote-development:
+          requires:
+            - build
+          filters:
+            branches:
+              only: develop
       - deploy-staging:
           requires:
             - build
@@ -117,3 +192,21 @@ workflows:
           filters:
             branches:
               only: master
+      - deploy-staging-apiary:
+          requires:
+            - build
+          filters:
+            branches:
+              only: develop
+      - deploy-production-apiary:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+      - deploy-exdocs:
+          requires:
+            - build
+          filters:
+            branches:
+              only: develop
