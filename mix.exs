@@ -10,7 +10,7 @@ defmodule CodeCorps.Mixfile do
   def project do
     [app: :code_corps,
      version: "0.0.1",
-     elixir: "~> 1.5.2",
+     elixir: "~> 1.6",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
      dialyzer: [ignore_warnings: "dialyzer.ignore-warnings", plt_add_apps: [:kernel, :stdlib], plt_add_deps: :transitive],
