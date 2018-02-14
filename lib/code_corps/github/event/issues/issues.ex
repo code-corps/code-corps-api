@@ -8,10 +8,9 @@ defmodule CodeCorps.GitHub.Event.Issues do
   @behaviour CodeCorps.GitHub.Event.Handler
 
   alias CodeCorps.{
-    GitHub,
+    GitHub.Sync,
     GitHub.Event.Issues.Validator
   }
-  alias GitHub.Sync
 
   @doc ~S"""
   Handles the "Issues" GitHub webhook
@@ -23,7 +22,8 @@ defmodule CodeCorps.GitHub.Event.Issues do
   - sync the issue using `CodeCorps.GitHub.Sync.Issue`
   """
   @impl CodeCorps.GitHub.Event.Handler
-  @spec handle(map) :: {:ok, any} | {:error, atom}
+  @spec handle(map) ::
+    Sync.issue_event_outcome() | {:error, :unexpected_payload}
   def handle(payload) do
     with {:ok, :valid} <- validate_payload(payload) do
       Sync.issue_event(payload)

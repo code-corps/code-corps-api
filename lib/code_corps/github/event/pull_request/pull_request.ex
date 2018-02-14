@@ -8,10 +8,9 @@ defmodule CodeCorps.GitHub.Event.PullRequest do
   @behaviour CodeCorps.GitHub.Event.Handler
 
   alias CodeCorps.{
-    GitHub,
+    GitHub.Sync,
     GitHub.Event.PullRequest.Validator
   }
-  alias GitHub.Sync
 
   @doc ~S"""
   Handles the "PullRequest" GitHub webhook
@@ -23,7 +22,8 @@ defmodule CodeCorps.GitHub.Event.PullRequest do
   - sync the pull request using `CodeCorps.GitHub.Sync.PullRequest`
   """
   @impl CodeCorps.GitHub.Event.Handler
-  @spec handle(map) :: {:ok, any} | {:error, atom}
+  @spec handle(map) ::
+    Sync.pull_request_event_outcome() | {:error, :unexpected_payload}
   def handle(payload) do
     with {:ok, :valid} <- validate_payload(payload) do
       Sync.pull_request_event(payload)

@@ -6,7 +6,10 @@ defmodule CodeCorps.GitHub.Event.Installation do
 
   @behaviour CodeCorps.GitHub.Event.Handler
 
-  alias CodeCorps.{GitHub.Sync, GitHub.Event.Installation}
+  alias CodeCorps.{
+    GitHub.Sync,
+    GitHub.Event.Installation
+  }
 
 
   @doc """
@@ -17,6 +20,7 @@ defmodule CodeCorps.GitHub.Event.Installation do
 
   `CodeCorps.GitHub.Sync.installation_event/1`
   """
+  @impl CodeCorps.GitHub.Event.Handler
   @spec handle(map) ::
     Sync.installation_event_outcome() | {:error, :unexpected_payload}
   def handle(payload) do

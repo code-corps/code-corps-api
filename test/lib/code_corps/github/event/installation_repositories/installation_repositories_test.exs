@@ -112,7 +112,7 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositoriesTest do
     end
 
     test "marks event as errored if no installation" do
-      assert {:error, :unmatched_installation, %{}} == InstallationRepositories.handle(@payload)
+      assert {:error, :unmatched_installation} == InstallationRepositories.handle(@payload)
     end
   end
 
@@ -168,7 +168,7 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositoriesTest do
     end
 
     test "marks event as errored if no installation" do
-      assert {:error, :unmatched_installation, %{}} == InstallationRepositories.handle(@payload)
+      assert {:error, :unmatched_installation} == InstallationRepositories.handle(@payload)
     end
   end
 end

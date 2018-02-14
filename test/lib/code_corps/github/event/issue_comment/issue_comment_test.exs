@@ -35,7 +35,7 @@ defmodule CodeCorps.GitHub.Event.IssueCommentTest do
       end
 
       test "returns error if unmatched repository" do
-        assert IssueComment.handle(@payload) == {:error, :repo_not_found, %{}}
+        assert IssueComment.handle(@payload) == {:error, :repo_not_found}
         refute Repo.one(User)
       end
 

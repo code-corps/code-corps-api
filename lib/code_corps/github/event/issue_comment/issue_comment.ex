@@ -8,10 +8,9 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
   @behaviour CodeCorps.GitHub.Event.Handler
 
   alias CodeCorps.{
-    GitHub,
+    GitHub.Sync,
     GitHub.Event.IssueComment.Validator
   }
-  alias GitHub.Sync
 
   @doc ~S"""
   Handles the "IssueComment" GitHub webhook
@@ -23,7 +22,8 @@ defmodule CodeCorps.GitHub.Event.IssueComment do
   - sync the comment using `CodeCorps.GitHub.Sync.Comment`
   """
   @impl CodeCorps.GitHub.Event.Handler
-  @spec handle(map) :: {:ok, any} | {:error, atom}
+  @spec handle(map) ::
+    Sync.issue_comment_event_outcome() | {:error, :unexpected_payload}
   def handle(payload) do
     with {:ok, :valid} <- validate_payload(payload) do
       Sync.issue_comment_event(payload)
