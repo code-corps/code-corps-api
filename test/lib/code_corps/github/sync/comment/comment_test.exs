@@ -1,73 +1,115 @@
-defmodule CodeCorps.GitHub.Sync.CommentTest do
+defmodule CodeCorps.GitHub.Sync.Comment.CommentTest do
   @moduledoc false
 
   use CodeCorps.DbAccessCase
 
-  import CodeCorps.GitHub.TestHelpers
+  alias CodeCorps.{Comment, GithubComment, GitHub.Sync, Repo}
 
-  alias CodeCorps.{
-    Comment,
-    GitHub.Sync,
-    GithubComment,
-    Repo,
-    User
-  }
-  describe "sync/2" do
-    @payload load_event_fixture("issue_comment_created")
+  describe "sync/4" do
+    test "creates missing comments for each project associated with the github repo" do
+      user = insert(:user)
+      project = insert(:project)
+      github_repo = insert(:github_repo, project: project)
+      github_issue = insert(:github_issue, github_repo: github_repo)
+      github_comment = insert(:github_comment, github_issue: github_issue)
 
-    test "with unmatched both users, creates users, missing comments, for all projects connected with the github repo" do
-      %{
-        "issue" => %{
-          "id" => issue_github_id,
-          "user" => %{"id" => issue_user_github_id}
-        },
-        "comment" => %{
-          "body" => comment_markdown, "id" => comment_github_id,
-          "user" => %{"id" => comment_user_github_id}
-        } = comment,
-        "repository" => %{"id" => repo_github_id}
-      } = @payload
+      task = insert(:task, project: project, user: user, github_issue: github_issue, github_repo: github_repo)
 
-      user = insert(:user, github_id: issue_user_github_id)
-      github_issue = insert(:github_issue, github_id: issue_github_id)
-      github_repo = insert(:github_repo, github_id: repo_github_id)
-      task = insert(:task, github_issue: github_issue, github_repo: github_repo, user: user)
+      # update will fail unless source is newer than target
+      github_comment =
+        github_comment
+        |> Map.update!(:github_updated_at, &Timex.shift(&1, minutes: 1))
 
-      changes = %{repo: github_repo, github_issue: github_issue, task: task}
-      {:ok, %{comment: comment}} = Sync.Comment.sync(changes, comment) |> Repo.transaction
+      {:ok, comment} =
+        task |> Sync.Comment.sync(github_comment, user)
 
-      comment_user = Repo.get_by(User, github_id: comment_user_github_id)
+      assert comment.user_id == user.id
+      assert comment.markdown == github_comment.body
+      assert comment.github_comment_id == github_comment.id
+      assert comment.task_id == task.id
 
-      assert comment.body
-      assert comment.markdown == comment_markdown
-      assert comment.user_id == comment_user.id
+      assert Repo.one(Comment)
+    end
 
-      Repo.all(GithubComment) |> Enum.each(fn github_comment ->
-        assert github_comment.github_id == comment_github_id
-        assert github_comment.body == comment_markdown
-      end)
+    test "updates existing comments for each project associated with the github repo" do
+      user = insert(:user)
+      project = insert(:project)
+      github_repo = insert(:github_repo, project: project)
+      github_issue = insert(:github_issue, github_repo: github_repo)
+      github_comment = insert(:github_comment, github_issue: github_issue)
 
-      assert Repo.aggregate(GithubComment, :count, :id) == 1
+      task = insert(:task, project: project, user: user, github_issue: github_issue, github_repo: github_repo)
+      existing_comment = insert(:comment, task: task, user: user, github_comment: github_comment)
+
+      # update will fail unless source is newer than target
+      github_comment =
+        github_comment
+        |> Map.update!(:github_updated_at, &Timex.shift(&1, minutes: 1))
+
+      {:ok, comment} =
+        task |> Sync.Comment.sync(github_comment, user)
+
+      assert comment.user_id == user.id
+      assert comment.markdown == github_comment.body
+      assert comment.github_comment_id == github_comment.id
+      assert comment.task_id == task.id
+      assert comment.id == existing_comment.id
+    end
+
+    test "fails on validation errors" do
+      user = insert(:user)
+      project = insert(:project)
+      github_repo = insert(:github_repo, project: project)
+      github_issue = insert(:github_issue, github_repo: github_repo)
+      # body will trigger validation error
+      github_comment = insert(:github_comment, github_issue: github_issue, body: nil)
+
+      task = insert(:task, project: project, user: user, github_issue: github_issue, github_repo: github_repo)
+
+      # update will fail either way unless source is newer than target
+      # we do not want to test for that problem in this test
+      github_comment =
+        github_comment
+        |> Map.update!(:github_updated_at, &Timex.shift(&1, minutes: 1))
+
+      %{user: user} = insert(:comment, task: task, github_comment: github_comment)
+
+      {:error, changeset} =
+        task |> Sync.Comment.sync(github_comment, user)
+
+      refute changeset.valid?
     end
   end
 
-  describe "delete/2" do
-    @payload load_event_fixture("issue_comment_deleted")
+  describe "delete/1" do
+    test "deletes the Comment record for a GithubComment" do
+      github_comment = insert(:github_comment)
+      comments = insert_list(2, :comment, github_comment: github_comment)
+      insert(:comment)
 
-    test "deletes github comment with id specified in payload, and associated comment" do
-      %{"comment" => %{"id" => github_id} = comment_payload} = @payload
-      github_comment = insert(:github_comment, github_id: github_id)
-      comment = insert(:comment, github_comment: github_comment)
+      comment_ids = Enum.map(comments, &Map.get(&1, :id))
 
-      {:ok, %{deleted_comments: [deleted_comment], deleted_github_comment: deleted_github_comment}} =
-        comment_payload
-        |> Sync.Comment.delete
-        |> Repo.transaction
+      {:ok, deleted_comments} =
+        github_comment.github_id
+        |> Sync.Comment.delete()
 
-      assert deleted_comment.id == comment.id
-      assert deleted_github_comment.id == github_comment.id
-      assert Repo.aggregate(Comment, :count, :id) == 0
-      assert Repo.aggregate(GithubComment, :count, :id) == 0
+      assert Enum.count(deleted_comments) == 2
+      assert Repo.aggregate(Comment, :count, :id) == 1
+      assert Repo.aggregate(GithubComment, :count, :id) == 1
+
+      for deleted_comment <- deleted_comments do
+        assert deleted_comment.id in comment_ids
+      end
+    end
+
+    test "works when there is no associated Comment record" do
+      github_comment = insert(:github_comment)
+
+      {:ok, deleted_comments} =
+        github_comment.github_id
+        |> Sync.Comment.delete()
+
+      assert Enum.count(deleted_comments) == 0
     end
   end
 end

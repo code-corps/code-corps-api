@@ -7,6 +7,14 @@ defmodule CodeCorps.Analytics.SegmentDataExtractor do
   def get_action(%Plug.Conn{private: %{phoenix_action: action}}), do: action
   def get_action(_), do: nil
 
+  @doc """
+  Tries to extract project id from given resource.
+  Returns `nil` if project id can't be extracted.
+  """
+  @spec get_project_id(CodeCorps.ProjectUser.t) :: String.t | nil
+  def get_project_id(%CodeCorps.ProjectUser{project_id: id}), do: "project_#{id}"
+  def get_project_id(_), do: nil
+
   @spec get_resource(Plug.Conn.t) :: struct
   def get_resource(%Plug.Conn{assigns: %{data: data}}), do: data
   # these are used for delete actions on records that support it

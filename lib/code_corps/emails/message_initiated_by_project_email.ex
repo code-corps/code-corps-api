@@ -11,7 +11,7 @@ defmodule CodeCorps.Emails.MessageInitiatedByProjectEmail do
     WebClient
   }
 
-  @spec create(User.t, String.t) :: Bamboo.Email.t
+  @spec create(Message.t, Conversation.t) :: Bamboo.Email.t
   def create(
     %Message{project: %Project{} = project},
     %Conversation{user: %User{} = user} = conversation) do

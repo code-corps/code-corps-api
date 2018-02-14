@@ -10,15 +10,8 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositories do
 
   alias CodeCorps.{
     GitHub.Sync,
-    GithubRepo,
     GitHub.Event.InstallationRepositories
   }
-
-  @type outcome :: {:ok, list(GithubRepo.t())} |
-                   {:error, :unmatched_installation} |
-                   {:error, :unexpected_payload} |
-                   {:error, :validation_error_on_syncing_repos} |
-                   {:error, :unexpected_transaction_outcome}
 
   @doc """
   Handles an "InstallationRepositories" GitHub Webhook event. The event could be
@@ -34,7 +27,10 @@ defmodule CodeCorps.GitHub.Event.InstallationRepositories do
       - if the GitHub payload for a repo is not matched with a record in our
         database, just skip deleting it
   """
-  @spec handle(map) :: outcome
+  @impl CodeCorps.GitHub.Event.Handler
+  @spec handle(map) ::
+    Sync.installation_repositories_event_outcome() |
+    {:error, :unexpected_payload}
   def handle(payload) do
     with {:ok, :valid} <- payload |> validate_payload() do
       Sync.installation_repositories_event(payload)

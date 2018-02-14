@@ -1,7 +1,9 @@
 defmodule CodeCorps.GitHub.Sync do
   @moduledoc """
-  Syncs events received from the GitHub API and also syncs entire GitHub
-  repositories.
+  GitHub syncing functions for:
+
+  - events received from the GitHub API
+  - entire GitHub repositories
   """
 
   alias CodeCorps.{
@@ -11,35 +13,22 @@ defmodule CodeCorps.GitHub.Sync do
     GitHub.Sync.Utils.Finder,
     GitHub.Utils.ResultAggregator,
     GithubAppInstallation,
+    GithubComment,
+    GithubIssue,
     GithubPullRequest,
     GithubRepo,
+    GithubUser,
     Repo,
     Task
   }
-
   alias Ecto.{Changeset, Multi}
-
-  @type outcome :: {:ok, list(Comment.t())}
-                 | {:ok, GithubPullRequest.t()}
-                 | {:error, :repo_not_found, %{}}
-                 | {:error, :fetching_issue}
-                 | {:error, :fetching_pull_request}
-                 | {:error, :multiple_comment_users_match}
-                 | {:error, :validating_github_pull_request}
-                 | {:error, :validating_github_comment}
-                 | {:error, :validating_user}
-                 | {:error, :validating_task}
-                 | {:error, :validating_comment}
-                 | {:error, :unexpected_transaction_outcome}
-
-
 
   @type issue_event_outcome ::
     {:ok, Task.t()} |
-    {:error, :repo_not_found, map} |
+    {:error, :repo_not_found} |
     {:error, :validating_github_issue, Changeset.t()} |
     {:error, :validating_user, Changeset.t()} |
-    {:error, :multiple_issue_users_match, map} |
+    {:error, :multiple_task_users_match} |
     {:error, :validating_task, Changeset.t()} |
     {:error, :unexpected_transaction_outcome, any}
 
@@ -56,23 +45,34 @@ defmodule CodeCorps.GitHub.Sync do
     multi =
       Multi.new
       |> Multi.run(:repo, fn _ -> Finder.find_repo(payload) end)
-      # steps :github_user, :github_issue, :issue_user, :task
-      |> Multi.merge(fn %{repo: github_repo} -> issue_payload |> Sync.Issue.sync(github_repo) end)
+      |> Multi.run(:github_issue, fn %{repo: github_repo} ->
+        issue_payload
+        |> Sync.GithubIssue.create_or_update_issue(github_repo)
+      end)
+      |> Multi.run(:task_user, fn %{github_issue: github_issue} ->
+        github_issue |> Sync.User.RecordLinker.link_to(issue_payload)
+      end)
+      |> Multi.run(:task, fn %{github_issue: github_issue, task_user: user} ->
+        github_issue |> Sync.Task.sync_github_issue(user)
+      end)
 
     case multi |> Repo.transaction() do
       {:ok, %{task: task}} -> {:ok, task}
 
       {:error, :repo, :unmatched_repository, _steps} ->
-        {:error, :repo_not_found, %{}}
+        {:error, :repo_not_found}
 
-      {:error, :github_issue, %Changeset{} = changeset, _steps} ->
+      {:error, :github_issue, %Changeset{data: %GithubIssue{}} = changeset, _steps} ->
         {:error, :validating_github_issue, changeset}
 
-      {:error, :issue_user, %Changeset{} = changeset, _steps} ->
+      {:error, :github_issue, %Changeset{data: %GithubUser{}} = changeset, _steps} ->
+        {:error, :validating_github_user, changeset}
+
+      {:error, :task_user, %Changeset{} = changeset, _steps} ->
         {:error, :validating_user, changeset}
 
-      {:error, :issue_user, :multiple_users, _steps} ->
-        {:error, :multiple_issue_users_match, %{}}
+      {:error, :task_user, :multiple_users, _steps} ->
+        {:error, :multiple_task_users_match}
 
       {:error, :task, %Changeset{} = changeset, _steps} ->
         {:error, :validating_task, changeset}
@@ -86,23 +86,29 @@ defmodule CodeCorps.GitHub.Sync do
 
   @type issue_comment_outcome ::
     {:ok, Comment.t()} |
-    {:error, :repo_not_found, map} |
+    {:error, :repo_not_found} |
     {:error, :validating_github_issue, Changeset.t()} |
-    {:error, :validating_user, Changeset.t()} |
-    {:error, :multiple_issue_users_match, map} |
+    {:error, :validating_github_user_on_github_issue, Changeset.t()} |
+    {:error, :validating_task_user, Changeset.t()} |
+    {:error, :multiple_task_users_match} |
     {:error, :validating_task, Changeset.t()} |
     {:error, :validating_github_comment, Changeset.t()} |
-    {:error, :validating_user, Changeset.t()} |
-    {:error, :multiple_comment_users_match, map} |
+    {:error, :validating_github_user_on_github_comment, Changeset.t()} |
+    {:error, :validating_comment_user, Changeset.t()} |
+    {:error, :multiple_comment_users_match} |
     {:error, :validating_comment, Changeset.t()} |
     {:error, :unexpected_transaction_outcome, any}
 
   @type pull_request_comment_outcome ::
     issue_comment_outcome() |
     {:error, :fetching_pull_request, struct} |
-    {:error, :validating_github_pull_request, Changeset.t()}
+    {:error, :validating_github_pull_request, Changeset.t()} |
+    {:error, :validating_github_user_on_github_pull_request, Changeset.t()}
 
-
+  @type issue_comment_event_outcome ::
+    comment_deleted_outcome() |
+    pull_request_comment_outcome() |
+    issue_comment_outcome()
 
   @doc ~S"""
   Syncs a GitHub IssueComment event.
@@ -118,18 +124,14 @@ defmodule CodeCorps.GitHub.Sync do
 
   [https://developer.github.com/v3/activity/events/types/#issuecommentevent](https://developer.github.com/v3/activity/events/types/#issuecommentevent)
   """
-  @spec issue_comment_event(map) ::
-    comment_deleted_outcome() |
-    pull_request_comment_outcome() |
-    issue_comment_outcome()
-
+  @spec issue_comment_event(map) :: issue_comment_event_outcome()
   def issue_comment_event(
     %{"action" => "deleted", "comment" => %{"id" => github_id}}) do
 
     multi =
       Multi.new
-      |> Multi.run(:deleted_comments, fn _ -> Sync.Comment.Comment.delete(github_id) end)
-      |> Multi.run(:deleted_github_comment, fn _ -> Sync.Comment.GithubComment.delete(github_id) end)
+      |> Multi.run(:deleted_comments, fn _ -> Sync.Comment.delete(github_id) end)
+      |> Multi.run(:deleted_github_comment, fn _ -> Sync.GithubComment.delete(github_id) end)
 
     case multi |> Repo.transaction() do
       {:ok, %{deleted_comments: _, deleted_github_comment: _} = result} ->
@@ -148,61 +150,70 @@ defmodule CodeCorps.GitHub.Sync do
       end)
       |> Multi.run(:github_pull_request, fn %{repo: github_repo, fetch_pull_request: pr_payload} ->
         pr_payload
-        |> Sync.PullRequest.create_or_update_pull_request(github_repo)
+        |> Sync.GithubPullRequest.create_or_update_pull_request(github_repo)
       end)
       |> Multi.run(:github_issue, fn %{repo: github_repo, github_pull_request: github_pull_request} ->
         issue_payload
-        |> Sync.Issue.GithubIssue.create_or_update_issue(github_repo, github_pull_request)
+        |> Sync.GithubIssue.create_or_update_issue(github_repo, github_pull_request)
       end)
-      |> Multi.run(:issue_user, fn %{github_issue: github_issue} ->
+      |> Multi.run(:task_user, fn %{github_issue: github_issue} ->
         github_issue |> Sync.User.RecordLinker.link_to(issue_payload)
       end)
-      |> Multi.run(:task, fn %{github_issue: github_issue, issue_user: user} ->
-        github_issue |> Sync.Issue.Task.sync_github_issue(user)
+      |> Multi.run(:task, fn %{github_issue: github_issue, task_user: user} ->
+        github_issue |> Sync.Task.sync_github_issue(user)
       end)
       |> Multi.run(:github_comment, fn %{github_issue: github_issue} ->
         github_issue
-        |> Sync.Comment.GithubComment.create_or_update_comment(comment_payload)
+        |> Sync.GithubComment.create_or_update_comment(comment_payload)
       end)
       |> Multi.run(:comment_user, fn %{github_comment: github_comment} ->
         github_comment |> Sync.User.RecordLinker.link_to(comment_payload)
       end)
       |> Multi.run(:comment, fn %{github_comment: github_comment, comment_user: user, task: task} ->
-        task |> Sync.Comment.Comment.sync(github_comment, user)
+        task |> Sync.Comment.sync(github_comment, user)
       end)
 
     case multi |> Repo.transaction() do
       {:ok, %{comment: %Comment{} = comment}} -> {:ok, comment}
 
       {:error, :repo, :unmatched_repository, _steps} ->
-        {:error, :repo_not_found, %{}}
+        {:error, :repo_not_found}
 
       {:error, :fetch_pull_request, error, _steps} ->
         {:error, :fetching_pull_request, error}
 
-      {:error, :github_pull_request, %Ecto.Changeset{} = changeset, _steps} ->
+      {:error, :github_pull_request, %Changeset{data: %GithubPullRequest{}} = changeset, _steps} ->
         {:error, :validating_github_pull_request, changeset}
 
-      {:error, :github_issue, %Ecto.Changeset{} = changeset, _steps} ->
+      {:error, :github_pull_request, %Changeset{data: %GithubUser{}} = changeset, _steps} ->
+        {:error, :validating_github_user_on_github_pull_request, changeset}
+
+      {:error, :github_issue, %Changeset{data: %GithubIssue{}} = changeset, _steps} ->
         {:error, :validating_github_issue, changeset}
 
-      {:error, :issue_user, %Changeset{} = changeset, _steps} ->
-        {:error, :validating_user, changeset}
+      {:error, :github_issue, %Changeset{data: %GithubUser{}} = changeset, _steps} ->
+        {:error, :validating_github_user_on_github_issue, changeset}
 
-      {:error, :issue_user, :multiple_users, _steps} ->
-        {:error, :multiple_issue_users_match, %{}}
+      {:error, :task_user, %Changeset{} = changeset, _steps} ->
+        {:error, :validating_task_user, changeset}
+
+      {:error, :task_user, :multiple_users, _steps} ->
+        {:error, :multiple_task_users_match}
 
       {:error, :task, %Changeset{} = changeset, _steps} ->
         {:error, :validating_task, changeset}
 
-      {:error, :github_comment, %Changeset{} = changeset, _steps} ->
+      {:error, :github_comment, %Changeset{data: %GithubComment{}} = changeset, _steps} ->
         {:error, :validating_github_comment, changeset}
 
+      {:error, :github_comment, %Changeset{data: %GithubUser{}} = changeset, _steps} ->
+        {:error, :validating_github_user_on_github_comment, changeset}
+
       {:error, :comment_user, %Changeset{} = changeset, _steps} ->
-        {:error, :validating_user, changeset}
+        {:error, :validating_comment_user, changeset}
 
       {:error, :comment_user, :multiple_users, _steps} ->
-        {:error, :multiple_comment_users_match, %{}}
+        {:error, :multiple_comment_users_match}
 
       {:error, :comment, %Changeset{} = changeset, _steps} ->
         {:error, :validating_comment, changeset}
@@ -216,51 +227,57 @@ defmodule CodeCorps.GitHub.Sync do
       Multi.new
       |> Multi.run(:repo, fn _ -> Finder.find_repo(payload) end)
       |> Multi.run(:github_issue, fn %{repo: github_repo} ->
-        issue_payload |> Sync.Issue.GithubIssue.create_or_update_issue(github_repo)
+        issue_payload |> Sync.GithubIssue.create_or_update_issue(github_repo)
       end)
-      |> Multi.run(:issue_user, fn %{github_issue: github_issue} ->
+      |> Multi.run(:task_user, fn %{github_issue: github_issue} ->
         github_issue |> Sync.User.RecordLinker.link_to(issue_payload)
       end)
-      |> Multi.run(:task, fn %{github_issue: github_issue, issue_user: user} ->
-        github_issue |> Sync.Issue.Task.sync_github_issue(user)
+      |> Multi.run(:task, fn %{github_issue: github_issue, task_user: user} ->
+        github_issue |> Sync.Task.sync_github_issue(user)
       end)
       |> Multi.run(:github_comment, fn %{github_issue: github_issue} ->
         github_issue
-        |> Sync.Comment.GithubComment.create_or_update_comment(comment_payload)
+        |> Sync.GithubComment.create_or_update_comment(comment_payload)
       end)
       |> Multi.run(:comment_user, fn %{github_comment: github_comment} ->
         github_comment |> Sync.User.RecordLinker.link_to(comment_payload)
       end)
       |> Multi.run(:comment, fn %{github_comment: github_comment, comment_user: user, task: task} ->
-        task |> Sync.Comment.Comment.sync(github_comment, user)
+        task |> Sync.Comment.sync(github_comment, user)
       end)
 
     case multi |> Repo.transaction() do
       {:ok, %{comment: %Comment{} = comment}} -> {:ok, comment}
 
       {:error, :repo, :unmatched_repository, _steps} ->
-        {:error, :repo_not_found, %{}}
+        {:error, :repo_not_found}
 
-      {:error, :github_issue, %Ecto.Changeset{} = changeset, _steps} ->
+      {:error, :github_issue, %Changeset{data: %GithubIssue{}} = changeset, _steps} ->
         {:error, :validating_github_issue, changeset}
 
-      {:error, :issue_user, %Changeset{} = changeset, _steps} ->
-        {:error, :validating_user, changeset}
+      {:error, :github_issue, %Changeset{data: %GithubUser{}} = changeset, _steps} ->
+        {:error, :validating_github_user_on_github_issue, changeset}
 
-      {:error, :issue_user, :multiple_users, _steps} ->
-        {:error, :multiple_issue_users_match, %{}}
+      {:error, :task_user, %Changeset{} = changeset, _steps} ->
+        {:error, :validating_task_user, changeset}
+
+      {:error, :task_user, :multiple_users, _steps} ->
+        {:error, :multiple_task_users_match}
 
       {:error, :task, %Changeset{} = changeset, _steps} ->
         {:error, :validating_task, changeset}
 
-      {:error, :github_comment, %Changeset{} = changeset, _steps} ->
+      {:error, :github_comment, %Changeset{data: %GithubComment{}} = changeset, _steps} ->
         {:error, :validating_github_comment, changeset}
 
+      {:error, :github_comment, %Changeset{data: %GithubUser{}} = changeset, _steps} ->
+        {:error, :validating_github_user_on_github_comment, changeset}
+
       {:error, :comment_user, %Changeset{} = changeset, _steps} ->
-        {:error, :validating_user, changeset}
+        {:error, :validating_comment_user, changeset}
 
       {:error, :comment_user, :multiple_users, _steps} ->
-        {:error, :multiple_comment_users_match, %{}}
+        {:error, :multiple_comment_users_match}
 
       {:error, :comment, %Changeset{} = changeset, _steps} ->
         {:error, :validating_comment, changeset}
@@ -273,12 +290,12 @@ defmodule CodeCorps.GitHub.Sync do
   @type installation_event_outcome() ::
     {:ok, GithubAppInstallation.t()} |
     {:error, :validation_error_on_syncing_installation, Changeset.t()} |
-    {:error, :multiple_unprocessed_installations_found, map} |
+    {:error, :multiple_unprocessed_installations_found} |
     {:error, :github_api_error_on_syncing_repos, struct} |
     {:error, :validation_error_on_deleting_removed_repos, {list, list}} |
     {:error, :validation_error_on_syncing_existing_repos, {list, list}} |
     {:error, :validation_error_on_marking_installation_processed, Changeset.t()} |
-    {:error, :unexpected_transaction_outcome, map}
+    {:error, :unexpected_transaction_outcome, any}
 
   @doc ~S"""
   Handles a GitHub installation event.
@@ -297,8 +314,8 @@ defmodule CodeCorps.GitHub.Sync do
   def installation_event(%{"action" => "created"} = payload) do
     multi =
       Multi.new
-      |> Multi.run(:installation, fn _ -> payload |> Sync.Installation.sync() end)
-      |> Multi.run(:repos, fn %{installation: installation} -> installation |> Sync.Repo.sync_installation() end)
+      |> Multi.run(:installation, fn _ -> payload |> Sync.GithubAppInstallation.sync() end)
+      |> Multi.run(:repos, fn %{installation: installation} -> installation |> Sync.GithubRepo.sync_installation() end)
 
     case multi |> Repo.transaction() do
       {:ok, %{installation: installation, repos: {synced_repos, _deleted_repos}}} ->
@@ -308,7 +325,7 @@ defmodule CodeCorps.GitHub.Sync do
         {:error, :validation_error_on_syncing_installation, changeset}
 
       {:error, :installation, :multiple_unprocessed_installations_found, _steps} ->
-        {:error, :multiple_unprocessed_installations_found, %{}}
+        {:error, :multiple_unprocessed_installations_found}
 
       {:error, :repos, {:api_error, error}, _steps} ->
         {:error, :github_api_error_on_syncing_repos, error}
@@ -322,26 +339,26 @@ defmodule CodeCorps.GitHub.Sync do
       {:error, :repos, {:mark_processed, %Changeset{} = changeset}, _steps} ->
         {:error, :validation_error_on_marking_installation_processed, changeset}
 
-      {:error, _errored_step, _error_response, _steps} ->
-        {:error, :unexpected_transaction_outcome, %{}}
+      {:error, _errored_step, error_response, _steps} ->
+        {:error, :unexpected_transaction_outcome, error_response}
     end
   end
 
   @type installation_repositories_event_outcome ::
     {:ok, list(GithubRepo.t())} |
-    {:error, :unmatched_installation, map} |
+    {:error, :unmatched_installation} |
     {:error, :validation_error_on_syncing_repos, Changeset.t()} |
-    {:error, :unexpected_transaction_outcome, map}
+    {:error, :unexpected_transaction_outcome, any}
 
   @doc ~S"""
   Syncs a GitHub InstallationRepositories event.
 
-  - For the "removed" action
-    - Deletes all  `CodeCorps.GithubRepo` records matched with the payload
-  - For the "added" action
-    -
+  - For the "removed" action:
+    - Deletes all `CodeCorps.GithubRepo` records matched with the payload
+  - For the "added" action:
+    - Adds all `CodeCorps.GithubRepo` records matching data from the payload
 
-  [https://developer.github.com/v3/activity/events/types/#issuecommentevent](https://developer.github.com/v3/activity/events/types/#issuecommentevent)
+  [https://developer.github.com/v3/activity/events/types/#installationrepositoriesevent](https://developer.github.com/v3/activity/events/types/#installationrepositoriesevent)
   """
   @spec installation_repositories_event(map) ::
     installation_repositories_event_outcome()
@@ -352,14 +369,14 @@ defmodule CodeCorps.GitHub.Sync do
         payload |> Finder.find_installation()
       end)
       |> Multi.run(:repos, fn %{installation: installation} ->
-        installation |> Sync.Repo.sync_installation(payload)
+        installation |> Sync.GithubRepo.sync_installation(payload)
       end)
 
     case multi |> Repo.transaction() do
       {:ok, %{repos: repos}} -> {:ok, repos}
 
       {:error, :installation, :unmatched_installation, _steps} ->
-        {:error, :unmatched_installation, %{}}
+        {:error, :unmatched_installation}
 
       {:error, :repos, {_repos, _changesets}, _steps} ->
         {:error, :validation_error_on_syncing_repos, %{}}
@@ -371,14 +388,14 @@ defmodule CodeCorps.GitHub.Sync do
 
   @type pull_request_event_outcome ::
     {:ok, map} |
-    {:error, :repo_not_found, map} |
+    {:error, :repo_not_found} |
     {:error, :fetching_issue, struct} |
     {:error, :validating_github_pull_request, Changeset.t()} |
     {:error, :validating_github_issue, Changeset.t()} |
     {:error, :validating_user, Changeset.t()} |
-    {:error, :multiple_issue_users_match, %{}} |
+    {:error, :multiple_issue_users_match} |
     {:error, :validating_task, Changeset.t()} |
-    {:error, :unexpected_transaction_outcome, map}
+    {:error, :unexpected_transaction_outcome, any}
 
   @doc ~S"""
   Syncs a GitHub PullRequest event.
@@ -403,24 +420,24 @@ defmodule CodeCorps.GitHub.Sync do
       end)
       |> Multi.run(:github_pull_request, fn %{repo: github_repo} ->
         pr_payload
-        |> Sync.PullRequest.create_or_update_pull_request(github_repo)
+        |> Sync.GithubPullRequest.create_or_update_pull_request(github_repo)
       end)
       |> Multi.run(:github_issue, fn %{fetch_issue: issue_payload, repo: github_repo, github_pull_request: github_pull_request} ->
         issue_payload
-        |> Sync.Issue.GithubIssue.create_or_update_issue(github_repo, github_pull_request)
+        |> Sync.GithubIssue.create_or_update_issue(github_repo, github_pull_request)
       end)
       |> Multi.run(:issue_user, fn %{fetch_issue: issue_payload, github_issue: github_issue} ->
         Sync.User.RecordLinker.link_to(github_issue, issue_payload)
       end)
       |> Multi.run(:task, fn %{github_issue: github_issue, issue_user: user} ->
-        github_issue |> Sync.Issue.Task.sync_github_issue(user)
+        github_issue |> Sync.Task.sync_github_issue(user)
       end)
 
     case multi |> Repo.transaction() do
       {:ok, %{github_pull_request: _, github_issue: _} = result} -> {:ok, result}
 
       {:error, :repo, :unmatched_repository, _steps} ->
-        {:error, :repo_not_found, %{}}
+        {:error, :repo_not_found}
 
       {:error, :fetch_issue, error, _steps} ->
         {:error, :fetching_issue, error}
@@ -435,7 +452,7 @@ defmodule CodeCorps.GitHub.Sync do
         {:error, :validating_user, changeset}
 
       {:error, :issue_user, :multiple_users, _steps} ->
-        {:error, :multiple_issue_users_match, %{}}
+        {:error, :multiple_issue_users_match}
 
       {:error, :task, %Changeset{} = changeset, _steps} ->
         {:error, :validating_task, changeset}
@@ -446,7 +463,7 @@ defmodule CodeCorps.GitHub.Sync do
   end
 
   @doc ~S"""
-  Syncs a `GithubRepo` with Code Corps.
+  Syncs a `GithubRepo`.
 
   Fetches and syncs records from the GitHub API for a given repository, marking
   progress of the sync state along the way.
@@ -474,23 +491,23 @@ defmodule CodeCorps.GitHub.Sync do
     with {:ok, repo} <- repo |> mark_repo("fetching_pull_requests"),
          {:ok, pr_payloads} <- repo |> API.Repository.pulls |> sync_step(:fetch_pull_requests),
          {:ok, repo} <- repo |> mark_repo("syncing_github_pull_requests", %{syncing_pull_requests_count: pr_payloads |> Enum.count}),
-         {:ok, pull_requests} <- pr_payloads |> Enum.map(&Sync.PullRequest.create_or_update_pull_request(&1, repo)) |> ResultAggregator.aggregate |> sync_step(:sync_pull_requests),
+         {:ok, pull_requests} <- pr_payloads |> Enum.map(&Sync.GithubPullRequest.create_or_update_pull_request(&1, repo)) |> ResultAggregator.aggregate |> sync_step(:sync_pull_requests),
          {:ok, repo} <- repo |> mark_repo("fetching_issues"),
          {:ok, issue_payloads} <- repo |> API.Repository.issues |> sync_step(:fetch_issues),
          {:ok, repo} <- repo |> mark_repo("syncing_github_issues", %{syncing_issues_count: issue_payloads |> Enum.count}),
          paired_issues <- issue_payloads |> pair_issues_payloads_with_prs(pull_requests),
-         {:ok, _issues} <- paired_issues |> Enum.map(fn {issue_payload, pr} -> issue_payload |> Sync.Issue.GithubIssue.create_or_update_issue(repo, pr) end) |> ResultAggregator.aggregate |> sync_step(:sync_issues),
+         {:ok, _issues} <- paired_issues |> Enum.map(fn {issue_payload, pr} -> issue_payload |> Sync.GithubIssue.create_or_update_issue(repo, pr) end) |> ResultAggregator.aggregate |> sync_step(:sync_issues),
          {:ok, repo} <- repo |> mark_repo("fetching_comments"),
          {:ok, comment_payloads} <- repo |> API.Repository.issue_comments |> sync_step(:fetch_comments),
          {:ok, repo} <- repo |> mark_repo("syncing_github_comments", %{syncing_comments_count: comment_payloads |> Enum.count}),
-         {:ok, _comments} <- comment_payloads |> Enum.map(&Sync.Comment.GithubComment.create_or_update_comment(repo, &1)) |> ResultAggregator.aggregate |> sync_step(:sync_comments),
+         {:ok, _comments} <- comment_payloads |> Enum.map(&Sync.GithubComment.create_or_update_comment(repo, &1)) |> ResultAggregator.aggregate |> sync_step(:sync_comments),
          repo <- GithubRepo |> Repo.get(repo.id) |> preload_github_repo(),
          {:ok, repo} <- repo |> mark_repo("syncing_users"),
-         {:ok, _users} <- repo |> Sync.User.User.sync_github_repo() |> sync_step(:sync_users),
+         {:ok, _users} <- repo |> Sync.User.sync_github_repo() |> sync_step(:sync_users),
          {:ok, repo} <- repo |> mark_repo("syncing_tasks"),
-         {:ok, _tasks} <- repo |> Sync.Issue.Task.sync_github_repo() |> sync_step(:sync_tasks),
+         {:ok, _tasks} <- repo |> Sync.Task.sync_github_repo() |> sync_step(:sync_tasks),
          {:ok, repo} <- repo |> mark_repo("syncing_comments"),
-         {:ok, _comments} <- repo |> Sync.Comment.Comment.sync_github_repo() |> sync_step(:sync_comments),
+         {:ok, _comments} <- repo |> Sync.Comment.sync_github_repo() |> sync_step(:sync_comments),
          {:ok, repo} <- repo |> mark_repo("synced")
     do
       {:ok, repo}
@@ -506,6 +523,14 @@ defmodule CodeCorps.GitHub.Sync do
       {:error, :sync_tasks} -> repo |> mark_repo("errored_syncing_tasks")
       {:error, :sync_comments} -> repo |> mark_repo("errored_syncing_comments")
     end
+  end
+
+  @spec mark_repo(GithubRepo.t(), String.t(), map) ::
+    {:ok, GithubRepo.t()} | {:error, Changeset.t()}
+  defp mark_repo(%GithubRepo{} = repo, sync_state, params \\ %{}) do
+    repo
+    |> GithubRepo.update_sync_changeset(params |> Map.put(:sync_state, sync_state))
+    |> Repo.update
   end
 
   @spec pair_issues_payloads_with_prs(list, list) :: list(tuple)
@@ -532,12 +557,4 @@ defmodule CodeCorps.GitHub.Sync do
   @spec sync_step(tuple, atom) :: tuple
   defp sync_step({:ok, _} = result, _step), do: result
   defp sync_step({:error, _}, step), do: {:error, step}
-
-  @spec mark_repo(GithubRepo.t(), String.t(), map) ::
-    {:ok, GithubRepo.t()} | {:error, Changeset.t()}
-  defp mark_repo(%GithubRepo{} = repo, sync_state, params \\ %{}) do
-    repo
-    |> GithubRepo.update_sync_changeset(params |> Map.put(:sync_state, sync_state))
-    |> Repo.update
-  end
 end

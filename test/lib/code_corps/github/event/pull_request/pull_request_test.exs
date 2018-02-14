@@ -36,7 +36,7 @@ defmodule CodeCorps.GitHub.Event.PullRequestTest do
       end
 
       test "returns error if unmatched repository" do
-        assert PullRequest.handle(@payload) == {:error, :repo_not_found, %{}}
+        assert PullRequest.handle(@payload) == {:error, :repo_not_found}
         refute Repo.one(User)
       end
 

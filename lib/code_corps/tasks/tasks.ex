@@ -72,7 +72,7 @@ defmodule CodeCorps.Tasks do
     with {:ok, payload} <- GitHub.API.Issue.create(task),
          {:ok, %GithubIssue{} = github_issue} <-
            payload
-           |> Sync.Issue.GithubIssue.create_or_update_issue(github_repo) do
+           |> Sync.GithubIssue.create_or_update_issue(github_repo) do
       task |> link_with_github_changeset(github_issue) |> Repo.update()
     else
       {:error, error} -> {:error, error}
@@ -89,7 +89,7 @@ defmodule CodeCorps.Tasks do
   defp update_on_github(%Task{github_repo_id: _, github_issue_id: nil} = task), do: task |> create_on_github()
   defp update_on_github(%Task{github_repo: github_repo} = task) do
     with {:ok, payload} <- GitHub.API.Issue.update(task),
-         {:ok, %GithubIssue{}} <- payload |> Sync.Issue.GithubIssue.create_or_update_issue(github_repo),
+         {:ok, %GithubIssue{}} <- payload |> Sync.GithubIssue.create_or_update_issue(github_repo),
          %Task{} = task <- Repo.get(Task, task.id) do
       {:ok, task}
     else
