@@ -51,9 +51,13 @@ defmodule CodeCorps.Factories do
 
   def github_app_installation_factory do
     %CodeCorps.GithubAppInstallation{
+      github_account_id: sequence(:github_account_login, &(&1)),
+      github_account_avatar_url: sequence(:github_account_avatar_url, &"http://test-#{&1}.com"),
+      github_account_login: sequence(:github_account_login, &"owner_#{&1}"),
+      github_id: sequence(:github_id, &(&1)),
+      github_account_type: "User",
       project: build(:project),
-      user: build(:user),
-      github_id: sequence(:id, (fn number -> number end))
+      user: build(:user)
     }
   end
 
@@ -111,6 +115,7 @@ defmodule CodeCorps.Factories do
     %CodeCorps.GithubRepo{
       github_account_login: sequence(:github_account_login, &"owner_#{&1}"),
       github_app_installation: build(:github_app_installation),
+      github_id: sequence(:github_id, &(&1)),
       name: sequence(:name, &"repo_#{&1}"),
       project: build(:project)
     }

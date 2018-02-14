@@ -8,6 +8,10 @@ defmodule CodeCorps.TestHelpers do
     end
   end
 
+  def assert_ids_from_query(query, ids) do
+    assert query |> Enum.map(&Map.get(&1, :id)) |> Enum.sort == ids |> Enum.sort()
+  end
+
   def assert_id_from_response(response, id) do
     assert String.to_integer(response["data"]["id"]) == id
     response

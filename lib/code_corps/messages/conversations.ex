@@ -16,4 +16,16 @@ defmodule CodeCorps.Messages.Conversations do
     |> Changeset.validate_required([:user_id])
     |> Changeset.assoc_constraint(:user)
   end
+
+  @doc false
+  @spec part_added_changeset(Conversation.t) :: Ecto.Changeset.t
+  def part_added_changeset(%Conversation{} = conversation) do
+    params = %{
+      status: "open",
+      updated_at: Ecto.DateTime.utc()
+    }
+
+    conversation
+    |> Changeset.cast(params, [:status, :updated_at])
+  end
 end

@@ -24,8 +24,10 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment do
   }
   alias Ecto.Changeset
 
-  @type outcome :: {:ok, list(Comment.t)} |
-                   {:error, {list(Comment.t), list(Changeset.t)}}
+  @type commit_result_aggregate ::
+    {:ok, list(Comment.t())} | {:error, {list(Comment.t()), list(Changeset.t())}}
+
+  @type commit_result :: {:ok, Comment.t()} | {:error, Changeset.t()}
 
   @doc ~S"""
   Creates or updates a `CodeCorps.Comment` for the specified `CodeCorps.Task`.
@@ -36,12 +38,28 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment do
   payload, associated to the specified `CodeCorps.GithubComment`,
   `CodeCorps.Task` and `CodeCorps.User`
   """
-  @spec sync(Task.t, GithubComment.t, User.t) :: outcome
+  @spec sync(Task.t(), GithubComment.t(), User.t()) :: commit_result()
   def sync(%Task{} = task, %GithubComment{} = github_comment, %User{} = user) do
-    task
-    |> find_or_init_comment(github_comment)
-    |> Sync.Comment.Comment.Changeset.build_changeset(github_comment, task, user)
-    |> Repo.insert_or_update()
+    case find_comment(task, github_comment) do
+      nil ->
+        github_comment
+        |> Sync.Comment.Comment.Changeset.create_changeset(task, user)
+        |> Repo.insert()
+
+      %Comment{} = comment ->
+        comment
+        |> Sync.Comment.Comment.Changeset.update_changeset(github_comment)
+        |> Repo.update()
+    end
+  end
+
+  @spec find_comment(Task.t(), GithubComment.t()) :: Comment.t() | nil
+  defp find_comment(%Task{id: task_id}, %GithubComment{id: github_comment_id}) do
+    query = from c in Comment,
+      where: c.task_id == ^task_id,
+      join: gc in GithubComment, on: c.github_comment_id == gc.id, where: gc.id == ^github_comment_id
+
+    query |> Repo.one()
   end
 
   @doc ~S"""
@@ -56,7 +74,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment do
   - Associate the `CodeCorps.Comment` record with the `CodeCorps.User` that
     relates to the `CodeCorps.GithubUser` for the `CodeCorps.GithubComment`
   """
-  @spec sync_github_repo(GithubRepo.t) :: outcome
+  @spec sync_github_repo(GithubRepo.t()) :: commit_result_aggregate()
   def sync_github_repo(%GithubRepo{} = github_repo) do
     preloads = [
       github_comments: [:github_issue, github_user: [:user]]
@@ -70,9 +88,11 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment do
       |> find_task(github_repo)
       |> sync(github_comment, user)
     end)
-    |> ResultAggregator.aggregate
+    |> ResultAggregator.aggregate()
   end
 
+  # can this return a nil?
+  @spec find_task(GithubComment.t(), GithubRepo.t()) :: Task.t()
   defp find_task(
     %GithubComment{github_issue: %GithubIssue{id: github_issue_id}},
     %GithubRepo{project_id: project_id}) do
@@ -80,7 +100,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment do
       where: t.project_id == ^project_id,
       join: gi in GithubIssue, on: t.github_issue_id == gi.id, where: gi.id == ^github_issue_id
 
-    query |> Repo.one
+    query |> Repo.one()
   end
 
   @doc ~S"""
@@ -90,7 +110,7 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment do
   Since there can be 0 or 1 such records, returns `{:ok, results}` where
   `results` is a 1-element or blank list of deleted records.
   """
-  @spec delete(String.t) :: {:ok, list(Comment.t)}
+  @spec delete(String.t()) :: {:ok, list(Comment.t())}
   def delete(github_id) do
     query =
       from c in Comment,
@@ -99,17 +119,5 @@ defmodule CodeCorps.GitHub.Sync.Comment.Comment do
     query
     |> Repo.delete_all(returning: true)
     |> (fn {_count, comments} -> {:ok, comments} end).()
-  end
-
-  @spec find_or_init_comment(Task.t, GithubComment.t) :: Comment.t
-  defp find_or_init_comment(%Task{id: task_id}, %GithubComment{id: github_comment_id}) do
-    query = from c in Comment,
-      where: c.task_id == ^task_id,
-      join: gc in GithubComment, on: c.github_comment_id == gc.id, where: gc.id == ^github_comment_id
-
-    case query |> Repo.one do
-      nil -> %Comment{}
-      %Comment{} = comment -> comment
-    end
   end
 end

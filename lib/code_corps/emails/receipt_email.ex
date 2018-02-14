@@ -57,6 +57,7 @@ defmodule CodeCorps.Emails.ReceiptEmail do
       charge_amount: charge.amount |> format_amount(),
       charge_statement_descriptor: charge.statement_descriptor,
       high_five_image_url: high_five_image_url(),
+      name: BaseEmail.get_name(charge.user),
       project_current_donation_goal_description: current_donation_goal.description,
       project_title: project.title,
       project_url: project |> url(),

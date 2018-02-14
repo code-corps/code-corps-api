@@ -52,6 +52,7 @@ defmodule CodeCorps.Emails.ReceiptEmailTest do
     assert template_model == %{
       charge_amount: "$5.00",
       charge_statement_descriptor: "Test descriptor",
+      name: "Jimmy",
       project_title: "Code Corps",
       project_url: "http://localhost:4200/#{project.organization.slug}/#{project.slug}",
       project_current_donation_goal_description: "Test goal",

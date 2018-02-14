@@ -30,18 +30,29 @@ defmodule CodeCorps.Validators.SlugValidator do
     # Routes for the API – api. subdomain
     api_routes = ~w(
       api
-      categories comments contributors
+      categories comments contributors connect conversations conversation-parts
+      donation-goals
+      email_available
+      forgot
+      github-app-installations github-events github-issues github-pull-requests
+      github-repos
       images issues
       mentions
+      messages
       notifications
-      oauth oauth_clients organizations
-      ping projects project-categories
-      project-skills
-      repositories roles
-      skills slugged-route stars
-      tags tasks task-images task-likes
+      oauth oauth_clients organizations organization-github-app-installations
+      organization-invites
+      password ping platform previews projects project-categories project-skills
+      project-users
+      refresh repositories reset roles role-skills
+      skills slugged-route stars stripe stripe-connect-accounts
+      stripe-connect-plans stripe-connect-subscriptions stripe-platform-cards
+      stripe-platform-customers
+      tags tasks task-images task-likes task-lists task-skills
       teams token tokens
-      user-roles user-skills user users
+      user-categories user-roles user-skills user-tasks user username_available
+      users
+      webhooks
     )
 
     # Routes for the web – www. subdomain

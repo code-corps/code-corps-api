@@ -1,9 +1,10 @@
 defmodule CodeCorps.Presenters.ImagePresenter do
-  alias CodeCorps.{Project, User}
+  alias CodeCorps.{Organization, Project, User}
   alias CodeCorps.Cloudex.CloudinaryUrl
 
   @large_options %{crop: "fill", height: 500, width: 500}
 
+  def large(%Organization{} = organization), do: do_large(organization, "organization")
   def large(%Project{} = project), do: do_large(project, "project")
   def large(%User{} = user), do: do_large(user, "user")
 
@@ -12,6 +13,7 @@ defmodule CodeCorps.Presenters.ImagePresenter do
 
   @thumb_options %{crop: "fill", height: 100, width: 100}
 
+  def thumbnail(%Organization{} = organization), do: do_thumbnail(organization, "organization")
   def thumbnail(%Project{} = project), do: do_thumbnail(project, "project")
   def thumbnail(%User{} = user), do: do_thumbnail(user, "user")
 

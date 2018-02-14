@@ -21,7 +21,7 @@ defmodule CodeCorps.Policy.MessageTest do
       assert Message |> scope(user) |> Repo.all |> Enum.count == 3
     end
 
-    test "returns records where user is the author or they administer the project" do
+    test "returns records where user is the author or they administer the project, or they are the target of the conversation" do
       user = insert(:user, admin: false)
 
       %{project: project_user_applied_to} =
@@ -58,6 +58,9 @@ defmodule CodeCorps.Policy.MessageTest do
       message_from_owned_project =
         insert(:message, project: project_user_owns)
 
+      %{message: message_where_user_is_target} =
+        insert(:conversation, user: user)
+
       result_ids =
         Message
         |> scope(user)
@@ -71,6 +74,7 @@ defmodule CodeCorps.Policy.MessageTest do
       assert message_from_other_administered_project.id in result_ids
       assert message_from_owned_project.id in result_ids
       refute some_other_message.id in result_ids
+      assert message_where_user_is_target.id in result_ids
     end
   end
 
@@ -86,35 +90,42 @@ defmodule CodeCorps.Policy.MessageTest do
       user = insert(:user)
       message = insert(:message, initiated_by: "user")
 
-      refute show?(user, message)
+      refute show?(user, message |> Repo.preload(:conversations))
     end
 
     test "returns false when user is a pending project member" do
       %{project: project, user: user} = insert(:project_user, role: "pending")
       message = insert(:message, initiated_by: "user", project: project)
 
-      refute show?(user, message)
+      refute show?(user, message |> Repo.preload(:conversations))
     end
 
     test "returns false when user is a project contributor" do
       %{project: project, user: user} = insert(:project_user, role: "contributor")
       message = insert(:message, initiated_by: "user", project: project)
 
-      refute show?(user, message)
+      refute show?(user, message |> Repo.preload(:conversations))
     end
 
     test "returns true when user is a project admin" do
       %{project: project, user: user} = insert(:project_user, role: "admin")
       message = insert(:message, initiated_by: "user", project: project)
 
-      assert show?(user, message)
+      assert show?(user, message |> Repo.preload(:conversations))
     end
 
     test "returns true when user is project owner" do
       %{project: project, user: user} = insert(:project_user, role: "owner")
       message = insert(:message, initiated_by: "user", project: project)
 
-      assert show?(user, message)
+      assert show?(user, message |> Repo.preload(:conversations))
+    end
+
+    test "returns true when message conversation is targeted at user" do
+      user = insert(:user)
+      %{message: message} = insert(:conversation, user: user)
+
+      assert show?(user, message |> Repo.preload(:conversations))
     end
   end
 

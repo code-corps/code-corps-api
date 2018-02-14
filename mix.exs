@@ -10,7 +10,7 @@ defmodule CodeCorps.Mixfile do
   def project do
     [app: :code_corps,
      version: "0.0.1",
-     elixir: "~> 1.5.2",
+     elixir: "~> 1.6",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
      dialyzer: [ignore_warnings: "dialyzer.ignore-warnings", plt_add_apps: [:kernel, :stdlib], plt_add_deps: :transitive],
@@ -141,10 +141,10 @@ defmodule CodeCorps.Mixfile do
         CodeCorps.StripeInvoice,
         CodeCorps.StripePlatformCard,
         CodeCorps.StripePlatformCustomer,
-        CodeCorps.Task,
-        CodeCorps.Task.Query,
         CodeCorps.TaskList,
         CodeCorps.TaskSkill,
+        CodeCorps.Tasks,
+        CodeCorps.Tasks.Query,
         CodeCorps.Transition.UserState,
         CodeCorps.User,
         CodeCorps.UserCategory,
@@ -162,7 +162,7 @@ defmodule CodeCorps.Mixfile do
         CodeCorps.Services.MarkdownRendererService,
         CodeCorps.Services.ProjectService,
         CodeCorps.Services.UserService,
-        CodeCorps.Task.Service
+        CodeCorps.Tasks
       ],
 
       "Policies": [
@@ -265,6 +265,7 @@ defmodule CodeCorps.Mixfile do
         GitHub.Sync.Comment.Comment,
         GitHub.Sync.Comment.Comment.Changeset,
         GitHub.Sync.Comment.GithubComment,
+        GitHub.Sync.Installation.Changeset,
         GitHub.Sync.Issue,
         GitHub.Sync.Issue.GithubIssue,
         GitHub.Sync.Issue.Task,
@@ -283,7 +284,6 @@ defmodule CodeCorps.Mixfile do
         GitHub.Event,
         GitHub.Event.Handler,
         GitHub.Event.Installation,
-        GitHub.Event.Installation.ChangesetBuilder,
         GitHub.Event.Installation.MatchedUser,
         GitHub.Event.Installation.Repos,
         GitHub.Event.Installation.UnmatchedUser,
