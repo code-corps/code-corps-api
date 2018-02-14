@@ -23,6 +23,12 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilderTest do
       assert :project_skill |> insert |> SegmentTraitsBuilder.build
       assert :project_user |> insert |> SegmentTraitsBuilder.build
 
+      data = %{
+        acceptor: insert(:user),
+        project_user: insert(:project_user)
+      }
+      assert SegmentTraitsBuilder.build(data) 
+
       assert :stripe_connect_account |> insert |> SegmentTraitsBuilder.build
       assert :stripe_connect_charge |> insert |> SegmentTraitsBuilder.build
       assert :stripe_connect_plan |> insert |> SegmentTraitsBuilder.build

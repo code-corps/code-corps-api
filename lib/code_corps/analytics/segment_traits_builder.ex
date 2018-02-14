@@ -225,4 +225,9 @@ defmodule CodeCorps.Analytics.SegmentTraitsBuilder do
     }
   end
   defp traits(%{token: _, user_id: _}), do: %{}
+  defp traits(%{acceptor: user, project_user: project_user}) do
+    project_user
+    |> traits()
+    |> Map.merge(%{acceptor_id: user.id, acceptor: user.username})
+  end
 end

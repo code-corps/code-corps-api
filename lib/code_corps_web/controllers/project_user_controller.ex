@@ -2,7 +2,15 @@ defmodule CodeCorpsWeb.ProjectUserController do
   @moduledoc false
   use CodeCorpsWeb, :controller
 
-  alias CodeCorps.{Emails, Helpers.Query, Mailer, ProjectUser, User}
+  alias CodeCorps.{
+    Analytics.SegmentTracker,
+    Analytics.SegmentDataExtractor,
+    Emails,
+    Helpers.Query,
+    Mailer,
+    ProjectUser,
+    User
+  }
 
   action_fallback CodeCorpsWeb.FallbackController
   plug CodeCorpsWeb.Plug.DataToAttributes
@@ -31,6 +39,7 @@ defmodule CodeCorpsWeb.ProjectUserController do
          {:ok, %ProjectUser{} = project_user} <- %ProjectUser{} |> ProjectUser.create_changeset(params) |> Repo.insert,
          _ <- maybe_send_create_email(project_user)
     do
+      track_created(current_user, project_user)
       conn |> put_status(:created) |> render("show.json-api", data: project_user)
     end
   end
@@ -43,6 +52,7 @@ defmodule CodeCorpsWeb.ProjectUserController do
          {:ok, %ProjectUser{} = updated_project_user} <- project_user |> ProjectUser.update_changeset(params) |> Repo.update,
          _ <- maybe_send_update_email(updated_project_user, project_user)
     do
+      track_updated(current_user, project_user)
       conn |> render("show.json-api", data: updated_project_user)
     end
   end
@@ -87,5 +97,34 @@ defmodule CodeCorpsWeb.ProjectUserController do
     |> Repo.preload(@preloads)
     |> Emails.ProjectUserAcceptanceEmail.create()
     |> Mailer.deliver_now()
+  end
+
+  @spec track_created(User.t, ProjectUser.t) :: any
+  def track_created(
+    %User{id: user_id},
+    %ProjectUser{} = project_user) do
+
+    SegmentTracker.track(user_id, "Requested Membership (User)", project_user)
+
+    project_user 
+    |> SegmentDataExtractor.get_project_id()
+    |> SegmentTracker.track("Membership Requested (Project)", project_user)
+  end
+
+  @spec track_updated(User.t, ProjectUser.t) :: any
+  def track_updated(
+    %User{id: user_id} = user,
+    %ProjectUser{} = project_user) do
+
+    data = %{
+      acceptor: user,
+      project_user: project_user
+    }
+
+    SegmentTracker.track(user_id, "Membership Approved (User)", data)
+
+    project_user
+    |> SegmentDataExtractor.get_project_id()
+    |> SegmentTracker.track("Approved Membership (Project)", data)
   end
 end
