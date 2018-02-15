@@ -12,6 +12,9 @@ defmodule CodeCorps.Messages do
     Repo
   }
   alias Ecto.{Changeset, Queryable}
+  
+  @reopened "reopened"
+  @closed "closed"
 
   @doc ~S"""
   Lists pre-scoped `CodeCorps.Message` records filtered by parameters.
@@ -52,9 +55,27 @@ defmodule CodeCorps.Messages do
     Conversation |> Repo.get(id)
   end
 
+  @doc ~S"""
+  Updates a `CodeCorps.Conversation` record
+  """  
+  def update_conversation(conversation, %{status: @reopened} = params) do
+    {:ok, now} = Timex.format(Timex.now, "{ISO:Extended}")
+    add_part(%{"conversation_id" => conversation.id, "body" => "Reopened on " <> now , "author_id" 
+      => conversation.user_id,  "part_type" => "reopened"})
+    conversation |> Conversation.update_changeset(params) |> Repo.update
+  end
+  
+  def update_conversation(conversation, %{status: @closed} = params) do
+    {:ok, now} = Timex.format(Timex.now, "{ISO:Extended}")
+    add_part(%{"conversation_id" => conversation.id, "body" => "Closed on " <> now, "author_id" 
+      => conversation.user_id,  "part_type" => "closed"})
+    conversation |> Conversation.update_changeset(params) |> Repo.update
+  end
+  
   def update_conversation(conversation, params) do
     conversation |> Conversation.update_changeset(params) |> Repo.update
   end
+  
 
   @doc ~S"""
   Gets a `CodeCorps.ConversationPart` record
