@@ -39,18 +39,14 @@ defmodule CodeCorps.GitHub.SyncTest do
       assert installation.github_id == installation_id
     end
 
-    test "fails if multiple installations are found" do
-      user = insert(:user)
+    test "fails if multiple installations are unprocessed" do
+      user = insert(:user, github_id: @payload["sender"]["id"])
       project = insert(:project)
-      installation = insert(:github_app_installation, project: project, user: user)
-      insert(:github_app_installation, project: project, user: user)
+      attrs = %{project: project, user: user, sender_github_id: user.id, github_id: nil}
+      insert(:github_app_installation, attrs)
+      insert(:github_app_installation, attrs)
 
-
-      current_user =  Map.put(@payload, "sender", %{"id" => user.id})
-      current_map = Map.put(current_user, "installation", %{"id" => user.id})
-
-
-      assert {:error, :multiple_unprocessed_installations_found} == Sync.installation_event(current_map)
+      {:error, :multiple_unprocessed_installations_found} = Sync.installation_event(@payload)
     end
   end
 
