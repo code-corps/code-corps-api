@@ -24,8 +24,22 @@ defmodule CodeCorps.GitHub.SyncTest do
 
   alias Ecto.Changeset
 
-  describe "installation_repositories_event/1 added" do
+  describe "installation_event" do
+    @payload load_event_fixture("installation_created")
 
+    test "syncs_correctly_with valid data" do
+      %{"installation" => %{"id" => installation_id}} = @payload
+
+      assert Repo.aggregate(GithubAppInstallation, :count, :id) == 0
+
+      {:ok, installation} = Sync.installation_event(@payload)
+
+      assert Repo.aggregate(GithubAppInstallation, :count, :id) == 1
+      assert installation.github_id == installation_id
+    end
+  end
+
+  describe "installation_repositories_event/1 added" do
     @payload load_event_fixture("installation_repositories_added")
 
     test "syncs_correctly when adding" do
