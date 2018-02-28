@@ -24,6 +24,55 @@ defmodule CodeCorps.GitHub.SyncTest do
 
   alias Ecto.Changeset
 
+  describe "pull_request_event/1 opened" do
+    @payload load_event_fixture("pull_request_opened")
+
+    test "syncs correctly with valid data when opening" do
+      project = insert(:project)
+      insert(:github_repo, github_id: @payload["repository"]["id"], project: project)
+      insert(:task_list, project: project, done: true)
+      insert(:task_list, project: project, inbox: true)
+      insert(:task_list, project: project, pull_requests: true)
+      {:ok, _map} = Sync.pull_request_event(@payload)
+    end
+
+    test "fails if repo is not found when syncing" do
+      {:error, :repo_not_found} = Sync.pull_request_event(@payload)
+    end
+
+    test "fails if api errors out" do
+      project = insert(:project)
+      insert(:github_repo, github_id: @payload["repository"]["id"], project: project)
+      insert(:task_list, project: project, done: true)
+      insert(:task_list, project: project, inbox: true)
+      insert(:task_list, project: project, pull_requests: true)
+
+      with_mock_api(CodeCorps.GitHub.FailureAPI) do
+        assert {:error, :fetching_issue, _error} = Sync.pull_request_event(@payload)
+      end
+    end
+
+    test "fails with validation error if pull request is invalid" do
+      project = insert(:project)
+      insert(:github_repo, github_id: @payload["repository"]["id"], project: project)
+      insert(:task_list, project: project, done: true)
+      insert(:task_list, project: project, inbox: true)
+      insert(:task_list, project: project, pull_requests: true)
+
+      %{"pull_request" => pull} = @payload
+      corrupt_pull =  %{pull | "created_at" => nil,  "updated_at" => nil, "html_url" => nil, "locked" => nil,
+      "number" => nil, "state" =>  nil, "title" => nil }
+      corrupt_pull_request = Map.put(@payload, "pull_request", corrupt_pull)
+      {:error, :validating_github_pull_request, _changeset} = Sync.pull_request_event(corrupt_pull_request)
+    end
+
+    test "fails with validation error if task_list isn't found" do
+      project = insert(:project)
+      insert(:github_repo, github_id: @payload["repository"]["id"], project: project)
+      {:error, :validating_task, _changeset} = Sync.pull_request_event(@payload)
+    end
+  end
+
 
   # Some clauses defined seem difficult or impossible to reach so their tests were omitted
   # - {:error, :validation_error_on_syncing_installation, Changeset.t()}
