@@ -56,24 +56,27 @@ defmodule CodeCorps.GitHub.SyncTest do
         end
       end
 
+      test "fails with validation error if pull request is invalid when " <> @event do
+        payload = load_event_fixture(@event)
+        project = insert(:project)
+        insert(:github_repo, github_id: payload["repository"]["id"], project: project)
+        insert(:task_list, project: project, done: true)
+        insert(:task_list, project: project, inbox: true)
+        insert(:task_list, project: project, pull_requests: true)
+
+        %{"pull_request" => pull} = payload
+        corrupt_pull =  %{pull | "created_at" => nil,  "updated_at" => nil, "html_url" => nil, "locked" => nil,
+        "number" => nil, "state" =>  nil, "title" => nil }
+        corrupt_pull_request = Map.put(payload, "pull_request", corrupt_pull)
+        {:error, :validating_github_pull_request, _changeset} = Sync.pull_request_event(corrupt_pull_request)
+      end
+
     end)
   end
 
   describe "pull_request_event/1 " do
     @payload load_event_fixture("pull_request_opened")
-    test "fails with validation error if pull request is invalid" do
-      project = insert(:project)
-      insert(:github_repo, github_id: @payload["repository"]["id"], project: project)
-      insert(:task_list, project: project, done: true)
-      insert(:task_list, project: project, inbox: true)
-      insert(:task_list, project: project, pull_requests: true)
 
-      %{"pull_request" => pull} = @payload
-      corrupt_pull =  %{pull | "created_at" => nil,  "updated_at" => nil, "html_url" => nil, "locked" => nil,
-      "number" => nil, "state" =>  nil, "title" => nil }
-      corrupt_pull_request = Map.put(@payload, "pull_request", corrupt_pull)
-      {:error, :validating_github_pull_request, _changeset} = Sync.pull_request_event(corrupt_pull_request)
-    end
 
     test "fails with validation error if task_list isn't found" do
       project = insert(:project)
