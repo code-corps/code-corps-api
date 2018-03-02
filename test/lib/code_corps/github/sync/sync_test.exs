@@ -37,6 +37,11 @@ defmodule CodeCorps.GitHub.SyncTest do
         insert(:task_list, project: project, pull_requests: true)
         {:ok, _map} = Sync.pull_request_event(payload)
       end
+
+      test "fails if repo not found when " <> @event do
+        payload = load_event_fixture(@event)
+        {:error, :repo_not_found} = Sync.pull_request_event(payload)
+      end
     end)
   end
 
