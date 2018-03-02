@@ -24,21 +24,26 @@ defmodule CodeCorps.GitHub.SyncTest do
 
   alias Ecto.Changeset
 
-  describe "pull_request_event/1 opened" do
+  describe "pull_request_event" do
+    ["pull_request_opened","pull_request_closed","pull_request_edited", "pull_request_opened_by_bot","pull_request_reopened"]
+    |> Enum.each(fn payload_name ->
+    @event payload_name
+      test  "runs succesfully when " <> @event do
+        payload = load_event_fixture(@event)
+        project = insert(:project)
+        insert(:github_repo, github_id: payload["repository"]["id"], project: project)
+        insert(:task_list, project: project, done: true)
+        insert(:task_list, project: project, inbox: true)
+        insert(:task_list, project: project, pull_requests: true)
+        {:ok, _map} = Sync.pull_request_event(payload)
+      end
+    end)
+  end
+
+  describe "pull_request_event/1 " do
     @payload load_event_fixture("pull_request_opened")
 
-    test "syncs correctly with valid data when opening" do
-      project = insert(:project)
-      insert(:github_repo, github_id: @payload["repository"]["id"], project: project)
-      insert(:task_list, project: project, done: true)
-      insert(:task_list, project: project, inbox: true)
-      insert(:task_list, project: project, pull_requests: true)
-      {:ok, _map} = Sync.pull_request_event(@payload)
-    end
 
-    test "fails if repo is not found when syncing" do
-      {:error, :repo_not_found} = Sync.pull_request_event(@payload)
-    end
 
     test "fails if api errors out" do
       project = insert(:project)
