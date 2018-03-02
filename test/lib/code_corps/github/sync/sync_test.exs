@@ -42,26 +42,25 @@ defmodule CodeCorps.GitHub.SyncTest do
         payload = load_event_fixture(@event)
         {:error, :repo_not_found} = Sync.pull_request_event(payload)
       end
+
+      test "fails if api errors out when " <> @event do
+        payload = load_event_fixture(@event)
+        project = insert(:project)
+        insert(:github_repo, github_id: payload["repository"]["id"], project: project)
+        insert(:task_list, project: project, done: true)
+        insert(:task_list, project: project, inbox: true)
+        insert(:task_list, project: project, pull_requests: true)
+
+        with_mock_api(CodeCorps.GitHub.FailureAPI) do
+          assert {:error, :fetching_issue, _error} = Sync.pull_request_event(payload)
+        end
+      end
+
     end)
   end
 
   describe "pull_request_event/1 " do
     @payload load_event_fixture("pull_request_opened")
-
-
-
-    test "fails if api errors out" do
-      project = insert(:project)
-      insert(:github_repo, github_id: @payload["repository"]["id"], project: project)
-      insert(:task_list, project: project, done: true)
-      insert(:task_list, project: project, inbox: true)
-      insert(:task_list, project: project, pull_requests: true)
-
-      with_mock_api(CodeCorps.GitHub.FailureAPI) do
-        assert {:error, :fetching_issue, _error} = Sync.pull_request_event(@payload)
-      end
-    end
-
     test "fails with validation error if pull request is invalid" do
       project = insert(:project)
       insert(:github_repo, github_id: @payload["repository"]["id"], project: project)
