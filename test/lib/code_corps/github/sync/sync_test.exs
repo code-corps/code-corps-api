@@ -71,20 +71,17 @@ defmodule CodeCorps.GitHub.SyncTest do
         {:error, :validating_github_pull_request, _changeset} = Sync.pull_request_event(corrupt_pull_request)
       end
 
+      test "fails with validation error if task_list isn't found " <> @event do
+        payload = load_event_fixture(@event)
+        project = insert(:project)
+        insert(:github_repo, github_id: payload["repository"]["id"], project: project)
+        {:error, :validating_task, _changeset} = Sync.pull_request_event(payload)
+      end
+
     end)
   end
 
-  describe "pull_request_event/1 " do
-    @payload load_event_fixture("pull_request_opened")
-
-
-    test "fails with validation error if task_list isn't found" do
-      project = insert(:project)
-      insert(:github_repo, github_id: @payload["repository"]["id"], project: project)
-      {:error, :validating_task, _changeset} = Sync.pull_request_event(@payload)
-    end
-  end
-
+ describe "installation_repositories_event/1 added" do
 
   # Some clauses defined seem difficult or impossible to reach so their tests were omitted
   # - {:error, :validation_error_on_syncing_installation, Changeset.t()}
