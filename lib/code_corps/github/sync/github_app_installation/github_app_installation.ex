@@ -1,7 +1,7 @@
 defmodule CodeCorps.GitHub.Sync.GithubAppInstallation do
   import Ecto.Query
 
-  alias CodeCorps.{GithubAppInstallation, GitHub.Sync, Repo, User}
+  alias CodeCorps.{GithubAppInstallation, Analytics.SegmentTracker, GitHub.Sync, Repo, User}
   alias Ecto.Changeset
 
   @type commit_result ::
@@ -53,11 +53,15 @@ defmodule CodeCorps.GitHub.Sync.GithubAppInstallation do
   @spec sync_unmatched(map, User.t() | nil) ::
     commit_result() | {:error, :multiple_unprocessed_installations_found}
   defp sync_unmatched(%{} = payload, nil) do
+    track_installed_from_github(nil, payload)
+
     payload |> create_installation()
   end
   defp sync_unmatched(%{} = payload, %User{} = user) do
     case user |> find_unprocessed_installations() do
       [] ->
+        track_installed_from_github(user, payload)
+
         create_installation(payload, user)
 
       [%GithubAppInstallation{} = installation] ->
@@ -88,6 +92,7 @@ defmodule CodeCorps.GitHub.Sync.GithubAppInstallation do
 
   @spec create_installation(map, User.t() | nil) :: commit_result()
   defp create_installation(%{} = payload, user \\ nil) do
+
     payload
     |> Sync.GithubAppInstallation.Changeset.create_changeset(user)
     |> Repo.insert()
@@ -98,5 +103,14 @@ defmodule CodeCorps.GitHub.Sync.GithubAppInstallation do
     installation
     |> Sync.GithubAppInstallation.Changeset.update_changeset(payload)
     |> Repo.update()
+  end
+
+  @spec track_installed_from_github(User.t | nil, map) :: any
+  defp track_installed_from_github(%User{id: user_id}, %{"installation" => installation} = _payload) do
+    user_id |> SegmentTracker.track("Installed from GitHub", struct(%GithubAppInstallation{}, installation))
+  end
+
+  defp track_installed_from_github(nil, %{"installation" => installation, "sender" => sender} = _payload) do
+    sender["id"] |> SegmentTracker.track("Installed from github by anon user", struct(%GithubAppInstallation{}, installation))
   end
 end
