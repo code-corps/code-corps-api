@@ -24,13 +24,13 @@ defmodule CodeCorps.GitHub.SyncTest do
 
   alias Ecto.Changeset
 
-  @doc """
-  Some clauses defined seem difficult or impossible to reach so their tests were ommitted
-    - {:error, :validation_error_on_syncing_installation, Changeset.t()}
-    - {:error, :validation_error_on_marking_installation_processed, Changeset.t()}
-    - {:error, :unexpected_transaction_outcome, any}
-  However, if these clauses can be caused by some updates upstream we should cover them with tests
-  """
+
+  # Some clauses defined seem difficult or impossible to reach so their tests were omitted
+  # - {:error, :validation_error_on_syncing_installation, Changeset.t()}
+  # - {:error, :validation_error_on_marking_installation_processed, Changeset.t()}
+  # - {:error, :unexpected_transaction_outcome, any}
+  # However, if these clauses can be caused by some updates upstream we should cover them with tests
+
   describe "installation_event" do
 
     @payload load_event_fixture("installation_created")
@@ -64,7 +64,7 @@ defmodule CodeCorps.GitHub.SyncTest do
     end
   end
 
-  
+
 
   describe "installation_repositories_event/1 added" do
     @payload load_event_fixture("installation_repositories_added")
