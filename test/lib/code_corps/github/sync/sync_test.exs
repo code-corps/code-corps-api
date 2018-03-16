@@ -24,8 +24,49 @@ defmodule CodeCorps.GitHub.SyncTest do
 
   alias Ecto.Changeset
 
-  describe "installation_repositories_event/1 added" do
 
+  # Some clauses defined seem difficult or impossible to reach so their tests were omitted
+  # - {:error, :validation_error_on_syncing_installation, Changeset.t()}
+  # - {:error, :validation_error_on_marking_installation_processed, Changeset.t()}
+  # - {:error, :unexpected_transaction_outcome, any}
+  # However, if these clauses can be caused by some updates upstream we should cover them with tests
+
+  describe "installation_event" do
+
+    @payload load_event_fixture("installation_created")
+
+    test "syncs_correctly_with valid data" do
+      %{"installation" => %{"id" => installation_id}} = @payload
+
+      assert Repo.aggregate(GithubAppInstallation, :count, :id) == 0
+
+      {:ok, installation} = Sync.installation_event(@payload)
+
+
+      assert Repo.aggregate(GithubAppInstallation, :count, :id) == 1
+      assert installation.github_id == installation_id
+    end
+
+    test "fails if multiple installations are unprocessed" do
+      user = insert(:user, github_id: @payload["sender"]["id"])
+      project = insert(:project)
+      attrs = %{project: project, user: user, sender_github_id: user.id, github_id: nil}
+      insert(:github_app_installation, attrs)
+      insert(:github_app_installation, attrs)
+
+      {:error, :multiple_unprocessed_installations_found} = Sync.installation_event(@payload)
+    end
+
+    test "fails on syncing api error" do
+      with_mock_api(CodeCorps.GitHub.FailureAPI) do
+        assert {:error, :github_api_error_on_syncing_repos, _error} = Sync.installation_event(@payload)
+      end
+    end
+  end
+
+
+
+  describe "installation_repositories_event/1 added" do
     @payload load_event_fixture("installation_repositories_added")
 
     test "syncs_correctly when adding" do
