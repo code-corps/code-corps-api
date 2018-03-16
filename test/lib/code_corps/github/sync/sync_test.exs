@@ -81,7 +81,6 @@ defmodule CodeCorps.GitHub.SyncTest do
     end)
   end
 
- describe "installation_repositories_event/1 added" do
 
   # Some clauses defined seem difficult or impossible to reach so their tests were omitted
   # - {:error, :validation_error_on_syncing_installation, Changeset.t()}
