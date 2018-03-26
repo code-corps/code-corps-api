@@ -8,5 +8,5 @@ defmodule CodeCorpsWeb.ConversationView do
   has_one :user, type: "user", field: :user_id
   has_one :message, type: "message", field: :message_id
 
-  has_many :conversation_parts, serializer: CodeCorpsWeb.ConversationPartView, identifiers: :always
+  has_many :conversation_parts, serializer: CodeCorpsWeb.ConversationPartView, include: false, identifiers: :when_included
 end

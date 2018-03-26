@@ -23,12 +23,6 @@ defmodule CodeCorpsWeb.ConversationPartViewTest do
               "id" => conversation_part.author_id |> Integer.to_string,
               "type" => "user"
             }
-          },
-          "conversation" => %{
-            "data" => %{
-              "id" => conversation_part.conversation_id |> Integer.to_string,
-              "type" => "conversation"
-            }
           }
         }
       },

@@ -23,9 +23,9 @@ defmodule CodeCorpsWeb.ConversationController do
   @spec show(Conn.t, map) :: Conn.t
   def show(%Conn{} = conn, %{"id" => id}) do
     with %User{} = current_user <- conn |> CodeCorps.Guardian.Plug.current_resource,
-      %Conversation{} = conversation <- Messages.get_conversation(id) |> preload(),
+      %Conversation{} = conversation <- Messages.get_conversation(id) |> preload_show(),
       {:ok, :authorized} <- current_user |> Policy.authorize(:show, conversation, %{}) do
-      conn |> render("show.json-api", data: conversation)
+      conn |> render("show.json-api", data: conversation, opts: [include: "conversation_parts"])
     end
   end
 
@@ -41,9 +41,14 @@ defmodule CodeCorpsWeb.ConversationController do
     end
   end
 
-  @preloads [:conversation_parts, :message, :user]
+  @preloads [:message, :user]
+  @preloads_show [:message, :user, conversation_parts: [:author]]
 
   def preload(data) do
     Repo.preload(data, @preloads)
+  end
+
+  def preload_show(data) do
+    Repo.preload(data, @preloads_show)
   end
 end
