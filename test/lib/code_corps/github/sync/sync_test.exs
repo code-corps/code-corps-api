@@ -908,6 +908,12 @@ defmodule CodeCorps.GitHub.SyncTest do
       assert Repo.aggregate(Task, :count, :id) == 8
       assert Repo.aggregate(User, :count, :id) == 13
 
+      # Simulate disconnecting the repo and updating a task locally
+
+      [task | _] = Repo.all(Task, limit: 1)
+      changeset = Task.update_changeset(task, %{title: "New title", updated_from: "codecorps"})
+      Repo.update!(changeset)
+
       # Sync a second time – should run without trouble
 
       Sync.sync_repo(github_repo)
