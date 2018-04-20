@@ -6,6 +6,11 @@ defmodule CodeCorps.Analytics.TestAPI do
   Each function should have the same signature as `CodeCorps.Analytics.SegmentAPI` and simply return `nil`.
   """
 
+  def alias(user_id, previous_id) do
+    send self(), {:alias, user_id, previous_id}
+    nil
+  end
+
   def identify(user_id, traits) do
     send self(), {:identify, user_id, traits}
     nil

@@ -8,20 +8,21 @@ defmodule CodeCorpsWeb.UserControllerTest do
   alias CodeCorps.{User, Repo}
 
   @valid_attrs %{
+    biography: "Just a test user",
     email: "test@user.com",
-    username: "testuser",
     first_name: "Test",
     last_name: "User",
-    website: "http://www.example.com",
+    previous_id: "abc123",
     twitter: "testuser",
-    biography: "Just a test user"
+    username: "testuser",
+    website: "http://www.example.com"
   }
 
   @invalid_attrs %{
     email: "",
+    twitter: " @ testuser",
     username: "",
-    website: "---_<>-blank.com",
-    twitter: " @ testuser"
+    website: "---_<>-blank.com"
   }
 
   @relationships %{}
@@ -134,6 +135,8 @@ defmodule CodeCorpsWeb.UserControllerTest do
         }
       }
       id = json_response(conn, 201)["data"]["id"] |> String.to_integer
+      previous_id = @valid_attrs.previous_id
+      assert_received {:alias, ^id, ^previous_id}
       assert_received {:track, ^id, "Signed Up", %{}}
     end
 
@@ -192,7 +195,6 @@ defmodule CodeCorpsWeb.UserControllerTest do
         |> put(path, params)
 
       id = json_response(conn, 200)["data"]["id"] |> String.to_integer
-      assert_received {:identify, ^id, %{email: "original@mail.com"}}
       assert_received {:track, ^id, "Updated Profile", %{}}
     end
 
