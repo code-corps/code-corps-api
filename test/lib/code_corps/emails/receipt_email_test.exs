@@ -4,6 +4,12 @@ defmodule CodeCorps.Emails.ReceiptEmailTest do
 
   alias CodeCorps.Emails.ReceiptEmail
 
+
+  test "get name returns there on nil name" do
+    user = %CodeCorps.User{}
+    assert ReceiptEmail.get_name(user) == "there"
+  end
+
   test "receipt email works" do
     invoice_fixture = CodeCorps.StripeTesting.Helpers.load_fixture("invoice")
 
@@ -50,7 +56,7 @@ defmodule CodeCorps.Emails.ReceiptEmailTest do
       project_title: "Code Corps",
       project_url: "http://localhost:4200/#{project.organization.slug}/#{project.slug}",
       project_current_donation_goal_description: "Test goal",
-      subject: "Your monthly donation to Code Corps"
+      subject: "Your monthly donation to Code Corps",
     }
     assert high_five_image_url
   end

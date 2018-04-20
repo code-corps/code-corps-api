@@ -34,6 +34,6 @@ defmodule CodeCorps.Conversation do
   end
 
   defp statuses do
-    ~w{ open closed }
+    ~w{ open closed reopened }
   end
 end

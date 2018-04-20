@@ -242,6 +242,37 @@ defmodule CodeCorps.MessagesTest do
       assert result.id == conversation.id
     end
   end
+  
+  describe "update_conversation/2" do
+
+    test "creates a conversation_part of part_type reopened when a conversation is reopened" do
+      conversation = insert(:conversation)
+      
+      assert Repo.aggregate(ConversationPart, :count, :id) == 0
+      conversation = Messages.get_conversation(conversation.id)            
+      {_ok, _updated} = Messages.update_conversation(conversation,%{status: "reopened"})
+  
+      assert Repo.aggregate(ConversationPart, :count, :id) == 1
+      
+      conversation_part = Repo.get_by(ConversationPart, part_type: "reopened")
+      assert conversation_part.author_id == conversation.user_id 
+      assert conversation_part.conversation_id == conversation.id
+    end
+    
+    test "creates a conversation_part of part_type closed when a conversation is closed" do
+      conversation = insert(:conversation)
+      
+      assert Repo.aggregate(ConversationPart, :count, :id) == 0
+      conversation = Messages.get_conversation(conversation.id)            
+      {_ok, _updated} = Messages.update_conversation(conversation,%{status: "closed"})
+  
+      assert Repo.aggregate(ConversationPart, :count, :id) == 1
+      
+      conversation_part = Repo.get_by(ConversationPart, part_type: "closed")
+      assert conversation_part.author_id == conversation.user_id 
+      assert conversation_part.conversation_id == conversation.id
+    end
+  end 
 
   describe "get_part/1" do
     test "gets a single part" do
